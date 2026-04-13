@@ -75,7 +75,7 @@ async function getDashboardData(authorId: string) {
     planName: plan?.plan?.name ?? "Free",
     planFeatures: plan?.plan
       ? [
-          plan.plan.maxBooks === -1 ? "Unlimited books" : `Up to ${plan.plan.maxBooks} books`,
+          (plan.plan.maxBooks === -1 || plan.plan.maxBooks === null) ? "Unlimited books" : `Up to ${plan.plan.maxBooks} books`,
           plan.plan.customDomain ? "Custom domain" : null,
           plan.plan.salesEnabled ? "Sales enabled" : null,
         ].filter(Boolean)
