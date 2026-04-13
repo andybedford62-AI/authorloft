@@ -1,31 +1,21 @@
 /**
- * Thin Nodemailer wrapper.
- * Requires these env vars to actually send mail:
- *   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
- * Optional:
- *   SMTP_FROM  (defaults to SMTP_USER)
- *   SMTP_SECURE ("true" to force TLS; defaults to port 465 detection)
+ * Email sender using Resend.
+ * Requires: RESEND_API_KEY environment variable.
  *
- * If the vars are absent the send call is a no-op so the app works
+ * If the var is absent the send call is a no-op so the app works
  * without email configured.
  */
 
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const FROM_ADDRESS = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
 
 export function isSmtpConfigured() {
-  return !!(
-    process.env.SMTP_HOST &&
-    process.env.SMTP_USER &&
-    process.env.SMTP_PASS
-  );
-}
-
-function isConfigured() {
-  return isSmtpConfigured();
+  return !!process.env.RESEND_API_KEY;
 }
 
 function baseUrl() {
-  return (process.env.NEXTAUTH_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  return (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
 }
 
 function wrapHtml(title: string, content: string) {
@@ -61,22 +51,6 @@ function wrapHtml(title: string, content: string) {
   </table>
 </body>
 </html>`;
-}
-
-function createTransport() {
-  const port = parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const secure =
-    process.env.SMTP_SECURE === "true" || port === 465;
-
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
 }
 
 export interface MailOptions {
@@ -142,26 +116,30 @@ export async function sendVerificationEmail(to: string, token: string) {
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**
- * Send an email. Returns true on success, false if SMTP is not configured
- * or the send fails (errors are logged but not thrown so callers continue).
+ * Send an email via Resend. Returns true on success, false if not configured
+ * or send fails (errors are logged but not thrown so callers continue).
  */
 export async function sendMail(opts: MailOptions): Promise<boolean> {
-  if (!isConfigured()) return false;
+  if (!isSmtpConfigured()) {
+    console.warn("[mailer] RESEND_API_KEY not set — email not sent to:", opts.to);
+    return false;
+  }
 
   try {
-    const transport = createTransport();
-    const from =
-      process.env.SMTP_FROM ||
-      `AuthorLoft <${process.env.SMTP_USER}>`;
-
-    await transport.sendMail({
-      from,
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: FROM_ADDRESS,
       to: opts.to,
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
       replyTo: opts.replyTo,
     });
+
+    if (error) {
+      console.error("[mailer] Resend error:", error);
+      return false;
+    }
     return true;
   } catch (err) {
     console.error("[mailer] Failed to send email:", err);
