@@ -91,7 +91,7 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin }: SidebarPr
         <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Your Site</p>
         <p className="text-sm text-white font-medium truncate">{authorName}</p>
         <a
-          href={`http://${authorSlug}.localhost:3000`}
+          href={`https://${authorSlug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-1 transition-colors"
