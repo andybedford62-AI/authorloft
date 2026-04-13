@@ -1,0 +1,421 @@
+// BookStage - Multi-tenant SaaS Author Platform
+// Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Plans & Billing ─────────────────────────────────────────────────────────
+
+enum PlanTier {
+  FREE
+  STANDARD
+  PREMIUM
+}
+
+model Plan {
+  id                String    @id @default(cuid())
+  name              String
+  tier              PlanTier  @unique
+  stripePriceId     String?
+  maxBooks          Int       @default(5)       // -1 = unlimited
+  maxStorageMb      Int       @default(100)     // -1 = unlimited
+  customDomain      Boolean   @default(false)
+  salesEnabled      Boolean   @default(false)
+  flipBooksEnabled  Boolean   @default(false)
+  analyticsEnabled  Boolean   @default(false)
+  monthlyPriceCents Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  authors           Author[]
+}
+
+// ─── Authors (Tenants) ────────────────────────────────────────────────────────
+
+model Author {
+  id                  String         @id @default(cuid())
+  email               String         @unique
+  passwordHash        String?
+  name                String
+  displayName         String?
+  slug                String         @unique   // used as subdomain: slug.bookstage.com
+  customDomain        String?        @unique
+  bio                 String?        @db.Text
+  shortBio            String?
+  profileImageUrl     String?
+  heroImageUrl        String?
+  heroTitle           String?
+  heroSubtitle        String?
+  accentColor         String         @default("#7B2D2D")  // from curated palette
+  tagline             String?
+  linkedinUrl         String?
+  youtubeUrl          String?
+  facebookUrl         String?
+  twitterUrl          String?
+  instagramUrl        String?
+  contactEmail        String?
+  aboutStats          Json?          // [{value:"40+", label:"Years Diving"}, ...]
+  credentials         Json?          // ["PADI Certified", "SDI Member", ""] — up to 3 credential pill labels
+  showHeroBanner      Boolean        @default(true)
+  homeTemplate        String         @default("classic") // "classic" | "minimal" | "bold"
+  // ── Navigation visibility toggles ─────────────────────────────────────────
+  navShowAbout        Boolean        @default(true)
+  navShowBooks        Boolean        @default(true)
+  navShowSpecials     Boolean        @default(true)
+  navShowFlipBooks    Boolean        @default(true)
+  navShowBlog         Boolean        @default(false)
+  navShowContact      Boolean        @default(true)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  planId              String?
+  plan                Plan?          @relation(fields: [planId], references: [id])
+  isActive            Boolean        @default(true)
+  isSuperAdmin        Boolean        @default(false)
+  emailVerified       DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  books               Book[]
+  genres              Genre[]
+  series              Series[]
+  subscribers         Subscriber[]
+  orders              Order[]
+  sessions            Session[]
+  accounts            Account[]
+  specials            Special[]
+  pages               AuthorPage[]
+  posts               Post[]
+  contactMessages     ContactMessage[]
+  subscription        AuthorSubscription?
+
+  @@index([slug])
+  @@index([customDomain])
+}
+
+// ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  authorId     String
+  expires      DateTime
+  author       Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  authorId          String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  author            Author  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Genre / Category (unlimited nesting) ────────────────────────────────────
+
+model Genre {
+  id          String   @id @default(cuid())
+  authorId    String
+  name        String
+  slug        String
+  description String?
+  parentId    String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent      Genre?   @relation("GenreChildren", fields: [parentId], references: [id])
+  children    Genre[]  @relation("GenreChildren")
+  books       BookGenre[]
+
+  @@unique([authorId, slug, parentId])
+  @@index([authorId])
+}
+
+// ─── Series ───────────────────────────────────────────────────────────────────
+
+model Series {
+  id          String   @id @default(cuid())
+  authorId    String
+  name        String
+  slug        String
+  description String?  @db.Text
+  coverUrl    String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  books       Book[]
+
+  @@unique([authorId, slug])
+  @@index([authorId])
+}
+
+// ─── Books ────────────────────────────────────────────────────────────────────
+
+model Book {
+  id                String      @id @default(cuid())
+  authorId          String
+  seriesId          String?
+  title             String
+  slug              String
+  subtitle          String?
+  description       String?     @db.Text
+  shortDescription  String?
+  coverImageUrl     String?
+  publishedAt       DateTime?
+  isbn              String?
+  pageCount         Int?
+  language          String      @default("en")
+  priceCents        Int         @default(0)    // 0 = free; managed via DirectSaleItems going forward
+  stripePriceId     String?
+  fileUrl           String?     // S3 key for purchased download
+  flipBookUrl       String?     // S3 key for flip book PDF
+  externalBuyUrl    String?     // Amazon or other retailer link
+  availableFormats  String[]    // e.g. ["EBOOK","PAPERBACK","HARDBACK","AUDIOBOOK"]
+  caption           String?     // e.g. "New Release!", "Coming Soon!" — shown on public pages
+  releaseDate       DateTime?   // Public-facing release date shown on book pages
+  isFeatured          Boolean     @default(false)
+  isPublished         Boolean     @default(true)
+  directSalesEnabled  Boolean     @default(false)  // show built-in checkout buy button
+  sortOrder         Int         @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  author            Author      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  series            Series?     @relation(fields: [seriesId], references: [id])
+  genres            BookGenre[]
+  orderItems        OrderItem[]
+  retailerLinks     BookRetailerLink[]
+  directSaleItems   BookDirectSaleItem[]
+  views             Int      @default(0)
+
+  @@unique([authorId, slug])
+  @@index([authorId])
+  @@index([seriesId])
+}
+
+// ─── Direct Sale Items (per-format pricing) ───────────────────────────────────
+
+enum DirectSaleFormat {
+  EBOOK
+  FLIPBOOK
+  PRINT
+}
+
+model BookDirectSaleItem {
+  id          String           @id @default(cuid())
+  bookId      String
+  book        Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  format      DirectSaleFormat
+  label       String           // e.g. "eBook", "Flip Book", "Signed Paperback"
+  description String?          // optional short note shown to buyers
+  priceCents  Int              @default(0)
+  isActive    Boolean          @default(true)
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([bookId])
+}
+
+// ─── Retailer Buy Links ───────────────────────────────────────────────────────
+
+model BookRetailerLink {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  retailer  String   // e.g. "amazon", "barnes_noble", "goodreads", "kobo", "custom" …
+  label     String   // display text on the button, e.g. "Buy on Amazon"
+  url       String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+}
+
+model BookGenre {
+  bookId  String
+  genreId String
+  book    Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, genreId])
+}
+
+// ─── Specials / Promotions ────────────────────────────────────────────────────
+
+model Special {
+  id          String    @id @default(cuid())
+  authorId    String
+  title       String
+  description String?   @db.Text
+  imageUrl    String?
+  ctaLabel    String?
+  ctaUrl      String?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+}
+
+// ─── Custom Pages ─────────────────────────────────────────────────────────────
+
+model AuthorPage {
+  id          String   @id @default(cuid())
+  authorId    String
+  slug        String   // e.g. "my-story", "events" — used as /[slug] on public site
+  title       String   // page heading
+  navTitle    String?  // optional shorter label for nav menu (falls back to title)
+  content     String?  @db.Text  // rich/markdown content
+  isVisible   Boolean  @default(true)   // page is publicly accessible
+  showInNav   Boolean  @default(true)   // appear in navigation menu
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, slug])
+}
+
+// ─── Blog / News Posts ────────────────────────────────────────────────────────
+
+model Post {
+  id            String    @id @default(cuid())
+  authorId      String
+  title         String
+  slug          String
+  excerpt       String?   @db.Text   // short teaser shown on listing page
+  content       String?   @db.Text   // full post body
+  coverImageUrl String?
+  publishedAt   DateTime?
+  isPublished   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  author        Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  views         Int       @default(0)
+
+  @@unique([authorId, slug])
+  @@index([authorId])
+}
+
+// ─── Newsletter Subscribers ───────────────────────────────────────────────────
+
+model Subscriber {
+  id              String    @id @default(cuid())
+  authorId        String
+  name            String?
+  email           String
+  categoryPrefs   String[]  // genre/category interests stored as array of genre IDs
+  isConfirmed     Boolean   @default(false)
+  confirmToken    String?   @unique
+  unsubscribeToken String   @default(cuid())
+  subscribedAt    DateTime  @default(now())
+  author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, email])
+  @@index([authorId])
+}
+
+// ─── Orders & Sales ───────────────────────────────────────────────────────────
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}
+
+model Order {
+  id                   String      @id @default(cuid())
+  authorId             String      // which author's store
+  customerEmail        String
+  customerName         String?
+  stripeSessionId      String?     @unique
+  stripePaymentIntentId String?
+  totalCents           Int
+  status               OrderStatus @default(PENDING)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  author               Author      @relation(fields: [authorId], references: [id])
+  items                OrderItem[]
+
+  @@index([authorId])
+  @@index([customerEmail])
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  orderId          String
+  bookId           String
+  priceCents       Int
+  downloadToken    String   @default(cuid())
+  downloadCount    Int      @default(0)
+  maxDownloads     Int      @default(5)
+  downloadExpiry   DateTime?
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book             Book     @relation(fields: [bookId], references: [id])
+
+  @@index([orderId])
+  @@index([downloadToken])
+}
+
+// ─── Contact Messages ─────────────────────────────────────────────────────────
+
+model ContactMessage {
+  id          String   @id @default(cuid())
+  authorId    String
+  senderName  String
+  senderEmail String
+  website     String?
+  subject     String?
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, createdAt])
+  @@index([authorId, isRead])
+}
+
+// ─── Platform Settings (singleton) ───────────────────────────────────────────
+// Stores platform-wide content like Privacy Policy and Terms of Service.
+// Always upsert with id = "singleton".
+
+model PlatformSettings {
+  id               String    @id @default("singleton")
+  privacyContent   String?   @db.Text   // editable Privacy Policy body
+  privacyUpdatedAt DateTime?            // stamped when admin publishes privacy update
+  termsContent     String?   @db.Text   // editable Terms of Service body
+  termsUpdatedAt   DateTime?            // stamped when admin publishes terms update
+  contactEmail     String?              // platform contact e-mail address
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}

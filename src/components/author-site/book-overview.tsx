@@ -1,0 +1,40 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+interface BookOverviewProps {
+  text: string;
+  accentColor: string;
+}
+
+export function BookOverview({ text, accentColor }: BookOverviewProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="mt-12 max-w-2xl">
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Book Overview</h2>
+
+      <div
+        className={`text-gray-600 leading-relaxed whitespace-pre-line overflow-hidden transition-all duration-300 ${
+          expanded ? "" : "line-clamp-2"
+        }`}
+      >
+        {text}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="mt-2 inline-flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
+        style={{ color: accentColor }}
+      >
+        {expanded ? (
+          <>Less <ChevronUp className="h-3.5 w-3.5" /></>
+        ) : (
+          <>More <ChevronDown className="h-3.5 w-3.5" /></>
+        )}
+      </button>
+    </div>
+  );
+}

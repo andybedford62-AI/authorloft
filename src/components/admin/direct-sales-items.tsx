@@ -1,0 +1,517 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package,
+} from "lucide-react";
+
+// ── Format config ─────────────────────────────────────────────────────────────
+
+type FormatKey = "EBOOK" | "FLIPBOOK" | "PRINT";
+
+const FORMATS: Record<FormatKey, {
+  label: string;
+  description: string;
+  defaultLabel: string;
+  icon: React.ReactNode;
+  color: string;
+  bg: string;
+}> = {
+  EBOOK: {
+    label: "eBook",
+    description: "Digital download (PDF, ePub, MOBI)",
+    defaultLabel: "eBook",
+    icon: <BookOpen className="h-4 w-4" />,
+    color: "#2563eb",
+    bg: "#eff6ff",
+  },
+  FLIPBOOK: {
+    label: "Flip Book",
+    description: "Interactive online flip-book edition",
+    defaultLabel: "Flip Book",
+    icon: <Film className="h-4 w-4" />,
+    color: "#7c3aed",
+    bg: "#f5f3ff",
+  },
+  PRINT: {
+    label: "Print / Physical",
+    description: "Paperback or hardcover",
+    defaultLabel: "Paperback",
+    icon: <Package className="h-4 w-4" />,
+    color: "#059669",
+    bg: "#ecfdf5",
+  },
+};
+
+const FORMAT_KEYS = Object.keys(FORMATS) as FormatKey[];
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+type DirectSaleItem = {
+  id: string;
+  format: FormatKey;
+  label: string;
+  description: string | null;
+  priceCents: number;
+  isActive: boolean;
+  sortOrder: number;
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function dollarsTocents(dollars: string): number {
+  const parsed = parseFloat(dollars.replace(/[^0-9.]/g, ""));
+  if (isNaN(parsed)) return 0;
+  return Math.round(parsed * 100);
+}
+
+function centsToDollars(cents: number): string {
+  return (cents / 100).toFixed(2);
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
+export function DirectSalesItems({ bookId }: { bookId: string }) {
+  const [items, setItems] = useState<DirectSaleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Add-form state
+  const [adding, setAdding] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<FormatKey>("EBOOK");
+  const [customLabel, setCustomLabel] = useState("");
+  const [description, setDescription] = useState("");
+  const [priceInput, setPriceInput] = useState("0.00");
+  const [addError, setAddError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  // Inline-edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [editPrice, setEditPrice] = useState("0.00");
+  const [editSaving, setEditSaving] = useState(false);
+
+  // Per-item pending state (toggle / delete)
+  const [pending, setPending] = useState<Record<string, boolean>>({});
+
+  // ── Load ───────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch(`/api/admin/books/${bookId}/direct-sales`)
+      .then((r) => r.json())
+      .then((data) => { setItems(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => { setError("Could not load direct sale items."); setLoading(false); });
+  }, [bookId]);
+
+  // ── Add ────────────────────────────────────────────────────────────────────
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    setAddError("");
+
+    const priceCents = dollarsTocents(priceInput);
+    const label = customLabel.trim() || FORMATS[selectedFormat].defaultLabel;
+
+    setSaving(true);
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        format: selectedFormat,
+        label,
+        description: description.trim() || undefined,
+        priceCents,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setAddError(data.error || "Could not add item.");
+    } else {
+      const created = await res.json();
+      setItems((prev) => [...prev, created]);
+      setCustomLabel("");
+      setDescription("");
+      setPriceInput("0.00");
+      setAdding(false);
+    }
+    setSaving(false);
+  }
+
+  // ── Toggle active ──────────────────────────────────────────────────────────
+  async function toggleActive(item: DirectSaleItem) {
+    setPending((p) => ({ ...p, [item.id]: true }));
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !item.isActive }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    }
+    setPending((p) => ({ ...p, [item.id]: false }));
+  }
+
+  // ── Delete ─────────────────────────────────────────────────────────────────
+  async function deleteItem(id: string, label: string) {
+    if (!confirm(`Remove "${label}"? This cannot be undone.`)) return;
+    setPending((p) => ({ ...p, [id]: true }));
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${id}`, { method: "DELETE" });
+    if (res.ok) setItems((prev) => prev.filter((i) => i.id !== id));
+    setPending((p) => ({ ...p, [id]: false }));
+  }
+
+  // ── Start edit ─────────────────────────────────────────────────────────────
+  function startEdit(item: DirectSaleItem) {
+    setEditingId(item.id);
+    setEditLabel(item.label);
+    setEditDesc(item.description ?? "");
+    setEditPrice(centsToDollars(item.priceCents));
+  }
+
+  // ── Save edit ──────────────────────────────────────────────────────────────
+  async function saveEdit(item: DirectSaleItem) {
+    setEditSaving(true);
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        label: editLabel.trim() || FORMATS[item.format].defaultLabel,
+        description: editDesc.trim() || null,
+        priceCents: dollarsTocents(editPrice),
+      }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setEditingId(null);
+    }
+    setEditSaving(false);
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-semibold text-gray-900">Direct Sales</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Offer different editions directly to readers — eBook, Flip Book, or Print.
+            Each can have its own price and be activated or deactivated independently.
+          </p>
+        </div>
+        {!adding && (
+          <button
+            type="button"
+            onClick={() => setAdding(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add Format
+          </button>
+        )}
+      </div>
+
+      {/* ── Info panel ──────────────────────────────────────────────────────── */}
+      {items.length === 0 && !loading && !adding && (
+        <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
+          <p className="font-medium">How direct sales work</p>
+          <p className="text-blue-600">
+            Add one or more formats (eBook, Flip Book, Print). Each format shows its own buy
+            button on your public book page. Readers click to purchase — your payment
+            and fulfilment settings handle the rest.
+          </p>
+          <p className="text-blue-600 font-medium mt-1">
+            Make sure <em>Direct Sales</em> is enabled in the Book Details section above.
+          </p>
+        </div>
+      )}
+
+      {/* ── Add form ────────────────────────────────────────────────────────── */}
+      {adding && (
+        <form
+          onSubmit={handleAdd}
+          className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4"
+        >
+          <p className="text-sm font-medium text-gray-700">Add a format for direct sale</p>
+
+          {/* Format picker */}
+          <div className="grid grid-cols-3 gap-2">
+            {FORMAT_KEYS.map((key) => {
+              const fmt = FORMATS[key];
+              const active = selectedFormat === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setSelectedFormat(key);
+                    setCustomLabel("");
+                  }}
+                  style={active ? { borderColor: fmt.color, backgroundColor: fmt.bg, color: fmt.color } : {}}
+                  className={`flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors
+                    ${active
+                      ? "shadow-sm"
+                      : "border-gray-200 text-gray-600 bg-white hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                >
+                  <span style={active ? { color: fmt.color } : { color: "#6b7280" }}>
+                    {fmt.icon}
+                  </span>
+                  <span className="text-xs font-semibold">{fmt.label}</span>
+                  <span className="text-[10px] leading-tight text-gray-400">{fmt.description}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Label */}
+            <div className="sm:col-span-2 space-y-1">
+              <label className="text-xs font-medium text-gray-600">
+                Button label{" "}
+                <span className="text-gray-400 font-normal">
+                  (optional — defaults to "{FORMATS[selectedFormat].defaultLabel}")
+                </span>
+              </label>
+              <input
+                type="text"
+                value={customLabel}
+                onChange={(e) => setCustomLabel(e.target.value)}
+                placeholder={FORMATS[selectedFormat].defaultLabel}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
+
+            {/* Price */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600">
+                Price (USD) <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={priceInput}
+                  onChange={(e) => setPriceInput(e.target.value)}
+                  required
+                  className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-600">
+              Short note{" "}
+              <span className="text-gray-400 font-normal">
+                (optional — shown to buyers, e.g. "DRM-free PDF + ePub")
+              </span>
+            </label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="e.g. DRM-free · PDF + ePub included"
+              maxLength={120}
+              className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+          </div>
+
+          {addError && <p className="text-xs text-red-600">{addError}</p>}
+
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+            >
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+              {saving ? "Adding…" : "Add Format"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAdding(false); setAddError(""); setCustomLabel(""); setDescription(""); setPriceInput("0.00"); }}
+              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ── Item list ────────────────────────────────────────────────────────── */}
+      {loading ? (
+        <div className="flex items-center gap-2 text-sm text-gray-400 py-4">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : error ? (
+        <p className="text-sm text-red-600">{error}</p>
+      ) : items.length > 0 ? (
+        <div className="divide-y divide-gray-100">
+          {items.map((item) => {
+            const fmt = FORMATS[item.format] ?? FORMATS.EBOOK;
+            const isBusy = pending[item.id];
+            const isEditing = editingId === item.id;
+
+            return (
+              <div key={item.id} className="py-3 first:pt-0 last:pb-0 space-y-2">
+                {isEditing ? (
+                  /* ── Inline edit form ───────────────────────────────────── */
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2 space-y-1">
+                        <label className="text-xs font-medium text-gray-600">Button label</label>
+                        <input
+                          type="text"
+                          value={editLabel}
+                          onChange={(e) => setEditLabel(e.target.value)}
+                          placeholder={fmt.defaultLabel}
+                          className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-600">Price (USD)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={editPrice}
+                            onChange={(e) => setEditPrice(e.target.value)}
+                            className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
+                      <input
+                        type="text"
+                        value={editDesc}
+                        onChange={(e) => setEditDesc(e.target.value)}
+                        placeholder="e.g. DRM-free · PDF + ePub included"
+                        maxLength={120}
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => saveEdit(item)}
+                        disabled={editSaving}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-60"
+                      >
+                        {editSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                        {editSaving ? "Saving…" : "Save"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(null)}
+                        className="px-3 py-1.5 text-xs rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* ── Row ────────────────────────────────────────────────── */
+                  <div className="flex items-center gap-3">
+                    {/* Format icon */}
+                    <div
+                      className="flex-shrink-0 h-9 w-9 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: fmt.bg, color: fmt.color }}
+                      title={fmt.label}
+                    >
+                      {fmt.icon}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-medium text-gray-800">{item.label}</p>
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          style={{ backgroundColor: fmt.bg, color: fmt.color }}
+                        >
+                          {fmt.label}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-700">
+                          ${centsToDollars(item.priceCents)}
+                        </span>
+                      </div>
+                      {item.description && (
+                        <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
+                      )}
+                    </div>
+
+                    {/* Status badge */}
+                    <span
+                      className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                        item.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      {item.isActive ? "Active" : "Inactive"}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {/* Edit */}
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => startEdit(item)}
+                        className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                      >
+                        Edit
+                      </button>
+
+                      {/* Activate / Deactivate */}
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => toggleActive(item)}
+                        title={item.isActive ? "Deactivate (hides from public site)" : "Activate"}
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
+                          item.isActive
+                            ? "border-amber-200 text-amber-600 hover:bg-amber-50"
+                            : "border-green-200 text-green-600 hover:bg-green-50"
+                        }`}
+                      >
+                        {isBusy ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : item.isActive ? (
+                          <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
+                        ) : (
+                          <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
+                        )}
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => deleteItem(item.id, item.label)}
+                        title="Delete"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                      >
+                        {isBusy ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </section>
+  );
+}

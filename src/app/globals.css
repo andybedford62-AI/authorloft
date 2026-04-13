@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+:root {
+  --accent: #7B2D2D;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: #111827;
+  background: #ffffff;
+}
+
+.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+
+/* ── Rich Text Editor — TipTap ──────────────────────────────────────────────── */
+/* Shared styles for both the admin editor and public page rendering             */
+
+.rich-content h1 { font-size: 2rem; font-weight: 700; line-height: 1.25; margin: 1.25rem 0 0.75rem; color: #111827; }
+.rich-content h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3;  margin: 1.1rem 0 0.6rem;  color: #111827; }
+.rich-content h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin: 1rem 0 0.5rem;   color: #111827; }
+.rich-content h4 { font-size: 1.05rem; font-weight: 600; line-height: 1.5; margin: 0.9rem 0 0.4rem; color: #111827; }
+.rich-content p  { margin: 0.6rem 0; line-height: 1.75; color: #374151; }
+.rich-content p:first-child { margin-top: 0; }
+.rich-content p:last-child  { margin-bottom: 0; }
+.rich-content strong { font-weight: 700; }
+.rich-content em     { font-style: italic; }
+.rich-content u      { text-decoration: underline; }
+.rich-content s      { text-decoration: line-through; }
+.rich-content mark   { background-color: #fef08a; color: inherit; border-radius: 2px; padding: 0 2px; }
+.rich-content a      { color: var(--accent, #2563eb); text-decoration: underline; }
+.rich-content a:hover { opacity: 0.8; }
+.rich-content ul { list-style-type: disc;    padding-left: 1.5rem; margin: 0.75rem 0; }
+.rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.75rem 0; }
+.rich-content li { margin: 0.25rem 0; line-height: 1.7; color: #374151; }
+.rich-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding: 0.5rem 0 0.5rem 1rem;
+  margin: 1rem 0;
+  color: #6b7280;
+  font-style: italic;
+}
+.rich-content hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+.rich-content code {
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 0.875em;
+  font-family: ui-monospace, monospace;
+}
+.rich-content pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.rich-content pre code { background: none; padding: 0; color: inherit; }
+
+/* Text alignment (output by TipTap TextAlign extension) */
+.rich-content [style*="text-align: center"] { text-align: center; }
+.rich-content [style*="text-align: right"]  { text-align: right; }
+.rich-content [style*="text-align: justify"] { text-align: justify; }
+
+/* Font family (output by TipTap TextStyle extension) */
+.rich-content span[style*="font-family"] { font-family: inherit; }
+
+/* TipTap editor area specifics */
+.tiptap-editor .ProseMirror {
+  outline: none;
+  min-height: 320px;
+  padding: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: #111827;
+}
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap-editor .ProseMirror:focus-visible { outline: none; }
+
+/* ── Premium Animations ─────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Hero entrance — applied directly to elements */
+.animate-fade-up {
+  animation: fadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+
+/* Shimmer gradient text for hero accent */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #93c5fd 0%,
+    #e0f2fe 30%,
+    #7dd3fc 50%,
+    #e0f2fe 70%,
+    #93c5fd 100%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Scroll-triggered reveal (toggled by IntersectionObserver) */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-item.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Honour the user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .text-shimmer {
+    animation: none !important;
+    background: none !important;
+    -webkit-text-fill-color: #93c5fd !important;
+  }
+  .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Images inside the editor and on the public blog */
+.rich-content img,
+.tiptap-editor img.rte-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: block;
+}
+.tiptap-editor img.rte-image.ProseMirror-selectednode {
+  outline: 3px solid #3b82f6;
+  border-radius: 8px;
+}
