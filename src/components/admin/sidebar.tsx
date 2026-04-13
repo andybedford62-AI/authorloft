@@ -44,7 +44,7 @@ const authorNavItems = [
   { href: "/admin/sales",       label: "Sales",        icon: ShoppingBag },
   { href: "/admin/appearance",  label: "Appearance",   icon: Paintbrush },
   { href: "/admin/branding",    label: "Branding",     icon: Palette },
-  { href: "/admin/legal",       label: "Legal Notice", icon: Shield },
+  { href: "/admin/legal",       label: "My Site Legal", icon: Shield },
   { href: "/admin/settings",    label: "Settings",     icon: Settings },
 ];
 
