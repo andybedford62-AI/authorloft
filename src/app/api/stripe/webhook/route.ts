@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail } from "@/lib/mailer";
+import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail } from "@/lib/mailer";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -75,11 +75,19 @@ export async function POST(req: NextRequest) {
               where: { orderId: order.id },
               select: {
                 downloadToken: true,
+                priceCents: true,
                 saleItem: { select: { label: true } },
                 book: {
                   select: {
                     title: true,
-                    author: { select: { displayName: true, name: true, slug: true } },
+                    author: {
+                      select: {
+                        displayName: true,
+                        name: true,
+                        slug: true,
+                        email: true,
+                      },
+                    },
                   },
                 },
               },
@@ -88,9 +96,11 @@ export async function POST(req: NextRequest) {
             for (const fi of fullItems) {
               const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
               const authorSlug = fi.book.author.slug;
+              const authorName = fi.book.author.displayName || fi.book.author.name;
+              const authorEmail = fi.book.author.email;
               const downloadUrl = `https://${authorSlug}.${platformDomain}/api/orders/download/${fi.downloadToken}`;
 
-              // Fire-and-forget — don't let email failure break the webhook response
+              // 1. Buyer confirmation email with download link
               sendPurchaseConfirmationEmail({
                 to:             customerEmail,
                 customerName,
@@ -98,9 +108,21 @@ export async function POST(req: NextRequest) {
                 itemLabel:      fi.saleItem?.label ?? "eBook",
                 downloadUrl,
                 downloadExpiry: expiry,
-                authorName:     fi.book.author.displayName || fi.book.author.name,
+                authorName,
                 authorSlug,
-              }).catch((e) => console.error("[webhook] Failed to send confirmation email:", e));
+              }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
+
+              // 2. Author sale notification email
+              sendSaleNotificationEmail({
+                to:            authorEmail,
+                authorName,
+                customerEmail,
+                customerName,
+                bookTitle:     fi.book.title,
+                itemLabel:     fi.saleItem?.label ?? "eBook",
+                priceCents:    fi.priceCents,
+                orderId:       order.id,
+              }).catch((e) => console.error("[webhook] Failed to send author notification:", e));
             }
           }
         }
