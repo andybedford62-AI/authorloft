@@ -12,22 +12,31 @@ export default async function AppearancePage() {
 
   const author = await prisma.author.findUnique({
     where: { id: authorId },
-    select: { homeTemplate: true, slug: true },
+    select: {
+      homeTemplate: true,
+      siteTheme:    true,
+      slug:         true,
+      plan:         { select: { tier: true } },
+    },
   });
 
   if (!author) redirect("/login");
+
+  const tier = author.plan?.tier ?? "FREE";
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Appearance</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Choose a homepage template that fits your style. Changes apply to your live site instantly.
+          Customise the look and feel of your author site — choose a layout template and a colour theme.
         </p>
       </div>
       <AppearanceClient
         currentTemplate={author.homeTemplate ?? "classic"}
+        currentTheme={author.siteTheme ?? "classic-literary"}
         authorSlug={author.slug}
+        planTier={tier}
       />
     </div>
   );
