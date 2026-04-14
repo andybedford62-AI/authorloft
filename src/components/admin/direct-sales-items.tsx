@@ -100,22 +100,54 @@ function FileUploadWidget({
     setUploadError("");
     setUploading(true);
 
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("itemId", item.id);
+    try {
+      // Step 1 — get a signed upload URL from our API (tiny request, no file data)
+      const urlRes = await fetch("/api/admin/upload/book-file-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: item.id, fileName: file.name }),
+      });
 
-    const res = await fetch("/api/admin/upload/book-file", {
-      method: "POST",
-      body: fd,
-    });
+      if (!urlRes.ok) {
+        const data = await urlRes.json().catch(() => ({}));
+        setUploadError(data.error || "Could not start upload. Please try again.");
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setUploadError(data.error || "Upload failed. Please try again.");
-    } else {
-      const data = await res.json();
-      // Merge into item
-      onUpdated({ ...item, fileUrl: data.url, fileKey: data.fileKey, fileName: data.fileName });
+      const { signedUrl, fileKey } = await urlRes.json();
+
+      // Step 2 — upload file directly from browser to Supabase (bypasses Vercel size limit)
+      const uploadRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        const text = await uploadRes.text().catch(() => uploadRes.statusText);
+        setUploadError(`Upload failed (${uploadRes.status}): ${text}`);
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      // Step 3 — tell our API the upload is done so it can record fileKey in DB
+      const completeRes = await fetch("/api/admin/upload/book-file-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: item.id, fileKey, fileName: file.name }),
+      });
+
+      if (!completeRes.ok) {
+        const data = await completeRes.json().catch(() => ({}));
+        setUploadError(data.error || "File uploaded but could not save. Please try again.");
+      } else {
+        onUpdated({ ...item, fileUrl: fileKey, fileKey, fileName: file.name });
+      }
+    } catch (err: any) {
+      setUploadError(err?.message ?? "Unexpected error. Please try again.");
     }
 
     setUploading(false);

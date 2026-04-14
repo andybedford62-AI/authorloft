@@ -61,6 +61,55 @@ export async function uploadToSupabaseStorage(
 }
 
 /**
+ * Generate a signed UPLOAD URL so the browser can upload a file directly to
+ * Supabase Storage without going through the Next.js/Vercel function.
+ * This bypasses Vercel's 4.5 MB body limit — essential for large book files.
+ *
+ * @param bucket  Bucket name, e.g. "book-files"
+ * @param path    Object path inside the bucket
+ * @returns       { signedUrl, path } — signedUrl is the URL the browser POSTs the file to
+ */
+export async function getSupabaseUploadUrl(
+  bucket: string,
+  path: string
+): Promise<{ signedUrl: string; path: string }> {
+  if (!SUPABASE_URL || !SERVICE_KEY) {
+    throw new Error(
+      "Supabase Storage is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/upload/sign/${bucket}/${path}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${SERVICE_KEY}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`Supabase signed upload URL failed (${res.status}): ${text}`);
+  }
+
+  const json = await res.json();
+  // Supabase returns { signedURL: "/storage/v1/object/upload/sign/bucket/path?token=..." }
+  const signedPath: string = json.signedURL ?? json.signedUrl;
+  if (!signedPath) {
+    throw new Error(`Missing signedURL in response: ${JSON.stringify(json)}`);
+  }
+
+  const signedUrl = signedPath.startsWith("http")
+    ? signedPath
+    : `${SUPABASE_URL}${signedPath}`;
+
+  return { signedUrl, path };
+}
+
+/**
  * Generate a short-lived signed URL for a private Supabase Storage object.
  * Use this for delivering book files to paying customers — the bucket must be private.
  *
