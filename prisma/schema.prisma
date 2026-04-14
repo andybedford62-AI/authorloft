@@ -271,8 +271,12 @@ model BookDirectSaleItem {
   priceCents  Int              @default(0)
   isActive    Boolean          @default(true)
   sortOrder   Int              @default(0)
+  fileUrl     String?          // Supabase storage URL (for display / reference)
+  fileKey     String?          // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
+  fileName    String?          // Original filename shown in admin UI
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  orderItems  OrderItem[]
 
   @@index([bookId])
 }
@@ -451,16 +455,19 @@ model Order {
 }
 
 model OrderItem {
-  id             String    @id @default(cuid())
+  id             String              @id @default(cuid())
   orderId        String
   bookId         String
+  saleItemId     String?             // links to BookDirectSaleItem — which format was purchased
   priceCents     Int
-  downloadToken  String    @default(cuid())
-  downloadCount  Int       @default(0)
-  maxDownloads   Int       @default(5)
+  fileKey        String?             // Supabase storage path — copied at purchase time for secure delivery
+  downloadToken  String              @default(cuid())
+  downloadCount  Int                 @default(0)
+  maxDownloads   Int                 @default(5)
   downloadExpiry DateTime?
-  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  book           Book      @relation(fields: [bookId], references: [id])
+  order          Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book           Book                @relation(fields: [bookId], references: [id])
+  saleItem       BookDirectSaleItem? @relation(fields: [saleItemId], references: [id])
 
   @@index([orderId])
   @@index([downloadToken])
