@@ -62,10 +62,15 @@ export async function POST(req: NextRequest) {
     const successUrl = `${baseUrl}/books/${book.slug}/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl  = `${baseUrl}/books/${book.slug}/buy?item=${saleItemId}`;
 
-    // Create Stripe Checkout session
+    // Create Stripe Checkout session with automatic tax collection
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
+      // Collect billing address so Stripe Tax can calculate the correct rate
+      billing_address_collection: "required",
+      // Stripe Tax — automatically calculates sales tax / VAT / GST by location
+      // Requires Stripe Tax to be enabled in your Stripe dashboard (Dashboard → Tax)
+      automatic_tax: { enabled: true },
       line_items: [
         {
           price_data: {
@@ -74,6 +79,8 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: `${book.title} — ${saleItem.label}`,
               ...(saleItem.description ? { description: saleItem.description } : {}),
+              // Digital goods tax code — tells Stripe Tax this is an eBook/digital product
+              tax_code: "txcd_10401100",
             },
           },
           quantity: 1,
