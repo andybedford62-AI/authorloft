@@ -87,6 +87,7 @@ export async function getSupabaseUploadUrl(
         Authorization: `Bearer ${SERVICE_KEY}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({}), // Supabase requires a body when Content-Type is application/json
     }
   );
 
