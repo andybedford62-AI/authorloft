@@ -6,7 +6,6 @@ import Link from "next/link";
 import { ChevronRight, BookOpen, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookCarousel } from "@/components/author-site/book-carousel";
-import { NewsletterForm } from "@/components/author-site/newsletter-form";
 import type { HomeTemplateProps } from "./types";
 
 // ── Gradient palette for series cards (cycles by index) ──────────────────────
@@ -19,12 +18,10 @@ const SERIES_GRADIENTS = [
   ["#7c3aed", "#db2777"],   // violet → pink
 ];
 
-export function ClassicTemplate({ author, books, series, genreTree }: HomeTemplateProps) {
+export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
   const salesEnabled = author.plan?.salesEnabled ?? false;
-  const flatGenres   = genreTree.flatMap((g) => [g, ...g.children]);
-
   // Hero shows only the single book marked isFeatured in the admin
   const heroBook = books.find((b) => b.isFeatured) ?? null;
 
@@ -256,24 +253,6 @@ export function ClassicTemplate({ author, books, series, genreTree }: HomeTempla
           </div>
         </section>
       )}
-
-      {/* ── Newsletter ───────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <div className="bg-gray-50 rounded-2xl p-8 sm:p-12">
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Stay in the Loop</h2>
-            <p className="text-gray-500 mb-6">
-              Sign up for news about new releases, special offers, and author updates. No spam — ever.
-            </p>
-            <NewsletterForm
-              authorId={author.id}
-              authorSlug={author.slug}
-              accentColor={accentColor}
-              genres={flatGenres.map((g) => ({ id: g.id, name: g.name }))}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* ── Contact CTA ──────────────────────────────────────────────────────── */}
       <section className="py-12" style={{ backgroundColor: accentColor + "15" }}>

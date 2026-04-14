@@ -5,15 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NewsletterForm } from "@/components/author-site/newsletter-form";
 import type { HomeTemplateProps } from "./types";
 
-export function BoldTemplate({ author, books, series, genreTree }: HomeTemplateProps) {
+export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
   const featuredBooks = books.filter((b) => b.isFeatured);
   const heroBooks = (featuredBooks.length > 0 ? featuredBooks : books).slice(0, 4);
   const displayBooks = books.slice(0, 6);
-  const flatGenres = genreTree.flatMap((g) => [g, ...g.children]);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
@@ -181,27 +179,6 @@ export function BoldTemplate({ author, books, series, genreTree }: HomeTemplateP
           </div>
         </section>
       )}
-
-      {/* ── Newsletter ───────────────────────────────────────────────────── */}
-      <section className="py-16" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="max-w-lg">
-            <h2 className="text-2xl font-extrabold text-white mb-1 tracking-tight">
-              Stay in the Loop
-            </h2>
-            <p className="text-white/70 text-sm mb-6">
-              New releases, exclusive updates, and no spam — ever.
-            </p>
-            <NewsletterForm
-              authorId={author.id}
-              authorSlug={author.slug}
-              accentColor="#ffffff"
-              genres={flatGenres.map((g) => ({ id: g.id, name: g.name }))}
-              darkMode
-            />
-          </div>
-        </div>
-      </section>
 
       {/* ── Contact CTA ─────────────────────────────────────────────────── */}
       <section className="py-10 bg-gray-950 border-t border-gray-800">

@@ -5,14 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, BookOpen, BookMarked, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NewsletterForm } from "@/components/author-site/newsletter-form";
 import type { HomeTemplateProps } from "./types";
 
-export function MinimalTemplate({ author, books, series, genreTree }: HomeTemplateProps) {
+export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
   const featuredBooks = books.filter((b) => b.isFeatured);
   const displayBooks = featuredBooks.length > 0 ? featuredBooks.slice(0, 8) : books.slice(0, 8);
-  const flatGenres = genreTree.flatMap((g) => [g, ...g.children]);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
@@ -245,34 +243,7 @@ export function MinimalTemplate({ author, books, series, genreTree }: HomeTempla
         </section>
       )}
 
-      {/* ── 5. Newsletter ───────────────────────────────────────────────── */}
-      <section className="py-16" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="max-w-lg">
-            <p className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em] mb-3">
-              Stay connected
-            </p>
-            <h2
-              className="text-2xl sm:text-3xl font-bold text-white mb-2"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-            >
-              New releases &amp; updates
-            </h2>
-            <p className="text-white/70 text-sm mb-8">
-              Be the first to know about new books, events, and exclusive content. No spam — ever.
-            </p>
-            <NewsletterForm
-              authorId={author.id}
-              authorSlug={author.slug}
-              accentColor={accentColor}
-              genres={flatGenres.map((g) => ({ id: g.id, name: g.name }))}
-              darkMode
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. Contact CTA ──────────────────────────────────────────────── */}
+      {/* ── 5. Contact CTA ──────────────────────────────────────────────── */}
       <section className="py-10 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>

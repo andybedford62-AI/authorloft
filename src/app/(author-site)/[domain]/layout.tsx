@@ -138,7 +138,7 @@ export default async function AuthorSiteLayout({
           customPages={customNavPages}
         />
         <main className="min-h-screen">{children}</main>
-        <AuthorFooter author={author} />
+        <AuthorFooter author={author} navConfig={navConfig} customPages={customNavPages} />
       </div>
     </AdminSessionProvider>
   );
