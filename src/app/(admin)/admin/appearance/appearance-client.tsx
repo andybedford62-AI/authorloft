@@ -121,7 +121,8 @@ export function AppearanceClient({ currentTemplate, authorSlug }: AppearanceClie
   const [previewKey, setPreviewKey] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const siteUrl = `http://${authorSlug}.localhost:3000`;
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const siteUrl = `https://${authorSlug}.${platformDomain}`;
   const isDirty = selected !== appliedTemplate;
 
   async function handleApply() {
