@@ -125,12 +125,12 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                "px-3 py-1.5 rounded-md text-sm font-body font-medium transition-colors",
+                "px-3 py-1.5 text-sm font-body font-medium transition-colors relative",
                 isActive(link.href)
-                  ? "text-white"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
+                  ? "text-white after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-current"
+                  : "text-white/60 hover:text-white hover:bg-white/10 rounded-md"
               )}
-              style={isActive(link.href) ? { color: accentColor } : {}}
+              style={isActive(link.href) ? { color: "white" } : {}}
             >
               {link.label}
             </Link>
@@ -188,7 +188,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                     ? "text-white bg-white/10"
                     : "text-white/60 hover:text-white hover:bg-white/10"
                 )}
-                style={isActive(link.href) ? { color: accentColor } : {}}
+                style={{}}
               >
                 {link.label}
               </Link>
