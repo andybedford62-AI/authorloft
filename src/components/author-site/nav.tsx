@@ -96,8 +96,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2 group">
             <BookOpen
-              className="h-5 w-5 flex-shrink-0 transition-opacity group-hover:opacity-80"
-              style={{ color: accentColor }}
+              className="h-5 w-5 flex-shrink-0 text-white/70 transition-opacity group-hover:opacity-80"
             />
             <span className="font-heading font-semibold text-white text-sm group-hover:opacity-80 transition-opacity">
               {author.displayName || author.name}
@@ -108,8 +107,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
           {isOwner && (
             <a
               href={dashboardUrl}
-              className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border transition-colors hover:opacity-90"
-              style={{ color: accentColor, borderColor: accentColor + "60" }}
+              className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-colors"
               title="Go to your admin dashboard"
             >
               <LayoutDashboard className="h-3 w-3" />
