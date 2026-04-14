@@ -92,7 +92,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
 
   const platformBase = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
   const dashboardUrl = `${platformBase}/admin/dashboard`;
-  const signOutUrl   = platformBase;
+  const signOutUrl   = `${platformBase}/login`;
 
   return (
     <header
