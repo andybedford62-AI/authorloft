@@ -86,8 +86,10 @@ model Author {
   navShowFlipBooks     Boolean        @default(true)
   navShowBlog          Boolean        @default(false)
   navShowContact       Boolean        @default(true)
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
+  stripeCustomerId          String?
+  stripeSubscriptionId      String?
+  stripeConnectAccountId    String?   // Stripe Express connected account ID (acct_xxx)
+  stripeConnectOnboarded    Boolean   @default(false) // true once onboarding is complete
   planId               String?
   plan                 Plan?          @relation(fields: [planId], references: [id])
   isActive             Boolean        @default(true)

@@ -1,10 +1,138 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+// ── Stripe Connect widget ─────────────────────────────────────────────────────
+
+function StripeConnectSection() {
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState<{
+    status: "not_connected" | "pending" | "active";
+    accountId?: string;
+    chargesEnabled?: boolean;
+    payoutsEnabled?: boolean;
+    requirementsDue?: string[];
+  } | null>(null);
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/stripe/connect/status")
+      .then((r) => r.json())
+      .then(setStatus)
+      .catch(() => setStatus({ status: "not_connected" }));
+  }, [searchParams]); // re-fetch when Stripe redirects back with ?connect=done
+
+  async function handleConnect() {
+    setConnectError("");
+    setConnecting(true);
+    try {
+      const res = await fetch("/api/admin/stripe/connect", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setConnectError(data.error || "Could not start Stripe Connect. Please try again.");
+        return;
+      }
+      // Redirect to Stripe onboarding
+      window.location.href = data.url;
+    } catch {
+      setConnectError("Network error. Please try again.");
+    } finally {
+      setConnecting(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Banknote className="h-4 w-4 text-gray-400" />
+          Stripe Payouts
+        </h2>
+        <p className="text-xs text-gray-400 mt-1">
+          Connect your Stripe account to receive direct sales revenue. A 10% platform fee applies per sale.
+        </p>
+      </div>
+
+      {!status ? (
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Loader2 className="h-4 w-4 animate-spin" /> Checking connection…
+        </div>
+      ) : status.status === "active" ? (
+        /* ── Connected & active ──────────────────────────────────────────── */
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 border border-green-200">
+            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-green-800">Connected to Stripe</p>
+              <p className="text-xs text-green-600 mt-0.5">
+                Payments enabled · Payouts enabled · Revenue goes directly to your bank
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400">
+            Account ID: <span className="font-mono">{status.accountId}</span>
+          </p>
+          <button
+            type="button"
+            onClick={handleConnect}
+            disabled={connecting}
+            className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
+          >
+            <ExternalLink className="h-3 w-3" />
+            {connecting ? "Opening Stripe…" : "Manage payout settings in Stripe"}
+          </button>
+        </div>
+      ) : status.status === "pending" ? (
+        /* ── Account created but onboarding incomplete ───────────────────── */
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
+            <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Onboarding incomplete</p>
+              <p className="text-xs text-amber-600 mt-0.5">
+                You need to finish setting up your Stripe account to receive payouts.
+              </p>
+            </div>
+          </div>
+          <Button onClick={handleConnect} disabled={connecting}>
+            {connecting
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
+              : "Continue Stripe setup →"}
+          </Button>
+        </div>
+      ) : (
+        /* ── Not connected ───────────────────────────────────────────────── */
+        <div className="space-y-4">
+          <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
+            <p className="font-medium">How payouts work</p>
+            <p className="text-blue-600 text-xs">
+              Connect your Stripe account in a few minutes. When readers buy your books,
+              90% goes directly to your bank account. AuthorLoft retains a 10% platform fee.
+              You never need to chase invoices or transfer money manually.
+            </p>
+          </div>
+          <Button onClick={handleConnect} disabled={connecting}>
+            {connecting
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
+              : "Connect Stripe account →"}
+          </Button>
+          {connectError && (
+            <p className="text-sm text-red-600">{connectError}</p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ── Main Settings page ────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -177,6 +305,11 @@ export default function SettingsPage() {
           </form>
         )}
       </section>
+
+      {/* ── Stripe Connect ───────────────────────────────────────── */}
+      <Suspense fallback={null}>
+        <StripeConnectSection />
+      </Suspense>
 
       {/* ── Danger Zone ───────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-red-100 p-6">

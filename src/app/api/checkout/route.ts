@@ -28,7 +28,14 @@ export async function POST(req: NextRequest) {
       include: {
         book: {
           include: {
-            author: { select: { id: true, slug: true } },
+            author: {
+              select: {
+                id: true,
+                slug: true,
+                stripeConnectAccountId: true,
+                stripeConnectOnboarded: true,
+              },
+            },
           },
         },
       },
@@ -62,6 +69,14 @@ export async function POST(req: NextRequest) {
     const successUrl = `${baseUrl}/books/${book.slug}/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl  = `${baseUrl}/books/${book.slug}/buy?item=${saleItemId}`;
 
+    // Platform fee percentage (default 10% — set PLATFORM_FEE_PERCENT env var to override)
+    const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
+    const platformFeeCents = Math.round(saleItem.priceCents * feePct);
+
+    // Route payment through author's Stripe Connect account if fully onboarded
+    const useConnect =
+      !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
+
     // Create Stripe Checkout session with automatic tax collection
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -94,6 +109,14 @@ export async function POST(req: NextRequest) {
       },
       success_url: successUrl,
       cancel_url:  cancelUrl,
+      // If the author has a connected Stripe account, route funds there
+      // and retain a platform fee. If not connected, payment goes to platform account.
+      ...(useConnect && {
+        payment_intent_data: {
+          application_fee_amount: platformFeeCents,
+          transfer_data: { destination: author.stripeConnectAccountId! },
+        },
+      }),
     });
 
     // Persist a PENDING order so the webhook can find and complete it
