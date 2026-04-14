@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package,
+  Upload, FileText, X, CheckCircle,
 } from "lucide-react";
 
 // ── Format config ─────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ const FORMATS: Record<FormatKey, {
   icon: React.ReactNode;
   color: string;
   bg: string;
+  needsFile: boolean; // PRINT doesn't need a digital file
 }> = {
   EBOOK: {
     label: "eBook",
@@ -24,6 +26,7 @@ const FORMATS: Record<FormatKey, {
     icon: <BookOpen className="h-4 w-4" />,
     color: "#2563eb",
     bg: "#eff6ff",
+    needsFile: true,
   },
   FLIPBOOK: {
     label: "Flip Book",
@@ -32,6 +35,7 @@ const FORMATS: Record<FormatKey, {
     icon: <Film className="h-4 w-4" />,
     color: "#7c3aed",
     bg: "#f5f3ff",
+    needsFile: true,
   },
   PRINT: {
     label: "Print / Physical",
@@ -40,6 +44,7 @@ const FORMATS: Record<FormatKey, {
     icon: <Package className="h-4 w-4" />,
     color: "#059669",
     bg: "#ecfdf5",
+    needsFile: false,
   },
 };
 
@@ -55,6 +60,9 @@ type DirectSaleItem = {
   priceCents: number;
   isActive: boolean;
   sortOrder: number;
+  fileUrl: string | null;
+  fileKey: string | null;
+  fileName: string | null;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -67,6 +75,133 @@ function dollarsTocents(dollars: string): number {
 
 function centsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
+}
+
+// ── File Upload widget (per item) ─────────────────────────────────────────────
+
+function FileUploadWidget({
+  item,
+  bookId,
+  onUpdated,
+}: {
+  item: DirectSaleItem;
+  bookId: string;
+  onUpdated: (updated: DirectSaleItem) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [removing, setRemoving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError("");
+    setUploading(true);
+
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("itemId", item.id);
+
+    const res = await fetch("/api/admin/upload/book-file", {
+      method: "POST",
+      body: fd,
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setUploadError(data.error || "Upload failed. Please try again.");
+    } else {
+      const data = await res.json();
+      // Merge into item
+      onUpdated({ ...item, fileUrl: data.url, fileKey: data.fileKey, fileName: data.fileName });
+    }
+
+    setUploading(false);
+    // Reset input so the same file can be re-uploaded if needed
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleRemoveFile() {
+    if (!confirm("Remove the uploaded file? Buyers will no longer be able to download it.")) return;
+    setRemoving(true);
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clearFile: true }),
+    });
+    if (res.ok) {
+      onUpdated({ ...item, fileUrl: null, fileKey: null, fileName: null });
+    }
+    setRemoving(false);
+  }
+
+  const hasFile = !!item.fileKey;
+
+  return (
+    <div className="mt-2 pl-12">
+      {hasFile ? (
+        /* ── File attached ─────────────────────────────────────────────────── */
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 border border-green-200 text-green-700 text-xs">
+            <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="font-medium truncate max-w-[200px]" title={item.fileName ?? undefined}>
+              {item.fileName ?? "File uploaded"}
+            </span>
+          </div>
+          <label className="relative cursor-pointer">
+            <span className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+              {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+              {uploading ? "Uploading…" : "Replace"}
+            </span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.epub,.mobi"
+              className="sr-only"
+              disabled={uploading || removing}
+              onChange={handleFileChange}
+            />
+          </label>
+          <button
+            type="button"
+            disabled={removing || uploading}
+            onClick={handleRemoveFile}
+            className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+          >
+            {removing ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3" />}
+            Remove
+          </button>
+        </div>
+      ) : (
+        /* ── No file yet ───────────────────────────────────────────────────── */
+        <label className="relative cursor-pointer inline-flex">
+          <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-colors
+            ${uploading
+              ? "border-blue-200 bg-blue-50 text-blue-600"
+              : "border-dashed border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
+            }`}
+          >
+            {uploading ? (
+              <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
+            ) : (
+              <><FileText className="h-3.5 w-3.5" /> Upload file (PDF / ePub / MOBI)</>
+            )}
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.epub,.mobi"
+            className="sr-only"
+            disabled={uploading}
+            onChange={handleFileChange}
+          />
+        </label>
+      )}
+      {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
+    </div>
+  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -218,8 +353,8 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
           <p className="font-medium">How direct sales work</p>
           <p className="text-blue-600">
             Add one or more formats (eBook, Flip Book, Print). Each format shows its own buy
-            button on your public book page. Readers click to purchase — your payment
-            and fulfilment settings handle the rest.
+            button on your public book page. For digital formats, upload your file here —
+            buyers receive a secure download link after payment.
           </p>
           <p className="text-blue-600 font-medium mt-1">
             Make sure <em>Direct Sales</em> is enabled in the Book Details section above.
@@ -321,6 +456,12 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
             />
           </div>
 
+          {FORMATS[selectedFormat].needsFile && (
+            <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-3 py-2">
+              After adding this format, upload your PDF / ePub / MOBI file so buyers can download it after payment.
+            </p>
+          )}
+
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
@@ -420,92 +561,105 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
                   </div>
                 ) : (
                   /* ── Row ────────────────────────────────────────────────── */
-                  <div className="flex items-center gap-3">
-                    {/* Format icon */}
-                    <div
-                      className="flex-shrink-0 h-9 w-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: fmt.bg, color: fmt.color }}
-                      title={fmt.label}
-                    >
-                      {fmt.icon}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-medium text-gray-800">{item.label}</p>
-                        <span
-                          className="text-xs px-2 py-0.5 rounded-full font-medium"
-                          style={{ backgroundColor: fmt.bg, color: fmt.color }}
-                        >
-                          {fmt.label}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-700">
-                          ${centsToDollars(item.priceCents)}
-                        </span>
-                      </div>
-                      {item.description && (
-                        <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
-                      )}
-                    </div>
-
-                    {/* Status badge */}
-                    <span
-                      className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
-                        item.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
-                      }`}
-                    >
-                      {item.isActive ? "Active" : "Inactive"}
-                    </span>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      {/* Edit */}
-                      <button
-                        type="button"
-                        disabled={isBusy}
-                        onClick={() => startEdit(item)}
-                        className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  <>
+                    <div className="flex items-center gap-3">
+                      {/* Format icon */}
+                      <div
+                        className="flex-shrink-0 h-9 w-9 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: fmt.bg, color: fmt.color }}
+                        title={fmt.label}
                       >
-                        Edit
-                      </button>
+                        {fmt.icon}
+                      </div>
 
-                      {/* Activate / Deactivate */}
-                      <button
-                        type="button"
-                        disabled={isBusy}
-                        onClick={() => toggleActive(item)}
-                        title={item.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
-                          item.isActive
-                            ? "border-amber-200 text-amber-600 hover:bg-amber-50"
-                            : "border-green-200 text-green-600 hover:bg-green-50"
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-medium text-gray-800">{item.label}</p>
+                          <span
+                            className="text-xs px-2 py-0.5 rounded-full font-medium"
+                            style={{ backgroundColor: fmt.bg, color: fmt.color }}
+                          >
+                            {fmt.label}
+                          </span>
+                          <span className="text-sm font-semibold text-gray-700">
+                            ${centsToDollars(item.priceCents)}
+                          </span>
+                        </div>
+                        {item.description && (
+                          <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
+                        )}
+                      </div>
+
+                      {/* Status badge */}
+                      <span
+                        className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                          item.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
                         }`}
                       >
-                        {isBusy ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : item.isActive ? (
-                          <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
-                        ) : (
-                          <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
-                        )}
-                      </button>
+                        {item.isActive ? "Active" : "Inactive"}
+                      </span>
 
-                      {/* Delete */}
-                      <button
-                        type="button"
-                        disabled={isBusy}
-                        onClick={() => deleteItem(item.id, item.label)}
-                        title="Delete"
-                        className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-                      >
-                        {isBusy ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                      </button>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {/* Edit */}
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => startEdit(item)}
+                          className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        >
+                          Edit
+                        </button>
+
+                        {/* Activate / Deactivate */}
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => toggleActive(item)}
+                          title={item.isActive ? "Deactivate (hides from public site)" : "Activate"}
+                          className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
+                            item.isActive
+                              ? "border-amber-200 text-amber-600 hover:bg-amber-50"
+                              : "border-green-200 text-green-600 hover:bg-green-50"
+                          }`}
+                        >
+                          {isBusy ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : item.isActive ? (
+                            <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
+                          ) : (
+                            <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
+                          )}
+                        </button>
+
+                        {/* Delete */}
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => deleteItem(item.id, item.label)}
+                          title="Delete"
+                          className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                        >
+                          {isBusy ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+
+                    {/* ── File upload (only for digital formats) ─────────── */}
+                    {fmt.needsFile && (
+                      <FileUploadWidget
+                        item={item}
+                        bookId={bookId}
+                        onUpdated={(updated) =>
+                          setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
+                        }
+                      />
+                    )}
+                  </>
                 )}
               </div>
             );

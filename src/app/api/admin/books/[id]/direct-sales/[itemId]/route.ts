@@ -9,7 +9,7 @@ async function getAuthorId(): Promise<string | null> {
   return (session.user as any).id as string;
 }
 
-// ── PATCH — update a direct sale item (label, description, priceCents, isActive) ──
+// ── PATCH — update label, description, priceCents, isActive; or clear file ───
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; itemId: string }> }
@@ -26,7 +26,17 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { label, description, priceCents, isActive } = body;
+  const { label, description, priceCents, isActive, clearFile } = body;
+
+  // If clearFile is requested, delete file from Supabase storage
+  if (clearFile && existing.fileKey) {
+    try {
+      const { deleteFromSupabaseStorage } = await import("@/lib/supabase-storage");
+      await deleteFromSupabaseStorage("book-files", existing.fileKey);
+    } catch (e) {
+      console.error("[direct-sales/patch] Failed to delete file:", e);
+    }
+  }
 
   const updated = await prisma.bookDirectSaleItem.update({
     where: { id: itemId },
@@ -35,13 +45,14 @@ export async function PATCH(
       ...(description !== undefined && { description: description?.trim() || null }),
       ...(priceCents !== undefined && { priceCents }),
       ...(isActive !== undefined && { isActive }),
+      ...(clearFile && { fileUrl: null, fileKey: null, fileName: null }),
     },
   });
 
   return NextResponse.json(updated);
 }
 
-// ── DELETE ────────────────────────────────────────────────────────────────────
+// ── DELETE — remove item and its associated file from storage ─────────────────
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; itemId: string }> }
@@ -53,8 +64,18 @@ export async function DELETE(
 
   const existing = await prisma.bookDirectSaleItem.findFirst({
     where: { id: itemId, book: { id: bookId, authorId } },
+    select: { id: true, fileKey: true },
   });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Delete associated file from Supabase storage (fire-and-forget)
+  if (existing.fileKey) {
+    import("@/lib/supabase-storage")
+      .then(({ deleteFromSupabaseStorage }) =>
+        deleteFromSupabaseStorage("book-files", existing.fileKey!)
+      )
+      .catch((e) => console.error("[direct-sales/delete] Failed to delete file:", e));
+  }
 
   await prisma.bookDirectSaleItem.delete({ where: { id: itemId } });
   return NextResponse.json({ ok: true });

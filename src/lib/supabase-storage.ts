@@ -61,6 +61,73 @@ export async function uploadToSupabaseStorage(
 }
 
 /**
+ * Generate a short-lived signed URL for a private Supabase Storage object.
+ * Use this for delivering book files to paying customers — the bucket must be private.
+ *
+ * @param bucket          Bucket name, e.g. "book-files"
+ * @param path            Object path inside the bucket
+ * @param expiresInSeconds How long the link is valid (default 3600 = 1 hour)
+ * @param filename        Optional: sets Content-Disposition so browser downloads with this name
+ * @returns               Signed URL string
+ */
+export async function getSupabaseSignedUrl(
+  bucket: string,
+  path: string,
+  expiresInSeconds = 3600,
+  filename?: string
+): Promise<string> {
+  if (!SUPABASE_URL || !SERVICE_KEY) {
+    throw new Error(
+      "Supabase Storage is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
+  const signUrl = `${SUPABASE_URL}/storage/v1/object/sign/${bucket}/${path}`;
+
+  const body: Record<string, unknown> = { expiresIn: expiresInSeconds };
+  if (filename) {
+    // Ask Supabase to set Content-Disposition so the browser shows a save dialog
+    body.transform = {};
+    // Supabase doesn't support Content-Disposition transforms via sign API,
+    // so we append it as a query param after getting the signed URL instead.
+  }
+
+  const res = await fetch(signUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ expiresIn: expiresInSeconds }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`Supabase sign URL failed (${res.status}): ${text}`);
+  }
+
+  const json = await res.json();
+  // Supabase returns { signedURL: "/storage/v1/object/sign/bucket/path?token=..." }
+  const signedPath: string = json.signedURL ?? json.signedUrl ?? json.signed_url;
+  if (!signedPath) {
+    throw new Error(`Supabase signed URL response missing signedURL field: ${JSON.stringify(json)}`);
+  }
+
+  // Build absolute URL
+  let fullUrl = signedPath.startsWith("http")
+    ? signedPath
+    : `${SUPABASE_URL}${signedPath}`;
+
+  // Append content-disposition so the browser downloads the file with a nice name
+  if (filename) {
+    const sep = fullUrl.includes("?") ? "&" : "?";
+    fullUrl += `${sep}download=${encodeURIComponent(filename)}`;
+  }
+
+  return fullUrl;
+}
+
+/**
  * Delete an object from a Supabase Storage bucket.
  *
  * @param bucket  Bucket name
