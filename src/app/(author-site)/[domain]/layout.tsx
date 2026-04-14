@@ -134,11 +134,18 @@ export default async function AuthorSiteLayout({
   const theme = getTheme((author as any).siteTheme);
   const dataTheme = theme.dataTheme || undefined;
 
+  // Only apply the author's branding accent on the default (classic-literary) theme.
+  // All other themes define their own intentional accent colour via CSS data-theme variables.
+  const isDefaultTheme = !dataTheme;
+  const accentStyle = isDefaultTheme
+    ? ({ "--accent": author.accentColor || "#7B2D2D" } as React.CSSProperties)
+    : undefined;
+
   return (
     <AdminSessionProvider>
       <div
         data-theme={dataTheme}
-        style={{ "--accent": author.accentColor || "#7B2D2D" } as React.CSSProperties}
+        style={accentStyle}
       >
         <AuthorNav
           author={author}
