@@ -83,6 +83,50 @@ async function getDashboardData(authorId: string) {
   };
 }
 
+function ChecklistRow({
+  step,
+  optional = false,
+}: {
+  step: { done: boolean; label: string; hint?: string | null; href: string | null };
+  optional?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3 px-5 py-3.5">
+      {/* Check circle */}
+      <div
+        className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center
+          ${step.done ? "bg-green-500 border-green-500" : optional ? "border-gray-200 bg-white" : "border-gray-300 bg-white"}`}
+      >
+        {step.done && (
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 12 12">
+            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </div>
+
+      {/* Label + hint */}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium ${step.done ? "text-gray-400 line-through" : "text-gray-900"}`}>
+          {step.label}
+        </p>
+        {!step.done && step.hint && (
+          <p className="text-xs text-gray-400 mt-0.5">{step.hint}</p>
+        )}
+      </div>
+
+      {/* Action link */}
+      {!step.done && step.href && (
+        <Link
+          href={step.href}
+          className="flex-shrink-0 text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-0.5"
+        >
+          Go <ArrowRight className="h-3 w-3" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   const authorId = (session?.user as any)?.id;
@@ -100,9 +144,77 @@ export default async function DashboardPage() {
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
-      select: { emailVerified: true, email: true },
+      select: {
+        emailVerified: true,
+        email: true,
+        profileImageUrl: true,
+        bio: true,
+        stripeConnectOnboarded: true,
+        plan: { select: { salesEnabled: true } },
+        books: {
+          where: { directSalesEnabled: true },
+          select: {
+            directSaleItems: {
+              where: { isActive: true, fileKey: { not: null } },
+              select: { id: true },
+              take: 1,
+            },
+          },
+          take: 1,
+        },
+      },
     }),
   ]);
+
+  // ── Setup checklist state ────────────────────────────────────────────────
+  const hasProfile     = !!(authorMeta?.profileImageUrl && authorMeta?.bio);
+  const hasBook        = data.totalBooks > 0;
+  const hasStripe      = !!authorMeta?.stripeConnectOnboarded;
+  const hasFile        = !!(authorMeta?.books?.[0]?.directSaleItems?.length);
+  const salesEnabled   = !!authorMeta?.plan?.salesEnabled;
+
+  const checklistSteps = [
+    {
+      done: !!authorMeta?.emailVerified,
+      label: "Verify your email address",
+      hint: "Check your inbox for the verification link",
+      href: null,
+      optional: false,
+    },
+    {
+      done: hasProfile,
+      label: "Complete your profile",
+      hint: "Add a photo and bio so readers can find you",
+      href: "/admin/branding",
+      optional: false,
+    },
+    {
+      done: hasBook,
+      label: "Add your first book",
+      hint: "Upload a cover, description, and set your price",
+      href: "/admin/books/new",
+      optional: false,
+    },
+    {
+      done: hasStripe,
+      label: "Connect Stripe for payouts",
+      hint: "Settings → Stripe Payouts → Connect Stripe account",
+      href: "/admin/settings",
+      optional: true,
+    },
+    {
+      done: salesEnabled && hasFile,
+      label: "Upload a book file for direct sales",
+      hint: "Go to Books → your book → Direct Sales → upload PDF/ePub",
+      href: "/admin/books",
+      optional: true,
+    },
+  ];
+
+  const requiredSteps   = checklistSteps.filter((s) => !s.optional);
+  const optionalSteps   = checklistSteps.filter((s) => s.optional);
+  const completedCount  = requiredSteps.filter((s) => s.done).length;
+  const allDone         = completedCount === requiredSteps.length;
 
   const statCards = [
     { label: "Total Books",            value: data.totalBooks,                     icon: BookOpen,    color: "blue",   href: "/admin/books" },
@@ -132,6 +244,45 @@ export default async function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Getting Started checklist — hidden once all steps complete */}
+      {!allDone && (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-gray-900">Getting Started</h2>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {completedCount} of {requiredSteps.length} required steps complete
+              </p>
+            </div>
+            {/* Progress bar */}
+            <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all"
+                style={{ width: `${(completedCount / requiredSteps.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="divide-y divide-gray-50">
+            {requiredSteps.map((step) => (
+              <ChecklistRow key={step.label} step={step} />
+            ))}
+          </div>
+
+          {/* Optional steps */}
+          <div className="border-t border-dashed border-gray-200">
+            <p className="px-5 pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              Optional — for direct sales
+            </p>
+            <div className="divide-y divide-gray-50">
+              {optionalSteps.map((step) => (
+                <ChecklistRow key={step.label} step={step} optional />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
