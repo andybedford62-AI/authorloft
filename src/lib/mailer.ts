@@ -113,6 +113,87 @@ export async function sendVerificationEmail(to: string, token: string) {
   });
 }
 
+// ── Purchase confirmation email ───────────────────────────────────────────────
+
+export async function sendPurchaseConfirmationEmail({
+  to,
+  customerName,
+  bookTitle,
+  itemLabel,
+  downloadUrl,
+  downloadExpiry,
+  authorName,
+  authorSlug,
+}: {
+  to: string;
+  customerName?: string;
+  bookTitle: string;
+  itemLabel: string;
+  downloadUrl: string;
+  downloadExpiry: Date;
+  authorName: string;
+  authorSlug: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+  const greeting = customerName ? `Hi ${customerName},` : "Hi there,";
+
+  return sendMail({
+    to,
+    subject: `Your download is ready — ${bookTitle}`,
+    text: [
+      greeting,
+      `Thank you for purchasing ${bookTitle} (${itemLabel}).`,
+      `Download your file here: ${downloadUrl}`,
+      `This link expires on ${expiryStr} and allows up to 5 downloads.`,
+      `— ${authorName}`,
+    ].join("\n\n"),
+    html: wrapHtml(`Your download is ready`, `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 16px;">
+        Thank you for purchasing <strong>${bookTitle}</strong> (${itemLabel}).
+        Your file is ready to download right now.
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:8px 0 28px;">
+            <a href="${downloadUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              ⬇ Download ${itemLabel}
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">
+        If the button above doesn't work, paste this link into your browser:
+      </p>
+      <p style="margin:0 0 24px;font-size:13px;word-break:break-all;">
+        <a href="${downloadUrl}" style="color:#2563eb;">${downloadUrl}</a>
+      </p>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px;">
+        <p style="margin:0 0 4px;font-size:13px;color:#374151;">
+          ⏱ <strong>Link expires:</strong> ${expiryStr}
+        </p>
+        <p style="margin:0;font-size:13px;color:#374151;">
+          📥 <strong>Downloads allowed:</strong> 5
+        </p>
+      </div>
+      <p style="margin:0 0 8px;font-size:14px;color:#374151;">
+        Enjoy the read!<br/>
+        <strong>${authorName}</strong>
+      </p>
+      <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">
+        Visit the author's site:
+        <a href="https://${authorSlug}.${platformDomain}" style="color:#6b7280;">
+          ${authorSlug}.${platformDomain}
+        </a>
+      </p>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**
