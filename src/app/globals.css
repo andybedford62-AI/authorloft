@@ -13,6 +13,154 @@
   --cream: #faf7f2;  /* warm off-white content background      */
 }
 
+/* ── Google Fonts ───────────────────────────────────────────────────────── */
+/* Loaded via next/font in layout.tsx — CSS vars available as              */
+/* --font-playfair and --font-inter                                        */
+
+/* ── Author site theme CSS variables ───────────────────────────────────── */
+/* Applied via data-theme attribute on the author site wrapper div         */
+
+/* Default (Classic Literary) — no data-theme needed */
+[data-theme='modern'] {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 4%;
+  --primary: 0 0% 4%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
+  --accent: 239 84% 67%;
+  --border: 240 6% 90%;
+  --font-heading: var(--font-inter), 'DM Sans', sans-serif;
+  --font-body: var(--font-inter), 'DM Sans', sans-serif;
+  --navy: #111111;
+  --cream: #ffffff;
+}
+
+[data-theme='dark'] {
+  --background: 222 47% 7%;
+  --foreground: 210 20% 98%;
+  --primary: 210 20% 98%;
+  --muted-foreground: 210 15% 58%;
+  --accent: 38 60% 57%;
+  --border: 222 20% 18%;
+  --font-heading: var(--font-playfair), 'Libre Baskerville', serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #060b12;
+  --cream: #0d1117;
+}
+
+[data-theme='thriller'] {
+  --background: 0 0% 90%;
+  --foreground: 0 0% 10%;
+  --primary: 218 56% 7%;
+  --primary-foreground: 0 0% 90%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 353 67% 50%;
+  --border: 0 0% 78%;
+  --font-heading: var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #0b1220;
+  --cream: #e5e5e5;
+}
+
+[data-theme='fantasy'] {
+  --background: 40 25% 96%;
+  --foreground: 10 15% 20%;
+  --primary: 270 50% 24%;
+  --primary-foreground: 40 25% 96%;
+  --muted-foreground: 10 10% 45%;
+  --accent: 46 78% 60%;
+  --border: 40 18% 83%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #2d1b5e;
+  --cream: #f5f0e8;
+}
+
+[data-theme='romance'] {
+  --background: 15 100% 99%;
+  --foreground: 0 10% 29%;
+  --primary: 335 55% 46%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 0 8% 50%;
+  --accent: 33 100% 83%;
+  --border: 10 30% 88%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #7a2040;
+  --cream: #fff8f6;
+}
+
+[data-theme='scifi'] {
+  --background: 240 50% 4%;
+  --foreground: 0 0% 95%;
+  --primary: 214 22% 39%;
+  --primary-foreground: 0 0% 95%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 187 100% 50%;
+  --border: 218 30% 20%;
+  --font-heading: var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #060b18;
+  --cream: #0a1628;
+}
+
+[data-theme='nautical'] {
+  --background: 205 30% 96%;
+  --foreground: 0 0% 5%;
+  --primary: 210 100% 12%;
+  --primary-foreground: 205 30% 96%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 37 100% 50%;
+  --border: 205 18% 82%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #001f3f;
+  --cream: #eef4f8;
+}
+
+[data-theme='childrens'] {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 20%;
+  --primary: 184 56% 22%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 0 0% 44%;
+  --accent: 51 100% 71%;
+  --border: 0 0% 88%;
+  --font-heading: var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #1a5c5a;
+  --cream: #ffffff;
+}
+
+[data-theme='literary'] {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 10%;
+  --primary: 0 0% 17%;
+  --primary-foreground: 0 0% 98%;
+  --muted-foreground: 0 0% 44%;
+  --accent: 29 35% 57%;
+  --border: 0 0% 88%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #1a1a1a;
+  --cream: #fafafa;
+}
+
+[data-theme='western'] {
+  --background: 36 40% 96%;
+  --foreground: 10 15% 20%;
+  --primary: 18 50% 36%;
+  --primary-foreground: 36 40% 96%;
+  --muted-foreground: 10 10% 48%;
+  --accent: 38 62% 55%;
+  --border: 36 18% 82%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --navy: #3d1f0d;
+  --cream: #f5ede0;
+}
+
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
 .author-site .font-heading,

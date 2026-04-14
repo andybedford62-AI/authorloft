@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getTheme } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import type { Metadata } from "next";
 
@@ -43,6 +44,7 @@ async function resolveAuthor(domain: string) {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      siteTheme: true,
       isActive: true,
       plan: {
         select: { flipBooksLimit: true },
@@ -129,9 +131,15 @@ export default async function AuthorSiteLayout({
     navShowContact: author.navShowContact,
   };
 
+  const theme = getTheme((author as any).siteTheme);
+  const dataTheme = theme.dataTheme || undefined;
+
   return (
     <AdminSessionProvider>
-      <div style={{ "--accent": author.accentColor || "#7B2D2D" } as React.CSSProperties}>
+      <div
+        data-theme={dataTheme}
+        style={{ "--accent": author.accentColor || "#7B2D2D" } as React.CSSProperties}
+      >
         <AuthorNav
           author={author}
           navConfig={navConfig}
