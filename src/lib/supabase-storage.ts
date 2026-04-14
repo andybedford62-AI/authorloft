@@ -104,9 +104,11 @@ export async function getSupabaseUploadUrl(
     throw new Error(`Missing signedURL in response: ${JSON.stringify(json)}`);
   }
 
+  // Supabase returns a relative path like "/object/upload/sign/..."
+  // The full URL needs the /storage/v1 prefix added
   const signedUrl = signedPath.startsWith("http")
     ? signedPath
-    : `${SUPABASE_URL}${signedPath}`;
+    : `${SUPABASE_URL}/storage/v1${signedPath}`;
 
   return { signedUrl, path };
 }
