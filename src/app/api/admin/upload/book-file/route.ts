@@ -40,7 +40,14 @@ const SUPABASE_CONFIGURED =
  * Files are stored in a PRIVATE Supabase bucket ("book-files").
  * They are only delivered to buyers via short-lived signed URLs.
  */
+
+// Tell Vercel/Next.js not to limit the request body size
+export const config = {
+  api: { bodyParser: false },
+};
+
 export async function POST(req: NextRequest) {
+  try {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -50,8 +57,8 @@ export async function POST(req: NextRequest) {
   let formData: FormData;
   try {
     formData = await req.formData();
-  } catch {
-    return NextResponse.json({ error: "Invalid multipart request" }, { status: 400 });
+  } catch (e: any) {
+    return NextResponse.json({ error: `Could not parse upload: ${e?.message ?? "invalid request"}` }, { status: 400 });
   }
 
   const file = formData.get("file");
@@ -167,4 +174,11 @@ export async function POST(req: NextRequest) {
     fileKey,
     fileName: file.name,
   });
+
+  } catch (err: any) {
+    // Top-level catch — surface the real error instead of returning a blank 500
+    const msg = err?.message ?? String(err);
+    console.error("[upload/book-file] Unhandled error:", msg);
+    return NextResponse.json({ error: `Server error: ${msg}` }, { status: 500 });
+  }
 }
