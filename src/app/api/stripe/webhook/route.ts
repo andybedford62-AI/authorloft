@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
+import { sendPurchaseConfirmationEmail } from "@/lib/mailer";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -31,36 +32,76 @@ export async function POST(req: NextRequest) {
         });
 
         if (order) {
+          const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
+          const customerName  = session.customer_details?.name ?? undefined;
+
           // Mark order complete and record customer email + payment intent
           await prisma.order.update({
             where: { id: order.id },
             data: {
               status: "COMPLETED",
-              customerEmail: session.customer_email ?? session.customer_details?.email ?? "",
+              customerEmail,
               stripePaymentIntentId: session.payment_intent,
             },
           });
 
           // Set download expiry and ensure fileKey is populated on each item
+          const expiry = generateDownloadExpiry(48);
           for (const item of order.items) {
             // If fileKey wasn't captured at order creation, pull it from the sale item now
             let fileKey = item.fileKey;
             if (!fileKey && (saleItemId || item.saleItemId)) {
               const sid = item.saleItemId ?? saleItemId;
-              const saleItem = await prisma.bookDirectSaleItem.findUnique({
+              const si = await prisma.bookDirectSaleItem.findUnique({
                 where: { id: sid },
                 select: { fileKey: true },
               });
-              fileKey = saleItem?.fileKey ?? null;
+              fileKey = si?.fileKey ?? null;
             }
 
             await prisma.orderItem.update({
               where: { id: item.id },
               data: {
-                downloadExpiry: generateDownloadExpiry(48),
+                downloadExpiry: expiry,
                 ...(fileKey && !item.fileKey ? { fileKey } : {}),
               },
             });
+          }
+
+          // Send purchase confirmation email with download link(s)
+          if (customerEmail) {
+            // Load the full order items with book + author + saleItem details for the email
+            const fullItems = await prisma.orderItem.findMany({
+              where: { orderId: order.id },
+              select: {
+                downloadToken: true,
+                saleItem: { select: { label: true } },
+                book: {
+                  select: {
+                    title: true,
+                    author: { select: { displayName: true, name: true, slug: true } },
+                  },
+                },
+              },
+            });
+
+            for (const fi of fullItems) {
+              const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+              const authorSlug = fi.book.author.slug;
+              const downloadUrl = `https://${authorSlug}.${platformDomain}/api/orders/download/${fi.downloadToken}`;
+
+              // Fire-and-forget — don't let email failure break the webhook response
+              sendPurchaseConfirmationEmail({
+                to:             customerEmail,
+                customerName,
+                bookTitle:      fi.book.title,
+                itemLabel:      fi.saleItem?.label ?? "eBook",
+                downloadUrl,
+                downloadExpiry: expiry,
+                authorName:     fi.book.author.displayName || fi.book.author.name,
+                authorSlug,
+              }).catch((e) => console.error("[webhook] Failed to send confirmation email:", e));
+            }
           }
         }
       }
