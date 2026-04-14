@@ -61,6 +61,99 @@ export interface MailOptions {
   replyTo?: string;
 }
 
+// ── Sale notification email (to author) ──────────────────────────────────────
+
+export async function sendSaleNotificationEmail({
+  to,
+  authorName,
+  customerEmail,
+  customerName,
+  bookTitle,
+  itemLabel,
+  priceCents,
+  orderId,
+}: {
+  to: string;
+  authorName: string;
+  customerEmail: string;
+  customerName?: string;
+  bookTitle: string;
+  itemLabel: string;
+  priceCents: number;
+  orderId: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const salesUrl = `https://www.${platformDomain}/admin/sales`;
+  const dollars = (priceCents / 100).toFixed(2);
+  const buyer = customerName ? `${customerName} (${customerEmail})` : customerEmail;
+  const now = new Date().toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+
+  return sendMail({
+    to,
+    subject: `💰 New sale — ${bookTitle} — $${dollars}`,
+    text: [
+      `Hi ${authorName},`,
+      `You just made a sale!`,
+      `Book: ${bookTitle} (${itemLabel})`,
+      `Amount: $${dollars}`,
+      `Buyer: ${buyer}`,
+      `Date: ${now}`,
+      `View all sales: ${salesUrl}`,
+    ].join("\n\n"),
+    html: wrapHtml("You just made a sale! 🎉", `
+      <p style="margin:0 0 16px;">Hi ${authorName},</p>
+      <p style="margin:0 0 24px;">Great news — someone just purchased one of your books on AuthorLoft!</p>
+
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#6b7280;">Book</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#111827;">${bookTitle}</span>
+              <span style="font-size:13px;color:#6b7280;margin-left:8px;">${itemLabel}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Amount</span><br/>
+              <span style="font-size:22px;font-weight:700;color:#15803d;">$${dollars}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Buyer</span><br/>
+              <span style="font-size:14px;color:#374151;">${buyer}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Date</span><br/>
+              <span style="font-size:14px;color:#374151;">${now}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${salesUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              View Sales Dashboard
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Order ID: <span style="font-family:monospace;">${orderId}</span>
+      </p>
+    `),
+  });
+}
+
 // ── Transactional helpers ────────────────────────────────────────────────────
 
 export async function sendPasswordResetEmail(to: string, token: string) {
