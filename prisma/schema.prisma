@@ -461,7 +461,7 @@ model OrderItem {
   saleItemId     String?             // links to BookDirectSaleItem — which format was purchased
   priceCents     Int
   fileKey        String?             // Supabase storage path — copied at purchase time for secure delivery
-  downloadToken  String              @default(cuid())
+  downloadToken  String              @unique @default(cuid())
   downloadCount  Int                 @default(0)
   maxDownloads   Int                 @default(5)
   downloadExpiry DateTime?
