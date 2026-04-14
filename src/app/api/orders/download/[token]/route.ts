@@ -10,7 +10,7 @@ export async function GET(
     const { token } = await params;
 
     // Load the order item — keep includes minimal to avoid Prisma relation issues
-    const item = await prisma.orderItem.findUnique({
+    const item = await prisma.orderItem.findFirst({
       where: { downloadToken: token },
       select: {
         id: true,
