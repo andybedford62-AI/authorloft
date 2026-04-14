@@ -97,8 +97,9 @@ export async function getSupabaseUploadUrl(
   }
 
   const json = await res.json();
-  // Supabase returns { signedURL: "/storage/v1/object/upload/sign/bucket/path?token=..." }
-  const signedPath: string = json.signedURL ?? json.signedUrl;
+  // Supabase returns { url: "/object/upload/sign/bucket/path?token=..." }
+  // (field name varies by Supabase version — check all known variants)
+  const signedPath: string = json.url ?? json.signedURL ?? json.signedUrl;
   if (!signedPath) {
     throw new Error(`Missing signedURL in response: ${JSON.stringify(json)}`);
   }
