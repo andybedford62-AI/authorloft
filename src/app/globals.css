@@ -2,7 +2,20 @@
 
 :root {
   --accent: #7B2D2D;
+
+  /* ── Author site design system ──────────────────────────────────────── */
+  --font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-body:    var(--font-inter), 'Inter', system-ui, sans-serif;
+
+  /* Fixed structural colours — same across all author themes */
+  --navy:  #1a2236;  /* nav, footer, hero backgrounds          */
+  --navy2: #151c2c;  /* slightly darker for bottom bar         */
+  --cream: #faf7f2;  /* warm off-white content background      */
 }
+
+/* ── Font utility classes ───────────────────────────────────────────────── */
+.font-heading { font-family: var(--font-heading); }
+.font-body    { font-family: var(--font-body); }
 
 html {
   scroll-behavior: smooth;
