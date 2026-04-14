@@ -90,6 +90,10 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
   const links = buildNavLinks(showFlipBooks, navConfig, customPages);
 
+  const platformBase = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
+  const dashboardUrl = `${platformBase}/admin/dashboard`;
+  const signOutUrl   = platformBase;
+
   return (
     <header
       className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm"
@@ -105,15 +109,15 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </span>
           </Link>
           {isOwner && (
-            <Link
-              href="/admin"
+            <a
+              href={dashboardUrl}
               className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-white px-2.5 py-1 rounded-md transition-colors"
               style={{ backgroundColor: author.accentColor }}
               title="Go to your admin dashboard"
             >
               <LayoutDashboard className="h-3 w-3" />
               Dashboard
-            </Link>
+            </a>
           )}
         </div>
 
@@ -157,7 +161,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </a>
           )}
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => signOut({ callbackUrl: signOutUrl })}
             className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-red-500 transition-colors ml-2 border-l border-gray-200 pl-3"
             title="Sign out"
           >
@@ -191,18 +195,18 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               </Link>
             ))}
             {isOwner && (
-              <Link
-                href="/admin"
+              <a
+                href={dashboardUrl}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 text-sm font-medium py-1 border-t border-gray-100 mt-1 pt-3"
                 style={{ color: author.accentColor }}
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
-              </Link>
+              </a>
             )}
             <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => signOut({ callbackUrl: signOutUrl })}
               className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-red-500 transition-colors py-1"
             >
               <LogOut className="h-4 w-4" />
