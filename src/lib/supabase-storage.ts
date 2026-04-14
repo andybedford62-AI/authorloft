@@ -160,16 +160,17 @@ export async function getSupabaseSignedUrl(
   }
 
   const json = await res.json();
-  // Supabase returns { signedURL: "/storage/v1/object/sign/bucket/path?token=..." }
-  const signedPath: string = json.signedURL ?? json.signedUrl ?? json.signed_url;
+  // Supabase returns { signedURL: "/object/sign/bucket/path?token=..." }
+  // Check all known field name variants across Supabase versions
+  const signedPath: string = json.signedURL ?? json.signedUrl ?? json.signed_url ?? json.url;
   if (!signedPath) {
     throw new Error(`Supabase signed URL response missing signedURL field: ${JSON.stringify(json)}`);
   }
 
-  // Build absolute URL
+  // Build absolute URL — Supabase returns a relative path so we must add /storage/v1
   let fullUrl = signedPath.startsWith("http")
     ? signedPath
-    : `${SUPABASE_URL}${signedPath}`;
+    : `${SUPABASE_URL}/storage/v1${signedPath}`;
 
   // Append content-disposition so the browser downloads the file with a nice name
   if (filename) {

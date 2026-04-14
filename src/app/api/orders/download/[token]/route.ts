@@ -75,7 +75,9 @@ export async function GET(
   } catch (err: any) {
     const msg = err?.message ?? String(err);
     console.error("[download] Error:", msg);
-    // Temporarily expose the real error so we can diagnose it
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json(
+      { error: "Could not generate download link. Please try again or contact support." },
+      { status: 500 }
+    );
   }
 }
