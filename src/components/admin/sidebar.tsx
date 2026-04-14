@@ -165,7 +165,7 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin }: SidebarPr
       <div className="px-3 py-4 border-t border-gray-800">
         <button
           className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors w-full"
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => signOut({ callbackUrl: "https://www.authorloft.com/login" })}
         >
           <LogOut className="h-4 w-4" />
           Sign Out
