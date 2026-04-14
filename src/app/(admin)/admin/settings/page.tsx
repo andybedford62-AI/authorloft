@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +9,6 @@ import { Input } from "@/components/ui/input";
 // ── Stripe Connect widget ─────────────────────────────────────────────────────
 
 function StripeConnectSection() {
-  const searchParams = useSearchParams();
   const [status, setStatus] = useState<{
     status: "not_connected" | "pending" | "active";
     accountId?: string;
@@ -27,7 +24,7 @@ function StripeConnectSection() {
       .then((r) => r.json())
       .then(setStatus)
       .catch(() => setStatus({ status: "not_connected" }));
-  }, [searchParams]); // re-fetch when Stripe redirects back with ?connect=done
+  }, []);
 
   async function handleConnect() {
     setConnectError("");
@@ -307,9 +304,7 @@ export default function SettingsPage() {
       </section>
 
       {/* ── Stripe Connect ───────────────────────────────────────── */}
-      <Suspense fallback={null}>
-        <StripeConnectSection />
-      </Suspense>
+      <StripeConnectSection />
 
       {/* ── Danger Zone ───────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-red-100 p-6">
