@@ -13,8 +13,11 @@
   --cream: #faf7f2;  /* warm off-white content background      */
 }
 
-/* ── Font utility classes ───────────────────────────────────────────────── */
+/* ── Font utility classes (author site only) ────────────────────────────── */
+/* Scoped to avoid affecting the admin UI */
+.author-site .font-heading,
 .font-heading { font-family: var(--font-heading); }
+.author-site .font-body,
 .font-body    { font-family: var(--font-body); }
 
 html {
