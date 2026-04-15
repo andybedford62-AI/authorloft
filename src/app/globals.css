@@ -21,6 +21,10 @@
 /* Applied via data-theme attribute on the author site wrapper div         */
 
 /* Default (Classic Literary) — no data-theme needed */
+/* ── Nav and footer (--navy, --cream) are intentionally NOT overridden here.  */
+/* They stay fixed at #1a2236 / #faf7f2 across all themes so the shell of     */
+/* the site is always consistent. Only page content variables change.          */
+
 [data-theme='modern'] {
   --background: 0 0% 100%;
   --foreground: 0 0% 4%;
@@ -32,8 +36,6 @@
   --border: 240 6% 90%;
   --font-heading: var(--font-inter), 'DM Sans', sans-serif;
   --font-body: var(--font-inter), 'DM Sans', sans-serif;
-  --navy: #111111;
-  --cream: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -45,8 +47,6 @@
   --border: 222 20% 18%;
   --font-heading: var(--font-playfair), 'Libre Baskerville', serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #060b12;
-  --cream: #0d1117;
 }
 
 [data-theme='thriller'] {
@@ -59,8 +59,6 @@
   --border: 0 0% 78%;
   --font-heading: var(--font-inter), sans-serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #0b1220;
-  --cream: #e5e5e5;
 }
 
 [data-theme='fantasy'] {
@@ -73,8 +71,6 @@
   --border: 40 18% 83%;
   --font-heading: var(--font-playfair), serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #2d1b5e;
-  --cream: #f5f0e8;
 }
 
 [data-theme='romance'] {
@@ -87,8 +83,6 @@
   --border: 10 30% 88%;
   --font-heading: var(--font-playfair), serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #7a2040;
-  --cream: #fff8f6;
 }
 
 [data-theme='scifi'] {
@@ -101,8 +95,6 @@
   --border: 218 30% 20%;
   --font-heading: var(--font-inter), sans-serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #060b18;
-  --cream: #0a1628;
 }
 
 [data-theme='nautical'] {
@@ -115,8 +107,6 @@
   --border: 205 18% 82%;
   --font-heading: var(--font-playfair), serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #001f3f;
-  --cream: #eef4f8;
 }
 
 [data-theme='childrens'] {
@@ -129,8 +119,6 @@
   --border: 0 0% 88%;
   --font-heading: var(--font-inter), sans-serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #1a5c5a;
-  --cream: #ffffff;
 }
 
 [data-theme='literary'] {
@@ -143,8 +131,6 @@
   --border: 0 0% 88%;
   --font-heading: var(--font-playfair), serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #1a1a1a;
-  --cream: #fafafa;
 }
 
 [data-theme='western'] {
@@ -157,8 +143,6 @@
   --border: 36 18% 82%;
   --font-heading: var(--font-playfair), serif;
   --font-body: var(--font-inter), sans-serif;
-  --navy: #3d1f0d;
-  --cream: #f5ede0;
 }
 
 /* ── Font utility classes (author site only) ────────────────────────────── */
