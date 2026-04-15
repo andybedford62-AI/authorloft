@@ -33,6 +33,7 @@ export default async function FlipBooksPage({
         label="Interactive Reading"
         title="Flip Books"
         subtitle="Browse and read interactive flip book editions. Flip through pages, zoom in, and enjoy a fully immersive reading experience."
+        accentColor={accentColor}
       />
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14">

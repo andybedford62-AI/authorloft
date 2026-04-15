@@ -36,6 +36,7 @@ export default async function SpecialsPage({
         label="Promotions & Offers"
         title="Specials"
         subtitle={`Limited-time deals, signed copies, bundles, and exclusive offers from ${author.displayName || author.name}.`}
+        accentColor={accentColor}
       />
 
       {/* ── Specials Grid ───────────────────────────────────────────── */}

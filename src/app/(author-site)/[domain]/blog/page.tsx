@@ -52,6 +52,7 @@ export default async function BlogListPage({
         label={authorName}
         title="Blog & News"
         subtitle="Announcements, behind-the-scenes updates, and stories from the author."
+        accentColor={accentColor}
       />
 
       {/* ── Posts ────────────────────────────────────────────────────────── */}
