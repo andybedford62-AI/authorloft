@@ -61,6 +61,7 @@ export default async function ContactPage({
         label="Get in Touch"
         title={`Contact ${displayName}`}
         subtitle="Whether you're a reader, a media contact, or interested in collaboration — I'd love to hear from you."
+        accentColor={accentColor}
       />
 
       {/* ── Contact Content ──────────────────────────────────────────────── */}

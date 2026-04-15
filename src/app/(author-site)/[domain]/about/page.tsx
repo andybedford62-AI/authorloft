@@ -65,7 +65,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   return (
     <div>
 
-      <PageBanner label="Biography" title="About the Author" />
+      <PageBanner label="Biography" title="About the Author" accentColor={accentColor} />
 
       {/* ── Main content ─────────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
