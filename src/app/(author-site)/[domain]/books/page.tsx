@@ -1,6 +1,6 @@
-import { BookOpen } from "lucide-react";
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
 import { BooksClient } from "./books-client";
+import { PageBanner } from "@/components/author-site/page-banner";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -59,23 +59,13 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
   const authorName = author.displayName || author.name;
 
   return (
-    <div style={{ "--accent": author.accentColor } as React.CSSProperties}>
+    <div>
 
-      {/* ── Page Banner ──────────────────────────────────────────────────── */}
-      <section className="w-full py-12 px-4" style={{ backgroundColor: author.accentColor }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <BookOpen className="h-6 w-6 text-white/70" />
-            <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              Full Catalog
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">Books</h1>
-          <p className="text-white/75 mt-2 max-w-xl">
-            Every title by {authorName} — browse, filter, and find your next read.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        label="Full Catalog"
+        title="Books"
+        subtitle={`Every title by ${authorName} — browse, filter, and find your next read.`}
+      />
 
       <BooksClient
         books={clientBooks}

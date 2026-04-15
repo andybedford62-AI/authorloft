@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { ContactForm } from "./contact-form";
-import { Mail, Clock, MessageSquare } from "lucide-react";
+import { Mail, Clock } from "lucide-react";
+import { PageBanner } from "@/components/author-site/page-banner";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -53,23 +54,13 @@ export default async function ContactPage({
   const accentColor = author.accentColor ?? "#7B2D2D";
 
   return (
-    <div style={{ "--accent": accentColor } as React.CSSProperties}>
+    <div>
 
-      {/* ── Page Banner ──────────────────────────────────────────────────── */}
-      <section className="w-full py-12 px-4" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <MessageSquare className="h-6 w-6 text-white/70" />
-            <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              Get in Touch
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">Contact {displayName}</h1>
-          <p className="text-white/75 mt-2 max-w-xl">
-            Whether you&apos;re a reader, a media contact, or interested in collaboration — I&apos;d love to hear from you.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        label="Get in Touch"
+        title={`Contact ${displayName}`}
+        subtitle="Whether you're a reader, a media contact, or interested in collaboration — I'd love to hear from you."
+      />
 
       {/* ── Contact Content ──────────────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
