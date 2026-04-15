@@ -65,6 +65,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
         label="Full Catalog"
         title="Books"
         subtitle={`Every title by ${authorName} — browse, filter, and find your next read.`}
+        accentColor={author.accentColor}
       />
 
       <BooksClient
