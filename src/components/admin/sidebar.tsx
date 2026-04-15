@@ -56,12 +56,13 @@ const superAdminItems = [
 ];
 
 interface SidebarProps {
-  authorName: string;
-  authorSlug: string;
+  authorName:   string;
+  authorSlug:   string;
   isSuperAdmin?: boolean;
+  planTier?:    string;
 }
 
-export function AdminSidebar({ authorName, authorSlug, isSuperAdmin }: SidebarProps) {
+export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = "FREE" }: SidebarProps) {
   const pathname = usePathname();
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -103,6 +104,10 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin }: SidebarPr
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {authorNavItems.map(({ href, label, icon: Icon }) => {
+          // FREE plan cannot access Appearance — it redirects to branding anyway,
+          // but hiding the link keeps the nav clean and avoids confusion.
+          if (href === "/admin/appearance" && planTier === "FREE") return null;
+
           const active = pathname.startsWith(href);
           const badge =
             href === "/admin/messages" && unreadMessages > 0

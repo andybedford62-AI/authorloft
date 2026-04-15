@@ -12,7 +12,6 @@ export async function PATCH(req: NextRequest) {
 
   const {
     displayName, tagline, shortBio, bio,
-    accentColor,
     profileImageUrl,
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
     contactEmail, heroTitle, heroSubtitle, showHeroBanner,
@@ -26,7 +25,6 @@ export async function PATCH(req: NextRequest) {
       tagline:        tagline        ?? null,
       shortBio:       shortBio       ?? null,
       bio:            bio            ?? null,
-      accentColor:    accentColor    || "#7B2D2D",
       // Only update profileImageUrl if explicitly provided (allows clearing with "")
       ...(profileImageUrl !== undefined && {
         profileImageUrl: profileImageUrl || null,
@@ -43,7 +41,7 @@ export async function PATCH(req: NextRequest) {
       ...(Array.isArray(aboutStats) && { aboutStats }),
       ...(Array.isArray(credentials) && { credentials: credentials.slice(0, 3) }),
     },
-    select: { id: true, displayName: true, accentColor: true, profileImageUrl: true },
+    select: { id: true, displayName: true, profileImageUrl: true },
   });
 
   return NextResponse.json(author);

@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { TEMPLATES } from "@/lib/templates";
-import { ALL_THEMES } from "@/lib/themes";
+import { ALL_THEMES, BASE_THEME_IDS, isThemeAllowed } from "@/lib/themes";
 
-const VALID_TEMPLATES = TEMPLATES.map((t) => t.id);
-const VALID_THEMES    = ALL_THEMES.map((t) => t.id);
+const VALID_THEMES = ALL_THEMES.map((t) => t.id);
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,22 +12,58 @@ export async function PATCH(req: NextRequest) {
 
   const authorId = (session.user as any).id as string;
   const body = await req.json();
-  const { homeTemplate, siteTheme } = body;
+  const { siteTheme } = body;
 
-  // Validate whichever field was sent
-  if (homeTemplate !== undefined && !VALID_TEMPLATES.includes(homeTemplate)) {
-    return NextResponse.json({ error: "Invalid template" }, { status: 400 });
+  if (siteTheme !== undefined) {
+    // Validate theme ID
+    if (!VALID_THEMES.includes(siteTheme)) {
+      return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+    }
+
+    // Fetch current plan + baseTheme to validate access and track base theme
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { plan: { select: { tier: true } }, baseTheme: true, siteTheme: true },
+    });
+
+    const planTier = author?.plan?.tier ?? "FREE";
+
+    // Enforce plan access
+    if (!isThemeAllowed(siteTheme, planTier)) {
+      return NextResponse.json(
+        { error: "This theme is not available on your current plan." },
+        { status: 403 }
+      );
+    }
+
+    // When selecting a genre palette, save the current base theme so we can
+    // revert cleanly on downgrade. Only update baseTheme when switching TO a
+    // genre palette FROM a base theme (not on every save).
+    const isGenrePalette   = !BASE_THEME_IDS.includes(siteTheme as any);
+    const currentIsBase    = BASE_THEME_IDS.includes((author?.siteTheme ?? "classic-literary") as any);
+    const shouldSaveBase   = isGenrePalette && currentIsBase;
+
+    await prisma.author.update({
+      where: { id: authorId },
+      data: {
+        siteTheme,
+        ...(shouldSaveBase && { baseTheme: author!.siteTheme }),
+      },
+    });
+
+    return NextResponse.json({ ok: true, siteTheme });
   }
-  if (siteTheme !== undefined && !VALID_THEMES.includes(siteTheme)) {
-    return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+
+  // homeTemplate (layout) — still supported, no plan gating
+  const { homeTemplate } = body;
+  if (homeTemplate !== undefined) {
+    const VALID_TEMPLATES = ["classic", "minimal", "bold"];
+    if (!VALID_TEMPLATES.includes(homeTemplate)) {
+      return NextResponse.json({ error: "Invalid template" }, { status: 400 });
+    }
+    await prisma.author.update({ where: { id: authorId }, data: { homeTemplate } });
+    return NextResponse.json({ ok: true, homeTemplate });
   }
 
-  // Build update data from whichever fields were provided
-  const data: Record<string, string> = {};
-  if (homeTemplate !== undefined) data.homeTemplate = homeTemplate;
-  if (siteTheme    !== undefined) data.siteTheme    = siteTheme;
-
-  await prisma.author.update({ where: { id: authorId }, data });
-
-  return NextResponse.json({ ok: true, ...data });
+  return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 }

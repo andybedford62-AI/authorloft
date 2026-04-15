@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { getTheme } from "@/lib/themes";
+import { getTheme, getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import type { Metadata } from "next";
 
@@ -29,7 +29,6 @@ async function resolveAuthor(domain: string) {
       slug: true,
       customDomain: true,
       shortBio: true,
-      accentColor: true,
       profileImageUrl: true,
       linkedinUrl: true,
       youtubeUrl: true,
@@ -47,7 +46,7 @@ async function resolveAuthor(domain: string) {
       siteTheme: true,
       isActive: true,
       plan: {
-        select: { flipBooksLimit: true },
+        select: { flipBooksLimit: true, tier: true },
       },
     },
   });
@@ -131,29 +130,31 @@ export default async function AuthorSiteLayout({
     navShowContact: author.navShowContact,
   };
 
-  const theme = getTheme((author as any).siteTheme);
+  // Enforce plan-based theme access at render time
+  const planTier = author.plan?.tier ?? "FREE";
+  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier)
+    ? author.siteTheme
+    : planTier === "FREE" ? "modern-minimal" : "classic-literary";
+
+  const theme = getTheme(effectiveSiteTheme);
   const dataTheme = theme.dataTheme || undefined;
 
-  // Only apply the author's branding accent on the default (classic-literary) theme.
-  // All other themes define their own intentional accent colour via CSS data-theme variables.
-  const isDefaultTheme = !dataTheme;
-  const accentStyle = isDefaultTheme
-    ? ({ "--accent": author.accentColor || "#7B2D2D" } as React.CSSProperties)
-    : undefined;
+  // Compute accent from theme — no longer from the author's stored accentColor field.
+  const accentColor = getThemeAccentHex(effectiveSiteTheme);
+  const authorWithAccent = { ...author, accentColor };
 
   return (
     <AdminSessionProvider>
       <div
         data-theme={dataTheme}
-        style={accentStyle}
       >
         <AuthorNav
-          author={author}
+          author={authorWithAccent}
           navConfig={navConfig}
           customPages={customNavPages}
         />
         <main className="min-h-screen">{children}</main>
-        <AuthorFooter author={author} navConfig={navConfig} customPages={customNavPages} />
+        <AuthorFooter author={authorWithAccent} navConfig={navConfig} customPages={customNavPages} />
       </div>
     </AdminSessionProvider>
   );

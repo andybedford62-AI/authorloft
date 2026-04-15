@@ -66,7 +66,8 @@ model Author {
   heroImageUrl         String?
   heroTitle            String?
   heroSubtitle         String?
-  accentColor          String         @default("#7B2D2D")
+  accentColor          String         @default("#7B2D2D")  // legacy — no longer drives UI; kept for data safety
+  baseTheme            String         @default("classic-literary") // last base theme before a genre palette was applied; used on plan downgrade
   tagline              String?
   linkedinUrl          String?
   youtubeUrl           String?

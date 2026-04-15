@@ -13,10 +13,9 @@ export default async function AppearancePage() {
   const author = await prisma.author.findUnique({
     where: { id: authorId },
     select: {
-      homeTemplate: true,
-      siteTheme:    true,
-      slug:         true,
-      plan:         { select: { tier: true } },
+      siteTheme: true,
+      slug:      true,
+      plan:      { select: { tier: true } },
     },
   });
 
@@ -24,16 +23,18 @@ export default async function AppearancePage() {
 
   const tier = author.plan?.tier ?? "FREE";
 
+  // FREE authors have no theme choice — redirect to branding
+  if (tier === "FREE") redirect("/admin/branding");
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Appearance</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Customise the look and feel of your author site — choose a layout template and a colour theme.
+          Choose a colour theme for your author site. Changes apply instantly to all visitors.
         </p>
       </div>
       <AppearanceClient
-        currentTemplate={author.homeTemplate ?? "classic"}
         currentTheme={author.siteTheme ?? "classic-literary"}
         authorSlug={author.slug}
         planTier={tier}

@@ -4,6 +4,7 @@ import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
 
 export default async function AdminLayout({
   children,
@@ -15,9 +16,17 @@ export default async function AdminLayout({
   // Redirect to login if not authenticated
   if (!session?.user) redirect("/login");
 
-  const authorName = (session.user as any).name || "Author";
-  const authorSlug = (session.user as any).slug || "author";
+  const authorName   = (session.user as any).name        || "Author";
+  const authorSlug   = (session.user as any).slug        || "author";
   const isSuperAdmin = (session.user as any).isSuperAdmin || false;
+  const authorId     = (session.user as any).id          as string;
+
+  // Fetch plan tier for sidebar — controls which nav items are shown
+  const authorRecord = await prisma.author.findUnique({
+    where:  { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const planTier = authorRecord?.plan?.tier ?? "FREE";
 
   return (
     <AdminSessionProvider>
@@ -26,6 +35,7 @@ export default async function AdminLayout({
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={isSuperAdmin}
+          planTier={planTier}
         />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0">

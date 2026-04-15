@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { FileText } from "lucide-react";
+import { getThemeAccentHex } from "@/lib/themes";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ async function resolveAuthorAndPage(domain: string, pageSlug: string) {
       where: {
         OR: [{ slug: domain }, { customDomain: domain }],
       },
-      select: { id: true, name: true, displayName: true, accentColor: true },
+      select: { id: true, name: true, displayName: true, siteTheme: true },
     });
 
     if (!author) return null;
@@ -36,7 +37,8 @@ async function resolveAuthorAndPage(domain: string, pageSlug: string) {
     });
 
     if (!page || !page.isVisible) return null;
-    return { author, page };
+    const accentColor = getThemeAccentHex(author.siteTheme);
+    return { author: { ...author, accentColor }, page };
   } catch (err) {
     console.error("[CustomPage] error:", err);
     return null;

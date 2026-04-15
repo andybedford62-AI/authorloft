@@ -14,7 +14,7 @@ export default async function BrandingPage() {
     where: { id: authorId },
     select: {
       displayName: true, tagline: true, shortBio: true, bio: true,
-      accentColor: true, profileImageUrl: true,
+      profileImageUrl: true,
       linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
       twitterUrl: true, instagramUrl: true,
       contactEmail: true, heroTitle: true, heroSubtitle: true,
@@ -31,7 +31,6 @@ export default async function BrandingPage() {
     tagline:        author.tagline        ?? "",
     shortBio:       author.shortBio       ?? "",
     bio:            author.bio            ?? "",
-    accentColor:    author.accentColor    ?? "#7B2D2D",
     profileImageUrl: author.profileImageUrl ?? "",
     linkedinUrl:    author.linkedinUrl    ?? "",
     youtubeUrl:     author.youtubeUrl     ?? "",
