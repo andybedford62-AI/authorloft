@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ContactForm } from "./contact-form";
 import { Mail, Clock } from "lucide-react";
 import { PageBanner } from "@/components/author-site/page-banner";
+import { getThemeAccentHex } from "@/lib/themes";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +44,7 @@ export default async function ContactPage({
       displayName: true,
       name: true,
       contactEmail: true,
-      accentColor: true,
+      siteTheme: true,
     },
   });
 
@@ -51,7 +52,7 @@ export default async function ContactPage({
 
   const displayName = author.displayName || author.name;
 
-  const accentColor = author.accentColor ?? "#7B2D2D";
+  const accentColor = getThemeAccentHex(author.siteTheme);
 
   return (
     <div>

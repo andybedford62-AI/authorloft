@@ -3,6 +3,37 @@ import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail } from "@/lib/mailer";
+import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
+
+/**
+ * Reverts the author's theme if their new plan no longer allows the current one.
+ * - Genre palette on Standard → revert to baseTheme (last used base theme)
+ * - Any non-Modern-Minimal on Free → force Modern Minimal
+ */
+async function revertThemeOnDowngrade(authorId: string, newPlanTier: string) {
+  const author = await prisma.author.findUnique({
+    where:  { id: authorId },
+    select: { siteTheme: true, baseTheme: true },
+  });
+  if (!author) return;
+
+  if (isThemeAllowed(author.siteTheme, newPlanTier)) return; // already valid
+
+  // Determine the revert target
+  let revertTo: string;
+  if (newPlanTier === "FREE") {
+    revertTo = "modern-minimal";
+  } else {
+    // STANDARD: genre palette → revert to saved baseTheme (or Classic Literary fallback)
+    const candidateBase = author.baseTheme ?? "classic-literary";
+    revertTo = BASE_THEME_IDS.includes(candidateBase as any) ? candidateBase : "classic-literary";
+  }
+
+  await prisma.author.update({
+    where: { id: authorId },
+    data:  { siteTheme: revertTo },
+  });
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -142,12 +173,47 @@ export async function POST(req: NextRequest) {
     }
 
     case "customer.subscription.deleted": {
-      // Downgrade author to Free plan when subscription is cancelled
+      // Subscription cancelled — downgrade author to Free plan
       const subscription = event.data.object as any;
+      const affected = await prisma.author.findMany({
+        where:  { stripeSubscriptionId: subscription.id },
+        select: { id: true },
+      });
       await prisma.author.updateMany({
         where: { stripeSubscriptionId: subscription.id },
-        data: { planId: null }, // null planId = Free
+        data:  { planId: null }, // null planId = Free
       });
+      // Revert theme for each affected author
+      for (const a of affected) {
+        await revertThemeOnDowngrade(a.id, "FREE");
+      }
+      break;
+    }
+
+    case "customer.subscription.updated": {
+      // Plan change — check if the new plan is a downgrade and revert theme if needed
+      const subscription = event.data.object as any;
+      const newPriceId   = subscription.items?.data?.[0]?.price?.id as string | undefined;
+      if (newPriceId) {
+        const newPlan = await prisma.plan.findFirst({
+          where:  { OR: [{ stripePriceId: newPriceId }, { stripePriceIdMonthly: newPriceId }, { stripePriceIdAnnual: newPriceId }] },
+          select: { id: true, tier: true },
+        });
+        if (newPlan) {
+          // Update author's planId and revert theme if needed
+          const affected = await prisma.author.findMany({
+            where:  { stripeSubscriptionId: subscription.id },
+            select: { id: true },
+          });
+          await prisma.author.updateMany({
+            where: { stripeSubscriptionId: subscription.id },
+            data:  { planId: newPlan.id },
+          });
+          for (const a of affected) {
+            await revertThemeOnDowngrade(a.id, newPlan.tier);
+          }
+        }
+      }
       break;
     }
   }

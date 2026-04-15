@@ -158,3 +158,30 @@ export const ALL_THEMES = [...BASE_THEMES, ...GENRE_PALETTES];
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];
 }
+
+/** Returns the hex accent colour for a given theme — used to drive inline styles across the author site. */
+export function getThemeAccentHex(siteTheme: string | null | undefined): string {
+  return getTheme(siteTheme).preview.accent;
+}
+
+/**
+ * Which themes are available per plan tier.
+ * FREE   → Modern Minimal only
+ * STANDARD → all 3 base themes
+ * PREMIUM  → all base themes + all genre palettes
+ */
+export const BASE_THEME_IDS  = BASE_THEMES.map((t) => t.id);
+export const GENRE_PALETTE_IDS = GENRE_PALETTES.map((t) => t.id);
+
+export function isThemeAllowed(themeId: string, planTier: string): boolean {
+  if (planTier === "PREMIUM") return true;
+  if (planTier === "STANDARD") return BASE_THEME_IDS.includes(themeId as ThemeId);
+  // FREE — only Modern Minimal
+  return themeId === "modern-minimal";
+}
+
+/** The default theme for each plan tier (used on downgrade). */
+export function getDefaultThemeForPlan(planTier: string): string {
+  if (planTier === "FREE") return "modern-minimal";
+  return "classic-literary"; // STANDARD and PREMIUM default
+}

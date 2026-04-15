@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NewsletterClient } from "./newsletter-client";
+import { getThemeAccentHex } from "@/lib/themes";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export default async function NewsletterPage() {
     }),
     prisma.author.findUnique({
       where: { id: authorId },
-      select: { accentColor: true, displayName: true, name: true },
+      select: { siteTheme: true, displayName: true, name: true },
     }),
   ]);
 
@@ -54,7 +55,7 @@ export default async function NewsletterPage() {
       genreMap={genreMap}
       confirmedCount={confirmedCount}
       smtpConfigured={smtpConfigured}
-      accentColor={author?.accentColor ?? "#7B2D2D"}
+      accentColor={getThemeAccentHex(author?.siteTheme)}
       authorName={author?.displayName || author?.name || ""}
     />
   );

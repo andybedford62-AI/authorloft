@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --accent: #7B2D2D;
+  --accent: #c89b3c;  /* Classic Literary gold — matches BASE_THEMES[0].preview.accent */
 
   /* ── Author site design system ──────────────────────────────────────── */
   --font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;

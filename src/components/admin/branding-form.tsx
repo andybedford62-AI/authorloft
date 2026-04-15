@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { Check, Loader2, Upload, X, User, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ACCENT_COLORS } from "@/lib/utils";
 
 type Stat = { value: string; label: string };
 
@@ -14,7 +13,6 @@ type BrandingFormProps = {
     tagline: string;
     shortBio: string;
     bio: string;
-    accentColor: string;
     profileImageUrl: string;
     linkedinUrl: string;
     youtubeUrl: string;
@@ -35,7 +33,6 @@ export function BrandingForm({ initial }: BrandingFormProps) {
   const [tagline, setTagline] = useState(initial.tagline);
   const [shortBio, setShortBio] = useState(initial.shortBio);
   const [bio, setBio] = useState(initial.bio);
-  const [accentColor, setAccentColor] = useState(initial.accentColor);
   const [profileImageUrl, setProfileImageUrl] = useState(initial.profileImageUrl);
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl);
   const [youtubeUrl, setYoutubeUrl] = useState(initial.youtubeUrl);
@@ -108,7 +105,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        displayName, tagline, shortBio, bio, accentColor,
+        displayName, tagline, shortBio, bio,
         profileImageUrl,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
         contactEmail, heroTitle, heroSubtitle, showHeroBanner,
@@ -282,50 +279,6 @@ export function BrandingForm({ initial }: BrandingFormProps) {
             <Plus className="h-4 w-4" /> Add stat
           </button>
         )}
-      </section>
-
-      {/* Accent Color */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-900">Accent Color</h2>
-        <p className="text-sm text-gray-500">
-          Used for buttons, links, and highlighted elements across your site.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          {ACCENT_COLORS.map(({ name, value }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setAccentColor(value)}
-              title={name}
-              className="group relative w-10 h-10 rounded-full border-2 transition-all hover:scale-110"
-              style={{
-                backgroundColor: value,
-                borderColor: accentColor === value ? value : "transparent",
-                outline: accentColor === value ? `2px solid ${value}` : "none",
-                outlineOffset: "2px",
-              }}
-            >
-              {accentColor === value && (
-                <Check className="h-4 w-4 text-white absolute inset-0 m-auto" />
-              )}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-3 mt-2">
-          <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
-          <div>
-            <p className="text-sm font-medium text-gray-900">
-              {ACCENT_COLORS.find((c) => c.value === accentColor)?.name || "Custom"}
-            </p>
-            <p className="text-xs text-gray-400">{accentColor}</p>
-          </div>
-        </div>
-        <div className="mt-4 rounded-lg p-4 flex items-center gap-3" style={{ backgroundColor: accentColor }}>
-          <p className="text-white text-sm font-medium">Preview: This is your accent color</p>
-          <button className="ml-auto px-3 py-1 bg-white text-sm font-medium rounded" style={{ color: accentColor }}>
-            Button
-          </button>
-        </div>
       </section>
 
       {/* Social Links */}

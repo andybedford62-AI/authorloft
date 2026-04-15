@@ -1,6 +1,7 @@
 // Reusable database queries for the public author site
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
 
 export async function getAuthorByDomain(domain: string) {
   const author = await prisma.author.findFirst({
@@ -13,7 +14,20 @@ export async function getAuthorByDomain(domain: string) {
     },
   });
   if (!author) notFound();
-  return author;
+
+  // Enforce plan-based theme access at render time:
+  // FREE authors are locked to Modern Minimal regardless of what's stored.
+  const planTier = author.plan?.tier ?? "FREE";
+  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier)
+    ? author.siteTheme
+    : planTier === "FREE" ? "modern-minimal" : "classic-literary";
+
+  // Compute accent from the effective theme — accentColor is no longer user-controlled.
+  return {
+    ...author,
+    siteTheme: effectiveSiteTheme,
+    accentColor: getThemeAccentHex(effectiveSiteTheme),
+  };
 }
 
 export async function getAuthorBooks(authorId: string) {
