@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Newspaper, ArrowRight, CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import { PageBanner } from "@/components/author-site/page-banner";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import type { Metadata } from "next";
@@ -45,25 +46,13 @@ export default async function BlogListPage({
   const authorName = author.displayName || author.name;
 
   return (
-    <div
-      className="min-h-screen bg-white"
-      style={{ "--accent": accentColor } as React.CSSProperties}
-    >
-      {/* ── Banner ───────────────────────────────────────────────────────── */}
-      <section className="w-full py-12 px-4" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <Newspaper className="h-6 w-6 text-white/70" />
-            <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              {authorName}
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">Blog &amp; News</h1>
-          <p className="text-white/70 mt-2 max-w-xl">
-            Announcements, behind-the-scenes updates, and stories from the author.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen">
+
+      <PageBanner
+        label={authorName}
+        title="Blog & News"
+        subtitle="Announcements, behind-the-scenes updates, and stories from the author."
+      />
 
       {/* ── Posts ────────────────────────────────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">

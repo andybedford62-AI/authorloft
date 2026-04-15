@@ -1,7 +1,7 @@
-import Link from "next/link";
 import Image from "next/image";
 import { GraduationCap, Pin } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
+import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
 import type { Metadata } from "next";
 
@@ -63,20 +63,9 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   ];
 
   return (
-    <div style={{ "--accent": accentColor } as React.CSSProperties}>
+    <div>
 
-      {/* ── Page header ──────────────────────────────────────────────────────── */}
-      <section className="w-full bg-gray-50 border-b border-gray-100 py-12 px-4 text-center">
-        <p
-          className="text-xs font-bold uppercase tracking-widest mb-3"
-          style={{ color: accentColor }}
-        >
-          Biography
-        </p>
-        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 font-heading">
-          About the Author
-        </h1>
-      </section>
+      <PageBanner label="Biography" title="About the Author" />
 
       {/* ── Main content ─────────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Tag, ExternalLink, Clock } from "lucide-react";
+import { ExternalLink, Clock } from "lucide-react";
+import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
@@ -29,26 +30,13 @@ export default async function SpecialsPage({
   });
 
   return (
-    <div style={{ "--accent": accentColor } as React.CSSProperties}>
+    <div>
 
-      {/* ── Page Header ─────────────────────────────────────────────── */}
-      <section className="w-full py-12 px-4" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <Tag className="h-6 w-6 text-white/70" />
-            <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              Promotions &amp; Offers
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">
-            Specials
-          </h1>
-          <p className="text-white/75 mt-2 max-w-xl">
-            Limited-time deals, signed copies, bundles, and exclusive offers from{" "}
-            {author.displayName || author.name}.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        label="Promotions & Offers"
+        title="Specials"
+        subtitle={`Limited-time deals, signed copies, bundles, and exclusive offers from ${author.displayName || author.name}.`}
+      />
 
       {/* ── Specials Grid ───────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
