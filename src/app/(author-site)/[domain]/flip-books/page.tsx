@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BookMarked, Play, Lock } from "lucide-react";
+import { Play, Lock } from "lucide-react";
+import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
@@ -26,24 +27,13 @@ export default async function FlipBooksPage({
     : [];
 
   return (
-    <div style={{ "--accent": accentColor } as React.CSSProperties}>
+    <div>
 
-      {/* ── Page Header ─────────────────────────────────────────────── */}
-      <section className="w-full py-12 px-4" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <BookMarked className="h-6 w-6 text-white/70" />
-            <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              Interactive Reading
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white">Flip Books</h1>
-          <p className="text-white/75 mt-2 max-w-xl">
-            Browse and read interactive flip book editions. Flip through pages, zoom in,
-            and enjoy a fully immersive reading experience.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        label="Interactive Reading"
+        title="Flip Books"
+        subtitle="Browse and read interactive flip book editions. Flip through pages, zoom in, and enjoy a fully immersive reading experience."
+      />
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
 

@@ -21,10 +21,7 @@ export function PageBanner({
       className="w-full py-14 px-4 text-center"
       style={{ backgroundColor: "var(--navy, #1a2236)" }}
     >
-      <p
-        className="text-xs font-bold uppercase tracking-widest mb-3"
-        style={{ color: "var(--accent, #c9a84c)" }}
-      >
+      <p className="text-xs font-bold uppercase tracking-widest mb-3 text-white/60">
         {label}
       </p>
       <h1 className="text-4xl sm:text-5xl font-bold text-white font-heading leading-tight">
