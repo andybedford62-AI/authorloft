@@ -144,16 +144,16 @@ export default async function BookDetailPage({
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
         {/* ── Main book layout ────────────────────────────────────────────── */}
-        <div className="flex flex-col md:flex-row gap-10 py-12">
+        <div className="flex flex-col md:flex-row gap-12 py-12">
 
           {/* ── Cover column ──────────────────────────────────────────────── */}
           <div className="flex-shrink-0 flex flex-col items-center md:items-start gap-4">
 
             {/* Cover image */}
-            <div className="w-52 md:w-56 aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden relative shadow-lg">
+            <div className="w-64 md:w-72 aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden relative shadow-lg">
               {book.coverImageUrl ? (
                 <Image
                   src={book.coverImageUrl}
@@ -247,10 +247,11 @@ export default async function BookDetailPage({
 
             {/* Short description */}
             {book.shortDescription && (
-              <p className="text-base text-gray-600 leading-relaxed border-l-4 pl-4"
-                style={{ borderColor: accentColor }}>
-                {book.shortDescription}
-              </p>
+              <div
+                className="text-base text-gray-600 leading-relaxed border-l-4 pl-4 rich-content"
+                style={{ borderColor: accentColor }}
+                dangerouslySetInnerHTML={{ __html: book.shortDescription }}
+              />
             )}
 
             {/* Buy / Retailer buttons */}

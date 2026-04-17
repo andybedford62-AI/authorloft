@@ -6,6 +6,7 @@ import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, Bo
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
@@ -574,16 +575,22 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
 
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Short Description</label>
-          <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)}
-            rows={2} placeholder="1–2 sentence teaser shown on book cards and listings"
-            className={textareaClass} />
+          <p className="text-xs text-gray-400">1–2 sentence teaser shown on book cards and listings.</p>
+          <RichTextEditor
+            value={shortDescription}
+            onChange={setShortDescription}
+            placeholder="1–2 sentence teaser shown on book cards and listings"
+          />
         </div>
 
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Book Overview</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-            rows={7} placeholder="Full book overview shown on the detail page"
-            className={textareaClass} />
+          <p className="text-xs text-gray-400">Full book overview shown on the detail page.</p>
+          <RichTextEditor
+            value={description}
+            onChange={setDescription}
+            placeholder="Full book overview shown on the detail page"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
