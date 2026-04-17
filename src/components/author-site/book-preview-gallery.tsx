@@ -118,7 +118,7 @@ function ThumbCard({
     <button
       type="button"
       className="relative rounded-lg overflow-visible focus:outline-none group"
-      style={{ width: 100, height: 100, flexShrink: 0 }}
+      style={{ width: 120, height: 120, flexShrink: 0 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -160,8 +160,8 @@ function ThumbCard({
         <div
           className="absolute z-20 rounded-xl overflow-hidden shadow-2xl border border-white/20 pointer-events-none"
           style={{
-            width:  220,
-            height: 165,
+            width:  260,
+            height: 195,
             bottom: "calc(100% + 8px)",
             left:   "50%",
             transform: "translateX(-50%)",
