@@ -1,0 +1,186 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { X, Play, Music } from "lucide-react";
+
+type MediaType = "IMAGE" | "VIDEO" | "AUDIO";
+
+interface PreviewItem {
+  id:           string;
+  position:     number;
+  mediaType:    MediaType;
+  fileUrl:      string;
+  thumbnailUrl: string | null;
+}
+
+interface Props {
+  items:       PreviewItem[];
+  accentColor: string;
+}
+
+// ── Lightbox ──────────────────────────────────────────────────────────────────
+
+function Lightbox({
+  item,
+  onClose,
+}: {
+  item:    PreviewItem;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+      >
+        <X className="w-8 h-8" />
+      </button>
+
+      <div
+        className="relative max-w-3xl w-full mx-4 rounded-xl overflow-hidden shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {item.mediaType === "IMAGE" && (
+          <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
+            <Image
+              src={item.fileUrl}
+              alt=""
+              fill
+              className="object-contain bg-black"
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+          </div>
+        )}
+
+        {item.mediaType === "VIDEO" && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            src={item.fileUrl}
+            autoPlay
+            controls
+            playsInline
+            className="w-full rounded-xl bg-black"
+            style={{ maxHeight: "70vh" }}
+          />
+        )}
+
+        {item.mediaType === "AUDIO" && (
+          <div className="bg-gray-900 p-8 rounded-xl flex flex-col items-center gap-4">
+            {item.thumbnailUrl && (
+              <div className="relative w-40 h-40 rounded-lg overflow-hidden">
+                <Image src={item.thumbnailUrl} alt="" fill className="object-cover" />
+              </div>
+            )}
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <audio src={item.fileUrl} autoPlay controls className="w-full" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Thumbnail card ────────────────────────────────────────────────────────────
+
+function ThumbCard({
+  item,
+  accentColor,
+  onClick,
+}: {
+  item:        PreviewItem;
+  accentColor: string;
+  onClick:     () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  const thumbSrc =
+    item.thumbnailUrl ?? (item.mediaType === "IMAGE" ? item.fileUrl : null);
+
+  const icon =
+    item.mediaType === "VIDEO" ? (
+      <Play className="w-8 h-8 text-white drop-shadow" fill="white" />
+    ) : item.mediaType === "AUDIO" ? (
+      <Music className="w-8 h-8 text-white drop-shadow" />
+    ) : null;
+
+  return (
+    <button
+      type="button"
+      className="relative rounded-lg overflow-visible focus:outline-none group"
+      style={{ width: 100, height: 100, flexShrink: 0 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
+      {/* Base thumbnail */}
+      <div className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent group-hover:border-[var(--accent)] transition-all duration-200 bg-gray-100 flex items-center justify-center"
+        style={{ borderColor: hovered ? accentColor : "transparent" }}
+      >
+        {thumbSrc ? (
+          <Image src={thumbSrc} alt="" fill className="object-cover rounded-lg" sizes="100px" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
+            {icon ?? <Play className="w-6 h-6 text-gray-400" />}
+          </div>
+        )}
+
+        {/* Play/audio overlay icon */}
+        {icon && thumbSrc && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
+            {icon}
+          </div>
+        )}
+      </div>
+
+      {/* Hover popup — enlarged preview */}
+      {hovered && thumbSrc && (
+        <div
+          className="absolute z-20 rounded-xl overflow-hidden shadow-2xl border border-white/20 pointer-events-none"
+          style={{
+            width:  220,
+            height: 165,
+            bottom: "calc(100% + 8px)",
+            left:   "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          <Image src={thumbSrc} alt="" fill className="object-cover" sizes="220px" />
+          {icon && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              {icon}
+            </div>
+          )}
+        </div>
+      )}
+    </button>
+  );
+}
+
+// ── Main export ───────────────────────────────────────────────────────────────
+
+export function BookPreviewGallery({ items, accentColor }: Props) {
+  const [active, setActive] = useState<PreviewItem | null>(null);
+
+  if (!items.length) return null;
+
+  return (
+    <>
+      <div className="flex items-end gap-3 mt-4">
+        {items.map(item => (
+          <ThumbCard
+            key={item.id}
+            item={item}
+            accentColor={accentColor}
+            onClick={() => setActive(item)}
+          />
+        ))}
+      </div>
+
+      {active && <Lightbox item={active} onClose={() => setActive(null)} />}
+    </>
+  );
+}

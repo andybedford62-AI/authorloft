@@ -6,6 +6,7 @@ import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
 import { BookAudioTracks } from "@/components/admin/book-audio-tracks";
+import { BookPreviewMedia } from "@/components/admin/book-preview-media";
 
 export default async function EditBookPage({
   params,
@@ -18,7 +19,7 @@ export default async function EditBookPage({
   const authorId = (session.user as any).id as string;
   const { id } = await params;
 
-  const [book, seriesList, genreTree, author] = await Promise.all([
+  const [book, seriesList, genreTree, author, previewMedia] = await Promise.all([
     prisma.book.findFirst({
       where: { id, authorId },
       include: { genres: { select: { genreId: true } } },
@@ -35,6 +36,10 @@ export default async function EditBookPage({
     prisma.author.findUnique({
       where: { id: authorId },
       select: { plan: { select: { flipBooksLimit: true, audioEnabled: true } } },
+    }),
+    prisma.bookPreviewMedia.findMany({
+      where: { bookId: id },
+      orderBy: { position: "asc" },
     }),
   ]);
 
@@ -87,6 +92,8 @@ export default async function EditBookPage({
       <DirectSalesItems bookId={book.id} />
       {/* Audio previews — narrations, excerpts, author notes */}
       <BookAudioTracks bookId={book.id} audioEnabled={author?.plan?.audioEnabled ?? false} />
+      {/* Preview media — up to 3 images/videos/audio shown on the public book page */}
+      <BookPreviewMedia bookId={book.id} initial={previewMedia} />
       {/* Retailer links are managed separately so changes take effect immediately */}
       <RetailerLinks bookId={book.id} />
     </div>

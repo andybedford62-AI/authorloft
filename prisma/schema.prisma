@@ -251,6 +251,7 @@ model Book {
   retailerLinks       BookRetailerLink[]
   directSaleItems     BookDirectSaleItem[]
   audioTracks         BookAudioTrack[]
+  previewMedia        BookPreviewMedia[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -302,6 +303,31 @@ model BookAudioTrack {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  @@index([bookId])
+}
+
+// ─── Book Preview Media ───────────────────────────────────────────────────────
+
+enum PreviewMediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+model BookPreviewMedia {
+  id               String           @id @default(cuid())
+  bookId           String
+  book             Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  position         Int              // 1, 2, or 3
+  mediaType        PreviewMediaType @default(IMAGE)
+  fileUrl          String           // main media file (image/MP4/MP3)
+  fileKey          String?          // Supabase storage path for deletion
+  thumbnailUrl     String?          // poster image for VIDEO/AUDIO slots
+  thumbnailFileKey String?          // Supabase path for poster deletion
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([bookId, position])
   @@index([bookId])
 }
 

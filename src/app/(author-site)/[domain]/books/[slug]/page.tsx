@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, Fil
 import { BookOverview } from "@/components/author-site/book-overview";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
+import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getRetailer } from "@/lib/retailers";
@@ -99,6 +100,11 @@ export default async function BookDetailPage({
         select: { id: true, title: true, description: true, url: true, durationSeconds: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
+      previewMedia: {
+        where: { fileUrl: { not: "" } },
+        select: { id: true, position: true, mediaType: true, fileUrl: true, thumbnailUrl: true },
+        orderBy: { position: "asc" },
+      },
     },
   });
 
@@ -162,6 +168,13 @@ export default async function BookDetailPage({
                 </div>
               )}
             </div>
+
+            {/* Preview media thumbnails */}
+            {book.previewMedia.length > 0 && (
+              <div className="w-full overflow-visible">
+                <BookPreviewGallery items={book.previewMedia} accentColor={accentColor} />
+              </div>
+            )}
 
             {/* Format badges under cover */}
             {book.availableFormats.length > 0 && (
