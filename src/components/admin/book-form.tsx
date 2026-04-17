@@ -19,7 +19,7 @@ type BookData = {
   shortDescription: string | null;
   description: string | null;
   coverImageUrl: string | null;
-  priceCents: number;            // kept for legacy order compatibility; not shown in form
+  priceCents: number;            // retail / display price shown on public book page
   seriesId: string | null;
   isbn: string | null;
   pageCount: number | null;
@@ -202,6 +202,9 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
   const [seriesId, setSeriesId]     = useState(book?.seriesId ?? "");
   const [isbn, setIsbn]             = useState(book?.isbn ?? "");
   const [pageCount, setPageCount]   = useState(book?.pageCount?.toString() ?? "");
+  const [retailPrice, setRetailPrice] = useState(
+    book?.priceCents ? (book.priceCents / 100).toFixed(2) : ""
+  );
   const [isFeatured, setIsFeatured]               = useState(book?.isFeatured ?? false);
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
   const [directSalesEnabled, setDirectSalesEnabled] = useState(book?.directSalesEnabled ?? false);
@@ -375,6 +378,7 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
       availableFormats,
       caption:     caption || null,
       releaseDate: releaseDate || null,
+      priceCents:  retailPrice ? Math.round(parseFloat(retailPrice) * 100) : 0,
     };
 
     const url    = mode === "edit" ? `/api/admin/books/${book!.id}` : "/api/admin/books";
@@ -631,11 +635,29 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
 
         <CoverUpload value={coverImageUrl} onChange={setCoverImageUrl} />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Input label="ISBN" value={isbn} onChange={(e) => setIsbn(e.target.value)}
             placeholder="978-0-000-00000-0" />
           <Input label="Page Count" type="number" value={pageCount}
             onChange={(e) => setPageCount(e.target.value)} placeholder="e.g. 312" />
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Retail / Display Price
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={retailPrice}
+                onChange={(e) => setRetailPrice(e.target.value)}
+                placeholder="0.00"
+                className="block w-full rounded-md border border-gray-300 bg-white pl-6 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
+            <p className="text-xs text-gray-400">Shown on the public book page. Leave blank to hide.</p>
+          </div>
         </div>
       </section>
 
