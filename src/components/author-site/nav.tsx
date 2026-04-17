@@ -89,7 +89,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--navy)] shadow-lg">
+    <header className="sticky top-0 z-50 bg-[var(--nav-bg)] shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
         {/* ── Logo ─────────────────────────────────────────────────────── */}
@@ -173,7 +173,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
 
       {/* ── Mobile menu ───────────────────────────────────────────────────── */}
       {open && (
-        <div className="md:hidden border-t bg-[var(--navy)]" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className="md:hidden border-t bg-[var(--nav-bg)]" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
           <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
             {links.map((link) => (
               <Link

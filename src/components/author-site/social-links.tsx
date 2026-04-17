@@ -59,7 +59,7 @@ function SocialPillButton({ href, icon, label }: SocialItem) {
 
   const sharedProps = {
     className:
-      "inline-flex items-center gap-2 px-4 py-2 rounded-md bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors duration-200",
+      "inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[hsl(var(--primary))] hover:opacity-90 text-[hsl(var(--primary-foreground))] text-sm font-medium transition-opacity duration-200",
   };
 
   if (href.startsWith("/")) {
