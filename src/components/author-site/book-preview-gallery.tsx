@@ -97,15 +97,22 @@ function ThumbCard({
 }) {
   const [hovered, setHovered] = useState(false);
 
-  const thumbSrc =
-    item.thumbnailUrl ?? (item.mediaType === "IMAGE" ? item.fileUrl : null);
+  // For images use the file itself; for audio use the uploaded poster if available.
+  // For video we always use the <video> element to show the first frame — no poster needed.
+  const imageSrc =
+    item.mediaType === "IMAGE"  ? item.fileUrl :
+    item.mediaType === "AUDIO"  ? (item.thumbnailUrl ?? null) :
+    null; // VIDEO handled separately via <video> element
 
-  const icon =
-    item.mediaType === "VIDEO" ? (
-      <Play className="w-8 h-8 text-white drop-shadow" fill="white" />
-    ) : item.mediaType === "AUDIO" ? (
-      <Music className="w-8 h-8 text-white drop-shadow" />
-    ) : null;
+  const isVideo = item.mediaType === "VIDEO";
+  const hasPreview = isVideo || !!imageSrc;
+
+  const playIcon  = <Play  className="w-8 h-8 text-white drop-shadow" fill="white" />;
+  const musicIcon = <Music className="w-8 h-8 text-white drop-shadow" />;
+  const overlayIcon =
+    item.mediaType === "VIDEO" ? playIcon :
+    item.mediaType === "AUDIO" && imageSrc ? musicIcon :
+    null;
 
   return (
     <button
@@ -116,28 +123,40 @@ function ThumbCard({
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {/* Base thumbnail */}
-      <div className="w-full h-full rounded-lg overflow-hidden border-2 border-transparent group-hover:border-[var(--accent)] transition-all duration-200 bg-gray-100 flex items-center justify-center"
+      {/* ── Base thumbnail ─────────────────────────────────────────────────── */}
+      <div
+        className="w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-200 bg-gray-100 flex items-center justify-center relative"
         style={{ borderColor: hovered ? accentColor : "transparent" }}
       >
-        {thumbSrc ? (
-          <Image src={thumbSrc} alt="" fill className="object-cover rounded-lg" sizes="100px" />
+        {isVideo ? (
+          // Browser renders first frame automatically via preload="metadata"
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            src={item.fileUrl}
+            muted
+            preload="metadata"
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : imageSrc ? (
+          <Image src={imageSrc} alt="" fill className="object-cover" sizes="100px" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
-            {icon ?? <Play className="w-6 h-6 text-gray-400" />}
+          // Audio with no poster uploaded
+          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+            <Music className="w-6 h-6 text-gray-400" />
           </div>
         )}
 
-        {/* Play/audio overlay icon */}
-        {icon && thumbSrc && (
+        {/* Play / audio overlay icon */}
+        {overlayIcon && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-            {icon}
+            {overlayIcon}
           </div>
         )}
       </div>
 
-      {/* Hover popup — enlarged preview */}
-      {hovered && thumbSrc && (
+      {/* ── Hover popup — enlarged preview ────────────────────────────────── */}
+      {hovered && hasPreview && (
         <div
           className="absolute z-20 rounded-xl overflow-hidden shadow-2xl border border-white/20 pointer-events-none"
           style={{
@@ -148,10 +167,22 @@ function ThumbCard({
             transform: "translateX(-50%)",
           }}
         >
-          <Image src={thumbSrc} alt="" fill className="object-cover" sizes="220px" />
-          {icon && (
+          {isVideo ? (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <video
+              src={item.fileUrl}
+              muted
+              preload="metadata"
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : imageSrc ? (
+            <Image src={imageSrc} alt="" fill className="object-cover" sizes="220px" />
+          ) : null}
+
+          {overlayIcon && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-              {icon}
+              {overlayIcon}
             </div>
           )}
         </div>
