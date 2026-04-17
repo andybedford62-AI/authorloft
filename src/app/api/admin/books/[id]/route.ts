@@ -45,7 +45,7 @@ export async function PUT(
   const body = await req.json();
   const {
     title, slug, subtitle, shortDescription, description,
-    coverImageUrl, seriesId,
+    coverImageUrl, seriesId, priceCents,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
     availableFormats, caption, releaseDate, flipBookUrl,
   } = body;
@@ -87,8 +87,7 @@ export async function PUT(
       shortDescription: shortDescription || null,
       description: description || null,
       coverImageUrl: coverImageUrl || null,
-      // priceCents and externalBuyUrl are no longer managed by the book form.
-      // Leave existing values untouched so legacy data is preserved.
+      priceCents: typeof priceCents === "number" ? priceCents : 0,
       seriesId: seriesId || null,
       isbn: isbn || null,
       pageCount: pageCount || null,
