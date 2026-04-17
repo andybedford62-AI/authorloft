@@ -8,9 +8,10 @@
   --font-body:    var(--font-inter), 'Inter', system-ui, sans-serif;
 
   /* Fixed structural colours — same across all author themes */
-  --navy:  #1a2236;  /* nav, footer, hero backgrounds          */
-  --navy2: #151c2c;  /* slightly darker for bottom bar         */
-  --cream: #faf7f2;  /* warm off-white content background      */
+  --navy:    #1a2236;  /* nav, footer, hero backgrounds          */
+  --navy2:   #151c2c;  /* slightly darker for bottom bar         */
+  --cream:   #faf7f2;  /* warm off-white content background      */
+  --nav-bg:  #1a2236;  /* nav background — overridden per theme  */
 }
 
 /* ── Google Fonts ───────────────────────────────────────────────────────── */
@@ -21,11 +22,11 @@
 /* Applied via data-theme attribute on the author site wrapper div         */
 
 /* Default (Classic Literary) — no data-theme needed */
-/* ── Nav and footer (--navy, --cream) are intentionally NOT overridden here.  */
-/* They stay fixed at #1a2236 / #faf7f2 across all themes so the shell of     */
-/* the site is always consistent. Only page content variables change.          */
+/* ── --nav-bg is overridden per theme so the nav matches each palette card.  */
+/* --navy stays as the fallback default; --cream stays fixed across themes.   */
 
 [data-theme='modern'] {
+  --nav-bg: #0a0a0a;
   --background: 0 0% 100%;
   --foreground: 0 0% 4%;
   --primary: 0 0% 4%;
@@ -39,6 +40,7 @@
 }
 
 [data-theme='dark'] {
+  --nav-bg: #0d1117;
   --background: 222 47% 7%;
   --foreground: 210 20% 98%;
   --primary: 210 20% 98%;
@@ -50,6 +52,7 @@
 }
 
 [data-theme='thriller'] {
+  --nav-bg: #0b1220;
   --background: 0 0% 90%;
   --foreground: 0 0% 10%;
   --primary: 218 56% 7%;
@@ -62,6 +65,7 @@
 }
 
 [data-theme='fantasy'] {
+  --nav-bg: #2d1b5e;
   --background: 40 25% 96%;
   --foreground: 10 15% 20%;
   --primary: 270 50% 24%;
@@ -74,6 +78,7 @@
 }
 
 [data-theme='romance'] {
+  --nav-bg: #7a2040;
   --background: 15 100% 99%;
   --foreground: 0 10% 29%;
   --primary: 335 55% 46%;
@@ -86,6 +91,7 @@
 }
 
 [data-theme='scifi'] {
+  --nav-bg: #060b18;
   --background: 240 50% 4%;
   --foreground: 0 0% 95%;
   --primary: 214 22% 39%;
@@ -98,6 +104,7 @@
 }
 
 [data-theme='nautical'] {
+  --nav-bg: #001f3f;
   --background: 205 30% 96%;
   --foreground: 0 0% 5%;
   --primary: 210 100% 12%;
@@ -110,6 +117,7 @@
 }
 
 [data-theme='childrens'] {
+  --nav-bg: #1a5c5a;
   --background: 0 0% 100%;
   --foreground: 0 0% 20%;
   --primary: 184 56% 22%;
@@ -122,6 +130,7 @@
 }
 
 [data-theme='literary'] {
+  --nav-bg: #1a1a1a;
   --background: 0 0% 98%;
   --foreground: 0 0% 10%;
   --primary: 0 0% 17%;
@@ -134,6 +143,7 @@
 }
 
 [data-theme='western'] {
+  --nav-bg: #3d1f0d;
   --background: 36 40% 96%;
   --foreground: 10 15% 20%;
   --primary: 18 50% 36%;
