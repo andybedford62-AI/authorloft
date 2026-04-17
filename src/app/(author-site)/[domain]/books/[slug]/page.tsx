@@ -150,10 +150,10 @@ export default async function BookDetailPage({
         <div className="flex flex-col md:flex-row gap-12 py-12">
 
           {/* ── Cover column ──────────────────────────────────────────────── */}
-          <div className="flex-shrink-0 flex flex-col items-center md:items-start gap-4">
+          <div className="flex-shrink-0 flex flex-col items-center md:items-start gap-4 w-full md:w-72">
 
             {/* Cover image */}
-            <div className="w-64 md:w-72 aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden relative shadow-lg">
+            <div className="w-full aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden relative shadow-lg">
               {book.coverImageUrl ? (
                 <Image
                   src={book.coverImageUrl}
@@ -243,6 +243,11 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
+              {book.priceCents > 0 && (
+                <p className="mt-3 text-2xl font-bold" style={{ color: accentColor }}>
+                  {formatCents(book.priceCents)}
+                </p>
+              )}
             </div>
 
             {/* Short description */}
@@ -256,80 +261,73 @@ export default async function BookDetailPage({
 
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 space-y-3">
-                <p className="text-sm font-semibold text-gray-700">Get this book</p>
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
+                <div className="flex flex-wrap gap-2">
 
-                {/* Per-format direct sale items */}
-                {hasDirectSaleItems && (
-                  <div className="flex flex-wrap gap-2">
-                    {book.directSaleItems.map((item) => {
-                      const fmtStyle = FORMAT_COLORS[item.format] ?? FORMAT_COLORS.EBOOK;
-                      return (
-                        <Link
-                          key={item.id}
-                          href={`/books/${book.slug}/buy?item=${item.id}`}
-                          title={item.description ?? undefined}
-                          style={{ backgroundColor: accentColor }}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 shadow-sm"
-                        >
-                          <ShoppingCart className="h-3.5 w-3.5" />
-                          <span>
-                            {item.label}
-                            {item.priceCents > 0
-                              ? ` — ${formatCents(item.priceCents)}`
-                              : " — Free"}
+                  {/* Retailer links — shown first */}
+                  {hasRetailerLinks && book.retailerLinks.map((link) => {
+                    const info = getRetailer(link.retailer);
+                    return (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          borderColor: info.color,
+                          color: info.color,
+                          backgroundColor: info.badgeBg,
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
+                      >
+                        {link.label}
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    );
+                  })}
+
+                  {/* Per-format direct sale items (eBook etc.) — shown last */}
+                  {hasDirectSaleItems && book.directSaleItems.map((item) => {
+                    const fmtStyle = FORMAT_COLORS[item.format] ?? FORMAT_COLORS.EBOOK;
+                    return (
+                      <Link
+                        key={item.id}
+                        href={`/books/${book.slug}/buy?item=${item.id}`}
+                        title={item.description ?? undefined}
+                        style={{ backgroundColor: accentColor }}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 shadow-sm"
+                      >
+                        <ShoppingCart className="h-3.5 w-3.5" />
+                        <span>
+                          {item.label}
+                          {item.priceCents > 0
+                            ? ` — ${formatCents(item.priceCents)}`
+                            : " — Free"}
+                        </span>
+                        {item.description && (
+                          <span
+                            className="ml-1 text-xs px-1.5 py-0.5 rounded-full"
+                            style={{ backgroundColor: fmtStyle.bg, color: fmtStyle.color }}
+                          >
+                            {item.description}
                           </span>
-                          {item.description && (
-                            <span
-                              className="ml-1 text-xs px-1.5 py-0.5 rounded-full"
-                              style={{ backgroundColor: fmtStyle.bg, color: fmtStyle.color }}
-                            >
-                              {item.description}
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                        )}
+                      </Link>
+                    );
+                  })}
 
-                {/* Legacy single direct-buy button */}
-                {showLegacyDirectBuy && (
-                  <div className="flex flex-wrap gap-2">
+                  {/* Legacy single direct-buy button */}
+                  {showLegacyDirectBuy && (
                     <Link href={`/books/${book.slug}/buy`}>
                       <Button variant="primary" size="sm">
                         <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
                         Buy — {formatCents(book.priceCents)}
                       </Button>
                     </Link>
-                  </div>
-                )}
+                  )}
 
-                {/* Retailer links */}
-                {hasRetailerLinks && (
-                  <div className="flex flex-wrap gap-2">
-                    {book.retailerLinks.map((link) => {
-                      const info = getRetailer(link.retailer);
-                      return (
-                        <a
-                          key={link.id}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            borderColor: info.color,
-                            color: info.color,
-                            backgroundColor: info.badgeBg,
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
-                        >
-                          {link.label}
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
+                </div>
               </div>
             )}
 

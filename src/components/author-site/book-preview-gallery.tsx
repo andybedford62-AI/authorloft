@@ -117,8 +117,7 @@ function ThumbCard({
   return (
     <button
       type="button"
-      className="relative rounded-lg overflow-visible focus:outline-none group"
-      style={{ width: 120, height: 120, flexShrink: 0 }}
+      className="relative w-full aspect-square rounded-lg overflow-visible focus:outline-none group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -200,7 +199,7 @@ export function BookPreviewGallery({ items, accentColor }: Props) {
 
   return (
     <>
-      <div className="flex items-end gap-3 mt-4">
+      <div className="grid grid-cols-3 gap-2 w-full mt-1">
         {items.map(item => (
           <ThumbCard
             key={item.id}
