@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Clock } from "lucide-react";
+import { ExternalLink, Clock, Tag } from "lucide-react";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";

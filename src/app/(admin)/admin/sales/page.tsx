@@ -6,11 +6,11 @@ import { ShoppingBag, TrendingUp, DollarSign, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/utils";
 
-const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "destructive"> = {
+const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger"> = {
   COMPLETED: "success",
   PENDING: "warning",
   REFUNDED: "default",
-  FAILED: "destructive",
+  FAILED: "danger",
 };
 
 export default async function SalesPage() {
