@@ -26,6 +26,7 @@ import {
   Newspaper,
   Shield,
   Bot,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +47,8 @@ const authorNavItems = [
   { href: "/admin/appearance",  label: "Appearance",   icon: Paintbrush },
   { href: "/admin/branding",    label: "Branding",     icon: Palette },
   { href: "/admin/legal",        label: "My Site Legal", icon: Shield },
-  { href: "/admin/ai-assistant", label: "AI Assistant",  icon: Bot },
+  { href: "/admin/ai-assistant", label: "AI Assistant",  icon: Bot    },
+  { href: "/admin/seo-audit",    label: "SEO Audit",     icon: Search },
   { href: "/admin/settings",     label: "Settings",      icon: Settings },
 ];
 
@@ -110,6 +112,7 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = 
           // but hiding the link keeps the nav clean and avoids confusion.
           if (href === "/admin/appearance" && planTier === "FREE") return null;
           if (href === "/admin/ai-assistant" && planTier !== "PREMIUM") return null;
+          if (href === "/admin/seo-audit"    && planTier !== "PREMIUM") return null;
 
           const active = pathname.startsWith(href);
           const badge =
