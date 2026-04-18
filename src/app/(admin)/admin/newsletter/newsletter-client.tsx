@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Download, Users, Mail, Tag, Send, Eye, EyeOff,
-  CheckCircle, XCircle, Loader2, AlertTriangle,
+  CheckCircle, XCircle, Loader2, History, AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,49 +12,62 @@ import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Subscriber = {
-  id: string;
-  name: string | null;
-  email: string;
+  id:            string;
+  name:          string | null;
+  email:         string;
   categoryPrefs: string[];
-  isConfirmed: boolean;
-  subscribedAt: string;
+  isConfirmed:   boolean;
+  subscribedAt:  string;
 };
 
 type Genre = { id: string; name: string };
 
+type Campaign = {
+  id:            string;
+  subject:       string;
+  sentAt:        string;
+  totalSent:     number;
+  totalFailed:   number;
+  totalTargeted: number;
+};
+
 interface Props {
-  subscribers: Subscriber[];
-  genres: Genre[];
-  genreMap: Record<string, string>;
+  subscribers:    Subscriber[];
+  genres:         Genre[];
+  genreMap:       Record<string, string>;
   confirmedCount: number;
-  smtpConfigured: boolean;
-  accentColor: string;
-  authorName: string;
+  accentColor:    string;
+  authorName:     string;
+  campaigns:      Campaign[];
 }
 
 type SendResult = { sent: number; failed: number; total: number } | null;
+type Tab = "subscribers" | "compose" | "history";
 
 export function NewsletterClient({
   subscribers,
   genres,
   genreMap,
   confirmedCount,
-  smtpConfigured,
   accentColor,
   authorName,
+  campaigns: initialCampaigns,
 }: Props) {
-  const [tab, setTab] = useState<"subscribers" | "compose">("subscribers");
+  const router = useRouter();
+  const [tab, setTab] = useState<Tab>("subscribers");
 
   // Compose state
-  const [subject, setSubject] = useState("");
-  const [htmlBody, setHtmlBody] = useState("");
+  const [subject,        setSubject]        = useState("");
+  const [htmlBody,       setHtmlBody]       = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
-  const [showPreview, setShowPreview] = useState(false);
-  const [sendState, setSendState] = useState<"idle" | "confirming" | "sending" | "done">("idle");
-  const [sendResult, setSendResult] = useState<SendResult>(null);
-  const [sendError, setSendError] = useState("");
+  const [showPreview,    setShowPreview]    = useState(false);
+  const [sendState,      setSendState]      = useState<"idle" | "confirming" | "sending" | "done">("idle");
+  const [sendResult,     setSendResult]     = useState<SendResult>(null);
+  const [sendError,      setSendError]      = useState("");
 
-  // Compute how many subscribers will receive this campaign
+  // History — updated optimistically after each send
+  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+
   const targetCount =
     categoryFilter.length === 0
       ? confirmedCount
@@ -76,9 +90,9 @@ export function NewsletterClient({
 
     try {
       const res = await fetch("/api/admin/newsletter/send", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, htmlBody, categoryFilter }),
+        body:    JSON.stringify({ subject, htmlBody, categoryFilter }),
       });
       const data = await res.json();
 
@@ -88,6 +102,17 @@ export function NewsletterClient({
       } else {
         setSendResult(data);
         setSendState("done");
+        // Refresh campaign history from server
+        router.refresh();
+        // Also add optimistically to local state so History tab shows it immediately
+        setCampaigns((prev) => [{
+          id:            crypto.randomUUID(),
+          subject,
+          sentAt:        new Date().toISOString(),
+          totalSent:     data.sent,
+          totalFailed:   data.failed,
+          totalTargeted: data.total,
+        }, ...prev]);
       }
     } catch {
       setSendError("Network error. Please try again.");
@@ -126,9 +151,9 @@ export function NewsletterClient({
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: "Total Subscribers", value: subscribers.length, icon: Users },
-          { label: "Confirmed", value: confirmedCount, icon: Mail },
-          { label: "With Interests", value: subscribers.filter((s) => s.categoryPrefs.length > 0).length, icon: Tag },
+          { label: "Total Subscribers", value: subscribers.length,                                          icon: Users   },
+          { label: "Confirmed",         value: confirmedCount,                                              icon: Mail    },
+          { label: "Campaigns Sent",    value: campaigns.length,                                            icon: History },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg">
@@ -142,26 +167,9 @@ export function NewsletterClient({
         ))}
       </div>
 
-      {/* SMTP warning */}
-      {!smtpConfigured && (
-        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-amber-800">Email sending not configured</p>
-            <p className="text-sm text-amber-700 mt-0.5">
-              Add <code className="bg-amber-100 px-1 rounded">SMTP_HOST</code>,{" "}
-              <code className="bg-amber-100 px-1 rounded">SMTP_USER</code>, and{" "}
-              <code className="bg-amber-100 px-1 rounded">SMTP_PASS</code> to your{" "}
-              <code className="bg-amber-100 px-1 rounded">.env.local</code> file to enable sending.
-              Gmail with an App Password works well.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
-        {(["subscribers", "compose"] as const).map((t) => (
+        {(["subscribers", "compose", "history"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -171,7 +179,7 @@ export function NewsletterClient({
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {t === "compose" ? "Compose & Send" : "Subscribers"}
+            {t === "compose" ? "Compose & Send" : t === "history" ? "History" : "Subscribers"}
           </button>
         ))}
       </div>
@@ -212,19 +220,14 @@ export function NewsletterClient({
                           {sub.name || "—"}
                         </span>
                         {sub.isConfirmed && (
-                          <span
-                            className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"
-                            title="Confirmed"
-                          />
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" title="Confirmed" />
                         )}
                       </div>
                       <span className="text-sm text-gray-500 truncate">{sub.email}</span>
                       <div className="flex flex-wrap gap-1">
                         {interestNames.length > 0 ? (
                           interestNames.map((name) => (
-                            <Badge key={name} variant="default" className="text-xs">
-                              {name}
-                            </Badge>
+                            <Badge key={name} variant="default" className="text-xs">{name}</Badge>
                           ))
                         ) : (
                           <span className="text-xs text-gray-300">None</span>
@@ -232,9 +235,7 @@ export function NewsletterClient({
                       </div>
                       <span className="text-xs text-gray-400">
                         {new Date(sub.subscribedAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
+                          month: "short", day: "numeric", year: "numeric",
                         })}
                       </span>
                     </div>
@@ -267,9 +268,15 @@ export function NewsletterClient({
                   <span className="text-gray-400"> of {sendResult.total} total</span>
                 </p>
               </div>
-              <Button variant="outline" onClick={resetCompose}>
-                Compose another
-              </Button>
+              <div className="flex items-center justify-center gap-3">
+                <Button variant="outline" onClick={resetCompose}>
+                  Compose another
+                </Button>
+                <Button variant="outline" onClick={() => setTab("history")}>
+                  <History className="h-4 w-4 mr-2" />
+                  View history
+                </Button>
+              </div>
             </div>
           )}
 
@@ -279,7 +286,6 @@ export function NewsletterClient({
               <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
                 <h2 className="font-semibold text-gray-900">Compose Campaign</h2>
 
-                {/* Subject */}
                 <Input
                   label="Subject Line"
                   value={subject}
@@ -288,11 +294,8 @@ export function NewsletterClient({
                   disabled={sendState === "sending"}
                 />
 
-                {/* Body */}
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email Body
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">Email Body</label>
                   <RichTextEditor
                     value={htmlBody}
                     onChange={setHtmlBody}
@@ -300,13 +303,12 @@ export function NewsletterClient({
                   />
                 </div>
 
-                {/* Category filter */}
                 {genres.length > 0 && (
                   <div className="space-y-2 pt-1">
                     <div>
                       <p className="text-sm font-medium text-gray-700">Send to</p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        Leave blank to send to all confirmed subscribers. Or select categories to
+                        Leave blank to send to all confirmed subscribers. Select categories to
                         target readers with those interests (subscribers with no preference are
                         always included).
                       </p>
@@ -332,7 +334,7 @@ export function NewsletterClient({
                 )}
               </div>
 
-              {/* Preview toggle */}
+              {/* Preview */}
               {htmlBody && htmlBody !== "<p></p>" && (
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                   <button
@@ -341,22 +343,17 @@ export function NewsletterClient({
                     className="flex items-center justify-between w-full px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <span className="flex items-center gap-2">
-                      {showPreview ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
+                      {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       {showPreview ? "Hide preview" : "Preview email"}
                     </span>
                   </button>
 
                   {showPreview && (
                     <div className="border-t border-gray-100">
-                      {/* Simulated email chrome */}
                       <div className="bg-gray-50 px-6 py-3 border-b border-gray-100 space-y-1">
                         <div className="flex gap-3 text-xs text-gray-500">
                           <span className="font-medium w-12">From:</span>
-                          <span>{authorName}</span>
+                          <span>{authorName} via AuthorLoft</span>
                         </div>
                         <div className="flex gap-3 text-xs text-gray-500">
                           <span className="font-medium w-12">Subject:</span>
@@ -365,32 +362,19 @@ export function NewsletterClient({
                           </span>
                         </div>
                       </div>
-                      {/* Email body preview */}
                       <div className="p-6">
-                        <div
-                          className="rounded-xl overflow-hidden border border-gray-100"
-                          style={{ maxWidth: 560 }}
-                        >
-                          {/* Header */}
-                          <div
-                            className="px-8 py-6"
-                            style={{ backgroundColor: accentColor }}
-                          >
-                            <p className="text-xs text-white/60 uppercase tracking-widest mb-1">
-                              Newsletter from
-                            </p>
+                        <div className="rounded-xl overflow-hidden border border-gray-100" style={{ maxWidth: 560 }}>
+                          <div className="px-8 py-6" style={{ backgroundColor: accentColor }}>
+                            <p className="text-xs text-white/60 uppercase tracking-widest mb-1">Newsletter from</p>
                             <p className="text-xl font-bold text-white">{authorName}</p>
                           </div>
-                          {/* Body */}
                           <div
                             className="bg-white px-8 py-7 prose prose-sm max-w-none text-gray-700"
                             dangerouslySetInnerHTML={{ __html: htmlBody }}
                           />
-                          {/* Footer */}
                           <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
                             <p className="text-xs text-gray-400">
-                              You&apos;re receiving this because you subscribed to updates from{" "}
-                              {authorName}.
+                              You&apos;re receiving this because you subscribed to updates from {authorName}.
                             </p>
                             <p className="text-xs mt-2">
                               <span className="text-gray-400 underline">Unsubscribe</span>
@@ -405,7 +389,6 @@ export function NewsletterClient({
                 </div>
               )}
 
-              {/* Send bar */}
               {sendError && (
                 <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
                   {sendError}
@@ -423,11 +406,9 @@ export function NewsletterClient({
                       <p className="text-sm text-gray-500 mt-0.5">
                         Subject: <span className="font-medium text-gray-700">{subject}</span>
                       </p>
-                      {!smtpConfigured && (
-                        <p className="text-sm text-amber-600 mt-1">
-                          ⚠ SMTP is not configured — this will fail until you add your email credentials.
-                        </p>
-                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        Sent from: {authorName} via AuthorLoft &lt;noreply@authorloft.com&gt;
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-3">
@@ -435,9 +416,7 @@ export function NewsletterClient({
                       <Send className="h-4 w-4 mr-2" />
                       Yes, send now
                     </Button>
-                    <Button variant="outline" onClick={() => setSendState("idle")}>
-                      Cancel
-                    </Button>
+                    <Button variant="outline" onClick={() => setSendState("idle")}>Cancel</Button>
                   </div>
                 </div>
               ) : sendState === "sending" ? (
@@ -472,6 +451,67 @@ export function NewsletterClient({
                   </p>
                 </div>
               )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── History tab ───────────────────────────────────────────────── */}
+      {tab === "history" && (
+        <>
+          {campaigns.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
+              <History className="h-10 w-10 text-gray-200 mx-auto mb-3" />
+              <p className="font-medium text-gray-500">No campaigns sent yet</p>
+              <p className="text-sm text-gray-400 mt-1">
+                Once you send a campaign, it will appear here.
+              </p>
+              <Button variant="outline" className="mt-4" onClick={() => setTab("compose")}>
+                Compose your first campaign
+              </Button>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+                <div className="grid grid-cols-4 text-xs text-gray-500 uppercase tracking-wide font-medium">
+                  <span className="col-span-2">Subject</span>
+                  <span>Date Sent</span>
+                  <span>Results</span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {campaigns.map((c) => {
+                  const allDelivered = c.totalFailed === 0;
+                  const deliveryRate = c.totalTargeted > 0
+                    ? Math.round((c.totalSent / c.totalTargeted) * 100)
+                    : 0;
+                  return (
+                    <div key={c.id} className="grid grid-cols-4 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
+                      <div className="col-span-2 pr-4">
+                        <p className="text-sm font-medium text-gray-900 truncate">{c.subject}</p>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {new Date(c.sentAt).toLocaleDateString("en-US", {
+                          month: "short", day: "numeric", year: "numeric",
+                        })}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {allDelivered ? (
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {c.totalSent} / {c.totalTargeted}
+                          </p>
+                          <p className="text-xs text-gray-400">{deliveryRate}% delivered</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </>
