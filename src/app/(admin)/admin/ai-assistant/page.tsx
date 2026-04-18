@@ -28,7 +28,7 @@ export default async function AiAssistantPage() {
           </p>
         </div>
         <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-          Powered by Claude
+          Powered by Gemini
         </span>
       </div>
 
