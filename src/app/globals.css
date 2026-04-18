@@ -302,6 +302,15 @@ body {
   transform: translateY(0);
 }
 
+/* Gentle floating animation for hero book cover */
+@keyframes float {
+  0%, 100% { transform: perspective(600px) rotateY(-8deg) translateY(0px); }
+  50%       { transform: perspective(600px) rotateY(-8deg) translateY(-10px); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
 /* Honour the user's motion preference */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up {
@@ -318,6 +327,9 @@ body {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+  .animate-float {
+    animation: none !important;
   }
 }
 
