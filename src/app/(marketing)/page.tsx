@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
-import { BrowserMockup } from "@/components/marketing/browser-mockup";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -242,9 +242,18 @@ export default async function MarketingPage() {
             </div>
           </div>
 
-          {/* Right — browser mockup */}
-          <div className="animate-fade-up animate-delay-200 hidden lg:flex justify-end">
-            <BrowserMockup />
+          {/* Right — author site screenshot */}
+          <div className="animate-fade-up animate-delay-200 hidden lg:flex justify-end items-start">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-lg w-full">
+              <Image
+                src="/author-site-preview.png"
+                alt="Example author site built on AuthorLoft"
+                width={1092}
+                height={1404}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
