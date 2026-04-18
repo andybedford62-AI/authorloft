@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
 
 export default async function SuperAdminLayout({
   children,
@@ -20,6 +21,9 @@ export default async function SuperAdminLayout({
   const authorName = (session.user as any).name || "Admin";
   const authorSlug = (session.user as any).slug || "admin";
 
+  const featureConfig = await prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } });
+  const featureGates  = (featureConfig?.gates as Record<string, string>) ?? {};
+
   return (
     <AdminSessionProvider>
       <div className="flex min-h-screen bg-gray-50">
@@ -27,6 +31,7 @@ export default async function SuperAdminLayout({
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={true}
+          featureGates={featureGates}
         />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0">

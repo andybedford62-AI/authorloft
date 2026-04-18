@@ -29,8 +29,7 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const AUTHORLOFT_ACCENT = "#2563EB"; // Platform blue for admin UI
+import { canAccessFeature } from "@/lib/feature-gates";
 
 const authorNavItems = [
   { href: "/admin/dashboard",   label: "Dashboard",    icon: LayoutDashboard },
@@ -53,20 +52,22 @@ const authorNavItems = [
 ];
 
 const superAdminItems = [
-  { href: "/super-admin/authors",  label: "All Authors", icon: Users },
-  { href: "/super-admin/plans",    label: "Plans",       icon: CreditCard },
-  { href: "/super-admin/legal",    label: "Legal",       icon: Shield },
-  { href: "/super-admin/settings", label: "Platform",    icon: Settings },
+  { href: "/super-admin/authors",        label: "All Authors",   icon: Users      },
+  { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard },
+  { href: "/super-admin/feature-config", label: "Feature Gates", icon: Bot        },
+  { href: "/super-admin/legal",          label: "Legal",         icon: Shield     },
+  { href: "/super-admin/settings",       label: "Platform",      icon: Settings   },
 ];
 
 interface SidebarProps {
-  authorName:   string;
-  authorSlug:   string;
+  authorName:    string;
+  authorSlug:    string;
   isSuperAdmin?: boolean;
-  planTier?:    string;
+  planTier?:     string;
+  featureGates?: Record<string, string>;
 }
 
-export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = "FREE" }: SidebarProps) {
+export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = "FREE", featureGates = {} }: SidebarProps) {
   const pathname = usePathname();
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -108,11 +109,8 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {authorNavItems.map(({ href, label, icon: Icon }) => {
-          // FREE plan cannot access Appearance — it redirects to branding anyway,
-          // but hiding the link keeps the nav clean and avoids confusion.
-          if (href === "/admin/appearance" && planTier === "FREE") return null;
-          if (href === "/admin/ai-assistant" && planTier !== "PREMIUM") return null;
-          if (href === "/admin/seo-audit"    && planTier !== "PREMIUM") return null;
+          // Super-admins see all items regardless of plan.
+          if (!isSuperAdmin && !canAccessFeature(href, planTier, featureGates)) return null;
 
           const active = pathname.startsWith(href);
           const badge =
