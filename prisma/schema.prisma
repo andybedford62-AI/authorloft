@@ -556,3 +556,13 @@ model PlatformSettings {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }
+
+// ─── Plan Feature Gates (singleton) ──────────────────────────────────────────
+// Stores which minimum plan tier is required to access each admin feature.
+// Managed via Super Admin → Feature Gates UI.
+
+model PlanFeatureConfig {
+  id        String   @id @default("singleton")
+  gates     Json     @default("{}")
+  updatedAt DateTime @updatedAt
+}
