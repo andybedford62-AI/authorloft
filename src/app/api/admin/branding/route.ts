@@ -14,7 +14,8 @@ export async function PATCH(req: NextRequest) {
     displayName, tagline, shortBio, bio,
     profileImageUrl,
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
-    contactEmail, heroTitle, heroSubtitle, showHeroBanner,
+    contactEmail, contactResponseTime, contactOpenTo,
+    heroTitle, heroSubtitle, showHeroBanner,
     aboutStats, credentials,
   } = body;
 
@@ -34,7 +35,9 @@ export async function PATCH(req: NextRequest) {
       facebookUrl:    facebookUrl    || null,
       twitterUrl:     twitterUrl     || null,
       instagramUrl:   instagramUrl   || null,
-      contactEmail:   contactEmail   || null,
+      contactEmail:         contactEmail         || null,
+      contactResponseTime:  contactResponseTime  || null,
+      contactOpenTo:        contactOpenTo        || null,
       heroTitle:      heroTitle      || null,
       heroSubtitle:   heroSubtitle   || null,
       ...(typeof showHeroBanner === "boolean" && { showHeroBanner }),

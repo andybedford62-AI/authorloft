@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { CheckCircle, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  domain: string;
+  domain:      string;
+  accentColor: string;
 }
 
-export function ContactForm({ domain }: Props) {
+export function ContactForm({ domain, accentColor }: Props) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -23,8 +23,8 @@ export function ContactForm({ domain }: Props) {
       domain,
       name:    (form.elements.namedItem("name")    as HTMLInputElement).value.trim(),
       email:   (form.elements.namedItem("email")   as HTMLInputElement).value.trim(),
-      website: (form.elements.namedItem("website") as HTMLInputElement).value.trim() || undefined,
       subject: (form.elements.namedItem("subject") as HTMLInputElement).value.trim() || undefined,
+      website: (form.elements.namedItem("website") as HTMLInputElement).value.trim() || undefined,
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim(),
     };
 
@@ -50,65 +50,101 @@ export function ContactForm({ domain }: Props) {
   }
 
   const inputClass =
-    "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
+    "block w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 transition-shadow";
 
   if (status === "success") {
     return (
-      <div className="bg-gray-50 rounded-2xl p-6 sm:p-8">
+      <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-100">
         <div className="flex flex-col items-center gap-3 py-10 text-center">
           <CheckCircle className="h-12 w-12 text-green-500" />
           <h2 className="text-xl font-semibold text-gray-900">Message Sent!</h2>
           <p className="text-gray-500 text-sm">
             Thanks for reaching out. You&apos;ll hear back within 24–48 hours.
           </p>
-          <Button variant="outline" className="mt-4" onClick={() => setStatus("idle")}>
-            Send Another
-          </Button>
+          <button
+            type="button"
+            onClick={() => setStatus("idle")}
+            className="mt-4 text-sm font-medium underline underline-offset-2 hover:opacity-70 transition-opacity"
+            style={{ color: accentColor }}
+          >
+            Send another message
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-6 sm:p-8">
+    <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Your Name"
-          name="name"
-          placeholder="Jane Smith"
-          required
-          disabled={status === "loading"}
-        />
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="jane@example.com"
-          required
-          disabled={status === "loading"}
-        />
-        <Input
-          label="Subject"
-          name="subject"
-          placeholder="What's this about? (optional)"
-          disabled={status === "loading"}
-        />
-        <Input
-          label="Website"
-          name="website"
-          type="url"
-          placeholder="https://yoursite.com (optional)"
-          disabled={status === "loading"}
-        />
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              name="name"
+              placeholder="Your name"
+              required
+              disabled={status === "loading"}
+              className={inputClass}
+              style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Email <span className="text-red-400">*</span>
+            </label>
+            <input
+              name="email"
+              type="email"
+              placeholder="your@email.com"
+              required
+              disabled={status === "loading"}
+              className={inputClass}
+              style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+            />
+          </div>
+        </div>
+
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Message</label>
+          <label className="block text-sm font-medium text-gray-700">Subject</label>
+          <input
+            name="subject"
+            placeholder="What's this about?"
+            disabled={status === "loading"}
+            className={inputClass}
+            style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Website <span className="text-gray-400 text-xs font-normal">(optional)</span>
+          </label>
+          <input
+            name="website"
+            type="url"
+            placeholder="https://yoursite.com"
+            disabled={status === "loading"}
+            className={inputClass}
+            style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Message <span className="text-red-400">*</span>
+          </label>
           <textarea
             name="message"
             rows={5}
             required
             disabled={status === "loading"}
-            placeholder="What's on your mind?"
+            placeholder="Your message…"
             className={inputClass}
+            style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
           />
         </div>
 
@@ -118,18 +154,18 @@ export function ContactForm({ domain }: Props) {
           </p>
         )}
 
-        <Button
+        <button
           type="submit"
           disabled={status === "loading"}
-          size="lg"
-          className="w-full"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          style={{ backgroundColor: accentColor }}
         >
           {status === "loading" ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Sending…</>
+            <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>
           ) : (
-            "Send Message"
+            <><Send className="h-4 w-4" /> Send Message</>
           )}
-        </Button>
+        </button>
       </form>
     </div>
   );

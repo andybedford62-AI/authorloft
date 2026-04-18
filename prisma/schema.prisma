@@ -75,6 +75,8 @@ model Author {
   twitterUrl           String?
   instagramUrl         String?
   contactEmail         String?
+  contactResponseTime  String?
+  contactOpenTo        String?
   aboutStats           Json?
   credentials          Json?
   legalNotice          String?        @db.Text  // author's own legal/disclaimer notice
