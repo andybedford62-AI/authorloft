@@ -30,23 +30,28 @@ const FEATURES = [
   { key: "/admin/settings",     label: "Settings",        icon: Settings        },
 ];
 
-const TIERS = ["FREE", "STANDARD", "PREMIUM"] as const;
+const TIERS = ["FREE", "STANDARD", "PREMIUM", "DISABLED"] as const;
 
 const TIER_STYLES: Record<string, { active: string; inactive: string; badge: string }> = {
   FREE: {
-    active:  "bg-slate-100 text-slate-800 border-slate-400 ring-2 ring-slate-400 ring-offset-1",
+    active:   "bg-slate-100 text-slate-800 border-slate-400 ring-2 ring-slate-400 ring-offset-1",
     inactive: "bg-white text-slate-500 border-slate-200 hover:border-slate-400 hover:bg-slate-50",
-    badge:   "bg-slate-100 text-slate-700 border-slate-200",
+    badge:    "bg-slate-100 text-slate-700 border-slate-200",
   },
   STANDARD: {
-    active:  "bg-blue-50 text-blue-800 border-blue-400 ring-2 ring-blue-400 ring-offset-1",
+    active:   "bg-blue-50 text-blue-800 border-blue-400 ring-2 ring-blue-400 ring-offset-1",
     inactive: "bg-white text-blue-400 border-blue-100 hover:border-blue-300 hover:bg-blue-50",
-    badge:   "bg-blue-50 text-blue-700 border-blue-200",
+    badge:    "bg-blue-50 text-blue-700 border-blue-200",
   },
   PREMIUM: {
-    active:  "bg-purple-50 text-purple-800 border-purple-400 ring-2 ring-purple-400 ring-offset-1",
+    active:   "bg-purple-50 text-purple-800 border-purple-400 ring-2 ring-purple-400 ring-offset-1",
     inactive: "bg-white text-purple-400 border-purple-100 hover:border-purple-300 hover:bg-purple-50",
-    badge:   "bg-purple-50 text-purple-700 border-purple-200",
+    badge:    "bg-purple-50 text-purple-700 border-purple-200",
+  },
+  DISABLED: {
+    active:   "bg-red-50 text-red-800 border-red-400 ring-2 ring-red-400 ring-offset-1",
+    inactive: "bg-white text-red-300 border-red-100 hover:border-red-300 hover:bg-red-50",
+    badge:    "bg-red-50 text-red-700 border-red-200",
   },
 };
 
@@ -120,18 +125,21 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
       )}
 
       {/* Plan legend */}
-      <div className="flex flex-wrap gap-3">
-        {TIERS.map((tier) => (
+      <div className="flex flex-wrap items-center gap-3">
+        {(["FREE", "STANDARD", "PREMIUM"] as const).map((tier) => (
           <div
             key={tier}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold capitalize ${TIER_STYLES[tier].badge}`}
+            className={`px-3 py-1.5 rounded-lg border text-xs font-bold ${TIER_STYLES[tier].badge}`}
           >
             {tier}
           </div>
         ))}
-        <span className="text-xs text-gray-400 self-center ml-1">
-          — users on a higher tier inherit access to lower-tier features automatically
-        </span>
+        <span className="text-xs text-gray-400">— higher tiers inherit lower-tier access</span>
+        <div className="h-4 w-px bg-gray-200" />
+        <div className={`px-3 py-1.5 rounded-lg border text-xs font-bold ${TIER_STYLES.DISABLED.badge}`}>
+          DISABLED
+        </div>
+        <span className="text-xs text-gray-400">— hidden from all users including Premium</span>
       </div>
 
       {/* Feature rows */}
