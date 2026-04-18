@@ -21,20 +21,19 @@ export async function POST(req: NextRequest) {
   }
 
   const prompt = [
-    "You are a professional book description copywriter for authors.",
-    "Write a compelling, engaging book description based on the following details.\n",
+    "You are a professional book marketing copywriter.",
+    "Write compelling book marketing copy for the following book.\n",
     `Book Title: ${bookTitle.trim()}`,
-    genre?.trim()    ? `Genre: ${genre.trim()}`                        : null,
-    themes?.trim()   ? `Key Themes / Plot Points: ${themes.trim()}`    : null,
-    audience?.trim() ? `Target Audience: ${audience.trim()}`           : null,
+    genre?.trim()    ? `Genre: ${genre.trim()}`                     : null,
+    themes?.trim()   ? `Key Themes: ${themes.trim()}`               : null,
+    audience?.trim() ? `Target Audience: ${audience.trim()}`        : null,
     "",
-    "Write a single flowing description of approximately 200–250 words.",
-    "- Open with a powerful hook that draws the reader in immediately",
-    "- Build intrigue, tension, or emotional resonance",
-    "- End with a compelling reason to read the book",
-    "- Write in third person",
-    "- Do not use headers, bullet points, or the book title as the first word",
-    "- Do not add any preamble or commentary — output only the description itself",
+    "Please provide:",
+    "1. A SHORT DESCRIPTION (2–3 sentences, for listings and previews)",
+    "2. A FULL SYNOPSIS (2–3 paragraphs, engaging and spoiler-light)",
+    "",
+    "Use vivid, compelling language appropriate for the genre. Format clearly with headers.",
+    "Do not add any preamble before the first header.",
   ].filter(Boolean).join("\n");
 
   try {
