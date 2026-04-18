@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { getRetailer } from "@/lib/retailers";
+import { CoverTilt } from "./cover-tilt";
 import type { BookForTemplate } from "./templates/types";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -208,8 +209,8 @@ export function BookCarousel({
             >
               {/* Cover — consistent 3:4 ratio */}
               <Link href={`/books/${book.slug}`} className="block mb-2.5">
-                <div
-                  className="relative w-full rounded-xl overflow-hidden shadow-sm bg-gray-100 group-hover:shadow-md transition-shadow duration-200"
+                <CoverTilt
+                  className="relative w-full rounded-xl overflow-hidden shadow-sm bg-gray-100"
                   style={{ aspectRatio: "3/4" }}
                 >
                   {book.coverImageUrl ? (
@@ -217,7 +218,7 @@ export function BookCarousel({
                       src={book.coverImageUrl}
                       alt={book.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -234,10 +235,7 @@ export function BookCarousel({
                       {book.caption}
                     </span>
                   )}
-
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
-                </div>
+                </CoverTilt>
               </Link>
 
               {/* Series label */}
