@@ -12,11 +12,56 @@ import {
   ChevronRight,
   Sparkles,
   Tag,
+  Heart,
+  Zap,
+  Wand2,
+  Star,
+  Feather,
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import { prisma } from "@/lib/db";
+
+const AUTHOR_TYPES = [
+  {
+    icon: Heart,
+    genre: "Romance & Contemporary",
+    description: "Build a beautiful home for your series, capture subscriber emails, and sell direct to your most devoted readers.",
+    gradient: "linear-gradient(135deg, #ec4899, #f43f5e)",
+  },
+  {
+    icon: Zap,
+    genre: "Thriller & Mystery",
+    description: "Dark, dramatic themes with templates designed to create tension — from the moment a reader lands on your page.",
+    gradient: "linear-gradient(135deg, #dc2626, #7c3aed)",
+  },
+  {
+    icon: Wand2,
+    genre: "Fantasy & Sci-Fi",
+    description: "Showcase complex world-building with series pages, lore sections, and a catalog that grows with your universe.",
+    gradient: "linear-gradient(135deg, #7c3aed, #2563eb)",
+  },
+  {
+    icon: Star,
+    genre: "Children's & YA",
+    description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.",
+    gradient: "linear-gradient(135deg, #f59e0b, #10b981)",
+  },
+  {
+    icon: Feather,
+    genre: "Literary Fiction",
+    description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.",
+    gradient: "linear-gradient(135deg, #1e293b, #334155)",
+  },
+  {
+    icon: Lightbulb,
+    genre: "Non-Fiction & Memoir",
+    description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.",
+    gradient: "linear-gradient(135deg, #0891b2, #0d9488)",
+  },
+];
 
 const features = [
   {
@@ -233,8 +278,43 @@ export default async function MarketingPage() {
         </div>
       </section>
 
+      {/* ── Who It's For ──────────────────────────────────────────────────── */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <ScrollReveal className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
+              <Users className="h-3.5 w-3.5" />
+              Who It&apos;s For
+            </div>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Built for every kind of author
+            </h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">
+              Whether you write sweeping epics or slim novellas, AuthorLoft gives you a home that fits.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {AUTHOR_TYPES.map(({ icon: Icon, genre, description, gradient }, i) => (
+              <ScrollReveal key={genre} delay={i * 70}>
+                <div className="group h-full bg-white rounded-2xl border border-gray-100 p-6 space-y-3 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300"
+                    style={{ background: gradient }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900">{genre}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Pricing ───────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-24 bg-white">
+      <section id="pricing" className="py-24 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
           {/* Section heading */}

@@ -16,33 +16,36 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
       {/* ── 1. Top Banner ───────────────────────────────────────────────── */}
-      <section className="w-full py-14 px-4" style={{ backgroundColor: accentColor }}>
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
+      <section className="w-full py-16 px-4 relative overflow-hidden" style={{ backgroundColor: accentColor }}>
+        {/* Depth overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/35 pointer-events-none" />
+        {/* Decorative blobs */}
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full blur-3xl pointer-events-none opacity-20 bg-white" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full blur-2xl pointer-events-none opacity-15 bg-white" />
+
+        <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
 
           {/* Left: author identity */}
-          <div className="flex-1 text-white space-y-3">
-            <div className="flex items-center gap-2">
+          <div className="flex-1 text-white space-y-4">
+            <div className="animate-fade-up flex items-center gap-2">
               <BookMarked className="h-5 w-5 text-white/60" />
               <span className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em]">
                 Author
               </span>
             </div>
-            <h1
-              className="text-3xl sm:text-5xl font-bold text-white leading-tight"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-            >
+            <h1 className="animate-fade-up animate-delay-100 text-3xl sm:text-5xl font-bold text-white leading-tight font-heading">
               {author.displayName || author.name}
             </h1>
             {author.tagline && (
-              <p className="text-white/75 text-base sm:text-lg max-w-md">
+              <p className="animate-fade-up animate-delay-200 text-white/75 text-base sm:text-lg max-w-md">
                 {author.tagline}
               </p>
             )}
-            <div className="flex flex-wrap gap-3 pt-1">
+            <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-1">
               <Link href="/books">
                 <Button
                   size="sm"
-                  className="bg-white font-semibold hover:bg-white/90 shadow"
+                  className="bg-white font-semibold hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
                   style={{ color: accentColor }}
                 >
                   Browse Books <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
@@ -62,9 +65,9 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
 
           {/* Right: profile photo */}
           {author.profileImageUrl && (
-            <div className="flex-shrink-0">
+            <div className="animate-fade-up animate-delay-200 flex-shrink-0">
               <div
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden relative shadow-xl"
+                className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden relative shadow-2xl transition-transform duration-300 hover:scale-105"
                 style={{ outline: "3px solid rgba(255,255,255,0.3)", outlineOffset: "4px" }}
               >
                 <Image
@@ -88,10 +91,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
             <div className="space-y-4 flex-1">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
-                <h2
-                  className="text-xl font-bold text-gray-900"
-                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                >
+                <h2 className="text-xl font-bold text-gray-900 font-heading">
                   About {author.displayName || author.name}
                 </h2>
               </div>
@@ -117,10 +117,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-4">
               <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2
-                className="text-2xl font-bold text-gray-900"
-                style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-              >
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">
                 {featuredBooks.length > 0 ? "Featured Books" : "Books"}
               </h2>
             </div>
@@ -178,10 +175,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2
-                className="text-2xl font-bold text-gray-900"
-                style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-              >
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">
                 Series
               </h2>
             </div>
