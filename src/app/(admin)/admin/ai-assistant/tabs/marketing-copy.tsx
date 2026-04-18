@@ -47,7 +47,13 @@ export function MarketingCopyTab() {
 
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        throw new Error(json.error || "Generation failed. Please try again.");
+        if (res.status === 402 && json.error === "limit_reached") {
+          setErrorMsg("limit_reached");
+        } else {
+          throw new Error(json.error || "Generation failed. Please try again.");
+        }
+        setStatus("error");
+        return;
       }
 
       const reader  = res.body!.getReader();
@@ -139,10 +145,21 @@ export function MarketingCopyTab() {
         </div>
 
         {status === "error" && (
-          <div role="alert" aria-live="polite"
-            className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-            {errorMsg}
-          </div>
+          errorMsg === "limit_reached" ? (
+            <div role="alert" aria-live="polite"
+              className="mt-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              You've reached your monthly AI request limit.{" "}
+              <a href="/admin/settings" className="font-semibold underline hover:text-amber-900">
+                Add your own Gemini API key in Settings
+              </a>{" "}
+              to continue with no limits.
+            </div>
+          ) : (
+            <div role="alert" aria-live="polite"
+              className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              {errorMsg}
+            </div>
+          )
         )}
 
         <button

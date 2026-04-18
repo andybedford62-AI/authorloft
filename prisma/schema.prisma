@@ -77,6 +77,10 @@ model Author {
   contactEmail         String?
   contactResponseTime  String?
   contactOpenTo        String?
+  aiApiKey             String?
+  aiUsageCount         Int       @default(0)
+  aiUsageCap           Int       @default(20)
+  aiUsageResetAt       DateTime?
   aboutStats           Json?
   credentials          Json?
   legalNotice          String?        @db.Text  // author's own legal/disclaimer notice

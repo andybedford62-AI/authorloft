@@ -12,11 +12,22 @@ export default async function AiAssistantPage() {
 
   const author = await prisma.author.findUnique({
     where:  { id: authorId },
-    select: { plan: { select: { tier: true } } },
+    select: {
+      plan:          { select: { tier: true } },
+      aiApiKey:      true,
+      aiUsageCount:  true,
+      aiUsageCap:    true,
+      aiUsageResetAt: true,
+    },
   });
 
   const tier = author?.plan?.tier ?? "FREE";
   if (tier !== "PREMIUM") redirect("/admin/dashboard");
+
+  const hasOwnKey  = !!author?.aiApiKey;
+  const usageCount = author?.aiUsageCount ?? 0;
+  const usageCap   = author?.aiUsageCap   ?? 20;
+  const atLimit    = !hasOwnKey && usageCount >= usageCap;
 
   return (
     <div className="space-y-6">
@@ -32,7 +43,12 @@ export default async function AiAssistantPage() {
         </span>
       </div>
 
-      <AiAssistantShell />
+      <AiAssistantShell
+        hasOwnKey={hasOwnKey}
+        usageCount={usageCount}
+        usageCap={usageCap}
+        atLimit={atLimit}
+      />
     </div>
   );
 }
