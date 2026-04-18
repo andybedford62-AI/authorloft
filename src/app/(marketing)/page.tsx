@@ -152,7 +152,7 @@ export default async function MarketingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="animate-fade-up animate-delay-100 text-4xl sm:text-6xl font-bold leading-tight tracking-tight">
+          <h1 className="animate-fade-up animate-delay-100 font-heading text-4xl sm:text-6xl font-bold leading-tight tracking-tight">
             Your complete author
             <span className="text-shimmer"> website platform</span>
           </h1>
@@ -206,7 +206,7 @@ export default async function MarketingPage() {
               <Sparkles className="h-3.5 w-3.5" />
               Features
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Everything an author needs
             </h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
@@ -243,7 +243,7 @@ export default async function MarketingPage() {
               <Tag className="h-3.5 w-3.5" />
               Pricing
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Simple, transparent pricing
             </h2>
             <p className="text-gray-500 text-lg">
