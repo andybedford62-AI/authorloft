@@ -2,26 +2,34 @@
 
 import { useEffect, useRef } from "react";
 
+type RevealDirection = "up" | "left" | "right" | "scale";
+
 interface ScrollRevealProps {
   children: React.ReactNode;
-  /** Extra Tailwind classes applied to the wrapper div */
   className?: string;
-  /** Delay in ms before the reveal transition starts */
   delay?: number;
+  direction?: RevealDirection;
 }
 
-/**
- * Lightweight scroll-triggered reveal — no external libraries.
- * Uses IntersectionObserver; respects prefers-reduced-motion.
- */
-export function ScrollReveal({ children, className = "", delay = 0 }: ScrollRevealProps) {
+const directionClass: Record<RevealDirection, string> = {
+  up:    "reveal-item",
+  left:  "reveal-from-left",
+  right: "reveal-from-right",
+  scale: "reveal-scale",
+};
+
+export function ScrollReveal({
+  children,
+  className = "",
+  delay = 0,
+  direction = "up",
+}: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    // If the user prefers reduced motion, reveal immediately with no animation.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       el.classList.add("reveal-visible");
       return;
@@ -44,7 +52,7 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
   return (
     <div
       ref={ref}
-      className={`reveal-item ${className}`}
+      className={`${directionClass[direction]} ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

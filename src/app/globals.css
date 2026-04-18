@@ -294,12 +294,35 @@ body {
   opacity: 0;
   transform: translateY(18px);
   transition:
-    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal-item.reveal-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Directional reveal variants */
+.reveal-from-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-from-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.93);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-from-left.reveal-visible,
+.reveal-from-right.reveal-visible,
+.reveal-scale.reveal-visible {
+  opacity: 1;
+  transform: none;
 }
 
 /* Gentle floating animation for hero book cover */
@@ -323,7 +346,10 @@ body {
     background: none !important;
     -webkit-text-fill-color: #93c5fd !important;
   }
-  .reveal-item {
+  .reveal-item,
+  .reveal-from-left,
+  .reveal-from-right,
+  .reveal-scale {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
