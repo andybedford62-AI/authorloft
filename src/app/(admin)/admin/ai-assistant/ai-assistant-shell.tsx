@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Lightbulb, Megaphone, MessageSquareHeart, Bot } from "lucide-react";
+import { BookOpen, Lightbulb, Megaphone, MessageSquareHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookDescriptionsTab } from "./tabs/book-descriptions";
+import { BlogIdeasTab }        from "./tabs/blog-ideas";
+import { MarketingCopyTab }    from "./tabs/marketing-copy";
+import { ReaderFeedbackTab }   from "./tabs/reader-feedback";
 
 const TABS = [
   {
@@ -18,21 +21,21 @@ const TABS = [
     label:       "Blog Ideas",
     icon:        Lightbulb,
     description: "Generate blog post drafts, outlines, and ideas for your author site.",
-    ready:       false,
+    ready:       true,
   },
   {
     id:          "marketing",
     label:       "Marketing Copy",
     icon:        Megaphone,
     description: "Create back-cover blurbs, Amazon descriptions, social posts, and ad copy.",
-    ready:       false,
+    ready:       true,
   },
   {
     id:          "feedback",
     label:       "Reader Feedback",
     icon:        MessageSquareHeart,
     description: "Analyse reader reviews and craft thoughtful responses.",
-    ready:       false,
+    ready:       true,
   },
 ] as const;
 
@@ -78,22 +81,9 @@ export function AiAssistantShell() {
         aria-labelledby={`tab-${activeTab}`}
       >
         {activeTab === "descriptions" && <BookDescriptionsTab />}
-
-        {tab.ready === false && (
-          <div className="p-8 min-h-[420px] flex flex-col items-center justify-center text-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center">
-              <Icon className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="space-y-2 max-w-md">
-              <h2 className="text-xl font-semibold text-gray-900">{tab.label}</h2>
-              <p className="text-sm text-gray-500">{tab.description}</p>
-            </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-medium">
-              <Bot className="h-3.5 w-3.5" />
-              Coming soon — this tab is being built
-            </div>
-          </div>
-        )}
+        {activeTab === "blog"         && <BlogIdeasTab />}
+        {activeTab === "marketing"    && <MarketingCopyTab />}
+        {activeTab === "feedback"     && <ReaderFeedbackTab />}
       </div>
     </div>
   );
