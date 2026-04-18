@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -124,6 +124,186 @@ function StripeConnectSection() {
             <p className="text-sm text-red-600">{connectError}</p>
           )}
         </div>
+      )}
+    </section>
+  );
+}
+
+// ── AI Assistant key section ──────────────────────────────────────────────────
+
+function AiKeySection() {
+  const [hasKey,   setHasKey]   = useState<boolean | null>(null);
+  const [keyValue, setKeyValue] = useState("");
+  const [show,     setShow]     = useState(false);
+  const [busy,     setBusy]     = useState(false);
+  const [msg,      setMsg]      = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/ai-key")
+      .then((r) => r.json())
+      .then((d) => setHasKey(d.hasKey ?? false))
+      .catch(() => setHasKey(false));
+  }, []);
+
+  async function handleAction(action: "test" | "save" | "remove") {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch("/api/admin/settings/ai-key", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ action, apiKey: keyValue }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMsg({ type: "error", text: data.error || "Something went wrong." });
+      } else if (action === "test") {
+        setMsg({ type: "success", text: "Key is valid and working." });
+      } else if (action === "save") {
+        setMsg({ type: "success", text: "API key saved. No monthly limits apply." });
+        setHasKey(true);
+        setKeyValue("");
+      } else {
+        setMsg({ type: "success", text: "API key removed. Monthly usage cap now applies." });
+        setHasKey(false);
+        setKeyValue("");
+      }
+    } catch {
+      setMsg({ type: "error", text: "Network error. Please try again." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Bot className="h-4 w-4 text-gray-400" />
+          AI Assistant
+        </h2>
+        <p className="text-xs text-gray-400 mt-1">
+          Add your own Gemini API key to unlock unlimited AI requests. Without it, a monthly usage cap applies.{" "}
+          <a
+            href="https://aistudio.google.com/app/apikey"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            Get a free key at Google AI Studio →
+          </a>
+        </p>
+      </div>
+
+      {hasKey === null ? (
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : hasKey ? (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 border border-green-200">
+            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-green-800">API key saved</p>
+              <p className="text-xs text-green-600 mt-0.5">Your Gemini key is active — no monthly limits apply.</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="relative">
+              <input
+                type={show ? "text" : "password"}
+                value={keyValue}
+                onChange={(e) => { setKeyValue(e.target.value); setMsg(null); }}
+                placeholder="Enter new key to replace the saved one"
+                aria-label="New Gemini API key"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setShow((v) => !v)}
+                aria-label={show ? "Hide key" : "Show key"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                disabled={busy || !keyValue.trim()}
+                onClick={() => handleAction("test")}
+                className="text-sm"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                Test Key
+              </Button>
+              <Button
+                disabled={busy || !keyValue.trim()}
+                onClick={() => handleAction("save")}
+                className="text-sm"
+              >
+                Save New Key
+              </Button>
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => handleAction("remove")}
+                className="text-sm text-red-600 hover:bg-red-50 border-red-200 ml-auto"
+              >
+                <Trash2 className="h-4 w-4 mr-1.5" /> Remove Key
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className="relative">
+            <input
+              type={show ? "text" : "password"}
+              value={keyValue}
+              onChange={(e) => { setKeyValue(e.target.value); setMsg(null); }}
+              placeholder="Paste your Gemini API key here"
+              aria-label="Gemini API key"
+              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => setShow((v) => !v)}
+              aria-label={show ? "Hide key" : "Show key"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              disabled={busy || !keyValue.trim()}
+              onClick={() => handleAction("test")}
+              className="text-sm"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Test Key
+            </Button>
+            <Button
+              disabled={busy || !keyValue.trim()}
+              onClick={() => handleAction("save")}
+              className="text-sm"
+            >
+              Save Key
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {msg && (
+        <p className={`text-sm rounded-lg px-4 py-3 border ${
+          msg.type === "success"
+            ? "text-green-700 bg-green-50 border-green-200"
+            : "text-red-600 bg-red-50 border-red-200"
+        }`}>
+          {msg.text}
+        </p>
       )}
     </section>
   );
@@ -305,6 +485,9 @@ export default function SettingsPage() {
 
       {/* ── Stripe Connect ───────────────────────────────────────── */}
       <StripeConnectSection />
+
+      {/* ── AI Assistant ─────────────────────────────────────────── */}
+      <AiKeySection />
 
       {/* ── Danger Zone ───────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-red-100 p-6">

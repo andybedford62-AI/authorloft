@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Save, Loader2, CheckCircle, AlertTriangle,
-  Globe, Mail, User, Shield, ToggleLeft, CreditCard,
+  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw,
 } from "lucide-react";
 
 type Plan = {
@@ -33,6 +33,10 @@ type Author = {
 interface Props {
   author: Author;
   plans: Plan[];
+  aiUsageCount:  number;
+  aiUsageCap:    number;
+  aiUsageResetAt: Date | null;
+  hasOwnKey:     boolean;
 }
 
 function Section({ title, icon: Icon, children }: {
@@ -71,7 +75,7 @@ const inputClass =
 const textareaClass =
   "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none";
 
-export function AuthorEditForm({ author, plans }: Props) {
+export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey }: Props) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -92,6 +96,45 @@ export function AuthorEditForm({ author, plans }: Props) {
   const [saving,  setSaving]  = useState(false);
   const [status,  setStatus]  = useState<"idle" | "success" | "error">("idle");
   const [errMsg,  setErrMsg]  = useState("");
+
+  // AI Usage section state
+  const [aiCap,      setAiCap]      = useState(aiUsageCap);
+  const [aiCount,    setAiCount]    = useState(aiUsageCount);
+  const [aiResetAt,  setAiResetAt]  = useState<Date | null>(aiUsageResetAt);
+  const [aiSaving,   setAiSaving]   = useState(false);
+  const [aiStatus,   setAiStatus]   = useState<"idle" | "success" | "error">("idle");
+  const [aiErrMsg,   setAiErrMsg]   = useState("");
+
+  async function handleAiSave(opts: { cap?: number; resetCount?: boolean }) {
+    setAiSaving(true);
+    setAiStatus("idle");
+    setAiErrMsg("");
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}/ai-usage`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          ...(opts.cap !== undefined ? { aiUsageCap: opts.cap } : {}),
+          ...(opts.resetCount ? { resetCount: true } : {}),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (opts.cap !== undefined) setAiCap(data.aiUsageCap);
+        if (opts.resetCount) { setAiCount(0); setAiResetAt(new Date(data.aiUsageResetAt)); }
+        setAiStatus("success");
+        setTimeout(() => setAiStatus("idle"), 3000);
+      } else {
+        setAiErrMsg(data.error || "Could not update AI usage.");
+        setAiStatus("error");
+      }
+    } catch {
+      setAiErrMsg("Network error.");
+      setAiStatus("error");
+    } finally {
+      setAiSaving(false);
+    }
+  }
 
   function set(field: keyof typeof form, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -315,6 +358,86 @@ export function AuthorEditForm({ author, plans }: Props) {
               />
             </button>
           </div>
+        </div>
+      </Section>
+
+      {/* ── AI Usage ─────────────────────────────────────────────────── */}
+      <Section title="AI Usage" icon={Bot}>
+        <div className="space-y-4">
+          {/* Status row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-center">
+              <p className="text-xl font-bold text-gray-900">{aiCount}</p>
+              <p className="text-xs text-gray-500 mt-0.5">Used this month</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-center">
+              <p className="text-xl font-bold text-gray-900">{aiCap}</p>
+              <p className="text-xs text-gray-500 mt-0.5">Monthly cap</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-center">
+              <p className={`text-sm font-semibold ${hasOwnKey ? "text-green-600" : "text-gray-400"}`}>
+                {hasOwnKey ? "Own key active" : "Platform key"}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">Key source</p>
+            </div>
+          </div>
+
+          {aiResetAt && (
+            <p className="text-xs text-gray-400">
+              Counter last reset: {new Date(aiResetAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          )}
+
+          {/* Cap editor */}
+          <div className="flex items-end gap-3">
+            <div className="space-y-1">
+              <label htmlFor="ai-cap" className="block text-sm font-medium text-gray-700">
+                Monthly cap
+              </label>
+              <input
+                id="ai-cap"
+                type="number"
+                min={0}
+                value={aiCap}
+                onChange={(e) => setAiCap(Number(e.target.value))}
+                className={`${inputClass} w-28`}
+              />
+            </div>
+            <button
+              type="button"
+              disabled={aiSaving}
+              onClick={() => handleAiSave({ cap: aiCap })}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {aiSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Cap
+            </button>
+          </div>
+
+          {/* Reset counter */}
+          <div className="pt-1 border-t border-gray-100">
+            <button
+              type="button"
+              disabled={aiSaving}
+              onClick={() => handleAiSave({ resetCount: true })}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset Counter to 0
+            </button>
+            <p className="text-xs text-gray-400 mt-1.5">Resets the monthly count immediately.</p>
+          </div>
+
+          {aiStatus === "success" && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" /> Updated successfully.
+            </p>
+          )}
+          {aiStatus === "error" && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" /> {aiErrMsg}
+            </p>
+          )}
         </div>
       </Section>
 

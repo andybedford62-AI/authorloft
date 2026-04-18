@@ -2,31 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getAiContext, incrementUsage } from "@/lib/ai-usage";
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session  = await getServerSession(authOptions);
+  const authorId = (session?.user as any)?.id as string | undefined;
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const ctx = await getAiContext(authorId);
+  if (!ctx) return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });
+  if (ctx.atLimit) {
+    return NextResponse.json({
+      error:   "limit_reached",
+      message: `You've used all ${ctx.usageCap} free AI requests this month. Add your own Gemini API key in Settings to continue with no limits.`,
+    }, { status: 402 });
   }
 
   const { bookTitle, genre, themes, audience } = await req.json();
-
-  if (!bookTitle?.trim()) {
-    return NextResponse.json({ error: "Book title is required." }, { status: 400 });
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });
-  }
+  if (!bookTitle?.trim()) return NextResponse.json({ error: "Book title is required." }, { status: 400 });
 
   const prompt = [
     "You are a professional book marketing copywriter.",
     "Write compelling book marketing copy for the following book.\n",
     `Book Title: ${bookTitle.trim()}`,
-    genre?.trim()    ? `Genre: ${genre.trim()}`                     : null,
-    themes?.trim()   ? `Key Themes: ${themes.trim()}`               : null,
-    audience?.trim() ? `Target Audience: ${audience.trim()}`        : null,
+    genre?.trim()    ? `Genre: ${genre.trim()}`              : null,
+    themes?.trim()   ? `Key Themes: ${themes.trim()}`        : null,
+    audience?.trim() ? `Target Audience: ${audience.trim()}` : null,
     "",
     "Please provide:",
     "1. A SHORT DESCRIPTION (2–3 sentences, for listings and previews)",
@@ -37,10 +38,11 @@ export async function POST(req: NextRequest) {
   ].filter(Boolean).join("\n");
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
+    const genAI  = new GoogleGenerativeAI(ctx.apiKey);
+    const model  = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContentStream(prompt);
+
+    if (!ctx.hasOwnKey) await incrementUsage(authorId);
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -57,17 +59,10 @@ export async function POST(req: NextRequest) {
     });
 
     return new Response(stream, {
-      headers: {
-        "Content-Type":  "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache",
-        "X-Accel-Buffering": "no",
-      },
+      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-cache", "X-Accel-Buffering": "no" },
     });
   } catch (err: any) {
     console.error("[AI book-description]", err);
-    return NextResponse.json(
-      { error: err?.message ?? "Generation failed. Please try again." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
   }
 }

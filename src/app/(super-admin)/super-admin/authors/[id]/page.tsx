@@ -35,6 +35,10 @@ export default async function AuthorDetailPage({
         planId: true,
         createdAt: true,
         updatedAt: true,
+        aiUsageCount: true,
+        aiUsageCap: true,
+        aiUsageResetAt: true,
+        aiApiKey: true,
         plan: { select: { id: true, name: true, tier: true } },
         _count: {
           select: { books: true, subscribers: true, orders: true, posts: true },
@@ -101,7 +105,14 @@ export default async function AuthorDetailPage({
       </div>
 
       {/* Edit form */}
-      <AuthorEditForm author={author} plans={plans} />
+      <AuthorEditForm
+        author={author}
+        plans={plans}
+        aiUsageCount={author.aiUsageCount}
+        aiUsageCap={author.aiUsageCap}
+        aiUsageResetAt={author.aiUsageResetAt}
+        hasOwnKey={!!author.aiApiKey}
+      />
     </div>
   );
 }
