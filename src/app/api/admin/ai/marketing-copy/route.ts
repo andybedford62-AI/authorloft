@@ -4,16 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const CHANNEL_INSTRUCTIONS: Record<string, string> = {
-  "Social Media":
-    "Write 3 short, punchy social media posts optimised for Twitter/X and Instagram. Each post must be under 280 characters. Number them 1, 2, 3. Add 3-5 relevant hashtags to each.",
-  "Email Newsletter":
-    "Write an email newsletter promotion. Include: a compelling subject line (labelled 'Subject:'), a greeting, 2-3 paragraphs of engaging body copy, and a clear call-to-action.",
-  "Amazon/Retail Page":
-    "Write a full Amazon/retail product description of 200-300 words. Open with a strong hook, build intrigue, highlight key themes, and end with a compelling call-to-read.",
-  "Press Release":
-    "Write a standard press release with: a headline, dateline (use [CITY, DATE]), a 4-paragraph body (lead, background, quote from author, boilerplate), and a ### end marker.",
-  "Author Website":
-    "Write a homepage feature blurb of 100-150 words. It should be warm, inviting, and entice visitors to learn more about the book.",
+  "Social Media":           "Social media",
+  "Email Newsletter":       "Email Newsletter",
+  "Amazon / Retailer Page": "Amazon / Retailer Page",
+  "Press Release":          "Press Release",
+  "Author Website":         "Author Website",
 };
 
 export async function POST(req: NextRequest) {
@@ -33,21 +28,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });
   }
 
-  const channelKey    = channel?.trim() || "Social Media";
-  const channelGuide  = CHANNEL_INSTRUCTIONS[channelKey] ?? CHANNEL_INSTRUCTIONS["Social Media"];
+  const channelKey = channel?.trim() || "Social Media";
 
-  const prompt = [
-    "You are a professional book marketing copywriter.",
-    "Generate compelling marketing copy for the following book:\n",
-    `Book Title: ${bookTitle.trim()}`,
-    genre?.trim() ? `Genre: ${genre.trim()}`                        : null,
-    hook?.trim()  ? `Core Hook / Key Message: ${hook.trim()}`       : null,
-    `Primary Channel: ${channelKey}`,
-    "",
-    channelGuide,
-    "",
-    "Output only the copy itself — no preamble, labels like 'Here is your copy:', or closing commentary.",
-  ].filter(Boolean).join("\n");
+  const prompt = `You are an expert book launch marketing copywriter. Draft compelling marketing copy for the following book launch.
+
+Book Title: ${bookTitle.trim()}
+Genre: ${genre?.trim() || "not specified"}
+Core Hook / Tagline Idea: ${hook?.trim() || "none provided"}
+Primary Channel: ${channelKey}
+
+Please write:
+1. A launch announcement post (${channelKey})
+2. A short ad copy variant (under 50 words)
+3. An email subject line + preview text
+4. A call-to-action phrase
+
+Use persuasive, authentic language suited to the channel. Do not add any preamble before item 1.`;
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);

@@ -9,10 +9,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { topic, description, tone, audience, numIdeas, keywords } = await req.json();
+  const { niche, audience, count } = await req.json();
 
-  if (!topic?.trim()) {
-    return NextResponse.json({ error: "Topic is required." }, { status: 400 });
+  if (!niche?.trim()) {
+    return NextResponse.json({ error: "Author niche / genre is required." }, { status: 400 });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
@@ -20,23 +20,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });
   }
 
-  const count = Math.min(Math.max(parseInt(numIdeas) || 5, 1), 20);
+  const ideaCount = Math.min(Math.max(parseInt(count) || 5, 3), 10);
 
-  const prompt = [
-    "You are a creative content strategist for authors.",
-    `Generate exactly ${count} blog post ideas for an author based on the following:\n`,
-    `Topic: ${topic.trim()}`,
-    description?.trim() ? `Additional Context: ${description.trim()}` : null,
-    audience?.trim()    ? `Target Audience: ${audience.trim()}`       : null,
-    tone?.trim()        ? `Tone / Style: ${tone.trim()}`              : null,
-    keywords?.trim()    ? `Keywords to include: ${keywords.trim()}`   : null,
-    "",
-    "For each idea provide:",
-    "- A compelling blog post title",
-    "- A 1-2 sentence description of what the post would cover",
-    "",
-    "Format as a numbered list. Do not add any preamble, introduction, or closing commentary.",
-  ].filter(Boolean).join("\n");
+  const prompt = `You are a content strategist for authors and book publishers. Generate ${ideaCount} compelling blog post ideas for an author in the following niche.
+
+Author Niche / Genre: ${niche.trim()}
+Target Readership: ${audience?.trim() || "general readers"}
+
+For each idea provide:
+- A catchy title
+- A 2-sentence outline of what the post would cover
+- The primary goal (engage readers / SEO / community building / etc.)
+
+Number each idea clearly. Do not add any preamble or closing commentary.`;
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
