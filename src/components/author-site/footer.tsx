@@ -169,14 +169,30 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
             )}
 
             {/* Legal + Powered by */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
               <Link href="/legal" className="text-xs text-gray-600 hover:text-[var(--accent)] transition-colors">
                 Legal Notice
               </Link>
+              <a
+                href="https://www.authorloft.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-600 hover:text-[var(--accent)] transition-colors"
+              >
+                Privacy
+              </a>
+              <a
+                href="https://www.authorloft.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-600 hover:text-[var(--accent)] transition-colors"
+              >
+                Terms
+              </a>
               <p className="text-xs text-gray-600">
                 Powered by{" "}
                 <a
-                  href="https://authorloft.com"
+                  href="https://www.authorloft.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
