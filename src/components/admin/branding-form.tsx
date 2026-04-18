@@ -20,6 +20,8 @@ type BrandingFormProps = {
     twitterUrl: string;
     instagramUrl: string;
     contactEmail: string;
+    contactResponseTime: string;
+    contactOpenTo: string;
     heroTitle: string;
     heroSubtitle: string;
     aboutStats: Stat[];
@@ -40,6 +42,8 @@ export function BrandingForm({ initial }: BrandingFormProps) {
   const [twitterUrl, setTwitterUrl] = useState(initial.twitterUrl);
   const [instagramUrl, setInstagramUrl] = useState(initial.instagramUrl);
   const [contactEmail, setContactEmail] = useState(initial.contactEmail);
+  const [contactResponseTime, setContactResponseTime] = useState(initial.contactResponseTime);
+  const [contactOpenTo, setContactOpenTo] = useState(initial.contactOpenTo);
   const [heroTitle, setHeroTitle] = useState(initial.heroTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(initial.heroSubtitle);
   const [showHeroBanner, setShowHeroBanner] = useState(initial.showHeroBanner);
@@ -108,7 +112,8 @@ export function BrandingForm({ initial }: BrandingFormProps) {
         displayName, tagline, shortBio, bio,
         profileImageUrl,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
-        contactEmail, heroTitle, heroSubtitle, showHeroBanner,
+        contactEmail, contactResponseTime, contactOpenTo,
+        heroTitle, heroSubtitle, showHeroBanner,
         aboutStats, credentials,
       }),
     });
@@ -290,6 +295,28 @@ export function BrandingForm({ initial }: BrandingFormProps) {
         <Input label="X / Twitter URL" value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." />
         <Input label="Instagram URL" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." />
         <Input label="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" placeholder="you@example.com" />
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Response Time</label>
+          <input
+            type="text"
+            value={contactResponseTime}
+            onChange={(e) => setContactResponseTime(e.target.value)}
+            placeholder="Typically within 24–48 hours"
+            className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <p className="text-xs text-gray-400">Shown on your public Contact page.</p>
+        </div>
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Open To</label>
+          <textarea
+            rows={2}
+            value={contactOpenTo}
+            onChange={(e) => setContactOpenTo(e.target.value)}
+            placeholder="Reader questions, media inquiries, and book club discussions."
+            className={textareaClass}
+          />
+          <p className="text-xs text-gray-400">Shown on your public Contact page.</p>
+        </div>
       </section>
 
       {/* Hero Banner */}
