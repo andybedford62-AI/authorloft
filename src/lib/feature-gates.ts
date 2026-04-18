@@ -4,6 +4,7 @@ export const TIER_RANK: Record<string, number> = {
   FREE:     0,
   STANDARD: 1,
   PREMIUM:  2,
+  // DISABLED is not in TIER_RANK — it short-circuits before comparison.
 };
 
 // Default gates — mirrors the current hardcoded sidebar behaviour.
@@ -30,6 +31,7 @@ export const DEFAULT_GATES: Record<string, string> = {
 
 /**
  * Returns true when a user on `planTier` can access `featureKey`.
+ * "DISABLED" hides the feature from everyone regardless of tier.
  * Uses saved gates first, falling back to DEFAULT_GATES, then FREE.
  */
 export function canAccessFeature(
@@ -38,5 +40,6 @@ export function canAccessFeature(
   gates: Record<string, string>,
 ): boolean {
   const required = gates[featureKey] ?? DEFAULT_GATES[featureKey] ?? "FREE";
+  if (required === "DISABLED") return false;
   return (TIER_RANK[planTier] ?? 0) >= (TIER_RANK[required] ?? 0);
 }
