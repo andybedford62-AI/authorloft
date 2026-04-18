@@ -114,6 +114,7 @@ model Author {
   genres               Genre[]
   series               Series[]
   subscribers          Subscriber[]
+  campaigns            Campaign[]
   orders               Order[]
   sessions             Session[]
   accounts             Account[]
@@ -460,6 +461,21 @@ model Subscriber {
   author           Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, email])
+  @@index([authorId])
+}
+
+// ─── Newsletter Campaigns ─────────────────────────────────────────────────────
+
+model Campaign {
+  id           String   @id @default(cuid())
+  authorId     String
+  subject      String
+  sentAt       DateTime @default(now())
+  totalSent    Int
+  totalFailed  Int
+  totalTargeted Int
+  author       Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
   @@index([authorId])
 }
 

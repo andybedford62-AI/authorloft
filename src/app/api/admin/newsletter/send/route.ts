@@ -3,22 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canUseFeature } from "@/lib/plan-limits";
-import nodemailer from "nodemailer";
-
-function isSmtpConfigured() {
-  return !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
-}
-
-function createTransport() {
-  const port = parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const secure = process.env.SMTP_SECURE === "true" || port === 465;
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  });
-}
+import { Resend } from "resend";
 
 function buildEmailHtml(opts: {
   authorName: string;
@@ -103,23 +88,21 @@ function htmlToPlainText(html: string): string {
     .trim();
 }
 
+const BATCH_SIZE = 50;
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const authorId = (session.user as any).id as string;
 
-  // Plan gate: newsletter feature must be enabled
   const newsletterCheck = await canUseFeature(authorId, "newsletter");
   if (!newsletterCheck.allowed) {
     return NextResponse.json({ error: newsletterCheck.reason }, { status: 403 });
   }
 
-  if (!isSmtpConfigured()) {
-    return NextResponse.json(
-      { error: "SMTP is not configured. Add SMTP_HOST, SMTP_USER, and SMTP_PASS to your .env.local file." },
-      { status: 422 }
-    );
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: "Email service is not configured." }, { status: 503 });
   }
 
   const body = await req.json();
@@ -132,25 +115,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email body cannot be empty." }, { status: 400 });
   }
 
-  // Get author info
   const author = await prisma.author.findUnique({
-    where: { id: authorId },
-    select: {
-      id: true,
-      name: true,
-      displayName: true,
-      accentColor: true,
-      slug: true,
-      contactEmail: true,
-    },
+    where:  { id: authorId },
+    select: { id: true, name: true, displayName: true, accentColor: true, slug: true, contactEmail: true },
   });
   if (!author) return NextResponse.json({ error: "Author not found." }, { status: 404 });
 
-  // Build subscriber query
   const subscriberWhere: Record<string, unknown> = { authorId, isConfirmed: true };
   if (Array.isArray(categoryFilter) && categoryFilter.length > 0) {
-    // Only subscribers who have at least one of the selected category preferences
-    // or who have no preferences (they opted in for everything)
     subscriberWhere.OR = [
       { categoryPrefs: { isEmpty: true } },
       { categoryPrefs: { hasSome: categoryFilter } },
@@ -158,7 +130,7 @@ export async function POST(req: NextRequest) {
   }
 
   const subscribers = await prisma.subscriber.findMany({
-    where: subscriberWhere,
+    where:  subscriberWhere,
     select: { email: true, name: true, unsubscribeToken: true },
   });
 
@@ -166,58 +138,59 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No confirmed subscribers to send to." }, { status: 400 });
   }
 
-  const transport = createTransport();
-  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-  const siteUrl = `http://${author.slug}.${new URL(baseUrl).hostname}:${new URL(baseUrl).port || 80}`;
-  const authorName = author.displayName || author.name;
-  const fromAddress = process.env.SMTP_FROM || `${authorName} <${process.env.SMTP_USER}>`;
+  const resend       = new Resend(process.env.RESEND_API_KEY);
+  const authorName   = author.displayName || author.name;
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const siteUrl      = `https://${author.slug}.${platformDomain}`;
+  const baseUrl      = process.env.NEXTAUTH_URL ?? "https://www.authorloft.com";
+  const fromAddress  = `${authorName} via AuthorLoft <noreply@authorloft.com>`;
+  const replyTo      = author.contactEmail ?? undefined;
 
-  let sent = 0;
+  let sent   = 0;
   let failed = 0;
-
-  // Send in small batches to avoid overwhelming the SMTP server
-  const BATCH_SIZE = 20;
-  const BATCH_DELAY_MS = 500;
 
   for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
     const batch = subscribers.slice(i, i + BATCH_SIZE);
 
-    await Promise.allSettled(
-      batch.map(async (sub) => {
-        const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?token=${sub.unsubscribeToken}`;
-        const html = buildEmailHtml({
-          authorName,
-          accentColor: author.accentColor || "#7B2D2D",
-          subject,
-          body: htmlBody,
-          unsubscribeUrl,
-          siteUrl,
-        });
-        const plainText =
-          htmlToPlainText(htmlBody) +
-          `\n\n---\nUnsubscribe: ${unsubscribeUrl}`;
+    const emails = batch.map((sub) => {
+      const unsubscribeUrl = `${baseUrl}/api/newsletter/unsubscribe?token=${sub.unsubscribeToken}`;
+      return {
+        from:    fromAddress,
+        to:      sub.email,
+        subject,
+        replyTo,
+        html:    buildEmailHtml({ authorName, accentColor: author.accentColor || "#2563eb", subject, body: htmlBody, unsubscribeUrl, siteUrl }),
+        text:    htmlToPlainText(htmlBody) + `\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
+      };
+    });
 
-        try {
-          await transport.sendMail({
-            from: fromAddress,
-            to: sub.email,
-            subject,
-            text: plainText,
-            html,
-          });
-          sent++;
-        } catch (err) {
-          console.error(`[newsletter] Failed to send to ${sub.email}:`, err);
-          failed++;
-        }
-      })
-    );
+    try {
+      const result = await resend.batch.send(emails);
+      // result.data is an array; count successes vs errors
+      const data = Array.isArray(result.data) ? result.data : [];
+      sent   += data.filter((r: any) => r?.id).length;
+      failed += batch.length - data.filter((r: any) => r?.id).length;
+    } catch (err) {
+      console.error("[newsletter] Batch send failed:", err);
+      failed += batch.length;
+    }
 
-    // Pause between batches (skip after the last one)
+    // Small pause between batches
     if (i + BATCH_SIZE < subscribers.length) {
-      await new Promise((r) => setTimeout(r, BATCH_DELAY_MS));
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
+
+  // Persist campaign record
+  await prisma.campaign.create({
+    data: {
+      authorId,
+      subject: subject.trim(),
+      totalSent:     sent,
+      totalFailed:   failed,
+      totalTargeted: subscribers.length,
+    },
+  });
 
   return NextResponse.json({ sent, failed, total: subscribers.length });
 }

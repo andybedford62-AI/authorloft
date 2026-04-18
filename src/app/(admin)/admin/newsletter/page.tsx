@@ -13,37 +13,44 @@ export default async function NewsletterPage() {
 
   const authorId = (session.user as any).id as string;
 
-  const [subscribers, genres, author] = await Promise.all([
+  const [subscribers, genres, author, campaigns] = await Promise.all([
     prisma.subscriber.findMany({
-      where: { authorId },
+      where:   { authorId },
       orderBy: { subscribedAt: "desc" },
       select: {
-        id: true,
-        name: true,
-        email: true,
+        id:            true,
+        name:          true,
+        email:         true,
         categoryPrefs: true,
-        isConfirmed: true,
-        subscribedAt: true,
+        isConfirmed:   true,
+        subscribedAt:  true,
       },
     }),
     prisma.genre.findMany({
-      where: { authorId },
-      select: { id: true, name: true },
+      where:   { authorId },
+      select:  { id: true, name: true },
       orderBy: { name: "asc" },
     }),
     prisma.author.findUnique({
-      where: { id: authorId },
+      where:  { id: authorId },
       select: { siteTheme: true, displayName: true, name: true },
+    }),
+    prisma.campaign.findMany({
+      where:   { authorId },
+      orderBy: { sentAt: "desc" },
+      select: {
+        id:            true,
+        subject:       true,
+        sentAt:        true,
+        totalSent:     true,
+        totalFailed:   true,
+        totalTargeted: true,
+      },
     }),
   ]);
 
-  const genreMap = Object.fromEntries(genres.map((g) => [g.id, g.name]));
+  const genreMap      = Object.fromEntries(genres.map((g) => [g.id, g.name]));
   const confirmedCount = subscribers.filter((s) => s.isConfirmed).length;
-  const smtpConfigured = !!(
-    process.env.SMTP_HOST &&
-    process.env.SMTP_USER &&
-    process.env.SMTP_PASS
-  );
 
   return (
     <NewsletterClient
@@ -54,9 +61,12 @@ export default async function NewsletterPage() {
       genres={genres}
       genreMap={genreMap}
       confirmedCount={confirmedCount}
-      smtpConfigured={smtpConfigured}
       accentColor={getThemeAccentHex(author?.siteTheme)}
       authorName={author?.displayName || author?.name || ""}
+      campaigns={campaigns.map((c) => ({
+        ...c,
+        sentAt: c.sentAt.toISOString(),
+      }))}
     />
   );
 }
