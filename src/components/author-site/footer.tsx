@@ -123,18 +123,17 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
                   Quick Links
                 </p>
-                <ul className="space-y-2">
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
                   {quickLinks.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="text-gray-400 text-sm hover:text-[var(--accent)] transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-gray-400 text-sm hover:text-[var(--accent)] transition-colors"
+                    >
+                      {link.label}
+                    </Link>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
