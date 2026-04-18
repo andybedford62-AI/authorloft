@@ -166,10 +166,16 @@ export async function POST(req: NextRequest) {
 
     try {
       const result = await resend.batch.send(emails);
-      // result.data is an array; count successes vs errors
-      const data = Array.isArray(result.data) ? result.data : [];
-      sent   += data.filter((r: any) => r?.id).length;
-      failed += batch.length - data.filter((r: any) => r?.id).length;
+      if (result.error) {
+        console.error("[newsletter] Resend batch error:", result.error);
+        failed += batch.length;
+      } else {
+        // result.data is { data: Array<{ id: string }> }
+        const emailResults: any[] = (result.data as any)?.data ?? [];
+        const successCount = emailResults.filter((r) => r?.id).length;
+        sent   += successCount;
+        failed += batch.length - successCount;
+      }
     } catch (err) {
       console.error("[newsletter] Batch send failed:", err);
       failed += batch.length;
