@@ -97,20 +97,20 @@ function ThumbCard({
 }) {
   const [hovered, setHovered] = useState(false);
 
-  // For images use the file itself; for audio use the uploaded poster if available.
-  // For video we always use the <video> element to show the first frame — no poster needed.
+  // For images use the file itself; for audio/video use the uploaded thumbnail if available.
+  // Only fall back to <video> element for first-frame if no thumbnail was uploaded.
   const imageSrc =
-    item.mediaType === "IMAGE"  ? item.fileUrl :
-    item.mediaType === "AUDIO"  ? (item.thumbnailUrl ?? null) :
-    null; // VIDEO handled separately via <video> element
+    item.mediaType === "IMAGE" ? item.fileUrl :
+    (item.thumbnailUrl ?? null); // audio & video both use thumbnailUrl when set
 
   const isVideo = item.mediaType === "VIDEO";
+  const useVideoEmbed = isVideo && !item.thumbnailUrl; // only use <video> when no poster
   const hasPreview = isVideo || !!imageSrc;
 
   const playIcon  = <Play  className="w-8 h-8 text-white drop-shadow" fill="white" />;
   const musicIcon = <Music className="w-8 h-8 text-white drop-shadow" />;
   const overlayIcon =
-    item.mediaType === "VIDEO" ? playIcon :
+    isVideo ? playIcon :
     item.mediaType === "AUDIO" && imageSrc ? musicIcon :
     null;
 
@@ -127,11 +127,10 @@ function ThumbCard({
         className="w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-200 bg-gray-100 flex items-center justify-center relative"
         style={{ borderColor: hovered ? accentColor : "transparent" }}
       >
-        {isVideo ? (
-          // Browser renders first frame automatically via preload="metadata"
+        {useVideoEmbed ? (
           // eslint-disable-next-line jsx-a11y/media-has-caption
           <video
-            src={item.fileUrl}
+            src={item.fileUrl + "#t=0.001"}
             muted
             preload="metadata"
             playsInline
@@ -166,10 +165,10 @@ function ThumbCard({
             transform: "translateX(-50%)",
           }}
         >
-          {isVideo ? (
+          {useVideoEmbed ? (
             // eslint-disable-next-line jsx-a11y/media-has-caption
             <video
-              src={item.fileUrl}
+              src={item.fileUrl + "#t=0.001"}
               muted
               preload="metadata"
               playsInline

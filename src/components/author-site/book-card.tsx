@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, BookOpen, ExternalLink } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getRetailer } from "@/lib/retailers";
+import { CoverTilt } from "./cover-tilt";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -138,23 +141,21 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
       >
         {/* Cover — clickable link to book detail */}
         <div className="flex-shrink-0">
-          <Link href={`/books/${book.slug}`} className="block group/cover">
-            <div className="w-full sm:w-32 h-48 sm:h-44 bg-gray-100 rounded overflow-hidden relative shadow-sm group-hover/cover:shadow-md transition-shadow duration-200">
+          <Link href={`/books/${book.slug}`} className="block">
+            <CoverTilt className="w-full sm:w-32 h-48 sm:h-44 bg-gray-100 rounded overflow-hidden relative shadow-sm">
               {book.coverImageUrl ? (
                 <Image
                   src={book.coverImageUrl}
                   alt={book.title}
                   fill
-                  className="object-cover group-hover/cover:scale-105 transition-transform duration-300"
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <BookOpen className="h-10 w-10 text-gray-300" />
                 </div>
               )}
-              {/* Subtle overlay on hover */}
-              <div className="absolute inset-0 bg-black/0 group-hover/cover:bg-black/10 transition-colors duration-200" />
-            </div>
+            </CoverTilt>
           </Link>
         </div>
 

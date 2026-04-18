@@ -35,7 +35,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       {/* ── Hero Banner ────────────────────────────────────────────────────── */}
       {author.showHeroBanner !== false && (
         <section
-          className="w-full py-20 px-4 relative overflow-hidden"
+          className="w-full py-10 px-4 relative overflow-hidden"
           style={{ backgroundColor: accentColor }}
         >
           {/* Depth overlay */}
@@ -81,8 +81,8 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
                   title={heroBook.title}
                   coverImageUrl={heroBook.coverImageUrl}
                   caption={heroBook.caption}
-                  width={160}
-                  height={240}
+                  width={130}
+                  height={195}
                 />
               </div>
             )}
