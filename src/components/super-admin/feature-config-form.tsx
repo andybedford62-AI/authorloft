@@ -4,9 +4,9 @@ import { useState } from "react";
 import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag,
-  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2,
+  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe,
 } from "lucide-react";
-import { DEFAULT_GATES } from "@/lib/feature-gates";
+import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 
 // ── Feature list with icons ───────────────────────────────────────────────────
 
@@ -140,12 +140,19 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
           DISABLED
         </div>
         <span className="text-xs text-gray-400">— hidden from all users including Premium</span>
+        <div className="h-4 w-px bg-gray-200" />
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+          <Globe className="h-2.5 w-2.5" />
+          Public site
+        </span>
+        <span className="text-xs text-gray-400">— also updates the public author site instantly</span>
       </div>
 
       {/* Feature rows */}
       <div className="space-y-2">
         {FEATURES.map(({ key, label, icon: Icon }) => {
-          const current = gates[key] ?? DEFAULT_GATES[key] ?? "FREE";
+          const current    = gates[key] ?? DEFAULT_GATES[key] ?? "FREE";
+          const affectsPublic = !!FEATURE_PLAN_MAP[key];
           return (
             <div
               key={key}
@@ -153,9 +160,17 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
             >
               <div className="flex items-center gap-3">
                 <Icon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                <div>
-                  <span className="text-sm font-medium text-gray-900">{label}</span>
-                  <span className="ml-2 text-xs text-gray-400 font-mono">{key}</span>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900">{label}</span>
+                    {affectsPublic && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                        <Globe className="h-2.5 w-2.5" />
+                        Public site
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-mono">{key}</span>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-// Shared feature-gate logic used by the sidebar and the super-admin config UI.
+// Shared feature-gate logic used by the sidebar, super-admin UI, and cascade API.
 
 export const TIER_RANK: Record<string, number> = {
   FREE:     0,
@@ -7,12 +7,11 @@ export const TIER_RANK: Record<string, number> = {
   // DISABLED is not in TIER_RANK — it short-circuits before comparison.
 };
 
-// Default gates — mirrors the current hardcoded sidebar behaviour.
-// These are used when no config has been saved yet, and as fallback keys.
+// Default gates — used when no config has been saved yet.
 export const DEFAULT_GATES: Record<string, string> = {
   "/admin/dashboard":    "FREE",
   "/admin/books":        "FREE",
-  "/admin/flip-books":   "STANDARD",
+  "/admin/flip-books":   "PREMIUM",   // premium-only from day one
   "/admin/specials":     "FREE",
   "/admin/series":       "FREE",
   "/admin/genres":       "FREE",
@@ -27,6 +26,33 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/ai-assistant": "PREMIUM",
   "/admin/seo-audit":    "PREMIUM",
   "/admin/settings":     "FREE",
+};
+
+// Features that map to a Plan model field.
+// When Feature Gates saves, these cascade to every Plan record so the
+// public author site stays in sync with the admin gate setting.
+export const FEATURE_PLAN_MAP: Record<
+  string,
+  { field: string; enabledValue: number | boolean; disabledValue: number | boolean } | null
+> = {
+  "/admin/flip-books": { field: "flipBooksLimit", enabledValue: -1,   disabledValue: 0     },
+  "/admin/sales":      { field: "salesEnabled",   enabledValue: true,  disabledValue: false },
+  "/admin/newsletter": { field: "newsletter",     enabledValue: true,  disabledValue: false },
+  // Admin-only — no public-site Plan field to update:
+  "/admin/dashboard":    null,
+  "/admin/books":        null,
+  "/admin/specials":     null,
+  "/admin/series":       null,
+  "/admin/genres":       null,
+  "/admin/pages":        null,
+  "/admin/blog":         null,
+  "/admin/messages":     null,
+  "/admin/appearance":   null,
+  "/admin/branding":     null,
+  "/admin/legal":        null,
+  "/admin/ai-assistant": null,
+  "/admin/seo-audit":    null,
+  "/admin/settings":     null,
 };
 
 /**
