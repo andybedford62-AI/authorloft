@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { sendMail } from "@/lib/mailer";
 
 // POST /api/marketing/contact — platform-level contact form submission
 // Stores the message in DB (linked to no specific author) and can optionally
@@ -39,7 +40,26 @@ export async function POST(req: Request) {
     });
   }
 
-  // Future: send email to settings.contactEmail via nodemailer / Resend
+  // Notify platform owner — fire-and-forget, never blocks the response
+  const notifyTo = settings?.contactEmail || process.env.SUPER_ADMIN_EMAIL;
+  if (notifyTo) {
+    const subjectLine = subject?.trim()
+      ? `Contact: ${subject.trim()} — ${name.trim()}`
+      : `New contact from ${name.trim()}`;
+    sendMail({
+      to:       notifyTo,
+      subject:  subjectLine,
+      replyTo:  email.trim(),
+      text:     `Name: ${name.trim()}\nEmail: ${email.trim()}\nSubject: ${subject?.trim() || "(none)"}\n\n${message.trim()}`,
+      html:     `
+        <p><strong>Name:</strong> ${name.trim()}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email.trim()}">${email.trim()}</a></p>
+        <p><strong>Subject:</strong> ${subject?.trim() || "(none)"}</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0"/>
+        <p style="white-space:pre-wrap">${message.trim()}</p>
+      `,
+    }).catch((err) => console.error("[marketing/contact] notify email failed:", err));
+  }
 
   return NextResponse.json({ ok: true });
 }
