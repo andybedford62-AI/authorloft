@@ -52,11 +52,13 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     ...(author.contactEmail ? [{ href: "/contact", icon: "mail", label: "Contact" }] : []),
   ].filter((s): s is { href: string; icon: string; label: string } => !!s.href);
 
-  // Credential items
-  const credentials = [
-    "Author",
-    ...(books.length > 0 ? [`${books.length} ${books.length === 1 ? "Book" : "Books"} Published`] : []),
-  ];
+  // Credential items — use custom credentials from branding if set
+  const customCredentials = Array.isArray((author as any).credentials)
+    ? ((author as any).credentials as string[]).filter((c: string) => c?.trim())
+    : [];
+  const credentials = customCredentials.length > 0
+    ? customCredentials
+    : ["Author", ...(books.length > 0 ? [`${books.length} ${books.length === 1 ? "Book" : "Books"} Published`] : [])];
 
   // About page stats from branding
   const rawStats = Array.isArray((author as any).aboutStats)

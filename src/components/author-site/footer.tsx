@@ -97,7 +97,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 <Image
-                  src="/AL_site_Logo_Dark.png"
+                  src="/AL_site_Logo-Dark.png"
                   alt="AuthorLoft"
                   width={24}
                   height={24}
