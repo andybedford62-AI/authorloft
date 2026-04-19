@@ -187,6 +187,12 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
             )}
           </h3>
 
+          {book.priceCents > 0 && (
+            <p className="text-sm font-semibold" style={{ color: accentColor }}>
+              {formatCents(book.priceCents)}
+            </p>
+          )}
+
           {/* Buy buttons */}
           <div className="flex flex-wrap gap-2 items-center">
             {/* Per-format direct sale items */}

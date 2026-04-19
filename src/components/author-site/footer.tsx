@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import Image from "next/image";
 import { NewsletterModalButton } from "./newsletter-modal";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -85,15 +85,27 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
     >
       {/* ── Dark panel ─────────────────────────────────────────────────────── */}
       <div className="bg-gray-900">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
           <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
 
             {/* Col 1 — Brand */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" style={{ color: author.accentColor }} />
-                <span className="font-bold text-white text-sm">{displayName}</span>
-              </div>
+              <a
+                href="https://www.authorloft.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
+                <Image
+                  src="/AL_site_Logo_Dark.png"
+                  alt="AuthorLoft"
+                  width={24}
+                  height={24}
+                  className="h-6 w-auto"
+                  unoptimized
+                />
+                <span className="font-bold text-white text-sm">AuthorLoft.com</span>
+              </a>
               <p className="text-gray-400 text-xs leading-relaxed">
                 A platform for authors to establish their web presence, showcase their work,
                 and connect with readers worldwide.
@@ -107,9 +119,6 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
               </p>
               <p className="text-gray-400 text-xs leading-relaxed">
                 Subscribe to get news and updates from the author.
-              </p>
-              <p className="text-gray-500 text-xs">
-                Get updates on new releases, events, and exclusive content.
               </p>
               <NewsletterModalButton
                 authorId={author.id}

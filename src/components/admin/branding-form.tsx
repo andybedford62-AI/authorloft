@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Check, Loader2, Upload, X, User, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Stat = { value: string; label: string };
 
@@ -310,13 +311,21 @@ export function BrandingForm({ initial }: BrandingFormProps) {
         />
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Short Bio</label>
-          <textarea rows={3} value={shortBio} onChange={(e) => setShortBio(e.target.value)} className={textareaClass} />
-          <p className="text-xs text-gray-400">Shown on the homepage. Keep it under 200 characters.</p>
+          <RichTextEditor
+            value={shortBio}
+            onChange={setShortBio}
+            placeholder="A brief intro shown on your homepage…"
+          />
+          <p className="text-xs text-gray-400">Shown on the homepage. Keep it concise.</p>
         </div>
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Full Bio</label>
-          <textarea rows={6} value={bio} onChange={(e) => setBio(e.target.value)} className={textareaClass} />
-          <p className="text-xs text-gray-400">Displayed on your About page. Use blank lines to separate paragraphs.</p>
+          <RichTextEditor
+            value={bio}
+            onChange={setBio}
+            placeholder="Your full biography shown on the About page…"
+          />
+          <p className="text-xs text-gray-400">Displayed on your About page.</p>
         </div>
       </section>
 
