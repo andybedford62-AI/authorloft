@@ -359,6 +359,22 @@ body {
   }
 }
 
+/* ── Global interactive cursor ─────────────────────────────────────────────
+   Browsers default <button> to 'default' cursor. Make every clickable element
+   use pointer so the UI consistently signals interactivity.               */
+
+button:not([disabled]),
+[role="button"]:not([disabled]),
+select,
+label[for],
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+input[type="button"],
+input[type="file"] {
+  cursor: pointer;
+}
+
 /* ── Admin dark theme ───────────────────────────────────────────────────────
    Scoped entirely to [data-admin-theme="dark"] on the admin layout wrapper.
    Uses !important so Tailwind utility specificity is reliably overridden.

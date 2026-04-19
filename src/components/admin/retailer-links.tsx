@@ -282,7 +282,7 @@ export function RetailerLinks({ bookId }: Props) {
                   <IconButton
                     icon={link.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
                     title={link.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                    variant={link.isActive ? "warning" : "success"}
+                    variant="ghost"
                     onClick={() => toggleActive(link)}
                     loading={isBusy}
                     disabled={isBusy}
@@ -290,7 +290,7 @@ export function RetailerLinks({ bookId }: Props) {
                   <IconButton
                     icon={<Trash2 className="h-4 w-4" />}
                     title="Delete link"
-                    variant="danger"
+                    variant="ghost"
                     onClick={() => deleteLink(link.id, link.label)}
                     loading={isBusy}
                     disabled={isBusy}
