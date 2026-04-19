@@ -220,7 +220,7 @@ export function SpecialsListClient({ specials: initial }: SpecialsListClientProp
                     href={`/admin/specials/${special.id}/edit`}
                     title="Edit special"
                     aria-label="Edit special"
-                    className="relative group/tip p-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                    className="relative group/tip p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                   >
                     <Pencil className="h-4 w-4" />
                     <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">

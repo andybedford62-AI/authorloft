@@ -111,7 +111,7 @@ export default async function AdminFlipBooksPage() {
 
       {/* Flip books grid */}
       {flipBooks.length > 0 && !planBlocked && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {flipBooks.map((book) => (
             <div
               key={book.id}
@@ -119,7 +119,7 @@ export default async function AdminFlipBooksPage() {
             >
               {/* Cover — clickable to edit */}
               <Link href={`/admin/flip-books/${book.id}/edit`} className="block cursor-pointer">
-                <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
+                <div className="aspect-[2/3] bg-gray-100 relative overflow-hidden">
                   {book.coverImageUrl ? (
                     <Image
                       src={book.coverImageUrl}

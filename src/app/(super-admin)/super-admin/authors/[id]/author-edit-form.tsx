@@ -163,9 +163,7 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
       });
 
       if (res.ok) {
-        setStatus("success");
-        router.refresh();
-        setTimeout(() => setStatus("idle"), 3000);
+        router.push("/super-admin/authors");
       } else {
         const d = await res.json().catch(() => ({}));
         setErrMsg(d.error || "Could not save changes.");

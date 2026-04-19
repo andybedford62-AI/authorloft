@@ -169,8 +169,8 @@ export function BookReviews({ bookId }: Props) {
                     </p>
                   </div>
                   <div className="flex items-start gap-1 flex-shrink-0">
-                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit review" variant="primary" onClick={() => startEdit(r)} />
-                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete review" variant="danger" onClick={() => remove(r.id)} />
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit review" variant="ghost" onClick={() => startEdit(r)} />
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete review" variant="ghost" onClick={() => remove(r.id)} />
                   </div>
                 </div>
               )}

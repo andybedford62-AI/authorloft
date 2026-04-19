@@ -109,9 +109,9 @@ function GenreRow({
           </div>
         ) : (
           <div className="flex items-center gap-1 ml-2">
-            <IconButton icon={<Pencil className="h-4 w-4" />} title="Rename" variant="primary" onClick={() => { setEditing(true); setEditName(genre.name); }} />
-            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="success" onClick={() => onAddChild(genre.id, genre.name)} />
-            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="danger" onClick={handleDelete} loading={deleting} />
+            <IconButton icon={<Pencil className="h-4 w-4" />} title="Rename" variant="ghost" onClick={() => { setEditing(true); setEditName(genre.name); }} />
+            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="ghost" onClick={() => onAddChild(genre.id, genre.name)} />
+            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="ghost" onClick={handleDelete} loading={deleting} />
           </div>
         )}
       </div>
