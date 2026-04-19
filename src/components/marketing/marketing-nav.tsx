@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
@@ -32,11 +32,9 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-lg text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+          <Link href="/" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-11 w-auto" />
           </Link>
 
           {author && (

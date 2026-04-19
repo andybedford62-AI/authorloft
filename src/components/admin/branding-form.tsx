@@ -14,6 +14,7 @@ type BrandingFormProps = {
     shortBio: string;
     bio: string;
     profileImageUrl: string;
+    logoUrl: string;
     linkedinUrl: string;
     youtubeUrl: string;
     facebookUrl: string;
@@ -36,6 +37,10 @@ export function BrandingForm({ initial }: BrandingFormProps) {
   const [shortBio, setShortBio] = useState(initial.shortBio);
   const [bio, setBio] = useState(initial.bio);
   const [profileImageUrl, setProfileImageUrl] = useState(initial.profileImageUrl);
+  const [logoUrl, setLogoUrl]               = useState(initial.logoUrl);
+  const [uploadingLogo, setUploadingLogo]   = useState(false);
+  const [logoError, setLogoError]           = useState("");
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl);
   const [youtubeUrl, setYoutubeUrl] = useState(initial.youtubeUrl);
   const [facebookUrl, setFacebookUrl] = useState(initial.facebookUrl);
@@ -92,11 +97,48 @@ export function BrandingForm({ initial }: BrandingFormProps) {
 
   async function handleRemovePhoto() {
     setProfileImageUrl("");
-    // Persist the removal immediately
     await fetch("/api/admin/branding", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ profileImageUrl: "" }),
+    });
+  }
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    setLogoError("");
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/admin/upload/logo", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setLogoError(data.error || "Upload failed.");
+      } else {
+        setLogoUrl(data.url);
+        // Persist immediately
+        await fetch("/api/admin/branding", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ logoUrl: data.url }),
+        });
+      }
+    } catch {
+      setLogoError("Upload failed. Please try again.");
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
+
+  async function handleRemoveLogo() {
+    setLogoUrl("");
+    await fetch("/api/admin/branding", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ logoUrl: "" }),
     });
   }
 
@@ -110,7 +152,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
-        profileImageUrl,
+        profileImageUrl, logoUrl,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner,
@@ -186,6 +228,66 @@ export function BrandingForm({ initial }: BrandingFormProps) {
             <p className="text-xs text-gray-400">JPEG, PNG, or WebP · Max 5 MB</p>
             {photoError && (
               <p className="text-xs text-red-600">{photoError}</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Site Logo */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold text-gray-900">Site Logo</h2>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Shown in your site navigation instead of your name. Leave empty to display your display name.
+          </p>
+        </div>
+        <div className="flex items-center gap-6">
+          {/* Preview */}
+          <div className="w-32 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 flex items-center justify-center">
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="Site logo" className="w-full h-full object-contain p-1" />
+            ) : (
+              <span className="text-xs text-gray-400 text-center px-2">No logo</span>
+            )}
+          </div>
+
+          {/* Controls */}
+          <div className="space-y-2">
+            <label className="cursor-pointer inline-block">
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors ${
+                uploadingLogo
+                  ? "bg-gray-50 text-gray-400 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}>
+                {uploadingLogo
+                  ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
+                  : <><Upload className="h-4 w-4" /> {logoUrl ? "Change Logo" : "Upload Logo"}</>
+                }
+              </div>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                className="sr-only"
+                onChange={handleLogoUpload}
+                disabled={uploadingLogo}
+              />
+            </label>
+
+            {logoUrl && (
+              <button
+                type="button"
+                onClick={handleRemoveLogo}
+                className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-600 transition-colors cursor-pointer"
+              >
+                <X className="h-3 w-3" /> Remove logo
+              </button>
+            )}
+
+            <p className="text-xs text-gray-400">JPEG, PNG, WebP or SVG · Max 5 MB · Transparent PNG or SVG recommended</p>
+            {logoError && (
+              <p className="text-xs text-red-600">{logoError}</p>
             )}
           </div>
         </div>

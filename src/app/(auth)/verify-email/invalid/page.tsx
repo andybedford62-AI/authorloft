@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function VerifyEmailInvalidPage() {
@@ -7,11 +7,9 @@ export default function VerifyEmailInvalidPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <BookOpen className="h-7 w-7 text-blue-600" />
-            <span className="font-bold text-2xl text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+          <Link href="/" className="inline-flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
           </Link>
         </div>
 
