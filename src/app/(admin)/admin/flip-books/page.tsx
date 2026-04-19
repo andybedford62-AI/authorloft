@@ -6,6 +6,7 @@ import { Plus, BookMarked, ExternalLink, Pencil, Lock } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 import { canAddFlipBook } from "@/lib/plan-limits";
+import { FlipBookToggle } from "@/components/admin/flip-book-toggle";
 
 export default async function AdminFlipBooksPage() {
   const session = await getServerSession(authOptions);
@@ -34,29 +35,33 @@ export default async function AdminFlipBooksPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Flip Books</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {flipBooks.length} flip book{flipBooks.length !== 1 ? "s" : ""}
-            {!planBlocked && (
-              <span className="ml-2 text-gray-400">
-                ({isUnlimited ? "unlimited on your plan" : `${current} of ${limit} on your plan`})
-              </span>
+            {planBlocked ? (
+              "Premium plan required"
+            ) : (
+              <>
+                {flipBooks.length} flip book{flipBooks.length !== 1 ? "s" : ""}
+                <span className="ml-2 text-gray-400">
+                  ({isUnlimited ? "unlimited on your plan" : `${current} of ${limit} on your plan`})
+                </span>
+              </>
             )}
           </p>
         </div>
 
         {planBlocked ? (
-          <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+          <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg text-sm text-purple-700 font-medium">
             <Lock className="h-4 w-4 flex-shrink-0" />
-            Upgrade to Standard or Premium to add flip books
+            Premium plan required
           </div>
         ) : atLimit ? (
           <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
             <Lock className="h-4 w-4 flex-shrink-0" />
-            Limit reached — upgrade to Premium for unlimited
+            Limit reached — upgrade for unlimited
           </div>
         ) : (
           <Link
             href="/admin/flip-books/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Add Flip Book
@@ -64,18 +69,24 @@ export default async function AdminFlipBooksPage() {
         )}
       </div>
 
-      {/* Plan info banner */}
+      {/* Plan locked banner */}
       {planBlocked && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-          <div className="flex gap-3">
-            <Lock className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-amber-800">Flip Books require a paid plan</p>
-              <p className="text-sm text-amber-700 mt-1">
-                Standard plans include up to 3 flip books. Premium plans include unlimited flip books.
-                Contact your administrator to upgrade.
-              </p>
-            </div>
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 flex gap-4 items-start">
+          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+            <Lock className="h-6 w-6 text-purple-600" />
+          </div>
+          <div>
+            <p className="font-semibold text-purple-900">Flip Books — Premium feature</p>
+            <p className="text-sm text-purple-700 mt-1">
+              Flip Books are available on the Premium plan. Upgrade to add interactive flip book
+              reading experiences to your author site.
+            </p>
+            <Link
+              href="/admin/settings"
+              className="inline-block mt-3 text-sm font-medium text-purple-800 underline hover:text-purple-900 cursor-pointer"
+            >
+              View plan options →
+            </Link>
           </div>
         </div>
       )}
@@ -90,7 +101,7 @@ export default async function AdminFlipBooksPage() {
           </p>
           <Link
             href="/admin/flip-books/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Add Your First Flip Book
@@ -99,70 +110,71 @@ export default async function AdminFlipBooksPage() {
       )}
 
       {/* Flip books grid */}
-      {flipBooks.length > 0 && (
+      {flipBooks.length > 0 && !planBlocked && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {flipBooks.map((book) => (
             <div
               key={book.id}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col hover:border-gray-300 transition-colors"
             >
-              {/* Cover */}
-              <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
-                {book.coverImageUrl ? (
-                  <Image
-                    src={book.coverImageUrl}
-                    alt={book.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <BookMarked className="h-12 w-12 text-gray-300" />
-                  </div>
-                )}
-                {/* Active badge */}
-                <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                  book.isActive
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-500"
-                }`}>
-                  {book.isActive ? "Active" : "Hidden"}
+              {/* Cover — clickable to edit */}
+              <Link href={`/admin/flip-books/${book.id}/edit`} className="block cursor-pointer">
+                <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
+                  {book.coverImageUrl ? (
+                    <Image
+                      src={book.coverImageUrl}
+                      alt={book.title}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <BookMarked className="h-12 w-12 text-gray-300" />
+                    </div>
+                  )}
                 </div>
-              </div>
+              </Link>
 
               {/* Info */}
-              <div className="p-4 flex flex-col gap-2 flex-1">
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">{book.title}</h3>
+              <div className="p-4 flex flex-col gap-3 flex-1">
+                <Link href={`/admin/flip-books/${book.id}/edit`} className="cursor-pointer">
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-blue-600 transition-colors">
+                    {book.title}
+                  </h3>
                   {book.subtitle && (
                     <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{book.subtitle}</p>
                   )}
-                </div>
+                </Link>
 
                 {book.description && (
                   <p className="text-xs text-gray-500 line-clamp-2 flex-1">{book.description}</p>
                 )}
 
                 <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
-                  <Link
-                    href={`/admin/flip-books/${book.id}/edit`}
-                    className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit
-                  </Link>
-                  {book.flipBookUrl && (
-                    <a
-                      href={book.flipBookUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 ml-auto"
+                  {/* Active/Hidden toggle */}
+                  <FlipBookToggle id={book.id} initialActive={book.isActive} />
+
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Link
+                      href={`/admin/flip-books/${book.id}/edit`}
+                      className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      Preview
-                    </a>
-                  )}
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </Link>
+                    {book.flipBookUrl && (
+                      <a
+                        href={book.flipBookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Preview
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
