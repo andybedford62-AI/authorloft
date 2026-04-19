@@ -103,23 +103,23 @@ function GenreRow({
         {/* Action buttons */}
         {editing ? (
           <div className="flex items-center gap-1 ml-2">
-            <button onClick={handleSave} disabled={saving} className="p-1 text-green-600 hover:text-green-700 rounded cursor-pointer">
+            <button onClick={handleSave} disabled={saving} className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded cursor-pointer" title="Save">
               {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
             </button>
-            <button onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} className="p-1 text-gray-400 hover:text-gray-600 rounded cursor-pointer">
+            <button onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} className="p-1.5 bg-gray-400 hover:bg-gray-500 text-white rounded cursor-pointer" title="Cancel">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-            <button onClick={() => { setEditing(true); setEditName(genre.name); }} className="p-1 text-gray-400 hover:text-blue-600 rounded transition-colors cursor-pointer" title="Edit">
+          <div className="flex items-center gap-1 ml-2">
+            <button onClick={() => { setEditing(true); setEditName(genre.name); }} className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors cursor-pointer" title="Edit name">
               <Pencil className="h-3.5 w-3.5" />
             </button>
-            <button onClick={handleDelete} disabled={deleting} className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors cursor-pointer" title="Delete">
-              {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-            </button>
-            <button onClick={() => onAddChild(genre.id, genre.name)} className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors cursor-pointer" title="Add sub-genre">
+            <button onClick={() => onAddChild(genre.id, genre.name)} className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded transition-colors cursor-pointer" title="Add sub-genre">
               <Plus className="h-3.5 w-3.5" />
+            </button>
+            <button onClick={handleDelete} disabled={deleting} className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded transition-colors cursor-pointer" title="Delete">
+              {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
             </button>
           </div>
         )}
