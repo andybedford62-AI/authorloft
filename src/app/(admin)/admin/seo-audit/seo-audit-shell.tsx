@@ -43,7 +43,7 @@ export function SeoAuditShell({ books, hasOwnKey, usageCount, usageCap, atLimit 
           <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5 text-amber-600" />
           <span>
             You've used all {usageCap} free AI requests this month.{" "}
-            <Link href="/admin/settings" className="font-semibold underline hover:text-amber-900">
+            <Link href="/admin/settings" className="font-semibold underline hover:text-amber-900 cursor-pointer">
               Add your own Gemini API key in Settings
             </Link>{" "}
             to continue with no limits.
@@ -53,7 +53,7 @@ export function SeoAuditShell({ books, hasOwnKey, usageCount, usageCap, atLimit 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span>{usageCount} of {usageCap} free AI requests used this month</span>
-            <Link href="/admin/settings" className="text-blue-600 hover:underline">Add your own key →</Link>
+            <Link href="/admin/settings" className="text-blue-600 hover:underline cursor-pointer">Add your own key →</Link>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
             <div

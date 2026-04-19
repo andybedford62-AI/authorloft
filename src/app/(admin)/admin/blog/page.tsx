@@ -136,7 +136,7 @@ export default async function AdminBlogPage() {
       {/* Info note about enabling in nav */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
         <strong>Tip:</strong> Enable the Blog link in your site navigation from{" "}
-        <Link href="/admin/pages" className="underline hover:text-blue-900">
+        <Link href="/admin/pages" className="underline hover:text-blue-900 cursor-pointer">
           Pages &amp; Navigation
         </Link>
         .

@@ -134,7 +134,7 @@ export function LegalEditor({
                 )}
               </p>
             </div>
-            <Link href="/privacy" target="_blank" className="text-xs text-blue-600 flex items-center gap-1 hover:text-blue-700 flex-shrink-0">
+            <Link href="/privacy" target="_blank" className="text-xs text-blue-600 flex items-center gap-1 hover:text-blue-700 flex-shrink-0 cursor-pointer">
               Preview <ExternalLink className="h-3 w-3" />
             </Link>
           </div>
@@ -182,7 +182,7 @@ export function LegalEditor({
                 )}
               </p>
             </div>
-            <Link href="/terms" target="_blank" className="text-xs text-blue-600 flex items-center gap-1 hover:text-blue-700 flex-shrink-0">
+            <Link href="/terms" target="_blank" className="text-xs text-blue-600 flex items-center gap-1 hover:text-blue-700 flex-shrink-0 cursor-pointer">
               Preview <ExternalLink className="h-3 w-3" />
             </Link>
           </div>

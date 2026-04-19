@@ -168,10 +168,10 @@ export function BookReviews({ bookId }: Props) {
                     </p>
                   </div>
                   <div className="flex items-start gap-1 flex-shrink-0">
-                    <button onClick={() => startEdit(r)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                    <button onClick={() => startEdit(r)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => remove(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                    <button onClick={() => remove(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>

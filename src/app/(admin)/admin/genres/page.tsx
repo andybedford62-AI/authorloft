@@ -24,7 +24,7 @@ function GenreNode({
         style={{ paddingLeft: `${16 + depth * 24}px` }}
       >
         {hasChildren ? (
-          <button onClick={() => setExpanded(!expanded)} className="flex-shrink-0">
+          <button onClick={() => setExpanded(!expanded)} className="flex-shrink-0 cursor-pointer">
             <ChevronRight
               className={`h-4 w-4 text-gray-400 transition-transform ${expanded ? "rotate-90" : ""}`}
             />
@@ -41,13 +41,13 @@ function GenreNode({
         <span className="text-xs text-gray-400 hidden sm:block">{genre.slug}</span>
 
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-          <button className="p-1 text-gray-400 hover:text-blue-600 rounded transition-colors">
+          <button className="p-1 text-gray-400 hover:text-blue-600 rounded transition-colors cursor-pointer">
             <Pencil className="h-3.5 w-3.5" />
           </button>
-          <button className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors">
+          <button className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors cursor-pointer">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
-          <button className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors" title="Add sub-genre">
+          <button className="p-1 text-gray-400 hover:text-green-600 rounded transition-colors cursor-pointer" title="Add sub-genre">
             <Plus className="h-3.5 w-3.5" />
           </button>
         </div>
