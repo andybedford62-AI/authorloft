@@ -434,7 +434,7 @@ export function BookAudioTracks({ bookId, audioEnabled }: Props) {
           <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
           <div className="text-sm text-amber-800">
             <span className="font-semibold">Audio previews require a Standard or Premium plan.</span>{" "}
-            <a href="/admin/settings" className="underline hover:text-amber-900">Upgrade your plan</a> to
+            <a href="/admin/settings" className="underline hover:text-amber-900 cursor-pointer">Upgrade your plan</a> to
             add audio tracks to your books.
           </div>
         </div>

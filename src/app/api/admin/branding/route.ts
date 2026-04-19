@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest) {
 
   const {
     displayName, tagline, shortBio, bio,
-    profileImageUrl,
+    profileImageUrl, logoUrl,
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
     contactEmail, contactResponseTime, contactOpenTo,
     heroTitle, heroSubtitle, showHeroBanner,
@@ -26,9 +26,11 @@ export async function PATCH(req: NextRequest) {
       tagline:        tagline        ?? null,
       shortBio:       shortBio       ?? null,
       bio:            bio            ?? null,
-      // Only update profileImageUrl if explicitly provided (allows clearing with "")
       ...(profileImageUrl !== undefined && {
         profileImageUrl: profileImageUrl || null,
+      }),
+      ...(logoUrl !== undefined && {
+        logoUrl: logoUrl || null,
       }),
       linkedinUrl:    linkedinUrl    || null,
       youtubeUrl:     youtubeUrl     || null,

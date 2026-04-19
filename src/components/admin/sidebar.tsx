@@ -83,11 +83,12 @@ export function AdminSidebar({ authorName, authorSlug, isSuperAdmin, planTier = 
   return (
     <aside className="w-64 flex-shrink-0 bg-gray-900 min-h-screen flex flex-col">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-gray-800">
-        <span className="text-white font-bold text-lg tracking-tight">
-          Author<span className="text-blue-400">Loft</span>
-        </span>
-        <span className="ml-2 text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium">
+      <div className="h-16 flex items-center px-4 border-b border-gray-800 gap-2">
+        <div className="bg-white rounded-lg p-0.5 flex-shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-10 w-auto" />
+        </div>
+        <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium flex-shrink-0">
           Admin
         </span>
       </div>

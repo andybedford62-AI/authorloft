@@ -30,6 +30,7 @@ async function resolveAuthor(domain: string) {
       customDomain: true,
       shortBio: true,
       profileImageUrl: true,
+      logoUrl: true,
       linkedinUrl: true,
       youtubeUrl: true,
       facebookUrl: true,

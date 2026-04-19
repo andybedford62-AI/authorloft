@@ -141,7 +141,7 @@ export function KeywordDensityTab({ books }: { books: Book[] }) {
             <div role="alert" aria-live="polite"
               className="mt-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
               You've reached your monthly AI request limit.{" "}
-              <a href="/admin/settings" className="font-semibold underline hover:text-amber-900">
+              <a href="/admin/settings" className="font-semibold underline hover:text-amber-900 cursor-pointer">
                 Add your own Gemini API key in Settings
               </a>{" "}
               to continue with no limits.

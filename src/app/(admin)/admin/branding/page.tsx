@@ -15,6 +15,7 @@ export default async function BrandingPage() {
     select: {
       displayName: true, tagline: true, shortBio: true, bio: true,
       profileImageUrl: true,
+      logoUrl: true,
       linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
       twitterUrl: true, instagramUrl: true,
       contactEmail: true, contactResponseTime: true, contactOpenTo: true,
@@ -33,6 +34,7 @@ export default async function BrandingPage() {
     shortBio:       author.shortBio       ?? "",
     bio:            author.bio            ?? "",
     profileImageUrl: author.profileImageUrl ?? "",
+    logoUrl:         author.logoUrl         ?? "",
     linkedinUrl:    author.linkedinUrl    ?? "",
     youtubeUrl:     author.youtubeUrl     ?? "",
     facebookUrl:    author.facebookUrl    ?? "",

@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BookOpen, Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -41,11 +41,9 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <BookOpen className="h-7 w-7 text-blue-600" />
-            <span className="font-bold text-2xl text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+          <Link href="/" className="inline-flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Sign in to your author dashboard</p>
           {justRegistered && (

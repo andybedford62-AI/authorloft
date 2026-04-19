@@ -31,6 +31,7 @@ interface NavProps {
     name:         string;
     slug:         string;
     accentColor:  string;
+    logoUrl?:     string | null;
     linkedinUrl?: string | null;
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
@@ -95,12 +96,21 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
         {/* ── Logo ─────────────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2 group">
-            <BookOpen
-              className="h-5 w-5 flex-shrink-0 text-white/70 transition-opacity group-hover:opacity-80"
-            />
-            <span className="font-heading font-semibold text-white text-sm group-hover:opacity-80 transition-opacity">
-              {author.displayName || author.name}
-            </span>
+            {author.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={author.logoUrl}
+                alt={author.displayName || author.name}
+                className="h-10 w-auto max-w-[160px] object-contain group-hover:opacity-80 transition-opacity"
+              />
+            ) : (
+              <>
+                <BookOpen className="h-5 w-5 flex-shrink-0 text-white/70 transition-opacity group-hover:opacity-80" />
+                <span className="font-heading font-semibold text-white text-sm group-hover:opacity-80 transition-opacity">
+                  {author.displayName || author.name}
+                </span>
+              </>
+            )}
           </Link>
 
           {/* Owner-only Dashboard badge */}

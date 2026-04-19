@@ -63,6 +63,7 @@ model Author {
   bio                  String?        @db.Text
   shortBio             String?
   profileImageUrl      String?
+  logoUrl              String?
   heroImageUrl         String?
   heroTitle            String?
   heroSubtitle         String?
