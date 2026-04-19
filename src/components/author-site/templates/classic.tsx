@@ -103,9 +103,10 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               <h2 className="text-2xl font-bold text-gray-900 font-heading">{authorName}</h2>
             </div>
 
-            <p className="text-gray-600 leading-relaxed">
-              {author.shortBio || "Author bio coming soon."}
-            </p>
+            <div
+              className="rich-content"
+              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+            />
 
             {/* Credential pills — only rendered if at least one has text */}
             {credentialPills.length > 0 && (
@@ -168,7 +169,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── Browse by Series ────────────────────────────────────────────────── */}
-      {series.length > 0 && (
+      {series.filter((s) => s.books.length > 0).length > 0 && (
         <section className="bg-gray-50 py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>

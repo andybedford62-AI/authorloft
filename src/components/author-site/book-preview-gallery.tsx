@@ -60,7 +60,6 @@ function Lightbox({
           // eslint-disable-next-line jsx-a11y/media-has-caption
           <video
             src={item.fileUrl}
-            autoPlay
             controls
             playsInline
             className="w-full rounded-xl bg-black"

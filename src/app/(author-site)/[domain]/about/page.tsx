@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { GraduationCap, Pin } from "lucide-react";
+import { GraduationCap, Pin, BarChart2 } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
@@ -40,11 +40,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   const authorName = author.displayName || author.name;
   const accentColor = author.accentColor || "#7B2D2D";
 
-  // Bio paragraphs — split on double newlines
-  const bioParagraphs = (author.bio || author.shortBio || "Bio coming soon.")
-    .split("\n\n")
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const bioHtml = (author as any).bio || (author as any).shortBio || "<p>Bio coming soon.</p>";
 
   // Social / connect links
   const socialLinks = [
@@ -60,6 +56,15 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   const credentials = [
     "Author",
     ...(books.length > 0 ? [`${books.length} ${books.length === 1 ? "Book" : "Books"} Published`] : []),
+  ];
+
+  // About page stats from branding
+  const rawStats = Array.isArray((author as any).aboutStats)
+    ? (author as any).aboutStats as { value: string; label: string }[]
+    : [];
+  const aboutStats = [
+    { value: String(books.length), label: books.length === 1 ? "Book Published" : "Books Published" },
+    ...rawStats.filter((s) => s.value?.trim() && s.label?.trim()),
   ];
 
   return (
@@ -115,16 +120,35 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
               </div>
             </div>
 
+            {/* About Page Stats */}
+            {aboutStats.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <BarChart2 className="h-4 w-4" style={{ color: accentColor }} />
+                  <h3 className="text-sm font-semibold text-gray-800">By the Numbers</h3>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  {aboutStats.map((stat, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center px-4 py-3 rounded-lg border"
+                      style={{ borderColor: accentColor + "40", backgroundColor: accentColor + "08" }}
+                    >
+                      <span className="text-xl font-bold" style={{ color: accentColor }}>{stat.value}</span>
+                      <span className="text-xs text-gray-500 mt-0.5 text-center">{stat.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* About (bio) */}
             <div className="mb-6">
               <h3 className="text-base font-semibold text-gray-800 mb-2">About</h3>
-              <div className="space-y-3">
-                {bioParagraphs.map((para, i) => (
-                  <p key={i} className="text-gray-600 leading-relaxed text-sm">
-                    {para}
-                  </p>
-                ))}
-              </div>
+              <div
+                className="rich-content"
+                dangerouslySetInnerHTML={{ __html: bioHtml }}
+              />
             </div>
 
             {/* Connect */}

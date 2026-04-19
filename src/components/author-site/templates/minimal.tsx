@@ -95,9 +95,10 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
                   About {author.displayName || author.name}
                 </h2>
               </div>
-              <p className="text-gray-600 leading-relaxed">
-                {author.shortBio || "Author bio coming soon."}
-              </p>
+              <div
+                className="rich-content"
+                dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+              />
               <Link
                 href="/about"
                 className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
@@ -170,7 +171,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── 4. Series ───────────────────────────────────────────────────── */}
-      {series.length > 0 && (
+      {series.filter((s) => s.books.length > 0).length > 0 && (
         <section className="py-14 bg-white border-t border-gray-100">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center gap-4 mb-8">
