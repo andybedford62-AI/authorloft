@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { BookOpen } from "lucide-react";
 import { NewsletterModalButton } from "./newsletter-modal";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -90,22 +90,10 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
 
             {/* Col 1 — Brand */}
             <div className="space-y-3">
-              <a
-                href="https://www.authorloft.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              >
-                <Image
-                  src="/AL_site_Logo-Dark_footer.png"
-                  alt="AuthorLoft"
-                  width={24}
-                  height={24}
-                  className="h-6 w-auto"
-                  unoptimized
-                />
-                <span className="font-bold text-white text-sm">AuthorLoft.com</span>
-              </a>
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" style={{ color: author.accentColor }} />
+                <span className="font-bold text-white text-sm">{displayName}</span>
+              </div>
               <p className="text-gray-400 text-xs leading-relaxed">
                 A platform for authors to establish their web presence, showcase their work,
                 and connect with readers worldwide.
