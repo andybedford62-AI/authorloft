@@ -12,20 +12,26 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const genres = await prisma.genre.findMany({
-    where: { parentId: null },
-    include: {
-      children: {
-        include: { children: { include: { children: true, _count: { select: { books: true } } }, _count: { select: { books: true } } } },
-        orderBy: { sortOrder: "asc" },
-        _count: { select: { books: true } },
-      },
-      _count: { select: { books: true } },
-    },
+  // Fetch all genres flat, then build tree in JS to avoid nested _count issues
+  const all = await prisma.genre.findMany({
+    include: { _count: { select: { books: true } } },
     orderBy: { sortOrder: "asc" },
   });
 
-  return NextResponse.json(genres);
+  type Flat = typeof all[0] & { children: Flat[] };
+  const map = new Map<string, Flat>();
+  all.forEach((g) => map.set(g.id, { ...g, children: [] }));
+
+  const roots: Flat[] = [];
+  map.forEach((g) => {
+    if (g.parentId && map.has(g.parentId)) {
+      map.get(g.parentId)!.children.push(g);
+    } else if (!g.parentId) {
+      roots.push(g);
+    }
+  });
+
+  return NextResponse.json(roots);
 }
 
 export async function POST(req: NextRequest) {
