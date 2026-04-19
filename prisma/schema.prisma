@@ -259,6 +259,7 @@ model Book {
   directSaleItems     BookDirectSaleItem[]
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
+  reviews             BookReview[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -335,6 +336,23 @@ model BookPreviewMedia {
   updatedAt        DateTime         @updatedAt
 
   @@unique([bookId, position])
+  @@index([bookId])
+}
+
+// ─── Book Reviews ────────────────────────────────────────────────────────────
+
+model BookReview {
+  id           String   @id @default(cuid())
+  bookId       String
+  book         Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  quote        String   @db.Text
+  reviewerName String
+  source       String?
+  rating       Int?                              // 1–5 stars, optional
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   @@index([bookId])
 }
 
