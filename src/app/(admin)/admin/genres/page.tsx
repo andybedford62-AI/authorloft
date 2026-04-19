@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { ChevronRight, Plus, Pencil, Trash2, Tag, FolderOpen, Loader2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Genre = {
   id: string;
@@ -103,24 +104,14 @@ function GenreRow({
         {/* Action buttons */}
         {editing ? (
           <div className="flex items-center gap-1 ml-2">
-            <button onClick={handleSave} disabled={saving} className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded cursor-pointer" title="Save">
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-            </button>
-            <button onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} className="p-1.5 bg-gray-400 hover:bg-gray-500 text-white rounded cursor-pointer" title="Cancel">
-              <X className="h-3.5 w-3.5" />
-            </button>
+            <IconButton icon={<Check className="h-4 w-4" />} title="Save" variant="success" onClick={handleSave} loading={saving} />
+            <IconButton icon={<X className="h-4 w-4" />} title="Cancel" variant="ghost" onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} />
           </div>
         ) : (
           <div className="flex items-center gap-1 ml-2">
-            <button onClick={() => { setEditing(true); setEditName(genre.name); }} className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors cursor-pointer" title="Edit name">
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={() => onAddChild(genre.id, genre.name)} className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded transition-colors cursor-pointer" title="Add sub-genre">
-              <Plus className="h-3.5 w-3.5" />
-            </button>
-            <button onClick={handleDelete} disabled={deleting} className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded transition-colors cursor-pointer" title="Delete">
-              {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-            </button>
+            <IconButton icon={<Pencil className="h-4 w-4" />} title="Rename" variant="primary" onClick={() => { setEditing(true); setEditName(genre.name); }} />
+            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="success" onClick={() => onAddChild(genre.id, genre.name)} />
+            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="danger" onClick={handleDelete} loading={deleting} />
           </div>
         )}
       </div>
