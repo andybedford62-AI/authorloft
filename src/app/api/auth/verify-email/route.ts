@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { sendWelcomeEmail } from "@/lib/mailer";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
         emailVerifyToken: token,
         emailVerifyExpiry: { gt: new Date() },
       },
-      select: { id: true, emailVerified: true },
+      select: { id: true, email: true, name: true, slug: true, emailVerified: true },
     });
 
     if (!author) {
@@ -30,6 +31,13 @@ export async function GET(req: NextRequest) {
         emailVerifyExpiry: null,
       },
     });
+
+    // Send welcome email only on first verification
+    if (!author.emailVerified) {
+      sendWelcomeEmail(author.email, author.name, author.slug).catch((err) => {
+        console.error("[verify-email] Failed to send welcome email:", err);
+      });
+    }
 
     return NextResponse.redirect(new URL("/verify-email/success", req.url));
   } catch (err) {

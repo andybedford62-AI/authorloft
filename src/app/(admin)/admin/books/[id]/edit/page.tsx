@@ -7,6 +7,7 @@ import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
 import { BookAudioTracks } from "@/components/admin/book-audio-tracks";
 import { BookPreviewMedia } from "@/components/admin/book-preview-media";
+import { BookReviews } from "@/components/admin/book-reviews";
 
 export default async function EditBookPage({
   params,
@@ -94,6 +95,8 @@ export default async function EditBookPage({
       <BookAudioTracks bookId={book.id} audioEnabled={author?.plan?.audioEnabled ?? false} />
       {/* Preview media — up to 3 images/videos/audio shown on the public book page */}
       <BookPreviewMedia bookId={book.id} initial={previewMedia} />
+      {/* Reader reviews and pull quotes shown on the public book page */}
+      <BookReviews bookId={book.id} />
       {/* Retailer links are managed separately so changes take effect immediately */}
       <RetailerLinks bookId={book.id} />
     </div>

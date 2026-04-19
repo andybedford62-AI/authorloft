@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
@@ -104,6 +104,10 @@ export default async function BookDetailPage({
         where: { fileUrl: { not: "" } },
         select: { id: true, position: true, mediaType: true, fileUrl: true, thumbnailUrl: true },
         orderBy: { position: "asc" },
+      },
+      reviews: {
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        select: { id: true, quote: true, reviewerName: true, source: true, rating: true },
       },
     },
   });
@@ -334,6 +338,42 @@ export default async function BookDetailPage({
             {/* Book Overview — collapsible */}
             {book.description && (
               <BookOverview text={book.description} accentColor={accentColor} />
+            )}
+
+            {/* Pull quotes / reviews */}
+            {book.reviews.length > 0 && (
+              <div className="pt-2 space-y-4">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">What Readers Are Saying</h2>
+                <div className="space-y-4">
+                  {book.reviews.map((review) => (
+                    <blockquote
+                      key={review.id}
+                      className="relative pl-5 border-l-4"
+                      style={{ borderColor: accentColor }}
+                    >
+                      {review.rating && (
+                        <div className="flex gap-0.5 mb-1.5">
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <Star
+                              key={n}
+                              className={`h-3.5 w-3.5 ${n <= review.rating! ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-base text-gray-700 leading-relaxed italic">
+                        &ldquo;{review.quote}&rdquo;
+                      </p>
+                      <footer className="mt-2 text-sm text-gray-500">
+                        — <span className="font-medium text-gray-700">{review.reviewerName}</span>
+                        {review.source && (
+                          <span className="text-gray-400">, {review.source}</span>
+                        )}
+                      </footer>
+                    </blockquote>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Genres */}
