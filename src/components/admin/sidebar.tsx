@@ -233,7 +233,7 @@ export function AdminSidebar({
   isSuperAdmin = false,
   planTier = "FREE",
   featureGates = {},
-  adminTheme = "dark",
+  adminTheme = "light",
 }: SidebarProps) {
   const pathname = usePathname();
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -273,9 +273,18 @@ export function AdminSidebar({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-10 w-auto" />
         </div>
-        <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium flex-shrink-0">
-          Admin
-        </span>
+        <div className="flex flex-col gap-0.5 flex-shrink-0">
+          <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium leading-none">
+            Admin
+          </span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold leading-none text-center ${
+            planTier === "PREMIUM"  ? "bg-purple-600 text-white" :
+            planTier === "STANDARD" ? "bg-blue-500 text-white"   :
+                                      "bg-gray-400 text-white"
+          }`}>
+            {planTier === "PREMIUM" ? "Premium" : planTier === "STANDARD" ? "Standard" : "Free"}
+          </span>
+        </div>
       </div>
 
       {/* Author info */}
