@@ -78,6 +78,7 @@ model Author {
   contactEmail         String?
   contactResponseTime  String?
   contactOpenTo        String?
+  adminTheme           String         @default("dark")  // admin UI preference: "dark" | "light"
   aiApiKey             String?
   aiUsageCount         Int       @default(0)
   aiUsageCap           Int       @default(20)

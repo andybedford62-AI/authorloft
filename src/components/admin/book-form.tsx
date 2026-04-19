@@ -305,13 +305,11 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
     }
 
     // ── 3. Not found in either source ────────────────────────────────────────
-    // Pre-fill the manual ISBN field so the user doesn't have to retype it
     setIsbn(q);
-
     const isKdp = q.startsWith("9798");
     setIsbnError(
       isKdp
-        ? "This looks like an Amazon KDP ISBN (979-8‑…). KDP books often aren't in public databases — the ISBN has been filled in below. Please enter the title, description and cover manually."
+        ? "This looks like an Amazon KDP ISBN (979-8‑…). KDP books often aren't in public databases — the ISBN has been filled in below. Please enter the title, description, and cover manually."
         : "No book found for that ISBN. The ISBN has been filled in below — please enter the remaining details manually."
     );
     setIsbnLooking(false);
@@ -443,8 +441,9 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             Import by ISBN
           </h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Enter an ISBN (10 or 13 digits) to pre-fill book details from Google Books.
-            You can edit any field after importing.
+            Enter an ISBN (10 or 13 digits) to pre-fill book details. We search both
+            Google Books and Open Library — covering traditionally published and many
+            self-published titles. You can edit any field after importing.
           </p>
         </div>
 

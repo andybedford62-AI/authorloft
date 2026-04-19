@@ -35,6 +35,7 @@ export default async function SuperAdminLayout({
             <Link href="/super-admin" className="text-gray-400 hover:text-white transition-colors">Dashboard</Link>
             <Link href="/super-admin/plans" className="text-gray-400 hover:text-white transition-colors">Plans</Link>
             <Link href="/super-admin/authors" className="text-gray-400 hover:text-white transition-colors">Authors</Link>
+            <Link href="/admin/genres" className="text-gray-400 hover:text-white transition-colors">Genres</Link>
             <Link href="/super-admin/legal" className="text-gray-400 hover:text-white transition-colors">Legal</Link>
           </nav>
           <div className="ml-auto text-xs text-gray-500">
