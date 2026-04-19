@@ -33,9 +33,6 @@ const nextConfig: NextConfig = {
     // Re-enable strict checking once the site is confirmed working.
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       // Amazon product images (used in seed data)
