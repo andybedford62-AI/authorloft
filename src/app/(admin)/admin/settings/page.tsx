@@ -371,15 +371,16 @@ function AdminThemeSection() {
                 : "border-gray-200 hover:border-gray-300 bg-white"
             }`}
           >
-            <div className="w-full h-20 rounded-lg bg-gray-900 flex overflow-hidden">
-              <div className="w-1/3 bg-gray-800 flex flex-col gap-1 p-2">
+            {/* Preview: dark sidebar + dark content */}
+            <div className="w-full h-20 rounded-lg overflow-hidden flex" style={{ background: "#111827" }}>
+              <div className="w-1/3 flex flex-col gap-1 p-2" style={{ background: "#111827", borderRight: "1px solid #374151" }}>
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-2 rounded bg-gray-700 w-full" />
+                  <div key={i} className="h-2 rounded w-full" style={{ background: "#374151" }} />
                 ))}
               </div>
-              <div className="flex-1 flex flex-col gap-1.5 p-2">
-                <div className="h-2.5 rounded bg-gray-700 w-3/4" />
-                <div className="h-2 rounded bg-gray-800 w-1/2" />
+              <div className="flex-1 flex flex-col gap-1.5 p-2" style={{ background: "#111827" }}>
+                <div className="h-2.5 rounded w-3/4" style={{ background: "#1f2937" }} />
+                <div className="h-8 rounded w-full" style={{ background: "#1f2937", border: "1px solid #374151" }} />
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
