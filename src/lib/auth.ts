@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
+import { slugify } from "./utils";
 import bcrypt from "bcryptjs";
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
@@ -9,6 +11,16 @@ const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "";
 // Only apply a custom cookie domain when using a real custom domain (e.g. authorloft.com).
 const isPublicSuffixDomain = platformDomain.includes("vercel.app") || platformDomain.includes("localhost");
 const useCustomCookieDomain = platformDomain && !isPublicSuffixDomain;
+
+// Ensure slug is unique — appends a number if taken
+async function uniqueSlug(base: string): Promise<string> {
+  let candidate = base;
+  let attempt = 2;
+  while (await prisma.author.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+    candidate = `${base}${attempt++}`;
+  }
+  return candidate;
+}
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -35,18 +47,18 @@ export const authOptions: NextAuthOptions = {
     error: "/login",
   },
   providers: [
+    GoogleProvider({
+      clientId:     process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: "Email & Password",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email:    { label: "Email",    type: "email"    },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("[auth] authorize called, email:", credentials?.email);
-        if (!credentials?.email || !credentials?.password) {
-          console.log("[auth] missing credentials");
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         let author;
         try {
@@ -54,59 +66,115 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
             include: { plan: true },
           });
-          console.log("[auth] author found:", !!author);
         } catch (err) {
           console.error("[auth] prisma error:", err);
           return null;
         }
 
-        if (!author || !author.passwordHash) {
-          console.log("[auth] no author or no hash");
-          return null;
-        }
+        if (!author || !author.passwordHash) return null;
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          author.passwordHash
-        );
-        console.log("[auth] bcrypt result:", isValid);
+        const isValid = await bcrypt.compare(credentials.password, author.passwordHash);
         if (!isValid) return null;
 
         return {
-          id: author.id,
-          email: author.email,
-          name: author.displayName || author.name,
-          image: author.profileImageUrl,
-          slug: author.slug,
+          id:          author.id,
+          email:       author.email,
+          name:        author.displayName || author.name,
+          image:       author.profileImageUrl,
+          slug:        author.slug,
           isSuperAdmin: author.isSuperAdmin,
-          planTier: author.plan?.tier || "FREE",
+          planTier:    author.plan?.tier || "FREE",
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.slug = (user as any).slug;
+    // ── Google: create or find author on first sign-in ─────────────────────
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") return true;
+
+      try {
+        const email = user.email!.toLowerCase();
+        const existing = await prisma.author.findUnique({
+          where: { email },
+          select: { id: true, emailVerified: true },
+        });
+
+        if (existing) {
+          // Existing account — mark email verified if not already
+          if (!existing.emailVerified) {
+            await prisma.author.update({
+              where: { id: existing.id },
+              data: { emailVerified: new Date() },
+            });
+          }
+        } else {
+          // New Google user — create author with auto-generated slug
+          const freePlan = await prisma.plan.findFirst({
+            where: { tier: "FREE" },
+            select: { id: true },
+          });
+          const baseName  = user.name ?? email.split("@")[0];
+          const slugBase  = slugify(baseName) || "author";
+          const finalSlug = await uniqueSlug(slugBase.slice(0, 38));
+
+          await prisma.author.create({
+            data: {
+              email,
+              name:           baseName,
+              displayName:    baseName,
+              slug:           finalSlug,
+              isActive:       true,
+              emailVerified:  new Date(),   // Google has already verified the email
+              profileImageUrl: user.image ?? null,
+              ...(freePlan && { planId: freePlan.id }),
+            },
+          });
+        }
+        return true;
+      } catch (err) {
+        console.error("[auth] Google signIn error:", err);
+        return false;
+      }
+    },
+
+    // ── Enrich JWT with author fields ──────────────────────────────────────
+    async jwt({ token, user, account }) {
+      if (account?.provider === "google") {
+        // Google initial sign-in — look up author for custom fields
+        const author = await prisma.author.findUnique({
+          where: { email: token.email! },
+          include: { plan: true },
+        });
+        if (author) {
+          token.id          = author.id;
+          token.slug        = author.slug;
+          token.isSuperAdmin = author.isSuperAdmin;
+          token.planTier    = author.plan?.tier || "FREE";
+        }
+      } else if (user) {
+        // Credentials initial sign-in
+        token.id          = user.id;
+        token.slug        = (user as any).slug;
         token.isSuperAdmin = (user as any).isSuperAdmin;
-        token.planTier = (user as any).planTier;
+        token.planTier    = (user as any).planTier;
       }
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).slug = token.slug;
+        (session.user as any).id          = token.id;
+        (session.user as any).slug        = token.slug;
         (session.user as any).isSuperAdmin = token.isSuperAdmin;
-        (session.user as any).planTier = token.planTier;
+        (session.user as any).planTier    = token.planTier;
       }
       return session;
     },
   },
 };
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────────
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
