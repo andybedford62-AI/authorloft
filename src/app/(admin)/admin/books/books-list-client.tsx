@@ -121,18 +121,18 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
 
               {/* Title + cover */}
               <td className="px-4 py-4">
-                <div className="flex items-center gap-3">
+                <Link href={`/admin/books/${book.id}/edit`} className="flex items-center gap-3 group cursor-pointer">
                   <div className="w-8 h-11 bg-gray-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {book.coverImageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={book.coverImageUrl} alt="" className="w-full h-full object-cover" />
+                      <img src={book.coverImageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : (
                       <BookOpen className="h-4 w-4 text-gray-300" />
                     )}
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <p className="font-medium text-gray-900 line-clamp-1">{book.title}</p>
+                      <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{book.title}</p>
                       {book.isFeatured && (
                         <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
                       )}
@@ -146,7 +146,7 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                       <p className="text-xs text-gray-400 line-clamp-1">{book.subtitle}</p>
                     )}
                   </div>
-                </div>
+                </Link>
               </td>
 
               {/* Series */}
@@ -193,10 +193,12 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
               {/* Edit */}
               <td className="px-4 py-4">
                 <div className="flex items-center justify-end">
-                  <Link href={`/admin/books/${book.id}/edit`}>
-                    <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                      <Pencil className="h-4 w-4" />
-                    </button>
+                  <Link
+                    href={`/admin/books/${book.id}/edit`}
+                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors cursor-pointer"
+                    title="Edit book"
+                  >
+                    <Pencil className="h-4 w-4" />
                   </Link>
                 </div>
               </td>
