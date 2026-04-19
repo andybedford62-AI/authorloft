@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { BookMarked, ArrowLeft, ExternalLink, Lock } from "lucide-react";
+import { BookMarked, ArrowLeft, ExternalLink, Lock, Play } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -118,92 +118,73 @@ export default async function FlipBookViewerPage({ params }: Props) {
 
       {/* ── Viewer ───────────────────────────────────────────────────────────── */}
       {flipBooksEnabled && flipBook.flipBookUrl && (
-        <div className="flex flex-col lg:flex-row flex-1 min-h-0">
+        <div className="flex-1 flex items-center justify-center px-4 py-12 bg-gray-50">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-          {/* Flip book iframe — takes most of the space */}
-          <div className="flex-1 bg-gray-900 flex flex-col" style={{ minHeight: "70vh" }}>
-            <iframe
-              src={flipBook.flipBookUrl}
-              className="w-full flex-1"
-              allowFullScreen
-              allow="fullscreen"
-              title={`${flipBook.title} — Flip Book`}
-              style={{ minHeight: "60vh", border: "none" }}
-            />
+            {/* Cover image */}
+            {flipBook.coverImageUrl && (
+              <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
+                <Image
+                  src={flipBook.coverImageUrl}
+                  alt={flipBook.title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h1 className="text-xl font-bold text-white leading-snug">{flipBook.title}</h1>
+                  {flipBook.subtitle && (
+                    <p className="text-sm text-white/70 mt-1">{flipBook.subtitle}</p>
+                  )}
+                </div>
+              </div>
+            )}
 
-            {/* Bottom hint bar */}
-            <div className="bg-gray-900 px-4 py-2 flex items-center justify-between">
-              <p className="text-xs text-gray-400">
-                Use the controls inside the viewer to navigate pages.
-              </p>
+            {/* No cover fallback */}
+            {!flipBook.coverImageUrl && (
+              <div className="p-8 pb-0">
+                <h1 className="text-2xl font-bold text-gray-900">{flipBook.title}</h1>
+                {flipBook.subtitle && (
+                  <p className="text-sm text-gray-500 mt-1">{flipBook.subtitle}</p>
+                )}
+              </div>
+            )}
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              {flipBook.description && (
+                <p className="text-sm text-gray-600 leading-relaxed">{flipBook.description}</p>
+              )}
+
+              {/* Primary CTA */}
               <a
                 href={flipBook.flipBookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+                className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl text-white font-semibold text-base transition-opacity hover:opacity-90"
+                style={{ backgroundColor: accentColor }}
               >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Open in new tab
+                <Play className="h-5 w-5 fill-white" />
+                Open Flip Book
+                <ExternalLink className="h-4 w-4 opacity-70" />
               </a>
+
+              {/* Secondary nav */}
+              <div className="flex gap-3">
+                <Link href="/flip-books" className="flex-1">
+                  <Button variant="outline" className="w-full text-sm">
+                    ← All Flip Books
+                  </Button>
+                </Link>
+                <Link href="/books" className="flex-1">
+                  <Button variant="outline" className="w-full text-sm">
+                    Browse Books
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
-
-          {/* Sidebar — flip book info */}
-          <aside className="lg:w-72 xl:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col">
-
-            {/* Book info */}
-            <div className="p-6 space-y-5 flex-1">
-
-              {/* Cover + title */}
-              <div className="flex gap-4 items-start">
-                <div className="relative w-20 h-28 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 shadow-md">
-                  {flipBook.coverImageUrl ? (
-                    <Image
-                      src={flipBook.coverImageUrl}
-                      alt={flipBook.title}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <BookMarked className="h-8 w-8 text-gray-300" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h1 className="font-bold text-gray-900 leading-snug">{flipBook.title}</h1>
-                  {flipBook.subtitle && (
-                    <p className="text-sm text-gray-500 mt-1 leading-tight">{flipBook.subtitle}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Description */}
-              {flipBook.description && (
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {flipBook.description}
-                </p>
-              )}
-            </div>
-
-            {/* Footer actions */}
-            <div className="p-6 border-t border-gray-100 space-y-3">
-              <Link href="/flip-books">
-                <Button variant="outline" className="w-full">
-                  ← All Flip Books
-                </Button>
-              </Link>
-              <Link href="/books">
-                <Button
-                  className="w-full"
-                  style={{ backgroundColor: accentColor }}
-                >
-                  Browse Full Catalog
-                </Button>
-              </Link>
-            </div>
-          </aside>
         </div>
       )}
     </div>
