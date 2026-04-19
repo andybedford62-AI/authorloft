@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ChevronRight, Plus, Pencil, Trash2, Tag, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +67,18 @@ function GenreNode({
 }
 
 export default function GenresPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [showAdd, setShowAdd] = useState(false);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!(session?.user as any)?.isSuperAdmin) {
+      router.replace("/admin/dashboard");
+    }
+  }, [session, status, router]);
+
+  if (status === "loading" || !(session?.user as any)?.isSuperAdmin) return null;
 
   return (
     <div className="space-y-6 max-w-3xl">

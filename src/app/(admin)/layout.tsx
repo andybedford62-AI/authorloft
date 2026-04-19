@@ -21,29 +21,40 @@ export default async function AdminLayout({
   const isSuperAdmin = (session.user as any).isSuperAdmin || false;
   const authorId     = (session.user as any).id          as string;
 
-  // Fetch plan tier + feature gates for sidebar
+  // Fetch plan tier, feature gates, and admin theme preference
   const [authorRecord, featureConfig] = await Promise.all([
     prisma.author.findUnique({
       where:  { id: authorId },
-      select: { plan: { select: { tier: true } } },
+      select: { plan: { select: { tier: true } }, adminTheme: true },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
   ]);
   const planTier    = authorRecord?.plan?.tier ?? "FREE";
   const featureGates = (featureConfig?.gates as Record<string, string>) ?? {};
+  const adminTheme  = (authorRecord?.adminTheme === "light" ? "light" : "dark") as "dark" | "light";
 
   return (
     <AdminSessionProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div
+        className="flex min-h-screen"
+        style={{ background: adminTheme === "light" ? "#faf8f5" : "#f9fafb" }}
+      >
         <AdminSidebar
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={isSuperAdmin}
           planTier={planTier}
           featureGates={featureGates}
+          adminTheme={adminTheme}
         />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0">
+          <header
+            className="h-16 border-b flex items-center px-6 flex-shrink-0"
+            style={{
+              background:   adminTheme === "light" ? "#faf8f5" : "#ffffff",
+              borderColor:  adminTheme === "light" ? "#ddd6c8" : "#e5e7eb",
+            }}
+          >
             <div className="flex-1" />
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">{authorName}</span>

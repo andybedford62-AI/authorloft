@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -309,6 +309,123 @@ function AiKeySection() {
   );
 }
 
+// ── Admin Theme section ───────────────────────────────────────────────────────
+
+function AdminThemeSection() {
+  const [theme, setTheme]   = useState<"dark" | "light" | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved,  setSaved]  = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/theme")
+      .then((r) => r.json())
+      .then((d) => { if (d.theme) setTheme(d.theme); })
+      .catch(() => {});
+  }, []);
+
+  async function choose(next: "dark" | "light") {
+    if (next === theme) return;
+    setTheme(next);
+    setSaving(true);
+    setSaved(false);
+    try {
+      await fetch("/api/admin/settings/theme", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ theme: next }),
+      });
+      setSaved(true);
+      // Reload so the layout re-renders with the new theme
+      setTimeout(() => window.location.reload(), 600);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Sun className="h-4 w-4 text-gray-400" />
+          Admin Interface Theme
+        </h2>
+        <p className="text-xs text-gray-400 mt-1">
+          Choose how your admin area looks. Your preference is saved to your profile and
+          applies across devices.
+        </p>
+      </div>
+
+      {theme === null ? (
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : (
+        <div className="flex gap-4">
+          {/* Dark option */}
+          <button
+            onClick={() => choose("dark")}
+            disabled={saving}
+            className={`flex-1 flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all ${
+              theme === "dark"
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
+            }`}
+          >
+            <div className="w-full h-20 rounded-lg bg-gray-900 flex overflow-hidden">
+              <div className="w-1/3 bg-gray-800 flex flex-col gap-1 p-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-2 rounded bg-gray-700 w-full" />
+                ))}
+              </div>
+              <div className="flex-1 flex flex-col gap-1.5 p-2">
+                <div className="h-2.5 rounded bg-gray-700 w-3/4" />
+                <div className="h-2 rounded bg-gray-800 w-1/2" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
+              <Moon className="h-4 w-4" /> Dark
+              {theme === "dark" && <CheckCircle className="h-4 w-4 text-blue-500 ml-1" />}
+            </div>
+          </button>
+
+          {/* Light option */}
+          <button
+            onClick={() => choose("light")}
+            disabled={saving}
+            className={`flex-1 flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all ${
+              theme === "light"
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
+            }`}
+          >
+            <div className="w-full h-20 rounded-lg bg-[#faf8f5] flex overflow-hidden border border-[#ddd6c8]">
+              <div className="w-1/3 bg-[#f2ede4] flex flex-col gap-1 p-2 border-r border-[#ddd6c8]">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-2 rounded bg-[#ddd6c8] w-full" />
+                ))}
+              </div>
+              <div className="flex-1 flex flex-col gap-1.5 p-2">
+                <div className="h-2.5 rounded bg-[#ddd6c8] w-3/4" />
+                <div className="h-2 rounded bg-[#e8e0d4] w-1/2" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
+              <Sun className="h-4 w-4" /> Warm Light
+              {theme === "light" && <CheckCircle className="h-4 w-4 text-blue-500 ml-1" />}
+            </div>
+          </button>
+        </div>
+      )}
+
+      {saved && (
+        <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+          Theme updated — reloading…
+        </p>
+      )}
+    </section>
+  );
+}
+
 // ── Main Settings page ────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -488,6 +605,9 @@ export default function SettingsPage() {
 
       {/* ── AI Assistant ─────────────────────────────────────────── */}
       <AiKeySection />
+
+      {/* ── Admin Theme ──────────────────────────────────────────── */}
+      <AdminThemeSection />
 
       {/* ── Danger Zone ───────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-red-100 p-6">
