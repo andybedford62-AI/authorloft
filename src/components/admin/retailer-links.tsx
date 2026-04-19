@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -278,41 +279,22 @@ export function RetailerLinks({ bookId }: Props) {
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  {/* Activate / Deactivate */}
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => toggleActive(link)}
+                  <IconButton
+                    icon={link.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
                     title={link.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
-                      link.isActive
-                        ? "border-amber-200 text-amber-600 hover:bg-amber-50"
-                        : "border-green-200 text-green-600 hover:bg-green-50"
-                    }`}
-                  >
-                    {isBusy ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : link.isActive ? (
-                      <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
-                    ) : (
-                      <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
-                    )}
-                  </button>
-
-                  {/* Delete */}
-                  <button
-                    type="button"
+                    variant={link.isActive ? "warning" : "success"}
+                    onClick={() => toggleActive(link)}
+                    loading={isBusy}
                     disabled={isBusy}
-                    onClick={() => deleteLink(link.id, link.label)}
+                  />
+                  <IconButton
+                    icon={<Trash2 className="h-4 w-4" />}
                     title="Delete link"
-                    className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-                  >
-                    {isBusy ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-3.5 w-3.5" />
-                    )}
-                  </button>
+                    variant="danger"
+                    onClick={() => deleteLink(link.id, link.label)}
+                    loading={isBusy}
+                    disabled={isBusy}
+                  />
                 </div>
               </div>
             );
