@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Library, Plus, Pencil, Trash2, BookOpen, Loader2, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Series = {
   id: string;
@@ -195,7 +196,7 @@ export default function SeriesPage() {
                 </form>
               ) : (
                 /* Display row */
-                <div className="flex items-center gap-4 group">
+                <div className="flex items-center gap-4">
                   <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
                     <Library className="h-4 w-4 text-blue-500" />
                   </div>
@@ -212,19 +213,9 @@ export default function SeriesPage() {
                       <p className="text-xs text-gray-500 mt-1 line-clamp-1">{s.description}</p>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => startEdit(s)}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(s.id, s.name, s._count.books)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                  <div className="flex items-center gap-1">
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit series" variant="primary" onClick={() => startEdit(s)} />
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete series" variant="danger" onClick={() => handleDelete(s.id, s.name, s._count.books)} />
                   </div>
                 </div>
               )}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Tag, Pencil, Clock, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
 
 interface Special {
   id: string;
@@ -217,10 +218,14 @@ export function SpecialsListClient({ specials: initial }: SpecialsListClientProp
                   {/* Edit */}
                   <Link
                     href={`/admin/specials/${special.id}/edit`}
-                    className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+                    title="Edit special"
+                    aria-label="Edit special"
+                    className="relative group/tip p-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                   >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit
+                    <Pencil className="h-4 w-4" />
+                    <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">
+                      Edit special
+                    </span>
                   </Link>
                 </div>
               </div>

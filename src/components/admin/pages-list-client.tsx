@@ -8,6 +8,7 @@ import {
   Loader2, ExternalLink
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { IconButton } from "@/components/admin/icon-button";
 
 interface PageItem {
   id: string;
@@ -145,23 +146,23 @@ export function PagesListClient({ pages: initial }: PagesListClientProps) {
           <div className="flex items-center gap-1 justify-end">
             <Link
               href={`/admin/pages/${page.id}/edit`}
-              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
               title="Edit page"
+              aria-label="Edit page"
+              className="relative group/tip p-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
             >
               <Pencil className="h-4 w-4" />
+              <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">
+                Edit page
+              </span>
             </Link>
-            <button
+            <IconButton
+              icon={<Trash2 className="h-4 w-4" />}
+              title="Delete page"
+              variant="danger"
               onClick={() => deletePage(page.id, page.title)}
               disabled={deleting === page.id}
-              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
-              title="Delete page"
-            >
-              {deleting === page.id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </button>
+              loading={deleting === page.id}
+            />
           </div>
         </div>
       ))}
