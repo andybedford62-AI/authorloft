@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -18,11 +17,8 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const authorId = (session.user as any).id as string;
+    const authorId = await getAdminAuthorIdForApi();
+    if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
     const { itemId, fileKey, fileName } = body;

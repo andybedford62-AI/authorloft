@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function getAuthorId(): Promise<string | null> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  return (session.user as any).id as string;
-}
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // ── PATCH — update label, description, priceCents, isActive; or clear file ───
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
-  const authorId = await getAuthorId();
+  const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId, itemId } = await params;
@@ -57,7 +50,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; itemId: string }> }
 ) {
-  const authorId = await getAuthorId();
+  const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId, itemId } = await params;

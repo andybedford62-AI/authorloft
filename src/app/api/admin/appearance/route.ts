@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { ALL_THEMES, BASE_THEME_IDS, isThemeAllowed } from "@/lib/themes";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const VALID_THEMES = ALL_THEMES.map((t) => t.id);
 
 export async function PATCH(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
   const { siteTheme } = body;
 

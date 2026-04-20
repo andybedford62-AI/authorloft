@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const series = await prisma.series.findMany({
     where: { authorId },

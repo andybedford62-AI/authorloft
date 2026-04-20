@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id as string | undefined;
+  const userId = await getAdminAuthorIdForApi();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -44,8 +42,7 @@ export async function PATCH(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  const patchUserId = (session?.user as any)?.id as string | undefined;
+  const patchUserId = await getAdminAuthorIdForApi();
   if (!patchUserId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

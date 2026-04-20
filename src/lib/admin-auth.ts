@@ -3,14 +3,9 @@ import { authOptions } from "./auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-/**
- * Returns the effective author ID for admin pages.
- * When a super admin is impersonating another author (via al_impersonate cookie),
- * returns the impersonated author's ID so all data queries reflect their account.
- */
-export async function getAdminAuthorId(): Promise<string> {
+async function resolveAuthorId(): Promise<string | null> {
   const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
+  if (!session?.user) return null;
 
   const sessionAuthorId = (session.user as any).id as string;
   const isSuperAdmin    = (session.user as any).isSuperAdmin || false;
@@ -22,4 +17,22 @@ export async function getAdminAuthorId(): Promise<string> {
   }
 
   return sessionAuthorId;
+}
+
+/**
+ * For page components — redirects to /login if unauthenticated.
+ * Returns impersonated author ID when a super admin is impersonating.
+ */
+export async function getAdminAuthorId(): Promise<string> {
+  const id = await resolveAuthorId();
+  if (!id) redirect("/login");
+  return id;
+}
+
+/**
+ * For API route handlers — returns null if unauthenticated (no redirect).
+ * Returns impersonated author ID when a super admin is impersonating.
+ */
+export async function getAdminAuthorIdForApi(): Promise<string | null> {
+  return resolveAuthorId();
 }

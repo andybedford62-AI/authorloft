@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function authorId() {
-  const session = await getServerSession(authOptions);
-  return (session?.user as any)?.id as string | undefined;
-}
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // GET /api/admin/books/[id]/reviews
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const uid = await authorId();
+  const uid = await getAdminAuthorIdForApi();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;
@@ -34,7 +28,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const uid = await authorId();
+  const uid = await getAdminAuthorIdForApi();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;
@@ -66,7 +60,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const uid = await authorId();
+  const uid = await getAdminAuthorIdForApi();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;
@@ -98,7 +92,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const uid = await authorId();
+  const uid = await getAdminAuthorIdForApi();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;

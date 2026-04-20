@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -14,11 +13,8 @@ const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.c
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const authorId = (session.user as any).id as string;
+    const authorId = await getAdminAuthorIdForApi();
+    if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const author = await prisma.author.findUnique({
       where: { id: authorId },

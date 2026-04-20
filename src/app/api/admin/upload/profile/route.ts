@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import nodePath from "path";
 import fs from "fs/promises";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const MAX_BYTES    = 5 * 1024 * 1024;
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -12,10 +11,8 @@ const SUPABASE_CONFIGURED =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   let formData: FormData;
   try {
@@ -52,7 +49,7 @@ export async function POST(req: NextRequest) {
   if (SUPABASE_CONFIGURED) {
     // ── Supabase Storage (production) ────────────────────────────────────────
     const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
-    const storagePath = `${session.user.id}/profiles/${Date.now()}.${ext}`;
+    const storagePath = `${authorId}/profiles/${Date.now()}.${ext}`;
     try {
       publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type);
     } catch (err) {
@@ -68,14 +65,14 @@ export async function POST(req: NextRequest) {
     const uploadsDir = nodePath.join(process.cwd(), "public", "uploads", "profiles");
     await fs.mkdir(uploadsDir, { recursive: true });
 
-    const filename = `${session.user.id}-${Date.now()}.${ext}`;
+    const filename = `${authorId}-${Date.now()}.${ext}`;
     await fs.writeFile(nodePath.join(uploadsDir, filename), buffer);
     publicUrl = `/uploads/profiles/${filename}`;
   }
 
   // Immediately persist the URL so the live site reflects the change
   await prisma.author.update({
-    where: { id: session.user.id },
+    where: { id: authorId },
     data: { profileImageUrl: publicUrl },
   });
 
