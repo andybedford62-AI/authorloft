@@ -5,7 +5,7 @@ const ContentSecurityPolicy = [
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.supabase.co https://*.amazonaws.com https://m.media-amazon.com https://images-na.ssl-images-amazon.com https://books.google.com https://covers.openlibrary.org",
+  "img-src 'self' data: blob: https://*.supabase.co https://*.amazonaws.com https://m.media-amazon.com https://images-na.ssl-images-amazon.com https://books.google.com https://covers.openlibrary.org https://images.unsplash.com",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
   "connect-src 'self' https://*.supabase.co https://api.stripe.com",
@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "covers.openlibrary.org",
+      },
+      // Unsplash (demo author images)
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },
