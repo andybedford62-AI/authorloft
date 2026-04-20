@@ -16,12 +16,11 @@ export function BookOverview({ text, accentColor }: BookOverviewProps) {
       <h2 className="text-xl font-bold text-gray-900 mb-4">Book Overview</h2>
 
       <div
-        className={`text-gray-600 leading-relaxed whitespace-pre-line overflow-hidden transition-all duration-300 ${
+        className={`rich-content text-gray-600 overflow-hidden transition-all duration-300 ${
           expanded ? "" : "line-clamp-2"
         }`}
-      >
-        {text}
-      </div>
+        dangerouslySetInnerHTML={{ __html: text }}
+      />
 
       <button
         type="button"
