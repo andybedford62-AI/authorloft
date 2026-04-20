@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getRetailer, RETAILER_KEYS } from "@/lib/retailers";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // ── GET — list all retailer links for a book ─────────────────────────────────
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;
-  const authorId = (session.user as { id: string }).id;
 
   // Verify ownership
   const book = await prisma.book.findFirst({ where: { id: bookId, authorId } });
@@ -34,13 +30,10 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId } = await params;
-  const authorId = (session.user as { id: string }).id;
 
   // Verify ownership
   const book = await prisma.book.findFirst({ where: { id: bookId, authorId } });

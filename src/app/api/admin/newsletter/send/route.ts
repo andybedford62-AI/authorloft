@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canUseFeature } from "@/lib/plan-limits";
 import { Resend } from "resend";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 function buildEmailHtml(opts: {
   authorName: string;
@@ -91,10 +90,8 @@ function htmlToPlainText(html: string): string {
 const BATCH_SIZE = 50;
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const newsletterCheck = await canUseFeature(authorId, "newsletter");
   if (!newsletterCheck.allowed) {

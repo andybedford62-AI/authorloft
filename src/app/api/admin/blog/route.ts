@@ -1,14 +1,12 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canPublishPost } from "@/lib/plan-limits";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // GET /api/admin/blog — list all posts for this author
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const posts = await prisma.post.findMany({
     where: { authorId },
@@ -31,9 +29,8 @@ export async function GET() {
 
 // POST /api/admin/blog — create a new post
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { title, slug, excerpt, content, coverImageUrl, isPublished } = body;

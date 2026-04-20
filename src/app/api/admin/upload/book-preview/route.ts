@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PreviewMediaType } from "@prisma/client";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const LIMITS: Record<string, number> = {
   "image/jpeg": 5  * 1024 * 1024,
@@ -21,8 +20,7 @@ function mediaTypeFromMime(mime: string): PreviewMediaType {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id as string | undefined;
+  const userId = await getAdminAuthorIdForApi();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

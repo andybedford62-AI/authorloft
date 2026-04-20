@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import nodePath from "path";
 import fs from "fs/promises";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // Max 500 MB — large illustrated PDFs can be hefty
 const MAX_BYTES = 500 * 1024 * 1024;
@@ -48,11 +47,8 @@ export const config = {
 
 export async function POST(req: NextRequest) {
   try {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   let formData: FormData;
   try {

@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
 // ─── GET /api/admin/flip-books/[id] ──────────────────────────────────────────
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
 
   const flipBook = await prisma.flipBook.findFirst({
@@ -26,10 +23,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // ─── PUT /api/admin/flip-books/[id] ──────────────────────────────────────────
 
 export async function PUT(req: NextRequest, { params }: Params) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
 
   const existing = await prisma.flipBook.findFirst({ where: { id, authorId } });
@@ -83,10 +78,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
 // ─── DELETE /api/admin/flip-books/[id] ───────────────────────────────────────
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
 
   const flipBook = await prisma.flipBook.findFirst({ where: { id, authorId } });

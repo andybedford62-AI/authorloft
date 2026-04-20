@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canAddFlipBook } from "@/lib/plan-limits";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 // ─── GET /api/admin/flip-books ────────────────────────────────────────────────
 // List all flip books for the logged-in author
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const [flipBooks, planInfo] = await Promise.all([
     prisma.flipBook.findMany({
@@ -28,10 +25,8 @@ export async function GET() {
 // Create a new flip book
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // Check plan limit
   const planCheck = await canAddFlipBook(authorId);

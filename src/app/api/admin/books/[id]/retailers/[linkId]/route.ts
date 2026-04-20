@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 type RouteParams = { params: Promise<{ id: string; linkId: string }> };
 
@@ -17,13 +16,10 @@ async function verifyOwnership(bookId: string, linkId: string, authorId: string)
 
 // ── PATCH — activate / deactivate (toggle isActive) ──────────────────────────
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId, linkId } = await params;
-  const authorId = (session.user as { id: string }).id;
 
   const link = await verifyOwnership(bookId, linkId, authorId);
   if (!link) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -46,13 +42,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
 // ── DELETE — remove the link entirely ────────────────────────────────────────
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id: bookId, linkId } = await params;
-  const authorId = (session.user as { id: string }).id;
 
   const link = await verifyOwnership(bookId, linkId, authorId);
   if (!link) return NextResponse.json({ error: "Not found" }, { status: 404 });
