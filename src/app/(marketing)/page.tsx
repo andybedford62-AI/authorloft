@@ -220,7 +220,7 @@ export default async function MarketingPage() {
                   Start for Free <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/demo">
+              <a href="https://demo.authorloft.com">
                 <Button
                   size="lg"
                   variant="outline"
@@ -228,7 +228,7 @@ export default async function MarketingPage() {
                 >
                   View Demo Site <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
-              </Link>
+              </a>
             </div>
 
             {/* Trust pills */}
