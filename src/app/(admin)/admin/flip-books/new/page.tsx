@@ -1,16 +1,11 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Lock } from "lucide-react";
-import { authOptions } from "@/lib/auth";
 import { canAddFlipBook } from "@/lib/plan-limits";
 import { FlipBookForm } from "@/components/admin/flip-book-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function NewFlipBookPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
   const planCheck = await canAddFlipBook(authorId);
 
   return (

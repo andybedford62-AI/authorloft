@@ -1,7 +1,5 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 import { ShoppingBag, TrendingUp, DollarSign, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/utils";
@@ -14,10 +12,7 @@ const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger
 };
 
 export default async function SalesPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

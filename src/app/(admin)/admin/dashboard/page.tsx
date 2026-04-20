@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
@@ -128,17 +127,7 @@ function ChecklistRow({
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-  const authorId = (session?.user as any)?.id;
-
-  // Fallback for demo mode (no DB)
-  if (!authorId) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        Not authenticated. <Link href="/login" className="text-blue-600 underline">Sign in</Link>
-      </div>
-    );
-  }
+  const authorId = await getAdminAuthorId();
 
   const [data, authorMeta] = await Promise.all([
     getDashboardData(authorId),

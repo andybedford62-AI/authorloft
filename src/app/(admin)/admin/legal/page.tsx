@@ -1,8 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { LegalNoticeForm } from "@/components/admin/legal-notice-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export const metadata = { title: "Legal Notice" };
 
@@ -35,10 +34,7 @@ This site may use cookies to improve your experience. By continuing to use this 
 For any legal enquiries, please use the contact form on this website.`;
 
 export default async function AdminLegalPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const author = await prisma.author.findUnique({
     where: { id: authorId },

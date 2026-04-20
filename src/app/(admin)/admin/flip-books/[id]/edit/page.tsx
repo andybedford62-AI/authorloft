@@ -1,18 +1,14 @@
-import { getServerSession } from "next-auth";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { FlipBookForm } from "@/components/admin/flip-book-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 type Props = { params: Promise<{ id: string }> };
 
 export default async function EditFlipBookPage({ params }: Props) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
   const { id } = await params;
 
   const flipBook = await prisma.flipBook.findFirst({

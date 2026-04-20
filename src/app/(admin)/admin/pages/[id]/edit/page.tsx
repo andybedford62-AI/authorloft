@@ -1,19 +1,16 @@
-import { getServerSession } from "next-auth";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageForm } from "@/components/admin/page-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function EditPagePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
   const { id } = await params;
 
   const page = await prisma.authorPage.findFirst({

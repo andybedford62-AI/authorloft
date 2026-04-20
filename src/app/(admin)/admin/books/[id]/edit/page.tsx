@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
-import { redirect, notFound } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
@@ -14,10 +13,7 @@ export default async function EditBookPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
   const { id } = await params;
 
   const [book, seriesList, genreTree, author, previewMedia] = await Promise.all([

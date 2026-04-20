@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { authOptions } from "@/lib/auth";
 import { SpecialsListClient } from "@/components/admin/specials-list-client";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function AdminSpecialsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const specials = await prisma.special.findMany({
     where: { authorId },

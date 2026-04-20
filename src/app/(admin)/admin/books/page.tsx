@@ -1,17 +1,12 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { Plus, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
-import { authOptions } from "@/lib/auth";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BooksListClient } from "./books-list-client";
 
 export default async function AdminBooksPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const books = await prisma.book.findMany({
     where: { authorId },

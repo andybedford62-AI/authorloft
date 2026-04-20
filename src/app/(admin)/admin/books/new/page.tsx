@@ -1,14 +1,9 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { BookForm } from "@/components/admin/book-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function NewBookPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const [seriesList, genreTree] = await Promise.all([
     prisma.series.findMany({

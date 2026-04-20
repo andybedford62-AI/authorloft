@@ -1,16 +1,11 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { MessagesClient } from "./messages-client";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function MessagesPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const messages = await prisma.contactMessage.findMany({
     where: { authorId, isArchived: false },
