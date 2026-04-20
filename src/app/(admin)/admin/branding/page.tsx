@@ -1,14 +1,10 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { BrandingForm } from "@/components/admin/branding-form";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function BrandingPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const author = await prisma.author.findUnique({
     where: { id: authorId },

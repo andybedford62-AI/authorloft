@@ -1,16 +1,12 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { Plus, Pencil, Newspaper, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
-import { authOptions } from "@/lib/auth";
 import { BlogDeleteButton } from "@/components/admin/blog-delete-button";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function AdminBlogPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const posts = await prisma.post.findMany({
     where: { authorId },

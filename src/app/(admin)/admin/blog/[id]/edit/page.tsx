@@ -1,20 +1,17 @@
-import { getServerSession } from "next-auth";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PostForm } from "@/components/admin/post-form";
 import { BlogDeleteButton } from "@/components/admin/blog-delete-button";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function EditPostPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
   const { id } = await params;
 
   const post = await prisma.post.findFirst({

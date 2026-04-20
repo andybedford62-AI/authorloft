@@ -1,16 +1,13 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NavSettingsPanel } from "@/components/admin/nav-settings-panel";
 import { PagesListClient } from "@/components/admin/pages-list-client";
 import { Plus, FileText } from "lucide-react";
+import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function AdminPagesPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-  const authorId = (session.user as any).id as string;
+  const authorId = await getAdminAuthorId();
 
   const [author, pages] = await Promise.all([
     prisma.author.findUnique({
