@@ -3,7 +3,9 @@ import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { LogoutButton } from "@/components/admin/logout-button";
+import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 
 export default async function AdminLayout({
@@ -12,26 +14,42 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-
-  // Redirect to login if not authenticated
   if (!session?.user) redirect("/login");
 
-  const authorName   = (session.user as any).name        || "Author";
-  const authorSlug   = (session.user as any).slug        || "author";
-  const isSuperAdmin = (session.user as any).isSuperAdmin || false;
-  const authorId     = (session.user as any).id          as string;
+  const sessionAuthorId = (session.user as any).id as string;
+  const isSuperAdmin    = (session.user as any).isSuperAdmin || false;
 
-  // Fetch plan tier, feature gates, and admin theme preference
+  // Check for active impersonation (super admins only)
+  const cookieStore = await cookies();
+  const impersonateCookie = cookieStore.get("al_impersonate");
+  const impersonatedId = isSuperAdmin && impersonateCookie?.value
+    ? impersonateCookie.value
+    : null;
+
+  const effectiveAuthorId = impersonatedId ?? sessionAuthorId;
+
+  // Fetch the effective author's data (impersonated or own)
   const [authorRecord, featureConfig] = await Promise.all([
     prisma.author.findUnique({
-      where:  { id: authorId },
-      select: { plan: { select: { tier: true } }, adminTheme: true },
+      where:  { id: effectiveAuthorId },
+      select: {
+        name:        true,
+        displayName: true,
+        slug:        true,
+        adminTheme:  true,
+        plan:        { select: { tier: true } },
+      },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
   ]);
-  const planTier    = authorRecord?.plan?.tier ?? "FREE";
+
+  if (!authorRecord) redirect("/login");
+
+  const authorName   = authorRecord.displayName || authorRecord.name;
+  const authorSlug   = authorRecord.slug;
+  const planTier     = authorRecord.plan?.tier ?? "FREE";
   const featureGates = (featureConfig?.gates as Record<string, string>) ?? {};
-  const adminTheme  = (authorRecord?.adminTheme === "dark" ? "dark" : "light") as "dark" | "light";
+  const adminTheme   = (authorRecord.adminTheme === "dark" ? "dark" : "light") as "dark" | "light";
 
   const bg = {
     dark:  { outer: "#111827", header: "#1f2937", headerBorder: "#374151" },
@@ -42,34 +60,39 @@ export default async function AdminLayout({
     <AdminSessionProvider>
       <div
         data-admin-theme={adminTheme}
-        className="flex min-h-screen"
+        className="flex min-h-screen flex-col"
         style={{ background: bg.outer }}
       >
-        <AdminSidebar
-          authorName={authorName}
-          authorSlug={authorSlug}
-          isSuperAdmin={isSuperAdmin}
-          planTier={planTier}
-          featureGates={featureGates}
-          adminTheme={adminTheme}
-        />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header
-            className="h-16 border-b flex items-center px-6 flex-shrink-0"
-            style={{ background: bg.header, borderColor: bg.headerBorder }}
-          >
-            <div className="flex-1" />
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">{authorName}</span>
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-700">
-                {authorName[0]}
+        {/* Impersonation banner — shown when super admin is acting as another author */}
+        {impersonatedId && <ImpersonationBanner authorName={authorName} />}
+
+        <div className="flex flex-1 min-h-0">
+          <AdminSidebar
+            authorName={authorName}
+            authorSlug={authorSlug}
+            isSuperAdmin={isSuperAdmin}
+            planTier={planTier}
+            featureGates={featureGates}
+            adminTheme={adminTheme}
+          />
+          <div className="flex-1 flex flex-col min-w-0">
+            <header
+              className="h-16 border-b flex items-center px-6 flex-shrink-0"
+              style={{ background: bg.header, borderColor: bg.headerBorder }}
+            >
+              <div className="flex-1" />
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-500">{authorName}</span>
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-700">
+                  {authorName[0]}
+                </div>
+                <LogoutButton />
               </div>
-              <LogoutButton />
-            </div>
-          </header>
-          <main className="flex-1 p-6 overflow-y-auto">
-            {children}
-          </main>
+            </header>
+            <main className="flex-1 p-6 overflow-y-auto">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
     </AdminSessionProvider>

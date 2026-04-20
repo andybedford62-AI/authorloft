@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle, XCircle, ExternalLink, BookOpen,
-  Mail, Pencil, Trash2, Loader2,
+  Mail, Pencil, Trash2, Loader2, UserCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,9 +31,10 @@ const TIER_VARIANT: Record<string, "success" | "default" | "warning"> = {
 export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) {
   const router = useRouter();
   const [authors, setAuthors] = useState(initial);
-  const [toggling,  setToggling]  = useState<string | null>(null);
-  const [deleting,  setDeleting]  = useState<string | null>(null);
-  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [toggling,      setToggling]      = useState<string | null>(null);
+  const [deleting,      setDeleting]      = useState<string | null>(null);
+  const [confirmId,     setConfirmId]     = useState<string | null>(null);
+  const [impersonating, setImpersonating] = useState<string | null>(null);
 
   async function toggleActive(author: Author) {
     setToggling(author.id);
@@ -51,6 +52,20 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
       }
     } finally {
       setToggling(null);
+    }
+  }
+
+  async function handleImpersonate(author: Author) {
+    setImpersonating(author.id);
+    try {
+      const res = await fetch("/api/super-admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorId: author.id }),
+      });
+      if (res.ok) router.push("/admin/dashboard");
+    } finally {
+      setImpersonating(null);
     }
   }
 
@@ -171,9 +186,22 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 {/* Actions */}
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-end gap-1">
+                    {/* Impersonate */}
+                    <button
+                      onClick={() => handleImpersonate(author)}
+                      disabled={!!impersonating}
+                      className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors disabled:opacity-40 cursor-pointer"
+                      title="Impersonate author"
+                    >
+                      {impersonating === author.id
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <UserCheck className="h-4 w-4" />
+                      }
+                    </button>
+
                     {/* View live site */}
                     <a
-                      href={`http://${author.slug}.localhost:3000`}
+                      href={`https://${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
