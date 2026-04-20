@@ -173,7 +173,7 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                   <div className="flex items-center justify-end gap-1">
                     {/* View live site */}
                     <a
-                      href={`http://${author.slug}.localhost:3000`}
+                      href={`https://${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
