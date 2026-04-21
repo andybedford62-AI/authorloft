@@ -65,6 +65,7 @@ model Author {
   profileImageUrl      String?
   logoUrl              String?
   heroImageUrl         String?
+  heroLayout           String         @default("author-right")
   heroTitle            String?
   heroSubtitle         String?
   accentColor          String         @default("#7B2D2D")  // legacy — no longer drives UI; kept for data safety
