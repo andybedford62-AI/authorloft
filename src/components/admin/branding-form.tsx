@@ -506,18 +506,17 @@ export function BrandingForm({ initial }: BrandingFormProps) {
               <div>
                 <p className="text-sm font-medium text-gray-700">Hero Photo</p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  When uploaded, your homepage shows a cinematic full-screen photo hero instead of the colored banner.
-                  Best results with a wide landscape or dramatic portrait. Min 1200px wide recommended.
+                  This photo appears on the left or right panel of your homepage hero banner, fading softly into the background.
+                  Use a portrait or head-and-shoulders shot. The full image will be shown — nothing is cropped.
                 </p>
               </div>
 
               {/* Preview */}
               {heroImageUrl && (
-                <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+                <div className="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center" style={{ minHeight: "200px", maxHeight: "280px" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={heroImageUrl} alt="Hero preview" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <p className="absolute bottom-2 left-3 text-white text-xs font-medium">Preview</p>
+                  <img src={heroImageUrl} alt="Hero preview" className="max-w-full max-h-[280px] object-contain block" />
+                  <p className="absolute bottom-2 left-3 bg-black/50 text-white text-xs font-medium px-2 py-0.5 rounded">Preview</p>
                 </div>
               )}
 
@@ -554,7 +553,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
               {heroError && <p className="text-xs text-red-600">{heroError}</p>}
               {!heroImageUrl && (
                 <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-                  No hero photo uploaded — your site will use the colored accent banner below.
+                  No hero photo uploaded — the banner will show without a side portrait. Upload a photo to enable the author photo panel.
                 </p>
               )}
             </div>
