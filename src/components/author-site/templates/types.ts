@@ -10,6 +10,7 @@ export interface AuthorForTemplate {
   tagline: string | null;
   profileImageUrl: string | null;
   heroImageUrl: string | null;
+  heroLayout: string;
   accentColor: string;
   heroTitle: string | null;
   heroSubtitle: string | null;

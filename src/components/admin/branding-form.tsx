@@ -17,6 +17,7 @@ type BrandingFormProps = {
     profileImageUrl: string;
     logoUrl: string;
     heroImageUrl: string;
+    heroLayout: string;
     linkedinUrl: string;
     youtubeUrl: string;
     facebookUrl: string;
@@ -45,6 +46,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   const [heroImageUrl, setHeroImageUrl]         = useState(initial.heroImageUrl);
+  const [heroLayout, setHeroLayout]             = useState(initial.heroLayout ?? "author-right");
   const [uploadingHero, setUploadingHero]       = useState(false);
   const [heroError, setHeroError]               = useState("");
   const heroInputRef = useRef<HTMLInputElement>(null);
@@ -191,7 +193,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
-        profileImageUrl, logoUrl, heroImageUrl,
+        profileImageUrl, logoUrl, heroImageUrl, heroLayout,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner,
@@ -557,7 +559,48 @@ export function BrandingForm({ initial }: BrandingFormProps) {
               )}
             </div>
 
-            <Input label="Hero Title" value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="e.g. Dive Into Adventure" />
+            {/* Layout direction */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-700">Layout Direction</p>
+              <p className="text-xs text-gray-400">Which side your author photo appears on.</p>
+              <div className="flex gap-3">
+                {[
+                  { value: "author-left",  label: "Author Left",  diagram: "▐░░░░░░▌" },
+                  { value: "author-right", label: "Author Right", diagram: "▐░░░░░░▌" },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setHeroLayout(value)}
+                    className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors cursor-pointer ${
+                      heroLayout === value
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {/* Mini diagram */}
+                    <div className="flex gap-1 w-full h-8">
+                      {value === "author-left" ? (
+                        <>
+                          <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book + Text</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book + Text</div>
+                          <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                        </>
+                      )}
+                    </div>
+                    <span className={`text-xs font-medium ${heroLayout === value ? "text-blue-600" : "text-gray-600"}`}>
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Input label="Eyebrow Text" value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="e.g. Discover the Latest · Available Now" hint="Small text above the book title in the hero banner." />
             <Input label="Hero Subtitle" value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="e.g. Thrilling underwater mysteries by A.P. Bedford" />
           </div>
         )}
