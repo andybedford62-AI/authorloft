@@ -1,6 +1,8 @@
-// HeroBanner — cinematic banner: accent-gradient background, author portrait fades in from one
-// side, featured book cover + CTAs on the other. No background photo — always uses accent colour.
-// Layout direction controlled by author.heroLayout ("author-left" | "author-right").
+// HeroBanner — cinematic two-zone banner.
+// Background: always the accent-colour gradient.
+// Right (or left): dedicated hero photo (heroImageUrl) dissolves into the gradient.
+// Left (or right): large featured book cover + title + CTAs.
+// heroLayout ("author-right" | "author-left") controls which side the photo appears.
 
 import Image from "next/image";
 import Link from "next/link";
@@ -22,22 +24,22 @@ function hexToRgb(hex: string) {
 }
 
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
-  const accentColor  = author.accentColor;
-  const authorName   = author.displayName || author.name;
-  const authorRight  = (author.heroLayout ?? "author-right") === "author-right";
-  const rgb          = hexToRgb(accentColor);
-  const bookHref     = featuredBook ? `/books/${featuredBook.slug}` : "/books";
-  const hasPhoto     = Boolean(author.profileImageUrl);
+  const accentColor = author.accentColor;
+  const authorName  = author.displayName || author.name;
+  const authorRight = (author.heroLayout ?? "author-right") === "author-right";
+  const rgb         = hexToRgb(accentColor);
+  const bookHref    = featuredBook ? `/books/${featuredBook.slug}` : "/books";
+  const heroPhoto   = author.heroImageUrl; // dedicated hero panel image
 
   return (
     <section
       className="relative overflow-hidden"
       style={{
-        minHeight: "440px",
+        minHeight: "380px",
         background: `linear-gradient(135deg, rgba(${rgb},1) 0%, rgba(${rgb},0.92) 55%, rgba(${rgb},0.78) 100%)`,
       }}
     >
-      {/* ── Subtle decorative blobs ────────────────────────────────────── */}
+      {/* ── Decorative blobs ─────────────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute -top-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-10 bg-white"
@@ -49,109 +51,98 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
         />
       </div>
 
-      {/* ── Author photo — absolute, covers one side, fades inward ───── */}
-      {hasPhoto && (
+      {/* ── Hero photo — absolute on one side, dissolves into gradient ── */}
+      {heroPhoto && (
         <div
           className="absolute top-0 bottom-0 hidden sm:block"
-          style={{ [authorRight ? "right" : "left"]: 0, width: "45%" }}
+          style={{ [authorRight ? "right" : "left"]: 0, width: "44%" }}
         >
           <Image
-            src={author.profileImageUrl!}
+            src={heroPhoto}
             alt={authorName}
             fill
             priority
             className="object-cover object-top"
-            sizes="45vw"
+            sizes="44vw"
           />
-
-          {/* Inward gradient — photo dissolves into the background colour */}
+          {/* Inward fade — photo melts into background */}
           <div
             className="absolute inset-0"
             style={{
               background: authorRight
-                ? `linear-gradient(to right, rgba(${rgb},1) 0%, rgba(${rgb},0.6) 22%, rgba(${rgb},0.18) 50%, transparent 78%)`
-                : `linear-gradient(to left,  rgba(${rgb},1) 0%, rgba(${rgb},0.6) 22%, rgba(${rgb},0.18) 50%, transparent 78%)`,
+                ? `linear-gradient(to right, rgba(${rgb},1) 0%, rgba(${rgb},0.55) 20%, rgba(${rgb},0.15) 48%, transparent 75%)`
+                : `linear-gradient(to left,  rgba(${rgb},1) 0%, rgba(${rgb},0.55) 20%, rgba(${rgb},0.15) 48%, transparent 75%)`,
             }}
           />
-
           {/* Top + bottom feather */}
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(to bottom, rgba(${rgb},0.4) 0%, transparent 22%, transparent 68%, rgba(${rgb},0.75) 100%)`,
+              background: `linear-gradient(to bottom, rgba(${rgb},0.45) 0%, transparent 20%, transparent 65%, rgba(${rgb},0.85) 100%)`,
             }}
           />
-
-          {/* "Meet the Author" label pinned to bottom of photo */}
-          <p
-            className="absolute bottom-5 text-white drop-shadow-lg leading-none z-10"
+          {/* Meet the Author label */}
+          <div
+            className="absolute bottom-4 z-10 text-white drop-shadow-lg"
             style={{ [authorRight ? "right" : "left"]: "18px", textAlign: authorRight ? "right" : "left" }}
           >
-            <span className="block text-[9px] uppercase tracking-[0.3em] font-bold text-white/35 mb-1">
+            <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-white/35 mb-0.5">
               Meet the Author
-            </span>
-            <span className="text-base font-extrabold text-white/75">{authorName}</span>
-          </p>
+            </p>
+            <p className="text-base font-extrabold text-white/75 leading-tight">{authorName}</p>
+          </div>
         </div>
       )}
 
-      {/* ── Foreground content — pushed to the side opposite the photo ── */}
-      <div className="relative z-10 flex items-center w-full min-h-[440px] px-8 sm:px-14 py-10">
-        <div
-          className={`flex items-center gap-6 sm:gap-8 w-full ${
-            hasPhoto
-              ? authorRight
-                ? "mr-auto sm:max-w-[52%]"
-                : "ml-auto sm:max-w-[52%]"
-              : "mx-auto max-w-2xl"
-          }`}
-        >
+      {/* ── Foreground: eyebrow + book cover + text ───────────────────── */}
+      <div className="relative z-10 flex flex-col min-h-[380px]">
 
-          {/* Book cover */}
-          {featuredBook?.coverImageUrl && (
-            <Link href={bookHref} className="flex-shrink-0 group hidden xs:block">
+        {/* Eyebrow — top of banner */}
+        <div className="pt-7 pb-1 px-8 sm:px-14">
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/45">
+            {author.heroTitle || "Available Now"}
+          </p>
+        </div>
+
+        {/* Main row */}
+        <div
+          className="flex-1 flex items-center gap-7 sm:gap-10 px-8 sm:px-14 py-6"
+          style={heroPhoto ? { maxWidth: "58%" } : {}}
+        >
+          {/* ── Large book cover ── */}
+          {featuredBook?.coverImageUrl ? (
+            <Link href={bookHref} className="flex-shrink-0 group">
               <div
                 className="relative shadow-2xl rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:-rotate-1"
-                style={{ width: "115px", height: "172px" }}
+                style={{ width: "130px", height: "195px" }}
               >
                 <Image
                   src={featuredBook.coverImageUrl}
                   alt={featuredBook.title}
                   fill
                   className="object-cover"
-                  sizes="115px"
+                  sizes="130px"
                 />
               </div>
             </Link>
+          ) : (
+            /* No cover yet — empty reserved slot so layout stays consistent */
+            <div className="flex-shrink-0 hidden sm:block" style={{ width: "130px" }} />
           )}
 
-          {/* Text + buttons */}
+          {/* ── Title + subtitle + buttons ── */}
           <div className="space-y-3 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
-              {author.heroTitle || "Available Now"}
-            </p>
-
-            {/* Mobile-only book cover (photo col hidden, show small cover inline) */}
-            {featuredBook?.coverImageUrl && (
-              <Link href={bookHref} className="block sm:hidden mb-2">
-                <div className="relative shadow-xl rounded overflow-hidden" style={{ width: "80px", height: "120px" }}>
-                  <Image src={featuredBook.coverImageUrl} alt={featuredBook.title} fill className="object-cover" sizes="80px" />
-                </div>
-              </Link>
-            )}
-
             {featuredBook && (
               <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight drop-shadow line-clamp-3">
                 {featuredBook.title}
               </h2>
             )}
             {author.heroSubtitle && (
-              <p className="text-sm text-white/65 leading-relaxed max-w-xs line-clamp-2">
+              <p className="text-sm text-white/60 leading-relaxed max-w-xs line-clamp-2">
                 {author.heroSubtitle}
               </p>
             )}
-
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-3 pt-1">
               <Link href={bookHref}>
                 <Button
                   size="sm"
@@ -173,7 +164,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               </Link>
             </div>
 
-            {/* Mobile: author name since photo is hidden */}
+            {/* Mobile: author name (hero photo hidden on mobile) */}
             <p className="sm:hidden text-xs text-white/40 pt-1">by {authorName}</p>
           </div>
         </div>
