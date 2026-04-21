@@ -560,17 +560,28 @@ export function BrandingForm({ initial }: BrandingFormProps) {
 
             {/* Layout direction */}
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Layout Direction</p>
-              <p className="text-xs text-gray-400">Which side your author photo appears on.</p>
+              <p className="text-sm font-medium text-gray-700">Banner Style</p>
+              <p className="text-xs text-gray-400">Choose how your hero banner displays. Changes save instantly.</p>
               <div className="flex gap-3">
                 {[
-                  { value: "author-left",  label: "Author Left",  diagram: "▐░░░░░░▌" },
-                  { value: "author-right", label: "Author Right", diagram: "▐░░░░░░▌" },
+                  { value: "author-left",  label: "Author Left" },
+                  { value: "author-right", label: "Author Right" },
+                  { value: "portrait",     label: "Portrait" },
                 ].map(({ value, label }) => (
                   <button
                     key={value}
                     type="button"
-                    onClick={() => setHeroLayout(value)}
+                    onClick={async () => {
+                      setHeroLayout(value);
+                      // Auto-save immediately so the live site updates without needing to click Save
+                      try {
+                        await fetch("/api/admin/branding", {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ heroLayout: value }),
+                        });
+                      } catch { /* silent — full save still works */ }
+                    }}
                     className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors cursor-pointer ${
                       heroLayout === value
                         ? "border-blue-500 bg-blue-50"
@@ -579,16 +590,25 @@ export function BrandingForm({ initial }: BrandingFormProps) {
                   >
                     {/* Mini diagram */}
                     <div className="flex gap-1 w-full h-8">
-                      {value === "author-left" ? (
+                      {value === "author-left" && (
                         <>
                           <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
-                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book + Text</div>
+                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
                         </>
-                      ) : (
+                      )}
+                      {value === "author-right" && (
                         <>
-                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book + Text</div>
+                          <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
                           <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
                         </>
+                      )}
+                      {value === "portrait" && (
+                        <div className="flex-1 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500 relative overflow-hidden">
+                          <span>Full Photo</span>
+                          <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-400 flex items-center justify-center">
+                            <span className="text-[6px] text-white">name overlay</span>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <span className={`text-xs font-medium ${heroLayout === value ? "text-blue-600" : "text-gray-600"}`}>
