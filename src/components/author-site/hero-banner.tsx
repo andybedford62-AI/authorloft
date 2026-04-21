@@ -1,3 +1,5 @@
+"use client";
+
 // HeroBanner — cinematic editorial banner.
 // • Accent-gradient background (no background photo).
 // • Hero photo: CSS mask-image creates seamless all-edge soft fade into background.
