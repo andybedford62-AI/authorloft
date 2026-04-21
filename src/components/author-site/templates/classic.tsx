@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BookCarousel } from "@/components/author-site/book-carousel";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { HeroBanner } from "@/components/author-site/hero-banner";
