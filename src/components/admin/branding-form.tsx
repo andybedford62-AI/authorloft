@@ -16,6 +16,7 @@ type BrandingFormProps = {
     bio: string;
     profileImageUrl: string;
     logoUrl: string;
+    heroImageUrl: string;
     linkedinUrl: string;
     youtubeUrl: string;
     facebookUrl: string;
@@ -38,10 +39,15 @@ export function BrandingForm({ initial }: BrandingFormProps) {
   const [shortBio, setShortBio] = useState(initial.shortBio);
   const [bio, setBio] = useState(initial.bio);
   const [profileImageUrl, setProfileImageUrl] = useState(initial.profileImageUrl);
-  const [logoUrl, setLogoUrl]               = useState(initial.logoUrl);
-  const [uploadingLogo, setUploadingLogo]   = useState(false);
-  const [logoError, setLogoError]           = useState("");
+  const [logoUrl, setLogoUrl]                   = useState(initial.logoUrl);
+  const [uploadingLogo, setUploadingLogo]       = useState(false);
+  const [logoError, setLogoError]               = useState("");
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const [heroImageUrl, setHeroImageUrl]         = useState(initial.heroImageUrl);
+  const [uploadingHero, setUploadingHero]       = useState(false);
+  const [heroError, setHeroError]               = useState("");
+  const heroInputRef = useRef<HTMLInputElement>(null);
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl);
   const [youtubeUrl, setYoutubeUrl] = useState(initial.youtubeUrl);
   const [facebookUrl, setFacebookUrl] = useState(initial.facebookUrl);
@@ -143,6 +149,38 @@ export function BrandingForm({ initial }: BrandingFormProps) {
     });
   }
 
+  async function handleHeroUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingHero(true);
+    setHeroError("");
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/admin/upload/hero", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setHeroError(data.error || "Upload failed.");
+      } else {
+        setHeroImageUrl(data.url);
+      }
+    } catch {
+      setHeroError("Upload failed. Please try again.");
+    } finally {
+      setUploadingHero(false);
+      if (heroInputRef.current) heroInputRef.current.value = "";
+    }
+  }
+
+  async function handleRemoveHero() {
+    setHeroImageUrl("");
+    await fetch("/api/admin/branding", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heroImageUrl: "" }),
+    });
+  }
+
   async function handleSave() {
     setSaving(true);
     setError("");
@@ -153,7 +191,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
-        profileImageUrl, logoUrl,
+        profileImageUrl, logoUrl, heroImageUrl,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner,
@@ -459,7 +497,66 @@ export function BrandingForm({ initial }: BrandingFormProps) {
         </div>
 
         {showHeroBanner && (
-          <div className="space-y-4 pt-2">
+          <div className="space-y-5 pt-2">
+
+            {/* Hero Photo */}
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-gray-700">Hero Photo</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  When uploaded, your homepage shows a cinematic full-screen photo hero instead of the colored banner.
+                  Best results with a wide landscape or dramatic portrait. Min 1200px wide recommended.
+                </p>
+              </div>
+
+              {/* Preview */}
+              {heroImageUrl && (
+                <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={heroImageUrl} alt="Hero preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <p className="absolute bottom-2 left-3 text-white text-xs font-medium">Preview</p>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <label className="cursor-pointer inline-block">
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium transition-colors ${
+                    uploadingHero ? "bg-gray-50 text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-50"
+                  }`}>
+                    {uploadingHero
+                      ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
+                      : <><Upload className="h-4 w-4" /> {heroImageUrl ? "Change Hero Photo" : "Upload Hero Photo"}</>
+                    }
+                  </div>
+                  <input
+                    ref={heroInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={handleHeroUpload}
+                    disabled={uploadingHero}
+                  />
+                </label>
+                {heroImageUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveHero}
+                    className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-600 transition-colors cursor-pointer"
+                  >
+                    <X className="h-3 w-3" /> Remove photo
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-400">JPEG, PNG or WebP · Max 10 MB</p>
+              {heroError && <p className="text-xs text-red-600">{heroError}</p>}
+              {!heroImageUrl && (
+                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+                  No hero photo uploaded — your site will use the colored accent banner below.
+                </p>
+              )}
+            </div>
+
             <Input label="Hero Title" value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="e.g. Dive Into Adventure" />
             <Input label="Hero Subtitle" value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="e.g. Thrilling underwater mysteries by A.P. Bedford" />
           </div>

@@ -32,62 +32,107 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
-      {/* ── Hero Banner ────────────────────────────────────────────────────── */}
+      {/* ── Hero ───────────────────────────────────────────────────────────── */}
       {author.showHeroBanner !== false && (
-        <section
-          className="w-full py-10 px-4 relative overflow-hidden"
-          style={{ backgroundColor: accentColor }}
-        >
-          {/* Depth overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
-          {/* Decorative blobs */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-25 bg-white" />
-          <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full blur-2xl pointer-events-none opacity-20 bg-white" />
+        author.heroImageUrl ? (
+          /* ── Full-bleed photo hero ── */
+          <section className="relative min-h-[85vh] flex items-end overflow-hidden">
+            {/* Background photo */}
+            <Image
+              src={author.heroImageUrl}
+              alt={authorName}
+              fill
+              priority
+              className="object-cover object-center"
+              sizes="100vw"
+            />
+            {/* Gradient overlays — top vignette + strong bottom-up darkening for text */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent pointer-events-none" />
 
-          <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
-
-            {/* Text */}
-            <div className="flex-1 text-white space-y-5 order-2 md:order-1">
-              <span className="animate-fade-up block text-sm font-medium uppercase tracking-widest opacity-70">
-                Available now
-              </span>
-              <h1 className="animate-fade-up animate-delay-100 text-3xl sm:text-5xl font-bold leading-tight font-heading">
-                {author.heroTitle || `Books by ${authorName}`}
+            {/* Content — sits at the bottom-left, editorial style */}
+            <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 pb-14 sm:pb-20 space-y-4">
+              <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
+                Author
+              </p>
+              <h1 className="animate-fade-up animate-delay-100 text-4xl sm:text-6xl md:text-7xl font-extrabold leading-none tracking-tight text-white font-heading drop-shadow-lg">
+                {author.heroTitle || authorName}
               </h1>
-              {author.heroSubtitle && (
-                <p className="animate-fade-up animate-delay-200 text-white/80 text-lg max-w-md">
-                  {author.heroSubtitle}
+              {(author.heroSubtitle || author.tagline) && (
+                <p className="animate-fade-up animate-delay-200 text-lg sm:text-xl text-white/80 max-w-xl leading-relaxed">
+                  {author.heroSubtitle || author.tagline}
                 </p>
               )}
-              <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-1">
+              <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-2">
                 <Link href={heroBook ? `/books/${heroBook.slug}` : "/books"}>
                   <Button
                     size="lg"
-                    className="bg-white hover:bg-gray-100 font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+                    className="bg-white hover:bg-white/90 font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
                     style={{ color: accentColor }}
                   >
                     <ShoppingBag className="h-4 w-4 mr-2" />
                     Shop Now
                   </Button>
                 </Link>
+                <Link href="/about">
+                  <Button size="lg" variant="ghost" className="text-white/80 hover:text-white hover:bg-white/15 border border-white/30">
+                    About Me
+                  </Button>
+                </Link>
               </div>
             </div>
+          </section>
+        ) : (
+          /* ── Colored accent banner (fallback) ── */
+          <section
+            className="w-full py-10 px-4 relative overflow-hidden"
+            style={{ backgroundColor: accentColor }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-25 bg-white" />
+            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full blur-2xl pointer-events-none opacity-20 bg-white" />
 
-            {/* Single featured book cover — 3D tilt */}
-            {heroBook && (
-              <div className="animate-fade-up animate-delay-200">
-                <BookCoverTilt
-                  href={`/books/${heroBook.slug}`}
-                  title={heroBook.title}
-                  coverImageUrl={heroBook.coverImageUrl}
-                  caption={heroBook.caption}
-                  width={130}
-                  height={195}
-                />
+            <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+              <div className="flex-1 text-white space-y-5 order-2 md:order-1">
+                <span className="animate-fade-up block text-sm font-medium uppercase tracking-widest opacity-70">
+                  Available now
+                </span>
+                <h1 className="animate-fade-up animate-delay-100 text-3xl sm:text-5xl font-bold leading-tight font-heading">
+                  {author.heroTitle || `Books by ${authorName}`}
+                </h1>
+                {author.heroSubtitle && (
+                  <p className="animate-fade-up animate-delay-200 text-white/80 text-lg max-w-md">
+                    {author.heroSubtitle}
+                  </p>
+                )}
+                <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-1">
+                  <Link href={heroBook ? `/books/${heroBook.slug}` : "/books"}>
+                    <Button
+                      size="lg"
+                      className="bg-white hover:bg-gray-100 font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+                      style={{ color: accentColor }}
+                    >
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      Shop Now
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
-        </section>
+              {heroBook && (
+                <div className="animate-fade-up animate-delay-200">
+                  <BookCoverTilt
+                    href={`/books/${heroBook.slug}`}
+                    title={heroBook.title}
+                    coverImageUrl={heroBook.coverImageUrl}
+                    caption={heroBook.caption}
+                    width={130}
+                    height={195}
+                  />
+                </div>
+              )}
+            </div>
+          </section>
+        )
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}

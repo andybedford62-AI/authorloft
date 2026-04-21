@@ -9,6 +9,7 @@ export interface AuthorForTemplate {
   bio: string | null;
   tagline: string | null;
   profileImageUrl: string | null;
+  heroImageUrl: string | null;
   accentColor: string;
   heroTitle: string | null;
   heroSubtitle: string | null;
