@@ -43,6 +43,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
     priceCents: b.priceCents,
     isFeatured: b.isFeatured,
     externalBuyUrl: b.externalBuyUrl,
+    releaseDate: b.releaseDate?.toISOString() ?? null,
     seriesId: b.seriesId,
     seriesName: b.series?.name ?? null,
     seriesSlug: b.series?.slug ?? null,
@@ -75,6 +76,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
         authorName={authorName}
         authorSlug={author.slug}
         accentColor={author.accentColor}
+        layout={author.booksLayout ?? "list"}
         hideHeader
       />
     </div>

@@ -62,5 +62,29 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, homeTemplate });
   }
 
+  // booksLayout — list is free; grid/shelf require Standard or Premium
+  const { booksLayout } = body;
+  if (booksLayout !== undefined) {
+    const VALID_LAYOUTS = ["list", "grid", "shelf"];
+    if (!VALID_LAYOUTS.includes(booksLayout)) {
+      return NextResponse.json({ error: "Invalid layout" }, { status: 400 });
+    }
+    if (booksLayout !== "list") {
+      const author = await prisma.author.findUnique({
+        where: { id: authorId },
+        select: { plan: { select: { tier: true } } },
+      });
+      const tier = author?.plan?.tier ?? "FREE";
+      if (tier === "FREE") {
+        return NextResponse.json(
+          { error: "Grid and Shelf layouts require a Standard or Premium plan." },
+          { status: 403 }
+        );
+      }
+    }
+    await prisma.author.update({ where: { id: authorId }, data: { booksLayout } });
+    return NextResponse.json({ ok: true, booksLayout });
+  }
+
   return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 }

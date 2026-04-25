@@ -90,6 +90,7 @@ model Author {
   legalNoticeUpdatedAt DateTime?               // stamped when author saves a new version
   showHeroBanner       Boolean        @default(true)
   homeTemplate         String         @default("classic")
+  booksLayout          String         @default("list")
   siteTheme            String         @default("classic-literary")
   navShowAbout         Boolean        @default(true)
   navShowBooks         Boolean        @default(true)

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import { BookCard, type RetailerLinkPublic, type DirectSaleItemPublic } from "@/components/author-site/book-card";
+import { BooksLayoutGrid } from "@/components/author-site/books-layout-grid";
+import { BooksLayoutShelf } from "@/components/author-site/books-layout-shelf";
 import { Button } from "@/components/ui/button";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -17,19 +19,22 @@ interface Book {
   directSalesEnabled?: boolean;
   retailerLinks?: RetailerLinkPublic[];
   directSaleItems?: DirectSaleItemPublic[];
+  releaseDate?: string | Date | null;
 }
 
 interface Props {
-  books: Book[];
-  series: { id: string; name: string; slug: string }[];
-  genres: { id: string; name: string }[];
-  authorName: string;
-  authorSlug: string;
+  books:       Book[];
+  series:      { id: string; name: string; slug: string }[];
+  genres:      { id: string; name: string }[];
+  authorName:  string;
+  authorSlug:  string;
   accentColor: string;
+  layout?:     string;
   hideHeader?: boolean;
 }
 
-type PerPage = 5 | 10 | 25 | 0; // 0 = All
+type PerPage = 5 | 10 | 25 | 0;
+type SortKey = "featured" | "az" | "newest";
 
 const PER_PAGE_OPTIONS: { value: PerPage; label: string }[] = [
   { value: 5,  label: "5"   },
@@ -38,99 +43,58 @@ const PER_PAGE_OPTIONS: { value: PerPage; label: string }[] = [
   { value: 0,  label: "All" },
 ];
 
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "featured", label: "Featured first" },
+  { value: "az",       label: "A – Z"          },
+  { value: "newest",   label: "Newest first"   },
+];
+
 // ── Pagination bar ─────────────────────────────────────────────────────────────
 
 function PaginationBar({
-  currentPage,
-  totalPages,
-  totalItems,
-  rangeStart,
-  rangeEnd,
-  perPage,
-  accentColor,
-  onPrev,
-  onNext,
-  onPerPageChange,
+  currentPage, totalPages, totalItems, rangeStart, rangeEnd,
+  perPage, accentColor, onPrev, onNext, onPerPageChange,
 }: {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  rangeStart: number;
-  rangeEnd: number;
-  perPage: PerPage;
+  currentPage: number; totalPages: number; totalItems: number;
+  rangeStart: number; rangeEnd: number; perPage: PerPage;
   accentColor: string;
-  onPrev: () => void;
-  onNext: () => void;
+  onPrev: () => void; onNext: () => void;
   onPerPageChange: (v: PerPage) => void;
 }) {
   const showingAll = perPage === 0;
-
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 py-3">
-
-      {/* Left: count info */}
       <p className="text-sm text-gray-500 order-2 sm:order-1">
         {showingAll
           ? <>Showing all <span className="font-medium text-gray-700">{totalItems}</span> books</>
           : totalItems === 0
           ? "No books match your filters"
-          : <>
-              Showing{" "}
-              <span className="font-medium text-gray-700">{rangeStart}–{rangeEnd}</span>
-              {" "}of{" "}
-              <span className="font-medium text-gray-700">{totalItems}</span>
-              {" "}books
-            </>
+          : <>Showing <span className="font-medium text-gray-700">{rangeStart}–{rangeEnd}</span> of <span className="font-medium text-gray-700">{totalItems}</span> books</>
         }
       </p>
-
-      {/* Right: per-page selector + prev/next */}
       <div className="flex items-center gap-3 order-1 sm:order-2">
-        {/* Per-page selector */}
         <div className="flex items-center gap-2">
           <label className="text-xs text-gray-500 whitespace-nowrap">Show:</label>
           <select
             value={perPage}
             onChange={(e) => onPerPageChange(Number(e.target.value) as PerPage)}
-            className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700
-                       focus:outline-none focus:ring-2 focus:border-transparent cursor-pointer"
-            style={{ focusRingColor: accentColor } as React.CSSProperties}
+            className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:border-transparent cursor-pointer"
           >
             {PER_PAGE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
-
-        {/* Prev / Next — hidden when showing all */}
         {!showingAll && totalPages > 1 && (
           <div className="flex items-center gap-1">
-            <button
-              onClick={onPrev}
-              disabled={currentPage === 1}
-              aria-label="Previous page"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-sm
-                         text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-40
-                         disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Prev
+            <button onClick={onPrev} disabled={currentPage === 1} aria-label="Previous page"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              <ChevronLeft className="h-4 w-4" />Prev
             </button>
-
-            <span className="px-3 py-1.5 text-sm text-gray-600 select-none">
-              {currentPage} / {totalPages}
-            </span>
-
-            <button
-              onClick={onNext}
-              disabled={currentPage === totalPages}
-              aria-label="Next page"
-              className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-sm
-                         text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-40
-                         disabled:cursor-not-allowed transition-colors"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
+            <span className="px-3 py-1.5 text-sm text-gray-600 select-none">{currentPage} / {totalPages}</span>
+            <button onClick={onNext} disabled={currentPage === totalPages} aria-label="Next page"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-sm text-gray-600 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              Next<ChevronRight className="h-4 w-4" />
             </button>
           </div>
         )}
@@ -139,26 +103,39 @@ function PaginationBar({
   );
 }
 
+// ── Sort helper ────────────────────────────────────────────────────────────────
+
+function sortBooks(books: Book[], sort: SortKey): Book[] {
+  const copy = [...books];
+  if (sort === "az") {
+    return copy.sort((a, b) => a.title.localeCompare(b.title));
+  }
+  if (sort === "newest") {
+    return copy.sort((a, b) => {
+      const da = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
+      const db = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
+      return db - da;
+    });
+  }
+  // "featured" — featured first, then original order (admin sort order preserved from server)
+  return copy.sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured));
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function BooksClient({
-  books,
-  series,
-  genres,
-  authorName,
-  authorSlug,
-  accentColor,
-  hideHeader = false,
+  books, series, genres, authorName, authorSlug, accentColor,
+  layout = "list", hideHeader = false,
 }: Props) {
   const [search,         setSearch]         = useState("");
   const [selectedGenre,  setSelectedGenre]  = useState<string | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
   const [showFilters,    setShowFilters]    = useState(false);
-  const [perPage,        setPerPage]        = useState<PerPage>(5);
+  const [perPage,        setPerPage]        = useState<PerPage>(layout === "shelf" ? 10 : 5);
   const [currentPage,    setCurrentPage]    = useState(1);
+  const [sortKey,        setSortKey]        = useState<SortKey>("featured");
 
-  // Reset to page 1 whenever filters or perPage changes
-  useEffect(() => { setCurrentPage(1); }, [search, selectedGenre, selectedSeries, perPage]);
+  useEffect(() => { setCurrentPage(1); }, [search, selectedGenre, selectedSeries, perPage, sortKey]);
 
   const filtered = useMemo(() =>
     books.filter((book) => {
@@ -170,62 +147,66 @@ export function BooksClient({
     }),
   [search, selectedGenre, selectedSeries, books]);
 
-  // Pagination calculations
-  const totalItems  = filtered.length;
-  const showingAll  = perPage === 0;
-  const totalPages  = showingAll ? 1 : Math.max(1, Math.ceil(totalItems / perPage));
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-  const rangeStart  = showingAll ? 1          : (safeCurrentPage - 1) * perPage + 1;
-  const rangeEnd    = showingAll ? totalItems  : Math.min(safeCurrentPage * perPage, totalItems);
-  const paginated   = showingAll ? filtered    : filtered.slice(rangeStart - 1, rangeEnd);
+  const sorted = useMemo(() => sortBooks(filtered, sortKey), [filtered, sortKey]);
+
+  const totalItems       = sorted.length;
+  const showingAll       = perPage === 0;
+  const totalPages       = showingAll ? 1 : Math.max(1, Math.ceil(totalItems / perPage));
+  const safeCurrentPage  = Math.min(currentPage, totalPages);
+  const rangeStart       = showingAll ? 1         : (safeCurrentPage - 1) * perPage + 1;
+  const rangeEnd         = showingAll ? totalItems : Math.min(safeCurrentPage * perPage, totalItems);
+  const paginated        = showingAll ? sorted     : sorted.slice(rangeStart - 1, rangeEnd);
 
   const hasActiveFilters = selectedGenre || selectedSeries || search;
 
-  function clearFilters() {
-    setSearch(""); setSelectedGenre(null); setSelectedSeries(null);
-  }
+  function clearFilters() { setSearch(""); setSelectedGenre(null); setSelectedSeries(null); }
 
   const paginationProps = {
-    currentPage: safeCurrentPage,
-    totalPages,
-    totalItems,
-    rangeStart,
-    rangeEnd,
-    perPage,
-    accentColor,
+    currentPage: safeCurrentPage, totalPages, totalItems, rangeStart, rangeEnd,
+    perPage, accentColor,
     onPrev:          () => setCurrentPage((p) => Math.max(1, p - 1)),
     onNext:          () => setCurrentPage((p) => Math.min(totalPages, p + 1)),
     onPerPageChange: (v: PerPage) => setPerPage(v),
   };
 
   return (
-    <div
-      style={{ "--accent": accentColor } as React.CSSProperties}
-      className="max-w-6xl mx-auto px-4 sm:px-6 py-12"
-    >
-      {/* Header */}
+    <div style={{ "--accent": accentColor } as React.CSSProperties}
+         className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+
       {!hideHeader && (
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">All Books</h1>
-          <p className="text-gray-500">
-            {books.length} title{books.length !== 1 ? "s" : ""} by {authorName}
-          </p>
+          <p className="text-gray-500">{books.length} title{books.length !== 1 ? "s" : ""} by {authorName}</p>
         </div>
       )}
 
-      {/* Search + Filter bar */}
+      {/* ── Search + Filter + Sort bar ─────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        {/* Search */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
-            type="text"
-            placeholder="Search books…"
-            value={search}
+            type="text" placeholder="Search books…" value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 text-sm
-                       focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
           />
         </div>
+
+        {/* Sort dropdown */}
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <select
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value as SortKey)}
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] cursor-pointer"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Filters toggle */}
         <Button variant="outline" onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4" />
@@ -239,7 +220,7 @@ export function BooksClient({
         )}
       </div>
 
-      {/* Expanded filters */}
+      {/* ── Expanded filters ───────────────────────────────────────────────── */}
       {showFilters && (
         <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
           {genres.length > 0 && (
@@ -247,15 +228,13 @@ export function BooksClient({
               <p className="text-sm font-medium text-gray-700 mb-2">Genre / Category</p>
               <div className="flex flex-wrap gap-2">
                 {genres.map((genre) => (
-                  <button
-                    key={genre.id}
+                  <button key={genre.id}
                     onClick={() => setSelectedGenre(selectedGenre === genre.id ? null : genre.id)}
                     className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
                       selectedGenre === genre.id
                         ? "bg-[var(--accent)] text-white border-[var(--accent)]"
                         : "bg-white text-gray-600 border-gray-300 hover:border-[var(--accent)]"
-                    }`}
-                  >
+                    }`}>
                     {genre.name}
                   </button>
                 ))}
@@ -267,15 +246,13 @@ export function BooksClient({
               <p className="text-sm font-medium text-gray-700 mb-2">Series</p>
               <div className="flex flex-wrap gap-2">
                 {series.map((s) => (
-                  <button
-                    key={s.id}
+                  <button key={s.id}
                     onClick={() => setSelectedSeries(selectedSeries === s.id ? null : s.id)}
                     className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
                       selectedSeries === s.id
                         ? "bg-[var(--accent)] text-white border-[var(--accent)]"
                         : "bg-white text-gray-600 border-gray-300 hover:border-[var(--accent)]"
-                    }`}
-                  >
+                    }`}>
                     {s.name}
                   </button>
                 ))}
@@ -285,34 +262,32 @@ export function BooksClient({
         </div>
       )}
 
-      {/* ── Top pagination bar ─────────────────────────────────────────────── */}
-      <div className="border-b border-gray-100 mb-1">
+      {/* ── Top pagination ─────────────────────────────────────────────────── */}
+      <div className="border-b border-gray-100 mb-4">
         <PaginationBar {...paginationProps} />
       </div>
 
-      {/* ── Book list ──────────────────────────────────────────────────────── */}
-      {filtered.length === 0 ? (
+      {/* ── Book layout ────────────────────────────────────────────────────── */}
+      {sorted.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-gray-500">No books match your filters.</p>
           <Button variant="ghost" className="mt-3" onClick={clearFilters}>Clear filters</Button>
         </div>
+      ) : layout === "grid" ? (
+        <BooksLayoutGrid books={paginated} accentColor={accentColor} />
+      ) : layout === "shelf" ? (
+        <BooksLayoutShelf books={paginated} accentColor={accentColor} />
       ) : (
         <div className="divide-y divide-gray-100">
           {paginated.map((book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              accentColor={accentColor}
-              authorSlug={authorSlug}
-              layout="list"
-            />
+            <BookCard key={book.id} book={book} accentColor={accentColor} authorSlug={authorSlug} layout="list" />
           ))}
         </div>
       )}
 
-      {/* ── Bottom pagination bar ──────────────────────────────────────────── */}
-      {filtered.length > 0 && (
-        <div className="border-t border-gray-100 mt-1">
+      {/* ── Bottom pagination ──────────────────────────────────────────────── */}
+      {sorted.length > 0 && (
+        <div className="border-t border-gray-100 mt-4">
           <PaginationBar {...paginationProps} />
         </div>
       )}
