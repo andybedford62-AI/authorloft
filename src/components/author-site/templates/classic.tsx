@@ -3,10 +3,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, ShoppingBag } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookCarousel } from "@/components/author-site/book-carousel";
-import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
+import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
 // ── Gradient palette for series cards (cycles by index) ──────────────────────
@@ -23,71 +23,19 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
   const salesEnabled = author.plan?.salesEnabled ?? false;
-  // Hero shows only the single book marked isFeatured in the admin
-  const heroBook = books.find((b) => b.isFeatured) ?? null;
 
   // Credential pills — filter out blanks, only render if at least one has text
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
+
+  // Featured book for hero: use heroFeaturedBook if set, otherwise fall back to isFeatured book
+  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null;
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
       {/* ── Hero Banner ────────────────────────────────────────────────────── */}
       {author.showHeroBanner !== false && (
-        <section
-          className="w-full py-10 px-4 relative overflow-hidden"
-          style={{ backgroundColor: accentColor }}
-        >
-          {/* Depth overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
-          {/* Decorative blobs */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-25 bg-white" />
-          <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full blur-2xl pointer-events-none opacity-20 bg-white" />
-
-          <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
-
-            {/* Text */}
-            <div className="flex-1 text-white space-y-5 order-2 md:order-1">
-              <span className="animate-fade-up block text-sm font-medium uppercase tracking-widest opacity-70">
-                Available now
-              </span>
-              <h1 className="animate-fade-up animate-delay-100 text-3xl sm:text-5xl font-bold leading-tight font-heading">
-                {author.heroTitle || `Books by ${authorName}`}
-              </h1>
-              {author.heroSubtitle && (
-                <p className="animate-fade-up animate-delay-200 text-white/80 text-lg max-w-md">
-                  {author.heroSubtitle}
-                </p>
-              )}
-              <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-1">
-                <Link href={heroBook ? `/books/${heroBook.slug}` : "/books"}>
-                  <Button
-                    size="lg"
-                    className="bg-white hover:bg-gray-100 font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
-                    style={{ color: accentColor }}
-                  >
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    Shop Now
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Single featured book cover — 3D tilt */}
-            {heroBook && (
-              <div className="animate-fade-up animate-delay-200">
-                <BookCoverTilt
-                  href={`/books/${heroBook.slug}`}
-                  title={heroBook.title}
-                  coverImageUrl={heroBook.coverImageUrl}
-                  caption={heroBook.caption}
-                  width={130}
-                  height={195}
-                />
-              </div>
-            )}
-          </div>
-        </section>
+        <HeroBanner author={author} featuredBook={heroBook} />
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}

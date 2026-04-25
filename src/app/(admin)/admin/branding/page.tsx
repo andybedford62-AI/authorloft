@@ -6,23 +6,31 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 export default async function BrandingPage() {
   const authorId = await getAdminAuthorId();
 
-  const author = await prisma.author.findUnique({
-    where: { id: authorId },
-    select: {
-      displayName: true, tagline: true, shortBio: true, bio: true,
-      profileImageUrl: true,
-      logoUrl: true,
-      heroImageUrl: true,
-      heroLayout: true,
-      linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
-      twitterUrl: true, instagramUrl: true,
-      contactEmail: true, contactResponseTime: true, contactOpenTo: true,
-      heroTitle: true, heroSubtitle: true,
-      showHeroBanner: true,
-      aboutStats: true,
-      credentials: true,
-    },
-  });
+  const [author, books] = await Promise.all([
+    prisma.author.findUnique({
+      where: { id: authorId },
+      select: {
+        displayName: true, tagline: true, shortBio: true, bio: true,
+        profileImageUrl: true,
+        logoUrl: true,
+        heroImageUrl: true,
+        heroLayout: true,
+        heroFeaturedBookId: true,
+        linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
+        twitterUrl: true, instagramUrl: true,
+        contactEmail: true, contactResponseTime: true, contactOpenTo: true,
+        heroTitle: true, heroSubtitle: true,
+        showHeroBanner: true,
+        aboutStats: true,
+        credentials: true,
+      },
+    }),
+    prisma.book.findMany({
+      where: { authorId, isPublished: true },
+      select: { id: true, title: true, coverImageUrl: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    }),
+  ]);
 
   if (!author) redirect("/login");
 
@@ -43,9 +51,10 @@ export default async function BrandingPage() {
     contactEmail:        author.contactEmail        ?? "",
     contactResponseTime: author.contactResponseTime ?? "",
     contactOpenTo:       author.contactOpenTo       ?? "",
-    heroTitle:      author.heroTitle      ?? "",
-    heroSubtitle:   author.heroSubtitle   ?? "",
-    showHeroBanner: author.showHeroBanner ?? true,
+    heroTitle:           author.heroTitle           ?? "",
+    heroSubtitle:        author.heroSubtitle        ?? "",
+    showHeroBanner:      author.showHeroBanner      ?? true,
+    heroFeaturedBookId:  author.heroFeaturedBookId  ?? "",
     aboutStats: Array.isArray(author.aboutStats)
       ? (author.aboutStats as { value: string; label: string }[])
       : [],
@@ -62,7 +71,7 @@ export default async function BrandingPage() {
           Update your photo, bio, and how your author site looks and feels.
         </p>
       </div>
-      <BrandingForm initial={initial} />
+      <BrandingForm initial={initial} books={books} />
     </div>
   );
 }

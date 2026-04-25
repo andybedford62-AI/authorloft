@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 //import { prisma } from "@/lib/prisma";
 import { prisma } from "@/lib/db";
@@ -36,6 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.audioEnabled !== undefined && { audioEnabled: body.audioEnabled }),
         ...(body.newsletter !== undefined && { newsletter: body.newsletter }),
         ...(body.analyticsEnabled !== undefined && { analyticsEnabled: body.analyticsEnabled }),
+        ...(body.featuresJson !== undefined && { featuresJson: body.featuresJson }),
         ...(body.badgeColor !== undefined && { badgeColor: body.badgeColor }),
         ...(body.featuredLabel !== undefined && { featuredLabel: body.featuredLabel }),
         ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
@@ -43,6 +45,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.isDefault !== undefined && { isDefault: body.isDefault }),
       },
     });
+    revalidatePath("/");
+    revalidatePath("/pricing");
     return NextResponse.json(plan);
   } catch (err: any) {
     if (err?.code === "P2002") return NextResponse.json({ error: "A plan with that slug already exists." }, { status: 400 });

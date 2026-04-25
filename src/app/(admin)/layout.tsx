@@ -33,17 +33,24 @@ export default async function AdminLayout({
     prisma.author.findUnique({
       where:  { id: effectiveAuthorId },
       select: {
-        name:        true,
-        displayName: true,
-        slug:        true,
-        adminTheme:  true,
-        plan:        { select: { tier: true } },
+        name:             true,
+        displayName:      true,
+        slug:             true,
+        adminTheme:       true,
+        termsAcceptedAt:  true,
+        plan:             { select: { tier: true } },
       },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
   ]);
 
   if (!authorRecord) redirect("/login");
+
+  // Gate: new users must accept T&C before accessing any admin page.
+  // Impersonated sessions are exempt (super admin already accepted).
+  if (!impersonatedId && !authorRecord.termsAcceptedAt) {
+    redirect("/accept-terms");
+  }
 
   const authorName   = authorRecord.displayName || authorRecord.name;
   const authorSlug   = authorRecord.slug;

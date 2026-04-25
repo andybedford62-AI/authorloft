@@ -11,6 +11,9 @@ export async function getAuthorByDomain(domain: string) {
     },
     include: {
       plan: true,
+      heroFeaturedBook: {
+        select: { title: true, slug: true, coverImageUrl: true, caption: true },
+      },
     },
   });
   if (!author) notFound();

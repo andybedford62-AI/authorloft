@@ -12,9 +12,31 @@ const PLATFORM_HOSTNAMES = [
   "localhost:3000",
 ];
 
-export function proxy(req: NextRequest) {
+const MAINTENANCE_PATHS = ["/login", "/register", "/api/auth/signin", "/api/auth/callback"];
+
+export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
+
+  // ── Maintenance mode check ───────────────────────────────────────────────
+  // Block logins/registrations when maintenance mode is active.
+  const isMaintPath = MAINTENANCE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"));
+  if (isMaintPath) {
+    try {
+      const origin = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
+      const res = await fetch(`${origin}/api/maintenance-check`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) {
+        const data = await res.json() as { maintenanceMode: boolean };
+        if (data.maintenanceMode) {
+          return NextResponse.redirect(new URL("/maintenance", req.url));
+        }
+      }
+    } catch {
+      // Fail open — DB hiccup should not lock everyone out
+    }
+  }
 
   // Strip port for local dev comparison
   const hostnameWithoutPort = hostname.split(":")[0];

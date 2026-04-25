@@ -11,6 +11,15 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ─── System Config (singleton) ────────────────────────────────────────────────
+
+model SystemConfig {
+  id                 String   @id @default("main")
+  maintenanceMode    Boolean  @default(false)
+  maintenanceMessage String   @default("")
+  updatedAt          DateTime @updatedAt
+}
+
 // ─── Plans & Billing ─────────────────────────────────────────────────────────
 
 enum PlanTier {
@@ -39,6 +48,7 @@ model Plan {
   audioEnabled         Boolean   @default(false)
   analyticsEnabled     Boolean   @default(false)
   newsletter           Boolean   @default(false)
+  featuresJson         String?
   badgeColor           String    @default("gray")
   featuredLabel        String?
   sortOrder            Int       @default(0)
@@ -89,6 +99,8 @@ model Author {
   legalNotice          String?        @db.Text  // author's own legal/disclaimer notice
   legalNoticeUpdatedAt DateTime?               // stamped when author saves a new version
   showHeroBanner       Boolean        @default(true)
+  heroFeaturedBookId   String?
+  heroFeaturedBook     Book?          @relation("HeroFeaturedBook", fields: [heroFeaturedBookId], references: [id])
   homeTemplate         String         @default("classic")
   booksLayout          String         @default("list")
   siteTheme            String         @default("classic-literary")
@@ -111,6 +123,7 @@ model Author {
   emailVerifyExpiry    DateTime?
   passwordResetToken   String?        @unique
   passwordResetExpiry  DateTime?
+  termsAcceptedAt      DateTime?      // null = never accepted; non-null = timestamp of acceptance
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   books                Book[]
@@ -264,6 +277,7 @@ model Book {
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
   reviews             BookReview[]
+  heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
 
   @@unique([authorId, slug])
   @@index([authorId])

@@ -27,10 +27,14 @@ export default async function SuperAdminLayout({
   const [authorRecord, featureConfig] = await Promise.all([
     prisma.author.findUnique({
       where:  { id: authorId },
-      select: { plan: { select: { tier: true } }, adminTheme: true },
+      select: { plan: { select: { tier: true } }, adminTheme: true, termsAcceptedAt: true },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
   ]);
+
+  if (authorRecord && !authorRecord.termsAcceptedAt) {
+    redirect("/accept-terms");
+  }
 
   const planTier    = authorRecord?.plan?.tier ?? "FREE";
   const featureGates = (featureConfig?.gates as Record<string, string>) ?? {};

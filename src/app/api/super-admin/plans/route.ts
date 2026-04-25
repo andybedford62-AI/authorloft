@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 //import { prisma } from "@/lib/prisma";
 import { prisma } from "@/lib/db";
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
     const plan = await prisma.plan.create({
       data: {
         name: body.name, slug: body.slug, description: body.description ?? null,
+        featuresJson: body.featuresJson ?? null,
         monthlyPriceCents: body.monthlyPriceCents ?? 0, annualPriceCents: body.annualPriceCents ?? 0,
         stripePriceIdMonthly: body.stripePriceIdMonthly ?? null, stripePriceIdAnnual: body.stripePriceIdAnnual ?? null,
         maxBooks: body.maxBooks ?? null, maxPosts: body.maxPosts ?? null, maxStorageMb: body.maxStorageMb ?? null,
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
         sortOrder: body.sortOrder ?? 0, isActive: body.isActive ?? true, isDefault: body.isDefault ?? false,
       },
     });
+    revalidatePath("/");
+    revalidatePath("/pricing");
     return NextResponse.json(plan, { status: 201 });
   } catch (err: any) {
     if (err?.code === "P2002") return NextResponse.json({ error: "A plan with that slug already exists." }, { status: 400 });

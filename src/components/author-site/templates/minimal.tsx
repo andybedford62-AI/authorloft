@@ -3,8 +3,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen, BookMarked, ArrowRight } from "lucide-react";
+import { ChevronRight, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
@@ -15,72 +16,13 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
-      {/* ── 1. Top Banner ───────────────────────────────────────────────── */}
-      <section className="w-full py-16 px-4 relative overflow-hidden" style={{ backgroundColor: accentColor }}>
-        {/* Depth overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/35 pointer-events-none" />
-        {/* Decorative blobs */}
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full blur-3xl pointer-events-none opacity-20 bg-white" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full blur-2xl pointer-events-none opacity-15 bg-white" />
-
-        <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10">
-
-          {/* Left: author identity */}
-          <div className="flex-1 text-white space-y-4">
-            <div className="animate-fade-up flex items-center gap-2">
-              <BookMarked className="h-5 w-5 text-white/60" />
-              <span className="text-white/60 text-xs font-semibold uppercase tracking-[0.2em]">
-                Author
-              </span>
-            </div>
-            <h1 className="animate-fade-up animate-delay-100 text-3xl sm:text-5xl font-bold text-white leading-tight font-heading">
-              {author.displayName || author.name}
-            </h1>
-            {author.tagline && (
-              <p className="animate-fade-up animate-delay-200 text-white/75 text-base sm:text-lg max-w-md">
-                {author.tagline}
-              </p>
-            )}
-            <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-1">
-              <Link href="/books">
-                <Button
-                  size="sm"
-                  className="bg-white font-semibold hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
-                  style={{ color: accentColor }}
-                >
-                  Browse Books <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                </Button>
-              </Link>
-              <Link href="/about">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-white/80 hover:text-white hover:bg-white/15 border border-white/30"
-                >
-                  About Me
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Right: profile photo */}
-          {author.profileImageUrl && (
-            <div className="animate-fade-up animate-delay-200 flex-shrink-0">
-              <div
-                className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden relative shadow-2xl transition-transform duration-300 hover:scale-105"
-                style={{ outline: "3px solid rgba(255,255,255,0.3)", outlineOffset: "4px" }}
-              >
-                <Image
-                  src={author.profileImageUrl}
-                  alt={author.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* ── 1. Hero Banner ──────────────────────────────────────────────── */}
+      {author.showHeroBanner !== false && (
+        <HeroBanner
+          author={author}
+          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null}
+        />
+      )}
 
       {/* ── 2. Author Bio ───────────────────────────────────────────────── */}
       <section className="bg-white border-b border-gray-100">

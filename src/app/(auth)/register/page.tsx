@@ -79,8 +79,9 @@ export default function RegisterPage() {
   const [showPassword,    setShowPassword]    = useState(false);
 
   // Step 2 fields
-  const [slug,       setSlug]       = useState("");
-  const [slugEdited, setSlugEdited] = useState(false); // user manually changed slug
+  const [slug,          setSlug]          = useState("");
+  const [slugEdited,    setSlugEdited]    = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Auto-generate slug from name (unless user has edited it manually)
   useEffect(() => {
@@ -116,6 +117,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setStep2Error("");
 
+    if (!termsAccepted)           return setStep2Error("You must accept the Terms of Service and Privacy Policy to create an account.");
     if (slugStatus === "taken")   return setStep2Error("That URL is already taken. Please choose another.");
     if (slugStatus === "invalid") return setStep2Error("Site URL must be 3–40 characters, letters, numbers, and hyphens only.");
     if (slugStatus === "checking") return setStep2Error("Still checking availability — please wait a moment.");
@@ -126,7 +128,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.toLowerCase().trim(), password, slug }),
+        body: JSON.stringify({ name: name.trim(), email: email.toLowerCase().trim(), password, slug, termsAccepted }),
       });
       const data = await res.json();
 
@@ -395,6 +397,28 @@ export default function RegisterPage() {
                 </p>
               </div>
 
+              {/* Terms & Conditions */}
+              <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => { setTermsAccepted(e.target.checked); setStep2Error(""); }}
+                  className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
+                  I have read and agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
+                    Terms of Service
+                  </Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
+                    Privacy Policy
+                  </Link>
+                  . By creating an account I confirm I am at least 18 years of age.
+                </label>
+              </div>
+
               {step2Error && (
                 <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                   {step2Error}
@@ -418,6 +442,7 @@ export default function RegisterPage() {
                   disabled={
                     submitting ||
                     !slug ||
+                    !termsAccepted ||
                     slugStatus === "taken" ||
                     slugStatus === "invalid" ||
                     slugStatus === "checking"
