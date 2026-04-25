@@ -14,6 +14,7 @@ export interface AuthorForTemplate {
   siteTheme: string;
   heroTitle: string | null;
   heroSubtitle: string | null;
+  heroLayout: string;
   showHeroBanner: boolean;
   homeTemplate: string;
   heroFeaturedBook: { title: string; slug: string; coverImageUrl: string | null; caption: string | null } | null;
