@@ -38,87 +38,65 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const photoSrc = author.heroImageUrl || author.profileImageUrl;
   const layout = author.heroLayout ?? "author-right";
 
-  // ── Portrait layout ─────────────────────────────────────────────────────────
+  // ── Classic layout (formerly "portrait") — accent bg, text left, book right ──
   if (layout === "portrait") {
     return (
       <section
-        className="relative w-full overflow-hidden"
-        style={{ background: bg, minHeight: "580px" }}
+        className="relative w-full overflow-hidden py-10 px-4"
+        style={{ backgroundColor: accent }}
         aria-label="Author hero"
       >
-        {/* Full-bleed background photo */}
-        {photoSrc && (
-          <div className="absolute inset-0">
-            <Image
-              src={photoSrc}
-              alt={authorName}
-              fill
-              className="object-cover object-center"
-              priority
-            />
+        {/* Depth overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
+        {/* Decorative blobs */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-25 bg-white" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full blur-2xl pointer-events-none opacity-20 bg-white" />
+
+        <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 py-6">
+
+          {/* Text */}
+          <div className="flex-1 text-white space-y-5">
+            {author.heroTitle && (
+              <span className="block text-sm font-medium uppercase tracking-widest opacity-70">
+                {author.heroTitle}
+              </span>
+            )}
+            <h1 className="text-3xl sm:text-5xl font-bold leading-tight font-heading">
+              {featuredBook?.title || `Books by ${authorName}`}
+            </h1>
+            {author.heroSubtitle && (
+              <p className="text-white/80 text-lg max-w-md">{author.heroSubtitle}</p>
+            )}
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link
+                href={buyHref}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl"
+                style={{ background: "#fff", color: accent }}
+              >
+                Buy Now
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest border border-white/40 text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                Learn More
+              </Link>
+            </div>
           </div>
-        )}
 
-        {/* Dark gradient overlay for text readability */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `linear-gradient(to bottom, ${bg}cc 0%, ${bg}88 35%, ${bg}99 65%, ${bg}ee 100%)`,
-          }}
-        />
-
-        {/* Accent glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse 60% 50% at 50% 60%, ${accent}22 0%, transparent 70%)`,
-          }}
-        />
-
-        {/* Centered content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20" style={{ minHeight: "580px" }}>
-          {author.heroTitle && (
-            <p className="text-xs font-bold uppercase tracking-[0.35em] mb-4" style={{ color: accent }}>
-              {author.heroTitle}
-            </p>
-          )}
-
-          <h1 className="text-5xl xl:text-6xl font-bold text-white leading-tight font-heading mb-4">
-            {authorName}
-          </h1>
-
-          {author.heroSubtitle && (
-            <p className="text-base leading-relaxed max-w-lg mb-8" style={{ color: "rgba(255,255,255,0.72)" }}>
-              {author.heroSubtitle}
-            </p>
-          )}
-
+          {/* Book cover */}
           {featuredBook && (
-            <p className="text-xs uppercase tracking-widest mb-6" style={{ color: "rgba(255,255,255,0.40)" }}>
-              {featuredBook.title}
-            </p>
+            <div className="flex-shrink-0">
+              <BookCoverTilt
+                href={buyHref}
+                title={featuredBook.title}
+                coverImageUrl={featuredBook.coverImageUrl}
+                caption={featuredBook.caption}
+                width={130}
+                height={195}
+              />
+            </div>
           )}
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              href={buyHref}
-              className="py-3 px-8 text-sm font-bold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
-              style={{
-                background: accent,
-                color: isLightColor(accent) ? "#111" : "#fff",
-                boxShadow: `0 4px 24px ${accent}55`,
-              }}
-            >
-              Buy Now
-            </Link>
-            <Link
-              href="/about"
-              className="py-3 px-8 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
-              style={{ border: `2px solid ${accent}60`, color: "rgba(255,255,255,0.85)" }}
-            >
-              Learn More
-            </Link>
-          </div>
         </div>
       </section>
     );
