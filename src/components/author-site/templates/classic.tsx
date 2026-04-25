@@ -103,9 +103,10 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               <h2 className="text-2xl font-bold text-gray-900 font-heading">{authorName}</h2>
             </div>
 
-            <p className="text-gray-600 leading-relaxed">
-              {author.shortBio || "Author bio coming soon."}
-            </p>
+            <div
+              className="text-gray-600 leading-relaxed rich-content"
+              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+            />
 
             {/* Credential pills — only rendered if at least one has text */}
             {credentialPills.length > 0 && (

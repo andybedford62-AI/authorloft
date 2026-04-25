@@ -95,9 +95,10 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
                   About {author.displayName || author.name}
                 </h2>
               </div>
-              <p className="text-gray-600 leading-relaxed">
-                {author.shortBio || "Author bio coming soon."}
-              </p>
+              <div
+                className="text-gray-600 leading-relaxed rich-content"
+                dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+              />
               <Link
                 href="/about"
                 className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"

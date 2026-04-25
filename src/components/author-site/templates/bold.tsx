@@ -44,9 +44,10 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
               </p>
             )}
             {author.heroSubtitle || author.shortBio ? (
-              <p className="animate-fade-up animate-delay-200 text-gray-400 leading-relaxed max-w-md text-sm sm:text-base">
-                {author.heroSubtitle || author.shortBio}
-              </p>
+              <div
+                className="animate-fade-up animate-delay-200 text-gray-400 leading-relaxed max-w-md text-sm sm:text-base rich-content"
+                dangerouslySetInnerHTML={{ __html: author.heroSubtitle || author.shortBio || "" }}
+              />
             ) : null}
             <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-2">
               <Link href="/books">
@@ -109,9 +110,10 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
           )}
           <div className="space-y-2 text-center sm:text-left">
             <p className="text-sm text-gray-400 uppercase tracking-widest">About the Author</p>
-            <p className="text-gray-300 leading-relaxed max-w-2xl text-sm">
-              {author.shortBio || "More about this author coming soon."}
-            </p>
+            <div
+              className="text-gray-300 leading-relaxed max-w-2xl text-sm rich-content"
+              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>More about this author coming soon.</p>" }}
+            />
             <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
               Full biography <ChevronRight className="h-3.5 w-3.5" />
             </Link>
