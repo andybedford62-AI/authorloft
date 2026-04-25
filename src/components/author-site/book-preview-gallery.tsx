@@ -61,6 +61,7 @@ function Lightbox({
           <video
             src={item.fileUrl}
             controls
+            autoPlay
             playsInline
             className="w-full rounded-xl bg-black"
             style={{ maxHeight: "70vh" }}
