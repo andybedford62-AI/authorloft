@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 
 interface BookOverviewProps {
   text: string;
@@ -19,7 +20,7 @@ export function BookOverview({ text, accentColor }: BookOverviewProps) {
         className={`rich-content text-gray-600 overflow-hidden transition-all duration-300 ${
           expanded ? "" : "line-clamp-2"
         }`}
-        dangerouslySetInnerHTML={{ __html: text }}
+        dangerouslySetInnerHTML={{ __html: sanitize(text) }}
       />
 
       <button

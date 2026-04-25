@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { GraduationCap, Pin, BarChart2 } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
+import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
 import type { Metadata } from "next";
@@ -149,7 +150,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
               <h3 className="text-base font-semibold text-gray-800 mb-2">About</h3>
               <div
                 className="rich-content"
-                dangerouslySetInnerHTML={{ __html: bioHtml }}
+                dangerouslySetInnerHTML={{ __html: sanitize(bioHtml) }}
               />
             </div>
 

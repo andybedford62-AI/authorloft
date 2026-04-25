@@ -30,9 +30,15 @@ async function uniqueSlug(base: string): Promise<string> {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, slug: rawSlug } = body;
+    const { name, email, password, slug: rawSlug, termsAccepted } = body;
 
     // ── Field validation ────────────────────────────────────────────────────
+    if (!termsAccepted) {
+      return NextResponse.json(
+        { error: "You must accept the Terms of Service and Privacy Policy to create an account." },
+        { status: 400 }
+      );
+    }
     if (!name?.trim()) {
       return NextResponse.json({ error: "Full name is required." }, { status: 400 });
     }
@@ -113,6 +119,7 @@ export async function POST(req: NextRequest) {
         isActive: true,
         emailVerifyToken,
         emailVerifyExpiry,
+        termsAcceptedAt: new Date(),
         ...(freePlan && { planId: freePlan.id }),
       },
     });

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
-import { Settings, Globe, Database, BookOpen, Users, Mail, ShoppingBag } from "lucide-react";
+import { Settings, Globe, Database, BookOpen, Users, Mail, ShoppingBag, WifiOff } from "lucide-react";
 import { formatCents } from "@/lib/utils";
+import { MaintenanceToggle } from "@/components/super-admin/maintenance-toggle";
 
 export default async function SuperAdminSettingsPage() {
   // Gather platform-wide stats
@@ -11,6 +12,7 @@ export default async function SuperAdminSettingsPage() {
     orderCount,
     revenueResult,
     planBreakdown,
+    maintenanceConfig,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -20,6 +22,11 @@ export default async function SuperAdminSettingsPage() {
     prisma.plan.findMany({
       include: { _count: { select: { authors: true } } },
       orderBy: { monthlyPriceCents: "asc" },
+    }),
+    prisma.systemConfig.upsert({
+      where: { id: "main" },
+      create: { id: "main", maintenanceMode: false, maintenanceMessage: "" },
+      update: {},
     }),
   ]);
 
@@ -113,6 +120,22 @@ export default async function SuperAdminSettingsPage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Maintenance Mode */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <WifiOff className="h-4 w-4 text-gray-400" />
+          Maintenance Mode
+        </h2>
+        <p className="text-xs text-gray-500">
+          When enabled, all logins and new registrations are blocked and visitors are redirected to the maintenance page.
+          The marketing site, demos, and email contact remain accessible.
+        </p>
+        <MaintenanceToggle
+          initialMode={maintenanceConfig.maintenanceMode}
+          initialMessage={maintenanceConfig.maintenanceMessage}
+        />
       </section>
 
       {/* Super Admin Tools */}

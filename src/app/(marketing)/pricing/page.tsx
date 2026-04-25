@@ -1,8 +1,11 @@
 import Link from "next/link";
-import { BookOpen, ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import type { Metadata } from "next";
+
+export const revalidate = 3600; // fallback: refresh at most every hour
 
 export const metadata: Metadata = {
   title: "Pricing | AuthorLoft",
@@ -18,6 +21,7 @@ async function getActivePlans() {
       name: true,
       tier: true,
       description: true,
+      featuresJson: true,
       monthlyPriceCents: true,
       annualPriceCents: true,
       featuredLabel: true,
@@ -60,11 +64,8 @@ export default async function PricingPage() {
       {/* Nav */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-lg text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image src="/AL_site_Logo-Blue.png" alt="AuthorLoft" width={160} height={48} className="h-10 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/#features" className="text-sm text-gray-600 hover:text-gray-900">Features</Link>
@@ -158,11 +159,8 @@ export default async function PricingPage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-400" />
-            <span className="text-white font-bold">
-              Author<span className="text-blue-400">Loft</span>
-            </span>
+          <div className="flex items-center">
+            <Image src="/AL_site_Logo-Dark_footer.png" alt="AuthorLoft" width={140} height={40} className="h-8 w-auto" />
           </div>
           <p className="text-sm">© {new Date().getFullYear()} AuthorLoft. Built for authors.</p>
           <div className="flex gap-4 text-sm">

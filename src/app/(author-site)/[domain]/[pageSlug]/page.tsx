@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { FileText } from "lucide-react";
 import { getThemeAccentHex } from "@/lib/themes";
+import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -84,7 +85,7 @@ export default async function CustomPage({ params }: PageProps) {
         {page.content ? (
           <div
             className="rich-content"
-            dangerouslySetInnerHTML={{ __html: page.content }}
+            dangerouslySetInnerHTML={{ __html: sanitize(page.content) }}
           />
         ) : (
           <p className="text-gray-400 italic text-sm">This page has no content yet.</p>

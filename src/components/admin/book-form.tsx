@@ -49,7 +49,7 @@ type CoverUploadProps = {
 function CoverUpload({ value, onChange }: CoverUploadProps) {
   const [uploading, setUploading]   = useState(false);
   const [uploadError, setUploadError] = useState("");
-  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(!!value);
   const [dragging, setDragging]     = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -114,7 +114,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
           </div>
         </div>
         {showUrlInput && (
-          <input type="url" value={value} onChange={(e) => onChange(e.target.value)}
+          <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
             placeholder="https://example.com/cover.jpg"
             className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]" />
         )}
@@ -160,7 +160,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
           {showUrlInput ? "Hide URL field" : "Or paste an image URL instead"}
         </button>
         {showUrlInput && (
-          <input type="url" value={value} onChange={(e) => onChange(e.target.value)}
+          <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
             placeholder="https://example.com/cover.jpg"
             className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]" />
         )}

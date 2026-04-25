@@ -4,25 +4,35 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BooksListClient } from "./books-list-client";
+import { BookShelfPicker } from "./book-shelf-picker";
 
 export default async function AdminBooksPage() {
   const authorId = await getAdminAuthorId();
 
-  const books = await prisma.book.findMany({
-    where: { authorId },
-    select: {
-      id: true,
-      title: true,
-      subtitle: true,
-      coverImageUrl: true,
-      isFeatured: true,
-      isPublished: true,
-      caption: true,
-      series: { select: { name: true } },
-      _count: { select: { directSaleItems: true, retailerLinks: true } },
-    },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const [books, author] = await Promise.all([
+    prisma.book.findMany({
+      where: { authorId },
+      select: {
+        id: true,
+        title: true,
+        subtitle: true,
+        coverImageUrl: true,
+        isFeatured: true,
+        isPublished: true,
+        caption: true,
+        series: { select: { name: true } },
+        _count: { select: { directSaleItems: true, retailerLinks: true } },
+      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    }),
+    prisma.author.findUnique({
+      where: { id: authorId },
+      select: { booksLayout: true, plan: { select: { tier: true } } },
+    }),
+  ]);
+
+  const booksLayout = author?.booksLayout ?? "list";
+  const planTier    = author?.plan?.tier ?? "FREE";
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -43,18 +53,33 @@ export default async function AdminBooksPage() {
         </Link>
       </div>
 
-      {books.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-          <BookOpen className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-          <p className="font-medium text-gray-500">No books yet</p>
-          <p className="text-sm text-gray-400 mt-1 mb-6">Add your first book to get started.</p>
-          <Link href="/admin/books/new">
-            <Button>Add Your First Book</Button>
-          </Link>
-        </div>
-      ) : (
-        <BooksListClient initialBooks={books} />
-      )}
+      {/* Tabs + content */}
+      <AdminBooksTabs
+        books={books}
+        booksLayout={booksLayout}
+        planTier={planTier}
+      />
     </div>
+  );
+}
+
+// ── Inline tab wrapper (client component) ──────────────────────────────────────
+import { AdminBooksTabsClient } from "./admin-books-tabs-client";
+
+function AdminBooksTabs({
+  books,
+  booksLayout,
+  planTier,
+}: {
+  books: any[];
+  booksLayout: string;
+  planTier: string;
+}) {
+  return (
+    <AdminBooksTabsClient
+      books={books}
+      booksLayout={booksLayout}
+      planTier={planTier}
+    />
   );
 }

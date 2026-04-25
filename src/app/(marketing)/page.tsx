@@ -26,6 +26,8 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 
+export const revalidate = 3600; // fallback: refresh at most every hour
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 const TRUST_ITEMS = [
@@ -140,7 +142,7 @@ async function getActivePlans() {
   return prisma.plan.findMany({
     where: { isActive: true },
     select: {
-      id: true, name: true, tier: true, description: true,
+      id: true, name: true, tier: true, description: true, featuresJson: true,
       monthlyPriceCents: true, annualPriceCents: true,
       featuredLabel: true, badgeColor: true,
       maxBooks: true, maxPosts: true, maxStorageMb: true,
@@ -162,11 +164,8 @@ export default async function MarketingPage() {
       {/* ── Nav ───────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <BookOpen className="h-6 w-6 text-blue-600 transition-transform duration-300 group-hover:scale-110" />
-            <span className="font-bold text-lg text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image src="/AL_site_Logo-Blue.png" alt="AuthorLoft" width={160} height={48} className="h-10 w-auto" priority />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Features</a>
@@ -439,9 +438,8 @@ export default async function MarketingPage() {
       {/* ── Footer ────────────────────────────────────────────────────────── */}
       <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-400 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-400" />
-            <span className="text-white font-bold">Author<span className="text-blue-400">Loft</span></span>
+          <div className="flex items-center">
+            <Image src="/AL_site_Logo-Dark_footer.png" alt="AuthorLoft" width={140} height={40} className="h-8 w-auto" />
           </div>
           <p className="text-sm text-gray-500">
             © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.

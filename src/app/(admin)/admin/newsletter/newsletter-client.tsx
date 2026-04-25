@@ -6,6 +6,7 @@ import {
   Download, Users, Mail, Tag, Send, Eye, EyeOff,
   CheckCircle, XCircle, Loader2, History, AlertTriangle,
 } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -370,7 +371,7 @@ export function NewsletterClient({
                           </div>
                           <div
                             className="bg-white px-8 py-7 prose prose-sm max-w-none text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: htmlBody }}
+                            dangerouslySetInnerHTML={{ __html: sanitize(htmlBody) }}
                           />
                           <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
                             <p className="text-xs text-gray-400">

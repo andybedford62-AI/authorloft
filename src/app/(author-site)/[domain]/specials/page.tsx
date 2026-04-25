@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Clock, Tag } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";
@@ -103,7 +104,7 @@ export default async function SpecialsPage({
                     {special.description && (
                       <div
                         className="text-sm text-gray-500 leading-relaxed flex-1 rich-content"
-                        dangerouslySetInnerHTML={{ __html: special.description }}
+                        dangerouslySetInnerHTML={{ __html: sanitize(special.description) }}
                       />
                     )}
 
@@ -129,18 +130,6 @@ export default async function SpecialsPage({
         )}
       </section>
 
-      {/* ── Newsletter CTA ───────────────────────────────────────────── */}
-      <section className="py-12 border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Never miss a deal</h2>
-          <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-            Subscribe to the newsletter to get new specials and offers delivered straight to your inbox.
-          </p>
-          <Link href="/#newsletter">
-            <Button size="lg">Subscribe for Updates</Button>
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

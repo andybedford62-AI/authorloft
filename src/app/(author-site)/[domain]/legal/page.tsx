@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { Metadata } from "next";
+import { sanitize } from "@/lib/sanitize";
 
 async function getAuthorLegal(domain: string) {
   return prisma.author.findFirst({
@@ -103,7 +104,7 @@ export default async function LegalPage({
           prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-2
           prose-h3:text-base prose-h3:mt-6 prose-h3:mb-1
           prose-p:text-gray-700 prose-p:my-2"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: sanitize(html) }}
       />
     </div>
   );

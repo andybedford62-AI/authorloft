@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
 import { FormatBadges } from "@/components/author-site/format-badges";
@@ -259,7 +260,7 @@ export default async function BookDetailPage({
               <div
                 className="text-base text-gray-600 leading-relaxed border-l-4 pl-4 rich-content"
                 style={{ borderColor: accentColor }}
-                dangerouslySetInnerHTML={{ __html: book.shortDescription }}
+                dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
               />
             )}
 

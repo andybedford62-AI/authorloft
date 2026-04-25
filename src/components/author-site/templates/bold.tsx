@@ -4,101 +4,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
+import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
-  const featuredBooks = books.filter((b) => b.isFeatured);
-  const heroBooks = (featuredBooks.length > 0 ? featuredBooks : books).slice(0, 4);
   const displayBooks = books.slice(0, 6);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
-      {/* ── Dark Hero ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gray-950 text-white">
-        {/* Gradient overlays */}
-        <div
-          className="absolute inset-0 opacity-25"
-          style={{ background: `radial-gradient(ellipse at 70% 40%, ${accentColor}, transparent 65%)` }}
+      {/* ── Hero Banner ─────────────────────────────────────────────────── */}
+      {author.showHeroBanner !== false && (
+        <HeroBanner
+          author={author}
+          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-950/80 pointer-events-none" />
-        {/* Decorative blobs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-10" style={{ backgroundColor: accentColor }} />
-        <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full blur-3xl pointer-events-none opacity-10" style={{ backgroundColor: accentColor }} />
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 flex flex-col md:flex-row items-center gap-10 md:gap-16">
-
-          {/* Text side */}
-          <div className="flex-1 space-y-5 z-10">
-            <p className="animate-fade-up text-xs uppercase tracking-[0.2em] font-semibold" style={{ color: accentColor }}>
-              Author
-            </p>
-            <h1 className="animate-fade-up animate-delay-100 text-4xl sm:text-6xl font-extrabold leading-none tracking-tight">
-              {author.displayName || author.name}
-            </h1>
-            {author.tagline && (
-              <p className="animate-fade-up animate-delay-200 text-lg text-gray-300 font-light">
-                {author.tagline}
-              </p>
-            )}
-            {author.heroSubtitle || author.shortBio ? (
-              <div
-                className="animate-fade-up animate-delay-200 text-gray-400 leading-relaxed max-w-md text-sm sm:text-base rich-content"
-                dangerouslySetInnerHTML={{ __html: author.heroSubtitle || author.shortBio || "" }}
-              />
-            ) : null}
-            <div className="animate-fade-up animate-delay-300 flex flex-wrap gap-3 pt-2">
-              <Link href="/books">
-                <Button
-                  size="lg"
-                  className="text-gray-900 font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-                  style={{ backgroundColor: accentColor, borderColor: accentColor }}
-                >
-                  Explore Books <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-              <Link href="/about">
-                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                  About the Author
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Books side — large covers with staggered entrance */}
-          {heroBooks.length > 0 && (
-            <div className="flex-shrink-0 flex gap-3 sm:gap-4 items-end z-10">
-              {heroBooks.map((book, i) => (
-                <Link
-                  key={book.id}
-                  href={`/books/${book.slug}`}
-                  title={book.title}
-                  className={`animate-fade-up group relative rounded-lg overflow-hidden shadow-2xl block transition-transform duration-300 hover:scale-105 hover:-translate-y-1 ${
-                    i === 0 ? "w-32 h-48 sm:w-40 sm:h-60" :
-                    i === 1 ? "w-28 h-40 sm:w-32 sm:h-48" :
-                    "w-20 h-32 sm:w-24 sm:h-36 hidden sm:block"
-                  }`}
-                  style={{
-                    marginBottom: i === 1 ? "0" : i === 0 ? "0" : "8px",
-                    animationDelay: `${(i + 2) * 100}ms`,
-                  }}
-                >
-                  {book.coverImageUrl ? (
-                    <Image src={book.coverImageUrl} alt={book.title} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                      <BookOpen className="h-8 w-8 text-white/30" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      )}
 
       {/* ── Author Strip ─────────────────────────────────────────────────── */}
       <section className="bg-gray-900 text-white py-10 border-t border-gray-800">
@@ -112,7 +36,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
             <p className="text-sm text-gray-400 uppercase tracking-widest">About the Author</p>
             <div
               className="text-gray-300 leading-relaxed max-w-2xl text-sm rich-content"
-              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>More about this author coming soon.</p>" }}
+              dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
             <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
               Full biography <ChevronRight className="h-3.5 w-3.5" />

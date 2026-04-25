@@ -9,11 +9,15 @@ export interface AuthorForTemplate {
   bio: string | null;
   tagline: string | null;
   profileImageUrl: string | null;
+  heroImageUrl: string | null;
   accentColor: string;
+  siteTheme: string;
   heroTitle: string | null;
   heroSubtitle: string | null;
+  heroLayout: string;
   showHeroBanner: boolean;
   homeTemplate: string;
+  heroFeaturedBook: { title: string; slug: string; coverImageUrl: string | null; caption: string | null } | null;
   credentials: string[] | null;
   plan: { salesEnabled: boolean } | null;
 }
