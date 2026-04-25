@@ -374,7 +374,7 @@ export function BrandingForm({ initial }: BrandingFormProps) {
         <div>
           <h2 className="font-semibold text-gray-900">About Page Stats</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Highlight facts about yourself on your About page. Your book count is always shown automatically — add up to 4 custom stats below.
+            Highlight facts about yourself on your About page. Your book count is always shown automatically — add as many custom stats as you like below.
           </p>
         </div>
 
@@ -426,15 +426,13 @@ export function BrandingForm({ initial }: BrandingFormProps) {
           ))}
         </div>
 
-        {aboutStats.length < 4 && (
-          <button
-            type="button"
-            onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])}
-            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-          >
-            <Plus className="h-4 w-4" /> Add stat
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])}
+          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+        >
+          <Plus className="h-4 w-4" /> Add stat
+        </button>
       </section>
 
       {/* Social Links */}
