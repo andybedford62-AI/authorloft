@@ -55,7 +55,7 @@ export async function getAuthorBooks(authorId: string) {
 
 export async function getAuthorSeries(authorId: string) {
   return prisma.series.findMany({
-    where: { authorId },
+    where: { authorId, books: { some: { isPublished: true } } },
     include: {
       books: {
         where: { isPublished: true },
