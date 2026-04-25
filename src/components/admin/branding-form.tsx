@@ -517,7 +517,7 @@ export function BrandingForm({ initial, books }: BrandingFormProps) {
                     {[
                       { value: "author-left",  label: "Author Left" },
                       { value: "author-right", label: "Author Right" },
-                      { value: "portrait",     label: "Portrait" },
+                      { value: "portrait",     label: "Classic" },
                     ].map(({ value, label }) => (
                       <button key={value} type="button"
                         onClick={async () => {

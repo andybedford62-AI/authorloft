@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, BookOpen, ArrowRight } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
@@ -39,7 +40,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
               </div>
               <div
                 className="text-gray-600 leading-relaxed rich-content"
-                dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+                dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
               />
               <Link
                 href="/about"

@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
@@ -35,7 +36,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
             <p className="text-sm text-gray-400 uppercase tracking-widest">About the Author</p>
             <div
               className="text-gray-300 leading-relaxed max-w-2xl text-sm rich-content"
-              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>More about this author coming soon.</p>" }}
+              dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
             <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
               Full biography <ChevronRight className="h-3.5 w-3.5" />

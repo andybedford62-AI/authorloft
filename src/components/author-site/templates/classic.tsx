@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { BookCarousel } from "@/components/author-site/book-carousel";
 import { HeroBanner } from "@/components/author-site/hero-banner";
@@ -53,7 +54,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
 
             <div
               className="text-gray-600 leading-relaxed rich-content"
-              dangerouslySetInnerHTML={{ __html: author.shortBio || "<p>Author bio coming soon.</p>" }}
+              dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
             />
 
             {/* Credential pills — only rendered if at least one has text */}

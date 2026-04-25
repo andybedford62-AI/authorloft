@@ -72,7 +72,7 @@ export default async function BlogListPage({
               >
                 {/* Cover image */}
                 {post.coverImageUrl ? (
-                  <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
+                  <div className="relative aspect-[2/1] w-full bg-gray-100 overflow-hidden">
                     <Image
                       src={post.coverImageUrl}
                       alt={post.title}
@@ -82,7 +82,7 @@ export default async function BlogListPage({
                   </div>
                 ) : (
                   <div
-                    className="h-44 w-full flex items-center justify-center"
+                    className="aspect-[2/1] w-full flex items-center justify-center"
                     style={{ backgroundColor: `${accentColor}12` }}
                   >
                     <Newspaper className="h-10 w-10" style={{ color: `${accentColor}60` }} />

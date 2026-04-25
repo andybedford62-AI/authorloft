@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, CalendarDays, Newspaper } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ export default async function BlogPostPage({
 
         {/* Cover image */}
         {post.coverImageUrl && (
-          <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden mb-8 shadow-sm bg-gray-100">
+          <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-8 shadow-sm bg-gray-100">
             <Image
               src={post.coverImageUrl}
               alt={post.title}
@@ -122,7 +123,7 @@ export default async function BlogPostPage({
         {hasHtmlContent ? (
           <div
             className="rich-content"
-            dangerouslySetInnerHTML={{ __html: post.content ?? "" }}
+            dangerouslySetInnerHTML={{ __html: sanitize(post.content) }}
           />
         ) : paragraphs.length > 0 ? (
           <div className="space-y-5">
