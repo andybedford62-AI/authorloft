@@ -11,6 +11,7 @@ const ContentSecurityPolicy = [
   "connect-src 'self' https://*.supabase.co https://api.stripe.com",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+  "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self' https://checkout.stripe.com",
