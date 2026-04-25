@@ -43,15 +43,15 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
       />
 
       {/* ── Mobile layout (< md): centered stack ── */}
-      <div className="relative z-10 flex flex-col items-center gap-8 px-6 py-12 text-center md:hidden">
+      <div className="relative z-10 flex flex-col items-center gap-8 px-6 py-16 text-center md:hidden">
         {featuredBook && (
           <BookCoverTilt
             href={buyHref}
             title={featuredBook.title}
             coverImageUrl={featuredBook.coverImageUrl}
             caption={featuredBook.caption}
-            width={120}
-            height={180}
+            width={160}
+            height={240}
           />
         )}
         <div className="flex flex-col items-center gap-4 max-w-sm">
@@ -97,9 +97,9 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
           gridTemplateColumns: "1fr 300px 1fr",
           alignItems: "center",
           gap: "32px",
-          minHeight: "435px",
-          paddingTop: "48px",
-          paddingBottom: "48px",
+          minHeight: "580px",
+          paddingTop: "64px",
+          paddingBottom: "64px",
         }}
       >
 
@@ -117,8 +117,8 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
                 title={featuredBook.title}
                 coverImageUrl={featuredBook.coverImageUrl}
                 caption={featuredBook.caption}
-                width={200}
-                height={300}
+                width={240}
+                height={360}
               />
             </div>
           ) : (
@@ -188,7 +188,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
         </div>
 
         {/* ── Right: Author photo ── */}
-        <div className="relative flex items-end pl-4" style={{ alignSelf: "stretch", minHeight: "360px" }}>
+        <div className="relative flex items-end pl-4" style={{ alignSelf: "stretch", minHeight: "480px" }}>
           {photoSrc ? (
             <>
               <div className="absolute inset-0">
