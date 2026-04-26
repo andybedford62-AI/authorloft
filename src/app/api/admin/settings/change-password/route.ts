@@ -4,6 +4,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
+function passwordStrengthError(pw: string): string | null {
+  if (pw.length < 8)             return "Password must be at least 8 characters.";
+  if (!/[A-Z]/.test(pw))         return "Password must contain at least one uppercase letter.";
+  if (!/[0-9]/.test(pw))         return "Password must contain at least one number.";
+  if (!/[^A-Za-z0-9]/.test(pw))  return "Password must contain at least one special character (!@#$… etc).";
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -22,11 +30,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (newPassword.length < 8) {
-    return NextResponse.json(
-      { error: "New password must be at least 8 characters." },
-      { status: 400 }
-    );
+  const pwError = passwordStrengthError(newPassword);
+  if (pwError) {
+    return NextResponse.json({ error: pwError }, { status: 400 });
   }
 
   // Fetch the author to verify current password

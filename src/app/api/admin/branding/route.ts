@@ -2,6 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
+/** Returns true if the URL is safe to store: must be https and match an allowed domain. Empty string always passes. */
+function isSafeUrl(url: string | undefined, allowedDomains: string[]): boolean {
+  if (!url) return true;
+  try {
+    const { protocol, hostname } = new URL(url);
+    if (protocol !== "https:") return false;
+    return allowedDomains.some(d => hostname === d || hostname.endsWith(`.${d}`));
+  } catch {
+    return false;
+  }
+}
+
+const URL_RULES: { field: string; label: string; domains: string[] }[] = [
+  { field: "linkedinUrl",  label: "LinkedIn",  domains: ["linkedin.com"] },
+  { field: "youtubeUrl",   label: "YouTube",   domains: ["youtube.com", "youtu.be"] },
+  { field: "facebookUrl",  label: "Facebook",  domains: ["facebook.com", "fb.com"] },
+  { field: "twitterUrl",   label: "X / Twitter", domains: ["twitter.com", "x.com"] },
+  { field: "instagramUrl", label: "Instagram", domains: ["instagram.com"] },
+];
+
 export async function PATCH(req: NextRequest) {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,6 +35,16 @@ export async function PATCH(req: NextRequest) {
     heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
     aboutStats, credentials,
   } = body;
+
+  // Validate social URLs before writing to DB
+  for (const { field, label, domains } of URL_RULES) {
+    if (!isSafeUrl(body[field], domains)) {
+      return NextResponse.json(
+        { error: `${label} URL must be a valid https:// link to ${domains[0]}.` },
+        { status: 400 }
+      );
+    }
+  }
 
   const author = await prisma.author.update({
     where: { id: authorId },

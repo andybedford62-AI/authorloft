@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
-      return NextResponse.json({ error: `Upload failed: ${detail}` }, { status: 500 });
+      return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
     }
 
     // Delete the OLD file if one existed (avoid orphaned files in storage)
@@ -175,6 +175,6 @@ export async function POST(req: NextRequest) {
     // Top-level catch — surface the real error instead of returning a blank 500
     const msg = err?.message ?? String(err);
     console.error("[upload/book-file] Unhandled error:", msg);
-    return NextResponse.json({ error: `Server error: ${msg}` }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

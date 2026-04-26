@@ -5,10 +5,32 @@ import { hashPassword } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { sendVerificationEmail } from "@/lib/mailer";
 
+// ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
+const registrationAttempts = new Map<string, number[]>();
+const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_MAX       = 5;
+
+function checkRateLimit(ip: string): boolean {
+  const now      = Date.now();
+  const attempts = (registrationAttempts.get(ip) ?? []).filter(t => now - t < RATE_WINDOW_MS);
+  if (attempts.length >= RATE_MAX) return false;
+  attempts.push(now);
+  registrationAttempts.set(ip, attempts);
+  return true;
+}
+
 // ── Validation helpers ────────────────────────────────────────────────────────
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function passwordStrengthError(pw: string): string | null {
+  if (pw.length < 8)          return "Password must be at least 8 characters.";
+  if (!/[A-Z]/.test(pw))      return "Password must contain at least one uppercase letter.";
+  if (!/[0-9]/.test(pw))      return "Password must contain at least one number.";
+  if (!/[^A-Za-z0-9]/.test(pw)) return "Password must contain at least one special character (!@#$… etc).";
+  return null;
 }
 
 function isValidSlug(slug: string) {
@@ -29,6 +51,15 @@ async function uniqueSlug(base: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate limit ──────────────────────────────────────────────────────────
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many registration attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const { name, email, password, slug: rawSlug, termsAccepted } = body;
 
@@ -45,8 +76,9 @@ export async function POST(req: NextRequest) {
     if (!email?.trim() || !isValidEmail(email)) {
       return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
     }
-    if (!password || password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
+    const pwError = passwordStrengthError(password ?? "");
+    if (pwError) {
+      return NextResponse.json({ error: pwError }, { status: 400 });
     }
 
     // ── Slug handling ───────────────────────────────────────────────────────
