@@ -103,13 +103,25 @@ export async function POST(req: NextRequest) {
     // ── Uniqueness checks ───────────────────────────────────────────────────
     const existingEmail = await prisma.author.findUnique({
       where: { email: email.toLowerCase().trim() },
-      select: { id: true },
+      select: { id: true, emailVerified: true, emailVerifyExpiry: true },
     });
+
     if (existingEmail) {
-      return NextResponse.json(
-        { error: "An account with this email already exists.", field: "email" },
-        { status: 409 }
-      );
+      // Allow re-registration if the prior account was never verified and its
+      // verification window has now expired — purge the ghost record and continue.
+      const isAbandonedUnverified =
+        !existingEmail.emailVerified &&
+        existingEmail.emailVerifyExpiry &&
+        existingEmail.emailVerifyExpiry < new Date();
+
+      if (isAbandonedUnverified) {
+        await prisma.author.delete({ where: { id: existingEmail.id } });
+      } else {
+        return NextResponse.json(
+          { error: "An account with this email already exists.", field: "email" },
+          { status: 409 }
+        );
+      }
     }
 
     // If the user supplied a specific slug, check it's free — otherwise auto-increment
@@ -139,7 +151,7 @@ export async function POST(req: NextRequest) {
 
     // Generate an email verification token (expires in 24 hours)
     const emailVerifyToken = randomBytes(32).toString("hex");
-    const emailVerifyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const emailVerifyExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
     const author = await prisma.author.create({
       data: {
