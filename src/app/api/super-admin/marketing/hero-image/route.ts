@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import { revalidatePath } from "next/cache";
 
 async function requireSuperAdmin() {
   const session = await getServerSession(authOptions);
@@ -42,6 +43,7 @@ export async function PATCH(req: NextRequest) {
     update: { marketingHeroImageUrl: url || null },
   });
 
+  revalidatePath("/");
   return NextResponse.json({ ok: true, url: url || null });
 }
 
@@ -78,6 +80,7 @@ export async function POST(req: NextRequest) {
       update: { marketingHeroImageUrl: publicUrl },
     });
 
+    revalidatePath("/");
     return NextResponse.json({ ok: true, url: publicUrl });
   } catch {
     return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
