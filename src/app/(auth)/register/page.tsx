@@ -105,8 +105,10 @@ export default function RegisterPage() {
     if (!name.trim()) return setStep1Error("Please enter your full name.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return setStep1Error("Please enter a valid email address.");
-    if (password.length < 8)
-      return setStep1Error("Password must be at least 8 characters.");
+    if (password.length < 8)          return setStep1Error("Password must be at least 8 characters.");
+    if (!/[A-Z]/.test(password))      return setStep1Error("Password must contain at least one uppercase letter.");
+    if (!/[0-9]/.test(password))      return setStep1Error("Password must contain at least one number.");
+    if (!/[^A-Za-z0-9]/.test(password)) return setStep1Error("Password must contain at least one special character (!@#$… etc).");
     if (password !== confirmPassword)
       return setStep1Error("Passwords don't match.");
     setStep(2);
@@ -262,7 +264,7 @@ export default function RegisterPage() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min. 8 characters"
+                    placeholder="Min. 8 chars, uppercase, number, symbol"
                     autoComplete="new-password"
                     required
                     className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -294,6 +296,22 @@ export default function RegisterPage() {
                       Password strength: <span className="font-medium text-gray-600">{strength.label}</span>
                     </p>
                   </div>
+                )}
+                {/* Requirements checklist */}
+                {password && (
+                  <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pt-1">
+                    {[
+                      { label: "8+ characters",  met: password.length >= 8 },
+                      { label: "Uppercase letter", met: /[A-Z]/.test(password) },
+                      { label: "Number",          met: /[0-9]/.test(password) },
+                      { label: "Special character", met: /[^A-Za-z0-9]/.test(password) },
+                    ].map(({ label, met }) => (
+                      <li key={label} className={`flex items-center gap-1 text-xs ${met ? "text-green-600" : "text-gray-400"}`}>
+                        <Check className={`h-3 w-3 flex-shrink-0 ${met ? "opacity-100" : "opacity-30"}`} />
+                        {label}
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
 

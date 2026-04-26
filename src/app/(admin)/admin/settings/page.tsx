@@ -639,7 +639,10 @@ export default function SettingsPage() {
   function validateForm(): string | null {
     if (!currentPassword) return "Please enter your current password.";
     if (!newPassword) return "Please enter a new password.";
-    if (newPassword.length < 8) return "New password must be at least 8 characters.";
+    if (newPassword.length < 8)             return "Password must be at least 8 characters.";
+    if (!/[A-Z]/.test(newPassword))         return "Password must contain at least one uppercase letter.";
+    if (!/[0-9]/.test(newPassword))         return "Password must contain at least one number.";
+    if (!/[^A-Za-z0-9]/.test(newPassword))  return "Password must contain at least one special character (!@#$… etc).";
     if (newPassword !== confirmPassword) return "New passwords do not match.";
     return null;
   }
@@ -748,15 +751,32 @@ export default function SettingsPage() {
               required
             />
 
-            <Input
-              label="New Password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-              required
-            />
+            <div className="space-y-1.5">
+              <Input
+                label="New Password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Uppercase, number, special char"
+                autoComplete="new-password"
+                required
+              />
+              {newPassword && (
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                  {[
+                    { label: "8+ characters",    met: newPassword.length >= 8 },
+                    { label: "Uppercase letter",  met: /[A-Z]/.test(newPassword) },
+                    { label: "Number",            met: /[0-9]/.test(newPassword) },
+                    { label: "Special character", met: /[^A-Za-z0-9]/.test(newPassword) },
+                  ].map(({ label, met }) => (
+                    <li key={label} className={`flex items-center gap-1 text-xs ${met ? "text-green-600" : "text-gray-400"}`}>
+                      <span className={`inline-block w-3 h-3 flex-shrink-0 ${met ? "text-green-600" : "text-gray-300"}`}>✓</span>
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
             <div className="space-y-1">
               <Input
