@@ -4,6 +4,7 @@ import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
+import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
@@ -29,7 +30,7 @@ export default async function AdminLayout({
   const effectiveAuthorId = impersonatedId ?? sessionAuthorId;
 
   // Fetch the effective author's data (impersonated or own)
-  const [authorRecord, featureConfig] = await Promise.all([
+  const [authorRecord, featureConfig, subscription] = await Promise.all([
     prisma.author.findUnique({
       where:  { id: effectiveAuthorId },
       select: {
@@ -42,6 +43,10 @@ export default async function AdminLayout({
       },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
+    prisma.authorSubscription.findUnique({
+      where:  { authorId: effectiveAuthorId },
+      select: { currentPeriodEnd: true },
+    }),
   ]);
 
   if (!authorRecord) redirect("/login");
@@ -72,6 +77,11 @@ export default async function AdminLayout({
       >
         {/* Impersonation banner — shown when super admin is acting as another author */}
         {impersonatedId && <ImpersonationBanner authorName={authorName} />}
+
+        {/* Renewal reminder — shown to the author (not during impersonation) */}
+        {!impersonatedId && subscription?.currentPeriodEnd && (
+          <RenewalReminderBanner currentPeriodEnd={subscription.currentPeriodEnd} />
+        )}
 
         <div className="flex flex-1 min-h-0">
           <AdminSidebar

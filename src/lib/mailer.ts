@@ -346,6 +346,84 @@ export async function sendPurchaseConfirmationEmail({
   });
 }
 
+// ── Renewal reminder email (to author) ──────────────────────────────────────
+
+export async function sendRenewalReminderEmail({
+  to,
+  authorName,
+  renewalDate,
+  amountCents,
+}: {
+  to: string;
+  authorName: string;
+  renewalDate: Date;
+  amountCents: number;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const billingUrl     = `https://www.${platformDomain}/admin/settings`;
+  const firstName      = authorName.split(" ")[0];
+  const dateStr        = renewalDate.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+  const dollars = amountCents > 0 ? `$${(amountCents / 100).toFixed(2)}` : null;
+  const amountLine = dollars ? `Your plan will renew for <strong>${dollars}</strong>.` : "Your plan will renew automatically.";
+
+  return sendMail({
+    to,
+    subject: `Your AuthorLoft subscription renews on ${dateStr}`,
+    text: [
+      `Hi ${firstName},`,
+      `Just a heads-up — your AuthorLoft subscription renews on ${dateStr}.`,
+      dollars ? `Amount: ${dollars}` : "",
+      `No action is needed if you'd like to continue. To update your billing details or cancel, visit: ${billingUrl}`,
+      `— The AuthorLoft Team`,
+    ].filter(Boolean).join("\n\n"),
+    html: wrapHtml("Your subscription is renewing soon", `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        Just a friendly heads-up — your AuthorLoft subscription is coming up for renewal.
+      </p>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#92400e;">Renewal date</span><br/>
+              <span style="font-size:16px;font-weight:700;color:#78350f;">${dateStr}</span>
+            </td>
+          </tr>
+          ${dollars ? `
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #fde68a;">
+              <span style="font-size:13px;color:#92400e;">Amount</span><br/>
+              <span style="font-size:16px;font-weight:700;color:#78350f;">${dollars}</span>
+            </td>
+          </tr>` : ""}
+        </table>
+      </div>
+
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        ${amountLine} No action is needed if you'd like to continue — your site and books will keep running without interruption.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${billingUrl}"
+               style="display:inline-block;background:#d97706;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Manage Billing
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're happy to help.
+      </p>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**
