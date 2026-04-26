@@ -603,3 +603,8 @@ model PlanFeatureConfig {
   gates     Json     @default("{}")
   updatedAt DateTime @updatedAt
 }
+
+model StripeEvent {
+  id          String   @id  // Stripe event ID (evt_xxx) — unique by design
+  processedAt DateTime @default(now())
+}

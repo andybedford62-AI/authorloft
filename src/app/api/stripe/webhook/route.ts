@@ -50,6 +50,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Webhook error: ${err.message}` }, { status: 400 });
   }
 
+  // Deduplicate — Stripe retries on any non-2xx, so guard against double-processing
+  try {
+    await prisma.stripeEvent.create({ data: { id: event.id } });
+  } catch {
+    // Unique constraint violation = already processed
+    return NextResponse.json({ received: true });
+  }
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as any;
