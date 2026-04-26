@@ -153,10 +153,22 @@ async function getActivePlans() {
   }).catch(() => []);
 }
 
+async function getHeroImageUrl(): Promise<string> {
+  try {
+    const settings = await prisma.platformSettings.findUnique({
+      where:  { id: "singleton" },
+      select: { marketingHeroImageUrl: true },
+    });
+    return settings?.marketingHeroImageUrl || "/author-site-preview.png";
+  } catch {
+    return "/author-site-preview.png";
+  }
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function MarketingPage() {
-  const plans = await getActivePlans();
+  const [plans, heroImageUrl] = await Promise.all([getActivePlans(), getHeroImageUrl()]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -245,12 +257,13 @@ export default async function MarketingPage() {
           <div className="animate-fade-up animate-delay-200 hidden lg:flex justify-end items-start">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-lg w-full">
               <Image
-                src="/author-site-preview.png"
+                src={heroImageUrl}
                 alt="Example author site built on AuthorLoft"
                 width={1092}
                 height={1404}
                 className="w-full h-auto"
                 priority
+                unoptimized={heroImageUrl.startsWith("http")}
               />
             </div>
           </div>
