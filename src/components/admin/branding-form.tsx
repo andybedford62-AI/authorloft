@@ -34,6 +34,7 @@ type BrandingFormProps = {
     credentials: string[];
   };
   books: { id: string; title: string; coverImageUrl: string | null }[];
+  planTier?: string;
 };
 
 type Tab = "profile" | "about" | "hero" | "social";
@@ -45,7 +46,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "social",  label: "Social & Contact" },
 ];
 
-export function BrandingForm({ initial, books }: BrandingFormProps) {
+export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingFormProps) {
+  const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [tagline, setTagline] = useState(initial.tagline);
@@ -515,51 +517,62 @@ export function BrandingForm({ initial, books }: BrandingFormProps) {
                   <p className="text-xs text-gray-400">Choose how your hero banner displays. Changes save instantly.</p>
                   <div className="flex gap-3">
                     {[
-                      { value: "author-left",  label: "Author Left" },
-                      { value: "author-right", label: "Author Right" },
-                      { value: "portrait",     label: "Classic" },
-                    ].map(({ value, label }) => (
-                      <button key={value} type="button"
-                        onClick={async () => {
-                          setHeroLayout(value);
-                          try {
-                            await fetch("/api/admin/branding", {
-                              method: "PATCH",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ heroLayout: value }),
-                            });
-                          } catch { /* silent */ }
-                        }}
-                        className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                          heroLayout === value ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
-                        }`}>
-                        <div className="flex gap-1 w-full h-8">
-                          {value === "author-left" && (
-                            <>
-                              <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
-                              <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
-                            </>
-                          )}
-                          {value === "author-right" && (
-                            <>
-                              <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
-                              <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
-                            </>
-                          )}
-                          {value === "portrait" && (
-                            <div className="flex-1 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500 relative overflow-hidden">
-                              <span>Full Photo</span>
-                              <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-400 flex items-center justify-center">
-                                <span className="text-[6px] text-white">name overlay</span>
-                              </div>
+                      { value: "portrait",     label: "Classic",      paid: false },
+                      { value: "author-left",  label: "Author Left",  paid: true  },
+                      { value: "author-right", label: "Author Right", paid: true  },
+                    ].map(({ value, label, paid }) => {
+                      const locked = paid && isFree;
+                      return (
+                        <button key={value} type="button"
+                          onClick={async () => {
+                            if (locked) { window.location.href = "/admin/settings#billing"; return; }
+                            setHeroLayout(value);
+                            try {
+                              await fetch("/api/admin/branding", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ heroLayout: value }),
+                              });
+                            } catch { /* silent */ }
+                          }}
+                          className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors relative ${
+                            locked
+                              ? "border-gray-200 bg-gray-50 cursor-pointer opacity-75"
+                              : heroLayout === value
+                              ? "border-blue-500 bg-blue-50 cursor-pointer"
+                              : "border-gray-200 hover:border-gray-300 cursor-pointer"
+                          }`}>
+                          {locked && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-white/80 z-10 gap-1 px-2">
+                              <span className="text-lg">🔒</span>
+                              <span className="text-[10px] font-semibold text-blue-600 text-center leading-tight">Upgrade to unlock</span>
                             </div>
                           )}
-                        </div>
-                        <span className={`text-xs font-medium ${heroLayout === value ? "text-blue-600" : "text-gray-600"}`}>
-                          {label}
-                        </span>
-                      </button>
-                    ))}
+                          <div className="flex gap-1 w-full h-8">
+                            {value === "author-left" && (
+                              <>
+                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
+                              </>
+                            )}
+                            {value === "author-right" && (
+                              <>
+                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
+                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                              </>
+                            )}
+                            {value === "portrait" && (
+                              <div className="flex-1 rounded bg-blue-100 flex items-center justify-center text-[8px] text-blue-500">
+                                Book + Text
+                              </div>
+                            )}
+                          </div>
+                          <span className={`text-xs font-medium ${heroLayout === value && !locked ? "text-blue-600" : "text-gray-600"}`}>
+                            {label}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
