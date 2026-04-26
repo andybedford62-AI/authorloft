@@ -155,10 +155,11 @@ model AuthorSubscription {
   plan               Plan     @relation(fields: [planId], references: [id])
   status             String   @default("active")
   billingInterval    String   @default("monthly")
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  renewalReminderSentAt DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────

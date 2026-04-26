@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail } from "@/lib/mailer";
+import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -194,13 +194,32 @@ export async function POST(req: NextRequest) {
       // Plan change — check if the new plan is a downgrade and revert theme if needed
       const subscription = event.data.object as any;
       const newPriceId   = subscription.items?.data?.[0]?.price?.id as string | undefined;
+
+      // Persist billing period and reset reminder flag so the next cycle sends a fresh email
+      const periodEnd = subscription.current_period_end
+        ? new Date(subscription.current_period_end * 1000)
+        : undefined;
+      if (periodEnd) {
+        await prisma.authorSubscription.updateMany({
+          where: {
+            author: { stripeSubscriptionId: subscription.id },
+          },
+          data: {
+            currentPeriodEnd:      periodEnd,
+            currentPeriodStart:    subscription.current_period_start
+              ? new Date(subscription.current_period_start * 1000)
+              : undefined,
+            renewalReminderSentAt: null,
+          },
+        });
+      }
+
       if (newPriceId) {
         const newPlan = await prisma.plan.findFirst({
           where:  { OR: [{ stripePriceId: newPriceId }, { stripePriceIdMonthly: newPriceId }, { stripePriceIdAnnual: newPriceId }] },
           select: { id: true, tier: true },
         });
         if (newPlan) {
-          // Update author's planId and revert theme if needed
           const affected = await prisma.author.findMany({
             where:  { stripeSubscriptionId: subscription.id },
             select: { id: true },
@@ -214,6 +233,42 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+      break;
+    }
+
+    case "invoice.upcoming": {
+      // Stripe fires this ~30 days before renewal — send one reminder email per cycle
+      const invoice      = event.data.object as any;
+      const subId        = invoice.subscription as string | undefined;
+      if (!subId) break;
+
+      const author = await prisma.author.findFirst({
+        where:  { stripeSubscriptionId: subId },
+        select: { id: true, email: true, name: true, displayName: true },
+      });
+      if (!author) break;
+
+      const sub = await prisma.authorSubscription.findUnique({
+        where:  { authorId: author.id },
+        select: { renewalReminderSentAt: true, currentPeriodEnd: true },
+      });
+      if (!sub || sub.renewalReminderSentAt) break; // already sent this cycle
+
+      const renewalDate = sub.currentPeriodEnd
+        ?? (invoice.period_end ? new Date(invoice.period_end * 1000) : null);
+      const amountCents = invoice.amount_due as number ?? 0;
+
+      sendRenewalReminderEmail({
+        to:          author.email,
+        authorName:  author.displayName || author.name,
+        renewalDate: renewalDate ?? new Date(),
+        amountCents,
+      }).catch((e) => console.error("[webhook] Failed to send renewal reminder:", e));
+
+      await prisma.authorSubscription.update({
+        where: { authorId: author.id },
+        data:  { renewalReminderSentAt: new Date() },
+      });
       break;
     }
   }
