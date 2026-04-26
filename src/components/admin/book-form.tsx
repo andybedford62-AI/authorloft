@@ -37,6 +37,7 @@ type BookFormProps = {
   book?: BookData;
   series: Series[];
   genres: Genre[];
+  activeTab?: string; // injected by BookEditTabsClient; undefined = standalone (new book)
 };
 
 // ── Cover upload widget ────────────────────────────────────────────────────────
@@ -185,7 +186,7 @@ function Req() {
 
 // ── BookForm ───────────────────────────────────────────────────────────────────
 
-export function BookForm({ mode, book, series, genres }: BookFormProps) {
+export function BookForm({ mode, book, series, genres, activeTab }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -424,6 +425,13 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
     }
   }
 
+  // When used inside the tab wrapper, show/hide sections by tab.
+  // When standalone (new book, no activeTab), show everything.
+  const showDetails      = !activeTab || activeTab === "details";
+  const showOrganisation = !activeTab || activeTab === "organisation";
+  // Hide the entire form when a non-form tab is active (state is preserved in memory)
+  const formHidden = !!activeTab && activeTab !== "details" && activeTab !== "organisation";
+
   const textareaClass =
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
@@ -431,10 +439,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className={`space-y-6${formHidden ? " hidden" : ""}`}>
 
       {/* ── ISBN Lookup ──────────────────────────────────────────────────────── */}
-      <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
+      {showDetails && <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
         <div>
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
             <Search className="h-4 w-4 text-blue-600" />
@@ -524,10 +532,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             <span>Book data imported — review and edit the fields below, then save.</span>
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ── Book Details ─────────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      {showDetails && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-gray-900">Book Details</h2>
           <p className="text-xs text-gray-400"><span className="text-red-500">*</span> Required field</p>
@@ -626,10 +634,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             <p className="text-xs text-gray-400">Displayed on the public book page.</p>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ── Cover ────────────────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      {showDetails && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900">Cover</h2>
 
         <CoverUpload value={coverImageUrl} onChange={setCoverImageUrl} />
@@ -658,10 +666,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             <p className="text-xs text-gray-400">Shown on the public book page. Leave blank to hide.</p>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ── Organisation ────────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900">Organisation</h2>
 
         <div className="space-y-1">
@@ -694,10 +702,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             )}
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ── Available Formats ────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <div>
           <h2 className="font-semibold text-gray-900">Available Formats</h2>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -743,10 +751,10 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
             );
           })}
         </div>
-      </section>
+      </section>}
 
       {/* ── Visibility & Publishing ──────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900">Visibility & Publishing</h2>
 
         {/* Published */}
@@ -792,13 +800,13 @@ export function BookForm({ mode, book, series, genres }: BookFormProps) {
           <div className="ml-14 rounded-lg p-3 text-xs bg-blue-50 border border-blue-100 text-blue-700 space-y-1">
             <p className="font-medium">Next steps to go live:</p>
             <ol className="list-decimal list-inside space-y-0.5 ml-1">
-              <li>Add at least one format in the <strong>Direct Sales</strong> section below and set its price</li>
+              <li>Add at least one format in the <strong>Direct Sales</strong> tab and set its price</li>
               <li>Make sure your plan has Sales enabled (Standard or Premium)</li>
               <li>Connect Stripe in your platform settings</li>
             </ol>
           </div>
         )}
-      </section>
+      </section>}
 
       {/* ── Actions ─────────────────────────────────────────────────────────── */}
       {error && (

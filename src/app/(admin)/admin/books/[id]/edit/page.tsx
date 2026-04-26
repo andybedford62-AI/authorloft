@@ -1,12 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
-import { BookForm } from "@/components/admin/book-form";
-import { RetailerLinks } from "@/components/admin/retailer-links";
-import { DirectSalesItems } from "@/components/admin/direct-sales-items";
-import { BookAudioTracks } from "@/components/admin/book-audio-tracks";
-import { BookPreviewMedia } from "@/components/admin/book-preview-media";
-import { BookReviews } from "@/components/admin/book-reviews";
+import { BookEditTabsClient } from "@/components/admin/book-edit-tabs-client";
 
 export default async function EditBookPage({
   params,
@@ -42,7 +37,6 @@ export default async function EditBookPage({
 
   if (!book) notFound();
 
-  // Flatten genre tree into a labeled list for the form
   const genres = genreTree.flatMap((g) => [
     { id: g.id, name: g.name, parentName: undefined },
     ...g.children.map((c) => ({ id: c.id, name: c.name, parentName: g.name })),
@@ -58,7 +52,7 @@ export default async function EditBookPage({
     shortDescription: book.shortDescription,
     description: book.description,
     coverImageUrl: book.coverImageUrl,
-    priceCents: book.priceCents,   // kept for legacy order compatibility
+    priceCents: book.priceCents,
     seriesId: book.seriesId,
     isbn: book.isbn,
     pageCount: book.pageCount,
@@ -69,7 +63,7 @@ export default async function EditBookPage({
     availableFormats: book.availableFormats ?? [],
     caption: book.caption ?? null,
     releaseDate: book.releaseDate
-      ? book.releaseDate.toISOString().split("T")[0]   // YYYY-MM-DD
+      ? book.releaseDate.toISOString().split("T")[0]
       : null,
   };
 
@@ -79,22 +73,13 @@ export default async function EditBookPage({
         <h1 className="text-2xl font-bold text-gray-900">Edit Book</h1>
         <p className="text-sm text-gray-500 mt-1">{book.title}</p>
       </div>
-      <BookForm
-        mode="edit"
+      <BookEditTabsClient
         book={bookData}
         series={series}
         genres={genres}
+        audioEnabled={author?.plan?.audioEnabled ?? false}
+        previewMedia={previewMedia}
       />
-      {/* Direct sale items — per-format pricing for eBook, Flip Book, Print */}
-      <DirectSalesItems bookId={book.id} />
-      {/* Audio previews — narrations, excerpts, author notes */}
-      <BookAudioTracks bookId={book.id} audioEnabled={author?.plan?.audioEnabled ?? false} />
-      {/* Preview media — up to 3 images/videos/audio shown on the public book page */}
-      <BookPreviewMedia bookId={book.id} initial={previewMedia} />
-      {/* Reader reviews and pull quotes shown on the public book page */}
-      <BookReviews bookId={book.id} />
-      {/* Retailer links are managed separately so changes take effect immediately */}
-      <RetailerLinks bookId={book.id} />
     </div>
   );
 }
