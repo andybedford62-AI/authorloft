@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock, CheckCircle2 } from "lucide-react";
+import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -515,75 +515,15 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-700">Banner Style</p>
                   <p className="text-xs text-gray-400">Choose how your hero banner displays. Changes save instantly.</p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="flex gap-3">
                     {[
-                      {
-                        value: "portrait",
-                        label: "Classic",
-                        description: "Book cover with text & CTA",
-                        paid: false,
-                        preview: (
-                          <div className="h-28 w-full rounded-t-xl overflow-hidden bg-indigo-600 flex items-center px-3 gap-2">
-                            <div className="flex-1 space-y-1.5">
-                              <div className="h-1.5 w-3/4 rounded bg-white/60" />
-                              <div className="h-2.5 w-full rounded bg-white/90" />
-                              <div className="h-1.5 w-2/3 rounded bg-white/50" />
-                              <div className="h-5 w-16 rounded-md bg-white mt-2" />
-                            </div>
-                            <div className="w-10 h-16 rounded bg-white/30 flex-shrink-0" />
-                          </div>
-                        ),
-                      },
-                      {
-                        value: "author-left",
-                        label: "Author Left",
-                        description: "Photo left · content · book right",
-                        paid: true,
-                        preview: (
-                          <div className="h-28 w-full rounded-t-xl overflow-hidden bg-gray-900 flex items-stretch">
-                            <div className="w-1/3 bg-gray-600 flex items-end justify-center pb-1">
-                              <div className="w-8 h-14 rounded-t-full bg-gray-400" />
-                            </div>
-                            <div className="flex-1 flex flex-col items-center justify-center gap-1 px-1">
-                              <div className="h-1.5 w-3/4 rounded bg-white/40" />
-                              <div className="h-2 w-full rounded bg-white/70" />
-                              <div className="h-1.5 w-2/3 rounded bg-white/40" />
-                              <div className="h-4 w-12 rounded bg-indigo-400 mt-1" />
-                            </div>
-                            <div className="w-1/4 flex items-center justify-center">
-                              <div className="w-7 h-12 rounded bg-white/20" />
-                            </div>
-                          </div>
-                        ),
-                      },
-                      {
-                        value: "author-right",
-                        label: "Author Right",
-                        description: "Book left · content · photo right",
-                        paid: true,
-                        preview: (
-                          <div className="h-28 w-full rounded-t-xl overflow-hidden bg-gray-900 flex items-stretch">
-                            <div className="w-1/4 flex items-center justify-center">
-                              <div className="w-7 h-12 rounded bg-white/20" />
-                            </div>
-                            <div className="flex-1 flex flex-col items-center justify-center gap-1 px-1">
-                              <div className="h-1.5 w-3/4 rounded bg-white/40" />
-                              <div className="h-2 w-full rounded bg-white/70" />
-                              <div className="h-1.5 w-2/3 rounded bg-white/40" />
-                              <div className="h-4 w-12 rounded bg-indigo-400 mt-1" />
-                            </div>
-                            <div className="w-1/3 bg-gray-600 flex items-end justify-center pb-1">
-                              <div className="w-8 h-14 rounded-t-full bg-gray-400" />
-                            </div>
-                          </div>
-                        ),
-                      },
-                    ].map(({ value, label, description, paid, preview }) => {
+                      { value: "portrait",     label: "Classic",      paid: false },
+                      { value: "author-left",  label: "Author Left",  paid: true  },
+                      { value: "author-right", label: "Author Right", paid: true  },
+                    ].map(({ value, label, paid }) => {
                       const locked = paid && isFree;
-                      const isActive = heroLayout === value;
                       return (
-                        <div
-                          key={value}
+                        <button key={value} type="button"
                           onClick={async () => {
                             if (locked) { window.location.href = "/admin/settings#billing"; return; }
                             setHeroLayout(value);
@@ -595,49 +535,50 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                               });
                             } catch { /* silent */ }
                           }}
-                          className={`relative rounded-xl border-2 overflow-hidden transition-all cursor-pointer ${
+                          className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors relative overflow-hidden ${
                             locked
-                              ? "border-gray-200 opacity-70"
-                              : isActive
-                              ? "border-blue-500 shadow-md"
-                              : "border-gray-200 hover:border-blue-300 hover:shadow-sm"
-                          }`}
-                        >
-                          {/* Layout preview */}
-                          {preview}
-
-                          {/* Label */}
-                          <div className="p-2.5 bg-white">
-                            <div className="flex items-center justify-between mb-0.5">
-                              <p className="text-xs font-semibold text-gray-900">{label}</p>
-                              {isActive && !locked && (
-                                <span className="flex items-center gap-1 text-[10px] text-blue-600 font-medium">
-                                  <CheckCircle2 className="w-3 h-3" /> Active
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-gray-400 leading-tight">{description}</p>
+                              ? "border-gray-200 opacity-70 cursor-pointer"
+                              : heroLayout === value
+                              ? "border-blue-500 bg-blue-50 cursor-pointer"
+                              : "border-gray-200 hover:border-gray-300 cursor-pointer"
+                          }`}>
+                          <div className="flex gap-1 w-full h-8">
+                            {value === "author-left" && (
+                              <>
+                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
+                              </>
+                            )}
+                            {value === "author-right" && (
+                              <>
+                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
+                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                              </>
+                            )}
+                            {value === "portrait" && (
+                              <div className="flex-1 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500 relative overflow-hidden">
+                                <span>Full Photo</span>
+                                <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-400 flex items-center justify-center">
+                                  <span className="text-[6px] text-white">name overlay</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-
-                          {/* Active tick */}
-                          {isActive && !locked && (
-                            <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shadow">
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-
+                          <span className={`text-xs font-medium ${heroLayout === value && !locked ? "text-blue-600" : "text-gray-600"}`}>
+                            {label}
+                          </span>
                           {/* Lock overlay */}
                           {locked && (
                             <div className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center gap-1.5">
-                              <div className="w-9 h-9 rounded-full bg-gray-800/75 flex items-center justify-center">
-                                <Lock className="w-4 h-4 text-white" />
+                              <div className="w-8 h-8 rounded-full bg-gray-800/75 flex items-center justify-center">
+                                <Lock className="w-3.5 h-3.5 text-white" />
                               </div>
-                              <span className="text-xs font-semibold text-white bg-gray-800/75 px-2.5 py-0.5 rounded-full">
+                              <span className="text-[10px] font-semibold text-white bg-gray-800/75 px-2 py-0.5 rounded-full">
                                 Upgrade to unlock
                               </span>
                             </div>
                           )}
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
