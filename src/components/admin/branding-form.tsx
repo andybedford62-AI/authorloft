@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Check, Loader2, Upload, X, User, Plus, Trash2 } from "lucide-react";
+import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -535,19 +535,13 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                               });
                             } catch { /* silent */ }
                           }}
-                          className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors relative ${
+                          className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors relative overflow-hidden ${
                             locked
-                              ? "border-gray-200 bg-gray-50 cursor-pointer opacity-75"
+                              ? "border-gray-200 opacity-70 cursor-pointer"
                               : heroLayout === value
                               ? "border-blue-500 bg-blue-50 cursor-pointer"
                               : "border-gray-200 hover:border-gray-300 cursor-pointer"
                           }`}>
-                          {locked && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-white/80 z-10 gap-1 px-2">
-                              <span className="text-lg">🔒</span>
-                              <span className="text-[10px] font-semibold text-blue-600 text-center leading-tight">Upgrade to unlock</span>
-                            </div>
-                          )}
                           <div className="flex gap-1 w-full h-8">
                             {value === "author-left" && (
                               <>
@@ -562,14 +556,28 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                               </>
                             )}
                             {value === "portrait" && (
-                              <div className="flex-1 rounded bg-blue-100 flex items-center justify-center text-[8px] text-blue-500">
-                                Book + Text
+                              <div className="flex-1 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500 relative overflow-hidden">
+                                <span>Full Photo</span>
+                                <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-400 flex items-center justify-center">
+                                  <span className="text-[6px] text-white">name overlay</span>
+                                </div>
                               </div>
                             )}
                           </div>
                           <span className={`text-xs font-medium ${heroLayout === value && !locked ? "text-blue-600" : "text-gray-600"}`}>
                             {label}
                           </span>
+                          {/* Lock overlay */}
+                          {locked && (
+                            <div className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center gap-1.5">
+                              <div className="w-8 h-8 rounded-full bg-gray-800/75 flex items-center justify-center">
+                                <Lock className="w-3.5 h-3.5 text-white" />
+                              </div>
+                              <span className="text-[10px] font-semibold text-white bg-gray-800/75 px-2 py-0.5 rounded-full">
+                                Upgrade to unlock
+                              </span>
+                            </div>
+                          )}
                         </button>
                       );
                     })}

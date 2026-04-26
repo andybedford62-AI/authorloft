@@ -109,10 +109,7 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
-      return NextResponse.json(
-        { error: `Upload failed: ${detail}` },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
     }
   } else {
     // ── Local filesystem fallback (development) ───────────────────────────────

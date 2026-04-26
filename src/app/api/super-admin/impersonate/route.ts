@@ -29,22 +29,41 @@ export async function POST(req: NextRequest) {
   });
   if (!target) return NextResponse.json({ error: "Author not found" }, { status: 404 });
 
+  const superAdminId = (session.user as any).id as string;
+
+  await prisma.impersonationLog.create({
+    data: { superAdminId, targetAuthorId: authorId, action: "start" },
+  });
+
   const res = NextResponse.json({ ok: true });
   const secure = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "";
+  const isPublicSuffix = platformDomain.includes("vercel.app") || platformDomain.includes("localhost");
+  const cookieDomain = platformDomain && !isPublicSuffix ? `.${platformDomain}` : undefined;
   res.cookies.set(COOKIE, authorId, {
     httpOnly: true,
     secure,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 8, // 8 hours
+    ...(cookieDomain && { domain: cookieDomain }),
   });
   return res;
 }
 
 // DELETE /api/super-admin/impersonate — stop impersonating
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
   const session = await requireSuperAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const superAdminId = (session.user as any).id as string;
+  const targetAuthorId = req.cookies.get("al_impersonate")?.value;
+
+  if (targetAuthorId) {
+    await prisma.impersonationLog.create({
+      data: { superAdminId, targetAuthorId, action: "end" },
+    });
+  }
 
   const res = NextResponse.json({ ok: true });
   res.cookies.set(COOKIE, "", { maxAge: 0, path: "/" });

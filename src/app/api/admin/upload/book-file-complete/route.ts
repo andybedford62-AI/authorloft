@@ -55,6 +55,6 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     const msg = err?.message ?? String(err);
     console.error("[upload/book-file-complete] Error:", msg);
-    return NextResponse.json({ error: `Server error: ${msg}` }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

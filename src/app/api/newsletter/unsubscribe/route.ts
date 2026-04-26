@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const subscriber = await prisma.subscriber.findUnique({
+  const subscriber = await prisma.subscriber.findFirst({
     where: { unsubscribeToken: token },
     select: { id: true, email: true },
   });

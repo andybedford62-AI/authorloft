@@ -25,6 +25,7 @@ async function uniqueSlug(base: string): Promise<string> {
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   // Set cookie domain to root platform domain so subdomains can read the session.
   // Skipped for vercel.app and localhost (Public Suffix List restriction).
@@ -181,7 +182,7 @@ export const authOptions: NextAuthOptions = {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
+  return bcrypt.hash(password, 13);
 }
 
 export async function getAuthorBySlug(slug: string) {

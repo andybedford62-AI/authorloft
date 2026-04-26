@@ -48,7 +48,7 @@ export async function uploadToSupabaseStorage(
       "Content-Type": contentType,
       "x-upsert": "true", // overwrite if path already exists
     },
-    body: data,
+    body: data as BodyInit,
   });
 
   if (!res.ok) {

@@ -4,8 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 // One-time fix: sets isActive = true for the currently logged-in author.
-// Visit GET /api/admin/activate-self while logged in to activate your account.
-export async function GET() {
+export async function POST() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Not logged in" }, { status: 401 });

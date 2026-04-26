@@ -36,7 +36,7 @@ export function BlogDeleteButton({ postId, postTitle, redirectTo }: Props) {
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-500 hidden sm:inline">Delete "{postTitle}"?</span>
         <Button
-          variant="destructive"
+          variant="danger"
           size="sm"
           onClick={handleDelete}
           disabled={deleting}

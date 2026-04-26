@@ -140,6 +140,8 @@ model Author {
   posts                Post[]
   contactMessages      ContactMessage[]
   subscription         AuthorSubscription?
+  impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
+  impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
 
   @@index([slug])
   @@index([customDomain])
@@ -584,14 +586,15 @@ model ContactMessage {
 // ─── Platform Settings (singleton) ───────────────────────────────────────────
 
 model PlatformSettings {
-  id               String    @id @default("singleton")
-  privacyContent   String?   @db.Text
-  privacyUpdatedAt DateTime?
-  termsContent     String?   @db.Text
-  termsUpdatedAt   DateTime?
-  contactEmail     String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                    String    @id @default("singleton")
+  privacyContent        String?   @db.Text
+  privacyUpdatedAt      DateTime?
+  termsContent          String?   @db.Text
+  termsUpdatedAt        DateTime?
+  contactEmail          String?
+  marketingHeroImageUrl String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 // ─── Plan Feature Gates (singleton) ──────────────────────────────────────────
@@ -602,4 +605,20 @@ model PlanFeatureConfig {
   id        String   @id @default("singleton")
   gates     Json     @default("{}")
   updatedAt DateTime @updatedAt
+}
+
+model StripeEvent {
+  id          String   @id  // Stripe event ID (evt_xxx) — unique by design
+  processedAt DateTime @default(now())
+}
+
+model ImpersonationLog {
+  id            String   @id @default(cuid())
+  superAdminId  String
+  targetAuthorId String
+  action        String   // "start" | "end"
+  createdAt     DateTime @default(now())
+
+  superAdmin    Author   @relation("ImpersonationAsSuperAdmin", fields: [superAdminId],   references: [id])
+  targetAuthor  Author   @relation("ImpersonationAsTarget",     fields: [targetAuthorId], references: [id])
 }

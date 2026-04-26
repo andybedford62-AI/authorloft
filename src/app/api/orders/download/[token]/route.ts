@@ -2,12 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSupabaseSignedUrl } from "@/lib/supabase-storage";
 
+const downloadAttempts = new Map<string, number[]>();
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const window = 60_000;
+  const limit = 10;
+  const times = (downloadAttempts.get(ip) ?? []).filter((t) => now - t < window);
+  times.push(now);
+  downloadAttempts.set(ip, times);
+  return times.length > limit;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const { token } = await params;
+
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
 
     // Load the order item — keep includes minimal to avoid Prisma relation issues
     const item = await prisma.orderItem.findFirst({

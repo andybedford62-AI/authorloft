@@ -29,9 +29,10 @@ import {
   Search,
   Sun,
   Moon,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { canAccessFeature } from "@/lib/feature-gates";
+import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -139,6 +140,41 @@ function tokens(theme: "dark" | "light") {
   };
 }
 
+// ── Locked nav item ──────────────────────────────────────────────────────────
+
+function LockedNavItem({
+  label, icon: Icon, requiredTier, t,
+}: {
+  label:        string;
+  icon:         React.ElementType;
+  requiredTier: string;
+  t:            ReturnType<typeof tokens>;
+}) {
+  const tierLabel = requiredTier === "PREMIUM" ? "Premium" : "Standard";
+  return (
+    <div className="relative group">
+      <Link
+        href="/admin/settings#billing"
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors opacity-50",
+          t.navItem,
+        )}
+      >
+        <Icon className="h-4 w-4 flex-shrink-0" />
+        <span className="flex-1">{label}</span>
+        <Lock className="h-3.5 w-3.5 flex-shrink-0" />
+      </Link>
+      {/* Tooltip — drops below the item, stays within scroll container */}
+      <div className="absolute left-3 right-3 top-full mt-1 z-50 hidden group-hover:block pointer-events-none">
+        <div className="bg-gray-900 text-white text-xs rounded-md px-2.5 py-2 shadow-xl">
+          <span className="font-medium">{tierLabel} plan required</span>
+          <span className="block text-gray-400 mt-0.5">Click to upgrade your plan</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Collapsible group ────────────────────────────────────────────────────────
 
 function NavGroupSection({
@@ -175,9 +211,11 @@ function NavGroupSection({
     }
   }, [hasActive, storageKey]);
 
-  const visibleItems = group.items.filter((it) =>
-    isSuperAdmin || canAccessFeature(it.href, planTier, featureGates)
-  );
+  // Hide items marked DISABLED; show everything else (locked or unlocked)
+  const visibleItems = group.items.filter((it) => {
+    const required = featureGates[it.href] ?? DEFAULT_GATES[it.href] ?? "FREE";
+    return required !== "DISABLED";
+  });
   if (visibleItems.length === 0) return null;
 
   return (
@@ -198,8 +236,23 @@ function NavGroupSection({
       {open && (
         <div className="mt-0.5 space-y-0.5">
           {visibleItems.map(({ href, label, icon: Icon }) => {
+            const accessible = isSuperAdmin || canAccessFeature(href, planTier, featureGates);
+            const requiredTier = featureGates[href] ?? DEFAULT_GATES[href] ?? "FREE";
+
+            if (!accessible) {
+              return (
+                <LockedNavItem
+                  key={href}
+                  label={label}
+                  icon={Icon}
+                  requiredTier={requiredTier}
+                  t={t}
+                />
+              );
+            }
+
             const active = pathname.startsWith(href);
-            const badge = href === "/admin/messages" && unreadMessages > 0 ? unreadMessages : null;
+            const badge  = href === "/admin/messages" && unreadMessages > 0 ? unreadMessages : null;
             return (
               <Link
                 key={href}
