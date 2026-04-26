@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { decrypt } from "@/lib/encrypt";
 
 export interface AiContext {
   apiKey:     string;       // resolved key to use (own or platform)
@@ -35,7 +36,7 @@ export async function getAiContext(authorId: string): Promise<AiContext | null> 
 
   const hasOwnKey     = !!author.aiApiKey;
   const platformKey   = process.env.GEMINI_API_KEY ?? "";
-  const resolvedKey   = hasOwnKey ? author.aiApiKey! : platformKey;
+  const resolvedKey   = hasOwnKey ? decrypt(author.aiApiKey!) : platformKey;
   const atLimit       = !hasOwnKey && usageCount >= author.aiUsageCap;
 
   if (!resolvedKey) return null;

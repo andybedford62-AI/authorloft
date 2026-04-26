@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { encrypt } from "@/lib/encrypt";
 
 /** GET — returns whether a key is saved (never returns the key itself) */
 export async function GET() {
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     // ── Save key ─────────────────────────────────────────────────────────────
     await prisma.author.update({
       where: { id: authorId },
-      data:  { aiApiKey: apiKey.trim() },
+      data:  { aiApiKey: encrypt(apiKey.trim()) },
     });
     return NextResponse.json({ ok: true });
   }
