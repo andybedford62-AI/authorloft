@@ -81,7 +81,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="flex-shrink-0">
             <div
               className="w-56 h-56 rounded-2xl overflow-hidden bg-gray-100 shadow-lg relative ring-4"
-              style={{ ringColor: accentColor + "40" }}
+              style={{ "--tw-ring-color": accentColor + "40" } as React.CSSProperties}
             >
               {author.profileImageUrl ? (
                 <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />

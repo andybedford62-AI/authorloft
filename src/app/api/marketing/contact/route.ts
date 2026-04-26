@@ -1,11 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
+
+// ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
+const attempts = new Map<string, number[]>();
+const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_MAX = 5;
+
+function checkRateLimit(ip: string): boolean {
+  const now  = Date.now();
+  const hits = (attempts.get(ip) ?? []).filter(t => now - t < RATE_WINDOW_MS);
+  if (hits.length >= RATE_MAX) return false;
+  hits.push(now);
+  attempts.set(ip, hits);
+  return true;
+}
 
 // POST /api/marketing/contact — platform-level contact form submission
 // Stores the message in DB (linked to no specific author) and can optionally
 // trigger an email if SMTP is configured.
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   const body = await req.json();
   const { name, email, subject, message } = body;
 

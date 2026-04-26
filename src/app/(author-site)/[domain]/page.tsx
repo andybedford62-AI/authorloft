@@ -9,6 +9,7 @@ import {
 import { ClassicTemplate } from "@/components/author-site/templates/classic";
 import { MinimalTemplate } from "@/components/author-site/templates/minimal";
 import { BoldTemplate } from "@/components/author-site/templates/bold";
+import type { HomeTemplateProps } from "@/components/author-site/templates/types";
 
 export default async function AuthorHomePage({
   params,
@@ -23,7 +24,7 @@ export default async function AuthorHomePage({
     getAuthorGenres(author.id),
   ]);
 
-  const props = { author, books, series, genreTree };
+  const props = { author, books, series, genreTree } as unknown as HomeTemplateProps;
 
   switch (author.homeTemplate) {
     case "minimal":

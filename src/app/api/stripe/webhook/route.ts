@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
-    return NextResponse.json({ error: `Webhook error: ${err.message}` }, { status: 400 });
+    return NextResponse.json({ error: "Invalid webhook signature." }, { status: 400 });
   }
 
   // Deduplicate — Stripe retries on any non-2xx, so guard against double-processing
@@ -190,10 +190,11 @@ export async function POST(req: NextRequest) {
                 })
               : null;
 
-            const periodStart = stripeSub.current_period_start
-              ? new Date(stripeSub.current_period_start * 1000) : null;
-            const periodEnd   = stripeSub.current_period_end
-              ? new Date(stripeSub.current_period_end * 1000) : null;
+            const sub = stripeSub as any;
+            const periodStart = sub.current_period_start
+              ? new Date(sub.current_period_start * 1000) : null;
+            const periodEnd   = sub.current_period_end
+              ? new Date(sub.current_period_end * 1000) : null;
             const interval    = stripeSub.items.data[0]?.price?.recurring?.interval === "year"
               ? "annual" : "monthly";
 

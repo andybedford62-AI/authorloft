@@ -16,14 +16,14 @@ type Message = {
   message: string;
   isRead: boolean;
   isArchived: boolean;
-  createdAt: string;
+  createdAt: Date | string;
 };
 
 interface Props {
   initialMessages: Message[];
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: Date | string) {
   const d = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();

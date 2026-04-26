@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         newsletter: body.newsletter ?? false, analyticsEnabled: body.analyticsEnabled ?? false,
         badgeColor: body.badgeColor ?? "gray", featuredLabel: body.featuredLabel ?? null,
         sortOrder: body.sortOrder ?? 0, isActive: body.isActive ?? true, isDefault: body.isDefault ?? false,
-      },
+      } as any,
     });
     revalidatePath("/");
     revalidatePath("/pricing");
