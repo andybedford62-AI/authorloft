@@ -2,9 +2,204 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+// ── Subscription & Billing section ───────────────────────────────────────────
+
+type BillingPlan = {
+  id: string; name: string; tier: string; description: string | null;
+  monthlyPriceCents: number; annualPriceCents: number;
+  stripePriceIdMonthly: string | null; stripePriceIdAnnual: string | null;
+  featuresJson: string | null; badgeColor: string; featuredLabel: string | null;
+};
+
+type BillingData = {
+  currentTier: string; currentPlanName: string;
+  subscription: { currentPeriodEnd: string | null; billingInterval: string; status: string } | null;
+  plans: BillingPlan[];
+};
+
+function SubscriptionSection() {
+  const [data,     setData]     = useState<BillingData | null>(null);
+  const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const [busy,     setBusy]     = useState<string | null>(null); // priceId being loaded
+  const [portalBusy, setPortalBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/billing").then((r) => r.json()).then(setData).catch(() => {});
+  }, []);
+
+  async function handleUpgrade(priceId: string) {
+    setBusy(priceId);
+    try {
+      const res  = await fetch("/api/admin/stripe/subscribe", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ priceId }),
+      });
+      const json = await res.json();
+      if (json.url) window.location.href = json.url;
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handlePortal() {
+    setPortalBusy(true);
+    try {
+      const res  = await fetch("/api/admin/stripe/portal", { method: "POST" });
+      const json = await res.json();
+      if (json.url) window.location.href = json.url;
+    } finally {
+      setPortalBusy(false);
+    }
+  }
+
+  const isFree = !data || data.currentTier === "FREE";
+
+  const renewalDate = data?.subscription?.currentPeriodEnd
+    ? new Date(data.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric",
+      })
+    : null;
+
+  return (
+    <section id="billing" className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <CreditCard className="h-4 w-4 text-gray-400" />
+          Subscription &amp; Billing
+        </h2>
+        <p className="text-xs text-gray-400 mt-1">Manage your AuthorLoft plan.</p>
+      </div>
+
+      {!data ? (
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        </div>
+      ) : (
+        <>
+          {/* Current plan */}
+          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-200">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{data.currentPlanName}</p>
+              {renewalDate && (
+                <p className="text-xs text-gray-400 mt-0.5">Renews {renewalDate}</p>
+              )}
+              {isFree && (
+                <p className="text-xs text-gray-400 mt-0.5">Free plan — upgrade to unlock more features</p>
+              )}
+            </div>
+            {!isFree && (
+              <button
+                onClick={handlePortal}
+                disabled={portalBusy}
+                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {portalBusy ? "Opening…" : "Manage billing"}
+              </button>
+            )}
+          </div>
+
+          {/* Upgrade options — only shown to free users */}
+          {isFree && data.plans.length > 0 && (
+            <>
+              {/* Monthly / Annual toggle */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setInterval("monthly")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                    interval === "monthly"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setInterval("annual")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+                    interval === "annual"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  Annual <span className="text-green-600 ml-1">Save 20%</span>
+                </button>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {data.plans.map((plan) => {
+                  const priceId = interval === "annual"
+                    ? plan.stripePriceIdAnnual
+                    : plan.stripePriceIdMonthly;
+                  const cents = interval === "annual"
+                    ? plan.annualPriceCents
+                    : plan.monthlyPriceCents;
+                  const dollars = cents > 0 ? `$${(cents / 100).toFixed(0)}` : null;
+                  const features: string[] = plan.featuresJson
+                    ? JSON.parse(plan.featuresJson)
+                    : [];
+
+                  return (
+                    <div
+                      key={plan.id}
+                      className="border border-gray-200 rounded-xl p-5 space-y-4 flex flex-col"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-semibold text-gray-900">{plan.name}</p>
+                          {plan.featuredLabel && (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                              {plan.featuredLabel}
+                            </span>
+                          )}
+                        </div>
+                        {dollars && (
+                          <p className="text-2xl font-bold text-gray-900">
+                            {dollars}
+                            <span className="text-sm font-normal text-gray-400">
+                              /{interval === "annual" ? "yr" : "mo"}
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                      {features.length > 0 && (
+                        <ul className="space-y-1 flex-1">
+                          {features.slice(0, 5).map((f, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                              <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5" />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <button
+                        onClick={() => priceId && handleUpgrade(priceId)}
+                        disabled={!priceId || busy === priceId}
+                        className="w-full py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {busy === priceId
+                          ? <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
+                          : !priceId
+                          ? "Coming soon"
+                          : <><Zap className="h-4 w-4" /> Upgrade to {plan.name}</>
+                        }
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
 
 // ── Stripe Connect widget ─────────────────────────────────────────────────────
 
@@ -600,6 +795,9 @@ export default function SettingsPage() {
           </form>
         )}
       </section>
+
+      {/* ── Subscription & Billing ───────────────────────────────── */}
+      <SubscriptionSection />
 
       {/* ── Stripe Connect ───────────────────────────────────────── */}
       <StripeConnectSection />

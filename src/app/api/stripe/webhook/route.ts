@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
       });
       await prisma.author.updateMany({
         where: { stripeSubscriptionId: subscription.id },
-        data:  { planId: null }, // null planId = Free
+        data:  { planId: null, heroLayout: "portrait" }, // revert to free defaults
       });
       // Remove AuthorSubscription rows and revert theme for each affected author
       for (const a of affected) {

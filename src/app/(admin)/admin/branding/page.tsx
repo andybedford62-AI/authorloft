@@ -23,6 +23,7 @@ export default async function BrandingPage() {
         showHeroBanner: true,
         aboutStats: true,
         credentials: true,
+        plan: { select: { tier: true } },
       },
     }),
     prisma.book.findMany({
@@ -71,7 +72,7 @@ export default async function BrandingPage() {
           Update your photo, bio, and how your author site looks and feels.
         </p>
       </div>
-      <BrandingForm initial={initial} books={books} />
+      <BrandingForm initial={initial} books={books} planTier={author.plan?.tier ?? "FREE"} />
     </div>
   );
 }
