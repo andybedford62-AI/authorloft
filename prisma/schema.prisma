@@ -140,6 +140,8 @@ model Author {
   posts                Post[]
   contactMessages      ContactMessage[]
   subscription         AuthorSubscription?
+  impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
+  impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
 
   @@index([slug])
   @@index([customDomain])
@@ -607,4 +609,15 @@ model PlanFeatureConfig {
 model StripeEvent {
   id          String   @id  // Stripe event ID (evt_xxx) — unique by design
   processedAt DateTime @default(now())
+}
+
+model ImpersonationLog {
+  id            String   @id @default(cuid())
+  superAdminId  String
+  targetAuthorId String
+  action        String   // "start" | "end"
+  createdAt     DateTime @default(now())
+
+  superAdmin    Author   @relation("ImpersonationAsSuperAdmin", fields: [superAdminId],   references: [id])
+  targetAuthor  Author   @relation("ImpersonationAsTarget",     fields: [targetAuthorId], references: [id])
 }

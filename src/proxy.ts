@@ -12,20 +12,28 @@ const PLATFORM_HOSTNAMES = [
   "localhost:3000",
 ];
 
-const MAINTENANCE_PATHS = ["/login", "/register", "/api/auth/signin", "/api/auth/callback"];
+// Paths that must always be reachable even during maintenance
+const MAINTENANCE_EXEMPT = [
+  "/maintenance",
+  "/api/maintenance-check",
+  "/api/cron/",
+];
 
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
 
   // ── Maintenance mode check ───────────────────────────────────────────────
-  // Block logins/registrations when maintenance mode is active.
-  const isMaintPath = MAINTENANCE_PATHS.some((p) => url.pathname === p || url.pathname.startsWith(p + "/"));
-  if (isMaintPath) {
+  // Block ALL traffic when maintenance mode is active, except the maintenance
+  // page itself and the check endpoint.
+  const isExempt = MAINTENANCE_EXEMPT.some(
+    (p) => url.pathname === p || url.pathname.startsWith(p)
+  );
+  if (!isExempt) {
     try {
       const origin = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
       const res = await fetch(`${origin}/api/maintenance-check`, {
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(3000),
       });
       if (res.ok) {
         const data = await res.json() as { maintenanceMode: boolean };
