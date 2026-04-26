@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseFeature } from "@/lib/plan-limits";
 
 export async function GET() {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const gate = await canUseFeature(authorId, "newsletter");
+  if (!gate.allowed) return NextResponse.json({ error: gate.reason }, { status: 403 });
 
   const [subscribers, genres] = await Promise.all([
     prisma.subscriber.findMany({

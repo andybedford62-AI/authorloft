@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
 
   const ctx = await getAiContext(authorId);
   if (!ctx) return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });
+  if (!ctx.planAllowed) {
+    return NextResponse.json({ error: "AI features require a Premium plan. Upgrade to access AI tools." }, { status: 403 });
+  }
+
   if (ctx.atLimit) {
     return NextResponse.json({
       error:   "limit_reached",

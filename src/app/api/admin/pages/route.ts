@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
@@ -26,9 +26,20 @@ export async function GET() {
 }
 
 // POST /api/admin/pages — create a new custom page
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const author = await prisma.author.findUnique({
+    where:  { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  if ((author?.plan?.tier ?? "FREE") === "FREE") {
+    return NextResponse.json(
+      { error: "Custom pages require a Standard or Premium plan." },
+      { status: 403 }
+    );
+  }
 
   const body = await req.json();
   const { title, slug, navTitle, content, isPublished, showInNav, sortOrder } = body;
