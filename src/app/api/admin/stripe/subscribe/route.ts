@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { createPlanCheckoutSession } from "@/lib/stripe";
+import { createSubscriptionCheckoutSession } from "@/lib/stripe";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
-    const session = await createPlanCheckoutSession({
+    const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
       planPriceId: priceId,
