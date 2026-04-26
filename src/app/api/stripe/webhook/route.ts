@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail } from "@/lib/mailer";
+import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -209,6 +209,34 @@ export async function POST(req: NextRequest) {
                   renewalReminderSentAt: null,
                 },
               });
+
+              // Also update Author.planId to the new plan
+              await prisma.author.update({
+                where: { id: authorId },
+                data:  { planId: plan.id },
+              });
+
+              // Send welcome email
+              const authorRecord = await prisma.author.findUnique({
+                where:  { id: authorId },
+                select: { email: true, name: true, displayName: true },
+              });
+              const planRecord = await prisma.plan.findUnique({
+                where:  { id: plan.id },
+                select: { name: true, monthlyPriceCents: true, annualPriceCents: true },
+              });
+              if (authorRecord && planRecord) {
+                const amountCents = interval === "annual"
+                  ? planRecord.annualPriceCents
+                  : planRecord.monthlyPriceCents;
+                sendSubscriptionWelcomeEmail({
+                  to:             authorRecord.email,
+                  authorName:     authorRecord.displayName || authorRecord.name,
+                  planName:       planRecord.name,
+                  billingInterval: interval,
+                  amountCents,
+                }).catch((e) => console.error("[webhook] Failed to send welcome email:", e));
+              }
             }
           } catch (e) {
             console.error("[webhook] Failed to upsert AuthorSubscription:", e);
@@ -275,7 +303,12 @@ export async function POST(req: NextRequest) {
             where: { stripeSubscriptionId: subscription.id },
             data:  { planId: newPlan.id },
           });
+          // Keep AuthorSubscription.planId in sync with the new plan
           for (const a of affected) {
+            await prisma.authorSubscription.updateMany({
+              where: { authorId: a.id },
+              data:  { planId: newPlan.id },
+            });
             await revertThemeOnDowngrade(a.id, newPlan.tier);
           }
         }
@@ -316,6 +349,31 @@ export async function POST(req: NextRequest) {
         where: { authorId: author.id },
         data:  { renewalReminderSentAt: new Date() },
       });
+      break;
+    }
+
+    case "invoice.payment_failed": {
+      const invoice = event.data.object as any;
+      const subId   = invoice.subscription as string | undefined;
+      if (!subId) break;
+
+      const author = await prisma.author.findFirst({
+        where:  { stripeSubscriptionId: subId },
+        select: { email: true, name: true, displayName: true },
+      });
+      if (!author) break;
+
+      const amountCents = invoice.amount_due as number ?? 0;
+      const nextRetry   = invoice.next_payment_attempt
+        ? new Date(invoice.next_payment_attempt * 1000)
+        : null;
+
+      sendPaymentFailedEmail({
+        to:          author.email,
+        authorName:  author.displayName || author.name,
+        amountCents,
+        nextRetryDate: nextRetry,
+      }).catch((e) => console.error("[webhook] Failed to send payment failed email:", e));
       break;
     }
   }

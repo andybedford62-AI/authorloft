@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { createSubscriptionCheckoutSession } from "@/lib/stripe";
+import { createSubscriptionCheckoutSession, stripe } from "@/lib/stripe";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
@@ -32,9 +32,25 @@ export async function POST(req: NextRequest) {
 
     const author = await prisma.author.findUnique({
       where:  { id: authorId },
-      select: { email: true },
+      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true },
     });
     if (!author) return NextResponse.json({ error: "Author not found" }, { status: 404 });
+
+    // If author already has an active subscription, send them to the Customer Portal
+    // to upgrade/downgrade rather than creating a second subscription
+    if (author.stripeSubscriptionId) {
+      let customerId = author.stripeCustomerId;
+      if (!customerId) {
+        const sub = await stripe.subscriptions.retrieve(author.stripeSubscriptionId);
+        customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+        await prisma.author.update({ where: { id: authorId }, data: { stripeCustomerId: customerId } });
+      }
+      const portal = await stripe.billingPortal.sessions.create({
+        customer:   customerId,
+        return_url: `https://www.${PLATFORM_DOMAIN}/admin/settings`,
+      });
+      return NextResponse.json({ url: portal.url });
+    }
 
     const base       = `https://www.${PLATFORM_DOMAIN}`;
     const successUrl = `${base}/admin/settings?subscribed=1`;

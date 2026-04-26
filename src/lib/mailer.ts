@@ -346,6 +346,141 @@ export async function sendPurchaseConfirmationEmail({
   });
 }
 
+// ── Plan subscription welcome email (to author) ──────────────────────────────
+
+export async function sendSubscriptionWelcomeEmail({
+  to,
+  authorName,
+  planName,
+  billingInterval,
+  amountCents,
+}: {
+  to: string;
+  authorName: string;
+  planName: string;
+  billingInterval: string;
+  amountCents: number;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const dashboardUrl   = `https://www.${platformDomain}/admin/dashboard`;
+  const firstName      = authorName.split(" ")[0];
+  const dollars        = amountCents > 0 ? `$${(amountCents / 100).toFixed(2)}` : null;
+  const period         = billingInterval === "annual" ? "year" : "month";
+
+  return sendMail({
+    to,
+    subject: `You're now on the ${planName} plan — welcome!`,
+    text: [
+      `Hi ${firstName},`,
+      `Your ${planName} subscription is now active.`,
+      dollars ? `You'll be billed ${dollars} per ${period}.` : "",
+      `Head to your dashboard to explore everything unlocked: ${dashboardUrl}`,
+      `— The AuthorLoft Team`,
+    ].filter(Boolean).join("\n\n"),
+    html: wrapHtml(`Welcome to ${planName}! 🎉`, `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        Your <strong>${planName}</strong> subscription is now active. Here's what you've unlocked:
+      </p>
+
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#166534;">Plan</span><br/>
+              <span style="font-size:16px;font-weight:700;color:#14532d;">${planName}</span>
+            </td>
+          </tr>
+          ${dollars ? `
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #bbf7d0;">
+              <span style="font-size:13px;color:#166534;">Billing</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#14532d;">${dollars} / ${period}</span>
+            </td>
+          </tr>` : ""}
+        </table>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${dashboardUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Go to My Dashboard
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're happy to help.
+      </p>
+    `),
+  });
+}
+
+// ── Payment failed email (to author) ─────────────────────────────────────────
+
+export async function sendPaymentFailedEmail({
+  to,
+  authorName,
+  amountCents,
+  nextRetryDate,
+}: {
+  to: string;
+  authorName: string;
+  amountCents: number;
+  nextRetryDate: Date | null;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const billingUrl     = `https://www.${platformDomain}/admin/settings`;
+  const firstName      = authorName.split(" ")[0];
+  const dollars        = amountCents > 0 ? `$${(amountCents / 100).toFixed(2)}` : "your subscription";
+  const retryLine      = nextRetryDate
+    ? `We'll automatically retry on <strong>${nextRetryDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.`
+    : "We'll automatically retry the payment shortly.";
+
+  return sendMail({
+    to,
+    subject: "Action required — payment failed for your AuthorLoft subscription",
+    text: [
+      `Hi ${firstName},`,
+      `We were unable to process your payment of ${dollars} for your AuthorLoft subscription.`,
+      `Please update your payment method to keep your account active: ${billingUrl}`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml("Payment failed — action required", `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        We were unable to process your payment of <strong>${dollars}</strong> for your AuthorLoft subscription.
+      </p>
+
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#991b1b;">What happens next</p>
+        <p style="margin:0 0 8px;font-size:13px;color:#7f1d1d;">${retryLine}</p>
+        <p style="margin:0;font-size:13px;color:#7f1d1d;">
+          If payment continues to fail, your account will be downgraded to the Free plan.
+        </p>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${billingUrl}"
+               style="display:inline-block;background:#dc2626;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Update Payment Method
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're here to help.
+      </p>
+    `),
+  });
+}
+
 // ── Renewal reminder email (to author) ──────────────────────────────────────
 
 export async function sendRenewalReminderEmail({
