@@ -10,6 +10,10 @@ import { Resend } from "resend";
 
 const FROM_ADDRESS = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
 
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export function isSmtpConfigured() {
   return !!process.env.RESEND_API_KEY;
 }
@@ -85,7 +89,7 @@ export async function sendSaleNotificationEmail({
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const salesUrl = `https://www.${platformDomain}/admin/sales`;
   const dollars = (priceCents / 100).toFixed(2);
-  const buyer = customerName ? `${customerName} (${customerEmail})` : customerEmail;
+  const buyer = customerName ? `${esc(customerName)} (${esc(customerEmail)})` : esc(customerEmail);
   const now = new Date().toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric",
   });
@@ -103,7 +107,7 @@ export async function sendSaleNotificationEmail({
       `View all sales: ${salesUrl}`,
     ].join("\n\n"),
     html: wrapHtml("You just made a sale! 🎉", `
-      <p style="margin:0 0 16px;">Hi ${authorName},</p>
+      <p style="margin:0 0 16px;">Hi ${esc(authorName)},</p>
       <p style="margin:0 0 24px;">Great news — someone just purchased one of your books on AuthorLoft!</p>
 
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:0 0 24px;">
@@ -111,8 +115,8 @@ export async function sendSaleNotificationEmail({
           <tr>
             <td style="padding:6px 0;">
               <span style="font-size:13px;color:#6b7280;">Book</span><br/>
-              <span style="font-size:15px;font-weight:600;color:#111827;">${bookTitle}</span>
-              <span style="font-size:13px;color:#6b7280;margin-left:8px;">${itemLabel}</span>
+              <span style="font-size:15px;font-weight:600;color:#111827;">${esc(bookTitle)}</span>
+              <span style="font-size:13px;color:#6b7280;margin-left:8px;">${esc(itemLabel)}</span>
             </td>
           </tr>
           <tr>
@@ -185,7 +189,7 @@ export async function sendWelcomeEmail(to: string, name: string, slug: string) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const dashboardUrl = `${baseUrl()}/admin/dashboard`;
   const publicSiteUrl = `https://${slug}.${platformDomain}`;
-  const firstName = name.split(" ")[0];
+  const firstName = esc(name.split(" ")[0]);
 
   return sendMail({
     to,
@@ -290,7 +294,7 @@ export async function sendPurchaseConfirmationEmail({
   const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric",
   });
-  const greeting = customerName ? `Hi ${customerName},` : "Hi there,";
+  const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
 
   return sendMail({
     to,
@@ -305,7 +309,7 @@ export async function sendPurchaseConfirmationEmail({
     html: wrapHtml(`Your download is ready`, `
       <p style="margin:0 0 16px;">${greeting}</p>
       <p style="margin:0 0 16px;">
-        Thank you for purchasing <strong>${bookTitle}</strong> (${itemLabel}).
+        Thank you for purchasing <strong>${esc(bookTitle)}</strong> (${esc(itemLabel)}).
         Your file is ready to download right now.
       </p>
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -313,7 +317,7 @@ export async function sendPurchaseConfirmationEmail({
           <td align="center" style="padding:8px 0 28px;">
             <a href="${downloadUrl}"
                style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
-              ⬇ Download ${itemLabel}
+              ⬇ Download ${esc(itemLabel)}
             </a>
           </td>
         </tr>
@@ -334,7 +338,7 @@ export async function sendPurchaseConfirmationEmail({
       </div>
       <p style="margin:0 0 8px;font-size:14px;color:#374151;">
         Enjoy the read!<br/>
-        <strong>${authorName}</strong>
+        <strong>${esc(authorName)}</strong>
       </p>
       <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">
         Visit the author's site:
@@ -363,7 +367,7 @@ export async function sendSubscriptionWelcomeEmail({
 }) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const dashboardUrl   = `https://www.${platformDomain}/admin/dashboard`;
-  const firstName      = authorName.split(" ")[0];
+  const firstName      = esc(authorName.split(" ")[0]);
   const dollars        = amountCents > 0 ? `$${(amountCents / 100).toFixed(2)}` : null;
   const period         = billingInterval === "annual" ? "year" : "month";
 
@@ -380,7 +384,7 @@ export async function sendSubscriptionWelcomeEmail({
     html: wrapHtml(`Welcome to ${planName}! 🎉`, `
       <p style="margin:0 0 16px;">Hi ${firstName},</p>
       <p style="margin:0 0 16px;">
-        Your <strong>${planName}</strong> subscription is now active. Here's what you've unlocked:
+        Your <strong>${esc(planName)}</strong> subscription is now active. Here's what you've unlocked:
       </p>
 
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:0 0 24px;">
@@ -388,7 +392,7 @@ export async function sendSubscriptionWelcomeEmail({
           <tr>
             <td style="padding:6px 0;">
               <span style="font-size:13px;color:#166534;">Plan</span><br/>
-              <span style="font-size:16px;font-weight:700;color:#14532d;">${planName}</span>
+              <span style="font-size:16px;font-weight:700;color:#14532d;">${esc(planName)}</span>
             </td>
           </tr>
           ${dollars ? `
@@ -434,7 +438,7 @@ export async function sendPaymentFailedEmail({
 }) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const billingUrl     = `https://www.${platformDomain}/admin/settings`;
-  const firstName      = authorName.split(" ")[0];
+  const firstName      = esc(authorName.split(" ")[0]);
   const dollars        = amountCents > 0 ? `$${(amountCents / 100).toFixed(2)}` : "your subscription";
   const retryLine      = nextRetryDate
     ? `We'll automatically retry on <strong>${nextRetryDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.`
@@ -496,7 +500,7 @@ export async function sendRenewalReminderEmail({
 }) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const billingUrl     = `https://www.${platformDomain}/admin/settings`;
-  const firstName      = authorName.split(" ")[0];
+  const firstName      = esc(authorName.split(" ")[0]);
   const dateStr        = renewalDate.toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric",
   });

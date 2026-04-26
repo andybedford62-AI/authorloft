@@ -5,7 +5,8 @@ const ContentSecurityPolicy = [
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  // Supabase storage (covers any project ref), Google user avatars, Stripe branding
+  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
   "connect-src 'self' https://*.supabase.co https://api.stripe.com",

@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Hash and save the new password
-  const newHash = await bcrypt.hash(newPassword, 12);
+  const newHash = await bcrypt.hash(newPassword, 13);
   await prisma.author.update({
     where: { id: authorId },
     data: { passwordHash: newHash },

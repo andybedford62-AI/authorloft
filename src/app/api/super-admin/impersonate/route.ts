@@ -37,12 +37,16 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ ok: true });
   const secure = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "";
+  const isPublicSuffix = platformDomain.includes("vercel.app") || platformDomain.includes("localhost");
+  const cookieDomain = platformDomain && !isPublicSuffix ? `.${platformDomain}` : undefined;
   res.cookies.set(COOKIE, authorId, {
     httpOnly: true,
     secure,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 8, // 8 hours
+    ...(cookieDomain && { domain: cookieDomain }),
   });
   return res;
 }
