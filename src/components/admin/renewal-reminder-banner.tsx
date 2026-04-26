@@ -1,13 +1,17 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
 
 interface RenewalReminderBannerProps {
   currentPeriodEnd: Date;
 }
 
 export function RenewalReminderBanner({ currentPeriodEnd }: RenewalReminderBannerProps) {
-  const now        = new Date();
-  const msLeft     = currentPeriodEnd.getTime() - now.getTime();
-  const daysLeft   = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+  const [loading, setLoading] = useState(false);
+
+  const now      = new Date();
+  const msLeft   = currentPeriodEnd.getTime() - now.getTime();
+  const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
 
   if (daysLeft > 30 || daysLeft <= 0) return null;
 
@@ -18,6 +22,17 @@ export function RenewalReminderBanner({ currentPeriodEnd }: RenewalReminderBanne
   const urgency = daysLeft <= 7
     ? { bg: "#fef2f2", border: "#fca5a5", text: "#991b1b", icon: "⚠️" }
     : { bg: "#fffbeb", border: "#fde68a", text: "#92400e", icon: "🔔" };
+
+  async function openPortal() {
+    setLoading(true);
+    try {
+      const res  = await fetch("/api/admin/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div
@@ -33,13 +48,14 @@ export function RenewalReminderBanner({ currentPeriodEnd }: RenewalReminderBanne
         <strong>Subscription renews {daysLeft === 1 ? "tomorrow" : `in ${daysLeft} days`}</strong>
         {" "}— {dateStr}
       </span>
-      <Link
-        href="/admin/settings"
-        className="text-xs font-semibold underline underline-offset-2 whitespace-nowrap"
+      <button
+        onClick={openPortal}
+        disabled={loading}
+        className="text-xs font-semibold underline underline-offset-2 whitespace-nowrap disabled:opacity-50"
         style={{ color: urgency.text }}
       >
-        Manage billing
-      </Link>
+        {loading ? "Opening…" : "Manage billing"}
+      </button>
     </div>
   );
 }

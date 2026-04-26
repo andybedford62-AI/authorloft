@@ -162,10 +162,13 @@ export async function POST(req: NextRequest) {
       if (type === "plan_subscription") {
         const { authorId } = session.metadata ?? {};
         if (authorId && session.subscription) {
-          // Persist the subscription ID on the author
+          // Persist the subscription ID and customer ID on the author
           await prisma.author.update({
             where: { id: authorId },
-            data: { stripeSubscriptionId: session.subscription },
+            data: {
+              stripeSubscriptionId: session.subscription,
+              ...(session.customer ? { stripeCustomerId: session.customer } : {}),
+            },
           });
 
           // Fetch full subscription from Stripe to get billing period + plan
