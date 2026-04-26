@@ -472,7 +472,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                     <p className="text-sm font-medium text-gray-700">Hero Photo</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       This photo appears on the left or right panel of your homepage hero banner, fading softly into the background.
-                      Use a portrait or head-and-shoulders shot. The full image will be shown — nothing is cropped.
+                      For best results: use a portrait or head-and-shoulders shot with your subject centered — the display area crops to fit, so avoid placing important content near the very top or bottom edges.
                     </p>
                   </div>
                   {heroImageUrl && (
