@@ -160,13 +160,59 @@ export async function POST(req: NextRequest) {
       }
 
       if (type === "plan_subscription") {
-        // Update author plan after subscription purchase
         const { authorId } = session.metadata ?? {};
         if (authorId && session.subscription) {
+          // Persist the subscription ID and customer ID on the author
           await prisma.author.update({
             where: { id: authorId },
-            data: { stripeSubscriptionId: session.subscription },
+            data: {
+              stripeSubscriptionId: session.subscription,
+              ...(session.customer ? { stripeCustomerId: session.customer } : {}),
+            },
           });
+
+          // Fetch full subscription from Stripe to get billing period + plan
+          try {
+            const stripeSub = await stripe.subscriptions.retrieve(session.subscription);
+            const priceId   = stripeSub.items.data[0]?.price?.id;
+            const plan      = priceId
+              ? await prisma.plan.findFirst({
+                  where:  { OR: [{ stripePriceId: priceId }, { stripePriceIdMonthly: priceId }, { stripePriceIdAnnual: priceId }] },
+                  select: { id: true },
+                })
+              : null;
+
+            const periodStart = stripeSub.current_period_start
+              ? new Date(stripeSub.current_period_start * 1000) : null;
+            const periodEnd   = stripeSub.current_period_end
+              ? new Date(stripeSub.current_period_end * 1000) : null;
+            const interval    = stripeSub.items.data[0]?.price?.recurring?.interval === "year"
+              ? "annual" : "monthly";
+
+            if (plan) {
+              await prisma.authorSubscription.upsert({
+                where:  { authorId },
+                create: {
+                  authorId,
+                  planId:             plan.id,
+                  status:             "active",
+                  billingInterval:    interval,
+                  currentPeriodStart: periodStart,
+                  currentPeriodEnd:   periodEnd,
+                },
+                update: {
+                  planId:               plan.id,
+                  status:               "active",
+                  billingInterval:      interval,
+                  currentPeriodStart:   periodStart,
+                  currentPeriodEnd:     periodEnd,
+                  renewalReminderSentAt: null,
+                },
+              });
+            }
+          } catch (e) {
+            console.error("[webhook] Failed to upsert AuthorSubscription:", e);
+          }
         }
       }
       break;
@@ -183,8 +229,9 @@ export async function POST(req: NextRequest) {
         where: { stripeSubscriptionId: subscription.id },
         data:  { planId: null }, // null planId = Free
       });
-      // Revert theme for each affected author
+      // Remove AuthorSubscription rows and revert theme for each affected author
       for (const a of affected) {
+        await prisma.authorSubscription.deleteMany({ where: { authorId: a.id } });
         await revertThemeOnDowngrade(a.id, "FREE");
       }
       break;
