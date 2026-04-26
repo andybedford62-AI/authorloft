@@ -152,7 +152,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               src={photoSrc}
               alt={authorName}
               fill
-              className="object-cover object-top"
+              className="object-cover object-center"
               style={{
                 maskImage:
                   "radial-gradient(ellipse 78% 82% at 48% 38%, #000 35%, rgba(0,0,0,0.75) 58%, transparent 85%)",
