@@ -126,6 +126,9 @@ export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             {saving ? "Uploading…" : "Click to choose image (JPG, PNG, WebP)"}
           </button>
+          <p className="mt-2 text-center text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            Recommended size: <strong>1092 × 1404 px</strong> — PNG or WebP for best quality
+          </p>
         </div>
       ) : (
         <div className="flex gap-2">
@@ -154,7 +157,7 @@ export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <p className="text-xs text-gray-400">
-        Recommended: 1092 × 1404 px, PNG or WebP. Clearing reverts to the default screenshot.
+        Clearing the image reverts to the default screenshot.
       </p>
     </div>
   );
