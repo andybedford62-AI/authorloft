@@ -586,14 +586,15 @@ model ContactMessage {
 // ─── Platform Settings (singleton) ───────────────────────────────────────────
 
 model PlatformSettings {
-  id               String    @id @default("singleton")
-  privacyContent   String?   @db.Text
-  privacyUpdatedAt DateTime?
-  termsContent     String?   @db.Text
-  termsUpdatedAt   DateTime?
-  contactEmail     String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                    String    @id @default("singleton")
+  privacyContent        String?   @db.Text
+  privacyUpdatedAt      DateTime?
+  termsContent          String?   @db.Text
+  termsUpdatedAt        DateTime?
+  contactEmail          String?
+  marketingHeroImageUrl String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 // ─── Plan Feature Gates (singleton) ──────────────────────────────────────────
