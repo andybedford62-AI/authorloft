@@ -46,6 +46,21 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
+  // Hero layout gate — author-left and author-right require a paid plan
+  if (heroLayout && heroLayout !== "portrait") {
+    const author = await prisma.author.findUnique({
+      where:  { id: authorId },
+      select: { plan: { select: { tier: true } } },
+    });
+    const tier = author?.plan?.tier ?? "FREE";
+    if (tier === "FREE") {
+      return NextResponse.json(
+        { error: "Author Left and Author Right hero layouts require a Standard or Premium plan." },
+        { status: 403 }
+      );
+    }
+  }
+
   const author = await prisma.author.update({
     where: { id: authorId },
     data: {
