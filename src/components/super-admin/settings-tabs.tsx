@@ -12,11 +12,13 @@ import {
   Image,
   FlaskConical,
   Settings,
+  UserX,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
 import { MarketingHeroImage } from "./marketing-hero-image";
 import { BetaModePanel } from "./beta-mode-panel";
+import { GhostUsersPanel } from "./ghost-users-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -58,6 +60,7 @@ export interface SettingsTabsProps {
 
 const TABS = [
   { id: "overview",      label: "Overview",      icon: Database    },
+  { id: "onboarding",    label: "Onboarding",    icon: UserX       },
   { id: "beta",          label: "Beta Mode",      icon: FlaskConical },
   { id: "maintenance",   label: "Maintenance",    icon: WifiOff     },
   { id: "marketing",     label: "Marketing",      icon: Image       },
@@ -93,6 +96,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
 
       {/* Tab panels */}
       {activeTab === "overview"      && <OverviewTab      {...props} />}
+      {activeTab === "onboarding"    && <OnboardingTab />}
       {activeTab === "beta"          && <BetaTab          {...props} />}
       {activeTab === "maintenance"   && <MaintenanceTab   {...props} />}
       {activeTab === "marketing"     && <MarketingTab     {...props} />}
@@ -167,6 +171,25 @@ function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, tota
         </div>
       </section>
     </div>
+  );
+}
+
+// ── Onboarding tab ────────────────────────────────────────────────────────────
+
+function OnboardingTab() {
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <UserX className="h-4 w-4 text-gray-400" />
+          Ghost Account Management
+        </h2>
+        <p className="text-xs text-gray-500 mt-1">
+          Verified accounts that have never added a book. Reminder sent at day 7, auto-deleted at day 14.
+        </p>
+      </div>
+      <GhostUsersPanel />
+    </section>
   );
 }
 
