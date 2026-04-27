@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import {
   Loader2, Check, X, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
 } from "lucide-react";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -190,6 +191,8 @@ function RegisterPageInner() {
         setSubmitting(false);
         return;
       }
+
+      posthog.capture("signed_up", { method: "email", slug: data.slug });
 
       const signInResult = await signIn("credentials", {
         email: email.toLowerCase().trim(),

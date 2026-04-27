@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+
+function capturePostHog(distinctId: string, event: string, properties: Record<string, unknown>) {
+  const key  = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+  if (!key) return;
+  fetch(`${host}/capture/`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ api_key: key, distinct_id: distinctId, event, properties }),
+  }).catch(() => {});
+}
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from "@/lib/mailer";
@@ -234,6 +245,13 @@ export async function POST(req: NextRequest) {
                 where:  { id: plan.id },
                 select: { name: true, monthlyPriceCents: true, annualPriceCents: true },
               });
+
+              // Analytics: track plan upgrade (fires after planRecord is available)
+              capturePostHog(authorId, "upgraded_to_paid", {
+                plan:     planRecord?.name ?? "paid",
+                interval,
+              });
+
               if (authorRecord && planRecord) {
                 const amountCents = interval === "annual"
                   ? planRecord.annualPriceCents
