@@ -61,7 +61,49 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, email, password, slug: rawSlug, termsAccepted } = body;
+    const { name, email, password, slug: rawSlug, termsAccepted, inviteCode } = body;
+
+    // ── Beta mode invite-code check ─────────────────────────────────────────
+    const sysConfig = await prisma.systemConfig.findUnique({
+      where:  { id: "main" },
+      select: { betaMode: true },
+    });
+    if (sysConfig?.betaMode) {
+      if (!inviteCode?.trim()) {
+        return NextResponse.json(
+          { error: "An invite code is required to register during beta.", field: "inviteCode" },
+          { status: 403 }
+        );
+      }
+      const code = await prisma.inviteCode.findUnique({
+        where: { code: inviteCode.trim().toUpperCase() },
+      });
+      if (!code) {
+        return NextResponse.json(
+          { error: "Invalid invite code. Please check and try again.", field: "inviteCode" },
+          { status: 403 }
+        );
+      }
+      if (code.usesCount >= code.maxUses) {
+        return NextResponse.json(
+          { error: "This invite code has already been used.", field: "inviteCode" },
+          { status: 403 }
+        );
+      }
+      if (code.expiresAt && code.expiresAt < new Date()) {
+        return NextResponse.json(
+          { error: "This invite code has expired.", field: "inviteCode" },
+          { status: 403 }
+        );
+      }
+      // Increment usage count now — before account creation so race conditions
+      // can't result in over-use. Account creation failure is tolerable; double
+      // use is not.
+      await prisma.inviteCode.update({
+        where: { id: code.id },
+        data:  { usesCount: { increment: 1 } },
+      });
+    }
 
     // ── Field validation ────────────────────────────────────────────────────
     if (!termsAccepted) {

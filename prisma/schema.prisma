@@ -17,7 +17,21 @@ model SystemConfig {
   id                 String   @id @default("main")
   maintenanceMode    Boolean  @default(false)
   maintenanceMessage String   @default("")
+  betaMode           Boolean  @default(false)
+  betaMessage        String   @default("")
   updatedAt          DateTime @updatedAt
+}
+
+// ─── Beta Invite Codes ────────────────────────────────────────────────────────
+
+model InviteCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  label     String    @default("")
+  maxUses   Int       @default(1)
+  usesCount Int       @default(0)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
 }
 
 // ─── Plans & Billing ─────────────────────────────────────────────────────────
