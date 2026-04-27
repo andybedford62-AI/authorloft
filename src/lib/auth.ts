@@ -114,6 +114,15 @@ export const authOptions: NextAuthOptions = {
             });
           }
         } else {
+          // Block new account creation via Google while beta mode is active
+          const sysConfig = await prisma.systemConfig.findUnique({
+            where:  { id: "main" },
+            select: { betaMode: true },
+          });
+          if (sysConfig?.betaMode) {
+            return "/register?google_beta_blocked=1";
+          }
+
           // New Google user — create author with auto-generated slug
           const freePlan = await prisma.plan.findFirst({
             where: { tier: "FREE" },

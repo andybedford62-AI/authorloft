@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/db";
-import { Settings, Globe, Database, BookOpen, Users, Mail, ShoppingBag, WifiOff, Image } from "lucide-react";
+import { Settings, Globe, Database, BookOpen, Users, Mail, ShoppingBag, WifiOff, Image, FlaskConical } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "@/components/super-admin/maintenance-toggle";
 import { MarketingHeroImage } from "@/components/super-admin/marketing-hero-image";
+import { BetaModePanel } from "@/components/super-admin/beta-mode-panel";
 
 export default async function SuperAdminSettingsPage() {
   // Gather platform-wide stats
@@ -15,6 +16,7 @@ export default async function SuperAdminSettingsPage() {
     planBreakdown,
     maintenanceConfig,
     platformSettings,
+    betaCodes,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -36,6 +38,7 @@ export default async function SuperAdminSettingsPage() {
       update: {},
       select: { marketingHeroImageUrl: true },
     }),
+    prisma.inviteCode.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   const platformStats = [
@@ -143,6 +146,29 @@ export default async function SuperAdminSettingsPage() {
         <MaintenanceToggle
           initialMode={maintenanceConfig.maintenanceMode}
           initialMessage={maintenanceConfig.maintenanceMessage}
+        />
+      </section>
+
+      {/* Beta Mode */}
+      <section className="bg-gray-900 rounded-xl border border-gray-700 p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold text-gray-100 flex items-center gap-2">
+            <FlaskConical className="h-4 w-4 text-amber-400" />
+            Beta Mode
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">
+            When enabled, new registrations require an invite code and Google sign-up is blocked for new accounts.
+            Toggle off to go live — no code changes required.
+          </p>
+        </div>
+        <BetaModePanel
+          initialBetaMode={maintenanceConfig.betaMode}
+          initialBetaMessage={maintenanceConfig.betaMessage}
+          initialCodes={betaCodes.map((c) => ({
+            ...c,
+            expiresAt: c.expiresAt?.toISOString() ?? null,
+            createdAt: c.createdAt.toISOString(),
+          }))}
         />
       </section>
 
