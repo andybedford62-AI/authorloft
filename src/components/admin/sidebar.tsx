@@ -30,6 +30,7 @@ import {
   Sun,
   Moon,
   Lock,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -37,9 +38,10 @@ import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
 // ── Types ───────────────────────────────────────────────────────────────────
 
 interface NavItem {
-  href:  string;
-  label: string;
-  icon:  React.ElementType;
+  href:     string;
+  label:    string;
+  icon:     React.ElementType;
+  external?: boolean;
 }
 
 interface NavGroup {
@@ -105,6 +107,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/admin/genres",               label: "Genres",        icon: Tag        },
   { href: "/super-admin/legal",          label: "Legal",         icon: Shield     },
   { href: "/super-admin/settings",       label: "Platform",      icon: Settings   },
+  { href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", label: "Analytics", icon: BarChart2, external: true },
 ];
 
 // ── Theme token helper ───────────────────────────────────────────────────────
@@ -405,19 +408,26 @@ export function AdminSidebar({
 
               {superOpen && (
                 <div className="mt-0.5 space-y-0.5">
-                  {SUPER_ADMIN_ITEMS.map(({ href, label, icon: Icon }) => {
-                    const active = pathname.startsWith(href) &&
-                      // avoid /admin/dashboard matching /admin/genres etc.
+                  {SUPER_ADMIN_ITEMS.map(({ href, label, icon: Icon, external }) => {
+                    const active = !external && pathname.startsWith(href) &&
                       (href !== "/admin/dashboard");
-                    return (
-                      <Link
+                    const cls = cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                      active ? t.superActive : t.superItem
+                    );
+                    return external ? (
+                      <a
                         key={href}
                         href={href}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                          active ? t.superActive : t.superItem
-                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cls}
                       >
+                        <Icon className="h-4 w-4 flex-shrink-0" />
+                        {label}
+                      </a>
+                    ) : (
+                      <Link key={href} href={href} className={cls}>
                         <Icon className="h-4 w-4 flex-shrink-0" />
                         {label}
                       </Link>
