@@ -265,6 +265,7 @@ function ConfigurationTab({ envValues }: SettingsTabsProps) {
         </h2>
         <div className="grid sm:grid-cols-2 gap-3">
           {[
+            { label: "Analytics Dashboard",  href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", desc: "Page views, signups & conversions" },
             { label: "Supabase Dashboard", href: "https://supabase.com/dashboard", desc: "Manage the database directly"    },
             { label: "Stripe Dashboard",   href: "https://dashboard.stripe.com",   desc: "View payments and subscriptions" },
             { label: "Docs: Next.js",      href: "https://nextjs.org/docs",        desc: "Next.js 15 documentation"        },
