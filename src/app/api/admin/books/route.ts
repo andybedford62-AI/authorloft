@@ -86,5 +86,11 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // Mark onboarding complete on first book — protects the account from ghost-cleanup
+  await prisma.author.updateMany({
+    where: { id: authorId, onboardingCompletedAt: null },
+    data:  { onboardingCompletedAt: new Date() },
+  });
+
   return NextResponse.json(book, { status: 201 });
 }

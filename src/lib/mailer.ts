@@ -563,6 +563,56 @@ export async function sendRenewalReminderEmail({
   });
 }
 
+// ── Onboarding reminder email (to author) ────────────────────────────────────
+
+export async function sendOnboardingReminderEmail(to: string, name: string, slug: string) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const dashboardUrl   = `${baseUrl()}/admin/books`;
+  const publicSiteUrl  = `https://${slug}.${platformDomain}`;
+  const firstName      = esc(name.split(" ")[0]);
+
+  return sendMail({
+    to,
+    subject: "Your AuthorLoft site is waiting — add your first book",
+    text: [
+      `Hi ${firstName},`,
+      `You signed up for AuthorLoft a week ago but haven't added any books yet.`,
+      `Your author site is live at ${publicSiteUrl} — it just needs a book to really shine.`,
+      `Add your first book here: ${dashboardUrl}`,
+      `If you no longer need your account, you can simply ignore this email and it will be automatically removed in 7 days.`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml("Your site is waiting for its first book", `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        You signed up for AuthorLoft a week ago — great to have you! Your author site is live,
+        but it's still waiting for its first book.
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        Adding a book takes just a few minutes and brings your site to life for readers.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:8px 0 24px;">
+            <a href="${dashboardUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              Add My First Book
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 8px;font-size:13px;color:#6b7280;text-align:center;">
+        Your site: <a href="${publicSiteUrl}" style="color:#1d4ed8;">${publicSiteUrl}</a>
+      </p>
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
+        If you no longer need your account, simply ignore this email — it will be automatically removed in 7 days.
+      </p>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**
