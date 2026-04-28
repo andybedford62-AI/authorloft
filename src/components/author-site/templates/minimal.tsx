@@ -11,8 +11,7 @@ import type { HomeTemplateProps } from "./types";
 
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
-  const featuredBooks = books.filter((b) => b.isFeatured);
-  const displayBooks = featuredBooks.length > 0 ? featuredBooks.slice(0, 8) : books.slice(0, 8);
+  const displayBooks = books.slice(0, 3);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
@@ -61,22 +60,18 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-4">
               <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">
-                {featuredBooks.length > 0 ? "Featured Books" : "Books"}
-              </h2>
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
             </div>
-            {books.length > 8 && (
-              <Link
-                href="/books"
-                className="text-sm font-semibold flex items-center gap-1 transition-opacity hover:opacity-75"
-                style={{ color: accentColor }}
-              >
-                All {books.length} books <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
-            )}
+            <Link
+              href="/books"
+              className="text-sm font-semibold flex items-center gap-1 transition-opacity hover:opacity-75"
+              style={{ color: accentColor }}
+            >
+              View All <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
             {displayBooks.map((book) => (
               <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-3">
                 <div className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-200 relative shadow group-hover:shadow-lg transition-shadow duration-300">
