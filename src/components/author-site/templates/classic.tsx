@@ -98,7 +98,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       {books.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
+            <h2 className="text-2xl font-bold text-gray-900 font-heading">Featured Books</h2>
             <Link
               href="/books"
               className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"

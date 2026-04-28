@@ -50,7 +50,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-baseline justify-between mb-8">
             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight font-heading">
-              Books
+              Featured Books
             </h2>
             <Link href="/books" className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
               View All <ChevronRight className="h-3.5 w-3.5" />

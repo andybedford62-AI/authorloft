@@ -60,7 +60,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-4">
               <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">Featured Books</h2>
             </div>
             <Link
               href="/books"
