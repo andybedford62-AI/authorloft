@@ -43,6 +43,7 @@ interface BookCardProps {
     directSalesEnabled?: boolean;
     retailerLinks?: RetailerLinkPublic[];
     directSaleItems?: DirectSaleItemPublic[];
+    saleInfo?: { discountCents: number; salePriceCents: number } | null;
   };
   accentColor: string;
   authorSlug: string;
@@ -187,11 +188,26 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
             )}
           </h3>
 
-          {book.priceCents > 0 && (
+          {book.saleInfo ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                style={{ backgroundColor: accentColor + "20", color: accentColor }}
+              >
+                SALE
+              </span>
+              <span className="text-sm font-semibold" style={{ color: accentColor }}>
+                {formatCents(book.saleInfo.salePriceCents)}
+              </span>
+              <span className="text-xs text-gray-400 line-through">
+                {formatCents(book.priceCents)}
+              </span>
+            </div>
+          ) : book.priceCents > 0 ? (
             <p className="text-sm font-semibold" style={{ color: accentColor }}>
               {formatCents(book.priceCents)}
             </p>
-          )}
+          ) : null}
 
           {/* Buy buttons */}
           <div className="flex flex-wrap gap-2 items-center">
@@ -270,6 +286,14 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
             <BookOpen className="h-12 w-12 text-gray-300" />
           </div>
         )}
+        {book.saleInfo && (
+          <div
+            className="absolute top-2 left-2 z-10 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm text-white"
+            style={{ backgroundColor: accentColor }}
+          >
+            SALE
+          </div>
+        )}
       </div>
       <div className="p-4 flex flex-col gap-2 flex-1">
         {book.caption && (
@@ -293,7 +317,22 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
         )}
 
         <div className="flex items-center justify-between mt-2">
-          {priceLabel ? (
+          {book.saleInfo ? (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span
+                className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                style={{ backgroundColor: accentColor + "20", color: accentColor }}
+              >
+                SALE
+              </span>
+              <span className="text-sm font-medium" style={{ color: accentColor }}>
+                {formatCents(book.saleInfo.salePriceCents)}
+              </span>
+              <span className="text-xs text-gray-400 line-through">
+                {formatCents(book.priceCents)}
+              </span>
+            </div>
+          ) : priceLabel ? (
             <span className="text-sm font-medium" style={{ color: accentColor }}>
               {priceLabel}
             </span>

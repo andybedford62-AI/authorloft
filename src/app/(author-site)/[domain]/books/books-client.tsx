@@ -20,6 +20,8 @@ interface Book {
   retailerLinks?: RetailerLinkPublic[];
   directSaleItems?: DirectSaleItemPublic[];
   releaseDate?: string | Date | null;
+  caption?: string | null;
+  saleInfo?: { discountCents: number; salePriceCents: number } | null;
 }
 
 interface Props {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { calcDiscount } from "@/lib/discount-queries";
 
 /**
  * POST /api/checkout/validate-discount
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     // Look up the discount code for this author (case-insensitive)
     const discount = await prisma.discountCode.findUnique({
       where: { authorId_code: { authorId, code: code.trim().toUpperCase() } },
+      include: { books: { select: { bookId: true } } },
     });
 
     if (!discount || !discount.isActive) {
@@ -53,23 +55,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." });
     }
 
-    // Check book restriction
-    if (discount.bookId && discount.bookId !== bookId) {
+    // Check book restriction (if books are specified, this book must be in the list)
+    const restrictedBookIds = discount.books.map((b) => b.bookId);
+    if (restrictedBookIds.length > 0 && !restrictedBookIds.includes(bookId)) {
       return NextResponse.json({ valid: false, error: "This code is not valid for this book." });
     }
 
-    // Calculate discount amount
-    let discountCents: number;
-    if (discount.type === "PERCENT") {
-      discountCents = Math.round(saleItem.priceCents * (discount.value / 100));
-    } else {
-      discountCents = Math.min(discount.value, saleItem.priceCents);
-    }
-
-    const finalPriceCents = Math.max(0, saleItem.priceCents - discountCents);
+    // Calculate discount using shared helper
+    const { discountCents, finalPriceCents } = calcDiscount(
+      saleItem.priceCents,
+      discount.type,
+      discount.value,
+    );
 
     return NextResponse.json({
-      valid: true,
+      valid:           true,
       discountId:      discount.id,
       type:            discount.type,
       value:           discount.value,

@@ -298,7 +298,7 @@ model Book {
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
   reviews             BookReview[]
-  discountCodes       DiscountCode[]
+  discountCodeBooks   DiscountCodeBook[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
 
   @@unique([authorId, slug])
@@ -569,23 +569,33 @@ model Order {
 
 // ─── Discount Codes ───────────────────────────────────────────────────────────
 
+model DiscountCodeBook {
+  discountCodeId String
+  bookId         String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  book           Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([discountCodeId, bookId])
+  @@index([bookId])
+}
+
 model DiscountCode {
-  id          String    @id @default(cuid())
-  authorId    String
-  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  code        String    // stored uppercase, e.g. "LAUNCH20"
-  description String?   // internal note for the author
-  type        String    // "PERCENT" | "FIXED"
-  value       Int       // percent 1-100, or fixed cents (e.g. 500 = $5.00)
-  maxUses     Int?      // null = unlimited
-  usesCount   Int       @default(0)
-  expiresAt   DateTime? // null = no expiry
-  isActive    Boolean   @default(true)
-  bookId      String?   // null = applies to all books for this author
-  book        Book?     @relation(fields: [bookId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  orders      Order[]
+  id              String             @id @default(cuid())
+  authorId        String
+  author          Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  code            String             // stored uppercase, e.g. "LAUNCH20"
+  description     String?            // internal note for the author
+  type            String             // "PERCENT" | "FIXED"
+  value           Int                // percent 1-100, or fixed cents (e.g. 500 = $5.00)
+  maxUses         Int?               // null = unlimited
+  usesCount       Int                @default(0)
+  expiresAt       DateTime?          // null = no expiry
+  isActive        Boolean            @default(true)
+  showAsSalePrice Boolean            @default(false) // when true, show discounted price publicly on book pages
+  books           DiscountCodeBook[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  orders          Order[]
 
   @@unique([authorId, code])
   @@index([authorId])

@@ -19,8 +19,8 @@ type DiscountCode = {
   usesCount: number;
   expiresAt: string | null;
   isActive: boolean;
-  bookId: string | null;
-  book: { id: string; title: string } | null;
+  showAsSalePrice: boolean;
+  books: { book: { id: string; title: string } }[];
   createdAt: string;
 };
 
@@ -42,24 +42,25 @@ function usageLabel(code: DiscountCode) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DiscountCodesPage() {
-  const [codes,     setCodes]     = useState<DiscountCode[]>([]);
-  const [books,     setBooks]     = useState<BookOption[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [saving,    setSaving]    = useState(false);
-  const [error,     setError]     = useState("");
-  const [copied,    setCopied]    = useState<string | null>(null);
+  const [codes,      setCodes]      = useState<DiscountCode[]>([]);
+  const [books,      setBooks]      = useState<BookOption[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [saving,     setSaving]     = useState(false);
+  const [error,      setError]      = useState("");
+  const [copied,     setCopied]     = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   // Form state
   const [form, setForm] = useState({
-    code:        "",
-    description: "",
-    type:        "PERCENT" as "PERCENT" | "FIXED",
-    value:       "",
-    maxUses:     "",
-    expiresAt:   "",
-    bookId:      "",
+    code:            "",
+    description:     "",
+    type:            "PERCENT" as "PERCENT" | "FIXED",
+    value:           "",
+    maxUses:         "",
+    expiresAt:       "",
+    bookIds:         [] as string[],
+    showAsSalePrice: false,
   });
 
   useEffect(() => {
@@ -71,10 +72,19 @@ export default function DiscountCodesPage() {
       setBooks(
         Array.isArray(booksData)
           ? booksData.map((b: any) => ({ id: b.id, title: b.title }))
-          : []
+          : [],
       );
     }).finally(() => setLoading(false));
   }, []);
+
+  function toggleBookId(bookId: string, checked: boolean) {
+    setForm((prev) => ({
+      ...prev,
+      bookIds: checked
+        ? [...prev.bookIds, bookId]
+        : prev.bookIds.filter((id) => id !== bookId),
+    }));
+  }
 
   async function createCode(e: React.FormEvent) {
     e.preventDefault();
@@ -82,24 +92,28 @@ export default function DiscountCodesPage() {
     setSaving(true);
     try {
       const res = await fetch("/api/admin/discount-codes", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code:        form.code,
-          description: form.description || undefined,
-          type:        form.type,
-          value:       form.type === "PERCENT"
-                         ? Number(form.value)
-                         : Math.round(Number(form.value) * 100), // dollars → cents
-          maxUses:     form.maxUses ? Number(form.maxUses) : undefined,
-          expiresAt:   form.expiresAt || undefined,
-          bookId:      form.bookId || undefined,
+          code:            form.code,
+          description:     form.description || undefined,
+          type:            form.type,
+          value:           form.type === "PERCENT"
+                             ? Number(form.value)
+                             : Math.round(Number(form.value) * 100),
+          maxUses:         form.maxUses ? Number(form.maxUses) : undefined,
+          expiresAt:       form.expiresAt || undefined,
+          bookIds:         form.bookIds,
+          showAsSalePrice: form.showAsSalePrice,
         }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Could not create code."); return; }
       setCodes((prev) => [data, ...prev]);
-      setForm({ code: "", description: "", type: "PERCENT", value: "", maxUses: "", expiresAt: "", bookId: "" });
+      setForm({
+        code: "", description: "", type: "PERCENT", value: "",
+        maxUses: "", expiresAt: "", bookIds: [], showAsSalePrice: false,
+      });
     } finally {
       setSaving(false);
     }
@@ -109,9 +123,9 @@ export default function DiscountCodesPage() {
     setTogglingId(code.id);
     try {
       const res = await fetch(`/api/admin/discount-codes/${code.id}`, {
-        method: "PATCH",
+        method:  "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !code.isActive }),
+        body:    JSON.stringify({ isActive: !code.isActive }),
       });
       if (res.ok) {
         const updated = await res.json();
@@ -156,11 +170,12 @@ export default function DiscountCodesPage() {
         </p>
       </div>
 
-      {/* Create form */}
+      {/* ── Create form ─────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-base font-semibold text-gray-900 mb-5">New Discount Code</h2>
         <form onSubmit={createCode} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
+
             {/* Code */}
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-700">Code <span className="text-red-500">*</span></label>
@@ -225,7 +240,7 @@ export default function DiscountCodesPage() {
 
             {/* Max uses */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Usage limit <span className="text-gray-400">(optional — blank = unlimited)</span></label>
+              <label className="text-xs font-medium text-gray-700">Usage limit <span className="text-gray-400">(blank = unlimited)</span></label>
               <input
                 type="number"
                 min={1}
@@ -247,20 +262,53 @@ export default function DiscountCodesPage() {
               />
             </div>
 
-            {/* Book restriction */}
-            <div className="space-y-1 sm:col-span-2">
-              <label className="text-xs font-medium text-gray-700">Restrict to book <span className="text-gray-400">(optional — blank = all books)</span></label>
-              <select
-                value={form.bookId}
-                onChange={(e) => setForm({ ...form, bookId: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All books</option>
-                {books.map((b) => (
-                  <option key={b.id} value={b.id}>{b.title}</option>
-                ))}
-              </select>
+            {/* Book restriction — multi-select checkboxes */}
+            {books.length > 0 && (
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs font-medium text-gray-700">
+                  Restrict to books <span className="text-gray-400">(none selected = applies to all books)</span>
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                  {books.map((b) => (
+                    <label
+                      key={b.id}
+                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.bookIds.includes(b.id)}
+                        onChange={(e) => toggleBookId(b.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">{b.title}</span>
+                    </label>
+                  ))}
+                </div>
+                {form.bookIds.length > 0 && (
+                  <p className="text-xs text-blue-600">
+                    {form.bookIds.length} book{form.bookIds.length !== 1 ? "s" : ""} selected
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Show as sale price toggle */}
+            <div className="sm:col-span-2 flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
+              <input
+                id="showAsSalePrice"
+                type="checkbox"
+                checked={form.showAsSalePrice}
+                onChange={(e) => setForm({ ...form, showAsSalePrice: e.target.checked })}
+                className="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              />
+              <label htmlFor="showAsSalePrice" className="text-sm text-gray-800 cursor-pointer leading-snug">
+                <span className="font-medium">Show discounted price publicly on book pages</span>
+                <span className="block text-xs text-gray-500 mt-0.5 font-normal">
+                  Readers will see a crossed-out original price, the discounted sale price, and a SALE badge — before they reach checkout.
+                </span>
+              </label>
             </div>
+
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
@@ -278,7 +326,7 @@ export default function DiscountCodesPage() {
         </form>
       </div>
 
-      {/* Code list */}
+      {/* ── Code list ────────────────────────────────────────────────────── */}
       {codes.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
           <Tag className="h-8 w-8 text-gray-300 mx-auto mb-3" />
@@ -293,13 +341,14 @@ export default function DiscountCodesPage() {
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:table-cell">Discount</th>
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden md:table-cell">Usage</th>
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Expires</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Book</th>
+                <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Books</th>
                 <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {codes.map((code) => (
                 <tr key={code.id} className={`hover:bg-gray-50 transition-colors ${!code.isActive ? "opacity-50" : ""}`}>
+
                   {/* Code + description */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
@@ -311,8 +360,7 @@ export default function DiscountCodesPage() {
                       >
                         {copied === code.code
                           ? <Check className="h-3.5 w-3.5 text-green-500" />
-                          : <Copy className="h-3.5 w-3.5" />
-                        }
+                          : <Copy className="h-3.5 w-3.5" />}
                       </button>
                     </div>
                     {code.description && (
@@ -342,17 +390,21 @@ export default function DiscountCodesPage() {
                     </span>
                   </td>
 
-                  {/* Book restriction */}
+                  {/* Books */}
                   <td className="px-5 py-4 hidden lg:table-cell">
                     <span className="text-xs text-gray-500">
-                      {code.book ? code.book.title : "All books"}
+                      {code.books.length === 0
+                        ? "All books"
+                        : code.books.map((b) => b.book.title).join(", ")}
                     </span>
+                    {code.showAsSalePrice && (
+                      <span className="block text-xs text-amber-600 font-medium mt-0.5">Shows as sale price</span>
+                    )}
                   </td>
 
                   {/* Actions */}
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      {/* Toggle active */}
                       <button
                         onClick={() => toggleActive(code)}
                         disabled={!!togglingId}
@@ -363,11 +415,8 @@ export default function DiscountCodesPage() {
                           ? <Loader2 className="h-4 w-4 animate-spin" />
                           : code.isActive
                             ? <ToggleRight className="h-4 w-4 text-green-500" />
-                            : <ToggleLeft className="h-4 w-4" />
-                        }
+                            : <ToggleLeft className="h-4 w-4" />}
                       </button>
-
-                      {/* Delete */}
                       <button
                         onClick={() => deleteCode(code.id)}
                         disabled={!!deletingId}
@@ -376,8 +425,7 @@ export default function DiscountCodesPage() {
                       >
                         {deletingId === code.id
                           ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : <Trash2 className="h-4 w-4" />
-                        }
+                          : <Trash2 className="h-4 w-4" />}
                       </button>
                     </div>
                   </td>

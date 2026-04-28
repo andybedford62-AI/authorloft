@@ -1,4 +1,5 @@
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
+import { getActiveSaleDiscounts } from "@/lib/discount-queries";
 import { BooksClient } from "./books-client";
 import { PageBanner } from "@/components/author-site/page-banner";
 import type { Metadata } from "next";
@@ -32,6 +33,10 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
 
   const flatGenres = genreTree.flatMap((g) => [g, ...g.children]);
 
+  // Fetch active sale discounts for all books (one query)
+  const bookPriceMap = new Map(books.map((b) => [b.id, b.priceCents]));
+  const saleMap = await getActiveSaleDiscounts(author.id, bookPriceMap);
+
   // Simplify books for client component
   const clientBooks = books.map((b) => ({
     id: b.id,
@@ -52,6 +57,8 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
     directSalesEnabled: b.directSalesEnabled,
     retailerLinks: b.retailerLinks ?? [],
     directSaleItems: (b as any).directSaleItems ?? [],
+    caption: b.caption ?? null,
+    saleInfo: saleMap.get(b.id) ?? null,
   }));
 
   const clientSeries = series.map((s) => ({ id: s.id, name: s.name, slug: s.slug }));

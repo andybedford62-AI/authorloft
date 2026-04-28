@@ -9,6 +9,7 @@ import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import { getActiveSaleDiscounts } from "@/lib/discount-queries";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -114,6 +115,10 @@ export default async function BookDetailPage({
   });
 
   if (!book) notFound();
+
+  // Check for active sale discount on this book
+  const saleMap = await getActiveSaleDiscounts(author.id, new Map([[book.id, book.priceCents]]));
+  const saleInfo = saleMap.get(book.id) ?? null;
 
   const salesEnabled        = author.plan?.salesEnabled ?? false;
   const audioEnabled        = author.plan?.audioEnabled ?? false;
@@ -248,11 +253,26 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
-              {book.priceCents > 0 && (
+              {saleInfo ? (
+                <div className="mt-3 flex items-baseline gap-3 flex-wrap">
+                  <span
+                    className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded"
+                    style={{ backgroundColor: accentColor + "20", color: accentColor }}
+                  >
+                    SALE
+                  </span>
+                  <span className="text-2xl font-bold" style={{ color: accentColor }}>
+                    {formatCents(saleInfo.salePriceCents)}
+                  </span>
+                  <span className="text-lg text-gray-400 line-through">
+                    {formatCents(book.priceCents)}
+                  </span>
+                </div>
+              ) : book.priceCents > 0 ? (
                 <p className="mt-3 text-2xl font-bold" style={{ color: accentColor }}>
                   {formatCents(book.priceCents)}
                 </p>
-              )}
+              ) : null}
             </div>
 
             {/* Short description */}

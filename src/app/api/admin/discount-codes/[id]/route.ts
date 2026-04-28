@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
-// PATCH /api/admin/discount-codes/[id] — toggle isActive
+const BOOKS_INCLUDE = {
+  books: { include: { book: { select: { id: true, title: true } } } },
+} as const;
+
+// PATCH /api/admin/discount-codes/[id] — toggle isActive, showAsSalePrice, or replace bookIds
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorId();
@@ -14,12 +18,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "Not found." }, { status: 404 });
     }
 
+    // Build book update if bookIds provided
+    const booksUpdate =
+      body.bookIds !== undefined
+        ? {
+            deleteMany: {},
+            create: (body.bookIds as string[]).map((bid) => ({ bookId: bid })),
+          }
+        : undefined;
+
     const updated = await prisma.discountCode.update({
       where: { id },
       data: {
-        ...(body.isActive !== undefined && { isActive: body.isActive }),
+        ...(body.isActive !== undefined      && { isActive: body.isActive }),
+        ...(body.showAsSalePrice !== undefined && { showAsSalePrice: body.showAsSalePrice }),
+        ...(booksUpdate                       && { books: booksUpdate }),
       },
-      include: { book: { select: { id: true, title: true } } },
+      include: BOOKS_INCLUDE,
     });
 
     return NextResponse.json(updated);

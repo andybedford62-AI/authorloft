@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
+import { calcDiscount } from "@/lib/discount-queries";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -77,23 +78,25 @@ export async function POST(req: NextRequest) {
             code: discountCode.trim().toUpperCase(),
           },
         },
+        include: { books: { select: { bookId: true } } },
       });
+
+      const restrictedBookIds = discount?.books.map((b) => b.bookId) ?? [];
+      const bookAllowed =
+        restrictedBookIds.length === 0 || restrictedBookIds.includes(book.id);
 
       const isValid =
         discount &&
         discount.isActive &&
         (!discount.expiresAt || discount.expiresAt >= new Date()) &&
         (discount.maxUses === null || discount.usesCount < discount.maxUses) &&
-        (!discount.bookId || discount.bookId === book.id);
+        bookAllowed;
 
       if (isValid && discount) {
         discountCodeId = discount.id;
-        if (discount.type === "PERCENT") {
-          discountCents = Math.round(saleItem.priceCents * (discount.value / 100));
-        } else {
-          discountCents = Math.min(discount.value, saleItem.priceCents);
-        }
-        finalPriceCents = Math.max(50, saleItem.priceCents - discountCents); // Stripe minimum 50¢
+        const calc = calcDiscount(saleItem.priceCents, discount.type, discount.value);
+        discountCents   = calc.discountCents;
+        finalPriceCents = Math.max(50, calc.finalPriceCents); // Stripe minimum 50¢
       }
     }
 

@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
+const BOOKS_INCLUDE = {
+  books: { include: { book: { select: { id: true, title: true } } } },
+} as const;
+
 // GET /api/admin/discount-codes — list all codes for the author
 export async function GET() {
   try {
     const authorId = await getAdminAuthorId();
     const codes = await prisma.discountCode.findMany({
       where: { authorId },
-      include: { book: { select: { id: true, title: true } } },
+      include: BOOKS_INCLUDE,
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(codes);
@@ -30,7 +34,8 @@ export async function POST(req: NextRequest) {
       value,
       maxUses,
       expiresAt,
-      bookId,
+      bookIds,
+      showAsSalePrice,
     } = body;
 
     if (!code || !type || !value) {
@@ -50,19 +55,23 @@ export async function POST(req: NextRequest) {
     }
 
     const upperCode = code.trim().toUpperCase().replace(/\s+/g, "");
+    const safeBookIds: string[] = Array.isArray(bookIds) ? bookIds : [];
 
     const newCode = await prisma.discountCode.create({
       data: {
         authorId,
-        code:        upperCode,
-        description: description?.trim() || null,
+        code:            upperCode,
+        description:     description?.trim() || null,
         type,
-        value:       Number(value),
-        maxUses:     maxUses ? Number(maxUses) : null,
-        expiresAt:   expiresAt ? new Date(expiresAt) : null,
-        bookId:      bookId || null,
+        value:           Number(value),
+        maxUses:         maxUses ? Number(maxUses) : null,
+        expiresAt:       expiresAt ? new Date(expiresAt) : null,
+        showAsSalePrice: showAsSalePrice ?? false,
+        books: safeBookIds.length > 0
+          ? { create: safeBookIds.map((bid: string) => ({ bookId: bid })) }
+          : undefined,
       },
-      include: { book: { select: { id: true, title: true } } },
+      include: BOOKS_INCLUDE,
     });
 
     return NextResponse.json(newCode, { status: 201 });
