@@ -16,7 +16,7 @@ const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.c
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { saleItemId } = body;
+    const { saleItemId, discountCode } = body;
 
     if (!saleItemId || typeof saleItemId !== "string") {
       return NextResponse.json({ error: "saleItemId is required" }, { status: 400 });
@@ -64,6 +64,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Free items are not yet supported via this flow." }, { status: 400 });
     }
 
+    // ── Apply discount code if provided ─────────────────────────────────────
+    let discountCents   = 0;
+    let discountCodeId: string | null = null;
+    let finalPriceCents = saleItem.priceCents;
+
+    if (discountCode && typeof discountCode === "string") {
+      const discount = await prisma.discountCode.findUnique({
+        where: {
+          authorId_code: {
+            authorId: author.id,
+            code: discountCode.trim().toUpperCase(),
+          },
+        },
+      });
+
+      const isValid =
+        discount &&
+        discount.isActive &&
+        (!discount.expiresAt || discount.expiresAt >= new Date()) &&
+        (discount.maxUses === null || discount.usesCount < discount.maxUses) &&
+        (!discount.bookId || discount.bookId === book.id);
+
+      if (isValid && discount) {
+        discountCodeId = discount.id;
+        if (discount.type === "PERCENT") {
+          discountCents = Math.round(saleItem.priceCents * (discount.value / 100));
+        } else {
+          discountCents = Math.min(discount.value, saleItem.priceCents);
+        }
+        finalPriceCents = Math.max(50, saleItem.priceCents - discountCents); // Stripe minimum 50¢
+      }
+    }
+
     // Build redirect URLs — stay on the author's subdomain
     const baseUrl = `https://${author.slug}.${PLATFORM_DOMAIN}`;
     const successUrl = `${baseUrl}/books/${book.slug}/success?session_id={CHECKOUT_SESSION_ID}`;
@@ -71,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     // Platform fee percentage (default 10% — set PLATFORM_FEE_PERCENT env var to override)
     const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
-    const platformFeeCents = Math.round(saleItem.priceCents * feePct);
+    const platformFeeCents = Math.round(finalPriceCents * feePct);
 
     // Route payment through author's Stripe Connect account if fully onboarded
     const useConnect =
@@ -90,7 +123,7 @@ export async function POST(req: NextRequest) {
         {
           price_data: {
             currency: "usd",
-            unit_amount: saleItem.priceCents,
+            unit_amount: finalPriceCents,
             product_data: {
               name: `${book.title} — ${saleItem.label}`,
               ...(saleItem.description ? { description: saleItem.description } : {}),
@@ -124,15 +157,17 @@ export async function POST(req: NextRequest) {
       data: {
         authorId:       author.id,
         customerEmail:  "",           // filled in by webhook from session.customer_email
-        totalCents:     saleItem.priceCents,
+        totalCents:     finalPriceCents,
+        discountCents,
+        ...(discountCodeId && { discountCodeId }),
         stripeSessionId: session.id,
         status:         "PENDING",
         items: {
           create: {
             bookId:     book.id,
             saleItemId: saleItem.id,
-            priceCents: saleItem.priceCents,
-            fileKey:    saleItem.fileKey ?? null, // copy now so delivery works even if item is edited later
+            priceCents: finalPriceCents,
+            fileKey:    saleItem.fileKey ?? null,
           },
         },
       },

@@ -157,6 +157,7 @@ model Author {
   posts                Post[]
   contactMessages      ContactMessage[]
   subscription         AuthorSubscription?
+  discountCodes        DiscountCode[]
   impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
   impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
 
@@ -297,6 +298,7 @@ model Book {
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
   reviews             BookReview[]
+  discountCodes       DiscountCode[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
 
   @@unique([authorId, slug])
@@ -545,21 +547,48 @@ enum OrderStatus {
 }
 
 model Order {
-  id                    String      @id @default(cuid())
+  id                    String        @id @default(cuid())
   authorId              String
   customerEmail         String
   customerName          String?
-  stripeSessionId       String?     @unique
+  stripeSessionId       String?       @unique
   stripePaymentIntentId String?
   totalCents            Int
-  status                OrderStatus @default(PENDING)
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  author                Author      @relation(fields: [authorId], references: [id])
+  discountCents         Int           @default(0)
+  discountCodeId        String?
+  status                OrderStatus   @default(PENDING)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  author                Author        @relation(fields: [authorId], references: [id])
+  discountCode          DiscountCode? @relation(fields: [discountCodeId], references: [id])
   items                 OrderItem[]
 
   @@index([authorId])
   @@index([customerEmail])
+}
+
+// ─── Discount Codes ───────────────────────────────────────────────────────────
+
+model DiscountCode {
+  id          String    @id @default(cuid())
+  authorId    String
+  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  code        String    // stored uppercase, e.g. "LAUNCH20"
+  description String?   // internal note for the author
+  type        String    // "PERCENT" | "FIXED"
+  value       Int       // percent 1-100, or fixed cents (e.g. 500 = $5.00)
+  maxUses     Int?      // null = unlimited
+  usesCount   Int       @default(0)
+  expiresAt   DateTime? // null = no expiry
+  isActive    Boolean   @default(true)
+  bookId      String?   // null = applies to all books for this author
+  book        Book?     @relation(fields: [bookId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  orders      Order[]
+
+  @@unique([authorId, code])
+  @@index([authorId])
 }
 
 model OrderItem {

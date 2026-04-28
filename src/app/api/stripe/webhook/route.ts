@@ -95,6 +95,14 @@ export async function POST(req: NextRequest) {
             },
           });
 
+          // Increment discount code usage count if one was applied
+          if (order.discountCodeId) {
+            await prisma.discountCode.update({
+              where: { id: order.discountCodeId },
+              data: { usesCount: { increment: 1 } },
+            }).catch((err) => console.error("[webhook] discountCode increment error:", err));
+          }
+
           // Set download expiry and ensure fileKey is populated on each item
           const expiry = generateDownloadExpiry(48);
           for (const item of order.items) {

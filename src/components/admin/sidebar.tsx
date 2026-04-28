@@ -77,10 +77,11 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "marketing", label: "Marketing", defaultOpen: true,
     items: [
-      { href: "/admin/newsletter",   label: "Newsletter",   icon: Mail       },
-      { href: "/admin/sales",        label: "Sales",        icon: ShoppingBag},
-      { href: "/admin/ai-assistant", label: "AI Assistant", icon: Bot        },
-      { href: "/admin/seo-audit",    label: "SEO Audit",    icon: Search     },
+      { href: "/admin/newsletter",      label: "Newsletter",      icon: Mail       },
+      { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
+      { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
+      { href: "/admin/ai-assistant",    label: "AI Assistant",    icon: Bot        },
+      { href: "/admin/seo-audit",       label: "SEO Audit",       icon: Search     },
     ],
   },
   {
