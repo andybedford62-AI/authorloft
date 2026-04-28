@@ -18,6 +18,7 @@ type Author = {
   isActive: boolean;
   isSuperAdmin: boolean;
   createdAt: Date;
+  lastLoginAt: Date | null;
   plan: { name: string; tier: string; monthlyPriceCents: number } | null;
   _count: { books: number; subscribers: number; orders: number };
 };
@@ -27,6 +28,35 @@ const TIER_VARIANT: Record<string, "success" | "default" | "warning"> = {
   STANDARD: "default",
   FREE: "warning",
 };
+
+// Helper to format relative time (e.g., "2 days ago", "1 hour ago", "Never")
+function formatLastLogin(date: Date | null): string {
+  if (!date) return "Never";
+
+  const now = new Date();
+  const diff = now.getTime() - new Date(date).getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days === 1) return "1 day ago";
+  if (days < 30) return `${days}d ago`;
+
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "1 week ago";
+  if (weeks < 4) return `${weeks}w ago`;
+
+  const months = Math.floor(days / 30);
+  if (months === 1) return "1 month ago";
+  if (months < 12) return `${months}mo ago`;
+
+  const years = Math.floor(days / 365);
+  return `${years}y ago`;
+}
 
 export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) {
   const router = useRouter();
@@ -97,13 +127,14 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden md:table-cell">Subscribers</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Status</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Joined</th>
+              <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden xl:table-cell">Last Login</th>
               <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {authors.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-5 py-10 text-center text-gray-400 text-sm">
+                <td colSpan={8} className="px-5 py-10 text-center text-gray-400 text-sm">
                   No authors found.
                 </td>
               </tr>
@@ -180,6 +211,13 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                     {new Date(author.createdAt).toLocaleDateString("en-US", {
                       month: "short", day: "numeric", year: "numeric",
                     })}
+                  </span>
+                </td>
+
+                {/* Last login */}
+                <td className="px-5 py-4 hidden xl:table-cell">
+                  <span className="text-xs text-gray-500">
+                    {formatLastLogin(author.lastLoginAt)}
                   </span>
                 </td>
 

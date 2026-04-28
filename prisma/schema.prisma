@@ -140,6 +140,7 @@ model Author {
   termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
   onboardingCompletedAt   DateTime?      // set when first book is created; null = never completed onboarding
   onboardingReminderSentAt DateTime?     // set when the day-7 nudge email is sent
+  lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   books                Book[]

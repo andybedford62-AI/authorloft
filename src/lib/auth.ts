@@ -94,60 +94,74 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // ── Google: create or find author on first sign-in ─────────────────────
+    // ── Sign-in: track last login time ────────────────────────────────────
     async signIn({ user, account }) {
-      if (account?.provider !== "google") return true;
-
       try {
-        const email = user.email!.toLowerCase();
-        const existing = await prisma.author.findUnique({
-          where: { email },
-          select: { id: true, emailVerified: true },
-        });
+        // Handle Google provider
+        if (account?.provider === "google") {
+          const email = user.email!.toLowerCase();
+          const existing = await prisma.author.findUnique({
+            where: { email },
+            select: { id: true, emailVerified: true },
+          });
 
-        if (existing) {
-          // Existing account — mark email verified if not already
-          if (!existing.emailVerified) {
+          if (existing) {
+            // Existing account — mark email verified if not already and update lastLoginAt
             await prisma.author.update({
               where: { id: existing.id },
-              data: { emailVerified: new Date() },
+              data: {
+                ...((!existing.emailVerified) && { emailVerified: new Date() }),
+                lastLoginAt: new Date(),
+              },
+            });
+          } else {
+            // Block new account creation via Google while beta mode is active
+            const sysConfig = await prisma.systemConfig.findUnique({
+              where:  { id: "main" },
+              select: { betaMode: true },
+            });
+            if (sysConfig?.betaMode) {
+              return "/register?google_beta_blocked=1";
+            }
+
+            // New Google user — create author with auto-generated slug
+            const freePlan = await prisma.plan.findFirst({
+              where: { tier: "FREE" },
+              select: { id: true },
+            });
+            const baseName  = user.name ?? email.split("@")[0];
+            const slugBase  = slugify(baseName) || "author";
+            const finalSlug = await uniqueSlug(slugBase.slice(0, 38));
+
+            await prisma.author.create({
+              data: {
+                email,
+                name:           baseName,
+                displayName:    baseName,
+                slug:           finalSlug,
+                isActive:       true,
+                emailVerified:  new Date(),   // Google has already verified the email
+                profileImageUrl: user.image ?? null,
+                lastLoginAt:    new Date(),
+                ...(freePlan && { planId: freePlan.id }),
+              },
             });
           }
-        } else {
-          // Block new account creation via Google while beta mode is active
-          const sysConfig = await prisma.systemConfig.findUnique({
-            where:  { id: "main" },
-            select: { betaMode: true },
-          });
-          if (sysConfig?.betaMode) {
-            return "/register?google_beta_blocked=1";
-          }
-
-          // New Google user — create author with auto-generated slug
-          const freePlan = await prisma.plan.findFirst({
-            where: { tier: "FREE" },
-            select: { id: true },
-          });
-          const baseName  = user.name ?? email.split("@")[0];
-          const slugBase  = slugify(baseName) || "author";
-          const finalSlug = await uniqueSlug(slugBase.slice(0, 38));
-
-          await prisma.author.create({
-            data: {
-              email,
-              name:           baseName,
-              displayName:    baseName,
-              slug:           finalSlug,
-              isActive:       true,
-              emailVerified:  new Date(),   // Google has already verified the email
-              profileImageUrl: user.image ?? null,
-              ...(freePlan && { planId: freePlan.id }),
-            },
-          });
+          return true;
         }
+
+        // Handle Credentials provider — update lastLoginAt for existing credentials login
+        if (account?.provider === "credentials" && user?.email) {
+          await prisma.author.update({
+            where: { email: user.email },
+            data: { lastLoginAt: new Date() },
+          });
+          return true;
+        }
+
         return true;
       } catch (err) {
-        console.error("[auth] Google signIn error:", err);
+        console.error("[auth] signIn error:", err);
         return false;
       }
     },
