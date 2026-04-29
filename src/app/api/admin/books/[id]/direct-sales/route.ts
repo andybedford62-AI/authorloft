@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { canUseFeature } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
-const VALID_FORMATS = ["EBOOK", "FLIPBOOK", "PRINT"] as const;
+const VALID_FORMATS = ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] as const;
 type DirectSaleFormat = (typeof VALID_FORMATS)[number];
 
 // ── GET — list all direct sale items for a book ───────────────────────────────
@@ -50,7 +50,7 @@ export async function POST(
   const { format, label, description, priceCents } = body;
 
   if (!format || !VALID_FORMATS.includes(format as DirectSaleFormat)) {
-    return NextResponse.json({ error: "Invalid format. Must be EBOOK, FLIPBOOK, or PRINT." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid format. Must be EBOOK, AUDIO, FLIPBOOK, or PRINT." }, { status: 400 });
   }
   if (!label?.trim()) {
     return NextResponse.json({ error: "Label is required." }, { status: 400 });
@@ -71,6 +71,11 @@ export async function POST(
       sortOrder: count,
     },
   });
+
+  // Ensure the book has directSalesEnabled so items are visible on the public site
+  if (!book.directSalesEnabled) {
+    await prisma.book.update({ where: { id: bookId }, data: { directSalesEnabled: true } });
+  }
 
   return NextResponse.json(item, { status: 201 });
 }

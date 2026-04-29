@@ -5,37 +5,48 @@ import { calcDiscount } from "@/lib/discount-queries";
 /**
  * POST /api/checkout/validate-discount
  *
- * Validates a discount code for a given sale item.
- * Body: { code: string; saleItemId: string }
- * Returns: { valid: true; type; value; discountCents; finalPriceCents; description? }
+ * Validates a discount code for one or more sale items (cart).
+ * Body: { code: string; saleItemIds: string[] }
+ *   or legacy: { code: string; saleItemId: string }
+ * Returns: { valid: true; type; value; discountCents; finalTotal; description? }
  *       or { valid: false; error: string }
  */
 export async function POST(req: NextRequest) {
   try {
-    const { code, saleItemId } = await req.json();
+    const body = await req.json();
+    const { code } = body;
 
-    if (!code || !saleItemId) {
-      return NextResponse.json({ valid: false, error: "Missing code or item." }, { status: 400 });
+    // Support both new array format and legacy single-item format
+    let saleItemIds: string[];
+    if (Array.isArray(body.saleItemIds) && body.saleItemIds.length > 0) {
+      saleItemIds = body.saleItemIds;
+    } else if (typeof body.saleItemId === "string") {
+      saleItemIds = [body.saleItemId];
+    } else {
+      return NextResponse.json({ valid: false, error: "Missing code or items." }, { status: 400 });
     }
 
-    // Load the sale item to get price and authorId
-    const saleItem = await prisma.bookDirectSaleItem.findUnique({
-      where: { id: saleItemId },
+    if (!code) {
+      return NextResponse.json({ valid: false, error: "Missing discount code." }, { status: 400 });
+    }
+
+    // Load all sale items
+    const saleItems = await prisma.bookDirectSaleItem.findMany({
+      where: { id: { in: saleItemIds }, isActive: true },
       select: {
+        id:         true,
         priceCents: true,
-        isActive: true,
-        book: { select: { authorId: true, id: true } },
+        book:       { select: { authorId: true, id: true } },
       },
     });
 
-    if (!saleItem || !saleItem.isActive) {
-      return NextResponse.json({ valid: false, error: "Item not found." }, { status: 404 });
+    if (saleItems.length === 0) {
+      return NextResponse.json({ valid: false, error: "Items not found." }, { status: 404 });
     }
 
-    const authorId = saleItem.book.authorId;
-    const bookId   = saleItem.book.id;
+    const authorId = saleItems[0].book.authorId;
 
-    // Look up the discount code for this author (case-insensitive)
+    // Look up discount code
     const discount = await prisma.discountCode.findUnique({
       where: { authorId_code: { authorId, code: code.trim().toUpperCase() } },
       include: { books: { select: { bookId: true } } },
@@ -45,37 +56,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." });
     }
 
-    // Check expiry
     if (discount.expiresAt && discount.expiresAt < new Date()) {
       return NextResponse.json({ valid: false, error: "This discount code has expired." });
     }
 
-    // Check usage limit
     if (discount.maxUses !== null && discount.usesCount >= discount.maxUses) {
       return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." });
     }
 
-    // Check book restriction (if books are specified, this book must be in the list)
+    // Calculate discount across all qualifying items
     const restrictedBookIds = discount.books.map((b) => b.bookId);
-    if (restrictedBookIds.length > 0 && !restrictedBookIds.includes(bookId)) {
-      return NextResponse.json({ valid: false, error: "This code is not valid for this book." });
+
+    let totalDiscountCents = 0;
+    let totalOriginalCents = 0;
+    let anyApplied         = false;
+
+    for (const item of saleItems) {
+      totalOriginalCents += item.priceCents;
+      const bookAllowed =
+        restrictedBookIds.length === 0 || restrictedBookIds.includes(item.book.id);
+
+      if (bookAllowed) {
+        const { discountCents } = calcDiscount(item.priceCents, discount.type, discount.value);
+        totalDiscountCents += discountCents;
+        anyApplied = true;
+      }
     }
 
-    // Calculate discount using shared helper
-    const { discountCents, finalPriceCents } = calcDiscount(
-      saleItem.priceCents,
-      discount.type,
-      discount.value,
-    );
+    if (!anyApplied) {
+      return NextResponse.json({ valid: false, error: "This code is not valid for any items in your cart." });
+    }
+
+    const finalTotal = Math.max(0, totalOriginalCents - totalDiscountCents);
 
     return NextResponse.json({
-      valid:           true,
-      discountId:      discount.id,
-      type:            discount.type,
-      value:           discount.value,
-      discountCents,
-      finalPriceCents,
-      description:     discount.description ?? null,
+      valid:         true,
+      discountId:    discount.id,
+      type:          discount.type,
+      value:         discount.value,
+      discountCents: totalDiscountCents,
+      finalTotal,
+      // Legacy field for single-item buy page compatibility
+      finalPriceCents: finalTotal,
+      description:   discount.description ?? null,
     });
   } catch (err: any) {
     console.error("[validate-discount]", err);

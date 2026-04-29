@@ -310,6 +310,7 @@ model Book {
 
 enum DirectSaleFormat {
   EBOOK
+  AUDIO
   FLIPBOOK
   PRINT
 }
@@ -447,21 +448,24 @@ model BookGenre {
 // ─── Specials / Promotions ────────────────────────────────────────────────────
 
 model Special {
-  id          String    @id @default(cuid())
-  authorId    String
-  title       String
-  description String?   @db.Text
-  imageUrl    String?
-  ctaLabel    String?
-  ctaUrl      String?
-  startsAt    DateTime?
-  endsAt      DateTime?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  authorId       String
+  title          String
+  description    String?       @db.Text
+  imageUrl       String?
+  ctaLabel       String?
+  ctaUrl         String?
+  startsAt       DateTime?
+  endsAt         DateTime?
+  isActive       Boolean       @default(true)
+  discountCodeId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  author         Author        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  discountCode   DiscountCode? @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
 
   @@index([authorId])
+  @@index([discountCodeId])
 }
 
 // ─── Custom Pages ─────────────────────────────────────────────────────────────
@@ -593,6 +597,7 @@ model DiscountCode {
   isActive        Boolean            @default(true)
   showAsSalePrice Boolean            @default(false) // when true, show discounted price publicly on book pages
   books           DiscountCodeBook[]
+  specials        Special[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   orders          Order[]

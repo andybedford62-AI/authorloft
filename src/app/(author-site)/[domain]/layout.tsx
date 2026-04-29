@@ -5,6 +5,8 @@ import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getTheme, getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
+import { CartProvider } from "@/context/cart-context";
+import { CartDrawer } from "@/components/author-site/cart-drawer";
 import type { Metadata } from "next";
 
 // export const metadata: Metadata = {
@@ -146,17 +148,20 @@ export default async function AuthorSiteLayout({
 
   return (
     <AdminSessionProvider>
-      <div
-        data-theme={dataTheme}
-      >
-        <AuthorNav
-          author={authorWithAccent}
-          navConfig={navConfig}
-          customPages={customNavPages}
-        />
-        <main className="min-h-screen">{children}</main>
-        <AuthorFooter author={authorWithAccent} navConfig={navConfig} customPages={customNavPages} />
-      </div>
+      <CartProvider>
+        <div
+          data-theme={dataTheme}
+        >
+          <AuthorNav
+            author={authorWithAccent}
+            navConfig={navConfig}
+            customPages={customNavPages}
+          />
+          <CartDrawer />
+          <main className="min-h-screen">{children}</main>
+          <AuthorFooter author={authorWithAccent} navConfig={navConfig} customPages={customNavPages} />
+        </div>
+      </CartProvider>
     </AdminSessionProvider>
   );
 }

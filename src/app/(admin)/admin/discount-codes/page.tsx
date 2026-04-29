@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Tag, Plus, Trash2, ToggleLeft, ToggleRight,
-  Loader2, Copy, Check,
+  Loader2, Copy, Check, Pencil, X,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 
@@ -51,6 +51,16 @@ export default function DiscountCodesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
+  // Edit modal state
+  const [editingCode, setEditingCode] = useState<DiscountCode | null>(null);
+  const [editForm, setEditForm] = useState({
+    code: "", description: "", type: "PERCENT" as "PERCENT" | "FIXED",
+    value: "", maxUses: "", expiresAt: "", bookIds: [] as string[],
+    showAsSalePrice: false,
+  });
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError,  setEditError]  = useState("");
+
   // Form state
   const [form, setForm] = useState({
     code:            "",
@@ -71,7 +81,9 @@ export default function DiscountCodesPage() {
       setCodes(Array.isArray(codesData) ? codesData : []);
       setBooks(
         Array.isArray(booksData)
-          ? booksData.map((b: any) => ({ id: b.id, title: b.title }))
+          ? booksData
+              .filter((b: any) => b.directSalesEnabled)
+              .map((b: any) => ({ id: b.id, title: b.title }))
           : [],
       );
     }).finally(() => setLoading(false));
@@ -153,6 +165,65 @@ export default function DiscountCodesPage() {
     });
   }
 
+  function openEdit(code: DiscountCode) {
+    setEditError("");
+    setEditingCode(code);
+    setEditForm({
+      code:            code.code,
+      description:     code.description ?? "",
+      type:            code.type,
+      value:           code.type === "FIXED"
+                         ? (code.value / 100).toFixed(2)
+                         : String(code.value),
+      maxUses:         code.maxUses !== null ? String(code.maxUses) : "",
+      expiresAt:       code.expiresAt
+                         ? new Date(code.expiresAt).toISOString().slice(0, 10)
+                         : "",
+      bookIds:         code.books.map((b) => b.book.id),
+      showAsSalePrice: code.showAsSalePrice,
+    });
+  }
+
+  function toggleEditBookId(bookId: string, checked: boolean) {
+    setEditForm((prev) => ({
+      ...prev,
+      bookIds: checked
+        ? [...prev.bookIds, bookId]
+        : prev.bookIds.filter((id) => id !== bookId),
+    }));
+  }
+
+  async function saveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingCode) return;
+    setEditError("");
+    setEditSaving(true);
+    try {
+      const res = await fetch(`/api/admin/discount-codes/${editingCode.id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code:            editForm.code,
+          description:     editForm.description || null,
+          type:            editForm.type,
+          value:           editForm.type === "PERCENT"
+                             ? Number(editForm.value)
+                             : Math.round(Number(editForm.value) * 100),
+          maxUses:         editForm.maxUses ? Number(editForm.maxUses) : null,
+          expiresAt:       editForm.expiresAt || null,
+          bookIds:         editForm.bookIds,
+          showAsSalePrice: editForm.showAsSalePrice,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setEditError(data.error || "Could not save changes."); return; }
+      setCodes((prev) => prev.map((c) => (c.id === data.id ? data : c)));
+      setEditingCode(null);
+    } finally {
+      setEditSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-48">
@@ -166,7 +237,8 @@ export default function DiscountCodesPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Discount Codes</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Create codes your readers can enter at checkout to get a discount.
+          Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print).
+          Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.
         </p>
       </div>
 
@@ -266,8 +338,9 @@ export default function DiscountCodesPage() {
             {books.length > 0 && (
               <div className="space-y-1 sm:col-span-2">
                 <label className="text-xs font-medium text-gray-700">
-                  Restrict to books <span className="text-gray-400">(none selected = applies to all books)</span>
+                  Restrict to specific books <span className="text-gray-400">(none selected = applies to all direct-sale books)</span>
                 </label>
+                <p className="text-xs text-gray-400">Only books with direct sales enabled are shown here.</p>
                 <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
                   {books.map((b) => (
                     <label
@@ -394,7 +467,7 @@ export default function DiscountCodesPage() {
                   <td className="px-5 py-4 hidden lg:table-cell">
                     <span className="text-xs text-gray-500">
                       {code.books.length === 0
-                        ? "All books"
+                        ? "All direct-sale books"
                         : code.books.map((b) => b.book.title).join(", ")}
                     </span>
                     {code.showAsSalePrice && (
@@ -405,6 +478,13 @@ export default function DiscountCodesPage() {
                   {/* Actions */}
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => openEdit(code)}
+                        title="Edit"
+                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
                       <button
                         onClick={() => toggleActive(code)}
                         disabled={!!togglingId}
@@ -433,6 +513,168 @@ export default function DiscountCodesPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {/* ── Edit modal ──────────────────────────────────────────────────── */}
+      {editingCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="text-base font-semibold text-gray-900">Edit Discount Code</h2>
+              <button onClick={() => setEditingCode(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={saveEdit} className="p-6 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+
+                {/* Code */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Code <span className="text-red-500">*</span></label>
+                  <input
+                    required
+                    value={editForm.code}
+                    onChange={(e) => setEditForm({ ...editForm, code: e.target.value.toUpperCase().replace(/\s/g, "") })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Internal note <span className="text-gray-400">(optional)</span></label>
+                  <input
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Type */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Discount type <span className="text-red-500">*</span></label>
+                  <select
+                    value={editForm.type}
+                    onChange={(e) => setEditForm({ ...editForm, type: e.target.value as "PERCENT" | "FIXED" })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="PERCENT">Percentage (e.g. 20%)</option>
+                    <option value="FIXED">Fixed amount (e.g. $5.00)</option>
+                  </select>
+                </div>
+
+                {/* Value */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">
+                    {editForm.type === "PERCENT" ? "Percent off (1–100)" : "Amount off (dollars)"} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    {editForm.type === "FIXED" && (
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                    )}
+                    <input
+                      required
+                      type="number"
+                      min={1}
+                      max={editForm.type === "PERCENT" ? 100 : undefined}
+                      step={editForm.type === "FIXED" ? "0.01" : "1"}
+                      value={editForm.value}
+                      onChange={(e) => setEditForm({ ...editForm, value: e.target.value })}
+                      className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${editForm.type === "FIXED" ? "pl-6" : ""}`}
+                    />
+                    {editForm.type === "PERCENT" && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Max uses */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Usage limit <span className="text-gray-400">(blank = unlimited)</span></label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={editForm.maxUses}
+                    onChange={(e) => setEditForm({ ...editForm, maxUses: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Expiry */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Expiry date <span className="text-gray-400">(optional)</span></label>
+                  <input
+                    type="date"
+                    value={editForm.expiresAt}
+                    onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Book restriction */}
+                {books.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="text-xs font-medium text-gray-700">
+                      Restrict to specific books <span className="text-gray-400">(none = all direct-sale books)</span>
+                    </label>
+                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                      {books.map((b) => (
+                        <label key={b.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={editForm.bookIds.includes(b.id)}
+                            onChange={(e) => toggleEditBookId(b.id, e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-gray-700">{b.title}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {editForm.bookIds.length > 0 && (
+                      <p className="text-xs text-blue-600">{editForm.bookIds.length} book{editForm.bookIds.length !== 1 ? "s" : ""} selected</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Show as sale price */}
+                <div className="sm:col-span-2 flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
+                  <input
+                    id="editShowAsSalePrice"
+                    type="checkbox"
+                    checked={editForm.showAsSalePrice}
+                    onChange={(e) => setEditForm({ ...editForm, showAsSalePrice: e.target.checked })}
+                    className="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <label htmlFor="editShowAsSalePrice" className="text-sm text-gray-800 cursor-pointer leading-snug">
+                    <span className="font-medium">Show discounted price publicly on book pages</span>
+                    <span className="block text-xs text-gray-500 mt-0.5 font-normal">
+                      Readers will see a crossed-out original price, the discounted sale price, and a SALE badge — before they reach checkout.
+                    </span>
+                  </label>
+                </div>
+
+              </div>
+
+              {editError && <p className="text-sm text-red-600">{editError}</p>}
+
+              <div className="flex justify-end gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setEditingCode(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSaving}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

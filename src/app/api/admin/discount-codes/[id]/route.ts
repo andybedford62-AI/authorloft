@@ -6,7 +6,7 @@ const BOOKS_INCLUDE = {
   books: { include: { book: { select: { id: true, title: true } } } },
 } as const;
 
-// PATCH /api/admin/discount-codes/[id] — toggle isActive, showAsSalePrice, or replace bookIds
+// PATCH /api/admin/discount-codes/[id] — full edit or toggle isActive/showAsSalePrice/bookIds
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorId();
@@ -16,6 +16,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const existing = await prisma.discountCode.findUnique({ where: { id } });
     if (!existing || existing.authorId !== authorId) {
       return NextResponse.json({ error: "Not found." }, { status: 404 });
+    }
+
+    // Validate type/value when provided
+    if (body.type !== undefined && body.type !== "PERCENT" && body.type !== "FIXED") {
+      return NextResponse.json({ error: "Invalid discount type." }, { status: 400 });
+    }
+    const type = body.type ?? existing.type;
+    if (body.value !== undefined) {
+      if (type === "PERCENT" && (body.value < 1 || body.value > 100)) {
+        return NextResponse.json({ error: "Percentage must be 1–100." }, { status: 400 });
+      }
+      if (body.value < 1) {
+        return NextResponse.json({ error: "Value must be at least 1." }, { status: 400 });
+      }
     }
 
     // Build book update if bookIds provided
@@ -30,15 +44,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const updated = await prisma.discountCode.update({
       where: { id },
       data: {
-        ...(body.isActive !== undefined      && { isActive: body.isActive }),
+        ...(body.code            !== undefined && { code: (body.code as string).toUpperCase().trim() }),
+        ...(body.description     !== undefined && { description: body.description || null }),
+        ...(body.type            !== undefined && { type: body.type }),
+        ...(body.value           !== undefined && { value: body.value }),
+        ...(body.maxUses         !== undefined && { maxUses: body.maxUses ?? null }),
+        ...(body.expiresAt       !== undefined && { expiresAt: body.expiresAt ? new Date(body.expiresAt) : null }),
+        ...(body.isActive        !== undefined && { isActive: body.isActive }),
         ...(body.showAsSalePrice !== undefined && { showAsSalePrice: body.showAsSalePrice }),
-        ...(booksUpdate                       && { books: booksUpdate }),
+        ...(booksUpdate                        && { books: booksUpdate }),
       },
       include: BOOKS_INCLUDE,
     });
 
     return NextResponse.json(updated);
-  } catch {
+  } catch (err: any) {
+    if (err?.code === "P2002") {
+      return NextResponse.json({ error: "That code already exists." }, { status: 409 });
+    }
     return NextResponse.json({ error: "Could not update." }, { status: 500 });
   }
 }

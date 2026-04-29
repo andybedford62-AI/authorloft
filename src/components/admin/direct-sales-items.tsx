@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package,
+  Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
   Upload, FileText, X, CheckCircle,
 } from "lucide-react";
 
 // ── Format config ─────────────────────────────────────────────────────────────
 
-type FormatKey = "EBOOK" | "FLIPBOOK" | "PRINT";
+type FormatKey = "EBOOK" | "AUDIO" | "FLIPBOOK" | "PRINT";
 
 const FORMATS: Record<FormatKey, {
   label: string;
@@ -17,7 +17,9 @@ const FORMATS: Record<FormatKey, {
   icon: React.ReactNode;
   color: string;
   bg: string;
-  needsFile: boolean; // PRINT doesn't need a digital file
+  needsFile: boolean;
+  fileAccept: string;
+  fileHint: string;
 }> = {
   EBOOK: {
     label: "eBook",
@@ -27,6 +29,19 @@ const FORMATS: Record<FormatKey, {
     color: "#2563eb",
     bg: "#eff6ff",
     needsFile: true,
+    fileAccept: ".pdf,.epub,.mobi",
+    fileHint: "PDF / ePub / MOBI",
+  },
+  AUDIO: {
+    label: "Audio Book",
+    description: "Downloadable audio file (MP3, M4B)",
+    defaultLabel: "Audio Book",
+    icon: <Headphones className="h-4 w-4" />,
+    color: "#d97706",
+    bg: "#fffbeb",
+    needsFile: true,
+    fileAccept: ".mp3,.m4b,.m4a",
+    fileHint: "MP3 / M4B / M4A",
   },
   FLIPBOOK: {
     label: "Flip Book",
@@ -36,6 +51,8 @@ const FORMATS: Record<FormatKey, {
     color: "#7c3aed",
     bg: "#f5f3ff",
     needsFile: true,
+    fileAccept: ".pdf,.epub,.mobi",
+    fileHint: "PDF / ePub / MOBI",
   },
   PRINT: {
     label: "Print / Physical",
@@ -45,6 +62,8 @@ const FORMATS: Record<FormatKey, {
     color: "#059669",
     bg: "#ecfdf5",
     needsFile: false,
+    fileAccept: "",
+    fileHint: "",
   },
 };
 
@@ -83,10 +102,14 @@ function FileUploadWidget({
   item,
   bookId,
   onUpdated,
+  fileAccept,
+  fileHint,
 }: {
   item: DirectSaleItem;
   bookId: string;
   onUpdated: (updated: DirectSaleItem) => void;
+  fileAccept: string;
+  fileHint: string;
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -190,7 +213,7 @@ function FileUploadWidget({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf,.epub,.mobi"
+              accept={fileAccept}
               className="sr-only"
               disabled={uploading || removing}
               onChange={handleFileChange}
@@ -218,13 +241,13 @@ function FileUploadWidget({
             {uploading ? (
               <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
             ) : (
-              <><FileText className="h-3.5 w-3.5" /> Upload file (PDF / ePub / MOBI)</>
+              <><FileText className="h-3.5 w-3.5" /> Upload file ({fileHint})</>
             )}
           </span>
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,.epub,.mobi"
+            accept={fileAccept}
             className="sr-only"
             disabled={uploading}
             onChange={handleFileChange}
@@ -363,7 +386,7 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
         <div>
           <h2 className="font-semibold text-gray-900">Direct Sales</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            Offer different editions directly to readers — eBook, Flip Book, or Print.
+            Offer different editions directly to readers — eBook, Audio Book, Flip Book, or Print.
             Each can have its own price and be activated or deactivated independently.
           </p>
         </div>
@@ -403,7 +426,7 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
           <p className="text-sm font-medium text-gray-700">Add a format for direct sale</p>
 
           {/* Format picker */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {FORMAT_KEYS.map((key) => {
               const fmt = FORMATS[key];
               const active = selectedFormat === key;
@@ -490,7 +513,7 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
 
           {FORMATS[selectedFormat].needsFile && (
             <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-3 py-2">
-              After adding this format, upload your PDF / ePub / MOBI file so buyers can download it after payment.
+              After adding this format, upload your {FORMATS[selectedFormat].fileHint} file so buyers can download it after payment.
             </p>
           )}
 
@@ -686,6 +709,8 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
                       <FileUploadWidget
                         item={item}
                         bookId={bookId}
+                        fileAccept={fmt.fileAccept}
+                        fileHint={fmt.fileHint}
                         onUpdated={(updated) =>
                           setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
                         }

@@ -4,8 +4,10 @@ import { ExternalLink, Clock, Tag } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
+import { CopyCodeButton } from "@/components/author-site/copy-code-button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { formatCents } from "@/lib/utils";
 
 export default async function SpecialsPage({
   params,
@@ -28,6 +30,11 @@ export default async function SpecialsPage({
       ],
     },
     orderBy: { createdAt: "desc" },
+    include: {
+      discountCode: {
+        select: { code: true, type: true, value: true, isActive: true },
+      },
+    },
   });
 
   return (
@@ -106,6 +113,19 @@ export default async function SpecialsPage({
                         className="text-sm text-gray-500 leading-relaxed flex-1 rich-content"
                         dangerouslySetInnerHTML={{ __html: sanitize(special.description) }}
                       />
+                    )}
+
+                    {/* Discount code */}
+                    {special.discountCode?.isActive && (
+                      <div className="space-y-1.5 mt-auto">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Use code at checkout
+                          {special.discountCode.type === "PERCENT"
+                            ? ` — ${special.discountCode.value}% off`
+                            : ` — ${formatCents(special.discountCode.value)} off`}
+                        </p>
+                        <CopyCodeButton code={special.discountCode.code} />
+                      </div>
                     )}
 
                     {/* CTA */}

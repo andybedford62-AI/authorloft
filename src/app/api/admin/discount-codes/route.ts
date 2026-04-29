@@ -57,6 +57,20 @@ export async function POST(req: NextRequest) {
     const upperCode = code.trim().toUpperCase().replace(/\s+/g, "");
     const safeBookIds: string[] = Array.isArray(bookIds) ? bookIds : [];
 
+    // Validate that any restricted book IDs belong to this author and have direct sales enabled
+    if (safeBookIds.length > 0) {
+      const validBooks = await prisma.book.findMany({
+        where: { id: { in: safeBookIds }, authorId, directSalesEnabled: true },
+        select: { id: true },
+      });
+      if (validBooks.length !== safeBookIds.length) {
+        return NextResponse.json(
+          { error: "One or more selected books do not have direct sales enabled." },
+          { status: 400 }
+        );
+      }
+    }
+
     const newCode = await prisma.discountCode.create({
       data: {
         authorId,

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, BookOpen, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, BookOpen, LogOut, LayoutDashboard, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/context/cart-context";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
   const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
   const accentColor         = author.accentColor;
+  const { itemCount, openCart } = useCart();
 
   const platformBase  = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
   const dashboardUrl  = `${platformBase}/admin/dashboard`;
@@ -170,6 +172,21 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </a>
           )}
         </div>
+
+        {/* ── Cart icon (always visible) ────────────────────────────────── */}
+        <button
+          onClick={openCart}
+          className="relative p-2 text-white/70 hover:text-white transition-colors"
+          aria-label={`Open cart${itemCount > 0 ? ` (${itemCount} item${itemCount === 1 ? "" : "s"})` : ""}`}
+        >
+          <ShoppingCart className="h-5 w-5" />
+          {itemCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-white text-[10px] font-bold flex items-center justify-center leading-none"
+              style={{ color: accentColor }}>
+              {itemCount > 9 ? "9+" : itemCount}
+            </span>
+          )}
+        </button>
 
         {/* ── Mobile hamburger ──────────────────────────────────────────── */}
         <button

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Loader2, Tag, ExternalLink, Calendar, Clock } from "lucide-react";
+import { Upload, X, Loader2, Tag, ExternalLink, Calendar, Clock, Percent } from "lucide-react";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { formatCents } from "@/lib/utils";
 
 export interface SpecialData {
   id?: string;
@@ -16,7 +17,16 @@ export interface SpecialData {
   startsAt: string | null;  // ISO date string or YYYY-MM-DD
   endsAt: string | null;
   isActive: boolean;
+  discountCodeId: string | null;
 }
+
+type DiscountCodeOption = {
+  id: string;
+  code: string;
+  type: "PERCENT" | "FIXED";
+  value: number;
+  isActive: boolean;
+};
 
 interface SpecialFormProps {
   initial?: Partial<SpecialData>;
@@ -40,11 +50,19 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
   const [startsAt, setStartsAt]     = useState(toDateInput(initial?.startsAt));
   const [endsAt, setEndsAt]         = useState(toDateInput(initial?.endsAt));
   const [isActive, setIsActive]     = useState(initial?.isActive ?? true);
+  const [discountCodeId, setDiscountCodeId] = useState(initial?.discountCodeId ?? "");
+  const [discountCodes, setDiscountCodes]   = useState<DiscountCodeOption[]>([]);
 
   const [saving, setSaving]         = useState(false);
   const [deleting, setDeleting]     = useState(false);
   const [error, setError]           = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/discount-codes")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setDiscountCodes(data); });
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -99,6 +117,7 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
         startsAt: startsAt || null,
         endsAt: endsAt || null,
         isActive,
+        discountCodeId: discountCodeId || null,
       };
 
       const url = mode === "create"
@@ -281,6 +300,55 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
             />
           </div>
         </div>
+      </section>
+
+      {/* ── Discount Code ──────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Percent className="h-4 w-4 text-gray-500" />
+          <h2 className="font-semibold text-gray-900">Discount Code</h2>
+        </div>
+        <p className="text-sm text-gray-500 -mt-2">
+          Attach a discount code to this special. Visitors will see the code on the public specials page and can copy it to use at checkout.
+        </p>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Linked discount code</label>
+          <select
+            value={discountCodeId}
+            onChange={(e) => setDiscountCodeId(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">— None —</option>
+            {discountCodes.map((dc) => (
+              <option key={dc.id} value={dc.id}>
+                {dc.code} — {dc.type === "PERCENT" ? `${dc.value}% off` : `${formatCents(dc.value)} off`}
+                {!dc.isActive ? " (inactive)" : ""}
+              </option>
+            ))}
+          </select>
+          {discountCodes.length === 0 && (
+            <p className="text-xs text-gray-400 mt-1">
+              No discount codes yet — create one in <a href="/admin/discount-codes" className="text-blue-600 hover:underline">Discount Codes</a> first.
+            </p>
+          )}
+        </div>
+
+        {discountCodeId && (() => {
+          const selected = discountCodes.find((dc) => dc.id === discountCodeId);
+          if (!selected) return null;
+          return (
+            <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+              <span className="font-mono font-bold text-blue-800 text-sm">{selected.code}</span>
+              <span className="text-blue-600 text-sm">
+                {selected.type === "PERCENT" ? `${selected.value}% off` : `${formatCents(selected.value)} off`}
+              </span>
+              {!selected.isActive && (
+                <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Inactive</span>
+              )}
+            </div>
+          );
+        })()}
       </section>
 
       {/* ── Date Range ─────────────────────────────────────────────────────── */}
