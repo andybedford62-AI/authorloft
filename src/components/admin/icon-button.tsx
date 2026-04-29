@@ -10,7 +10,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   success: "bg-green-600 hover:bg-green-700 text-white",
   danger:  "bg-red-600  hover:bg-red-700  text-white",
   warning: "bg-amber-500 hover:bg-amber-600 text-white",
-  ghost:   "bg-transparent hover:bg-gray-100 text-gray-600 [data-admin-theme=dark_&]:hover:bg-gray-700 [data-admin-theme=dark_&]:text-gray-300",
+  ghost:   "bg-transparent hover:bg-gray-100 text-gray-600",
 };
 
 export function IconButton({
