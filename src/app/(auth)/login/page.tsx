@@ -31,6 +31,8 @@ function LoginForm() {
     if (result?.error) {
       if (result.error === "EmailNotVerified") {
         setError("Please verify your email before signing in. Check your inbox for the verification link.");
+      } else if (result.error === "TooManyAttempts") {
+        setError("Too many failed attempts. Please wait 15 minutes before trying again.");
       } else {
         setError("Invalid email or password.");
       }

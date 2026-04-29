@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
 import bcrypt from "bcryptjs";
+import { checkLoginRateLimit } from "./login-rate-limit";
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
 const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "";
@@ -60,6 +61,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+
+        if (!checkLoginRateLimit(credentials.email)) {
+          throw new Error("TooManyAttempts");
+        }
 
         let author;
         try {

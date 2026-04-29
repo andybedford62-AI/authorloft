@@ -10,7 +10,7 @@ import { Resend } from "resend";
 
 const FROM_ADDRESS = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
 
-function esc(s: string): string {
+export function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 

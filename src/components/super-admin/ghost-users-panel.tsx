@@ -65,9 +65,7 @@ export function GhostUsersPanel() {
   async function runCleanup() {
     setRunningCleanup(true);
     try {
-      const res  = await fetch("/api/cron/onboarding-cleanup", {
-        headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET ?? ""}` },
-      });
+      const res  = await fetch("/api/super-admin/trigger-cleanup", { method: "POST" });
       const data = await res.json();
       if (data.ok) {
         showToast(`Cleanup run: ${data.reminded} reminded, ${data.deleted} deleted.`, true);
