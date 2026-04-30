@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lock } from "lucide-react";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
@@ -46,6 +47,7 @@ type Props = {
   series: Series[];
   genres: Genre[];
   audioEnabled: boolean;
+  salesEnabled: boolean;
   previewMedia: PreviewMedia[];
 };
 
@@ -60,7 +62,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "reviews",       label: "Reviews" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, previewMedia }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, previewMedia }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("details");
 
   return (
@@ -73,13 +75,16 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, preview
               key={id}
               type="button"
               onClick={() => setActiveTab(id)}
-              className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
                 activeTab === id
                   ? "border-[var(--accent)] text-[var(--accent)]"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
               {label}
+              {id === "direct-sales" && !salesEnabled && (
+                <Lock className="h-3 w-3 text-amber-400" />
+              )}
             </button>
           ))}
         </nav>
@@ -93,6 +98,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, preview
         series={series}
         genres={genres}
         activeTab={activeTab}
+        salesEnabled={salesEnabled}
       />
 
       {/* ── Standalone tab panels — mounted only when active ── */}
@@ -104,7 +110,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, preview
 
       {activeTab === "direct-sales" && (
         <div className="max-w-3xl">
-          <DirectSalesItems bookId={book.id} />
+          <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} />
         </div>
       )}
 

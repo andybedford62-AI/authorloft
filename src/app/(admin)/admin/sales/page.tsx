@@ -17,7 +17,7 @@ export default async function SalesPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [orders, totalRevenue, ordersThisMonth, totalOrders] = await Promise.all([
+  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth] = await Promise.all([
     prisma.order.findMany({
       where: { authorId },
       include: {
@@ -36,12 +36,11 @@ export default async function SalesPage() {
       where: { authorId, status: "COMPLETED", createdAt: { gte: startOfMonth } },
     }),
     prisma.order.count({ where: { authorId, status: "COMPLETED" } }),
+    prisma.order.aggregate({
+      where: { authorId, status: "COMPLETED", createdAt: { gte: startOfMonth } },
+      _sum: { totalCents: true },
+    }),
   ]);
-
-  const revenueThisMonth = await prisma.order.aggregate({
-    where: { authorId, status: "COMPLETED", createdAt: { gte: startOfMonth } },
-    _sum: { totalCents: true },
-  });
 
   const stats = [
     {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle, Download, Loader2, Clock, ArrowLeft, Mail } from "lucide-react";
+import { useCart } from "@/context/cart-context";
 
 interface OrderItem {
   downloadToken: string;
@@ -24,14 +25,25 @@ interface OrderStatus {
 
 interface SuccessClientProps {
   sessionId: string;
-  bookSlug: string;
+  bookSlug?: string;
   accentColor: string;
+  clearOnMount?: boolean;
 }
 
-export function SuccessClient({ sessionId, bookSlug, accentColor }: SuccessClientProps) {
+export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }: SuccessClientProps) {
+  const backHref  = bookSlug ? `/books/${bookSlug}` : "/books";
+  const backLabel = bookSlug ? "Return to book page" : "Continue browsing";
+
+  const { clearCart } = useCart();
   const [order, setOrder] = useState<OrderStatus | null>(null);
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
+
+  // Clear the cart once on mount — only for cart checkouts, not single-book purchases
+  useEffect(() => {
+    if (clearOnMount && sessionId) clearCart();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const MAX_ATTEMPTS = 8; // Poll for up to ~16 seconds
 
@@ -77,8 +89,8 @@ export function SuccessClient({ sessionId, bookSlug, accentColor }: SuccessClien
     return (
       <div className="w-full max-w-md text-center space-y-4">
         <p className="text-red-600 text-sm">{error}</p>
-        <Link href={`/books/${bookSlug}`} className="text-sm text-gray-500 hover:underline">
-          Return to book page
+        <Link href={backHref} className="text-sm text-gray-500 hover:underline">
+          {backLabel}
         </Link>
       </div>
     );
@@ -117,11 +129,11 @@ export function SuccessClient({ sessionId, bookSlug, accentColor }: SuccessClien
           Check your email for the download link
         </div>
         <Link
-          href={`/books/${bookSlug}`}
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Return to book
+          {backLabel}
         </Link>
       </div>
     );
@@ -190,11 +202,11 @@ export function SuccessClient({ sessionId, bookSlug, accentColor }: SuccessClien
 
       <div className="text-center">
         <Link
-          href={`/books/${bookSlug}`}
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Return to book page
+          {backLabel}
         </Link>
       </div>
     </div>

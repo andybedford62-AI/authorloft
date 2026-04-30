@@ -20,6 +20,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/messages":     "FREE",
   "/admin/newsletter":   "STANDARD",
   "/admin/sales":        "STANDARD",
+  "direct-sales":        "STANDARD",  // gates Plan.salesEnabled (Direct Sales tab on books)
   "/admin/appearance":   "STANDARD",
   "/admin/branding":     "FREE",
   "/admin/legal":        "FREE",
@@ -36,11 +37,12 @@ export const FEATURE_PLAN_MAP: Record<
   { field: string; enabledValue: number | boolean; disabledValue: number | boolean } | null
 > = {
   "/admin/flip-books": { field: "flipBooksLimit", enabledValue: -1,   disabledValue: 0     },
-  "/admin/sales":      { field: "salesEnabled",   enabledValue: true,  disabledValue: false },
+  "direct-sales":      { field: "salesEnabled",   enabledValue: true,  disabledValue: false },
   "/admin/newsletter": { field: "newsletter",     enabledValue: true,  disabledValue: false },
   // Admin-only — no public-site Plan field to update:
   "/admin/dashboard":    null,
   "/admin/books":        null,
+  "/admin/sales":        null,
   "/admin/specials":     null,
   "/admin/series":       null,
   "/admin/genres":       null,

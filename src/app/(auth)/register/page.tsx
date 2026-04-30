@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import {
   Loader2, Check, X, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
 } from "lucide-react";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -191,6 +192,8 @@ function RegisterPageInner() {
         return;
       }
 
+      posthog.capture("signed_up", { method: "email", slug: data.slug });
+
       const signInResult = await signIn("credentials", {
         email: email.toLowerCase().trim(),
         password,
@@ -320,7 +323,7 @@ function RegisterPageInner() {
 
               <p className="text-center text-xs text-gray-400">
                 Don&apos;t have an invite code?{" "}
-                <a href="mailto:hello@authorloft.com" className="text-blue-600 hover:underline">
+                <a href="mailto:andybedford52+AL@gmail.com" className="text-blue-600 hover:underline">
                   Request access
                 </a>
               </p>

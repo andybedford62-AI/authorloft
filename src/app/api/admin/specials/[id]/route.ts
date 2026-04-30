@@ -12,7 +12,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
 
-  const special = await prisma.special.findFirst({ where: { id, authorId } });
+  const special = await prisma.special.findFirst({
+    where: { id, authorId },
+    include: { discountCode: { select: { id: true, code: true, type: true, value: true } } },
+  });
   if (!special) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ special });
@@ -29,7 +32,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, imageUrl, imageKey, ctaLabel, ctaUrl, startsAt, endsAt, isActive } = body;
+  const { title, description, imageUrl, imageKey, ctaLabel, ctaUrl, startsAt, endsAt, isActive, discountCodeId } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -39,15 +42,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "End date must be after start date" }, { status: 400 });
   }
 
-  // If image was replaced and old one was in Supabase, delete the old one
-  if (
-    imageKey &&
-    existing.imageUrl &&
-    imageUrl !== existing.imageUrl
-  ) {
-    // Try to extract the storage key from the old URL if it was a Supabase upload
-    // imageKey from body is the new key; we can't reliably get the old key, so skip deletion here.
-    // Deletion is handled explicitly when the user removes the image.
+  // Validate discount code belongs to this author if provided
+  if (discountCodeId) {
+    const code = await prisma.discountCode.findFirst({ where: { id: discountCodeId, authorId } });
+    if (!code) return NextResponse.json({ error: "Discount code not found" }, { status: 404 });
   }
 
   const special = await prisma.special.update({
@@ -61,7 +59,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
       startsAt: startsAt ? new Date(startsAt) : null,
       endsAt: endsAt ? new Date(endsAt) : null,
       isActive: isActive ?? existing.isActive,
+      discountCodeId: discountCodeId !== undefined ? (discountCodeId || null) : existing.discountCodeId,
     },
+    include: { discountCode: { select: { id: true, code: true, type: true, value: true } } },
   });
 
   return NextResponse.json({ special });

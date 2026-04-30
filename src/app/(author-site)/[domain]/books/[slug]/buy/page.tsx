@@ -5,7 +5,7 @@ import { ArrowLeft, ShoppingCart, BookOpen, Film, Package, Lock } from "lucide-r
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { formatCents } from "@/lib/utils";
-import { BuyButton } from "@/components/author-site/buy-button";
+import { BuySection } from "@/components/author-site/buy-section";
 
 // ── Format display helpers ────────────────────────────────────────────────────
 
@@ -140,7 +140,7 @@ export default async function BuyPage({ params, searchParams }: Props) {
               </span>
             </div>
 
-            {/* Total */}
+            {/* Base total (only shown when no discount yet applied) */}
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-600">Total</span>
               <span className="text-xl font-bold text-gray-900">{formatCents(saleItem.priceCents)}</span>
@@ -154,11 +154,11 @@ export default async function BuyPage({ params, searchParams }: Props) {
               </div>
             )}
 
-            {/* Checkout button */}
+            {/* Discount code input + checkout */}
             {(!isDigital || hasFile) && (
-              <BuyButton
+              <BuySection
                 saleItemId={saleItem.id}
-                label={`Pay ${formatCents(saleItem.priceCents)}`}
+                basePriceCents={saleItem.priceCents}
                 accentColor={accentColor}
               />
             )}

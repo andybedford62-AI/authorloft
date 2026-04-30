@@ -137,7 +137,10 @@ model Author {
   emailVerifyExpiry    DateTime?
   passwordResetToken   String?        @unique
   passwordResetExpiry  DateTime?
-  termsAcceptedAt      DateTime?      // null = never accepted; non-null = timestamp of acceptance
+  termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
+  onboardingCompletedAt   DateTime?      // set when first book is created; null = never completed onboarding
+  onboardingReminderSentAt DateTime?     // set when the day-7 nudge email is sent
+  lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   books                Book[]
@@ -154,6 +157,7 @@ model Author {
   posts                Post[]
   contactMessages      ContactMessage[]
   subscription         AuthorSubscription?
+  discountCodes        DiscountCode[]
   impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
   impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
 
@@ -294,6 +298,7 @@ model Book {
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
   reviews             BookReview[]
+  discountCodeBooks   DiscountCodeBook[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
 
   @@unique([authorId, slug])
@@ -305,6 +310,7 @@ model Book {
 
 enum DirectSaleFormat {
   EBOOK
+  AUDIO
   FLIPBOOK
   PRINT
 }
@@ -442,21 +448,24 @@ model BookGenre {
 // ─── Specials / Promotions ────────────────────────────────────────────────────
 
 model Special {
-  id          String    @id @default(cuid())
-  authorId    String
-  title       String
-  description String?   @db.Text
-  imageUrl    String?
-  ctaLabel    String?
-  ctaUrl      String?
-  startsAt    DateTime?
-  endsAt      DateTime?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  authorId       String
+  title          String
+  description    String?       @db.Text
+  imageUrl       String?
+  ctaLabel       String?
+  ctaUrl         String?
+  startsAt       DateTime?
+  endsAt         DateTime?
+  isActive       Boolean       @default(true)
+  discountCodeId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  author         Author        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  discountCode   DiscountCode? @relation(fields: [discountCodeId], references: [id], onDelete: SetNull)
 
   @@index([authorId])
+  @@index([discountCodeId])
 }
 
 // ─── Custom Pages ─────────────────────────────────────────────────────────────
@@ -542,21 +551,59 @@ enum OrderStatus {
 }
 
 model Order {
-  id                    String      @id @default(cuid())
+  id                    String        @id @default(cuid())
   authorId              String
   customerEmail         String
   customerName          String?
-  stripeSessionId       String?     @unique
+  stripeSessionId       String?       @unique
   stripePaymentIntentId String?
   totalCents            Int
-  status                OrderStatus @default(PENDING)
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  author                Author      @relation(fields: [authorId], references: [id])
+  discountCents         Int           @default(0)
+  discountCodeId        String?
+  status                OrderStatus   @default(PENDING)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  author                Author        @relation(fields: [authorId], references: [id])
+  discountCode          DiscountCode? @relation(fields: [discountCodeId], references: [id])
   items                 OrderItem[]
 
   @@index([authorId])
   @@index([customerEmail])
+}
+
+// ─── Discount Codes ───────────────────────────────────────────────────────────
+
+model DiscountCodeBook {
+  discountCodeId String
+  bookId         String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  book           Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([discountCodeId, bookId])
+  @@index([bookId])
+}
+
+model DiscountCode {
+  id              String             @id @default(cuid())
+  authorId        String
+  author          Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  code            String             // stored uppercase, e.g. "LAUNCH20"
+  description     String?            // internal note for the author
+  type            String             // "PERCENT" | "FIXED"
+  value           Int                // percent 1-100, or fixed cents (e.g. 500 = $5.00)
+  maxUses         Int?               // null = unlimited
+  usesCount       Int                @default(0)
+  expiresAt       DateTime?          // null = no expiry
+  isActive        Boolean            @default(true)
+  showAsSalePrice Boolean            @default(false) // when true, show discounted price publicly on book pages
+  books           DiscountCodeBook[]
+  specials        Special[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  orders          Order[]
+
+  @@unique([authorId, code])
+  @@index([authorId])
 }
 
 model OrderItem {

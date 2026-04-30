@@ -153,6 +153,21 @@ export async function DELETE(
     return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
   }
 
-  await prisma.author.delete({ where: { id } });
+  await prisma.$transaction([
+    // 1. Null the heroFeaturedBook FK to break the Author→Book circular reference
+    prisma.author.update({ where: { id }, data: { heroFeaturedBookId: null } }),
+    // 2. ImpersonationLog has no cascade — delete audit entries in both directions
+    prisma.impersonationLog.deleteMany({
+      where: { OR: [{ superAdminId: id }, { targetAuthorId: id }] },
+    }),
+    // 3. Order has no cascade — delete orders (OrderItems cascade from Order)
+    prisma.order.deleteMany({ where: { authorId: id } }),
+    // 4. Delete the author — schema cascades handle the rest:
+    //    Books, Subscribers, Sessions, Accounts, Genres, Series, FlipBooks,
+    //    Specials, AuthorPages, Posts, Campaigns, DiscountCodes, ContactMessages,
+    //    AuthorSubscription, DiscountCodeBooks
+    prisma.author.delete({ where: { id } }),
+  ]);
+
   return NextResponse.json({ success: true });
 }

@@ -40,11 +40,6 @@ const SUPABASE_CONFIGURED =
  * They are only delivered to buyers via short-lived signed URLs.
  */
 
-// Tell Vercel/Next.js not to limit the request body size
-export const config = {
-  api: { bodyParser: false },
-};
-
 export async function POST(req: NextRequest) {
   try {
   const authorId = await getAdminAuthorIdForApi();

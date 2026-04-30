@@ -12,6 +12,7 @@ import { getAuthorByDomain } from "@/lib/author-queries";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { AddToCartButtons } from "@/components/author-site/add-to-cart-buttons";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -66,6 +67,7 @@ export async function generateMetadata({
 // ── Format display helpers ────────────────────────────────────────────────────
 const FORMAT_COLORS: Record<string, { color: string; bg: string }> = {
   EBOOK:    { color: "#2563eb", bg: "#eff6ff" },
+  AUDIO:    { color: "#d97706", bg: "#fffbeb" },
   FLIPBOOK: { color: "#7c3aed", bg: "#f5f3ff" },
   PRINT:    { color: "#059669", bg: "#ecfdf5" },
 };
@@ -248,11 +250,6 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
-              {book.priceCents > 0 && (
-                <p className="mt-3 text-2xl font-bold" style={{ color: accentColor }}>
-                  {formatCents(book.priceCents)}
-                </p>
-              )}
             </div>
 
             {/* Short description */}
@@ -292,35 +289,18 @@ export default async function BookDetailPage({
                     );
                   })}
 
-                  {/* Per-format direct sale items (eBook etc.) — shown last */}
-                  {hasDirectSaleItems && book.directSaleItems.map((item) => {
-                    const fmtStyle = FORMAT_COLORS[item.format] ?? FORMAT_COLORS.EBOOK;
-                    return (
-                      <Link
-                        key={item.id}
-                        href={`/books/${book.slug}/buy?item=${item.id}`}
-                        title={item.description ?? undefined}
-                        style={{ backgroundColor: accentColor }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 shadow-sm"
-                      >
-                        <ShoppingCart className="h-3.5 w-3.5" />
-                        <span>
-                          {item.label}
-                          {item.priceCents > 0
-                            ? ` — ${formatCents(item.priceCents)}`
-                            : " — Free"}
-                        </span>
-                        {item.description && (
-                          <span
-                            className="ml-1 text-xs px-1.5 py-0.5 rounded-full"
-                            style={{ backgroundColor: fmtStyle.bg, color: fmtStyle.color }}
-                          >
-                            {item.description}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
+                  {/* Per-format direct sale items — Add to Cart */}
+                  {hasDirectSaleItems && (
+                    <AddToCartButtons
+                      items={book.directSaleItems}
+                      bookId={book.id}
+                      bookSlug={book.slug}
+                      bookTitle={book.title}
+                      coverImageUrl={book.coverImageUrl}
+                      accentColor={accentColor}
+                      formatColors={FORMAT_COLORS}
+                    />
+                  )}
 
                   {/* Legacy single direct-buy button */}
                   {showLegacyDirectBuy && (

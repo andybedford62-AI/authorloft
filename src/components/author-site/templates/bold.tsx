@@ -11,7 +11,7 @@ import type { HomeTemplateProps } from "./types";
 
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
-  const displayBooks = books.slice(0, 6);
+  const displayBooks = books.slice(0, 3);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
@@ -50,16 +50,14 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-baseline justify-between mb-8">
             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight font-heading">
-              Books
+              Featured Books
             </h2>
-            {books.length > 6 && (
-              <Link href="/books" className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
-                All {books.length} books <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
-            )}
+            <Link href="/books" className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
+              View All <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
             {displayBooks.map((book) => (
               <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-3">
                 <div className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-100 relative shadow-md group-hover:shadow-xl transition-shadow duration-300">

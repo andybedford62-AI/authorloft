@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+
+function capturePostHog(distinctId: string, event: string, properties: Record<string, unknown>) {
+  const key  = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+  if (!key) return;
+  fetch(`${host}/capture/`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ api_key: key, distinct_id: distinctId, event, properties }),
+  }).catch(() => {});
+}
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from "@/lib/mailer";
@@ -84,28 +95,50 @@ export async function POST(req: NextRequest) {
             },
           });
 
-          // Set download expiry and ensure fileKey is populated on each item
-          const expiry = generateDownloadExpiry(48);
-          for (const item of order.items) {
-            // If fileKey wasn't captured at order creation, pull it from the sale item now
-            let fileKey = item.fileKey;
-            if (!fileKey && (saleItemId || item.saleItemId)) {
-              const sid = item.saleItemId ?? saleItemId;
-              const si = await prisma.bookDirectSaleItem.findUnique({
-                where: { id: sid },
-                select: { fileKey: true },
-              });
-              fileKey = si?.fileKey ?? null;
-            }
-
-            await prisma.orderItem.update({
-              where: { id: item.id },
-              data: {
-                downloadExpiry: expiry,
-                ...(fileKey && !item.fileKey ? { fileKey } : {}),
-              },
-            });
+          // Increment discount code usage count if one was applied
+          if (order.discountCodeId) {
+            await prisma.discountCode.update({
+              where: { id: order.discountCodeId },
+              data: { usesCount: { increment: 1 } },
+            }).catch((err) => console.error("[webhook] discountCode increment error:", err));
           }
+
+          // Set download expiry and ensure fileKey is populated on each item.
+          // Pre-fetch all missing sale items in one query to avoid N+1.
+          const expiry = generateDownloadExpiry(48);
+          const missingSaleItemIds = [
+            ...new Set(
+              order.items
+                .filter((item) => !item.fileKey && (saleItemId || item.saleItemId))
+                .map((item) => item.saleItemId ?? saleItemId)
+                .filter(Boolean) as string[]
+            ),
+          ];
+          const saleItemFileKeys = new Map<string, string | null>();
+          if (missingSaleItemIds.length > 0) {
+            const fetched = await prisma.bookDirectSaleItem.findMany({
+              where:  { id: { in: missingSaleItemIds } },
+              select: { id: true, fileKey: true },
+            });
+            for (const si of fetched) saleItemFileKeys.set(si.id, si.fileKey);
+          }
+
+          await Promise.all(
+            order.items.map((item) => {
+              let fileKey = item.fileKey;
+              if (!fileKey && (saleItemId || item.saleItemId)) {
+                const sid = item.saleItemId ?? saleItemId;
+                fileKey = saleItemFileKeys.get(sid!) ?? null;
+              }
+              return prisma.orderItem.update({
+                where: { id: item.id },
+                data: {
+                  downloadExpiry: expiry,
+                  ...(fileKey && !item.fileKey ? { fileKey } : {}),
+                },
+              });
+            })
+          );
 
           // Send purchase confirmation email with download link(s)
           if (customerEmail) {
@@ -225,15 +258,24 @@ export async function POST(req: NextRequest) {
                 data:  { planId: plan.id },
               });
 
-              // Send welcome email
-              const authorRecord = await prisma.author.findUnique({
-                where:  { id: authorId },
-                select: { email: true, name: true, displayName: true },
+              // Send welcome email — fetch author + plan in parallel
+              const [authorRecord, planRecord] = await Promise.all([
+                prisma.author.findUnique({
+                  where:  { id: authorId },
+                  select: { email: true, name: true, displayName: true },
+                }),
+                prisma.plan.findUnique({
+                  where:  { id: plan.id },
+                  select: { name: true, monthlyPriceCents: true, annualPriceCents: true },
+                }),
+              ]);
+
+              // Analytics: track plan upgrade (fires after planRecord is available)
+              capturePostHog(authorId, "upgraded_to_paid", {
+                plan:     planRecord?.name ?? "paid",
+                interval,
               });
-              const planRecord = await prisma.plan.findUnique({
-                where:  { id: plan.id },
-                select: { name: true, monthlyPriceCents: true, annualPriceCents: true },
-              });
+
               if (authorRecord && planRecord) {
                 const amountCents = interval === "annual"
                   ? planRecord.annualPriceCents
@@ -266,11 +308,11 @@ export async function POST(req: NextRequest) {
         where: { stripeSubscriptionId: subscription.id },
         data:  { planId: null, heroLayout: "portrait" }, // revert to free defaults
       });
-      // Remove AuthorSubscription rows and revert theme for each affected author
-      for (const a of affected) {
-        await prisma.authorSubscription.deleteMany({ where: { authorId: a.id } });
-        await revertThemeOnDowngrade(a.id, "FREE");
-      }
+      // Remove AuthorSubscription rows in one batch, then revert themes in parallel
+      await prisma.authorSubscription.deleteMany({
+        where: { authorId: { in: affected.map((a) => a.id) } },
+      });
+      await Promise.all(affected.map((a) => revertThemeOnDowngrade(a.id, "FREE")));
       break;
     }
 
@@ -312,14 +354,12 @@ export async function POST(req: NextRequest) {
             where: { stripeSubscriptionId: subscription.id },
             data:  { planId: newPlan.id },
           });
-          // Keep AuthorSubscription.planId in sync with the new plan
-          for (const a of affected) {
-            await prisma.authorSubscription.updateMany({
-              where: { authorId: a.id },
-              data:  { planId: newPlan.id },
-            });
-            await revertThemeOnDowngrade(a.id, newPlan.tier);
-          }
+          // Keep AuthorSubscription.planId in sync with the new plan (batch + parallel)
+          await prisma.authorSubscription.updateMany({
+            where: { authorId: { in: affected.map((a) => a.id) } },
+            data:  { planId: newPlan.id },
+          });
+          await Promise.all(affected.map((a) => revertThemeOnDowngrade(a.id, newPlan.tier)));
         }
       }
       break;

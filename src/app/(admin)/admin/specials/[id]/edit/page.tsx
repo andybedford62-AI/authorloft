@@ -13,6 +13,7 @@ export default async function EditSpecialPage({ params }: Props) {
 
   const special = await prisma.special.findFirst({
     where: { id, authorId },
+    include: { discountCode: { select: { id: true } } },
   });
   if (!special) notFound();
 
@@ -45,9 +46,10 @@ export default async function EditSpecialPage({ params }: Props) {
           imageUrl:    special.imageUrl,
           ctaLabel:    special.ctaLabel,
           ctaUrl:      special.ctaUrl,
-          startsAt:    special.startsAt?.toISOString() ?? null,
-          endsAt:      special.endsAt?.toISOString() ?? null,
-          isActive:    special.isActive,
+          startsAt:       special.startsAt?.toISOString() ?? null,
+          endsAt:         special.endsAt?.toISOString() ?? null,
+          isActive:       special.isActive,
+          discountCodeId: special.discountCode?.id ?? null,
         }}
       />
     </div>

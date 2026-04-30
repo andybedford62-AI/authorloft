@@ -3,10 +3,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, BookOpen } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
-import { BookCarousel } from "@/components/author-site/book-carousel";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
@@ -95,11 +94,11 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
         </div>
       </section>
 
-      {/* ── Book Carousel ───────────────────────────────────────────────────── */}
+      {/* ── Featured Books (top 3) ──────────────────────────────────────────── */}
       {books.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 font-heading">Featured Books</h2>
             <Link
               href="/books"
               className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
@@ -109,11 +108,46 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
             </Link>
           </div>
 
-          <BookCarousel
-            books={books}
-            accentColor={accentColor}
-            salesEnabled={salesEnabled}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
+            {books.slice(0, 3).map((book) => (
+              <Link
+                key={book.id}
+                href={`/books/${book.slug}`}
+                className="group flex flex-col space-y-3"
+              >
+                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-gray-100 shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                  {book.coverImageUrl ? (
+                    <Image
+                      src={book.coverImageUrl}
+                      alt={book.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <BookOpen className="h-12 w-12 text-gray-300" />
+                    </div>
+                  )}
+                  {book.caption && (
+                    <span
+                      className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      {book.caption}
+                    </span>
+                  )}
+                </div>
+                {book.series && (
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide truncate">
+                    {book.series.name}
+                  </p>
+                )}
+                <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
+                  {book.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 

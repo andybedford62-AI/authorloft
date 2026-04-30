@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
+import { PostHogIdentify } from "@/components/posthog-provider";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
@@ -70,6 +71,7 @@ export default async function AdminLayout({
 
   return (
     <AdminSessionProvider>
+      <PostHogIdentify />
       <div
         data-admin-theme={adminTheme}
         className="flex min-h-screen flex-col"

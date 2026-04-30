@@ -34,7 +34,7 @@ function priceLabel(book: GridBook): string | null {
 
 export function BooksLayoutGrid({ books, accentColor }: Props) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
       {books.map((book) => {
         const price = priceLabel(book);
         return (

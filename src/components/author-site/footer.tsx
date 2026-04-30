@@ -92,7 +92,14 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" style={{ color: author.accentColor }} />
-                <span className="font-bold text-white text-sm">AuthorLoft.com</span>
+                <a
+                  href="https://www.authorloft.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-white text-sm hover:text-[var(--accent)] transition-colors"
+                >
+                  AuthorLoft.com
+                </a>
               </div>
               <p className="text-gray-400 text-xs leading-relaxed">
                 A platform for authors to establish their web presence, showcase their work,

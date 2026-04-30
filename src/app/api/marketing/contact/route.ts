@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendMail } from "@/lib/mailer";
+import { sendMail, esc } from "@/lib/mailer";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const attempts = new Map<string, number[]>();
@@ -71,11 +71,11 @@ export async function POST(req: NextRequest) {
       replyTo:  email.trim(),
       text:     `Name: ${name.trim()}\nEmail: ${email.trim()}\nSubject: ${subject?.trim() || "(none)"}\n\n${message.trim()}`,
       html:     `
-        <p><strong>Name:</strong> ${name.trim()}</p>
-        <p><strong>Email:</strong> <a href="mailto:${email.trim()}">${email.trim()}</a></p>
-        <p><strong>Subject:</strong> ${subject?.trim() || "(none)"}</p>
+        <p><strong>Name:</strong> ${esc(name.trim())}</p>
+        <p><strong>Email:</strong> <a href="mailto:${esc(email.trim())}">${esc(email.trim())}</a></p>
+        <p><strong>Subject:</strong> ${esc(subject?.trim() || "(none)")}</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0"/>
-        <p style="white-space:pre-wrap">${message.trim()}</p>
+        <p style="white-space:pre-wrap">${esc(message.trim())}</p>
       `,
     }).catch((err) => console.error("[marketing/contact] notify email failed:", err));
   }

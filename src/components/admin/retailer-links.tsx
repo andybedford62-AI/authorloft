@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
+import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit, Check, X } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
 
@@ -37,6 +37,12 @@ export function RetailerLinks({ bookId }: Props) {
 
   // Per-link pending state (for activate/deactivate/delete)
   const [pending, setPending] = useState<Record<string, boolean>>({});
+
+  // Per-link edit state
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [editLabel, setEditLabel] = useState<Record<string, string>>({});
+  const [editUrl, setEditUrl] = useState<Record<string, string>>({});
+  const [editError, setEditError] = useState<Record<string, string>>({});
 
   // ── Load links ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -109,6 +115,63 @@ export function RetailerLinks({ bookId }: Props) {
       setLinks((prev) => prev.filter((l) => l.id !== id));
     }
     setPending((p) => ({ ...p, [id]: false }));
+  }
+
+  // ── Edit ────────────────────────────────────────────────────────────────────
+  function startEdit(link: RetailerLink) {
+    setEditing((e) => ({ ...e, [link.id]: true }));
+    setEditLabel((l) => ({ ...l, [link.id]: link.label }));
+    setEditUrl((u) => ({ ...u, [link.id]: link.url }));
+    setEditError((e) => ({ ...e, [link.id]: "" }));
+  }
+
+  function cancelEdit(linkId: string) {
+    setEditing((e) => ({ ...e, [linkId]: false }));
+    setEditLabel((l) => {
+      const copy = { ...l };
+      delete copy[linkId];
+      return copy;
+    });
+    setEditUrl((u) => {
+      const copy = { ...u };
+      delete copy[linkId];
+      return copy;
+    });
+    setEditError((e) => {
+      const copy = { ...e };
+      delete copy[linkId];
+      return copy;
+    });
+  }
+
+  async function saveEdit(link: RetailerLink) {
+    const newLabel = editLabel[link.id] || "";
+    const newUrl = (editUrl[link.id] || "").trim();
+
+    if (!newUrl) {
+      setEditError((e) => ({ ...e, [link.id]: "URL is required." }));
+      return;
+    }
+
+    setPending((p) => ({ ...p, [link.id]: true }));
+    const res = await fetch(`/api/admin/books/${bookId}/retailers/${link.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        label: newLabel || undefined,
+        url: newUrl,
+      }),
+    });
+
+    if (res.ok) {
+      const updated = await res.json();
+      setLinks((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+      cancelEdit(link.id);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setEditError((e) => ({ ...e, [link.id]: data.error || "Could not save changes." }));
+    }
+    setPending((p) => ({ ...p, [link.id]: false }));
   }
 
   // ── Auto-fill label when retailer changes ──────────────────────────────────
@@ -240,62 +303,143 @@ export function RetailerLinks({ bookId }: Props) {
           {links.map((link) => {
             const info = getRetailer(link.retailer);
             const isBusy = pending[link.id];
+            const isEditing = editing[link.id];
+            const currentLabel = editLabel[link.id] ?? "";
+            const currentUrl = editUrl[link.id] ?? "";
+            const error = editError[link.id];
 
             return (
-              <div key={link.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+              <div key={link.id} className="py-3 first:pt-0 last:pb-0 space-y-2">
+                {/* Display mode */}
+                {!isEditing && (
+                  <div className="flex items-center gap-3">
 
-                {/* Retailer colour dot + label */}
-                <div
-                  className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{ backgroundColor: info.color }}
-                  title={info.shortLabel}
-                >
-                  {info.shortLabel.slice(0, 2).toUpperCase()}
-                </div>
+                    {/* Retailer colour dot + label */}
+                    <div
+                      className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                      style={{ backgroundColor: info.color }}
+                      title={info.shortLabel}
+                    >
+                      {info.shortLabel.slice(0, 2).toUpperCase()}
+                    </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">{link.label}</p>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-gray-400 hover:text-[var(--accent)] truncate flex items-center gap-1"
-                  >
-                    {link.url.length > 55 ? link.url.slice(0, 55) + "…" : link.url}
-                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                  </a>
-                </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{link.label}</p>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-gray-400 hover:text-[var(--accent)] truncate flex items-center gap-1"
+                      >
+                        {link.url.length > 55 ? link.url.slice(0, 55) + "…" : link.url}
+                        <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </a>
+                    </div>
 
-                {/* Status badge */}
-                <span
-                  className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
-                    link.isActive
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-400"
-                  }`}
-                >
-                  {link.isActive ? "Active" : "Inactive"}
-                </span>
+                    {/* Status badge */}
+                    <span
+                      className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                        link.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-100 text-gray-400"
+                      }`}
+                    >
+                      {link.isActive ? "Active" : "Inactive"}
+                    </span>
 
-                {/* Actions */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <IconButton
-                    icon={link.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
-                    title={link.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                    variant="ghost"
-                    onClick={() => toggleActive(link)}
-                    loading={isBusy}
-                    disabled={isBusy}
-                  />
-                  <IconButton
-                    icon={<Trash2 className="h-4 w-4" />}
-                    title="Delete link"
-                    variant="ghost"
-                    onClick={() => deleteLink(link.id, link.label)}
-                    loading={isBusy}
-                    disabled={isBusy}
-                  />
-                </div>
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <IconButton
+                        icon={<Edit className="h-4 w-4" />}
+                        title="Edit link"
+                        variant="ghost"
+                        onClick={() => startEdit(link)}
+                        disabled={isBusy}
+                      />
+                      <IconButton
+                        icon={link.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                        title={link.isActive ? "Deactivate (hides from public site)" : "Activate"}
+                        variant="ghost"
+                        onClick={() => toggleActive(link)}
+                        loading={isBusy}
+                        disabled={isBusy}
+                      />
+                      <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
+                        title="Delete link"
+                        variant="ghost"
+                        onClick={() => deleteLink(link.id, link.label)}
+                        loading={isBusy}
+                        disabled={isBusy}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Edit mode */}
+                {isEditing && (
+                  <div className="rounded-lg border border-[var(--accent)]/30 bg-[color:var(--accent)]/3 p-4 space-y-3">
+                    <p className="text-sm font-medium text-gray-700">Edit retailer link</p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-600">
+                          Button label <span className="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={currentLabel}
+                          onChange={(e) =>
+                            setEditLabel((l) => ({ ...l, [link.id]: e.target.value }))
+                          }
+                          placeholder={info.label}
+                          className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-600">
+                          URL <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="url"
+                          value={currentUrl}
+                          onChange={(e) =>
+                            setEditUrl((u) => ({ ...u, [link.id]: e.target.value }))
+                          }
+                          placeholder="https://..."
+                          className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                        />
+                      </div>
+                    </div>
+
+                    {error && <p className="text-xs text-red-600">{error}</p>}
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => saveEdit(link)}
+                        disabled={isBusy}
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                      >
+                        {isBusy ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Check className="h-3.5 w-3.5" />
+                        )}
+                        {isBusy ? "Saving…" : "Save"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => cancelEdit(link.id)}
+                        disabled={isBusy}
+                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors disabled:opacity-60"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

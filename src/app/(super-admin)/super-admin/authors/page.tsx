@@ -5,7 +5,16 @@ import { AuthorsTableClient } from "./authors-table-client";
 
 export default async function SuperAdminAuthorsPage() {
   const authors = await prisma.author.findMany({
-    include: {
+    select: {
+      id: true,
+      name: true,
+      displayName: true,
+      email: true,
+      slug: true,
+      isActive: true,
+      isSuperAdmin: true,
+      createdAt: true,
+      lastLoginAt: true,
       plan: { select: { name: true, tier: true, monthlyPriceCents: true } },
       _count: {
         select: {
