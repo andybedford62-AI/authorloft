@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
 
           // Set download expiry and ensure fileKey is populated on each item.
           // Pre-fetch all missing sale items in one query to avoid N+1.
-          const expiry = generateDownloadExpiry(48);
+          const expiry = generateDownloadExpiry(168);
           const missingSaleItemIds = [
             ...new Set(
               order.items

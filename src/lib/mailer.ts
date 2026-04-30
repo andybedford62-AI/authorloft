@@ -346,6 +346,12 @@ export async function sendPurchaseConfirmationEmail({
           ${authorSlug}.${platformDomain}
         </a>
       </p>
+      <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
+        Need to re-download later? Visit
+        <a href="https://www.${platformDomain}/orders/lookup" style="color:#6b7280;">
+          authorloft.com/orders/lookup
+        </a>
+      </p>
     `),
   });
 }
