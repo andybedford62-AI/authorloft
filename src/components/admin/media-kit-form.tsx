@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Save, Image as ImageIcon, BookOpen, Info } from "lucide-react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 interface MediaKitFormProps {
   initialData: {
@@ -67,12 +68,10 @@ export function MediaKitForm({ initialData }: MediaKitFormProps) {
           <label className="block text-sm font-medium text-gray-700">
             Press biography
           </label>
-          <textarea
-            rows={6}
+          <RichTextEditor
             value={pressBio}
-            onChange={(e) => setPressBio(e.target.value)}
+            onChange={setPressBio}
             placeholder="Write a biography for press and media use. If left blank, your regular bio will be displayed."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
           />
           <p className="text-xs text-gray-400">Falls back to your regular biography if left blank.</p>
         </div>

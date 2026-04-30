@@ -63,7 +63,7 @@ export default async function MediaKitPage({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-14">
 
         {/* Author Photo + Biography */}
-        <section className="grid md:grid-cols-[280px,1fr] gap-8 items-start">
+        <section className="grid md:grid-cols-[180px,1fr] gap-8 items-start">
           <div className="space-y-3">
             {author.profileImageUrl ? (
               <>
@@ -71,7 +71,7 @@ export default async function MediaKitPage({
                 <img
                   src={author.profileImageUrl}
                   alt={authorName}
-                  className="w-full rounded-xl shadow-md object-cover aspect-[3/4]"
+                  className="w-full rounded-xl shadow-md object-cover aspect-[3/4] max-h-[240px]"
                 />
                 <a
                   href={downloadProxy(author.profileImageUrl, `${authorName.replace(/\s+/g, "-")}-photo.jpg`)}
@@ -148,29 +148,29 @@ export default async function MediaKitPage({
             <h2 className="text-xl font-bold text-gray-900 font-heading border-b pb-2" style={{ borderColor: accentColor }}>
               Books for Press
             </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {books.map((book) => (
-                <div key={book.id} className="space-y-2">
+                <div key={book.id} className="space-y-1.5">
                   {book.coverImageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={book.coverImageUrl}
                       alt={book.title}
-                      className="w-full rounded-lg shadow-sm object-cover aspect-[2/3]"
+                      className="w-full rounded-md shadow-sm object-cover aspect-[2/3] max-h-[160px]"
                     />
                   ) : (
-                    <div className="w-full aspect-[2/3] rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                    <div className="w-full aspect-[2/3] max-h-[160px] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
                       No cover
                     </div>
                   )}
-                  <p className="text-sm font-medium text-gray-900 leading-snug">{book.title}</p>
+                  <p className="text-xs font-medium text-gray-900 leading-snug line-clamp-2">{book.title}</p>
                   {book.coverImageUrl && (
                     <a
                       href={downloadProxy(book.coverImageUrl, `${book.slug}-cover.jpg`)}
-                      className="block text-center text-xs font-medium px-3 py-1.5 border rounded-lg transition-colors hover:bg-gray-50"
+                      className="block text-center text-xs font-medium px-2 py-1 border rounded transition-colors hover:bg-gray-50"
                       style={{ color: accentColor, borderColor: accentColor }}
                     >
-                      Download Cover
+                      Download
                     </a>
                   )}
                 </div>
