@@ -11,6 +11,7 @@ interface NavConfig {
   navShowFlipBooks: boolean;
   navShowBlog:      boolean;
   navShowContact:   boolean;
+  navShowMediaKit:  boolean;
 }
 
 interface CustomPage {
@@ -31,7 +32,7 @@ interface FooterProps {
     twitterUrl?:    string | null;
     instagramUrl?:  string | null;
     accentColor:    string;
-    plan?:          { flipBooksLimit: number } | null;
+    plan?:          { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
   };
   navConfig?:    NavConfig;
   customPages?:  CustomPage[];
@@ -43,6 +44,7 @@ function buildQuickLinks(
   config?: NavConfig,
   customPages?: CustomPage[],
   showFlipBooks?: boolean,
+  showMediaKit?: boolean,
 ): { label: string; href: string }[] {
   const links: { label: string; href: string }[] = [];
 
@@ -56,8 +58,10 @@ function buildQuickLinks(
     links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
   }
 
-  if (!config || config.navShowAbout)   links.push({ label: "About",   href: "/about" });
-  if (!config || config.navShowContact) links.push({ label: "Contact", href: "/contact" });
+  if (!config || config.navShowAbout)    links.push({ label: "About",     href: "/about" });
+  if (!config || config.navShowContact)  links.push({ label: "Contact",   href: "/contact" });
+  if (showMediaKit && config?.navShowMediaKit)
+                                         links.push({ label: "Media Kit", href: "/media-kit" });
 
   return links;
 }
@@ -68,7 +72,8 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const year         = new Date().getFullYear();
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
+  const showMediaKit  = !!(author.plan?.mediaKitEnabled);
+  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks, showMediaKit);
 
   const socialLinks = [
     { href: author.linkedinUrl,  label: "LinkedIn" },

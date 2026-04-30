@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag, ShoppingCart,
-  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe,
+  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe, Megaphone,
 } from "lucide-react";
 import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 
@@ -21,6 +21,7 @@ const FEATURES = [
   { key: "direct-sales",        label: "Direct Sales",   icon: ShoppingCart    },
   { key: "/admin/flip-books",   label: "Flip Books",     icon: BookMarked      },
   { key: "/admin/genres",       label: "Genres",         icon: Tag             },
+  { key: "/admin/media-kit",    label: "Media Kit",      icon: Megaphone       },
   { key: "/admin/messages",     label: "Messages",       icon: Inbox           },
   { key: "/admin/legal",        label: "My Site Legal",  icon: Shield          },
   { key: "/admin/newsletter",   label: "Newsletter",     icon: Mail            },

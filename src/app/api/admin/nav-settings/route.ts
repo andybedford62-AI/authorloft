@@ -16,6 +16,7 @@ export async function GET() {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
     },
   });
 
@@ -36,6 +37,7 @@ export async function PUT(req: Request) {
     navShowFlipBooks,
     navShowBlog,
     navShowContact,
+    navShowMediaKit,
   } = body;
 
   const updated = await prisma.author.update({
@@ -47,6 +49,7 @@ export async function PUT(req: Request) {
       ...(typeof navShowFlipBooks === "boolean" && { navShowFlipBooks }),
       ...(typeof navShowBlog      === "boolean" && { navShowBlog }),
       ...(typeof navShowContact   === "boolean" && { navShowContact }),
+      ...(typeof navShowMediaKit  === "boolean" && { navShowMediaKit }),
     },
     select: {
       navShowAbout: true,
@@ -55,6 +58,7 @@ export async function PUT(req: Request) {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
     },
   });
 

@@ -46,10 +46,11 @@ async function resolveAuthor(domain: string) {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
       siteTheme: true,
       isActive: true,
       plan: {
-        select: { flipBooksLimit: true, tier: true },
+        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true },
       },
     },
   });
@@ -132,6 +133,7 @@ export default async function AuthorSiteLayout({
     navShowFlipBooks: author.navShowFlipBooks,
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
+    navShowMediaKit: author.navShowMediaKit,
   };
 
   // Enforce plan-based theme access at render time

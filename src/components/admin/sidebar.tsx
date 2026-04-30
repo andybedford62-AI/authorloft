@@ -31,6 +31,7 @@ import {
   Moon,
   Lock,
   BarChart2,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -80,6 +81,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/newsletter",      label: "Newsletter",      icon: Mail       },
       { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
       { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
+      { href: "/admin/media-kit",       label: "Media Kit",       icon: Megaphone  },
       { href: "/admin/ai-assistant",    label: "AI Assistant",    icon: Bot        },
       { href: "/admin/seo-audit",       label: "SEO Audit",       icon: Search     },
     ],

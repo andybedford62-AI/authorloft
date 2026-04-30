@@ -11,11 +11,13 @@ interface NavSettings {
   navShowFlipBooks: boolean;
   navShowBlog: boolean;
   navShowContact: boolean;
+  navShowMediaKit: boolean;
 }
 
 interface NavSettingsPanelProps {
   initial: NavSettings;
   flipBooksEnabled: boolean;
+  mediaKitEnabled: boolean;
 }
 
 const BUILT_IN_ITEMS = [
@@ -62,9 +64,18 @@ const BUILT_IN_ITEMS = [
     description: "Contact form for readers",
     alwaysOn: false,
   },
+  {
+    key: "navShowMediaKit" as keyof NavSettings,
+    label: "Media Kit",
+    href: "/media-kit",
+    description: "Press page with biography and downloadable assets",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "mediaKit" as const,
+  },
 ];
 
-export function NavSettingsPanel({ initial, flipBooksEnabled }: NavSettingsPanelProps) {
+export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled }: NavSettingsPanelProps) {
   const [settings, setSettings] = useState<NavSettings>(initial);
   const [saving, setSaving] = useState<keyof NavSettings | null>(null);
   const [saved, setSaved] = useState<keyof NavSettings | null>(null);
@@ -89,9 +100,11 @@ export function NavSettingsPanel({ initial, flipBooksEnabled }: NavSettingsPanel
     }
   }
 
-  const items = BUILT_IN_ITEMS.filter(
-    (item) => !item.planGated || flipBooksEnabled
-  );
+  const items = BUILT_IN_ITEMS.filter((item) => {
+    if (!item.planGated) return true;
+    if (item.planGateKey === "mediaKit") return mediaKitEnabled;
+    return flipBooksEnabled;
+  });
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">

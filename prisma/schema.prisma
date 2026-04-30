@@ -62,6 +62,7 @@ model Plan {
   audioEnabled         Boolean   @default(false)
   analyticsEnabled     Boolean   @default(false)
   newsletter           Boolean   @default(false)
+  mediaKitEnabled      Boolean   @default(false)
   featuresJson         String?
   badgeColor           String    @default("gray")
   featuredLabel        String?
@@ -124,6 +125,10 @@ model Author {
   navShowFlipBooks     Boolean        @default(true)
   navShowBlog          Boolean        @default(false)
   navShowContact       Boolean        @default(true)
+  navShowMediaKit      Boolean        @default(false)
+  pressTitle           String?
+  pressBio             String?        @db.Text
+  pressContact         String?
   stripeCustomerId          String?
   stripeSubscriptionId      String?
   stripeConnectAccountId    String?   // Stripe Express connected account ID (acct_xxx)

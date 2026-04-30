@@ -17,6 +17,7 @@ interface NavConfig {
   navShowFlipBooks: boolean;
   navShowBlog:      boolean;
   navShowContact:   boolean;
+  navShowMediaKit:  boolean;
 }
 
 interface CustomPage {
@@ -36,7 +37,7 @@ interface NavProps {
     linkedinUrl?: string | null;
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
-    plan?:        { flipBooksLimit: number } | null;
+    plan?:        { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
   };
   navConfig?:   NavConfig;
   customPages?: CustomPage[];
@@ -46,6 +47,7 @@ interface NavProps {
 
 function buildNavLinks(
   showFlipBooks: boolean,
+  showMediaKit: boolean,
   config?: NavConfig,
   customPages?: CustomPage[]
 ) {
@@ -63,8 +65,10 @@ function buildNavLinks(
     links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
   }
 
-  if (!config || config.navShowAbout)   links.push({ label: "About",   href: "/about" });
-  if (!config || config.navShowContact) links.push({ label: "Contact", href: "/contact" });
+  if (!config || config.navShowAbout)   links.push({ label: "About",     href: "/about" });
+  if (!config || config.navShowContact) links.push({ label: "Contact",   href: "/contact" });
+  if (showMediaKit && config?.navShowMediaKit)
+                                        links.push({ label: "Media Kit", href: "/media-kit" });
 
   return links;
 }
@@ -77,7 +81,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const pathname            = usePathname();
   const isOwner             = !!(session?.user && (session.user as any).id === author.id);
   const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
+  const showMediaKit        = !!(author.plan?.mediaKitEnabled);
+  const links               = buildNavLinks(showFlipBooks, showMediaKit, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
 

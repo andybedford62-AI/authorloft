@@ -19,7 +19,8 @@ export default async function AdminPagesPage() {
         navShowFlipBooks: true,
         navShowBlog: true,
         navShowContact: true,
-        plan: { select: { flipBooksLimit: true } },
+        navShowMediaKit: true,
+        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true } },
       },
     }),
     prisma.authorPage.findMany({
@@ -47,6 +48,7 @@ export default async function AdminPagesPage() {
     navShowFlipBooks: author.navShowFlipBooks,
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
+    navShowMediaKit: author.navShowMediaKit,
   };
 
   return (
@@ -78,6 +80,7 @@ export default async function AdminPagesPage() {
         <NavSettingsPanel
           initial={navSettings}
           flipBooksEnabled={((author.plan as any)?.flipBooksLimit ?? 0) !== 0}
+          mediaKitEnabled={!!(author.plan as any)?.mediaKitEnabled}
         />
       </section>
 

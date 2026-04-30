@@ -27,6 +27,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/ai-assistant": "PREMIUM",
   "/admin/seo-audit":    "PREMIUM",
   "/admin/settings":     "FREE",
+  "/admin/media-kit":    "STANDARD",
 };
 
 // Features that map to a Plan model field.
@@ -36,9 +37,10 @@ export const FEATURE_PLAN_MAP: Record<
   string,
   { field: string; enabledValue: number | boolean; disabledValue: number | boolean } | null
 > = {
-  "/admin/flip-books": { field: "flipBooksLimit", enabledValue: -1,   disabledValue: 0     },
-  "direct-sales":      { field: "salesEnabled",   enabledValue: true,  disabledValue: false },
-  "/admin/newsletter": { field: "newsletter",     enabledValue: true,  disabledValue: false },
+  "/admin/flip-books": { field: "flipBooksLimit",   enabledValue: -1,   disabledValue: 0     },
+  "direct-sales":      { field: "salesEnabled",    enabledValue: true,  disabledValue: false },
+  "/admin/newsletter": { field: "newsletter",      enabledValue: true,  disabledValue: false },
+  "/admin/media-kit":  { field: "mediaKitEnabled", enabledValue: true,  disabledValue: false },
   // Admin-only — no public-site Plan field to update:
   "/admin/dashboard":    null,
   "/admin/books":        null,

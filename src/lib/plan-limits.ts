@@ -12,6 +12,7 @@ const OPEN_LIMITS = {
   analyticsEnabled:false,
   flipBooksLimit:  -1,  // unlimited when no plan assigned
   audioEnabled:    false,
+  mediaKitEnabled: false,
 };
 
 // ─── Core lookup ─────────────────────────────────────────────────────────────
@@ -99,7 +100,7 @@ export async function canAddFlipBook(
 
 export async function canUseFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled"
 ): Promise<{ allowed: boolean; reason?: string }> {
   const limits = await getAuthorPlanLimits(authorId);
 
@@ -109,6 +110,7 @@ export async function canUseFeature(
     newsletter:       "newsletter",
     analyticsEnabled: "analytics",
     audioEnabled:     "audio previews",
+    mediaKitEnabled:  "media kit",
   };
 
   if (!(limits as any)[feature]) {
@@ -124,7 +126,7 @@ export async function canUseFeature(
 
 export async function assertFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled"
 ) {
   const result = await canUseFeature(authorId, feature);
   return result; // Caller decides how to respond
