@@ -297,6 +297,9 @@ export function DirectSalesItems({
   const [connectLoading, setConnectLoading] = useState(false);
   const [connectError, setConnectError] = useState("");
 
+  // Toggle error (shown inline above the item list)
+  const [toggleError, setToggleError] = useState("");
+
   // ── Load ───────────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`/api/admin/books/${bookId}/direct-sales`)
@@ -341,6 +344,7 @@ export function DirectSalesItems({
 
   // ── Toggle active ──────────────────────────────────────────────────────────
   async function toggleActive(item: DirectSaleItem) {
+    setToggleError("");
     setPending((p) => ({ ...p, [item.id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
       method: "PATCH",
@@ -350,6 +354,9 @@ export function DirectSalesItems({
     if (res.ok) {
       const updated = await res.json();
       setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setToggleError(data.error || "Could not update item. Please try again.");
     }
     setPending((p) => ({ ...p, [item.id]: false }));
   }
@@ -624,6 +631,13 @@ export function DirectSalesItems({
             </button>
           </div>
         </form>
+      )}
+
+      {/* ── Toggle error ─────────────────────────────────────────────────────── */}
+      {toggleError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {toggleError}
+        </p>
       )}
 
       {/* ── Item list ────────────────────────────────────────────────────────── */}
