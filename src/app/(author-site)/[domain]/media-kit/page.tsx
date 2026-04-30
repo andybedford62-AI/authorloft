@@ -72,8 +72,8 @@ export default async function MediaKitPage({
               <img
                 src={author.profileImageUrl}
                 alt={authorName}
-                className="w-full object-cover"
-                style={{ maxHeight: "340px", objectPosition: "top" }}
+                className="w-full h-auto block"
+                style={{ maxHeight: "520px", objectFit: "contain" }}
               />
             ) : (
               <div className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
@@ -119,7 +119,18 @@ export default async function MediaKitPage({
             {bio ? (
               <div className="bg-gray-50 rounded-xl p-4">
                 <div
-                  className="prose prose-sm text-gray-700 max-w-none"
+                  className="text-sm text-gray-700 leading-relaxed
+                    [&_p]:mb-3 [&_p:last-child]:mb-0
+                    [&_strong]:font-semibold [&_strong]:text-gray-900
+                    [&_em]:italic
+                    [&_u]:underline
+                    [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-2
+                    [&_h2]:text-base [&_h2]:font-bold [&_h2]:mb-2
+                    [&_h3]:text-sm [&_h3]:font-bold [&_h3]:mb-1
+                    [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:mb-3
+                    [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-3
+                    [&_li]:mb-1
+                    [&_a]:underline"
                   dangerouslySetInnerHTML={{ __html: bio }}
                 />
               </div>
