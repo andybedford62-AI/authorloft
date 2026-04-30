@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -38,6 +38,7 @@ type BookFormProps = {
   series: Series[];
   genres: Genre[];
   activeTab?: string; // injected by BookEditTabsClient; undefined = standalone (new book)
+  salesEnabled?: boolean;
 };
 
 // ── Cover upload widget ────────────────────────────────────────────────────────
@@ -186,7 +187,7 @@ function Req() {
 
 // ── BookForm ───────────────────────────────────────────────────────────────────
 
-export function BookForm({ mode, book, series, genres, activeTab }: BookFormProps) {
+export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -782,28 +783,38 @@ export function BookForm({ mode, book, series, genres, activeTab }: BookFormProp
         </div>
 
         {/* Direct Sales master switch */}
-        <div className="flex items-center gap-4 cursor-pointer select-none"
-          onClick={() => setDirectSalesEnabled((v) => !v)}>
-          <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${directSalesEnabled ? "bg-blue-500" : "bg-gray-300"}`}>
-            <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${directSalesEnabled ? "translate-x-5" : "translate-x-1"}`} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-700">Enable Direct Sales</p>
-            <p className="text-xs text-gray-400">
-              Shows buy buttons from the <strong>Direct Sales</strong> section below on your public book pages.
-              Requires a Standard or Premium plan with Stripe connected.
-            </p>
-          </div>
-        </div>
-
-        {directSalesEnabled && (
-          <div className="ml-14 rounded-lg p-3 text-xs bg-blue-50 border border-blue-100 text-blue-700 space-y-1">
-            <p className="font-medium">Next steps to go live:</p>
-            <ol className="list-decimal list-inside space-y-0.5 ml-1">
-              <li>Add at least one format in the <strong>Direct Sales</strong> tab and set its price</li>
-              <li>Make sure your plan has Sales enabled (Standard or Premium)</li>
-              <li>Connect Stripe in your platform settings</li>
-            </ol>
+        {salesEnabled ? (
+          <>
+            <div className="flex items-center gap-4 cursor-pointer select-none"
+              onClick={() => setDirectSalesEnabled((v) => !v)}>
+              <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${directSalesEnabled ? "bg-blue-500" : "bg-gray-300"}`}>
+                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${directSalesEnabled ? "translate-x-5" : "translate-x-1"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">Enable Direct Sales</p>
+                <p className="text-xs text-gray-400">
+                  Shows buy buttons from the <strong>Direct Sales</strong> tab on your public book pages.
+                </p>
+              </div>
+            </div>
+            {directSalesEnabled && (
+              <div className="ml-14 rounded-lg p-3 text-xs bg-blue-50 border border-blue-100 text-blue-700 space-y-1">
+                <p className="font-medium">Next steps to go live:</p>
+                <ol className="list-decimal list-inside space-y-0.5 ml-1">
+                  <li>Add at least one format in the <strong>Direct Sales</strong> tab and set its price</li>
+                  <li>Connect Stripe in your platform settings</li>
+                </ol>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+            <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+            <div className="text-sm text-amber-800">
+              <span className="font-semibold">Direct Sales requires a paid plan.</span>{" "}
+              <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to enable
+              direct sales on your books.
+            </div>
           </div>
         )}
       </section>}

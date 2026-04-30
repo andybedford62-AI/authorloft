@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle,
+  Upload, FileText, X, CheckCircle, Lock,
 } from "lucide-react";
 
 // ── Format config ─────────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ function FileUploadWidget({
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function DirectSalesItems({ bookId }: { bookId: string }) {
+export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; salesEnabled: boolean }) {
   const [items, setItems] = useState<DirectSaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -380,6 +380,26 @@ export function DirectSalesItems({ bookId }: { bookId: string }) {
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
+  if (!salesEnabled) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Direct Sales</h2>
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+          <Lock className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-amber-800">Direct Sales requires a paid plan</p>
+            <p className="text-amber-700 mt-0.5">
+              Upgrade your plan to offer direct book sales to readers.{" "}
+              <a href="/admin/settings/billing" className="underline font-medium">
+                View plans
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
       <div className="flex items-center justify-between">
