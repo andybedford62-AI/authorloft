@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle, Lock,
+  Upload, FileText, X, CheckCircle, Lock, Zap,
 } from "lucide-react";
 
 // ── Format config ─────────────────────────────────────────────────────────────
@@ -261,7 +261,15 @@ function FileUploadWidget({
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; salesEnabled: boolean }) {
+export function DirectSalesItems({
+  bookId,
+  salesEnabled,
+  stripeConnectOnboarded,
+}: {
+  bookId: string;
+  salesEnabled: boolean;
+  stripeConnectOnboarded: boolean;
+}) {
   const [items, setItems] = useState<DirectSaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -284,6 +292,10 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
 
   // Per-item pending state (toggle / delete)
   const [pending, setPending] = useState<Record<string, boolean>>({});
+
+  // Stripe Connect
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [connectError, setConnectError] = useState("");
 
   // ── Load ───────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -379,6 +391,25 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     setEditSaving(false);
   }
 
+  // ── Connect Stripe ────────────────────────────────────────────────────────
+  async function handleConnect() {
+    setConnectError("");
+    setConnectLoading(true);
+    try {
+      const res = await fetch("/api/admin/stripe/connect", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setConnectError(data.error || "Could not start Stripe setup. Please try again.");
+        setConnectLoading(false);
+      }
+    } catch {
+      setConnectError("Could not start Stripe setup. Please try again.");
+      setConnectLoading(false);
+    }
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
   if (!salesEnabled) {
     return (
@@ -394,6 +425,38 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                 View plans
               </a>
             </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!stripeConnectOnboarded) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Direct Sales</h2>
+        <div className="mt-4 rounded-lg border border-violet-200 bg-violet-50 p-4 flex items-start gap-3">
+          <Zap className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-violet-900">Connect your Stripe account to start selling</p>
+            <p className="text-violet-700 mt-1">
+              Readers pay you directly — payments land in your own Stripe account instantly.
+              AuthorLoft retains a <strong>10% platform fee</strong> per sale; you keep the rest.
+              Setup takes about 2 minutes.
+            </p>
+            {connectError && <p className="text-red-600 mt-2 text-xs">{connectError}</p>}
+            <button
+              type="button"
+              onClick={handleConnect}
+              disabled={connectLoading}
+              className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-60"
+            >
+              {connectLoading ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
+              ) : (
+                <><Zap className="h-4 w-4" /> Connect Stripe</>
+              )}
+            </button>
           </div>
         </div>
       </section>
@@ -430,6 +493,10 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
             Add one or more formats (eBook, Flip Book, Print). Each format shows its own buy
             button on your public book page. For digital formats, upload your file here —
             buyers receive a secure download link after payment.
+          </p>
+          <p className="text-blue-600 mt-1">
+            Payments go directly to your connected Stripe account. AuthorLoft retains a{" "}
+            <strong>10% platform fee</strong> per sale.
           </p>
           <p className="text-blue-600 font-medium mt-1">
             Make sure <em>Direct Sales</em> is enabled in the Book Details section above.

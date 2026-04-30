@@ -46,6 +46,18 @@ export async function POST(
     return NextResponse.json({ error: salesCheck.reason }, { status: 403 });
   }
 
+  // Stripe Connect gate: author must have completed onboarding before listing items
+  const author = await prisma.author.findUnique({
+    where: { id: authorId },
+    select: { stripeConnectOnboarded: true },
+  });
+  if (!author?.stripeConnectOnboarded) {
+    return NextResponse.json(
+      { error: "You must connect your Stripe account before listing items for direct sale." },
+      { status: 403 }
+    );
+  }
+
   const body = await req.json();
   const { format, label, description, priceCents } = body;
 

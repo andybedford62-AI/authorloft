@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseFeature } from "@/lib/plan-limits";
 
 // ── PATCH — update label, description, priceCents, isActive; or clear file ───
 export async function PATCH(
@@ -20,6 +21,24 @@ export async function PATCH(
 
   const body = await req.json();
   const { label, description, priceCents, isActive, clearFile } = body;
+
+  // Stripe Connect gate: block activation if author hasn't completed onboarding
+  if (isActive === true) {
+    const salesCheck = await canUseFeature(authorId, "salesEnabled");
+    if (!salesCheck.allowed) {
+      return NextResponse.json({ error: salesCheck.reason }, { status: 403 });
+    }
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { stripeConnectOnboarded: true },
+    });
+    if (!author?.stripeConnectOnboarded) {
+      return NextResponse.json(
+        { error: "You must connect your Stripe account before activating direct sale items." },
+        { status: 403 }
+      );
+    }
+  }
 
   // If clearFile is requested, delete file from Supabase storage
   if (clearFile && existing.fileKey) {

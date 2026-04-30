@@ -27,7 +27,10 @@ export default async function EditBookPage({
     }),
     prisma.author.findUnique({
       where: { id: authorId },
-      select: { plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true } } },
+      select: {
+        stripeConnectOnboarded: true,
+        plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true } },
+      },
     }),
     prisma.bookPreviewMedia.findMany({
       where: { bookId: id },
@@ -79,6 +82,7 @@ export default async function EditBookPage({
         genres={genres}
         audioEnabled={author?.plan?.audioEnabled ?? false}
         salesEnabled={author?.plan?.salesEnabled ?? false}
+        stripeConnectOnboarded={author?.stripeConnectOnboarded ?? false}
         previewMedia={previewMedia}
       />
     </div>

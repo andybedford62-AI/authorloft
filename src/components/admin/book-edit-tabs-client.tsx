@@ -48,6 +48,7 @@ type Props = {
   genres: Genre[];
   audioEnabled: boolean;
   salesEnabled: boolean;
+  stripeConnectOnboarded: boolean;
   previewMedia: PreviewMedia[];
 };
 
@@ -62,7 +63,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "reviews",       label: "Reviews" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, previewMedia }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, stripeConnectOnboarded, previewMedia }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("details");
 
   return (
@@ -110,7 +111,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
 
       {activeTab === "direct-sales" && (
         <div className="max-w-3xl">
-          <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} />
+          <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} stripeConnectOnboarded={stripeConnectOnboarded} />
         </div>
       )}
 
