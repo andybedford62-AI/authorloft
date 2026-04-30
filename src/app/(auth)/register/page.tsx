@@ -323,7 +323,7 @@ function RegisterPageInner() {
 
               <p className="text-center text-xs text-gray-400">
                 Don&apos;t have an invite code?{" "}
-                <a href="mailto:hello@authorloft.com" className="text-blue-600 hover:underline">
+                <a href="mailto:andybedford52+AL@gmail.com" className="text-blue-600 hover:underline">
                   Request access
                 </a>
               </p>
