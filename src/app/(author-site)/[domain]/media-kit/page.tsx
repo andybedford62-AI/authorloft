@@ -63,47 +63,72 @@ export default async function MediaKitPage({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-14">
 
         {/* Author Photo + Biography */}
-        <section className="grid md:grid-cols-[200px,1fr] gap-8 items-start">
-          <div className="space-y-3">
+        <section className="grid md:grid-cols-2 gap-6 items-start">
+
+          {/* Photo card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             {author.profileImageUrl ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={author.profileImageUrl}
-                  alt={authorName}
-                  className="w-full rounded-xl shadow-md object-contain bg-gray-50"
-                  style={{ maxHeight: "260px" }}
-                />
-                <a
-                  href={downloadProxy(author.profileImageUrl, `${authorName.replace(/\s+/g, "-")}-photo.jpg`)}
-                  className="block w-full text-center px-4 py-2.5 border rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
-                  style={{ color: accentColor, borderColor: accentColor }}
-                >
-                  Download Author Photo
-                </a>
-              </>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={author.profileImageUrl}
+                alt={authorName}
+                className="w-full object-cover"
+                style={{ maxHeight: "340px", objectPosition: "top" }}
+              />
             ) : (
-              <div className="w-full h-48 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+              <div className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
                 No photo available
               </div>
             )}
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">{authorName}</h2>
-              {pressTitle && (
-                <p className="text-base text-gray-500 mt-0.5">{pressTitle}</p>
+            <div className="p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-500">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 20.25h18M3.75 3.75h16.5A.75.75 0 0121 4.5v12a.75.75 0 01-.75.75H3.75A.75.75 0 013 16.5v-12a.75.75 0 01.75-.75z" />
+                  </svg>
+                </span>
+                <span className="text-sm font-semibold text-gray-800">Author Photo</span>
+              </div>
+              <p className="text-xs text-gray-500">High-resolution author portrait for press and publications.</p>
+              {author.profileImageUrl && (
+                <a
+                  href={downloadProxy(author.profileImageUrl, `${authorName.replace(/\s+/g, "-")}-photo.jpg`)}
+                  className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                  style={{ color: accentColor, borderColor: "#d1d5db" }}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  Download Photo
+                </a>
               )}
             </div>
+          </div>
+
+          {/* Biography card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </span>
+              <span className="text-sm font-semibold text-gray-800">Press Biography</span>
+            </div>
+
             {bio ? (
-              <div
-                className="prose prose-sm text-gray-700 max-w-none"
-                dangerouslySetInnerHTML={{ __html: bio }}
-              />
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div
+                  className="prose prose-sm text-gray-700 max-w-none"
+                  dangerouslySetInnerHTML={{ __html: bio }}
+                />
+              </div>
             ) : (
-              <p className="text-gray-400 italic text-sm">Biography coming soon.</p>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="text-gray-400 italic text-sm">Biography coming soon.</p>
+              </div>
             )}
+
             <p className="text-xs text-gray-400 italic">
               Feel free to use this biography in print or digital publications.
             </p>
