@@ -63,7 +63,7 @@ export default async function MediaKitPage({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-14">
 
         {/* Author Photo + Biography */}
-        <section className="grid md:grid-cols-[180px,1fr] gap-8 items-start">
+        <section className="grid md:grid-cols-[200px,1fr] gap-8 items-start">
           <div className="space-y-3">
             {author.profileImageUrl ? (
               <>
@@ -71,7 +71,8 @@ export default async function MediaKitPage({
                 <img
                   src={author.profileImageUrl}
                   alt={authorName}
-                  className="w-full rounded-xl shadow-md object-cover aspect-[3/4] max-h-[240px]"
+                  className="w-full rounded-xl shadow-md object-contain bg-gray-50"
+                  style={{ maxHeight: "260px" }}
                 />
                 <a
                   href={downloadProxy(author.profileImageUrl, `${authorName.replace(/\s+/g, "-")}-photo.jpg`)}
@@ -82,7 +83,7 @@ export default async function MediaKitPage({
                 </a>
               </>
             ) : (
-              <div className="w-full aspect-[3/4] rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+              <div className="w-full h-48 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
                 No photo available
               </div>
             )}
@@ -148,21 +149,23 @@ export default async function MediaKitPage({
             <h2 className="text-xl font-bold text-gray-900 font-heading border-b pb-2" style={{ borderColor: accentColor }}>
               Books for Press
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
               {books.map((book) => (
-                <div key={book.id} className="space-y-1.5">
-                  {book.coverImageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={book.coverImageUrl}
-                      alt={book.title}
-                      className="w-full rounded-md shadow-sm object-cover aspect-[2/3] max-h-[160px]"
-                    />
-                  ) : (
-                    <div className="w-full aspect-[2/3] max-h-[160px] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
-                      No cover
-                    </div>
-                  )}
+                <div key={book.id} className="flex flex-col gap-1.5">
+                  <div className="h-28 flex items-center justify-center">
+                    {book.coverImageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={book.coverImageUrl}
+                        alt={book.title}
+                        className="h-28 w-auto rounded-md shadow-sm object-contain"
+                      />
+                    ) : (
+                      <div className="h-28 w-full rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                        No cover
+                      </div>
+                    )}
+                  </div>
                   <p className="text-xs font-medium text-gray-900 leading-snug line-clamp-2">{book.title}</p>
                   {book.coverImageUrl && (
                     <a
