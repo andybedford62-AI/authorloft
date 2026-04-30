@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+  icons: { icon: "/authorloft-logo.png" },
 };
 
 export default function RootLayout({

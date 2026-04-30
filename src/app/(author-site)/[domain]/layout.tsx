@@ -78,6 +78,7 @@ export async function generateMetadata({
       template: `%s | ${authorName}`,
     },
     description,
+    icons: { icon: "/authorloft-logo.png" },
     openGraph: {
       type: "website",
       siteName: authorName,
