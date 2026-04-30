@@ -53,15 +53,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (!discount || !discount.isActive) {
-      return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." });
+      return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." }, { status: 400 });
     }
 
     if (discount.expiresAt && discount.expiresAt < new Date()) {
-      return NextResponse.json({ valid: false, error: "This discount code has expired." });
+      return NextResponse.json({ valid: false, error: "This discount code has expired." }, { status: 400 });
     }
 
     if (discount.maxUses !== null && discount.usesCount >= discount.maxUses) {
-      return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." });
+      return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." }, { status: 400 });
     }
 
     // Calculate discount across all qualifying items
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!anyApplied) {
-      return NextResponse.json({ valid: false, error: "This code is not valid for any items in your cart." });
+      return NextResponse.json({ valid: false, error: "This code is not valid for any items in your cart." }, { status: 400 });
     }
 
     const finalTotal = Math.max(0, totalOriginalCents - totalDiscountCents);

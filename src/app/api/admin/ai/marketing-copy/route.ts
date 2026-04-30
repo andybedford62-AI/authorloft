@@ -66,6 +66,6 @@ Use persuasive, authentic language suited to the channel. Do not add any preambl
     });
   } catch (err: any) {
     console.error("[AI marketing-copy]", err);
-    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI generation failed. Please try again in a moment." }, { status: 500 });
   }
 }

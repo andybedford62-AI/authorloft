@@ -66,6 +66,6 @@ Format each section clearly with the label in uppercase. Do not add any preamble
     });
   } catch (err: any) {
     console.error("[AI seo-meta-tags]", err);
-    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI generation failed. Please try again in a moment." }, { status: 500 });
   }
 }

@@ -77,6 +77,6 @@ Be specific and practical. Do not add any preamble before item 1.`;
     });
   } catch (err: any) {
     console.error("[AI seo-internal-links]", err);
-    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI generation failed. Please try again in a moment." }, { status: 500 });
   }
 }

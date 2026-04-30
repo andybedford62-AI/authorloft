@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   try {
     formData = await req.formData();
   } catch (e: any) {
-    return NextResponse.json({ error: `Could not parse upload: ${e?.message ?? "invalid request"}` }, { status: 400 });
+    return NextResponse.json({ error: "The file could not be received. Please check your connection and try again." }, { status: 400 });
   }
 
   const file = formData.get("file");

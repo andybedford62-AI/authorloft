@@ -92,7 +92,12 @@ export default function SeriesPage() {
     if (!confirm(msg)) return;
 
     const res = await fetch(`/api/admin/series/${id}`, { method: "DELETE" });
-    if (res.ok) fetchSeries();
+    if (res.ok) {
+      fetchSeries();
+    } else {
+      const d = await res.json().catch(() => ({}));
+      setEditError(d.error || "Could not delete this series. Please try again.");
+    }
   }
 
   if (loading) {

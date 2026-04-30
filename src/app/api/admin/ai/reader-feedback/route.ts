@@ -64,6 +64,6 @@ Be concise and specific. Quote short phrases from the feedback where relevant. D
     });
   } catch (err: any) {
     console.error("[AI reader-feedback]", err);
-    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI generation failed. Please try again in a moment." }, { status: 500 });
   }
 }

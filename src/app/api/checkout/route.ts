@@ -219,6 +219,9 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     const msg = err?.message ?? String(err);
     console.error("[checkout] Error:", msg);
-    return NextResponse.json({ error: `Something went wrong: ${msg}` }, { status: 500 });
+    return NextResponse.json(
+      { error: "We couldn't complete your checkout. Please try again, or contact support if this continues." },
+      { status: 500 }
+    );
   }
 }

@@ -65,6 +65,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("[AI book-description]", err);
-    return NextResponse.json({ error: err?.message ?? "Generation failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI generation failed. Please try again in a moment." }, { status: 500 });
   }
 }

@@ -48,8 +48,9 @@ export default function DiscountCodesPage() {
   const [saving,     setSaving]     = useState(false);
   const [error,      setError]      = useState("");
   const [copied,     setCopied]     = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId,   setDeletingId]   = useState<string | null>(null);
+  const [togglingId,   setTogglingId]   = useState<string | null>(null);
+  const [actionError,  setActionError]  = useState("");
 
   // Edit modal state
   const [editingCode, setEditingCode] = useState<DiscountCode | null>(null);
@@ -132,6 +133,7 @@ export default function DiscountCodesPage() {
   }
 
   async function toggleActive(code: DiscountCode) {
+    setActionError("");
     setTogglingId(code.id);
     try {
       const res = await fetch(`/api/admin/discount-codes/${code.id}`, {
@@ -142,6 +144,9 @@ export default function DiscountCodesPage() {
       if (res.ok) {
         const updated = await res.json();
         setCodes((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error || "Could not update the discount code. Please try again.");
       }
     } finally {
       setTogglingId(null);
@@ -149,10 +154,16 @@ export default function DiscountCodesPage() {
   }
 
   async function deleteCode(id: string) {
+    setActionError("");
     setDeletingId(id);
     try {
       const res = await fetch(`/api/admin/discount-codes/${id}`, { method: "DELETE" });
-      if (res.ok) setCodes((prev) => prev.filter((c) => c.id !== id));
+      if (res.ok) {
+        setCodes((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error || "Could not delete the discount code. Please try again.");
+      }
     } finally {
       setDeletingId(null);
     }
@@ -398,6 +409,13 @@ export default function DiscountCodesPage() {
           </div>
         </form>
       </div>
+
+      {/* ── Action error ─────────────────────────────────────────────────── */}
+      {actionError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          {actionError}
+        </p>
+      )}
 
       {/* ── Code list ────────────────────────────────────────────────────── */}
       {codes.length === 0 ? (

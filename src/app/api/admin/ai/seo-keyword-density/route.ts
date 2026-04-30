@@ -64,6 +64,6 @@ Format each section clearly with uppercase labels. Do not add any preamble befor
     });
   } catch (err: any) {
     console.error("[AI seo-keyword-density]", err);
-    return NextResponse.json({ error: err?.message ?? "Analysis failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: "AI analysis failed. Please try again in a moment." }, { status: 500 });
   }
 }

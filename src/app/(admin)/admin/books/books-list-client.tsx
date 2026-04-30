@@ -18,8 +18,9 @@ type BookRow = {
 
 export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
   const [books, setBooks]       = useState<BookRow[]>(initialBooks);
-  const [saving, setSaving]     = useState(false);
-  const [saveMsg, setSaveMsg]   = useState("");
+  const [saving,    setSaving]    = useState(false);
+  const [saveMsg,   setSaveMsg]   = useState("");
+  const [saveOk,    setSaveOk]    = useState(true);
   const dragId  = useRef<string | null>(null);
   const dragOver = useRef<string | null>(null);
 
@@ -57,9 +58,11 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderedIds: books.map((b) => b.id) }),
       });
-      setSaveMsg(res.ok ? "Order saved" : "Could not save order");
+      setSaveOk(res.ok);
+      setSaveMsg(res.ok ? "Order saved" : "Could not save order. Please try again.");
     } catch {
-      setSaveMsg("Network error saving order");
+      setSaveOk(false);
+      setSaveMsg("Network error — order not saved. Please try again.");
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(""), 2500);
@@ -72,7 +75,9 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
       <div className="flex items-center justify-between px-5 py-2.5 bg-gray-50 border-b border-gray-100 text-xs text-gray-400">
         <span>Drag <GripVertical className="inline h-3 w-3" /> to reorder · the top 3 published books appear on your homepage</span>
         {saving && <span className="text-blue-500 animate-pulse">Saving…</span>}
-        {saveMsg && !saving && <span className="text-green-600">{saveMsg}</span>}
+        {saveMsg && !saving && (
+          <span className={saveOk ? "text-green-600" : "text-red-600"}>{saveMsg}</span>
+        )}
       </div>
 
       <table className="w-full text-sm">

@@ -36,7 +36,8 @@ export function RetailerLinks({ bookId }: Props) {
   const [saving, setSaving] = useState(false);
 
   // Per-link pending state (for activate/deactivate/delete)
-  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [pending,      setPending]      = useState<Record<string, boolean>>({});
+  const [actionError,  setActionError]  = useState("");
 
   // Per-link edit state
   const [editing, setEditing] = useState<Record<string, boolean>>({});
@@ -91,6 +92,7 @@ export function RetailerLinks({ bookId }: Props) {
 
   // ── Toggle active ──────────────────────────────────────────────────────────
   async function toggleActive(link: RetailerLink) {
+    setActionError("");
     setPending((p) => ({ ...p, [link.id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/retailers/${link.id}`, {
       method: "PATCH",
@@ -100,6 +102,9 @@ export function RetailerLinks({ bookId }: Props) {
     if (res.ok) {
       const updated = await res.json();
       setLinks((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || "Could not update the link. Please try again.");
     }
     setPending((p) => ({ ...p, [link.id]: false }));
   }
@@ -107,12 +112,16 @@ export function RetailerLinks({ bookId }: Props) {
   // ── Delete ─────────────────────────────────────────────────────────────────
   async function deleteLink(id: string, label: string) {
     if (!confirm(`Remove "${label}"? This cannot be undone.`)) return;
+    setActionError("");
     setPending((p) => ({ ...p, [id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/retailers/${id}`, {
       method: "DELETE",
     });
     if (res.ok || res.status === 204) {
       setLinks((prev) => prev.filter((l) => l.id !== id));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || "Could not remove the link. Please try again.");
     }
     setPending((p) => ({ ...p, [id]: false }));
   }
@@ -285,6 +294,13 @@ export function RetailerLinks({ bookId }: Props) {
             </button>
           </div>
         </form>
+      )}
+
+      {/* ── Action error ─────────────────────────────────────────────────────── */}
+      {actionError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {actionError}
+        </p>
       )}
 
       {/* ── Link list ────────────────────────────────────────────────────────── */}
