@@ -15,6 +15,10 @@ export function BookExcerptEditor({ bookId, initial }: Props) {
   const [saved,   setSaved]   = useState(false);
   const [error,   setError]   = useState("");
 
+  const wordCount = content
+    ? content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length
+    : 0;
+
   async function handleSave() {
     setSaving(true);
     setError("");
@@ -58,6 +62,21 @@ export function BookExcerptEditor({ bookId, initial }: Props) {
         onChange={setContent}
         placeholder="Paste your excerpt here — first chapter, prologue, or opening pages…"
       />
+
+      {/* Word count + advisory */}
+      <div className="flex items-center justify-between text-xs text-gray-400">
+        <span>{wordCount.toLocaleString()} words</span>
+        {wordCount > 5000 && (
+          <span className="text-amber-500 font-medium">
+            Long excerpt — a first chapter (1,500–3,000 words) tends to work best.
+          </span>
+        )}
+        {wordCount > 0 && wordCount <= 5000 && (
+          <span className="text-green-600">
+            {wordCount < 500 ? "Short teaser — consider adding more to hook readers." : "Good length."}
+          </span>
+        )}
+      </div>
 
       {error && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>

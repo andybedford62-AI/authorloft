@@ -4,6 +4,7 @@ import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
+import { BookExcerptModal } from "@/components/author-site/book-excerpt-modal";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
@@ -321,34 +322,15 @@ export default async function BookDetailPage({
               <BookOverview text={book.description} accentColor={accentColor} />
             )}
 
-            {/* Read an Excerpt */}
+            {/* Read an Excerpt — modal */}
             {book.sampleContent && (
-              <div className="pt-2 space-y-3">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Read an Excerpt</h2>
-                <div className="relative">
-                  <div
-                    className="text-base text-gray-700 leading-relaxed rich-content max-h-80 overflow-hidden"
-                    dangerouslySetInnerHTML={{ __html: sanitize(book.sampleContent) }}
-                  />
-                  {/* Fade-out gradient */}
-                  <div
-                    className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-                    style={{ background: "linear-gradient(to bottom, transparent, white)" }}
-                  />
-                </div>
-                {hasBuyOptions && (
-                  <p className="text-sm text-gray-500 pt-1">
-                    Enjoying it?{" "}
-                    <a
-                      href="#buy"
-                      className="font-medium hover:underline"
-                      style={{ color: accentColor }}
-                    >
-                      Get the full book →
-                    </a>
-                  </p>
-                )}
-              </div>
+              <BookExcerptModal
+                sampleContent={sanitize(book.sampleContent)}
+                bookTitle={book.title}
+                bookSlug={book.slug}
+                hasBuyOptions={hasBuyOptions}
+                accentColor={accentColor}
+              />
             )}
 
             {/* Pull quotes / reviews */}
