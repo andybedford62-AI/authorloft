@@ -6,10 +6,39 @@ import { BASE_THEMES, GENRE_PALETTES } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 
 interface AppearanceClientProps {
-  currentTheme: string;
-  authorSlug:   string;
-  planTier:     string;
+  currentTheme:    string;
+  currentTemplate: string;
+  authorSlug:      string;
+  planTier:        string;
 }
+
+const TEMPLATES = [
+  {
+    id:          "classic",
+    name:        "Classic",
+    description: "Hero banner, author bio, books grid, series cards.",
+    preview:     { bg: "#faf7f2", primary: "#1e2a3a", accent: "#c89b3c" },
+  },
+  {
+    id:          "minimal",
+    name:        "Minimal",
+    description: "Clean and typographic — no hero banner, reduced chrome.",
+    preview:     { bg: "#ffffff", primary: "#0a0a0a", accent: "#6366f1" },
+  },
+  {
+    id:          "bold",
+    name:        "Bold",
+    description: "High-contrast, dark author strip, large cover grid.",
+    preview:     { bg: "#111827", primary: "#f9fafb", accent: "#f59e0b" },
+  },
+  {
+    id:          "cinematic",
+    name:        "🎬 Cinematic",
+    description: "Full-bleed portrait hero, gold accents, editorial layout.",
+    preview:     { bg: "#0A192F", primary: "#FBF6E9", accent: "#D4AF37" },
+    isPremium:   true,
+  },
+] as const;
 
 // ── Theme preview card ───────────────────────────────────────────────────────
 
@@ -126,12 +155,15 @@ function ThemeCard({
 
 export function AppearanceClient({
   currentTheme,
+  currentTemplate,
   authorSlug,
   planTier,
 }: AppearanceClientProps) {
-  const [selectedTheme, setSelectedTheme] = useState(currentTheme);
-  const [savingTheme,   setSavingTheme]   = useState<string | null>(null);
-  const [error,         setError]         = useState("");
+  const [selectedTheme,    setSelectedTheme]    = useState(currentTheme);
+  const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate);
+  const [savingTheme,      setSavingTheme]      = useState<string | null>(null);
+  const [savingTemplate,   setSavingTemplate]   = useState<string | null>(null);
+  const [error,            setError]            = useState("");
 
   const isFree     = planTier === "FREE";
   const isStandard = planTier === "STANDARD" || planTier === "PREMIUM";
@@ -163,12 +195,110 @@ export function AppearanceClient({
     }
   }
 
+  async function handleSelectTemplate(templateId: string) {
+    if (templateId === selectedTemplate) return;
+    setSavingTemplate(templateId);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/appearance", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ homeTemplate: templateId }),
+      });
+      if (res.ok) {
+        setSelectedTemplate(templateId);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "Could not save template.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSavingTemplate(null);
+    }
+  }
+
   return (
     <div className="space-y-8">
 
       {error && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
       )}
+
+      {/* ── Layout Templates ────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900">Layout Template</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Controls the overall page structure and section arrangement. Click to apply instantly.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {TEMPLATES.map((tmpl) => {
+            const locked    = "isPremium" in tmpl && tmpl.isPremium && !isPremium;
+            const isActive  = selectedTemplate === tmpl.id;
+            const isSaving  = savingTemplate === tmpl.id;
+            return (
+              <div
+                key={tmpl.id}
+                onClick={() => !locked && !isSaving && handleSelectTemplate(tmpl.id)}
+                className={cn(
+                  "relative rounded-2xl border-2 overflow-hidden transition-all",
+                  locked
+                    ? "border-gray-200 opacity-70 cursor-not-allowed"
+                    : isActive
+                      ? "border-blue-500 shadow-lg cursor-pointer"
+                      : "border-gray-200 hover:border-blue-300 hover:shadow-md cursor-pointer"
+                )}
+              >
+                {/* Mini preview */}
+                <div className="h-24 w-full relative overflow-hidden" style={{ background: tmpl.preview.bg }}>
+                  <div className="flex items-center justify-between px-3 py-2" style={{ background: tmpl.preview.primary + "dd" }}>
+                    <div className="h-1.5 w-10 rounded opacity-70" style={{ background: tmpl.preview.bg }} />
+                    <div className="w-2 h-2 rounded-full" style={{ background: tmpl.preview.accent }} />
+                  </div>
+                  <div className="px-3 pt-2 space-y-1.5">
+                    <div className="h-2.5 w-3/4 rounded" style={{ background: tmpl.preview.primary, opacity: 0.8 }} />
+                    <div className="h-1.5 w-1/2 rounded" style={{ background: tmpl.preview.primary, opacity: 0.3 }} />
+                  </div>
+                  {isActive && !locked && (
+                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shadow">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                  {isSaving && (
+                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-3 bg-white">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h3 className="text-sm font-semibold text-gray-900">{tmpl.name}</h3>
+                    {isActive && !locked && (
+                      <span className="flex items-center gap-1 text-xs text-blue-600 font-medium">
+                        <CheckCircle2 className="w-3 h-3" /> Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">{tmpl.description}</p>
+                </div>
+                {locked && (
+                  <div className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center gap-1.5">
+                    <div className="w-8 h-8 rounded-full bg-gray-800/75 flex items-center justify-center">
+                      <Lock className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-white bg-gray-800/75 px-2 py-0.5 rounded-full">
+                      Upgrade to Premium
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* ── Website Themes ──────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

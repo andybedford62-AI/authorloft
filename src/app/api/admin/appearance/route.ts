@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest) {
   // homeTemplate (layout) — still supported, no plan gating
   const { homeTemplate } = body;
   if (homeTemplate !== undefined) {
-    const VALID_TEMPLATES = ["classic", "minimal", "bold"];
+    const VALID_TEMPLATES = ["classic", "minimal", "bold", "cinematic"];
     if (!VALID_TEMPLATES.includes(homeTemplate)) {
       return NextResponse.json({ error: "Invalid template" }, { status: 400 });
     }

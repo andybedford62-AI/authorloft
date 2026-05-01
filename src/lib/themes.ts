@@ -13,7 +13,8 @@ export type ThemeId =
   | "nautical"
   | "childrens"
   | "literary"
-  | "western";
+  | "western"
+  | "cinematic";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -150,6 +151,17 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     mood: "Rustic, warm, earthy",
     preview: { bg: "#f5ede0", primary: "#3d1f0d", accent: "#c07830" },
     swatches: ["#3d1f0d", "#6b3518", "#c07830", "#d4944a", "#f5ede0", "#e8d4b8", "#a06028", "#804818", "#2a1008"],
+  },
+  {
+    id: "cinematic",
+    name: "Cinematic",
+    description: "Deep navy editorial with gold accents — atmospheric and immersive.",
+    isPremium: true,
+    dataTheme: "cinematic",
+    emoji: "🎬",
+    mood: "Cinematic · Editorial · Atmospheric",
+    preview: { bg: "#0A192F", primary: "#FBF6E9", accent: "#D4AF37" },
+    swatches: ["#050D1C","#0A192F","#1E3A5F","#D4AF37","#E8D08A","#B8932A","#FBF6E9","#F5EBD3","#E8DCB6"],
   },
 ];
 

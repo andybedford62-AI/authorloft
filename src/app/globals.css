@@ -155,6 +155,19 @@
   --font-body: var(--font-inter), sans-serif;
 }
 
+[data-theme='cinematic'] {
+  --nav-bg: #050D1C;
+  --background: 214 68% 8%;
+  --foreground: 42 67% 95%;
+  --primary: 42 67% 95%;
+  --primary-foreground: 214 68% 8%;
+  --muted-foreground: 42 30% 68%;
+  --accent: 46 63% 52%;
+  --border: 214 40% 18%;
+  --font-heading: var(--font-playfair), 'Playfair Display', serif;
+  --font-body: var(--font-inter), 'Inter', sans-serif;
+}
+
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
 .author-site .font-heading,
