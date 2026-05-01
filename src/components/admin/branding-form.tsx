@@ -32,6 +32,7 @@ type BrandingFormProps = {
     aboutStats: Stat[];
     showHeroBanner: boolean;
     credentials: string[];
+    pressOutlets: string[];
   };
   books: { id: string; title: string; coverImageUrl: string | null }[];
   planTier?: string;
@@ -80,6 +81,9 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
   // Exactly 3 slots; empty string means "don't show"
   const [credentials, setCredentials] = useState<string[]>(
     [...initial.credentials, "", "", ""].slice(0, 3)
+  );
+  const [pressOutlets, setPressOutlets] = useState<string[]>(
+    [...(initial.pressOutlets ?? []), "", "", "", "", "", ""].slice(0, 6)
   );
 
   const [saving, setSaving] = useState(false);
@@ -213,6 +217,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
         aboutStats, credentials,
+        pressOutlets: pressOutlets.map(s => s.trim()).filter(Boolean),
       }),
     });
 
@@ -425,13 +430,40 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                   <p className="text-xs text-gray-400 mb-2">Preview:</p>
                   <div className="flex flex-wrap gap-2">
                     {credentials.filter((c) => c.trim()).map((c, i) => (
-                      <span key={i} className="px-3 py-1 rounded-full text-xs font-medium border border-blue-200 text-blue-700 bg-blue-50">
+                      <span key={i} className="px-3 py-1 rounded-full text-xs font-medium border border-blue-200 text-blue-700 bg-blue-50 ">
                         {c}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
+            </section>
+
+            {/* Press Outlets */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <div>
+                <h2 className="font-semibold text-gray-900">Press Outlets</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Up to 6 publication names shown in the press strip on the Cinematic template. Leave blank to use defaults.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {pressOutlets.map((val, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={val}
+                    maxLength={30}
+                    onChange={(e) => {
+                      const next = [...pressOutlets];
+                      next[i] = e.target.value;
+                      setPressOutlets(next);
+                    }}
+                    placeholder={["THE SUNDAY TIMES","KIRKUS","PUBLISHERS WEEKLY","THE GUARDIAN","THE NEW YORKER","NPR BOOKS"][i] ?? `Outlet ${i + 1}`}
+                    className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                ))}
+              </div>
             </section>
           </>
         )}

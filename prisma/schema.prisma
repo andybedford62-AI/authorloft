@@ -129,6 +129,7 @@ model Author {
   pressTitle           String?
   pressBio             String?        @db.Text
   pressContact         String?
+  pressOutlets         String[]
   stripeCustomerId          String?
   stripeSubscriptionId      String?
   stripeConnectAccountId    String?   // Stripe Express connected account ID (acct_xxx)
@@ -274,6 +275,7 @@ model Book {
   subtitle            String?
   description         String?              @db.Text
   shortDescription    String?
+  sampleContent       String?              @db.Text
   coverImageUrl       String?
   publishedAt         DateTime?
   isbn                String?

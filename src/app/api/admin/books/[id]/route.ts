@@ -36,11 +36,21 @@ export async function PUT(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
+
+  // Excerpt-only save — only sampleContent sent, skip full validation
+  if (Object.keys(body).length === 1 && "sampleContent" in body) {
+    const updated = await prisma.book.update({
+      where: { id },
+      data: { sampleContent: body.sampleContent || null },
+    });
+    return NextResponse.json(updated);
+  }
+
   const {
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId, priceCents,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
-    availableFormats, caption, releaseDate, flipBookUrl,
+    availableFormats, caption, releaseDate, flipBookUrl, sampleContent,
   } = body;
 
   if (!title?.trim() || !slug?.trim()) {
@@ -85,9 +95,10 @@ export async function PUT(
       isbn: isbn || null,
       pageCount: pageCount || null,
       availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
-      caption:     caption     || null,
-      releaseDate: releaseDate ? new Date(releaseDate) : null,
-      flipBookUrl: flipBookUrl || null,
+      caption:       caption       || null,
+      releaseDate:   releaseDate ? new Date(releaseDate) : null,
+      flipBookUrl:   flipBookUrl   || null,
+      sampleContent: sampleContent || null,
       isFeatured: isFeatured ?? false,
       isPublished: isPublished ?? true,
       directSalesEnabled: directSalesEnabled ?? false,

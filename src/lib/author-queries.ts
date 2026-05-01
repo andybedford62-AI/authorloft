@@ -39,13 +39,11 @@ export async function getAuthorBooks(authorId: string) {
     include: {
       series: { select: { id: true, name: true, slug: true } },
       genres: { include: { genre: { select: { id: true, name: true, slug: true } } } },
-      // Only include active retailer links for the public site
       retailerLinks: {
         where: { isActive: true },
         select: { id: true, retailer: true, label: true, url: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
-      // Only include active direct sale items for the public site
       directSaleItems: {
         where: { isActive: true },
         select: { id: true, format: true, label: true, description: true, priceCents: true },

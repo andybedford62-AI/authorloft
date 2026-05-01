@@ -8,6 +8,7 @@ import { DirectSalesItems } from "@/components/admin/direct-sales-items";
 import { BookAudioTracks } from "@/components/admin/book-audio-tracks";
 import { BookPreviewMedia } from "@/components/admin/book-preview-media";
 import { BookReviews } from "@/components/admin/book-reviews";
+import { BookExcerptEditor } from "@/components/admin/book-excerpt-editor";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -40,6 +41,7 @@ type BookData = {
   availableFormats: string[];
   caption: string | null;
   releaseDate: string | null;
+  sampleContent: string | null;
 };
 
 type Props = {
@@ -52,7 +54,7 @@ type Props = {
   previewMedia: PreviewMedia[];
 };
 
-type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "media" | "reviews";
+type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "media" | "reviews" | "excerpt";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details",       label: "Details" },
@@ -61,6 +63,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "direct-sales",  label: "Direct Sales" },
   { id: "media",         label: "Media" },
   { id: "reviews",       label: "Reviews" },
+  { id: "excerpt",       label: "Excerpt" },
 ];
 
 export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, stripeConnectOnboarded, previewMedia }: Props) {
@@ -125,6 +128,12 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
       {activeTab === "reviews" && (
         <div className="max-w-3xl">
           <BookReviews bookId={book.id} />
+        </div>
+      )}
+
+      {activeTab === "excerpt" && (
+        <div className="max-w-3xl">
+          <BookExcerptEditor bookId={book.id} initial={book.sampleContent} />
         </div>
       )}
     </div>

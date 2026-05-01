@@ -19,6 +19,7 @@ export interface AuthorForTemplate {
   homeTemplate: string;
   heroFeaturedBook: { title: string; slug: string; coverImageUrl: string | null; caption: string | null } | null;
   credentials: string[] | null;
+  pressOutlets: string[];
   plan: { salesEnabled: boolean } | null;
 }
 
@@ -28,6 +29,7 @@ export interface BookForTemplate {
   slug: string;
   subtitle: string | null;
   shortDescription: string | null;
+  sampleContent: string | null;
   coverImageUrl: string | null;
   priceCents: number;
   isFeatured: boolean;

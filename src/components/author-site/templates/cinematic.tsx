@@ -13,7 +13,7 @@ const NAVY        = "#0A192F";
 const NAVY_CARD   = "#102544";
 const GOLD_DEFAULT = "#D4AF37";
 
-const PRESS_NAMES = [
+const DEFAULT_PRESS_NAMES = [
   "THE SUNDAY TIMES",
   "KIRKUS",
   "PUBLISHERS WEEKLY",
@@ -35,8 +35,9 @@ function formatPrice(cents: number) {
 }
 
 export function CinematicTemplate({ author, books, series }: HomeTemplateProps) {
-  const accent      = author.accentColor || GOLD_DEFAULT;
-  const authorName  = author.displayName || author.name;
+  const accent       = author.accentColor || GOLD_DEFAULT;
+  const authorName   = author.displayName || author.name;
+  const pressNames   = author.pressOutlets?.length ? author.pressOutlets : DEFAULT_PRESS_NAMES;
   // heroEyebrow: minimal type, used only for eyebrow label in the hero section
   const heroEyebrow = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
   // featuredBook: full BookForTemplate, used for the Featured Release section
@@ -151,7 +152,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       >
         <div className="max-w-6xl mx-auto px-6 sm:px-10">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {PRESS_NAMES.map((name) => (
+            {pressNames.map((name) => (
               <span
                 key={name}
                 className="font-heading italic text-[13px] tracking-wide opacity-40 text-[#FBF6E9]"

@@ -23,6 +23,7 @@ export default async function BrandingPage() {
         showHeroBanner: true,
         aboutStats: true,
         credentials: true,
+        pressOutlets: true,
         plan: { select: { tier: true } },
       },
     }),
@@ -62,6 +63,7 @@ export default async function BrandingPage() {
     credentials: Array.isArray(author.credentials)
       ? (author.credentials as string[]).slice(0, 3)
       : ["", "", ""],
+    pressOutlets: Array.isArray(author.pressOutlets) ? author.pressOutlets : [],
   };
 
   return (

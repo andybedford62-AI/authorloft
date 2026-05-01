@@ -263,7 +263,7 @@ export default async function BookDetailPage({
 
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+              <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                 <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
                 <div className="flex flex-wrap gap-2">
 
@@ -319,6 +319,36 @@ export default async function BookDetailPage({
             {/* Book Overview — collapsible */}
             {book.description && (
               <BookOverview text={book.description} accentColor={accentColor} />
+            )}
+
+            {/* Read an Excerpt */}
+            {book.sampleContent && (
+              <div className="pt-2 space-y-3">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Read an Excerpt</h2>
+                <div className="relative">
+                  <div
+                    className="text-base text-gray-700 leading-relaxed rich-content max-h-80 overflow-hidden"
+                    dangerouslySetInnerHTML={{ __html: sanitize(book.sampleContent) }}
+                  />
+                  {/* Fade-out gradient */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+                    style={{ background: "linear-gradient(to bottom, transparent, white)" }}
+                  />
+                </div>
+                {hasBuyOptions && (
+                  <p className="text-sm text-gray-500 pt-1">
+                    Enjoying it?{" "}
+                    <a
+                      href="#buy"
+                      className="font-medium hover:underline"
+                      style={{ color: accentColor }}
+                    >
+                      Get the full book →
+                    </a>
+                  </p>
+                )}
+              </div>
             )}
 
             {/* Pull quotes / reviews */}

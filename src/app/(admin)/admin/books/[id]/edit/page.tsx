@@ -68,6 +68,7 @@ export default async function EditBookPage({
     releaseDate: book.releaseDate
       ? book.releaseDate.toISOString().split("T")[0]
       : null,
+    sampleContent: book.sampleContent ?? null,
   };
 
   return (

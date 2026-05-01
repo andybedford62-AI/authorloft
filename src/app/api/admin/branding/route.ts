@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
     contactEmail, contactResponseTime, contactOpenTo,
     heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
-    aboutStats, credentials,
+    aboutStats, credentials, pressOutlets,
   } = body;
 
   // Validate social URLs before writing to DB
@@ -94,6 +94,7 @@ export async function PATCH(req: NextRequest) {
       }),
       ...(Array.isArray(aboutStats) && { aboutStats }),
       ...(Array.isArray(credentials) && { credentials: credentials.slice(0, 3) }),
+      ...(Array.isArray(pressOutlets) && { pressOutlets: pressOutlets.slice(0, 6) }),
     },
     select: { id: true, displayName: true, profileImageUrl: true },
   });
