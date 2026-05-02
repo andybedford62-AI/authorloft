@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 import { sendMail, esc, wrapHtml } from "@/lib/mailer";
 
 export async function POST(req: Request) {
@@ -7,6 +8,10 @@ export async function POST(req: Request) {
   if (!name || !email || !usageType) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
+
+  await prisma.accessRequest.create({
+    data: { name, email, usageType },
+  });
 
   const html = wrapHtml(
     "New Access Request",
@@ -27,17 +32,13 @@ export async function POST(req: Request) {
     </table>`
   );
 
-  const ok = await sendMail({
-    to: "andybedford62_AL@gmail.com",
+  await sendMail({
+    to: "andybedford62@gmail.com",
     subject: `AuthorLoft Access Request — ${name}`,
     text: `Name: ${name}\nEmail: ${email}\nIntended use: ${usageType}`,
     html,
     replyTo: email,
   });
-
-  if (!ok) {
-    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
-  }
 
   return NextResponse.json({ success: true });
 }

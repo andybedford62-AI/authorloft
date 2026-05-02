@@ -104,12 +104,13 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 const SUPER_ADMIN_ITEMS: NavItem[] = [
-  { href: "/super-admin/authors",        label: "All Authors",   icon: Users      },
-  { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard },
-  { href: "/super-admin/feature-config", label: "Feature Gates", icon: Bot        },
-  { href: "/admin/genres",               label: "Genres",        icon: Tag        },
-  { href: "/super-admin/legal",          label: "Legal",         icon: Shield     },
-  { href: "/super-admin/settings",       label: "Platform",      icon: Settings   },
+  { href: "/super-admin/authors",          label: "All Authors",     icon: Users      },
+  { href: "/super-admin/access-requests",  label: "Access Requests", icon: Inbox      },
+  { href: "/super-admin/plans",            label: "Plans",           icon: CreditCard },
+  { href: "/super-admin/feature-config",   label: "Feature Gates",   icon: Bot        },
+  { href: "/admin/genres",                 label: "Genres",          icon: Tag        },
+  { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },
+  { href: "/super-admin/settings",         label: "Platform",        icon: Settings   },
   { href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", label: "Analytics", icon: BarChart2, external: true },
 ];
 

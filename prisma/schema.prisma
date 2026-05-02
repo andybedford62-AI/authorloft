@@ -651,6 +651,18 @@ model ContactMessage {
   @@index([authorId, isRead])
 }
 
+// ─── Platform-level access requests (beta invite requests) ───────────────────
+
+model AccessRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  usageType String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 // ─── Platform Settings (singleton) ───────────────────────────────────────────
 
 model PlatformSettings {
