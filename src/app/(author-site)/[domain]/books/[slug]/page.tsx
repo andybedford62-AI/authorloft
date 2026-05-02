@@ -124,7 +124,6 @@ export default async function BookDetailPage({
   const showLegacyDirectBuy = !hasDirectSaleItems && salesEnabled && book.directSalesEnabled && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
   const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks;
-  const showRetailerPrice   = hasRetailerLinks && !hasDirectSaleItems && !showLegacyDirectBuy && book.priceCents > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const releaseDateFormatted = book.releaseDate
@@ -252,6 +251,9 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
+              {book.priceCents > 0 && (
+                <p className="mt-3 text-2xl font-bold text-gray-900">{formatCents(book.priceCents)}</p>
+              )}
             </div>
 
             {/* Short description */}
@@ -266,12 +268,7 @@ export default async function BookDetailPage({
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
               <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-gray-700">Get this book</p>
-                  {showRetailerPrice && (
-                    <span className="text-sm font-bold text-gray-900">{formatCents(book.priceCents)}</span>
-                  )}
-                </div>
+                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
                 <div className="flex flex-wrap gap-2">
 
                   {/* Retailer links — shown first */}
