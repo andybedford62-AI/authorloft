@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Plus } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import type { BookForTemplate } from "./types";
 
 interface Props {
@@ -100,17 +100,6 @@ export function CinematicBooksFilter({ books, accentColor }: Props) {
           </Link>
         ))}
 
-        {/* View all tile */}
-        <Link
-          href="/books"
-          className="group flex flex-col items-center justify-center aspect-[2/3] rounded-sm border border-dashed transition-colors duration-200"
-          style={{ borderColor: accentColor + "44" }}
-        >
-          <Plus className="w-8 h-8 mb-2 transition-colors" style={{ color: accentColor + "88" }} />
-          <span className="text-xs font-semibold tracking-wide" style={{ color: accentColor + "88" }}>
-            View all
-          </span>
-        </Link>
       </div>
     </div>
   );
