@@ -66,6 +66,17 @@ export async function DELETE(req: NextRequest) {
   }
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(COOKIE, "", { maxAge: 0, path: "/" });
+  const secure = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "";
+  const isPublicSuffix = platformDomain.includes("vercel.app") || platformDomain.includes("localhost");
+  const cookieDomain = platformDomain && !isPublicSuffix ? `.${platformDomain}` : undefined;
+  res.cookies.set(COOKIE, "", {
+    maxAge: 0,
+    path: "/",
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    ...(cookieDomain && { domain: cookieDomain }),
+  });
   return res;
 }
