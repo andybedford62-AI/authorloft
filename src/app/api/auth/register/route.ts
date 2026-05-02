@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
 
     // Generate an email verification token (expires in 24 hours)
     const emailVerifyToken = randomBytes(32).toString("hex");
-    const emailVerifyExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
+    const emailVerifyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const author = await prisma.author.create({
       data: {
