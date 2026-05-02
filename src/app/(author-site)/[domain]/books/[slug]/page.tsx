@@ -124,6 +124,7 @@ export default async function BookDetailPage({
   const showLegacyDirectBuy = !hasDirectSaleItems && salesEnabled && book.directSalesEnabled && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
   const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks;
+  const showRetailerPrice   = hasRetailerLinks && !hasDirectSaleItems && !showLegacyDirectBuy && book.priceCents > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const releaseDateFormatted = book.releaseDate
@@ -265,7 +266,12 @@ export default async function BookDetailPage({
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
               <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-gray-700">Get this book</p>
+                  {showRetailerPrice && (
+                    <span className="text-sm font-bold text-gray-900">{formatCents(book.priceCents)}</span>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
 
                   {/* Retailer links — shown first */}
