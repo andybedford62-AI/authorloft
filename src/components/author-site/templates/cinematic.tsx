@@ -145,24 +145,26 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
         </div>
       </section>
 
-      {/* ── Press Strip ──────────────────────────────────────────────────── */}
-      <div
-        className="py-4 border-y"
-        style={{ background: NAVY_DEEP, borderColor: accent + "22" }}
-      >
-        <div className="max-w-6xl mx-auto px-6 sm:px-10">
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {pressNames.map((name) => (
-              <span
-                key={name}
-                className="font-heading italic text-[13px] tracking-wide opacity-40 text-[#FBF6E9]"
-              >
-                {name}
-              </span>
-            ))}
+      {/* ── Press Strip — only shown when author has set real press outlets ── */}
+      {author.pressOutlets?.length > 0 && (
+        <div
+          className="py-5 border-y"
+          style={{ background: NAVY_DEEP, borderColor: accent + "22" }}
+        >
+          <div className="max-w-6xl mx-auto px-6 sm:px-10">
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+              {author.pressOutlets.map((name) => (
+                <span
+                  key={name}
+                  className="font-heading italic text-[13px] tracking-wide opacity-40 text-[#FBF6E9]"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Featured Release ─────────────────────────────────────────────── */}
       {featuredBook && (
