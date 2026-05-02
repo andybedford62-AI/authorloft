@@ -22,7 +22,7 @@ function baseUrl() {
   return (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
 }
 
-function wrapHtml(title: string, content: string) {
+export function wrapHtml(title: string, content: string) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

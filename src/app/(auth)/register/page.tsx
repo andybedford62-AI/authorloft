@@ -11,6 +11,7 @@ import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
+import { RequestAccessModal } from "@/components/auth/RequestAccessModal";
 
 const PLATFORM_DOMAIN =
   process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
@@ -94,6 +95,7 @@ function RegisterPageInner() {
 
   // Step 0 = invite code (beta only); Step 1 = account; Step 2 = site URL
   const [step, setStep] = useState<0 | 1 | 2>(1);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   // Step 0 fields
   const [inviteCode,      setInviteCode]      = useState("");
@@ -323,9 +325,13 @@ function RegisterPageInner() {
 
               <p className="text-center text-xs text-gray-400">
                 Don&apos;t have an invite code?{" "}
-                <a href="mailto:andybedford52+AL@gmail.com" className="text-blue-600 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => setShowRequestModal(true)}
+                  className="text-blue-600 hover:underline"
+                >
                   Request access
-                </a>
+                </button>
               </p>
             </form>
           )}
@@ -615,6 +621,11 @@ function RegisterPageInner() {
           </Link>
         </p>
       </div>
+
+      <RequestAccessModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+      />
     </div>
   );
 }
