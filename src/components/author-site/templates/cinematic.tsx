@@ -53,7 +53,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       <section
         className="relative overflow-hidden flex items-center"
         style={{
-          minHeight: "clamp(580px, 80vh, 920px)",
+          minHeight: "clamp(500px, 70vh, 780px)",
           background: `
             radial-gradient(ellipse 75% 60% at 30% 50%, ${accent}18 0%, transparent 70%),
             radial-gradient(ellipse 60% 80% at 75% 30%, #1E3A5F40 0%, transparent 65%),
@@ -83,8 +83,8 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
         )}
 
         {/* Text content — left side */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
-          <div className="max-w-[520px] space-y-6">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-18">
+          <div className="max-w-[520px] space-y-5">
 
             {/* Eyebrow */}
             {heroEyebrow && (
@@ -102,19 +102,19 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
             {/* Headline */}
             <h1
-              className="font-heading text-[clamp(44px,7vw,96px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
+              className="font-heading text-[clamp(36px,5.5vw,72px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
               dangerouslySetInnerHTML={{ __html: formatHeadline(headline, accent) }}
             />
 
             {/* Subhead */}
             {subhead && (
-              <p className="text-[17px] leading-relaxed text-[#FBF6E9]/70 max-w-[440px]">
+              <p className="text-[16px] leading-relaxed text-[#FBF6E9]/70 max-w-[440px]">
                 {subhead}
               </p>
             )}
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-1">
               <Link
                 href="/books"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
@@ -132,7 +132,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
             </div>
 
             {/* Meta strip */}
-            <div className="flex flex-wrap items-center gap-3 pt-4 border-t" style={{ borderColor: accent + "22" }}>
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t" style={{ borderColor: accent + "22" }}>
               <span className="text-[11px] font-medium" style={{ color: accent }}>★★★★★</span>
               {author.credentials?.slice(1).map((c, i) => (
                 <span key={i} className="text-[11px] text-[#FBF6E9]/50">
@@ -147,7 +147,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
       {/* ── Press Strip ──────────────────────────────────────────────────── */}
       <div
-        className="py-5 border-y"
+        className="py-4 border-y"
         style={{ background: NAVY_DEEP, borderColor: accent + "22" }}
       >
         <div className="max-w-6xl mx-auto px-6 sm:px-10">
@@ -167,21 +167,21 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       {/* ── Featured Release ─────────────────────────────────────────────── */}
       {featuredBook && (
         <section style={{ background: NAVY }}>
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
-            <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-16">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
 
               {/* Book cover with tilt effect */}
               <div className="flex justify-center md:justify-end">
                 <div className="relative">
                   {/* Decorative "01" */}
                   <span
-                    className="absolute -top-4 -left-6 font-heading text-[160px] leading-none font-bold select-none pointer-events-none hidden lg:block"
+                    className="absolute -top-4 -left-6 font-heading text-[120px] leading-none font-bold select-none pointer-events-none hidden lg:block"
                     style={{ color: accent + "10" }}
                   >
                     01
                   </span>
                   <div
-                    className="relative w-52 sm:w-64 aspect-[2/3] rounded-sm overflow-hidden"
+                    className="relative w-44 sm:w-52 aspect-[2/3] rounded-sm overflow-hidden"
                     style={{
                       transform: "perspective(800px) rotateY(-12deg) rotateX(3deg)",
                       boxShadow: "15px 20px 30px rgba(0,0,0,0.55), 4px 8px 12px rgba(0,0,0,0.35)",
@@ -199,7 +199,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               </div>
 
               {/* Book details */}
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
                     The Latest
@@ -207,7 +207,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                       ? ` · ${new Date(featuredBook.releaseDate).getFullYear()}`
                       : ""}
                   </p>
-                  <h2 className="font-heading text-[clamp(36px,5vw,64px)] leading-tight text-[#FBF6E9]">
+                  <h2 className="font-heading text-[clamp(28px,4vw,52px)] leading-tight text-[#FBF6E9]">
                     {featuredBook.title}
                   </h2>
                   {featuredBook.subtitle && (
@@ -218,7 +218,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 </div>
 
                 {featuredBook.shortDescription && (
-                  <p className="text-[17px] leading-relaxed text-[#FBF6E9]/65">
+                  <p className="text-[16px] leading-relaxed text-[#FBF6E9]/65">
                     {featuredBook.shortDescription}
                   </p>
                 )}
@@ -234,7 +234,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 )}
 
                 {/* CTAs */}
-                <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex flex-wrap gap-3 pt-1">
                   <Link
                     href={`/books/${featuredBook.slug}`}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90"
@@ -261,13 +261,13 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       {/* ── All Books ─────────────────────────────────────────────────────── */}
       {books.length > 0 && (
         <section style={{ background: NAVY_DEEP }}>
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
-            <div className="flex items-end justify-between mb-10">
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-16">
+            <div className="flex items-end justify-between mb-6">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                   The Shelf
                 </p>
-                <h2 className="font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+                <h2 className="font-heading text-[clamp(24px,3.5vw,40px)] text-[#FBF6E9]">
                   The complete shelf
                 </h2>
               </div>
@@ -287,12 +287,12 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       {/* ── Browse by Series ─────────────────────────────────────────────── */}
       {series.length > 0 && (
         <section style={{ background: NAVY }}>
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
-            <div className="text-center mb-12">
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-16">
+            <div className="text-center mb-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                 Collections
               </p>
-              <h2 className="font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+              <h2 className="font-heading text-[clamp(24px,3.5vw,40px)] text-[#FBF6E9]">
                 Choose your series
               </h2>
             </div>
@@ -328,7 +328,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                     )}
 
                     {/* Content */}
-                    <div className="relative z-10 p-7 pt-28 sm:pt-32">
+                    <div className="relative z-10 p-6 pt-24 sm:pt-28">
                       <span
                         className="inline-block text-[10px] font-bold uppercase tracking-widest mb-2 px-2 py-0.5 rounded-full"
                         style={{ background: accent + "22", color: accent }}
@@ -361,14 +361,14 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
       {/* ── About ─────────────────────────────────────────────────────────── */}
       <section style={{ background: NAVY_DEEP }}>
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-16">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
 
             {/* Portrait */}
             <div className="flex justify-center">
               <div className="relative">
                 <div
-                  className="relative w-72 sm:w-80 aspect-[4/5] overflow-hidden"
+                  className="relative w-60 sm:w-72 aspect-[4/5] overflow-hidden"
                   style={{
                     borderRadius: "0 0 50px 0",
                     boxShadow: "0 20px 40px rgba(0,0,0,0.45)",
@@ -395,22 +395,22 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
             </div>
 
             {/* Bio */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
                   About
                 </p>
-                <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight text-[#FBF6E9]">
+                <h2 className="font-heading text-[clamp(24px,3.5vw,40px)] leading-tight text-[#FBF6E9]">
                   {authorName}
                 </h2>
               </div>
               {author.shortBio ? (
                 <div
-                  className="text-[17px] leading-[1.75] text-[#FBF6E9]/65 rich-content"
+                  className="text-[16px] leading-[1.75] text-[#FBF6E9]/65 rich-content"
                   dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio) }}
                 />
               ) : (
-                <p className="text-[17px] leading-[1.75] text-[#FBF6E9]/65">
+                <p className="text-[16px] leading-[1.75] text-[#FBF6E9]/65">
                   Author bio coming soon.
                 </p>
               )}
@@ -430,14 +430,14 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
       <section
         style={{ background: NAVY, borderTop: `1px solid ${GOLD_DEFAULT}22` }}
       >
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-16 md:py-20">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
+        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-10 md:py-14">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
 
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
                 The Dispatch · Monthly
               </p>
-              <h2 className="font-heading text-[clamp(28px,3.5vw,44px)] leading-tight text-[#FBF6E9] mb-3">
+              <h2 className="font-heading text-[clamp(22px,3vw,36px)] leading-tight text-[#FBF6E9] mb-3">
                 Letters from the loft.
               </h2>
               <p className="text-base text-[#FBF6E9]/55">
