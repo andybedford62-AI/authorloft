@@ -60,12 +60,20 @@ export async function POST(req: NextRequest) {
     }
   } else {
     // ── Local filesystem fallback (development, no Supabase needed) ──────────
-    const uploadsDir = nodePath.join(process.cwd(), "public", "uploads", "covers");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    try {
+      const uploadsDir = nodePath.join(process.cwd(), "public", "uploads", "covers");
+      await fs.mkdir(uploadsDir, { recursive: true });
 
-    const filename = `${authorId}-${Date.now()}.${ext}`;
-    await fs.writeFile(nodePath.join(uploadsDir, filename), buffer);
-    publicUrl = `/uploads/covers/${filename}`;
+      const filename = `${authorId}-${Date.now()}.${ext}`;
+      await fs.writeFile(nodePath.join(uploadsDir, filename), buffer);
+      publicUrl = `/uploads/covers/${filename}`;
+    } catch (err) {
+      console.error("[upload/cover] Filesystem error:", err);
+      return NextResponse.json(
+        { error: "Upload failed. Supabase Storage is not configured." },
+        { status: 500 }
+      );
+    }
   }
 
   return NextResponse.json({ url: publicUrl });

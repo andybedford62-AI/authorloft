@@ -61,10 +61,17 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
     const body = new FormData();
     body.append("file", file);
     try {
-      const res  = await fetch("/api/admin/upload/cover", { method: "POST", body });
-      const data = await res.json();
-      if (!res.ok) setUploadError(data.error ?? "Upload failed. Please try again.");
-      else onChange(data.url);
+      const res = await fetch("/api/admin/upload/cover", { method: "POST", body });
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!res.ok) {
+        const msg = contentType.includes("application/json")
+          ? (await res.json()).error
+          : `Upload failed (HTTP ${res.status})`;
+        setUploadError(msg ?? "Upload failed. Please try again.");
+      } else {
+        const data = await res.json();
+        onChange(data.url);
+      }
     } catch {
       setUploadError("Network error — could not upload image.");
     } finally {
