@@ -658,9 +658,11 @@ model AccessRequest {
   name      String
   email     String
   usageType String
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+  @@index([isRead])
 }
 
 // ─── Platform Settings (singleton) ───────────────────────────────────────────
