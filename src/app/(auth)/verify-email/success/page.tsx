@@ -25,13 +25,13 @@ export default function VerifyEmailSuccessPage() {
               Your email address has been confirmed. Your AuthorLoft account is fully activated.
             </p>
           </div>
-          <Link href="/admin/dashboard">
+          <Link href="/login">
             <Button
               size="lg"
               className="w-full bg-blue-600 hover:bg-blue-700"
               style={{ "--accent": "#2563EB" } as React.CSSProperties}
             >
-              Go to your dashboard
+              Sign in to continue
             </Button>
           </Link>
         </div>

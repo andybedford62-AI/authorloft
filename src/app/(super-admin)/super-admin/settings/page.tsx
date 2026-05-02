@@ -11,7 +11,6 @@ export default async function SuperAdminSettingsPage() {
     planBreakdown,
     systemConfig,
     platformSettings,
-    betaCodes,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -33,7 +32,6 @@ export default async function SuperAdminSettingsPage() {
       update: {},
       select: { marketingHeroImageUrl: true },
     }),
-    prisma.inviteCode.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   // Build env display values server-side so secrets never reach the client bundle
@@ -61,13 +59,6 @@ export default async function SuperAdminSettingsPage() {
         planBreakdown={planBreakdown}
         maintenanceMode={systemConfig.maintenanceMode}
         maintenanceMessage={systemConfig.maintenanceMessage}
-        betaMode={systemConfig.betaMode}
-        betaMessage={systemConfig.betaMessage}
-        betaCodes={betaCodes.map((c) => ({
-          ...c,
-          expiresAt: c.expiresAt?.toISOString() ?? null,
-          createdAt: c.createdAt.toISOString(),
-        }))}
         marketingHeroImageUrl={platformSettings.marketingHeroImageUrl ?? null}
         envValues={envValues}
       />

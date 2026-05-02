@@ -10,14 +10,12 @@ import {
   Globe,
   WifiOff,
   Image,
-  FlaskConical,
   Settings,
   UserX,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
 import { MarketingHeroImage } from "./marketing-hero-image";
-import { BetaModePanel } from "./beta-mode-panel";
 import { GhostUsersPanel } from "./ghost-users-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -29,16 +27,6 @@ interface PlanStat {
   _count: { authors: number };
 }
 
-interface InviteCodeRow {
-  id: string;
-  code: string;
-  label: string;
-  maxUses: number;
-  usesCount: number;
-  expiresAt: string | null;
-  createdAt: string;
-}
-
 export interface SettingsTabsProps {
   authorCount: number;
   bookCount: number;
@@ -48,9 +36,6 @@ export interface SettingsTabsProps {
   planBreakdown: PlanStat[];
   maintenanceMode: boolean;
   maintenanceMessage: string;
-  betaMode: boolean;
-  betaMessage: string;
-  betaCodes: InviteCodeRow[];
   marketingHeroImageUrl: string | null;
   /** Env var display values — secrets resolved server-side before passing to client */
   envValues: { label: string; value: string | undefined }[];
@@ -59,12 +44,11 @@ export interface SettingsTabsProps {
 // ── Tab definitions ────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: "overview",      label: "Overview",      icon: Database    },
-  { id: "onboarding",    label: "Onboarding",    icon: UserX       },
-  { id: "beta",          label: "Beta Mode",      icon: FlaskConical },
-  { id: "maintenance",   label: "Maintenance",    icon: WifiOff     },
-  { id: "marketing",     label: "Marketing",      icon: Image       },
-  { id: "configuration", label: "Configuration",  icon: Globe       },
+  { id: "overview",      label: "Overview",      icon: Database },
+  { id: "onboarding",    label: "Onboarding",    icon: UserX    },
+  { id: "maintenance",   label: "Maintenance",   icon: WifiOff  },
+  { id: "marketing",     label: "Marketing",     icon: Image    },
+  { id: "configuration", label: "Configuration", icon: Globe    },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -97,7 +81,6 @@ export function SettingsTabs(props: SettingsTabsProps) {
       {/* Tab panels */}
       {activeTab === "overview"      && <OverviewTab      {...props} />}
       {activeTab === "onboarding"    && <OnboardingTab />}
-      {activeTab === "beta"          && <BetaTab          {...props} />}
       {activeTab === "maintenance"   && <MaintenanceTab   {...props} />}
       {activeTab === "marketing"     && <MarketingTab     {...props} />}
       {activeTab === "configuration" && <ConfigurationTab {...props} />}
@@ -189,30 +172,6 @@ function OnboardingTab() {
         </p>
       </div>
       <GhostUsersPanel />
-    </section>
-  );
-}
-
-// ── Beta tab ───────────────────────────────────────────────────────────────────
-
-function BetaTab({ betaMode, betaMessage, betaCodes }: SettingsTabsProps) {
-  return (
-    <section className="bg-gray-900 rounded-xl border border-gray-700 p-6 space-y-4">
-      <div>
-        <h2 className="font-semibold text-gray-100 flex items-center gap-2">
-          <FlaskConical className="h-4 w-4 text-amber-400" />
-          Beta Mode
-        </h2>
-        <p className="text-xs text-gray-400 mt-1">
-          When enabled, new registrations require an invite code and Google sign-up is blocked for new accounts.
-          Toggle off to go live — no code changes required.
-        </p>
-      </div>
-      <BetaModePanel
-        initialBetaMode={betaMode}
-        initialBetaMessage={betaMessage}
-        initialCodes={betaCodes}
-      />
     </section>
   );
 }

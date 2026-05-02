@@ -1,23 +1,31 @@
 import { prisma } from "@/lib/db";
-import { Inbox } from "lucide-react";
-import { AccessRequestsTable } from "./AccessRequestsTable";
+import { AccessRequestsClient } from "./AccessRequestsClient";
 
 export default async function AccessRequestsPage() {
-  const requests = await prisma.accessRequest.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [requests, systemConfig, betaCodes] = await Promise.all([
+    prisma.accessRequest.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.systemConfig.upsert({
+      where:  { id: "main" },
+      create: { id: "main", maintenanceMode: false, maintenanceMessage: "" },
+      update: {},
+    }),
+    prisma.inviteCode.findMany({ orderBy: { createdAt: "desc" } }),
+  ]);
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
-        <Inbox className="h-6 w-6 text-purple-400" />
-        <h1 className="text-2xl font-bold text-white">Access Requests</h1>
-      </div>
-
-      <AccessRequestsTable
-        initial={requests.map((r) => ({
+      <h1 className="text-2xl font-bold text-white mb-6">Access & Beta</h1>
+      <AccessRequestsClient
+        requests={requests.map((r) => ({
           ...r,
           createdAt: r.createdAt.toISOString(),
+        }))}
+        betaMode={systemConfig.betaMode}
+        betaMessage={systemConfig.betaMessage}
+        betaCodes={betaCodes.map((c) => ({
+          ...c,
+          expiresAt: c.expiresAt?.toISOString() ?? null,
+          createdAt: c.createdAt.toISOString(),
         }))}
       />
     </div>
