@@ -291,9 +291,16 @@ function RegisterPageInner() {
                   <KeyRound className="h-5 w-5 text-blue-500" />
                   Enter your invite code
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {betaMessage || "AuthorLoft is currently in private beta. You need an invite code to create an account."}
-                </p>
+                {betaMessage ? (
+                  <div
+                    className="text-sm text-gray-500 mt-1 rich-content"
+                    dangerouslySetInnerHTML={{ __html: betaMessage }}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500 mt-1">
+                    AuthorLoft is currently in private beta. You need an invite code to create an account.
+                  </p>
+                )}
               </div>
 
               <Input

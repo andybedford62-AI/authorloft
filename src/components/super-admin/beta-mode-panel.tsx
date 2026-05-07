@@ -5,6 +5,7 @@ import {
   AlertTriangle, Loader2, Check, Power, KeyRound, Plus, Trash2,
   Copy, RefreshCw, ChevronDown, ChevronUp,
 } from "lucide-react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type InviteCode = {
   id:        string;
@@ -236,13 +237,14 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
         <label className="block text-xs font-medium text-gray-400">
           Beta message <span className="text-gray-600">(shown on the register page when beta mode is on)</span>
         </label>
-        <textarea
-          rows={2}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="e.g. AuthorLoft is currently in private beta. You need an invite code to create an account."
-          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-        />
+        <div className="rounded-lg overflow-hidden border border-gray-600">
+          <RichTextEditor
+            value={message}
+            onChange={setMessage}
+            placeholder="e.g. AuthorLoft is currently in private beta. You need an invite code to create an account."
+            minHeight={120}
+          />
+        </div>
         <div className="flex items-center gap-3">
           <button
             type="button"

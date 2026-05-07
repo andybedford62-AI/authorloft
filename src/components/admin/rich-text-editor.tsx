@@ -29,6 +29,7 @@ interface RichTextEditorProps {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  minHeight?: number;
 }
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────────
@@ -738,6 +739,7 @@ export function RichTextEditor({
   onChange,
   placeholder = "Write your page content here…",
   className,
+  minHeight,
 }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -767,6 +769,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: "rich-content tiptap-editor-content",
+        ...(minHeight ? { style: `min-height:${minHeight}px` } : {}),
       },
     },
   });
