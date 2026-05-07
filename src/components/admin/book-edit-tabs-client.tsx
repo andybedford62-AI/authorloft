@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
@@ -9,6 +10,7 @@ import { BookAudioTracks } from "@/components/admin/book-audio-tracks";
 import { BookPreviewMedia } from "@/components/admin/book-preview-media";
 import { BookReviews } from "@/components/admin/book-reviews";
 import { BookExcerptEditor } from "@/components/admin/book-excerpt-editor";
+import { ArcTab } from "@/components/admin/books/arc/arc-tab";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -54,7 +56,7 @@ type Props = {
   previewMedia: PreviewMedia[];
 };
 
-type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "media" | "reviews" | "excerpt";
+type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "media" | "reviews" | "excerpt" | "arcs";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details",       label: "Details" },
@@ -64,10 +66,15 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "media",         label: "Media" },
   { id: "reviews",       label: "Reviews" },
   { id: "excerpt",       label: "Excerpt" },
+  { id: "arcs",          label: "ARCs" },
 ];
 
 export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, stripeConnectOnboarded, previewMedia }: Props) {
-  const [activeTab, setActiveTab] = useState<TabId>("details");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as TabId) ?? "details";
+  const [activeTab, setActiveTab] = useState<TabId>(
+    TABS.some((t) => t.id === initialTab) ? initialTab : "details"
+  );
 
   return (
     <div className="space-y-0">
@@ -134,6 +141,12 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
       {activeTab === "excerpt" && (
         <div className="max-w-3xl">
           <BookExcerptEditor bookId={book.id} initial={book.sampleContent} />
+        </div>
+      )}
+
+      {activeTab === "arcs" && (
+        <div className="max-w-3xl">
+          <ArcTab bookId={book.id} />
         </div>
       )}
     </div>

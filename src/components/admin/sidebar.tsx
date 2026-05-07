@@ -32,6 +32,7 @@ import {
   Lock,
   BarChart2,
   Megaphone,
+  ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -67,8 +68,9 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "content", label: "Content", defaultOpen: true,
     items: [
-      { href: "/admin/books",      label: "Books",       icon: BookOpen   },
-      { href: "/admin/flip-books", label: "Flip Books",  icon: BookMarked },
+      { href: "/admin/books",      label: "Books",       icon: BookOpen       },
+      { href: "/admin/arcs",       label: "ARCs",        icon: ClipboardList  },
+      { href: "/admin/flip-books", label: "Flip Books",  icon: BookMarked     },
       { href: "/admin/specials",   label: "Specials",    icon: Sparkles   },
       { href: "/admin/series",     label: "Series",      icon: Library    },
       { href: "/admin/pages",      label: "Pages",       icon: FileText   },

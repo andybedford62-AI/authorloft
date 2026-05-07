@@ -619,6 +619,208 @@ export async function sendOnboardingReminderEmail(to: string, name: string, slug
   });
 }
 
+// ── ARC (Advance Reader Copy) emails ────────────────────────────────────────
+
+export async function sendArcInvitationEmail({
+  to,
+  name,
+  bookTitle,
+  authorName,
+  downloadUrl,
+  expiresAt,
+  disclaimer,
+}: {
+  to: string;
+  name: string;
+  bookTitle: string;
+  authorName: string;
+  downloadUrl: string;
+  expiresAt: Date;
+  disclaimer: string;
+}) {
+  const expiryStr = expiresAt.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+
+  return sendMail({
+    to,
+    subject: `You're invited to read an advance copy of "${bookTitle}"`,
+    text: [
+      `Hi ${name},`,
+      `${authorName} has invited you to read an advance reader copy of "${bookTitle}".`,
+      `Download your copy here: ${downloadUrl}`,
+      `This link expires on ${expiryStr}.`,
+      disclaimer,
+    ].join("\n\n"),
+    html: wrapHtml(`Your ARC of "${esc(bookTitle)}" is ready`, `
+      <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
+      <p style="margin:0 0 16px;">
+        <strong>${esc(authorName)}</strong> has invited you to read an advance copy of
+        <strong>${esc(bookTitle)}</strong> before it's published.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:8px 0 24px;">
+            <a href="${downloadUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              Download Your ARC
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px;">
+        <p style="margin:0 0 4px;font-size:13px;color:#374151;">
+          ⏱ <strong>Link expires:</strong> ${expiryStr}
+        </p>
+        <p style="margin:0;font-size:12px;color:#6b7280;line-height:1.6;">${esc(disclaimer)}</p>
+      </div>
+
+      <p style="margin:0;font-size:13px;color:#6b7280;">
+        If the button above doesn't work, paste this link into your browser:<br/>
+        <a href="${downloadUrl}" style="color:#2563eb;word-break:break-all;">${downloadUrl}</a>
+      </p>
+    `),
+  });
+}
+
+export async function sendArcReminderEmail({
+  to,
+  name,
+  bookTitle,
+  downloadUrl,
+}: {
+  to: string;
+  name: string;
+  bookTitle: string;
+  downloadUrl: string;
+}) {
+  return sendMail({
+    to,
+    subject: `Reminder — your review of "${bookTitle}"`,
+    text: [
+      `Hi ${name},`,
+      `Just a friendly reminder that you received an advance copy of "${bookTitle}".`,
+      `When you're ready to post your review, you can re-download your copy here: ${downloadUrl}`,
+      `Thank you so much — your review means a lot to the author!`,
+    ].join("\n\n"),
+    html: wrapHtml(`Reminder: your review of "${esc(bookTitle)}"`, `
+      <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
+      <p style="margin:0 0 16px;">
+        Just a friendly reminder that you received an advance copy of
+        <strong>${esc(bookTitle)}</strong>.
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        Once you've had a chance to read it, your honest review would be greatly appreciated —
+        it makes a real difference to the author.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${downloadUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Re-download Your Copy
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Thank you for supporting indie authors!
+      </p>
+    `),
+  });
+}
+
+export async function sendArcApplicationConfirmEmail({
+  to,
+  name,
+  bookTitle,
+}: {
+  to: string;
+  name: string;
+  bookTitle: string;
+}) {
+  return sendMail({
+    to,
+    subject: `ARC application received — "${bookTitle}"`,
+    text: [
+      `Hi ${name},`,
+      `Thanks for applying to receive an advance reader copy of "${bookTitle}".`,
+      `The author will review your application and be in touch if you're selected.`,
+    ].join("\n\n"),
+    html: wrapHtml(`Application received`, `
+      <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
+      <p style="margin:0 0 16px;">
+        Thanks for applying to receive an advance reader copy of
+        <strong>${esc(bookTitle)}</strong>.
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        The author will review your application and be in touch soon if you're selected.
+        Keep an eye on your inbox!
+      </p>
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Thank you for supporting indie authors.
+      </p>
+    `),
+  });
+}
+
+export async function sendArcApprovalEmail({
+  to,
+  name,
+  bookTitle,
+  authorName,
+  downloadUrl,
+  expiresAt,
+  disclaimer,
+}: {
+  to: string;
+  name: string;
+  bookTitle: string;
+  authorName: string;
+  downloadUrl: string;
+  expiresAt: Date;
+  disclaimer: string;
+}) {
+  return sendArcInvitationEmail({ to, name, bookTitle, authorName, downloadUrl, expiresAt, disclaimer });
+}
+
+export async function sendArcDeclinedEmail({
+  to,
+  name,
+  bookTitle,
+}: {
+  to: string;
+  name: string;
+  bookTitle: string;
+}) {
+  return sendMail({
+    to,
+    subject: `ARC application update — "${bookTitle}"`,
+    text: [
+      `Hi ${name},`,
+      `Thank you for your interest in reading "${bookTitle}".`,
+      `Unfortunately we aren't able to send you an advance copy at this time, but we appreciate your support.`,
+    ].join("\n\n"),
+    html: wrapHtml(`ARC application update`, `
+      <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
+      <p style="margin:0 0 16px;">
+        Thank you for your interest in reading <strong>${esc(bookTitle)}</strong>.
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        Unfortunately we aren't able to send you an advance copy at this time,
+        but we appreciate your support of independent authors.
+      </p>
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Thank you for supporting indie authors.
+      </p>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**
