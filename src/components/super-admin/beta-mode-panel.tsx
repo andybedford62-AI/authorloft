@@ -144,10 +144,10 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
       <div className="flex items-center justify-between">
         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
           betaMode
-            ? "bg-amber-900/30 border-amber-700 text-amber-300"
-            : "bg-green-900/30 border-green-700 text-green-300"
+            ? "bg-amber-50 border-amber-200 text-amber-700"
+            : "bg-green-50 border-green-200 text-green-700"
         }`}>
-          <span className={`h-2 w-2 rounded-full ${betaMode ? "bg-amber-400 animate-pulse" : "bg-green-400"}`} />
+          <span className={`h-2 w-2 rounded-full ${betaMode ? "bg-amber-500 animate-pulse" : "bg-green-500"}`} />
           {betaMode ? "BETA MODE — invite only" : "GO LIVE — open registration"}
         </div>
 
@@ -170,12 +170,12 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
 
       {/* Confirm — enable beta */}
       {confirmOn && (
-        <div className="rounded-xl bg-amber-900/40 border border-amber-700 p-4 space-y-3">
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-3">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-300">Enable beta mode?</p>
-              <p className="text-xs text-amber-400 mt-1">
+              <p className="text-sm font-semibold text-amber-800">Enable beta mode?</p>
+              <p className="text-xs text-amber-700 mt-1">
                 New registrations will require an invite code. Google sign-up for new accounts will be blocked.
                 Existing accounts and logins are unaffected.
               </p>
@@ -192,7 +192,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
             </button>
             <button
               onClick={() => setConfirmOn(false)}
-              className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white text-sm font-medium"
+              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:text-gray-900 text-sm font-medium"
             >
               Cancel
             </button>
@@ -202,12 +202,12 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
 
       {/* Confirm — go live */}
       {confirmOff && (
-        <div className="rounded-xl bg-green-900/40 border border-green-700 p-4 space-y-3">
+        <div className="rounded-xl bg-green-50 border border-green-200 p-4 space-y-3">
           <div className="flex items-start gap-3">
-            <Check className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+            <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-green-300">Go live — open registration?</p>
-              <p className="text-xs text-green-400 mt-1">
+              <p className="text-sm font-semibold text-green-800">Go live — open registration?</p>
+              <p className="text-xs text-green-700 mt-1">
                 Invite codes will no longer be required. Google sign-up will be re-enabled.
                 Existing beta accounts are unaffected.
               </p>
@@ -224,7 +224,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
             </button>
             <button
               onClick={() => setConfirmOff(false)}
-              className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-white text-sm font-medium"
+              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:text-gray-900 text-sm font-medium"
             >
               Cancel
             </button>
@@ -234,10 +234,10 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
 
       {/* Beta message */}
       <div className="space-y-2">
-        <label className="block text-xs font-medium text-gray-400">
-          Beta message <span className="text-gray-600">(shown on the register page when beta mode is on)</span>
+        <label className="block text-xs font-medium text-gray-600">
+          Beta message <span className="text-gray-400">(shown on the register page when beta mode is on)</span>
         </label>
-        <div className="rounded-lg overflow-hidden border border-gray-600">
+        <div className="rounded-lg overflow-hidden border border-gray-300">
           <RichTextEditor
             value={message}
             onChange={setMessage}
@@ -258,35 +258,35 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
               ? <><Check className="h-3.5 w-3.5" /> Saved</>
               : "Save Message"}
           </button>
-          {error && <p className="text-xs text-red-400">{error}</p>}
+          {error && <p className="text-xs text-red-600">{error}</p>}
         </div>
       </div>
 
       {/* ── Invite codes ─────────────────────────────────────────────── */}
-      <div className="border border-gray-700 rounded-xl overflow-hidden">
+      <div className="border border-gray-200 rounded-xl overflow-hidden">
         <button
           type="button"
           onClick={() => setCodesOpen((o) => !o)}
-          className="w-full flex items-center justify-between px-5 py-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left"
+          className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-white transition-colors text-left"
         >
           <div className="flex items-center gap-2">
-            <KeyRound className="h-4 w-4 text-gray-400" />
-            <span className="text-sm font-medium text-gray-200">Invite Codes</span>
+            <KeyRound className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-800">Invite Codes</span>
             <span className="text-xs text-gray-500">
               {codes.length} total · {unusedCount} unused
             </span>
           </div>
           {codesOpen
-            ? <ChevronUp className="h-4 w-4 text-gray-400" />
-            : <ChevronDown className="h-4 w-4 text-gray-400" />}
+            ? <ChevronUp className="h-4 w-4 text-gray-500" />
+            : <ChevronDown className="h-4 w-4 text-gray-500" />}
         </button>
 
         {codesOpen && (
-          <div className="p-5 space-y-5 bg-gray-900/30">
+          <div className="p-5 space-y-5 bg-white">
 
             {/* Generate form */}
             <form onSubmit={handleGenerate} className="space-y-3">
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Generate new codes</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Generate new codes</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="block text-xs text-gray-500">Quantity</label>
@@ -296,7 +296,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                     max={50}
                     value={genCount}
                     onChange={(e) => setGenCount(Number(e.target.value))}
-                    className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div className="space-y-1">
@@ -307,31 +307,31 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                     max={1000}
                     value={genMaxUses}
                     onChange={(e) => setGenMaxUses(Number(e.target.value))}
-                    className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="block text-xs text-gray-500">Label <span className="text-gray-600">(optional, e.g. "Writing group April")</span></label>
+                <label className="block text-xs text-gray-500">Label <span className="text-gray-400">(optional, e.g. "Writing group April")</span></label>
                 <input
                   type="text"
                   value={genLabel}
                   onChange={(e) => setGenLabel(e.target.value)}
                   maxLength={100}
                   placeholder="Internal note about these codes"
-                  className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-1.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-xs text-gray-500">Expiry date <span className="text-gray-600">(optional)</span></label>
+                <label className="block text-xs text-gray-500">Expiry date <span className="text-gray-400">(optional)</span></label>
                 <input
                   type="date"
                   value={genExpiry}
                   onChange={(e) => setGenExpiry(e.target.value)}
-                  className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
-              {genError && <p className="text-xs text-red-400">{genError}</p>}
+              {genError && <p className="text-xs text-red-600">{genError}</p>}
               <button
                 type="submit"
                 disabled={generating}
@@ -349,11 +349,11 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">All codes</p>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">All codes</p>
                   <button
                     type="button"
                     onClick={refreshCodes}
-                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
+                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
                   >
                     <RefreshCw className="h-3 w-3" /> Refresh
                   </button>
@@ -368,12 +368,12 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                         key={c.id}
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 border ${
                           inactive
-                            ? "bg-gray-800/30 border-gray-700/50 opacity-60"
-                            : "bg-gray-800 border-gray-700"
+                            ? "bg-gray-50 border-gray-200 opacity-60"
+                            : "bg-white border-gray-200"
                         }`}
                       >
                         {/* Code */}
-                        <span className={`font-mono text-sm font-bold flex-shrink-0 ${inactive ? "text-gray-500" : "text-white"}`}>
+                        <span className={`font-mono text-sm font-bold flex-shrink-0 ${inactive ? "text-gray-400" : "text-gray-900"}`}>
                           {c.code}
                         </span>
 
@@ -385,14 +385,14 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
 
                         {/* Uses badge */}
                         <span className={`text-xs flex-shrink-0 px-1.5 py-0.5 rounded ${
-                          exhausted ? "bg-red-900/50 text-red-400" : "bg-gray-700 text-gray-300"
+                          exhausted ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-700"
                         }`}>
                           {c.usesCount}/{c.maxUses}
                         </span>
 
                         {/* Expired badge */}
                         {expired && (
-                          <span className="text-xs flex-shrink-0 px-1.5 py-0.5 rounded bg-gray-700 text-gray-500">
+                          <span className="text-xs flex-shrink-0 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
                             expired
                           </span>
                         )}
@@ -402,10 +402,10 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                           type="button"
                           onClick={() => copyCode(c.code)}
                           title="Copy code"
-                          className="text-gray-500 hover:text-gray-300 flex-shrink-0"
+                          className="text-gray-400 hover:text-gray-700 flex-shrink-0"
                         >
                           {copied === c.code
-                            ? <Check className="h-3.5 w-3.5 text-green-400" />
+                            ? <Check className="h-3.5 w-3.5 text-green-600" />
                             : <Copy className="h-3.5 w-3.5" />}
                         </button>
 
@@ -415,7 +415,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                           onClick={() => handleDelete(c.id)}
                           disabled={deletingId === c.id}
                           title="Revoke code"
-                          className="text-gray-600 hover:text-red-400 flex-shrink-0 disabled:opacity-50"
+                          className="text-gray-400 hover:text-red-600 flex-shrink-0 disabled:opacity-50"
                         >
                           {deletingId === c.id
                             ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
