@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseArc } from "@/lib/plan-limits";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -9,6 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const body = await req.json();
     const { bookId, fileKey, fileName, arcCopyId } = body;

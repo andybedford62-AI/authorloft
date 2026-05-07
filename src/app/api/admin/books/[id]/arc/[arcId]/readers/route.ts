@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseArc } from "@/lib/plan-limits";
 import { sendArcInvitationEmail } from "@/lib/mailer";
 import { DEFAULT_ARC_DISCLAIMER } from "@/lib/arc-constants";
 import { randomBytes } from "crypto";
@@ -13,6 +14,9 @@ export async function GET(
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId, arcId } = await params;
 
@@ -43,6 +47,9 @@ export async function POST(
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId, arcId } = await params;
 

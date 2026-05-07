@@ -13,6 +13,7 @@ import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 const FEATURES = [
   { key: "/admin/ai-assistant", label: "AI Assistant",   icon: Bot             },
   { key: "/admin/appearance",   label: "Appearance",     icon: Paintbrush      },
+  { key: "/admin/arcs",         label: "ARCs",           icon: BookOpen        },
   { key: "/admin/blog",         label: "Blog / News",    icon: Newspaper       },
   { key: "/admin/books",        label: "Books",          icon: BookOpen        },
   { key: "/admin/branding",     label: "Branding",       icon: Palette         },

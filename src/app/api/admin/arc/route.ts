@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseArc } from "@/lib/plan-limits";
 
 // GET /api/admin/arc — overview of all ARC copies across the author's books
 export async function GET() {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const arcCopies = await prisma.arcCopy.findMany({
       where: { book: { authorId } },

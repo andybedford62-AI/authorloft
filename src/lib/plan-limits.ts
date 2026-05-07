@@ -122,6 +122,25 @@ export async function canUseFeature(
   return { allowed: true };
 }
 
+// ─── ARC management gate ─────────────────────────────────────────────────────
+
+export async function canUseArc(
+  authorId: string,
+): Promise<{ allowed: boolean; reason?: string }> {
+  const author = await prisma.author.findUnique({
+    where:  { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const tier = author?.plan?.tier ?? "FREE";
+  if (tier === "FREE") {
+    return {
+      allowed: false,
+      reason: "ARC management requires a Standard or Premium plan. Upgrade to start sending advance reader copies.",
+    };
+  }
+  return { allowed: true };
+}
+
 // ─── Convenience: check feature and return 403 response payload ───────────────
 
 export async function assertFeature(

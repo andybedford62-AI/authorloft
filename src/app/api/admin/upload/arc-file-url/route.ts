@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSupabaseUploadUrl } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { canUseArc } from "@/lib/plan-limits";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf", "epub", "mobi"]);
 
@@ -9,6 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const body = await req.json();
     const { bookId, fileName } = body;

@@ -1,9 +1,17 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { ArcsListClient } from "./arcs-list-client";
 
 export default async function ArcsPage() {
   const authorId = await getAdminAuthorId();
+
+  const author = await prisma.author.findUnique({
+    where: { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const tier = author?.plan?.tier ?? "FREE";
+  if (tier === "FREE") redirect("/admin/settings#billing");
 
   const arcCopies = await prisma.arcCopy.findMany({
     where: { book: { authorId } },

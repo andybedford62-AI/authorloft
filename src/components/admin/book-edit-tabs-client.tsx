@@ -52,6 +52,7 @@ type Props = {
   genres: Genre[];
   audioEnabled: boolean;
   salesEnabled: boolean;
+  arcEnabled: boolean;
   stripeConnectOnboarded: boolean;
   previewMedia: PreviewMedia[];
 };
@@ -69,7 +70,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "arcs",          label: "ARCs" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, stripeConnectOnboarded, previewMedia }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, arcEnabled, stripeConnectOnboarded, previewMedia }: Props) {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as TabId) ?? "details";
   const [activeTab, setActiveTab] = useState<TabId>(
@@ -94,6 +95,9 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
             >
               {label}
               {id === "direct-sales" && !salesEnabled && (
+                <Lock className="h-3 w-3 text-amber-400" />
+              )}
+              {id === "arcs" && !arcEnabled && (
                 <Lock className="h-3 w-3 text-amber-400" />
               )}
             </button>
@@ -146,7 +150,24 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
 
       {activeTab === "arcs" && (
         <div className="max-w-3xl">
-          <ArcTab bookId={book.id} />
+          {arcEnabled ? (
+            <ArcTab bookId={book.id} />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+              <Lock className="h-8 w-8 text-amber-400" />
+              <p className="font-semibold text-gray-800">Standard plan required</p>
+              <p className="text-sm text-gray-500 max-w-sm">
+                ARC management is available on the Standard and Premium plans.
+                Upgrade to send advance reader copies and track reviews.
+              </p>
+              <a
+                href="/admin/settings#billing"
+                className="mt-2 inline-block px-5 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Upgrade Plan
+              </a>
+            </div>
+          )}
         </div>
       )}
     </div>
