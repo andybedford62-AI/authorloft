@@ -8,12 +8,12 @@ function generateToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string; arcId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string; arcId: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id: bookId, arcId } = params;
+    const { id: bookId, arcId } = await params;
 
     // Verify ARC belongs to author
     const arc = await prisma.arcCopy.findFirst({
@@ -64,12 +64,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string; 
   }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string; arcId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string; arcId: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id: bookId, arcId } = params;
+    const { id: bookId, arcId } = await params;
     const body = await req.json();
     const { email, name } = body;
 
