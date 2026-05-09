@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Trash2, ShoppingCart, Loader2, Tag, Headphones, Tablet, BookOpen, Music } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { formatCents } from "@/lib/utils";
+import { useCSRFToken } from "@/hooks/use-csrf-token";
 import Image from "next/image";
 
 // ── Format icon helper ────────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ export function CartDrawer() {
     closeCart,
   } = useCart();
 
+  const csrfToken = useCSRFToken();
   const [loading,       setLoading]       = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
@@ -74,7 +76,10 @@ export function CartDrawer() {
     try {
       const res = await fetch("/api/checkout/validate-discount", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body:    JSON.stringify({ code, saleItemIds: items.map((i) => i.saleItemId) }),
       });
       const data = await res.json();
@@ -111,7 +116,10 @@ export function CartDrawer() {
     try {
       const res = await fetch("/api/checkout", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body:    JSON.stringify({
           items: items.map((i) => ({ saleItemId: i.saleItemId })),
           ...(applied && { discountCode: applied.code }),

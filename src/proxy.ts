@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { validateCSRFToken } from "@/lib/csrf";
 
 // AuthorLoft Multi-Tenant Middleware
 // Handles subdomain routing: authorslug.authorloft.com → /author-site/[domain]
 // Also handles custom domains mapped by authors
+// Also enforces CSRF protection on state-changing requests
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 const PLATFORM_HOSTNAMES = [
@@ -19,9 +22,94 @@ const MAINTENANCE_EXEMPT = [
   "/api/cron/",
 ];
 
+// Endpoints that REQUIRE CSRF validation (starting with public checkout, expand later)
+const CSRF_PROTECTED_PATHS = [
+  "/api/checkout", // Public checkout — blocks CSRF order hijacking
+];
+// TODO: Add admin routes in Phase 2 after updating client code:
+// - /api/admin/books
+// - /api/admin/discount-codes
+// - /api/admin/branding
+// - /api/admin/settings
+// - /api/admin/stripe/connect
+
+// Endpoints explicitly exempt from CSRF (webhooks, public endpoints, read-only)
+const CSRF_EXEMPT_PATHS = [
+  "/api/stripe/webhook",
+  "/api/auth/",
+  "/api/checkout/validate-discount", // Read-only, no state change
+];
+
+// State-changing methods that require CSRF protection
+const STATE_CHANGING_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
+
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
+
+  // ── HTTPS Enforcement ──────────────────────────────────────────────────────
+  if (process.env.NODE_ENV === "production") {
+    const proto = req.headers.get("x-forwarded-proto");
+    if (proto !== "https") {
+      const httpsUrl = url.clone();
+      httpsUrl.protocol = "https";
+      return NextResponse.redirect(httpsUrl, 301);
+    }
+  }
+
+  // ── CSRF Protection ────────────────────────────────────────────────────────
+  // Protect critical state-changing requests with CSRF validation
+  if (STATE_CHANGING_METHODS.includes(req.method)) {
+    const isExempt = CSRF_EXEMPT_PATHS.some((path) =>
+      url.pathname.startsWith(path)
+    );
+    const isProtected = CSRF_PROTECTED_PATHS.some((path) =>
+      url.pathname.startsWith(path)
+    );
+
+    // Only validate CSRF for explicitly protected routes or if not exempt
+    if (isProtected && !isExempt) {
+      const csrfToken = req.headers.get("x-csrf-token");
+      const sessionToken = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+
+      // For protected routes with auth, require valid CSRF token
+      if (sessionToken) {
+        if (!csrfToken) {
+          console.warn("[csrf] Missing CSRF token for protected request:", {
+            pathname: url.pathname,
+            method: req.method,
+            userId: sessionToken.sub,
+          });
+          return NextResponse.json(
+            { error: "Missing CSRF token" },
+            { status: 403 }
+          );
+        }
+
+        // Validate token
+        const isValid = validateCSRFToken(
+          csrfToken,
+          sessionToken.sub || "",
+          process.env.NEXTAUTH_SECRET || ""
+        );
+
+        if (!isValid) {
+          console.warn("[csrf] Invalid CSRF token for protected request:", {
+            pathname: url.pathname,
+            method: req.method,
+            userId: sessionToken.sub,
+          });
+          return NextResponse.json(
+            { error: "Invalid CSRF token" },
+            { status: 403 }
+          );
+        }
+      }
+    }
+  }
 
   // ── Maintenance mode check ───────────────────────────────────────────────
   // Block ALL traffic when maintenance mode is active, except the maintenance

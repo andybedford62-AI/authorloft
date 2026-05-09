@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
+import { generateCSRFToken } from "./csrf";
 import bcrypt from "bcryptjs";
 import { checkLoginRateLimit } from "./login-rate-limit";
 
@@ -192,6 +193,12 @@ export const authOptions: NextAuthOptions = {
         token.isSuperAdmin = (user as any).isSuperAdmin;
         token.planTier    = (user as any).planTier;
       }
+
+      // Generate CSRF token for authenticated requests (regenerated on each token refresh)
+      if (token.sub) {
+        token.csrfToken = generateCSRFToken(token.sub, process.env.NEXTAUTH_SECRET || "");
+      }
+
       return token;
     },
 
@@ -201,6 +208,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).slug        = token.slug;
         (session.user as any).isSuperAdmin = token.isSuperAdmin;
         (session.user as any).planTier    = token.planTier;
+        (session.user as any).csrfToken   = token.csrfToken;
       }
       return session;
     },
