@@ -307,6 +307,7 @@ model Book {
   reviews             BookReview[]
   discountCodeBooks   DiscountCodeBook[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
+  arcCopies           ArcCopy[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -703,4 +704,98 @@ model ImpersonationLog {
 
   superAdmin    Author   @relation("ImpersonationAsSuperAdmin", fields: [superAdminId],   references: [id])
   targetAuthor  Author   @relation("ImpersonationAsTarget",     fields: [targetAuthorId], references: [id])
+}
+
+// ─── ARC (Advance Reader Copies) ─────────────────────────────────────────────
+
+enum ArcReaderSource {
+  INVITED
+  APPLIED
+}
+
+enum ArcReaderStatus {
+  PENDING
+  INVITED
+  DOWNLOADED
+  REVIEWED
+  DECLINED
+}
+
+enum ArcReviewPlatform {
+  AMAZON
+  GOODREADS
+  BOOKBUB
+  BLOG
+  OTHER
+}
+
+model ArcCopy {
+  id          String      @id @default(cuid())
+  bookId      String
+  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  disclaimer  String?     @db.Text
+  isActive    Boolean     @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  files       ArcFile[]
+  readers     ArcReader[]
+
+  @@index([bookId])
+}
+
+model ArcFile {
+  id            String      @id @default(cuid())
+  arcCopyId     String
+  arcCopy       ArcCopy     @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
+  format        String      // "PDF", "EPUB", "MOBI", etc.
+  fileUrl       String
+  fileKey       String
+  fileName      String
+  fileSizeBytes Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  downloads     ArcReaderDownload[]
+
+  @@index([arcCopyId])
+  @@unique([arcCopyId, format])
+}
+
+model ArcReader {
+  id                       String             @id @default(cuid())
+  arcCopyId                String
+  arcCopy                  ArcCopy            @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
+  email                    String
+  name                     String
+  source                   ArcReaderSource    @default(INVITED)
+  status                   ArcReaderStatus    @default(INVITED)
+  token                    String             @unique
+  tokenExpiresAt           DateTime?
+  reviewPlatform           ArcReviewPlatform?
+  reviewUrl                String?
+  notes                    String?            @db.Text
+  disclaimerAcknowledgedAt DateTime?
+  invitedAt                DateTime?
+  reviewedAt               DateTime?
+  reminderSentAt           DateTime?
+  createdAt                DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  downloads                ArcReaderDownload[]
+
+  @@index([arcCopyId])
+  @@index([token])
+  @@index([email])
+}
+
+model ArcReaderDownload {
+  id            String      @id @default(cuid())
+  readerId      String
+  reader        ArcReader   @relation(fields: [readerId], references: [id], onDelete: Cascade)
+  fileId        String
+  file          ArcFile     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  downloadedAt  DateTime    @default(now())
+
+  @@index([readerId])
+  @@index([fileId])
+  @@unique([readerId, fileId])
 }
