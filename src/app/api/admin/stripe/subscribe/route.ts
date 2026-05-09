@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createSubscriptionCheckoutSession, stripe } from "@/lib/stripe";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -14,6 +15,30 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // ── Rate Limiting ──────────────────────────────────────────────────────
+    const rateLimitResult = await checkRateLimit(
+      `user:${authorId}:subscribe`,
+      RATE_LIMITS.subscribe
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn("[subscribe] Rate limit exceeded:", { authorId });
+      return NextResponse.json(
+        { error: "Too many subscription attempts. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetAt - Date.now()) / 1000
+            ).toString(),
+            "RateLimit-Limit": rateLimitResult.limit.toString(),
+            "RateLimit-Remaining": "0",
+            "RateLimit-Reset": Math.floor(rateLimitResult.resetAt / 1000).toString(),
+          },
+        }
+      );
+    }
 
     const { priceId } = await req.json();
     if (!priceId) return NextResponse.json({ error: "priceId is required" }, { status: 400 });

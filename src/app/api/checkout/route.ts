@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { calcDiscount } from "@/lib/discount-queries";
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -17,6 +18,33 @@ const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.c
  */
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate Limiting ──────────────────────────────────────────────────────
+    const rateLimitKey = getRateLimitKey(req, "ip", "checkout");
+    const rateLimitResult = await checkRateLimit(
+      rateLimitKey,
+      RATE_LIMITS.checkout
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn("[checkout] Rate limit exceeded:", { rateLimitKey });
+      return NextResponse.json(
+        {
+          error: "Too many checkout attempts. Please try again in a moment.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetAt - Date.now()) / 1000
+            ).toString(),
+            "RateLimit-Limit": rateLimitResult.limit.toString(),
+            "RateLimit-Remaining": "0",
+            "RateLimit-Reset": Math.floor(rateLimitResult.resetAt / 1000).toString(),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
 
     // Support both new cart format and legacy single-item format
