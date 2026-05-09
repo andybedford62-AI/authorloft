@@ -41,6 +41,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (!arc) {
       console.log("[arc-get] No ARC for bookId:", bookId);
+      // Also check if there are ANY arcs for this author
+      const allArcs = await prisma.arcCopy.findMany({
+        where: { book: { authorId } },
+        include: { book: { select: { id: true, title: true } } },
+      });
+      console.log("[arc-get] Author has", allArcs.length, "ARCs total:");
+      allArcs.forEach((a) => console.log("[arc-get]   ARC for book:", a.book.title, "(" + a.book.id + ")"));
       return NextResponse.json({ arc: null });
     }
 
