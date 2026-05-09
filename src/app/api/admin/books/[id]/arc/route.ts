@@ -3,12 +3,12 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id: bookId } = params;
+    const { id: bookId } = await params;
 
     // Verify book belongs to author
     const book = await prisma.book.findFirst({
@@ -56,12 +56,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id: bookId } = params;
+    const { id: bookId } = await params;
     const body = await req.json();
     const { disclaimer, expiresAt } = body;
 
@@ -114,12 +114,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id: bookId } = params;
+    const { id: bookId } = await params;
 
     // Verify book belongs to author
     const book = await prisma.book.findFirst({
