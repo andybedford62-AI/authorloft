@@ -297,6 +297,16 @@ export function CartDrawer() {
               <p className="text-xs text-gray-400">+ tax where applicable</p>
             </div>
 
+            {/* Stripe minimum warning */}
+            {finalTotal < 50 && (
+              <div className="px-3 py-2.5 rounded-lg border border-orange-200 bg-orange-50">
+                <p className="text-xs font-semibold text-orange-800">⚠️ Stripe Minimum Charge</p>
+                <p className="text-xs text-orange-700 mt-1">
+                  Your order is {formatCents(finalTotal)}, but Stripe requires a {formatCents(50)} minimum. Your card will be charged {formatCents(50)}.
+                </p>
+              </div>
+            )}
+
             {/* Checkout button */}
             <button
               type="button"
@@ -318,9 +328,9 @@ export function CartDrawer() {
             {/* Clear cart */}
             <button
               onClick={clearCart}
-              className="w-full text-xs text-gray-400 hover:text-red-500 transition-colors py-1"
+              className="w-full px-4 py-2.5 rounded-lg border border-red-200 bg-red-50 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors"
             >
-              Clear cart
+              Clear Cart
             </button>
           </div>
         )}
