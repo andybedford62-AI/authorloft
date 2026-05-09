@@ -57,8 +57,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string;
 
     return NextResponse.json({ file: { id: file.id, format: file.format, fileName: file.fileName } });
   } catch (err: any) {
-    console.error("[arc-files] POST error:", err?.message ?? err);
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+    const msg = err?.message ?? String(err);
+    console.error("[arc-files] POST error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 

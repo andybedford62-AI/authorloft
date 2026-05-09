@@ -50,8 +50,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       },
     });
   } catch (err: any) {
-    console.error("[arc] GET error:", err?.message ?? err);
-    return NextResponse.json({ error: "Failed to fetch ARC" }, { status: 500 });
+    const msg = err?.message ?? String(err);
+    console.error("[arc] GET error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -107,8 +108,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     return NextResponse.json({ arc: { id: arc.id, disclaimer: arc.disclaimer, expiresAt: arc.expiresAt?.toISOString() } });
   } catch (err: any) {
-    console.error("[arc] POST error:", err?.message ?? err);
-    return NextResponse.json({ error: "Failed to create ARC" }, { status: 500 });
+    const msg = err?.message ?? String(err);
+    console.error("[arc] POST error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
