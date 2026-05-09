@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, BookMarked } from "lucide-react";
+import { BookOpen, BookMarked, Copy } from "lucide-react";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
+import { ArcsOverview } from "./arcs-overview";
 import { cn } from "@/lib/utils";
 
-type Tab = "my-books" | "book-shelf";
+type Tab = "my-books" | "book-shelf" | "arcs";
 
 type BookRow = {
   id: string;
@@ -32,6 +33,7 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "my-books",    label: "My Books",   icon: BookOpen   },
     { id: "book-shelf",  label: "Book Shelf",  icon: BookMarked },
+    { id: "arcs",        label: "ARC",        icon: Copy       },
   ];
 
   return (
@@ -75,6 +77,10 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
 
       {activeTab === "book-shelf" && (
         <BookShelfPicker currentLayout={booksLayout} planTier={planTier} />
+      )}
+
+      {activeTab === "arcs" && (
+        <ArcsOverview books={books} />
       )}
     </div>
   );
