@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
         if (bookAllowed) {
           const calc = calcDiscount(item.priceCents, discount.type, discount.value);
           itemDiscount = calc.discountCents;
-          itemPrice    = Math.max(50, calc.finalPriceCents);
+          itemPrice    = calc.finalPriceCents;
         }
       }
 
