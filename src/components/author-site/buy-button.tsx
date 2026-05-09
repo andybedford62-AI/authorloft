@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingCart, Loader2 } from "lucide-react";
+import { useCSRFToken } from "@/hooks/use-csrf-token";
 
 interface BuyButtonProps {
   saleItemId: string;
@@ -10,6 +11,7 @@ interface BuyButtonProps {
 }
 
 export function BuyButton({ saleItemId, label, accentColor }: BuyButtonProps) {
+  const csrfToken = useCSRFToken();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,7 +22,10 @@ export function BuyButton({ saleItemId, label, accentColor }: BuyButtonProps) {
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body: JSON.stringify({ saleItemId }),
       });
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ShoppingCart, Loader2, Tag, Check, X } from "lucide-react";
 import { formatCents } from "@/lib/utils";
+import { useCSRFToken } from "@/hooks/use-csrf-token";
 
 interface BuySectionProps {
   saleItemId:     string;
@@ -11,6 +12,7 @@ interface BuySectionProps {
 }
 
 export function BuySection({ saleItemId, basePriceCents, accentColor }: BuySectionProps) {
+  const csrfToken = useCSRFToken();
   const [loading,      setLoading]      = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
@@ -33,7 +35,10 @@ export function BuySection({ saleItemId, basePriceCents, accentColor }: BuySecti
     try {
       const res  = await fetch("/api/checkout/validate-discount", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body:    JSON.stringify({ code, saleItemId }),
       });
       const data = await res.json();
@@ -70,7 +75,10 @@ export function BuySection({ saleItemId, basePriceCents, accentColor }: BuySecti
     try {
       const res  = await fetch("/api/checkout", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body:    JSON.stringify({
           saleItemId,
           ...(applied && { discountCode: applied.code }),
