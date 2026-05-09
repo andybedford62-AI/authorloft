@@ -123,9 +123,17 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Calculate per-item price after discount ───────────────────────────────
+    let hasBelowMinimumPricing = false;
+
     const lineItems = saleItems.map((item) => {
+      const originalPrice = item.priceCents;
       let itemPrice = Math.max(50, item.priceCents); // Stripe minimum: $0.50
       let itemDiscount = 0;
+
+      // Track if we enforced the minimum on any item
+      if (originalPrice < 50) {
+        hasBelowMinimumPricing = true;
+      }
 
       if (discount) {
         const restrictedBookIds = discount.books.map((b) => b.bookId);
@@ -139,7 +147,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      return { item, itemPrice, itemDiscount };
+      return { item, itemPrice, itemDiscount, originalPrice };
     });
 
     const totalCents    = lineItems.reduce((s, l) => s + l.itemPrice, 0);
@@ -183,6 +191,7 @@ export async function POST(req: NextRequest) {
         // Keep single saleItemId for backward-compat webhook (first item)
         saleItemId:  saleItemIds[0],
         bookId:      saleItems[0].book.id,
+        hasBelowMinimumPricing: hasBelowMinimumPricing ? "true" : "false",
       },
       success_url: successUrl,
       cancel_url:  cancelUrl,

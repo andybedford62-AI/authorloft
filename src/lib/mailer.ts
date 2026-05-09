@@ -619,6 +619,85 @@ export async function sendOnboardingReminderEmail(to: string, name: string, slug
   });
 }
 
+// ── Below-minimum pricing alert (to author) ──────────────────────────────────
+
+export async function sendBelowMinimumPricingAlert({
+  to,
+  authorName,
+  bookTitle,
+  itemLabel,
+  originalPriceCents,
+  chargedCents,
+  orderId,
+}: {
+  to: string;
+  authorName: string;
+  bookTitle: string;
+  itemLabel: string;
+  originalPriceCents: number;
+  chargedCents: number;
+  orderId: string;
+}) {
+  const originalPrice = (originalPriceCents / 100).toFixed(2);
+  const chargedPrice = (chargedCents / 100).toFixed(2);
+  const settingsUrl = "https://www.authorloft.com/admin/books";
+
+  return sendMail({
+    to,
+    subject: `⚠️  Pricing Alert — ${bookTitle} charged at minimum`,
+    text: [
+      `Hi ${authorName},`,
+      `A sale just completed for "${bookTitle}" (${itemLabel}), but we wanted to alert you to a pricing issue:`,
+      `Original Price: $${originalPrice}`,
+      `Stripe Minimum: $0.50`,
+      `Amount Charged: $${chargedPrice}`,
+      `This happened because Stripe requires a $0.50 minimum per transaction. We recommend setting your book prices to $0.50 or higher to avoid this in the future.`,
+      `Review your pricing: ${settingsUrl}`,
+    ].join("\n\n"),
+    html: wrapHtml("Pricing Alert ⚠️", `
+      <p style="margin:0 0 16px;">Hi ${esc(authorName)},</p>
+      <p style="margin:0 0 24px;">A sale just completed for <strong>"${esc(bookTitle)}"</strong>, but we wanted to alert you to a pricing issue.</p>
+
+      <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <p style="margin:0 0 12px;font-weight:600;color:#92400e;">Stripe Minimum Charge</p>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#78350f;">Your Price</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#111827;">$${originalPrice}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #fde68a;">
+              <span style="font-size:13px;color:#78350f;">Stripe Minimum</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#111827;">$0.50</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #fde68a;">
+              <span style="font-size:13px;color:#78350f;">Amount Charged</span><br/>
+              <span style="font-size:18px;font-weight:700;color:#d97706;">$${chargedPrice}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="margin:0 0 16px;color:#374151;">Stripe requires a <strong>$0.50 minimum</strong> per transaction. We recommend setting your book prices to <strong>$0.50 or higher</strong> to avoid this in the future.</p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${settingsUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Update Pricing
+            </a>
+          </td>
+        </tr>
+      </table>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**

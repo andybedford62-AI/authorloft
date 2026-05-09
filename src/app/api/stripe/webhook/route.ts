@@ -13,7 +13,7 @@ function capturePostHog(distinctId: string, event: string, properties: Record<st
 }
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from "@/lib/mailer";
+import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
         if (order) {
           const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
           const customerName  = session.customer_details?.name ?? undefined;
+          const hasBelowMinimumPricing = session.metadata?.hasBelowMinimumPricing === "true";
 
           // Mark order complete and record customer email + payment intent
           await prisma.order.update({
@@ -195,6 +196,21 @@ export async function POST(req: NextRequest) {
                 priceCents:    fi.priceCents,
                 orderId:       order.id,
               }).catch((e) => console.error("[webhook] Failed to send author notification:", e));
+
+              // 3. If below-minimum pricing was applied, send alert to author
+              if (hasBelowMinimumPricing && fi.priceCents >= 50) {
+                // Only alert if the final charged price is actually >= $0.50 (valid sale)
+                // This indicates the original price was < $0.50 and was bumped up
+                sendBelowMinimumPricingAlert({
+                  to:                 authorEmail,
+                  authorName,
+                  bookTitle:          fi.book.title,
+                  itemLabel:          fi.saleItem?.label ?? "eBook",
+                  originalPriceCents: order.items.length > 0 ? order.items[0].priceCents : fi.priceCents,
+                  chargedCents:       fi.priceCents,
+                  orderId:            order.id,
+                }).catch((e) => console.error("[webhook] Failed to send pricing alert:", e));
+              }
             }
           }
         }
