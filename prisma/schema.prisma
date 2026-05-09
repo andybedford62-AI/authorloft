@@ -776,6 +776,7 @@ model ArcReader {
   notes                    String?            @db.Text
   disclaimerAcknowledgedAt DateTime?
   invitedAt                DateTime?
+  downloadedAt             DateTime?
   reviewedAt               DateTime?
   reminderSentAt           DateTime?
   createdAt                DateTime           @default(now())

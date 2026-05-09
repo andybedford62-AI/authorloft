@@ -71,7 +71,8 @@ export default function ArcDownloadPage() {
       });
 
       if (!res.ok) {
-        setError("Download failed or link expired");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Download failed — please try again");
         return;
       }
 
