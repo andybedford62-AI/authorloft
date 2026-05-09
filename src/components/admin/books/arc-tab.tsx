@@ -1,15 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
+import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText } from "lucide-react";
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface ArcFile {
+  id: string;
+  format: string;
+  fileName: string;
+  fileSizeBytes?: number;
+}
 
 interface ArcData {
   id: string;
   disclaimer?: string;
   isActive: boolean;
   expiresAt?: string;
-  files: Array<{ id: string; format: string; fileName: string; fileSizeBytes?: number }>;
+  files: ArcFile[];
   readerCounts: { total: number; invited: number; downloaded: number; reviewed: number };
+}
+
+interface UploadItem {
+  file: File;
+  status: "pending" | "uploading" | "done" | "error";
+  error?: string;
+  format?: string;
 }
 
 interface ArcTabProps {
@@ -17,18 +34,31 @@ interface ArcTabProps {
   bookTitle: string;
 }
 
+const ALLOWED_EXTS = new Set(["pdf", "epub", "mobi", "azw3"]);
+const DEFAULT_DISCLAIMER = "This is an advance reader copy. Please do not share.";
+
+function formatBytes(bytes?: number) {
+  if (!bytes) return "";
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const csrfToken = useCSRFToken();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [arc, setArc] = useState<ArcData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [disclaimer, setDisclaimer] = useState("This is an advance reader copy. Please do not share.");
+  const [disclaimer, setDisclaimer] = useState(DEFAULT_DISCLAIMER);
   const [expiresAt, setExpiresAt] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const [dragging, setDragging] = useState(false);
 
-  useEffect(() => {
-    loadArc();
-  }, []);
+  useEffect(() => { loadArc(); }, []);
 
   async function loadArc() {
     try {
@@ -38,31 +68,25 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       const data = await res.json();
       if (data.arc) {
         setArc(data.arc);
-        setDisclaimer(data.arc.disclaimer || "");
+        setDisclaimer(data.arc.disclaimer || DEFAULT_DISCLAIMER);
         setExpiresAt(data.arc.expiresAt ? new Date(data.arc.expiresAt).toISOString().split("T")[0] : "");
       }
-      setLoading(false);
-    } catch (err) {
+    } catch {
       setError("Failed to load ARC");
+    } finally {
       setLoading(false);
     }
   }
 
   async function createArc() {
+    setCreating(true);
+    setError("");
     try {
-      setError("");
       const res = await fetch(`/api/admin/books/${bookId}/arc`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        body: JSON.stringify({
-          disclaimer,
-          expiresAt: expiresAt || null,
-        }),
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({ disclaimer, expiresAt: expiresAt || null }),
       });
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to create ARC");
@@ -70,80 +94,163 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       await loadArc();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error creating ARC");
+    } finally {
+      setCreating(false);
     }
   }
 
-  async function uploadFile(format: string, file: File) {
+  // ── Upload logic ─────────────────────────────────────────────────────────────
+
+  function getExt(name: string) {
+    return name.split(".").pop()?.toLowerCase() ?? "";
+  }
+
+  function validateFiles(files: File[]): { valid: File[]; rejected: string[] } {
+    const valid: File[] = [];
+    const rejected: string[] = [];
+    for (const f of files) {
+      if (ALLOWED_EXTS.has(getExt(f.name))) valid.push(f);
+      else rejected.push(f.name);
+    }
+    return { valid, rejected };
+  }
+
+  async function uploadSingleFile(item: UploadItem, arcId: string): Promise<void> {
+    const updateStatus = (patch: Partial<UploadItem>) =>
+      setUploads((prev) =>
+        prev.map((u) => (u.file === item.file ? { ...u, ...patch } : u))
+      );
+
+    updateStatus({ status: "uploading" });
+
     try {
-      setError("");
-      setUploading(true);
-
-      // In production, upload to S3/storage first and get fileUrl/fileKey
-      // For now, we'll create a placeholder
-      const fileUrl = URL.createObjectURL(file);
-      const fileKey = `arc/${bookId}/${format}/${file.name}`;
-
-      const res = await fetch(`/api/admin/books/${bookId}/arc/${arc?.id}/files`, {
+      // Step 1 — get signed URL
+      const urlRes = await fetch("/api/admin/upload/arc-file-url", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ arcId, bookId, fileName: item.file.name }),
+      });
+
+      if (!urlRes.ok) {
+        const data = await urlRes.json().catch(() => ({}));
+        throw new Error(data.error || "Could not start upload");
+      }
+
+      const { signedUrl, fileKey, fileUrl, format } = await urlRes.json();
+
+      // Step 2 — upload directly to Supabase
+      const uploadRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": item.file.type || "application/octet-stream" },
+        body: item.file,
+      });
+
+      if (!uploadRes.ok) {
+        const text = await uploadRes.text().catch(() => uploadRes.statusText);
+        throw new Error(`Upload failed (${uploadRes.status}): ${text}`);
+      }
+
+      // Step 3 — record in DB
+      const completeRes = await fetch(`/api/admin/books/${bookId}/arc/${arcId}/files`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
         body: JSON.stringify({
           format,
           fileUrl,
           fileKey,
-          fileName: file.name,
-          fileSizeBytes: file.size,
+          fileName: item.file.name,
+          fileSizeBytes: item.file.size,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to upload file");
-      await loadArc();
+      if (!completeRes.ok) {
+        const data = await completeRes.json().catch(() => ({}));
+        throw new Error(data.error || "Uploaded but could not save");
+      }
+
+      updateStatus({ status: "done", format });
     } catch (err) {
-      setError("Error uploading file");
-    } finally {
-      setUploading(false);
+      updateStatus({ status: "error", error: err instanceof Error ? err.message : "Upload failed" });
     }
+  }
+
+  async function handleFiles(files: FileList | File[]) {
+    if (!arc) return;
+    const fileArr = Array.from(files);
+    const { valid, rejected } = validateFiles(fileArr);
+
+    if (rejected.length) {
+      setError(`Unsupported file type(s): ${rejected.join(", ")}. Use PDF, EPUB, MOBI, or AZW3.`);
+    } else {
+      setError("");
+    }
+    if (!valid.length) return;
+
+    const newItems: UploadItem[] = valid.map((f) => ({ file: f, status: "pending" }));
+    setUploads((prev) => [...prev, ...newItems]);
+
+    // Upload all in parallel
+    await Promise.all(newItems.map((item) => uploadSingleFile(item, arc.id)));
+    await loadArc();
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files?.length) handleFiles(e.target.files);
+    e.target.value = "";
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
   }
 
   async function deleteFile(fileId: string) {
-    try {
-      const res = await fetch(
-        `/api/admin/books/${bookId}/arc/${arc?.id}/files?fileId=${fileId}`,
-        {
-          method: "DELETE",
-          headers: { "X-CSRF-Token": csrfToken },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to delete file");
-      await loadArc();
-    } catch (err) {
-      setError("Error deleting file");
-    }
+    if (!arc) return;
+    if (!confirm("Remove this file? Readers will no longer be able to download it.")) return;
+    const res = await fetch(
+      `/api/admin/books/${bookId}/arc/${arc.id}/files?fileId=${fileId}`,
+      { method: "DELETE", headers: { "X-CSRF-Token": csrfToken } }
+    );
+    if (res.ok) await loadArc();
+    else setError("Failed to delete file");
   }
 
-  if (loading) return <div className="py-8 text-center text-gray-500">Loading ARC...</div>;
+  function clearDoneUploads() {
+    setUploads((prev) => prev.filter((u) => u.status !== "done" && u.status !== "error"));
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
+  if (loading) {
+    return <div className="py-12 text-center text-gray-500">Loading…</div>;
+  }
 
   if (!arc) {
     return (
-      <div className="space-y-6 py-8">
-        <p className="text-gray-600">Create an Advance Reader Copy for {bookTitle}.</p>
+      <div className="space-y-6 py-6 max-w-lg">
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-1">Create ARC for {bookTitle}</h3>
+          <p className="text-sm text-gray-500">
+            Set up an Advance Reader Copy so you can invite early readers and share pre-release files.
+          </p>
+        </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Disclaimer</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Disclaimer</label>
             <textarea
               value={disclaimer}
               onChange={(e) => setDisclaimer(e.target.value)}
-              placeholder="e.g., This is an advance reader copy. Please do not share."
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={3}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Expiration Date (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Expiration Date <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
             <input
               type="date"
               value={expiresAt}
@@ -156,8 +263,10 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
 
           <button
             onClick={createArc}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+            disabled={creating}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
           >
+            {creating && <Loader2 className="h-4 w-4 animate-spin" />}
             Create ARC
           </button>
         </div>
@@ -165,56 +274,104 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
     );
   }
 
-  return (
-    <div className="space-y-6 py-8">
-      <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900">File Formats</h3>
-        {arc.files.length === 0 ? (
-          <p className="text-sm text-gray-500">No formats uploaded yet.</p>
-        ) : (
-          <div className="space-y-2">
-            {arc.files.map((file) => (
-              <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-                <div>
-                  <p className="font-medium text-sm text-gray-900">{file.format}</p>
-                  <p className="text-xs text-gray-500">{file.fileName}</p>
-                </div>
-                <button
-                  onClick={() => deleteFile(file.id)}
-                  className="text-xs text-red-600 hover:text-red-700"
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+  const activeUploads = uploads.filter((u) => u.status === "uploading").length;
+  const hasFinished = uploads.some((u) => u.status === "done" || u.status === "error");
 
-        <div className="pt-4 space-y-3">
-          {["PDF", "EPUB", "MOBI", "AZW3"].map((format) => (
-            <label key={format} className="flex items-center">
-              <input
-                type="file"
-                onChange={(e) => e.target.files?.[0] && uploadFile(format, e.target.files[0])}
-                disabled={uploading || arc.files.some((f) => f.format === format)}
-                className="hidden"
-              />
-              <span className="cursor-pointer px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50">
-                Upload {format}
-              </span>
-            </label>
-          ))}
+  return (
+    <div className="space-y-6 py-6 max-w-2xl">
+
+      {/* Header stats */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="font-semibold text-gray-900">ARC Files</h3>
+          <p className="text-sm text-gray-500 mt-0.5">
+            {arc.readerCounts.total} reader{arc.readerCounts.total !== 1 ? "s" : ""} —{" "}
+            {arc.readerCounts.invited} invited · {arc.readerCounts.downloaded} downloaded · {arc.readerCounts.reviewed} reviewed
+          </p>
         </div>
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+          arc.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+        }`}>
+          {arc.isActive ? "Active" : "Inactive"}
+        </span>
       </div>
 
-      <div className="pt-4 border-t">
-        <h3 className="font-semibold text-gray-900 mb-3">Readers</h3>
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>👥 Total: {arc.readerCounts.total}</p>
-          <p>📨 Invited: {arc.readerCounts.invited}</p>
-          <p>⬇️ Downloaded: {arc.readerCounts.downloaded}</p>
-          <p>⭐ Reviewed: {arc.readerCounts.reviewed}</p>
+      {/* Existing files */}
+      {arc.files.length > 0 && (
+        <div className="space-y-2">
+          {arc.files.map((file) => (
+            <div key={file.id} className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FileText className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{file.format}</p>
+                  <p className="text-xs text-gray-500">{file.fileName}{file.fileSizeBytes ? ` · ${formatBytes(file.fileSizeBytes)}` : ""}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => deleteFile(file.id)}
+                className="text-gray-400 hover:text-red-500 transition-colors"
+                title="Delete file"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
         </div>
+      )}
+
+      {/* Upload queue */}
+      {uploads.length > 0 && (
+        <div className="space-y-2">
+          {uploads.map((item, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+              {item.status === "uploading" && <Loader2 className="h-4 w-4 text-blue-500 animate-spin flex-shrink-0" />}
+              {item.status === "done"      && <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />}
+              {item.status === "error"     && <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />}
+              {item.status === "pending"   && <Loader2 className="h-4 w-4 text-gray-400 animate-spin flex-shrink-0" />}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-800 truncate">{item.file.name}</p>
+                {item.error && <p className="text-xs text-red-500 mt-0.5">{item.error}</p>}
+                {item.status === "uploading" && <p className="text-xs text-blue-500 mt-0.5">Uploading…</p>}
+                {item.status === "done"      && <p className="text-xs text-green-600 mt-0.5">Uploaded as {item.format}</p>}
+              </div>
+            </div>
+          ))}
+          {hasFinished && activeUploads === 0 && (
+            <button onClick={clearDoneUploads} className="text-xs text-gray-400 hover:text-gray-600 underline">
+              Clear
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Drop zone */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={`relative flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl px-8 py-10 cursor-pointer transition-colors ${
+          dragging
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+        }`}
+      >
+        <Upload className={`h-6 w-6 ${dragging ? "text-blue-500" : "text-gray-400"}`} />
+        <div className="text-center">
+          <p className="text-sm font-medium text-gray-700">
+            {activeUploads > 0 ? `Uploading ${activeUploads} file${activeUploads !== 1 ? "s" : ""}…` : "Drop files here or click to browse"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">PDF · EPUB · MOBI · AZW3 — multiple files supported</p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.epub,.mobi,.azw3"
+          multiple
+          className="hidden"
+          onChange={handleInputChange}
+        />
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
