@@ -57,9 +57,13 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const [creating, setCreating] = useState(false);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [dragging, setDragging] = useState(false);
-  const [readers, setReaders] = useState<Array<{ id: string; name: string; email: string; status: string; invitedAt: string | null }>>([]);
+  const [readers, setReaders] = useState<Array<{
+    id: string; name: string; email: string; status: string;
+    invitedAt: string | null; tokenExpiresAt: string | null;
+  }>>([]);
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteExpiry, setInviteExpiry] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
@@ -105,13 +109,18 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       const res = await fetch(`/api/admin/books/${bookId}/arc/${arc.id}/readers`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
-        body: JSON.stringify({ name: inviteName.trim(), email: inviteEmail.trim() }),
+        body: JSON.stringify({
+          name: inviteName.trim(),
+          email: inviteEmail.trim(),
+          tokenExpiresAt: inviteExpiry || null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to invite reader");
       setInviteSuccess(`Invite sent to ${inviteEmail}`);
       setInviteName("");
       setInviteEmail("");
+      setInviteExpiry("");
       await loadReaders();
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : "Failed to send invite");
@@ -424,56 +433,91 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
           <UserPlus className="h-4 w-4" /> Invite Readers
         </h3>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <input
             type="text"
             placeholder="Reader name"
             value={inviteName}
             onChange={(e) => setInviteName(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <input
             type="email"
             placeholder="Email address"
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && inviteReader()}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <button
-            onClick={inviteReader}
-            disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
-          >
-            {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-            Send Invite
-          </button>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-500">Link expires <span className="text-gray-400">(optional — overrides ARC default)</span></label>
+            <input
+              type="date"
+              value={inviteExpiry}
+              onChange={(e) => setInviteExpiry(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={inviteReader}
+              disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            >
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+              Send Invite
+            </button>
+          </div>
         </div>
 
         {inviteError   && <p className="text-sm text-red-600">{inviteError}</p>}
         {inviteSuccess && <p className="text-sm text-green-600">{inviteSuccess}</p>}
-
-        {readers.length > 0 && (
-          <div className="space-y-2">
-            {readers.map((r) => (
-              <div key={r.id} className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm">
-                <div>
-                  <p className="font-medium text-gray-900">{r.name}</p>
-                  <p className="text-gray-500 text-xs">{r.email}</p>
-                </div>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  r.status === "REVIEWED"   ? "bg-purple-100 text-purple-700" :
-                  r.status === "DOWNLOADED" ? "bg-green-100 text-green-700" :
-                  r.status === "INVITED"    ? "bg-blue-100 text-blue-700" :
-                                              "bg-gray-100 text-gray-600"
-                }`}>
-                  {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* ── Sent log ── */}
+      {readers.length > 0 && (
+        <div className="border-t border-gray-200 pt-6 space-y-3">
+          <h3 className="font-semibold text-gray-900">Invite Log</h3>
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3 text-left">Name</th>
+                  <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Sent</th>
+                  <th className="px-4 py-3 text-left">Expires</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {readers.map((r) => (
+                  <tr key={r.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}</td>
+                    <td className="px-4 py-3 text-gray-600">{r.email}</td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                      {r.invitedAt ? new Date(r.invitedAt).toLocaleString() : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                      {r.tokenExpiresAt
+                        ? new Date(r.tokenExpiresAt).toLocaleDateString()
+                        : <span className="text-gray-400 italic">No expiry</span>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                        r.status === "REVIEWED"   ? "bg-purple-100 text-purple-700" :
+                        r.status === "DOWNLOADED" ? "bg-green-100 text-green-700" :
+                        r.status === "INVITED"    ? "bg-blue-100 text-blue-700" :
+                                                    "bg-gray-100 text-gray-600"
+                      }`}>
+                        {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

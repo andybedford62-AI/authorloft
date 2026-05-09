@@ -51,11 +51,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         name: r.name,
         email: r.email,
         status: r.status,
-        tokenExpiresAt: r.tokenExpiresAt?.toISOString() ?? null,
         invitedAt: r.invitedAt?.toISOString() ?? null,
+        tokenExpiresAt: r.tokenExpiresAt?.toISOString() ?? null,
         downloadedAt: r.downloadedAt?.toISOString() ?? null,
         reviewedAt: r.reviewedAt?.toISOString() ?? null,
-        reminderSentAt: r.reminderSentAt?.toISOString() ?? null,
         downloadCount: r.downloads.length,
       })),
     });
@@ -72,7 +71,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const { id: bookId, arcId } = await params;
     const body = await req.json();
-    const { email, name } = body;
+    const { email, name, tokenExpiresAt: customExpiry } = body;
 
     if (!email || !name) {
       return NextResponse.json({ error: "Email and name required" }, { status: 400 });
@@ -110,7 +109,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         email,
         name,
         token: generateToken(),
-        tokenExpiresAt: arc.expiresAt,
+        tokenExpiresAt: customExpiry ? new Date(customExpiry) : arc.expiresAt,
         invitedAt: new Date(),
       },
     });
