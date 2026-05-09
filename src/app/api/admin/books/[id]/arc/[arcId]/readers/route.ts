@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
+import { sendMail, wrapHtml, esc } from "@/lib/mailer";
 import crypto from "crypto";
 
 function generateToken(): string {
@@ -96,6 +97,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Reader already invited" }, { status: 400 });
     }
 
+    // Look up author name for the email
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { name: true, slug: true },
+    });
+
     // Create reader with token
     const reader = await prisma.arcReader.create({
       data: {
@@ -106,6 +113,55 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         tokenExpiresAt: arc.expiresAt,
         invitedAt: new Date(),
       },
+    });
+
+    // Send invite email
+    const book = await prisma.book.findUnique({ where: { id: bookId }, select: { title: true } });
+    const baseUrl = (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
+    const downloadUrl = `${baseUrl}/arc/${reader.token}`;
+    const expiryLine = arc.expiresAt
+      ? `This link expires on <strong>${new Date(arc.expiresAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong>.`
+      : "This link does not expire.";
+
+    await sendMail({
+      to: email,
+      subject: `You're invited to read an advance copy of "${book?.title}"`,
+      text: [
+        `Hi ${name},`,
+        `${author?.name ?? "An author"} has invited you to read an advance copy of "${book?.title}".`,
+        arc.disclaimer ? arc.disclaimer : "",
+        `Download your copy here: ${downloadUrl}`,
+        arc.expiresAt ? `This link expires on ${new Date(arc.expiresAt).toLocaleDateString()}.` : "",
+        `— ${author?.name ?? "AuthorLoft"}`,
+      ].filter(Boolean).join("\n\n"),
+      html: wrapHtml(`You're invited to read "${esc(book?.title ?? "")}"`, `
+        <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
+        <p style="margin:0 0 16px;">
+          <strong>${esc(author?.name ?? "An author")}</strong> has invited you to read an advance copy of
+          <strong>"${esc(book?.title ?? "")}"</strong> before it's published.
+        </p>
+        ${arc.disclaimer ? `
+        <div style="background:#f9fafb;border-left:3px solid #d1d5db;padding:12px 16px;margin:0 0 24px;font-size:13px;color:#6b7280;">
+          ${esc(arc.disclaimer)}
+        </div>` : ""}
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center" style="padding:8px 0 24px;">
+              <a href="${downloadUrl}"
+                 style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+                Download My ARC
+              </a>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">
+          If the button doesn't work, paste this link into your browser:
+        </p>
+        <p style="margin:0 0 24px;font-size:13px;word-break:break-all;">
+          <a href="${downloadUrl}" style="color:#2563eb;">${downloadUrl}</a>
+        </p>
+        <p style="margin:0;font-size:13px;color:#9ca3af;">${expiryLine}</p>
+      `),
     });
 
     auditLog({

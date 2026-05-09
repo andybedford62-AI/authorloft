@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
-import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText } from "lucide-react";
+import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText, UserPlus, Mail } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -57,8 +57,15 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const [creating, setCreating] = useState(false);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [dragging, setDragging] = useState(false);
+  const [readers, setReaders] = useState<Array<{ id: string; name: string; email: string; status: string; invitedAt: string | null }>>([]);
+  const [inviteName, setInviteName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
 
   useEffect(() => { loadArc(); }, []);
+  useEffect(() => { if (arc) loadReaders(); }, [arc?.id]);
 
   async function loadArc() {
     try {
@@ -75,6 +82,41 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       setError("Failed to load ARC");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadReaders() {
+    if (!arc) return;
+    try {
+      const res = await fetch(`/api/admin/books/${bookId}/arc/${arc.id}/readers`, {
+        headers: { "X-CSRF-Token": csrfToken },
+      });
+      const data = await res.json();
+      if (data.readers) setReaders(data.readers);
+    } catch {}
+  }
+
+  async function inviteReader() {
+    if (!arc || !inviteName.trim() || !inviteEmail.trim()) return;
+    setInviting(true);
+    setInviteError("");
+    setInviteSuccess("");
+    try {
+      const res = await fetch(`/api/admin/books/${bookId}/arc/${arc.id}/readers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({ name: inviteName.trim(), email: inviteEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to invite reader");
+      setInviteSuccess(`Invite sent to ${inviteEmail}`);
+      setInviteName("");
+      setInviteEmail("");
+      await loadReaders();
+    } catch (err) {
+      setInviteError(err instanceof Error ? err.message : "Failed to send invite");
+    } finally {
+      setInviting(false);
     }
   }
 
@@ -375,6 +417,63 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      {/* ── Invite readers ── */}
+      <div className="border-t border-gray-200 pt-6 space-y-4">
+        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+          <UserPlus className="h-4 w-4" /> Invite Readers
+        </h3>
+
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="Reader name"
+            value={inviteName}
+            onChange={(e) => setInviteName(e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <input
+            type="email"
+            placeholder="Email address"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && inviteReader()}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <button
+            onClick={inviteReader}
+            disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+          >
+            {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+            Send Invite
+          </button>
+        </div>
+
+        {inviteError   && <p className="text-sm text-red-600">{inviteError}</p>}
+        {inviteSuccess && <p className="text-sm text-green-600">{inviteSuccess}</p>}
+
+        {readers.length > 0 && (
+          <div className="space-y-2">
+            {readers.map((r) => (
+              <div key={r.id} className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm">
+                <div>
+                  <p className="font-medium text-gray-900">{r.name}</p>
+                  <p className="text-gray-500 text-xs">{r.email}</p>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  r.status === "REVIEWED"   ? "bg-purple-100 text-purple-700" :
+                  r.status === "DOWNLOADED" ? "bg-green-100 text-green-700" :
+                  r.status === "INVITED"    ? "bg-blue-100 text-blue-700" :
+                                              "bg-gray-100 text-gray-600"
+                }`}>
+                  {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
