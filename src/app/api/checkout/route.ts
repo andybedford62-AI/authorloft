@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     // ── Calculate per-item price after discount ───────────────────────────────
     const lineItems = saleItems.map((item) => {
-      let itemPrice = item.priceCents;
+      let itemPrice = Math.max(50, item.priceCents); // Stripe minimum: $0.50
       let itemDiscount = 0;
 
       if (discount) {
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
           restrictedBookIds.length === 0 || restrictedBookIds.includes(item.book.id);
 
         if (bookAllowed) {
-          const calc = calcDiscount(item.priceCents, discount.type, discount.value);
+          const calc = calcDiscount(itemPrice, discount.type, discount.value);
           itemDiscount = calc.discountCents;
           itemPrice    = calc.finalPriceCents;
         }
