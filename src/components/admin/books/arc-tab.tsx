@@ -68,8 +68,8 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const [inviteError, setInviteError] = useState("");
   const [inviteSuccess, setInviteSuccess] = useState("");
 
-  useEffect(() => { loadArc(); }, []);
-  useEffect(() => { if (arc) loadReaders(); }, [arc?.id]);
+  useEffect(() => { loadArc(); }, [bookId]);
+  useEffect(() => { if (arc) loadReaders(); }, [arc?.id, bookId]);
 
   async function loadArc() {
     try {
