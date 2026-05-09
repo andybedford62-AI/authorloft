@@ -9,12 +9,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id: bookId } = await params;
+    console.log("[arc-get] bookId:", bookId, "authorId:", authorId);
 
     // Verify book belongs to author
     const book = await prisma.book.findFirst({
       where: { id: bookId, authorId },
     });
-    if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    if (!book) {
+      console.log("[arc-get] Book not found for bookId:", bookId);
+      return NextResponse.json({ error: "Book not found" }, { status: 404 });
+    }
+    console.log("[arc-get] Found book:", book.title);
 
     // Get ARC with files and reader counts
     const arc = await prisma.arcCopy.findFirst({
@@ -29,7 +34,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
 
+    console.log("[arc-get] Found ARC:", arc?.id, "with", arc?.files.length, "files");
+    if (arc?.files) {
+      arc.files.forEach((f) => console.log("[arc-get]   file:", f.format, f.fileName));
+    }
+
     if (!arc) {
+      console.log("[arc-get] No ARC for bookId:", bookId);
       return NextResponse.json({ arc: null });
     }
 
