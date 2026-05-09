@@ -103,13 +103,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     // Create reader with token
+    let tokenExpiry: Date | null = null;
+    if (customExpiry) {
+      tokenExpiry = new Date(customExpiry);
+    } else {
+      // Default to 7 days from now
+      tokenExpiry = new Date();
+      tokenExpiry.setDate(tokenExpiry.getDate() + 7);
+    }
+
     const reader = await prisma.arcReader.create({
       data: {
         arcCopyId: arcId,
         email,
         name,
         token: generateToken(),
-        tokenExpiresAt: customExpiry ? new Date(customExpiry) : arc.expiresAt,
+        tokenExpiresAt: tokenExpiry,
         invitedAt: new Date(),
       },
     });

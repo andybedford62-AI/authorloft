@@ -53,7 +53,6 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [disclaimer, setDisclaimer] = useState(DEFAULT_DISCLAIMER);
-  const [expiresAt, setExpiresAt] = useState("");
   const [creating, setCreating] = useState(false);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [dragging, setDragging] = useState(false);
@@ -80,7 +79,6 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       if (data.arc) {
         setArc(data.arc);
         setDisclaimer(data.arc.disclaimer || DEFAULT_DISCLAIMER);
-        setExpiresAt(data.arc.expiresAt ? new Date(data.arc.expiresAt).toISOString().split("T")[0] : "");
       }
     } catch {
       setError("Failed to load ARC");
@@ -106,13 +104,21 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
     setInviteError("");
     setInviteSuccess("");
     try {
+      // Default to 7 days from today if no expiry provided
+      let expiryDate = inviteExpiry;
+      if (!expiryDate) {
+        const date = new Date();
+        date.setDate(date.getDate() + 7);
+        expiryDate = date.toISOString().split("T")[0];
+      }
+
       const res = await fetch(`/api/admin/books/${bookId}/arc/${arc.id}/readers`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
         body: JSON.stringify({
           name: inviteName.trim(),
           email: inviteEmail.trim(),
-          tokenExpiresAt: inviteExpiry || null,
+          tokenExpiresAt: expiryDate,
         }),
       });
       const data = await res.json();
@@ -136,7 +142,7 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       const res = await fetch(`/api/admin/books/${bookId}/arc`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
-        body: JSON.stringify({ disclaimer, expiresAt: expiresAt || null }),
+        body: JSON.stringify({ disclaimer }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -298,18 +304,6 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Expiration Date <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <input
-              type="date"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
@@ -460,7 +454,7 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
                 onChange={(e) => setInviteExpiry(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-              <p className="text-xs text-gray-400 mt-1">Leave blank to use ARC default</p>
+              <p className="text-xs text-gray-400 mt-1">Defaults to 7 days from today</p>
             </div>
             <div className="flex items-end pb-0.5">
               <button

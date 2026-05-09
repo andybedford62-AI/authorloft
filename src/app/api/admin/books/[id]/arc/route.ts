@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const { id: bookId } = await params;
     const body = await req.json();
-    const { disclaimer, expiresAt } = body;
+    const { disclaimer } = body;
 
     // Verify book belongs to author
     const book = await prisma.book.findFirst({
@@ -81,7 +81,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         where: { id: arc.id },
         data: {
           disclaimer: disclaimer ?? arc.disclaimer,
-          expiresAt: expiresAt ? new Date(expiresAt) : arc.expiresAt,
           isActive: true,
         },
       });
@@ -90,7 +89,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         data: {
           bookId,
           disclaimer,
-          expiresAt: expiresAt ? new Date(expiresAt) : null,
           isActive: true,
         },
       });
