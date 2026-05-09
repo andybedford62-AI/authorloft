@@ -433,39 +433,45 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
           <UserPlus className="h-4 w-4" /> Invite Readers
         </h3>
 
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="text"
-            placeholder="Reader name"
-            value={inviteName}
-            onChange={(e) => setInviteName(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-          <input
-            type="email"
-            placeholder="Email address"
-            value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">Link expires <span className="text-gray-400">(optional — overrides ARC default)</span></label>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <input
-              type="date"
-              value={inviteExpiry}
-              onChange={(e) => setInviteExpiry(e.target.value)}
+              type="text"
+              placeholder="Reader name"
+              value={inviteName}
+              onChange={(e) => setInviteName(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            <input
+              type="email"
+              placeholder="Email address"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          <div className="flex items-end">
-            <button
-              onClick={inviteReader}
-              disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-              Send Invite
-            </button>
+
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-xs text-gray-600 mb-1">Link expires <span className="text-gray-400">(optional)</span></label>
+              <input
+                type="date"
+                value={inviteExpiry}
+                onChange={(e) => setInviteExpiry(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-400 mt-1">Leave blank to use ARC default</p>
+            </div>
+            <div className="flex items-end pb-0.5">
+              <button
+                onClick={inviteReader}
+                disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              >
+                {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                Send Invite
+              </button>
+            </div>
           </div>
         </div>
 
