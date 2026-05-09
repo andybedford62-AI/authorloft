@@ -1,68 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSupabaseSignedUrl } from "@/lib/supabase-storage";
 
-export async function POST(req: NextRequest, { params }: { params: { token: string; fileId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string; fileId: string }> }) {
   try {
-    const { token, fileId } = params;
+    const { token, fileId } = await params;
 
-    // Verify token and file exist
     const reader = await prisma.arcReader.findUnique({
       where: { token },
-      include: {
-        arcCopy: true,
-      },
     });
 
     if (!reader) {
       return NextResponse.json({ error: "Invalid token" }, { status: 404 });
     }
 
-    // Check expiration
-    if (reader.arcCopy.tokenExpiresAt && new Date() > reader.arcCopy.tokenExpiresAt) {
+    if (reader.tokenExpiresAt && new Date() > reader.tokenExpiresAt) {
       return NextResponse.json({ error: "Link has expired" }, { status: 403 });
     }
 
     // Verify file belongs to this ARC
     const file = await prisma.arcFile.findFirst({
-      where: {
-        id: fileId,
-        arcCopyId: reader.arcCopyId,
-      },
+      where: { id: fileId, arcCopyId: reader.arcCopyId },
     });
 
     if (!file) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    // Record download (upsert to avoid duplicates for same reader/file)
+    // Generate a signed download URL (valid for 1 hour)
+    const signedUrl = await getSupabaseSignedUrl("book-files", file.fileKey, 3600, file.fileName);
+
+    // Record download
     await prisma.arcReaderDownload.upsert({
-      where: {
-        readerId_fileId: { readerId: reader.id, fileId },
-      },
-      create: {
-        readerId: reader.id,
-        fileId,
-      },
-      update: {
-        downloadedAt: new Date(),
-      },
+      where: { readerId_fileId: { readerId: reader.id, fileId } },
+      create: { readerId: reader.id, fileId },
+      update: { downloadedAt: new Date() },
     });
 
-    // Update reader status if not already downloaded
+    // Update reader status
     if (reader.status === "INVITED") {
       await prisma.arcReader.update({
         where: { id: reader.id },
-        data: { status: "DOWNLOADED" },
+        data: { status: "DOWNLOADED", downloadedAt: new Date() },
       });
     }
 
-    return NextResponse.json({
-      fileUrl: file.fileUrl,
-      fileName: file.fileName,
-      format: file.format,
-    });
+    return NextResponse.json({ fileUrl: signedUrl, fileName: file.fileName, format: file.format });
   } catch (err: any) {
-    console.error("[arc-download] POST error:", err?.message ?? err);
-    return NextResponse.json({ error: "Failed to download file" }, { status: 500 });
+    const msg = err?.message ?? String(err);
+    console.error("[arc-download] POST error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
