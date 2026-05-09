@@ -22,7 +22,7 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   const [arc, setArc] = useState<ArcData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [disclaimer, setDisclaimer] = useState("");
+  const [disclaimer, setDisclaimer] = useState("This is an advance reader copy. Please do not share.");
   const [expiresAt, setExpiresAt] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -63,10 +63,13 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create ARC");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to create ARC");
+      }
       await loadArc();
     } catch (err) {
-      setError("Error creating ARC");
+      setError(err instanceof Error ? err.message : "Error creating ARC");
     }
   }
 
