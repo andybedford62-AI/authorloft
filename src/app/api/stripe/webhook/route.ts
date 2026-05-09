@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
             data: {
               status: "COMPLETED",
               customerEmail,
+              customerName,
               stripePaymentIntentId: session.payment_intent,
             },
           });
