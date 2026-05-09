@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
         if (bookAllowed) {
           const calc = calcDiscount(itemPrice, discount.type, discount.value);
           itemDiscount = calc.discountCents;
-          itemPrice    = calc.finalPriceCents;
+          itemPrice    = Math.max(50, calc.finalPriceCents); // Enforce minimum again after discount
         }
       }
 
