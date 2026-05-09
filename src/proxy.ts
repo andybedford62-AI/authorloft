@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { validateCSRFToken } from "@/lib/csrf";
+import { auditLog, getAuditContext, shouldAuditRoute, getAuditAction } from "@/lib/audit-logger";
 
 // AuthorLoft Multi-Tenant Middleware
 // Handles subdomain routing: authorslug.authorloft.com → /author-site/[domain]
@@ -156,6 +157,24 @@ export async function proxy(req: NextRequest) {
     isVercelHost
   ) {
     return NextResponse.next();
+  }
+
+  // ── Audit Logging ─────────────────────────────────────────────────────────
+  // Log sensitive operations for forensics
+  if (shouldAuditRoute(url.pathname, req.method)) {
+    const sessionToken = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const auditContext = getAuditContext(req);
+
+    auditLog({
+      userId: sessionToken?.sub,
+      action: getAuditAction(url.pathname),
+      endpoint: url.pathname,
+      method: req.method,
+      ...auditContext,
+    });
   }
 
   // ── Subdomain routes ─────────────────────────────────────────────────────

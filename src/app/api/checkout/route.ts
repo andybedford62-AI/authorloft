@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { calcDiscount } from "@/lib/discount-queries";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
+import { auditLog, getAuditContext } from "@/lib/audit-logger";
+import { validateCheckoutRequest } from "@/lib/schemas/checkout";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -47,12 +50,29 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
+    // ── Input Validation ───────────────────────────────────────────────────
+    const validationResult = validateCheckoutRequest(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid checkout request",
+          details: validationResult.error.errors.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
+
+    const validatedBody = validationResult.data;
+
     // Support both new cart format and legacy single-item format
     let saleItemIds: string[];
-    if (Array.isArray(body.items) && body.items.length > 0) {
-      saleItemIds = body.items.map((i: { saleItemId: string }) => i.saleItemId).filter(Boolean);
-    } else if (typeof body.saleItemId === "string") {
-      saleItemIds = [body.saleItemId];
+    if (validatedBody.items && validatedBody.items.length > 0) {
+      saleItemIds = validatedBody.items.map((i) => i.saleItemId);
+    } else if (validatedBody.saleItemId) {
+      saleItemIds = [validatedBody.saleItemId];
     } else {
       return NextResponse.json({ error: "items array is required" }, { status: 400 });
     }
@@ -61,7 +81,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No items provided." }, { status: 400 });
     }
 
-    const { discountCode } = body;
+    const { discountCode } = validatedBody;
 
     // Load all sale items with their books and author
     const saleItems = await prisma.bookDirectSaleItem.findMany({
@@ -252,10 +272,48 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // ── Audit Log ──────────────────────────────────────────────────────
+    const sessionToken = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const auditContext = getAuditContext(req);
+    auditLog({
+      userId: sessionToken?.sub,
+      action: "Create checkout session",
+      endpoint: "/api/checkout",
+      method: req.method,
+      statusCode: 200,
+      ...auditContext,
+      metadata: {
+        saleItemIds: saleItemIds.slice(0, 3), // First 3 items only
+        itemCount: saleItemIds.length,
+        totalCents,
+        hasDiscount: !!discountCodeId,
+      },
+    });
+
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     const msg = err?.message ?? String(err);
     console.error("[checkout] Error:", msg);
+
+    // ── Audit Log for Error ─────────────────────────────────────────────
+    const sessionToken = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const auditContext = getAuditContext(req);
+    auditLog({
+      userId: sessionToken?.sub,
+      action: "Create checkout session",
+      endpoint: "/api/checkout",
+      method: req.method,
+      statusCode: 500,
+      errorMessage: msg,
+      ...auditContext,
+    });
+
     return NextResponse.json(
       { error: "We couldn't complete your checkout. Please try again, or contact support if this continues." },
       { status: 500 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { createSubscriptionCheckoutSession, stripe } from "@/lib/stripe";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { validateSubscriptionCheckout } from "@/lib/schemas/subscription";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -40,8 +41,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { priceId } = await req.json();
-    if (!priceId) return NextResponse.json({ error: "priceId is required" }, { status: 400 });
+    const body = await req.json();
+
+    // ── Input Validation ───────────────────────────────────────────────────
+    const validationResult = validateSubscriptionCheckout(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid subscription request",
+          details: validationResult.error.errors.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
+
+    const { priceId } = validationResult.data;
 
     // Verify the price ID belongs to a real plan
     const plan = await prisma.plan.findFirst({
