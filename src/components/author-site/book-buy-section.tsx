@@ -23,7 +23,7 @@ export function BookBuySection({ children }: BookBuySectionProps) {
           <div>
             <p className="text-sm font-semibold">Purchase features are disabled in demo mode</p>
             <p className="text-xs mt-1">
-              <a href="/pricing" className="text-blue-600 hover:text-blue-800 font-semibold underline">
+              <a href="https://www.authorloft.com/pricing" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-semibold underline">
                 View pricing
               </a>
               {" "}to start your paid plan

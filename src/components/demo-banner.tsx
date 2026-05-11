@@ -23,7 +23,9 @@ export function DemoBanner() {
         <p className="text-sm text-gray-700">
           You're viewing a demonstration. Ready to build your author site?{" "}
           <a
-            href="/pricing"
+            href="https://www.authorloft.com/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-800 font-semibold underline"
           >
             View pricing
