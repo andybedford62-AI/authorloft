@@ -622,13 +622,24 @@ function AdminThemeSection() {
   );
 }
 
-// ── Main Settings page ────────────────────────────────────────────────────────
+// ── Tab types ────────────────────────────────────────────────────────────────
 
-export default function SettingsPage() {
+type SettingsTab = "account" | "billing" | "integrations" | "appearance" | "danger";
+
+const TABS: { id: SettingsTab; label: string }[] = [
+  { id: "account",      label: "Account" },
+  { id: "billing",      label: "Billing" },
+  { id: "integrations", label: "Integrations" },
+  { id: "appearance",   label: "Appearance" },
+  { id: "danger",       label: "Danger Zone" },
+];
+
+// ── Account tab content ───────────────────────────────────────────────────────
+
+function AccountTab() {
   const { data: session } = useSession();
   const user = session?.user as any;
 
-  // Change password state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -651,13 +662,8 @@ export default function SettingsPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
-
     const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
+    if (validationError) { setError(validationError); return; }
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings/change-password", {
@@ -665,38 +671,23 @@ export default function SettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
-        return;
-      }
-
-      // Success — clear the form
+      if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return; }
       setSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account preferences.</p>
-      </div>
-
-      {/* ── Account Info ──────────────────────────────────────────── */}
+    <div className="space-y-6">
+      {/* Account info */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <User className="h-4 w-4 text-gray-400" />
-          Account
+          Account Info
         </h2>
-
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">Name</label>
@@ -705,62 +696,39 @@ export default function SettingsPage() {
               {user?.name || "—"}
             </div>
           </div>
-
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-600">
               <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
               {user?.email || "—"}
             </div>
-            <p className="text-xs text-gray-400">
-              To change your email address, please contact support.
-            </p>
+            <p className="text-xs text-gray-400">To change your email, please contact support.</p>
           </div>
         </div>
       </section>
 
-      {/* ── Change Password ───────────────────────────────────────── */}
+      {/* Change password */}
       <section className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-5">
           <KeyRound className="h-4 w-4 text-gray-400" />
           Change Password
         </h2>
-
         {success ? (
           <div className="flex flex-col items-center gap-3 py-8 text-center">
             <CheckCircle className="h-10 w-10 text-green-500" />
             <p className="font-medium text-gray-900">Password updated successfully</p>
             <p className="text-sm text-gray-500">Your new password is active.</p>
-            <Button
-              variant="outline"
-              className="mt-2"
-              onClick={() => setSuccess(false)}
-            >
-              Change Again
-            </Button>
+            <Button variant="outline" className="mt-2" onClick={() => setSuccess(false)}>Change Again</Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Current Password"
-              type="password"
-              value={currentPassword}
+            <Input label="Current Password" type="password" value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
-              autoComplete="current-password"
-              required
-            />
-
+              placeholder="Enter your current password" autoComplete="current-password" required />
             <div className="space-y-1.5">
-              <Input
-                label="New Password"
-                type="password"
-                value={newPassword}
+              <Input label="New Password" type="password" value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Uppercase, number, special char"
-                autoComplete="new-password"
-                required
-              />
+                placeholder="Uppercase, number, special char" autoComplete="new-password" required />
               {newPassword && (
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
                   {[
@@ -777,71 +745,96 @@ export default function SettingsPage() {
                 </ul>
               )}
             </div>
-
             <div className="space-y-1">
-              <Input
-                label="Confirm New Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  if (error === "New passwords do not match.") setError("");
-                }}
-                placeholder="Repeat your new password"
-                autoComplete="new-password"
-                required
-              />
-              {/* Live match indicator */}
+              <Input label="Confirm New Password" type="password" value={confirmPassword}
+                onChange={(e) => { setConfirmPassword(e.target.value); if (error === "New passwords do not match.") setError(""); }}
+                placeholder="Repeat your new password" autoComplete="new-password" required />
               {confirmPassword.length > 0 && (
                 <p className={`text-xs ${newPassword === confirmPassword ? "text-green-600" : "text-red-500"}`}>
                   {newPassword === confirmPassword ? "✓ Passwords match" : "Passwords do not match"}
                 </p>
               )}
             </div>
-
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                {error}
-              </p>
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
             )}
-
             <div className="pt-1">
               <Button type="submit" disabled={saving}>
-                {saving
-                  ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Updating...</>
-                  : "Update Password"}
+                {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Updating...</> : "Update Password"}
               </Button>
             </div>
           </form>
         )}
       </section>
+    </div>
+  );
+}
 
-      {/* ── Subscription & Billing ───────────────────────────────── */}
-      <SubscriptionSection />
+// ── Main Settings page ────────────────────────────────────────────────────────
 
-      {/* ── Stripe Connect ───────────────────────────────────────── */}
-      <StripeConnectSection />
+export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState<SettingsTab>("account");
 
-      {/* ── AI Assistant ─────────────────────────────────────────── */}
-      <AiKeySection />
+  useEffect(() => {
+    if (window.location.hash === "#billing") setActiveTab("billing");
+  }, []);
 
-      {/* ── Admin Theme ──────────────────────────────────────────── */}
-      <AdminThemeSection />
+  return (
+    <div className="space-y-0 max-w-2xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage your account preferences.</p>
+      </div>
 
-      {/* ── Danger Zone ───────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-red-100 p-6">
-        <h2 className="font-semibold text-red-700 mb-2">Danger Zone</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Permanently delete your AuthorLoft account and all associated data. This action cannot be undone.
-        </p>
-        <Button
-          variant="outline"
-          className="text-red-600 hover:bg-red-50 border-red-200"
-          onClick={() => alert("To delete your account, please contact support@authorloft.com")}
-        >
-          Delete Account
-        </Button>
-      </section>
+      {/* ── Tab bar ── */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex gap-1 overflow-x-auto">
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === id
+                  ? "border-[var(--accent)] text-[var(--accent)]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } ${id === "danger" ? (activeTab === "danger" ? "text-red-600 border-red-500" : "text-red-400 hover:text-red-600 hover:border-red-300") : ""}`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* ── Tab panels ── */}
+      {activeTab === "account" && <AccountTab />}
+
+      {activeTab === "billing" && (
+        <div className="space-y-6">
+          <SubscriptionSection />
+          <StripeConnectSection />
+        </div>
+      )}
+
+      {activeTab === "integrations" && <AiKeySection />}
+
+      {activeTab === "appearance" && <AdminThemeSection />}
+
+      {activeTab === "danger" && (
+        <section className="bg-white rounded-xl border border-red-100 p-6">
+          <h2 className="font-semibold text-red-700 mb-2">Danger Zone</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Permanently delete your AuthorLoft account and all associated data. This action cannot be undone.
+          </p>
+          <Button
+            variant="outline"
+            className="text-red-600 hover:bg-red-50 border-red-200"
+            onClick={() => alert("To delete your account, please contact support@authorloft.com")}
+          >
+            Delete Account
+          </Button>
+        </section>
+      )}
     </div>
   );
 }
