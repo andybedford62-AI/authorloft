@@ -6,11 +6,11 @@ import { Loader2 } from "lucide-react";
 type Variant = "primary" | "success" | "danger" | "warning" | "ghost";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white",
-  success: "bg-green-600 hover:bg-green-700 text-white",
-  danger:  "bg-red-600  hover:bg-red-700  text-white",
-  warning: "bg-amber-500 hover:bg-amber-600 text-white",
-  ghost:   "bg-transparent hover:bg-gray-100 text-gray-600",
+  primary: "text-blue-600 hover:text-blue-700 hover:bg-blue-50",
+  success: "text-green-600 hover:text-green-700 hover:bg-green-50",
+  danger:  "text-red-600  hover:text-red-700  hover:bg-red-50",
+  warning: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",
+  ghost:   "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
 };
 
 export function IconButton({
