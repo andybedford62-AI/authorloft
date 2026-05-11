@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Trash2, MailOpen, Mail } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
 
 interface AccessRequest {
   id: string;
@@ -102,21 +103,21 @@ export function AccessRequestsTable({ initial }: { initial: AccessRequest[] }) {
                   </td>
 
                   <td className="px-5 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button
-                        onClick={() => toggleRead(r.id, !r.isRead)}
+                    <div className="flex items-center gap-1 justify-end">
+                      <IconButton
+                        icon={r.isRead ? <Mail className="h-4 w-4" /> : <MailOpen className="h-4 w-4" />}
                         title={r.isRead ? "Mark as unread" : "Mark as read"}
-                        className="p-1.5 rounded-md text-gray-500 hover:text-white hover:bg-gray-700 transition-colors"
-                      >
-                        {r.isRead ? <Mail className="h-4 w-4" /> : <MailOpen className="h-4 w-4" />}
-                      </button>
-                      <button
-                        onClick={() => deleteRequest(r.id)}
+                        variant="ghost"
+                        className="text-gray-500 hover:text-white hover:bg-gray-700"
+                        onClick={() => toggleRead(r.id, !r.isRead)}
+                      />
+                      <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
                         title="Delete"
-                        className="p-1.5 rounded-md text-gray-500 hover:text-red-400 hover:bg-gray-700 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                        variant="delete"
+                        className="text-gray-500 hover:text-red-400 hover:bg-gray-700"
+                        onClick={() => deleteRequest(r.id)}
+                      />
                     </div>
                   </td>
                 </tr>

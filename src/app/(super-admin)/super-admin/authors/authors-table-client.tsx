@@ -8,6 +8,7 @@ import {
   Mail, Pencil, Trash2, Loader2, UserCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Author = {
   id: string;
@@ -225,50 +226,42 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-end gap-1">
                     {/* Impersonate */}
-                    <button
+                    <IconButton
+                      icon={<UserCheck className="h-4 w-4" />}
+                      title="Impersonate author"
+                      variant="ghost"
+                      className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
                       onClick={() => handleImpersonate(author)}
                       disabled={!!impersonating}
-                      className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors disabled:opacity-40 cursor-pointer"
-                      title="Impersonate author"
-                    >
-                      {impersonating === author.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <UserCheck className="h-4 w-4" />
-                      }
-                    </button>
+                      loading={impersonating === author.id}
+                    />
 
                     {/* View live site */}
                     <a
                       href={`https://${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                      title="View live site"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <IconButton
+                        icon={<ExternalLink className="h-4 w-4" />}
+                        title="View live site"
+                        variant="view"
+                      />
                     </a>
 
                     {/* Edit */}
-                    <Link
-                      href={`/super-admin/authors/${author.id}`}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Edit author"
-                    >
-                      <Pencil className="h-4 w-4" />
+                    <Link href={`/super-admin/authors/${author.id}`}>
+                      <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit author" variant="edit" />
                     </Link>
 
                     {/* Delete */}
-                    <button
+                    <IconButton
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title="Delete author"
+                      variant="delete"
                       onClick={() => setConfirmId(author.id)}
                       disabled={!!deleting}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
-                      title="Delete author"
-                    >
-                      {deleting === author.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <Trash2 className="h-4 w-4" />
-                      }
-                    </button>
+                    />
                   </div>
                 </td>
               </tr>

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Plan = {
   id: string;
@@ -140,11 +142,17 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
                   </button>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="flex items-center gap-3 justify-end">
-                    <Link href={`/super-admin/plans/${plan.id}`} className="text-xs text-purple-600 hover:text-purple-500">Edit</Link>
-                    <button onClick={() => setConfirmDelete(plan.id)} disabled={plan._count.subscriptions > 0}
-                      title={plan._count.subscriptions > 0 ? "Cannot delete — authors are on this plan" : "Delete"}
-                      className="text-xs text-red-500 hover:text-red-400 disabled:opacity-30">Delete</button>
+                  <div className="flex items-center gap-1 justify-end">
+                    <Link href={`/super-admin/plans/${plan.id}`}>
+                      <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit plan" variant="edit" />
+                    </Link>
+                    <IconButton
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title={plan._count.subscriptions > 0 ? "Cannot delete — authors are on this plan" : "Delete plan"}
+                      variant="delete"
+                      onClick={() => setConfirmDelete(plan.id)}
+                      disabled={plan._count.subscriptions > 0}
+                    />
                   </div>
                 </td>
               </tr>
