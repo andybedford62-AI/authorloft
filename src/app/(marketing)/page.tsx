@@ -232,7 +232,7 @@ export default async function MarketingPage() {
                   Start for Free <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <a href="https://demo.authorloft.com">
+              <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer">
                 <Button
                   size="lg"
                   variant="outline"

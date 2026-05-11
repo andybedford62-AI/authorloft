@@ -8,6 +8,7 @@ import { BookExcerptModal } from "@/components/author-site/book-excerpt-modal";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
+import { BookBuySection } from "@/components/author-site/book-buy-section";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getRetailer } from "@/lib/retailers";
@@ -267,57 +268,59 @@ export default async function BookDetailPage({
 
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
-              <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
-                <div className="flex flex-wrap gap-2">
+              <BookBuySection>
+                <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
+                  <div className="flex flex-wrap gap-2">
 
-                  {/* Retailer links — shown first */}
-                  {hasRetailerLinks && book.retailerLinks.map((link) => {
-                    const info = getRetailer(link.retailer);
-                    return (
-                      <a
-                        key={link.id}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          borderColor: info.color,
-                          color: info.color,
-                          backgroundColor: info.badgeBg,
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
-                      >
-                        {link.label}
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    );
-                  })}
+                    {/* Retailer links — shown first */}
+                    {hasRetailerLinks && book.retailerLinks.map((link) => {
+                      const info = getRetailer(link.retailer);
+                      return (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            borderColor: info.color,
+                            color: info.color,
+                            backgroundColor: info.badgeBg,
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
+                        >
+                          {link.label}
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      );
+                    })}
 
-                  {/* Per-format direct sale items — Add to Cart */}
-                  {hasDirectSaleItems && (
-                    <AddToCartButtons
-                      items={book.directSaleItems}
-                      bookId={book.id}
-                      bookSlug={book.slug}
-                      bookTitle={book.title}
-                      coverImageUrl={book.coverImageUrl}
-                      accentColor={accentColor}
-                      formatColors={FORMAT_COLORS}
-                    />
-                  )}
+                    {/* Per-format direct sale items — Add to Cart */}
+                    {hasDirectSaleItems && (
+                      <AddToCartButtons
+                        items={book.directSaleItems}
+                        bookId={book.id}
+                        bookSlug={book.slug}
+                        bookTitle={book.title}
+                        coverImageUrl={book.coverImageUrl}
+                        accentColor={accentColor}
+                        formatColors={FORMAT_COLORS}
+                      />
+                    )}
 
-                  {/* Legacy single direct-buy button */}
-                  {showLegacyDirectBuy && (
-                    <Link href={`/books/${book.slug}/buy`}>
-                      <Button variant="primary" size="sm">
-                        <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                        Buy — {formatCents(book.priceCents)}
-                      </Button>
-                    </Link>
-                  )}
+                    {/* Legacy single direct-buy button */}
+                    {showLegacyDirectBuy && (
+                      <Link href={`/books/${book.slug}/buy`}>
+                        <Button variant="primary" size="sm">
+                          <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+                          Buy — {formatCents(book.priceCents)}
+                        </Button>
+                      </Link>
+                    )}
 
+                  </div>
                 </div>
-              </div>
+              </BookBuySection>
             )}
 
             {/* Book Overview — collapsible */}

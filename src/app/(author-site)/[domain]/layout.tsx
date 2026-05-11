@@ -7,6 +7,7 @@ import { getTheme, getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { CartProvider } from "@/context/cart-context";
 import { CartDrawer } from "@/components/author-site/cart-drawer";
+import { DemoBanner } from "@/components/demo-banner";
 import type { Metadata } from "next";
 
 // export const metadata: Metadata = {
@@ -155,6 +156,7 @@ export default async function AuthorSiteLayout({
         <div
           data-theme={dataTheme}
         >
+          <DemoBanner />
           <AuthorNav
             author={authorWithAccent}
             navConfig={navConfig}
