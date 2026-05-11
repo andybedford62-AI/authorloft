@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
 
 type BookRow = {
   id: string;
@@ -198,12 +199,8 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
               {/* Edit */}
               <td className="px-4 py-4">
                 <div className="flex items-center justify-end">
-                  <Link
-                    href={`/admin/books/${book.id}/edit`}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors cursor-pointer"
-                    title="Edit book"
-                  >
-                    <Pencil className="h-4 w-4" />
+                  <Link href={`/admin/books/${book.id}/edit`}>
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" />
                   </Link>
                 </div>
               </td>

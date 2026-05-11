@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 
 interface Props {
   postId: string;
@@ -51,13 +52,11 @@ export function BlogDeleteButton({ postId, postTitle, redirectTo }: Props) {
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <IconButton
+      icon={<Trash2 className="h-4 w-4" />}
+      title="Delete"
+      variant="delete"
       onClick={() => setConfirming(true)}
-      className="text-gray-400 hover:text-red-600"
-    >
-      <Trash2 className="h-3.5 w-3.5" />
-    </Button>
+    />
   );
 }

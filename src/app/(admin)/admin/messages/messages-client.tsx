@@ -6,6 +6,7 @@ import {
   ExternalLink, ChevronDown, ChevronUp, CheckCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Message = {
   id: string;
@@ -243,38 +244,29 @@ export function MessagesClient({ initialMessages }: Props) {
                         Reply by email
                       </a>
 
-                      <button
+                      <IconButton
+                        icon={msg.isRead ? <Mail className="h-4 w-4" /> : <MailOpen className="h-4 w-4" />}
+                        title={msg.isRead ? "Mark unread" : "Mark read"}
+                        variant="ghost"
                         onClick={() => patchMessage(msg.id, { isRead: !msg.isRead })}
                         disabled={loadingId === msg.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-                      >
-                        {msg.isRead ? (
-                          <><Mail className="h-4 w-4" />Mark unread</>
-                        ) : (
-                          <><MailOpen className="h-4 w-4" />Mark read</>
-                        )}
-                      </button>
+                      />
 
-                      <button
+                      <IconButton
+                        icon={msg.isArchived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
+                        title={msg.isArchived ? "Move to inbox" : "Archive"}
+                        variant="ghost"
                         onClick={() => patchMessage(msg.id, { isArchived: !msg.isArchived })}
                         disabled={loadingId === msg.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-                      >
-                        {msg.isArchived ? (
-                          <><ArchiveRestore className="h-4 w-4" />Move to inbox</>
-                        ) : (
-                          <><Archive className="h-4 w-4" />Archive</>
-                        )}
-                      </button>
+                      />
 
-                      <button
+                      <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
+                        title="Delete"
+                        variant="delete"
                         onClick={() => deleteMessage(msg.id)}
                         disabled={loadingId === msg.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-red-100 rounded-lg text-sm text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Delete
-                      </button>
+                      />
                     </div>
                   </div>
                 )}
