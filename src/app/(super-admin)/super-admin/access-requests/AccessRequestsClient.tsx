@@ -44,21 +44,23 @@ export function AccessRequestsClient({ requests, betaMode, betaMessage, betaCode
   return (
     <div className="space-y-6">
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-gray-700 overflow-x-auto">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px ${
-              activeTab === id
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600"
-            }`}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </button>
-        ))}
+      <div className="border-b border-gray-200 overflow-x-auto">
+        <nav className="-mb-px flex gap-1">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                activeTab === id
+                  ? "border-purple-600 text-purple-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {activeTab === "requests" && (
@@ -66,13 +68,13 @@ export function AccessRequestsClient({ requests, betaMode, betaMessage, betaCode
       )}
 
       {activeTab === "beta" && (
-        <section className="bg-gray-900 rounded-xl border border-gray-700 p-6 space-y-4">
+        <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-100 flex items-center gap-2">
-              <FlaskConical className="h-4 w-4 text-amber-400" />
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <FlaskConical className="h-4 w-4 text-amber-500" />
               Beta Mode
             </h2>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               When enabled, new registrations require an invite code and Google sign-up is blocked for new accounts.
               Toggle off to go live — no code changes required.
             </p>

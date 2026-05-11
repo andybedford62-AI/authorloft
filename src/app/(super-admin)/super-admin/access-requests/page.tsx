@@ -14,7 +14,10 @@ export default async function AccessRequestsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Access & Beta</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Access &amp; Beta</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage access requests and beta invite codes.</p>
+      </div>
       <AccessRequestsClient
         requests={requests.map((r) => ({
           ...r,
