@@ -13,6 +13,17 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   ghost:   "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
 };
 
+interface IconButtonProps {
+  icon:      ReactNode;
+  title:     string;
+  onClick?:  () => void;
+  disabled?: boolean;
+  loading?:  boolean;
+  variant?:  Variant;
+  type?:     "button" | "submit";
+  className?: string;
+}
+
 export function IconButton({
   icon,
   title,
@@ -21,15 +32,8 @@ export function IconButton({
   loading  = false,
   variant  = "ghost",
   type     = "button",
-}: {
-  icon:      ReactNode;
-  title:     string;
-  onClick?:  () => void;
-  disabled?: boolean;
-  loading?:  boolean;
-  variant?:  Variant;
-  type?:     "button" | "submit";
-}) {
+  className,
+}: IconButtonProps) {
   return (
     <button
       type={type}
@@ -41,6 +45,7 @@ export function IconButton({
         relative group/tip p-1.5 rounded transition-colors cursor-pointer
         disabled:opacity-50 disabled:cursor-not-allowed
         ${VARIANT_CLASSES[variant]}
+        ${className || ""}
       `}
     >
       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon}
