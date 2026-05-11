@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
@@ -12,6 +13,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
+import { isDemoMode } from "@/lib/demo-mode";
 import { Button } from "@/components/ui/button";
 import { AddToCartButtons } from "@/components/author-site/add-to-cart-buttons";
 import type { Metadata } from "next";
@@ -79,6 +81,10 @@ export default async function BookDetailPage({
   params: Promise<{ domain: string; slug: string }>;
 }) {
   const { domain, slug } = await params;
+  const headersList = headers();
+  const hostname = headersList.get("host") || "";
+  const isDemoModeActive = isDemoMode(hostname);
+
   const author = await getAuthorByDomain(domain);
   const accentColor = author.accentColor;
 
@@ -268,55 +274,68 @@ export default async function BookDetailPage({
             {/* Buy / Retailer buttons */}
             {hasBuyOptions && (
               <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
-                <div className="flex flex-wrap gap-2">
+                {isDemoModeActive ? (
+                  <div className="text-center py-2">
+                    <p className="text-sm text-gray-700 font-medium">Purchase features are disabled in demo mode</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      <Link href="/#pricing" className="text-blue-600 hover:text-blue-800 underline">
+                        Subscribe to unlock purchasing
+                      </Link>
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
+                    <div className="flex flex-wrap gap-2">
 
-                  {/* Retailer links — shown first */}
-                  {hasRetailerLinks && book.retailerLinks.map((link) => {
-                    const info = getRetailer(link.retailer);
-                    return (
-                      <a
-                        key={link.id}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          borderColor: info.color,
-                          color: info.color,
-                          backgroundColor: info.badgeBg,
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
-                      >
-                        {link.label}
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    );
-                  })}
+                      {/* Retailer links — shown first */}
+                      {hasRetailerLinks && book.retailerLinks.map((link) => {
+                        const info = getRetailer(link.retailer);
+                        return (
+                          <a
+                            key={link.id}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              borderColor: info.color,
+                              color: info.color,
+                              backgroundColor: info.badgeBg,
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
+                          >
+                            {link.label}
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </a>
+                        );
+                      })}
 
-                  {/* Per-format direct sale items — Add to Cart */}
-                  {hasDirectSaleItems && (
-                    <AddToCartButtons
-                      items={book.directSaleItems}
-                      bookId={book.id}
-                      bookSlug={book.slug}
-                      bookTitle={book.title}
-                      coverImageUrl={book.coverImageUrl}
-                      accentColor={accentColor}
-                      formatColors={FORMAT_COLORS}
-                    />
-                  )}
+                      {/* Per-format direct sale items — Add to Cart */}
+                      {hasDirectSaleItems && (
+                        <AddToCartButtons
+                          items={book.directSaleItems}
+                          bookId={book.id}
+                          bookSlug={book.slug}
+                          bookTitle={book.title}
+                          coverImageUrl={book.coverImageUrl}
+                          accentColor={accentColor}
+                          formatColors={FORMAT_COLORS}
+                        />
+                      )}
 
-                  {/* Legacy single direct-buy button */}
-                  {showLegacyDirectBuy && (
-                    <Link href={`/books/${book.slug}/buy`}>
-                      <Button variant="primary" size="sm">
-                        <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                        Buy — {formatCents(book.priceCents)}
-                      </Button>
-                    </Link>
-                  )}
+                      {/* Legacy single direct-buy button */}
+                      {showLegacyDirectBuy && (
+                        <Link href={`/books/${book.slug}/buy`}>
+                          <Button variant="primary" size="sm">
+                            <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+                            Buy — {formatCents(book.priceCents)}
+                          </Button>
+                        </Link>
+                      )}
 
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

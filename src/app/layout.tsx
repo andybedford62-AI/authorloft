@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { DemoBanner } from "@/components/demo-banner";
+import { isDemoMode } from "@/lib/demo-mode";
+import { headers } from "next/headers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,12 +33,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = headers();
+  const hostname = headersList.get("host") || "";
+  const showDemoBanner = isDemoMode(hostname);
+
   return (
     <html lang="en" className="h-full antialiased">
-      
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
-          <PostHogProvider>{children}</PostHogProvider>
-        </body>
+        {showDemoBanner && <DemoBanner />}
+        <PostHogProvider>{children}</PostHogProvider>
+      </body>
     </html>
   );
 }
