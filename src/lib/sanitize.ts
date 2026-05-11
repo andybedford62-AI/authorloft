@@ -23,7 +23,7 @@ export function sanitize(html: string | null | undefined): string {
       img: ["src", "alt", "width", "height"],
       td: ["colspan", "rowspan"],
       th: ["colspan", "rowspan"],
-      "*": ["class"],
+      "*": ["class", "style"],
     },
     allowedSchemes: ["http", "https", "mailto"],
     // Force external links to open safely

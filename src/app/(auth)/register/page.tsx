@@ -294,7 +294,7 @@ function RegisterPageInner() {
                 </h2>
                 {betaMessage ? (
                   <div
-                    className="text-sm text-gray-500 mt-1 prose prose-sm max-w-none"
+                    className="rich-content mt-1"
                     dangerouslySetInnerHTML={{ __html: sanitize(betaMessage) }}
                   />
                 ) : (
