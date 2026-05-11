@@ -9,11 +9,11 @@
 
 | Variant | Use Case | Color |
 |---------|----------|-------|
-| `primary` (blue) | Edit, Add, Main actions | Blue → Darker blue on hover |
-| `danger` (red) | Delete, Destructive actions | Red → Darker red on hover |
-| `success` (green) | Save, Confirm, Complete | Green → Darker green on hover |
-| `warning` (amber) | Archive, Caution actions | Amber → Darker amber on hover |
-| `ghost` (gray) | Secondary, View, More actions | Gray → Darker gray on hover |
+| `edit` (blue) | Edit, Pencil actions | Blue → Darker blue on hover |
+| `add` (green) | Plus, Add, Create new | Green → Darker green on hover |
+| `delete` (red) | Trash, Delete, Remove | Red → Darker red on hover |
+| `view` (black) | Eye, View, Preview | Black → Darker gray on hover |
+| `ghost` (gray) | Secondary, More, Cancel | Gray → Darker gray on hover |
 
 ## Usage Examples
 
@@ -27,19 +27,19 @@ import { Edit2, Trash2, Eye } from "lucide-react";
     icon={<Edit2 className="h-4 w-4" />}
     title="Edit"
     onClick={handleEdit}
-    variant="primary"
+    variant="edit"
   />
   <IconButton 
     icon={<Trash2 className="h-4 w-4" />}
     title="Delete"
     onClick={handleDelete}
-    variant="danger"
+    variant="delete"
   />
   <IconButton 
     icon={<Eye className="h-4 w-4" />}
     title="View"
     onClick={handleView}
-    variant="ghost"
+    variant="view"
   />
 </div>
 ```
