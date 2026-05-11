@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Library, BookOpen, Loader2 } from "lucide-react";
+import { Library, Plus, Pencil, Trash2, BookOpen, Loader2, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { EditAction, DeleteAction } from "@/components/admin/action-icons";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Series = {
   id: string;
@@ -219,8 +219,8 @@ export default function SeriesPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    <EditAction onClick={() => startEdit(s)} />
-                    <DeleteAction onClick={() => handleDelete(s.id, s.name, s._count.books)} />
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit series" variant="ghost" onClick={() => startEdit(s)} />
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete series" variant="ghost" onClick={() => handleDelete(s.id, s.name, s._count.books)} />
                   </div>
                 </div>
               )}

@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ChevronRight, Tag, FolderOpen, Loader2 } from "lucide-react";
+import { ChevronRight, Plus, Pencil, Trash2, Tag, FolderOpen, Loader2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { EditAction, DeleteAction, AddAction, SaveAction, CancelAction } from "@/components/admin/action-icons";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Genre = {
   id: string;
@@ -104,14 +104,14 @@ function GenreRow({
         {/* Action buttons */}
         {editing ? (
           <div className="flex items-center gap-1 ml-2">
-            <SaveAction onClick={handleSave} loading={saving} />
-            <CancelAction onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} />
+            <IconButton icon={<Check className="h-4 w-4" />} title="Save" variant="success" onClick={handleSave} loading={saving} />
+            <IconButton icon={<X className="h-4 w-4" />} title="Cancel" variant="ghost" onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} />
           </div>
         ) : (
           <div className="flex items-center gap-1 ml-2">
-            <EditAction onClick={() => { setEditing(true); setEditName(genre.name); }} />
-            <AddAction onClick={() => onAddChild(genre.id, genre.name)} />
-            <DeleteAction onClick={handleDelete} loading={deleting} />
+            <IconButton icon={<Pencil className="h-4 w-4" />} title="Rename" variant="ghost" onClick={() => { setEditing(true); setEditName(genre.name); }} />
+            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="ghost" onClick={() => onAddChild(genre.id, genre.name)} />
+            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="ghost" onClick={handleDelete} loading={deleting} />
           </div>
         )}
       </div>
