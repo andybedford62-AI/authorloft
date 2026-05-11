@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 import {
   BookOpen,
   Globe,
@@ -466,6 +467,11 @@ export default async function MarketingPage() {
         </div>
       </footer>
 
+      <Script
+        async
+        src="https://cdn.onsetio.com/v1/u.js?key=PK_BB2BHNF4XWY0C5QM26J842JFJ6TWTFMA"
+        strategy="afterInteractive"
+      />
     </div>
   );
 }
