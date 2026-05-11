@@ -6,6 +6,7 @@ import {
   Loader2, Copy, Check, Pencil, X,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
+import { IconButton } from "@/components/admin/icon-button";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -496,35 +497,36 @@ export default function DiscountCodesPage() {
                   {/* Actions */}
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => openEdit(code)}
+                      <IconButton
+                        icon={<Pencil className="h-4 w-4" />}
                         title="Edit"
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
+                        onClick={() => openEdit(code)}
+                        variant="edit"
+                      />
+                      <IconButton
+                        icon={
+                          togglingId === code.id
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : code.isActive
+                              ? <ToggleRight className="h-4 w-4" />
+                              : <ToggleLeft className="h-4 w-4" />
+                        }
+                        title={code.isActive ? "Deactivate" : "Activate"}
                         onClick={() => toggleActive(code)}
                         disabled={!!togglingId}
-                        title={code.isActive ? "Deactivate" : "Activate"}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-40"
-                      >
-                        {togglingId === code.id
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : code.isActive
-                            ? <ToggleRight className="h-4 w-4 text-green-500" />
-                            : <ToggleLeft className="h-4 w-4" />}
-                      </button>
-                      <button
+                        variant="ghost"
+                      />
+                      <IconButton
+                        icon={
+                          deletingId === code.id
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : <Trash2 className="h-4 w-4" />
+                        }
+                        title="Delete"
                         onClick={() => deleteCode(code.id)}
                         disabled={!!deletingId}
-                        title="Delete"
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
-                      >
-                        {deletingId === code.id
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : <Trash2 className="h-4 w-4" />}
-                      </button>
+                        variant="delete"
+                      />
                     </div>
                   </td>
                 </tr>

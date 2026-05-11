@@ -144,16 +144,12 @@ export function PagesListClient({ pages: initial }: PagesListClientProps) {
 
           {/* Actions */}
           <div className="flex items-center gap-1 justify-end">
-            <Link
-              href={`/admin/pages/${page.id}/edit`}
-              title="Edit page"
-              aria-label="Edit page"
-              className="relative group/tip p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              <Pencil className="h-4 w-4" />
-              <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">
-                Edit page
-              </span>
+            <Link href={`/admin/pages/${page.id}/edit`}>
+              <IconButton
+                icon={<Pencil className="h-4 w-4" />}
+                title="Edit"
+                variant="edit"
+              />
             </Link>
             <IconButton
               icon={<Trash2 className="h-4 w-4" />}
