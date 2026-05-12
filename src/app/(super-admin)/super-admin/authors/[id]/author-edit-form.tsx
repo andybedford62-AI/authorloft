@@ -6,6 +6,7 @@ import {
   Save, Loader2, CheckCircle, AlertTriangle,
   Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw,
 } from "lucide-react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Plan = {
   id: string;
@@ -214,19 +215,17 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
           />
         </Field>
         <Field label="Short bio" hint="Used in cards and previews (1–2 sentences)">
-          <textarea
+          <RichTextEditor
             value={form.shortBio}
-            onChange={(e) => set("shortBio", e.target.value)}
-            rows={2}
-            className={textareaClass}
+            onChange={(val) => set("shortBio", val)}
+            placeholder="A brief intro shown on the homepage…"
           />
         </Field>
         <Field label="Full bio" hint="Shown on the About page">
-          <textarea
+          <RichTextEditor
             value={form.bio}
-            onChange={(e) => set("bio", e.target.value)}
-            rows={5}
-            className={textareaClass}
+            onChange={(val) => set("bio", val)}
+            placeholder="Full biography shown on the About page…"
           />
         </Field>
       </Section>
