@@ -149,7 +149,7 @@ function SubscriptionSection() {
                       : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  Annual <span className="text-green-600 ml-1">Save 20%</span>
+                  Annual <span className="text-green-600 ml-1">2 mo. free</span>
                 </button>
               </div>
 
@@ -161,7 +161,7 @@ function SubscriptionSection() {
                   const cents = interval === "annual"
                     ? plan.annualPriceCents
                     : plan.monthlyPriceCents;
-                  const dollars = cents > 0 ? `$${(cents / 100).toFixed(0)}` : null;
+                  const dollars = cents > 0 ? `$${(cents / 100).toFixed(2)}` : null;
                   const features: string[] = plan.featuresJson
                     ? JSON.parse(plan.featuresJson)
                     : [];
@@ -191,7 +191,7 @@ function SubscriptionSection() {
                       </div>
                       {features.length > 0 && (
                         <ul className="space-y-1 flex-1">
-                          {features.slice(0, 5).map((f, i) => (
+                          {features.map((f, i) => (
                             <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
                               <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5" />
                               {f}
