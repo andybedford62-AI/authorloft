@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/lib/use-toast";
 
 // ── Subscription & Billing section ───────────────────────────────────────────
 
@@ -27,6 +28,7 @@ function SubscriptionSection() {
   const [interval, setInterval] = useState<"monthly" | "annual">("annual");
   const [busy,     setBusy]     = useState<string | null>(null); // priceId being loaded
   const [portalBusy, setPortalBusy] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetch("/api/admin/billing").then((r) => r.json()).then(setData).catch(() => {});
@@ -41,7 +43,16 @@ function SubscriptionSection() {
         body:    JSON.stringify({ priceId }),
       });
       const json = await res.json();
-      if (json.url) window.open(json.url, "_blank");
+      if (json.url) {
+        window.open(json.url, "_blank");
+      } else if (json.error) {
+        toast("error", json.error);
+      } else {
+        toast("error", "Unable to start checkout. Please try again.");
+      }
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      toast("error", "Network error. Please check your connection and try again.");
     } finally {
       setBusy(null);
     }
@@ -55,13 +66,13 @@ function SubscriptionSection() {
       if (json.url) {
         window.open(json.url, "_blank");
       } else if (json.error) {
-        alert(`Billing error: ${json.error}`);
+        toast("error", json.error);
       } else {
-        alert("Unable to open billing portal. Please try again.");
+        toast("error", "Unable to open billing portal. Please try again.");
       }
     } catch (err) {
       console.error("Portal error:", err);
-      alert("Network error. Please try again.");
+      toast("error", "Network error. Please try again.");
     } finally {
       setPortalBusy(false);
     }

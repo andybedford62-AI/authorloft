@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
+import { ToastProvider } from "@/components/toast-provider";
 import { PostHogIdentify } from "@/components/posthog-provider";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
@@ -72,6 +73,7 @@ export default async function AdminLayout({
   return (
     <AdminSessionProvider>
       <PostHogIdentify />
+      <ToastProvider />
       <div
         data-admin-theme={adminTheme}
         className="flex min-h-screen flex-col"

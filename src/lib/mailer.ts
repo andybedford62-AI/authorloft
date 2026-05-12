@@ -269,7 +269,149 @@ export async function sendVerificationEmail(to: string, token: string) {
   });
 }
 
-// ── Purchase confirmation email ───────────────────────────────────────────────
+// ── Order confirmation email (single receipt for all items) ─────────────────
+
+export interface OrderItemForEmail {
+  bookTitle: string;
+  itemLabel: string;
+  downloadUrl: string;
+  authorName: string;
+  authorSlug: string;
+  priceCents: number;
+}
+
+export async function sendOrderConfirmationEmail({
+  to,
+  customerName,
+  items,
+  totalCents,
+  discountCents,
+  downloadExpiry,
+  orderId,
+}: {
+  to: string;
+  customerName?: string;
+  items: OrderItemForEmail[];
+  totalCents: number;
+  discountCents: number;
+  downloadExpiry: Date;
+  orderId: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+  const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
+  const subtotalStr = (totalCents / 100).toFixed(2);
+  const discountStr = discountCents > 0 ? (discountCents / 100).toFixed(2) : null;
+  const totalStr = ((totalCents - discountCents) / 100).toFixed(2);
+
+  const itemsHtml = items.map((item, i) => `
+    <tr ${i > 0 ? 'style="border-top:1px solid #e5e7eb;"' : ""}>
+      <td style="padding:12px 0;">
+        <div style="font-weight:600;color:#111827;">${esc(item.bookTitle)}</div>
+        <div style="font-size:13px;color:#6b7280;margin:4px 0 8px;">${esc(item.itemLabel)} — ${esc(item.authorName)}</div>
+        <a href="${item.downloadUrl}"
+           style="display:inline-block;background:#3b82f6;color:#ffffff;font-size:13px;font-weight:600;padding:8px 20px;border-radius:6px;text-decoration:none;margin-top:4px;">
+          Download
+        </a>
+      </td>
+      <td style="padding:12px 0;text-align:right;color:#111827;font-weight:600;">
+        $${(item.priceCents / 100).toFixed(2)}
+      </td>
+    </tr>
+  `).join("");
+
+  const itemsText = items.map(item =>
+    `${item.bookTitle} (${item.itemLabel})\n  Author: ${item.authorName}\n  Price: $${(item.priceCents / 100).toFixed(2)}\n  Download: ${item.downloadUrl}`
+  ).join("\n\n");
+
+  return sendMail({
+    to,
+    subject: `Order confirmation #${orderId.slice(-8).toUpperCase()} — AuthorLoft`,
+    text: [
+      greeting,
+      `Thank you for your purchase! Your order has been confirmed.`,
+      ``,
+      `Order #${orderId}`,
+      `Date: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
+      ``,
+      `Items:`,
+      itemsText,
+      ``,
+      `Subtotal: $${subtotalStr}`,
+      discountStr ? `Discount: -$${discountStr}` : "",
+      `Total: $${totalStr}`,
+      ``,
+      `Download links expire on ${expiryStr}.`,
+      `You can re-download anytime at: https://www.${platformDomain}/orders/lookup`,
+    ].filter(Boolean).join("\n"),
+    html: wrapHtml("Order Confirmed", `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 24px;">Thank you for your purchase! Your download links are ready below.</p>
+
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="font-size:13px;color:#0369a1;">Order #</td>
+            <td style="text-align:right;font-size:13px;font-weight:600;color:#0369a1;">${orderId.slice(-8).toUpperCase()}</td>
+          </tr>
+          <tr style="border-top:1px solid #bae6fd;">
+            <td style="padding:6px 0;font-size:13px;color:#0369a1;">Date</td>
+            <td style="padding:6px 0;text-align:right;font-size:13px;font-weight:600;color:#0369a1;">
+              ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="margin:0 0 12px;font-size:14px;font-weight:600;color:#374151;">Your Items:</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${itemsHtml}
+      </table>
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:24px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="font-size:13px;color:#6b7280;">Subtotal</td>
+            <td style="text-align:right;font-size:13px;color:#6b7280;">$${subtotalStr}</td>
+          </tr>
+          ${discountStr ? `
+          <tr style="border-top:1px solid #e5e7eb;">
+            <td style="padding:6px 0;font-size:13px;color:#16a34a;font-weight:600;">Discount</td>
+            <td style="padding:6px 0;text-align:right;font-size:13px;color:#16a34a;font-weight:600;">-$${discountStr}</td>
+          </tr>` : ""}
+          <tr style="border-top:1px solid #e5e7eb;">
+            <td style="padding:8px 0;font-size:15px;font-weight:700;color:#111827;">Total</td>
+            <td style="padding:8px 0;text-align:right;font-size:15px;font-weight:700;color:#111827;">$${totalStr}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="margin:0 0 16px;font-size:13px;color:#374151;">
+        <strong>📥 Download links expire:</strong> ${expiryStr}<br/>
+        <strong>💾 Downloads allowed:</strong> 5 per item
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="https://www.${platformDomain}/orders/lookup"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Re-download Later
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're here to help.
+      </p>
+    `),
+  });
+}
+
+// ── Purchase confirmation email (legacy — single item) ───────────────────────
 
 export async function sendPurchaseConfirmationEmail({
   to,
@@ -290,69 +432,22 @@ export async function sendPurchaseConfirmationEmail({
   authorName: string;
   authorSlug: string;
 }) {
-  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-  const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
-    month: "long", day: "numeric", year: "numeric",
-  });
-  const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
-
-  return sendMail({
+  // Delegate to sendOrderConfirmationEmail for consistency
+  return sendOrderConfirmationEmail({
     to,
-    subject: `Your download is ready — ${bookTitle}`,
-    text: [
-      greeting,
-      `Thank you for purchasing ${bookTitle} (${itemLabel}).`,
-      `Download your file here: ${downloadUrl}`,
-      `This link expires on ${expiryStr} and allows up to 5 downloads.`,
-      `— ${authorName}`,
-    ].join("\n\n"),
-    html: wrapHtml(`Your download is ready`, `
-      <p style="margin:0 0 16px;">${greeting}</p>
-      <p style="margin:0 0 16px;">
-        Thank you for purchasing <strong>${esc(bookTitle)}</strong> (${esc(itemLabel)}).
-        Your file is ready to download right now.
-      </p>
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="center" style="padding:8px 0 28px;">
-            <a href="${downloadUrl}"
-               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
-              ⬇ Download ${esc(itemLabel)}
-            </a>
-          </td>
-        </tr>
-      </table>
-      <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">
-        If the button above doesn't work, paste this link into your browser:
-      </p>
-      <p style="margin:0 0 24px;font-size:13px;word-break:break-all;">
-        <a href="${downloadUrl}" style="color:#2563eb;">${downloadUrl}</a>
-      </p>
-      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:0 0 24px;">
-        <p style="margin:0 0 4px;font-size:13px;color:#374151;">
-          ⏱ <strong>Link expires:</strong> ${expiryStr}
-        </p>
-        <p style="margin:0;font-size:13px;color:#374151;">
-          📥 <strong>Downloads allowed:</strong> 5
-        </p>
-      </div>
-      <p style="margin:0 0 8px;font-size:14px;color:#374151;">
-        Enjoy the read!<br/>
-        <strong>${esc(authorName)}</strong>
-      </p>
-      <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">
-        Visit the author's site:
-        <a href="https://${authorSlug}.${platformDomain}" style="color:#6b7280;">
-          ${authorSlug}.${platformDomain}
-        </a>
-      </p>
-      <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
-        Need to re-download later? Visit
-        <a href="https://www.${platformDomain}/orders/lookup" style="color:#6b7280;">
-          authorloft.com/orders/lookup
-        </a>
-      </p>
-    `),
+    customerName,
+    items: [{
+      bookTitle,
+      itemLabel,
+      downloadUrl,
+      authorName,
+      authorSlug,
+      priceCents: 0, // Price shown per-item doesn't make sense for single item anyway
+    }],
+    totalCents: 0,
+    discountCents: 0,
+    downloadExpiry,
+    orderId: "",
   });
 }
 

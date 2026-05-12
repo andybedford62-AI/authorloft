@@ -13,7 +13,7 @@ function capturePostHog(distinctId: string, event: string, properties: Record<st
 }
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert } from "@/lib/mailer";
+import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -167,26 +167,36 @@ export async function POST(req: NextRequest) {
               },
             });
 
+            const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+
+            // 1. Single order confirmation email for buyer (all items together)
+            const orderItemsForEmail = fullItems.map((fi) => ({
+              bookTitle: fi.book.title,
+              itemLabel: fi.saleItem?.label ?? "eBook",
+              downloadUrl: `https://${fi.book.author.slug}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
+              authorName: fi.book.author.displayName || fi.book.author.name,
+              authorSlug: fi.book.author.slug,
+              priceCents: fi.priceCents,
+            }));
+
+            const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
+            const discountCents = order.discountCodeId ? (order.items[0]?.priceCents ?? 0) * fullItems.length - totalCents : 0; // Approximate discount
+
+            sendOrderConfirmationEmail({
+              to: customerEmail,
+              customerName,
+              items: orderItemsForEmail,
+              totalCents,
+              discountCents: Math.max(0, discountCents),
+              downloadExpiry: expiry,
+              orderId: order.id,
+            }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
+
+            // 2. Per-author sale notifications (each author gets notified of their sale immediately)
             for (const fi of fullItems) {
-              const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-              const authorSlug = fi.book.author.slug;
-              const authorName = fi.book.author.displayName || fi.book.author.name;
               const authorEmail = fi.book.author.email;
-              const downloadUrl = `https://${authorSlug}.${platformDomain}/api/orders/download/${fi.downloadToken}`;
+              const authorName = fi.book.author.displayName || fi.book.author.name;
 
-              // 1. Buyer confirmation email with download link
-              sendPurchaseConfirmationEmail({
-                to:             customerEmail,
-                customerName,
-                bookTitle:      fi.book.title,
-                itemLabel:      fi.saleItem?.label ?? "eBook",
-                downloadUrl,
-                downloadExpiry: expiry,
-                authorName,
-                authorSlug,
-              }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
-
-              // 2. Author sale notification email
               sendSaleNotificationEmail({
                 to:            authorEmail,
                 authorName,
