@@ -71,7 +71,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/books",      label: "Books",       icon: BookOpen   },
       { href: "/admin/flip-books", label: "Flip Books",  icon: BookMarked },
-      { href: "/admin/specials",   label: "Specials",    icon: Sparkles   },
       { href: "/admin/series",     label: "Series",      icon: Library    },
       { href: "/admin/pages",      label: "Pages",       icon: FileText   },
       { href: "/admin/blog",       label: "Blog / News", icon: Newspaper  },
@@ -80,15 +79,21 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "marketing", label: "Marketing", defaultOpen: true,
     items: [
-      { href: "/admin/analytics",       label: "Analytics",       icon: BarChart2  },
-      { href: "/admin/newsletter",             label: "Newsletter",        icon: Mail    },
-      { href: "/admin/newsletter-integration", label: "Email Integration", icon: PlugZap },
-      { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
-      { href: "/admin/invoices",        label: "Invoices & Tax",  icon: Receipt    },
-      { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
-      { href: "/admin/media-kit",       label: "Media Kit",       icon: Megaphone  },
-      { href: "/admin/ai-assistant",    label: "AI Assistant",    icon: Bot        },
-      { href: "/admin/seo-audit",       label: "SEO Audit",       icon: Search     },
+      { href: "/admin/analytics",              label: "Analytics",       icon: BarChart2  },
+      { href: "/admin/newsletter",             label: "Newsletter",      icon: Mail       },
+      { href: "/admin/newsletter-integration", label: "Email Integration", icon: PlugZap  },
+      { href: "/admin/media-kit",              label: "Media Kit",       icon: Megaphone  },
+      { href: "/admin/ai-assistant",           label: "AI Assistant",    icon: Bot        },
+      { href: "/admin/seo-audit",              label: "SEO Audit",       icon: Search     },
+    ],
+  },
+  {
+    key: "sales", label: "Sales", defaultOpen: false,
+    items: [
+      { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
+      { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
+      { href: "/admin/specials",       label: "Specials",       icon: Sparkles    },
+      { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },
     ],
   },
   {
@@ -101,10 +106,10 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "account", label: "Account", defaultOpen: false,
     items: [
-      { href: "/admin/messages",    label: "Messages",        icon: Inbox    },
-      { href: "/admin/compliance",  label: "Privacy & GDPR",  icon: Shield   },
-      { href: "/admin/legal",     label: "My Site Legal", icon: Shield   },
-      { href: "/admin/settings",  label: "Settings",      icon: Settings },
+      { href: "/admin/messages",   label: "Messages",       icon: Inbox    },
+      { href: "/admin/compliance", label: "Privacy & GDPR", icon: Shield   },
+      { href: "/admin/legal",      label: "My Site Legal",  icon: Shield   },
+      { href: "/admin/settings",   label: "Settings",       icon: Settings },
     ],
   },
 ];
