@@ -11,6 +11,7 @@ import { BookPreviewGallery } from "@/components/author-site/book-preview-galler
 import { BookBuySection } from "@/components/author-site/book-buy-section";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,8 @@ export async function generateMetadata({
 
   if (!book) return { title: "Book Not Found" };
 
+  const base        = getAuthorBaseUrl(author);
+  const canonicalUrl = `${base}/books/${slug}`;
   const description =
     book.shortDescription ||
     (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 160) : null) ||
@@ -51,6 +54,7 @@ export async function generateMetadata({
   return {
     title: book.title,
     description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       type: "book",
       title: `${book.title} by ${authorName}`,
@@ -135,7 +139,6 @@ export default async function BookDetailPage({
 
   const authorName = author.displayName || author.name;
 
-  const { getAuthorBaseUrl } = await import("@/lib/site-url");
   const base = getAuthorBaseUrl(author);
   const bookUrl = `${base}/books/${book.slug}`;
 
@@ -163,9 +166,20 @@ export default async function BookDetailPage({
     }),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",  item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "Books", item: `${base}/books` },
+      { "@type": "ListItem", position: 3, name: book.title, item: bookUrl },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}

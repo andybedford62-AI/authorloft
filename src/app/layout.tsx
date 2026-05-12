@@ -45,6 +45,17 @@ export const metadata: Metadata = {
   },
 };
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "AuthorLoft",
+  url: PLATFORM_URL,
+  logo: `${PLATFORM_URL}/authorloft-logo.png`,
+  description:
+    "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
+  sameAs: [PLATFORM_URL],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -52,10 +63,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full antialiased">
-      
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
-          <PostHogProvider>{children}</PostHogProvider>
-        </body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <PostHogProvider>{children}</PostHogProvider>
+      </body>
     </html>
   );
 }

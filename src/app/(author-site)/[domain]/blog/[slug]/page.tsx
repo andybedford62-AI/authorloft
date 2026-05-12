@@ -5,6 +5,7 @@ import { ArrowLeft, CalendarDays, Newspaper } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
 
@@ -23,12 +24,15 @@ export async function generateMetadata({
 
   if (!post) return { title: "Post Not Found" };
 
-  const authorName = author.displayName || author.name;
-  const ogImages   = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : [];
+  const authorName   = author.displayName || author.name;
+  const base         = getAuthorBaseUrl(author);
+  const canonicalUrl = `${base}/blog/${slug}`;
+  const ogImages     = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : [];
 
   return {
     title:       post.title,
     description: post.excerpt ?? undefined,
+    alternates:  { canonical: canonicalUrl },
     openGraph: {
       type:        "article",
       title:       post.title,
@@ -66,8 +70,7 @@ export default async function BlogPostPage({
   const paragraphs = hasHtmlContent ? [] : (post.content ?? "").split(/\n\n+/).filter(Boolean);
 
   const authorName = author.displayName || author.name;
-  const { getAuthorBaseUrl } = await import("@/lib/site-url");
-  const base = getAuthorBaseUrl(author);
+  const base       = getAuthorBaseUrl(author);
 
   const jsonLd = {
     "@context":       "https://schema.org",
@@ -82,9 +85,20 @@ export default async function BlogPostPage({
     publisher: { "@type": "Person", name: authorName, url: base },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${base}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: `${base}/blog/${post.slug}` },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}
