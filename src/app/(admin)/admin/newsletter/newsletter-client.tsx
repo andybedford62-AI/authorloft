@@ -198,6 +198,8 @@ export function NewsletterClient({
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+              <div className="min-w-[560px]">
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
                 <div className="grid grid-cols-4 text-xs text-gray-500 uppercase tracking-wide font-medium">
                   <span>Subscriber</span>
@@ -242,6 +244,8 @@ export function NewsletterClient({
                     </div>
                   );
                 })}
+              </div>
+              </div>
               </div>
             </div>
           )}

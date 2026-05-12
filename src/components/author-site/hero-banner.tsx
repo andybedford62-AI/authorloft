@@ -152,6 +152,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               src={photoSrc}
               alt={authorName}
               fill
+              priority
               className="object-cover object-center"
               style={{
                 maskImage:

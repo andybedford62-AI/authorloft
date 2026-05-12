@@ -109,6 +109,7 @@ export default async function SalesPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -154,6 +155,7 @@ export default async function SalesPage() {
               ))}
             </tbody>
           </table>
+          </div>
           {orders.length === 50 && (
             <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 text-center">
               <p className="text-xs text-gray-400">Showing most recent 50 orders</p>
