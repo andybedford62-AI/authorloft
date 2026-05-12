@@ -24,7 +24,7 @@ type BillingData = {
 
 function SubscriptionSection() {
   const [data,     setData]     = useState<BillingData | null>(null);
-  const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const [interval, setInterval] = useState<"monthly" | "annual">("annual");
   const [busy,     setBusy]     = useState<string | null>(null); // priceId being loaded
   const [portalBusy, setPortalBusy] = useState(false);
 
@@ -41,7 +41,7 @@ function SubscriptionSection() {
         body:    JSON.stringify({ priceId }),
       });
       const json = await res.json();
-      if (json.url) window.location.href = json.url;
+      if (json.url) window.open(json.url, "_blank");
     } finally {
       setBusy(null);
     }
@@ -53,7 +53,7 @@ function SubscriptionSection() {
       const res  = await fetch("/api/admin/stripe/portal", { method: "POST" });
       const json = await res.json();
       if (json.url) {
-        window.location.href = json.url;
+        window.open(json.url, "_blank");
       } else if (json.error) {
         alert(`Billing error: ${json.error}`);
       } else {
