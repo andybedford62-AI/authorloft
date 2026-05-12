@@ -66,17 +66,21 @@ export async function createSubscriptionCheckoutSession({
   planPriceId,
   successUrl,
   cancelUrl,
+  existingCustomerId,
 }: {
   authorId: string;
   authorEmail: string;
   planPriceId: string;
   successUrl: string;
   cancelUrl: string;
+  existingCustomerId?: string;
 }) {
+  // Use existing customer ID if available, otherwise Stripe will create one from email
+  // Note: If no customer ID exists, Stripe creates one on first successful payment
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "subscription",
-    customer_email: authorEmail,
+    ...(existingCustomerId ? { customer: existingCustomerId } : { customer_email: authorEmail }),
     line_items: [
       {
         price: planPriceId,

@@ -104,6 +104,7 @@ export async function POST(req: NextRequest) {
       planPriceId: priceId,
       successUrl,
       cancelUrl,
+      existingCustomerId: author.stripeCustomerId || undefined,
     });
 
     return NextResponse.json({ url: session.url });
