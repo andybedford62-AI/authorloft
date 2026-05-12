@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { IconButton } from "@/components/admin/icon-button";
+import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -247,7 +248,10 @@ export default function DiscountCodesPage() {
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Discount Codes</h1>
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          Discount Codes
+          <HelpTip id="discount-codes" />
+        </h1>
         <p className="text-sm text-gray-500 mt-1">
           Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print).
           Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.

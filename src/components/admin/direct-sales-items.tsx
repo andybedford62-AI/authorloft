@@ -5,6 +5,7 @@ import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
   Upload, FileText, X, CheckCircle, Lock, Zap,
 } from "lucide-react";
+import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Format config ─────────────────────────────────────────────────────────────
 
@@ -474,7 +475,10 @@ export function DirectSalesItems({
     <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-gray-900">Direct Sales</h2>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            Direct Sales
+            <HelpTip id="direct-sales" />
+          </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Offer different editions directly to readers — eBook, Audio Book, Flip Book, or Print.
             Each can have its own price and be activated or deactivated independently.

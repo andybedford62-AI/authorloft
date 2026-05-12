@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText, UserPlus, Mail } from "lucide-react";
+import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -287,7 +288,10 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
     return (
       <div className="space-y-6 py-6 max-w-lg">
         <div>
-          <h3 className="font-semibold text-gray-900 mb-1">Create ARC for {bookTitle}</h3>
+          <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+            Create ARC for {bookTitle}
+            <HelpTip id="arc-setup" />
+          </h3>
           <p className="text-sm text-gray-500">
             Set up an Advance Reader Copy so you can invite early readers and share pre-release files.
           </p>

@@ -6,6 +6,7 @@ import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, Exte
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
+import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Subscription & Billing section ───────────────────────────────────────────
 
@@ -279,6 +280,7 @@ function StripeConnectSection() {
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Banknote className="h-4 w-4 text-gray-400" />
           Stripe Payouts
+          <HelpTip id="stripe-connect" />
         </h2>
         <p className="text-xs text-gray-400 mt-1">
           Connect your Stripe account to receive direct sales revenue. A 10% platform fee applies per sale.
@@ -409,6 +411,8 @@ function AiKeySection() {
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Bot className="h-4 w-4 text-gray-400" />
           AI Assistant
+          <HelpTip id="ai-key" />
+          <HelpTip id="ai-usage-cap" />
         </h2>
         <p className="text-xs text-gray-400 mt-1">
           Add your own Gemini API key to unlock unlimited AI requests. Without it, a monthly usage cap applies.{" "}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CheckCircle, AlertCircle, Loader2, Plug, PlugZap } from "lucide-react";
+import { HelpTip } from "@/components/admin/help-tip";
 
 type Provider = "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN" | "";
 
@@ -136,7 +137,10 @@ export default function NewsletterIntegrationPage() {
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Email Marketing Integration</h1>
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          Email Marketing Integration
+          <HelpTip id="email-integration" />
+        </h1>
         <p className="text-sm text-gray-500 mt-1">
           Connect your email marketing service to automatically sync new subscribers.
         </p>
