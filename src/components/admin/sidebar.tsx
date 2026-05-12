@@ -261,7 +261,7 @@ function NavGroupSection({
               );
             }
 
-            const active = pathname.startsWith(href);
+            const active = pathname === href || pathname.startsWith(href + "/");
             const badge  = href === "/admin/messages" && unreadMessages > 0 ? unreadMessages : null;
             return (
               <Link
