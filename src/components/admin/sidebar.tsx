@@ -32,6 +32,7 @@ import {
   Lock,
   BarChart2,
   Megaphone,
+  PlugZap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -79,7 +80,8 @@ const NAV_GROUPS: NavGroup[] = [
     key: "marketing", label: "Marketing", defaultOpen: true,
     items: [
       { href: "/admin/analytics",       label: "Analytics",       icon: BarChart2  },
-      { href: "/admin/newsletter",      label: "Newsletter",      icon: Mail       },
+      { href: "/admin/newsletter",             label: "Newsletter",        icon: Mail    },
+      { href: "/admin/newsletter-integration", label: "Email Integration", icon: PlugZap },
       { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
       { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
       { href: "/admin/media-kit",       label: "Media Kit",       icon: Megaphone  },

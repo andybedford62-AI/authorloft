@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { syncSubscriberToProvider, type EmailProvider } from "@/lib/email-integrations";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const attempts = new Map<string, number[]>();
@@ -33,25 +34,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
-    const subscriber = await prisma.subscriber.upsert({
-      where: {
-        authorId_email: {
+    const [subscriber, author] = await Promise.all([
+      prisma.subscriber.upsert({
+        where: { authorId_email: { authorId: data.authorId, email: data.email } },
+        update: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
+        create: {
           authorId: data.authorId,
+          name: data.name,
           email: data.email,
+          categoryPrefs: data.categoryPrefs || [],
+          isConfirmed: true,
         },
-      },
-      update: {
-        name: data.name,
-        categoryPrefs: data.categoryPrefs || [],
-      },
-      create: {
-        authorId: data.authorId,
-        name: data.name,
-        email: data.email,
-        categoryPrefs: data.categoryPrefs || [],
-        isConfirmed: true, // Simple opt-in; add double opt-in via email confirmation token as enhancement
-      },
-    });
+      }),
+      prisma.author.findUnique({
+        where: { id: data.authorId },
+        select: { emailProvider: true, emailProviderKey: true, emailProviderExtra: true },
+      }),
+    ]);
+
+    // Fire-and-forget sync to external email provider if configured
+    if (author?.emailProvider && author.emailProviderKey) {
+      syncSubscriberToProvider(
+        author.emailProvider as EmailProvider,
+        author.emailProviderKey,
+        author.emailProviderExtra ?? null,
+        data.email,
+        data.name
+      ).catch((err) => {
+        console.error("[newsletter/subscribe] External sync failed:", err);
+      });
+    }
 
     return NextResponse.json({ success: true, id: subscriber.id });
   } catch (err) {

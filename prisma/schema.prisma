@@ -143,6 +143,9 @@ model Author {
   emailVerifyExpiry    DateTime?
   passwordResetToken   String?        @unique
   passwordResetExpiry  DateTime?
+  emailProvider        String?        // "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN"
+  emailProviderKey     String?        // API key for the connected email service
+  emailProviderExtra   String?        // Provider-specific extra: Mailchimp audience ID or ActiveCampaign account URL
   termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
   onboardingCompletedAt   DateTime?      // set when first book is created; null = never completed onboarding
   onboardingReminderSentAt DateTime?     // set when the day-7 nudge email is sent

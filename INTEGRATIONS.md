@@ -136,6 +136,22 @@ Managed via Prisma ORM. Database hosted on Supabase.
 
 ---
 
+### Email Marketing Integrations (Kit / Mailchimp / ActiveCampaign)
+**Purpose:** Optional — authors connect their existing email service to auto-sync new subscribers.
+
+| Provider | What's needed | Details |
+|----------|--------------|---------|
+| Kit (ConvertKit) | API key | Subscribers added via Kit v4 API |
+| Mailchimp | API key + Audience ID | Subscribers added to specified audience/list |
+| ActiveCampaign | API key + Account URL | Contacts created via AC v3 API |
+
+Configured at `/admin/newsletter-integration`. When a reader subscribes on the author's site, they are synced to the connected service automatically (fire-and-forget, non-blocking). Test connection button verifies credentials before saving.
+
+**Files:** `src/lib/email-integrations.ts`, `src/app/api/admin/newsletter-integration/route.ts`, `src/app/(admin)/admin/newsletter-integration/page.tsx`  
+**DB fields:** `Author.emailProvider`, `Author.emailProviderKey`, `Author.emailProviderExtra`
+
+---
+
 ## Platform Features (No External Service)
 
 | Feature | Description | Key Files |
