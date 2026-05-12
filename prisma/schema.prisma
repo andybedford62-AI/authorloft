@@ -698,6 +698,64 @@ model StripeEvent {
   processedAt DateTime @default(now())
 }
 
+// ─── Help Centre ──────────────────────────────────────────────────────────────
+
+model HelpTopic {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  description String?
+  icon        String?        // lucide icon name e.g. "BookOpen"
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  subtopics   HelpSubtopic[]
+  articles    HelpArticle[]
+}
+
+model HelpSubtopic {
+  id        String        @id @default(cuid())
+  topicId   String
+  title     String
+  slug      String
+  sortOrder Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  topic     HelpTopic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  articles  HelpArticle[]
+
+  @@unique([topicId, slug])
+  @@index([topicId])
+}
+
+model HelpArticle {
+  id          String        @id @default(cuid())
+  topicId     String
+  subtopicId  String?
+  question    String        @db.Text  // rich HTML
+  answer      String        @db.Text  // rich HTML
+  sortOrder   Int           @default(0)
+  isPublished Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  topic       HelpTopic     @relation(fields: [topicId], references: [id])
+  subtopic    HelpSubtopic? @relation(fields: [subtopicId], references: [id])
+
+  @@index([topicId])
+  @@index([subtopicId])
+}
+
+model HelpTooltip {
+  id           String   @id @default(cuid())
+  tooltipKey   String   @unique
+  title        String
+  content      String
+  learnMoreUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model ImpersonationLog {
   id            String   @id @default(cuid())
   superAdminId  String

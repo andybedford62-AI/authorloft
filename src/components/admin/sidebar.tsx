@@ -34,6 +34,7 @@ import {
   Megaphone,
   PlugZap,
   Receipt,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -106,10 +107,11 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "account", label: "Account", defaultOpen: false,
     items: [
-      { href: "/admin/messages",   label: "Messages",       icon: Inbox    },
-      { href: "/admin/compliance", label: "Privacy & GDPR", icon: Shield   },
-      { href: "/admin/legal",      label: "My Site Legal",  icon: Shield   },
-      { href: "/admin/settings",   label: "Settings",       icon: Settings },
+      { href: "/admin/messages",   label: "Messages",       icon: Inbox       },
+      { href: "/admin/help",       label: "Help Centre",    icon: HelpCircle  },
+      { href: "/admin/compliance", label: "Privacy & GDPR", icon: Shield      },
+      { href: "/admin/legal",      label: "My Site Legal",  icon: Shield      },
+      { href: "/admin/settings",   label: "Settings",       icon: Settings    },
     ],
   },
 ];
@@ -122,6 +124,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/admin/genres",                 label: "Genres",          icon: Tag        },
   { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },
   { href: "/super-admin/settings",         label: "Platform",        icon: Settings   },
+  { href: "/super-admin/help",     label: "Help Centre",  icon: HelpCircle },
   { href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", label: "Analytics", icon: BarChart2, external: true },
 ];
 
