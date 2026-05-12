@@ -287,6 +287,21 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
   if (!arc) {
     return (
       <div className="space-y-6 py-6 max-w-lg">
+        {/* ARC explainer banner */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+          <p className="font-semibold mb-1">What is an ARC?</p>
+          <p className="leading-relaxed">
+            An <strong>Advanced Reader Copy (ARC)</strong> lets you share a pre-release version of this
+            book with reviewers, bloggers, or beta readers — at no charge — before or after your
+            official launch. Recipients get a secure download link without needing to purchase.
+            You control the expiry date and can track every download.
+          </p>
+          <p className="mt-2 leading-relaxed">
+            ARCs are typically used to build early reviews and buzz before launch, but you can also
+            use them to provide complimentary copies to libraries, educators, or book clubs at any time.
+          </p>
+        </div>
+
         <div>
           <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
             Create ARC for {bookTitle}
@@ -328,6 +343,16 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
 
   return (
     <div className="space-y-6 py-6 max-w-2xl">
+
+      {/* ARC explainer banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+        <p className="font-semibold mb-1">About Advanced Reader Copies (ARC)</p>
+        <p className="leading-relaxed">
+          Share a free pre-release or complimentary copy of this book with reviewers, bloggers,
+          librarians, or beta readers. Each recipient gets a secure download link — no purchase
+          required. Use the expiry date to limit access, and track every download below.
+        </p>
+      </div>
 
       {/* Header stats */}
       <div className="flex items-start justify-between">
