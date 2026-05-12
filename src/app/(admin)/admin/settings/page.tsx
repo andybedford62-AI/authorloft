@@ -51,7 +51,16 @@ function SubscriptionSection() {
     try {
       const res  = await fetch("/api/admin/stripe/portal", { method: "POST" });
       const json = await res.json();
-      if (json.url) window.location.href = json.url;
+      if (json.url) {
+        window.location.href = json.url;
+      } else if (json.error) {
+        alert(`Billing error: ${json.error}`);
+      } else {
+        alert("Unable to open billing portal. Please try again.");
+      }
+    } catch (err) {
+      console.error("Portal error:", err);
+      alert("Network error. Please try again.");
     } finally {
       setPortalBusy(false);
     }
@@ -92,16 +101,20 @@ function SubscriptionSection() {
                 <p className="text-xs text-gray-400 mt-0.5">Free plan — upgrade to unlock more features</p>
               )}
             </div>
-            {!isFree && (
+            <div className="relative">
               <button
                 onClick={handlePortal}
-                disabled={portalBusy}
-                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
+                disabled={isFree || portalBusy}
+                title={isFree ? "Upgrade to a paid plan to manage billing" : ""}
+                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
               >
                 <ExternalLink className="h-3 w-3" />
                 {portalBusy ? "Opening…" : "Manage billing"}
               </button>
-            )}
+              {isFree && (
+                <p className="text-xs text-gray-500 mt-1">Only available on paid plans</p>
+              )}
+            </div>
           </div>
 
           {/* Upgrade options — only shown to free users */}
