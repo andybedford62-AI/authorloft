@@ -15,8 +15,10 @@ export async function GET() {
       prisma.author.findUnique({
         where:  { id: authorId },
         select: {
-          plan:         { select: { tier: true, name: true } },
-          subscription: { select: { currentPeriodEnd: true, billingInterval: true, status: true } },
+          plan:                  { select: { tier: true, name: true } },
+          subscription:          { select: { currentPeriodEnd: true, billingInterval: true, status: true } },
+          stripeSubscriptionId:  true,
+          stripeCustomerId:      true,
         },
       }),
       prisma.plan.findMany({
@@ -31,10 +33,15 @@ export async function GET() {
       }),
     ]);
 
+    const tier = author?.plan?.tier ?? "FREE";
+    const hasStripeSubscription = !!author?.stripeSubscriptionId;
+    const isAdminAssigned = tier !== "FREE" && !hasStripeSubscription;
+
     return NextResponse.json({
-      currentTier:       author?.plan?.tier      ?? "FREE",
-      currentPlanName:   author?.plan?.name      ?? "Free",
-      subscription:      author?.subscription    ?? null,
+      currentTier:      tier,
+      currentPlanName:  author?.plan?.name ?? "Free",
+      subscription:     author?.subscription ?? null,
+      isAdminAssigned,
       plans,
     });
   } catch (err: any) {

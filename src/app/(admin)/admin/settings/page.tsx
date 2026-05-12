@@ -18,6 +18,7 @@ type BillingPlan = {
 type BillingData = {
   currentTier: string; currentPlanName: string;
   subscription: { currentPeriodEnd: string | null; billingInterval: string; status: string } | null;
+  isAdminAssigned: boolean;
   plans: BillingPlan[];
 };
 
@@ -66,7 +67,8 @@ function SubscriptionSection() {
     }
   }
 
-  const isFree = !data || data.currentTier === "FREE";
+  const isFree        = !data || data.currentTier === "FREE";
+  const isAdminAssigned = data?.isAdminAssigned ?? false;
 
   const renewalDate = data?.subscription?.currentPeriodEnd
     ? new Date(data.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
@@ -95,24 +97,31 @@ function SubscriptionSection() {
             <div>
               <p className="text-sm font-semibold text-gray-900">{data.currentPlanName}</p>
               {renewalDate && (
-                <p className="text-xs text-gray-400 mt-0.5">Renews {renewalDate}</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {data.subscription?.status === "active" ? "Renews" : "Expires"} {renewalDate}
+                </p>
               )}
               {isFree && (
                 <p className="text-xs text-gray-400 mt-0.5">Free plan — upgrade to unlock more features</p>
               )}
+              {isAdminAssigned && (
+                <p className="text-xs text-gray-400 mt-0.5">Plan assigned by admin</p>
+              )}
             </div>
-            <div className="relative">
-              <button
-                onClick={handlePortal}
-                disabled={isFree || portalBusy}
-                title={isFree ? "Upgrade to a paid plan to manage billing" : ""}
-                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {portalBusy ? "Opening…" : "Manage billing"}
-              </button>
-              {isFree && (
-                <p className="text-xs text-gray-500 mt-1">Only available on paid plans</p>
+            <div className="flex flex-col items-end gap-1">
+              {isFree ? (
+                <p className="text-xs text-gray-400">Upgrade to manage billing</p>
+              ) : isAdminAssigned ? (
+                <p className="text-xs text-gray-400">Contact support to manage billing</p>
+              ) : (
+                <button
+                  onClick={handlePortal}
+                  disabled={portalBusy}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {portalBusy ? "Opening…" : "Manage billing"}
+                </button>
               )}
             </div>
           </div>
