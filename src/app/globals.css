@@ -248,7 +248,7 @@ body {
 /* TipTap editor area specifics */
 .tiptap-editor .ProseMirror {
   outline: none;
-  min-height: 320px;
+  min-height: var(--editor-min-height, 320px);
   padding: 1rem;
   font-size: 0.9375rem;
   line-height: 1.75;

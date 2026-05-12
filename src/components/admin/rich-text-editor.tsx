@@ -29,6 +29,8 @@ interface RichTextEditorProps {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  minHeight?: string;  // e.g. "200px" — overrides the 320px default
+  resizable?: boolean; // allow vertical resize by the user
 }
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────────
@@ -738,6 +740,8 @@ export function RichTextEditor({
   onChange,
   placeholder = "Write your page content here…",
   className,
+  minHeight,
+  resizable = false,
 }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -777,8 +781,10 @@ export function RichTextEditor({
     <div
       className={cn(
         "tiptap-editor border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow",
+        resizable && "resize-y",
         className
       )}
+      style={minHeight ? { "--editor-min-height": minHeight } as React.CSSProperties : undefined}
     >
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
