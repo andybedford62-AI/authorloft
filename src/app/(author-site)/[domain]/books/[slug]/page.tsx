@@ -135,7 +135,37 @@ export default async function BookDetailPage({
 
   const authorName = author.displayName || author.name;
 
+  const { getAuthorBaseUrl } = await import("@/lib/site-url");
+  const base = getAuthorBaseUrl(author);
+  const bookUrl = `${base}/books/${book.slug}`;
+
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type":    "Book",
+    name:       book.title,
+    url:        bookUrl,
+    author:     { "@type": "Person", name: authorName, url: base },
+    description: book.shortDescription || (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 300) : undefined),
+    ...(book.coverImageUrl && { image: book.coverImageUrl }),
+    ...(book.isbn          && { isbn: book.isbn }),
+    ...(book.pageCount     && { numberOfPages: book.pageCount }),
+    ...(book.language      && { inLanguage: book.language }),
+    ...(book.releaseDate   && { datePublished: new Date(book.releaseDate).toISOString().split("T")[0] }),
+    ...(book.genres.length > 0 && { genre: book.genres.map((g) => g.genre.name) }),
+    ...(book.priceCents > 0 && {
+      offers: {
+        "@type":       "Offer",
+        price:         (book.priceCents / 100).toFixed(2),
+        priceCurrency: "USD",
+        availability:  "https://schema.org/InStock",
+        url:           bookUrl,
+      },
+    }),
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}
@@ -457,5 +487,6 @@ export default async function BookDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }

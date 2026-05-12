@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import {
@@ -27,7 +28,23 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 3600; // fallback: refresh at most every hour
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "AuthorLoft — Build Your Author Website",
+  description:
+    "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required. Start free.",
+  openGraph: {
+    type:        "website",
+    title:       "AuthorLoft — Build Your Author Website",
+    description: "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "AuthorLoft — Build Your Author Website",
+    description: "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
+  },
+};
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 

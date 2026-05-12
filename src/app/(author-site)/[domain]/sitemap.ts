@@ -22,6 +22,8 @@ export default async function sitemap({
       navShowAbout: true,
       navShowBooks: true,
       navShowContact: true,
+      navShowBlog: true,
+      navShowFlipBooks: true,
     },
   });
 
@@ -83,6 +85,33 @@ export default async function sitemap({
       changeFrequency: "yearly",
       priority: 0.5,
     });
+  }
+
+  // Blog posts
+  if (author.navShowBlog) {
+    entries.push({ url: `${base}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 });
+
+    const posts = await prisma.post.findMany({
+      where: { authorId: author.id, isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    for (const post of posts) {
+      entries.push({ url: `${base}/blog/${post.slug}`, lastModified: post.updatedAt, changeFrequency: "monthly", priority: 0.6 });
+    }
+  }
+
+  // Flip books
+  if (author.navShowFlipBooks) {
+    const flipBooks = await prisma.flipBook.findMany({
+      where: { authorId: author.id, isHidden: false },
+      select: { slug: true, updatedAt: true },
+    });
+    if (flipBooks.length > 0) {
+      entries.push({ url: `${base}/flip-books`, lastModified: now, changeFrequency: "monthly", priority: 0.6 });
+      for (const fb of flipBooks) {
+        entries.push({ url: `${base}/flip-books/${fb.slug}`, lastModified: fb.updatedAt, changeFrequency: "monthly", priority: 0.5 });
+      }
+    }
   }
 
   // Custom pages (visible ones)

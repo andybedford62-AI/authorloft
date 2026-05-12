@@ -15,7 +15,10 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
 });
 
+const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
 export const metadata: Metadata = {
+  metadataBase: new URL(PLATFORM_URL),
   title: {
     default: "AuthorLoft — The Author Website Platform",
     template: "%s | AuthorLoft",
@@ -23,6 +26,23 @@ export const metadata: Metadata = {
   description:
     "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
   icons: { icon: "/authorloft-logo.png" },
+  openGraph: {
+    type:        "website",
+    siteName:    "AuthorLoft",
+    title:       "AuthorLoft — The Author Website Platform",
+    description: "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+    url:         PLATFORM_URL,
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "AuthorLoft — The Author Website Platform",
+    description: "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+  },
+  robots: {
+    index:  true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 export default function RootLayout({

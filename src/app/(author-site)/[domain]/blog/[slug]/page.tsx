@@ -18,22 +18,31 @@ export async function generateMetadata({
 
   const post = await prisma.post.findFirst({
     where: { authorId: author.id, slug, isPublished: true },
-    select: { title: true, excerpt: true, coverImageUrl: true },
+    select: { title: true, excerpt: true, coverImageUrl: true, createdAt: true, updatedAt: true },
   });
 
   if (!post) return { title: "Post Not Found" };
 
-  const ogImages = post.coverImageUrl
-    ? [{ url: post.coverImageUrl, alt: post.title }]
-    : [];
+  const authorName = author.displayName || author.name;
+  const ogImages   = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : [];
 
   return {
-    title: post.title,
+    title:       post.title,
     description: post.excerpt ?? undefined,
     openGraph: {
-      title: post.title,
+      type:        "article",
+      title:       post.title,
       description: post.excerpt ?? undefined,
+      publishedTime: post.createdAt.toISOString(),
+      modifiedTime:  post.updatedAt.toISOString(),
+      authors:       [authorName],
       ...(ogImages.length > 0 && { images: ogImages }),
+    },
+    twitter: {
+      card:        ogImages.length > 0 ? "summary_large_image" : "summary",
+      title:       post.title,
+      description: post.excerpt ?? undefined,
+      ...(ogImages.length > 0 && { images: [ogImages[0].url] }),
     },
   };
 }
@@ -56,7 +65,26 @@ export default async function BlogPostPage({
   const hasHtmlContent = (post.content ?? "").trimStart().startsWith("<");
   const paragraphs = hasHtmlContent ? [] : (post.content ?? "").split(/\n\n+/).filter(Boolean);
 
+  const authorName = author.displayName || author.name;
+  const { getAuthorBaseUrl } = await import("@/lib/site-url");
+  const base = getAuthorBaseUrl(author);
+
+  const jsonLd = {
+    "@context":       "https://schema.org",
+    "@type":          "BlogPosting",
+    headline:         post.title,
+    description:      post.excerpt ?? undefined,
+    image:            post.coverImageUrl ?? undefined,
+    datePublished:    post.createdAt.toISOString(),
+    dateModified:     post.updatedAt.toISOString(),
+    url:              `${base}/blog/${post.slug}`,
+    author: { "@type": "Person", name: authorName, url: base },
+    publisher: { "@type": "Person", name: authorName, url: base },
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}
@@ -148,5 +176,6 @@ export default async function BlogPostPage({
         </div>
       </div>
     </div>
+    </>
   );
 }

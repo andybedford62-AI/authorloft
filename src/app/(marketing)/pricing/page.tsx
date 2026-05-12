@@ -11,6 +11,16 @@ export const metadata: Metadata = {
   title: "Pricing | AuthorLoft",
   description:
     "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+  openGraph: {
+    type:        "website",
+    title:       "AuthorLoft Pricing — Free Plan Available",
+    description: "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "AuthorLoft Pricing — Free Plan Available",
+    description: "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+  },
 };
 
 async function getActivePlans() {
