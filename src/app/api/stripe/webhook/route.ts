@@ -220,12 +220,19 @@ export async function POST(req: NextRequest) {
       if (type === "plan_subscription") {
         const { authorId } = session.metadata ?? {};
         if (authorId && session.subscription) {
+          // Fetch subscription to get customer ID (may not be in session.customer if auto-created)
+          let customerId = session.customer;
+          if (!customerId) {
+            const stripeSub = await stripe.subscriptions.retrieve(session.subscription);
+            customerId = typeof stripeSub.customer === "string" ? stripeSub.customer : stripeSub.customer?.id;
+          }
+
           // Persist the subscription ID and customer ID on the author
           await prisma.author.update({
             where: { id: authorId },
             data: {
               stripeSubscriptionId: session.subscription,
-              ...(session.customer ? { stripeCustomerId: session.customer } : {}),
+              ...(customerId ? { stripeCustomerId: customerId } : {}),
             },
           });
 
