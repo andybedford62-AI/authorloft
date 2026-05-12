@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
@@ -69,7 +70,11 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, stripeConnectOnboarded, previewMedia }: Props) {
-  const [activeTab, setActiveTab] = useState<TabId>("details");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    const tab = searchParams.get("tab") as TabId | null;
+    return tab && TABS.some((t) => t.id === tab) ? tab : "details";
+  });
 
   return (
     <div className="space-y-0">
