@@ -78,6 +78,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "marketing", label: "Marketing", defaultOpen: true,
     items: [
+      { href: "/admin/analytics",       label: "Analytics",       icon: BarChart2  },
       { href: "/admin/newsletter",      label: "Newsletter",      icon: Mail       },
       { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
       { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
