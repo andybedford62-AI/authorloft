@@ -33,6 +33,7 @@ import {
   BarChart2,
   Megaphone,
   PlugZap,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -83,6 +84,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/newsletter",             label: "Newsletter",        icon: Mail    },
       { href: "/admin/newsletter-integration", label: "Email Integration", icon: PlugZap },
       { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
+      { href: "/admin/invoices",        label: "Invoices & Tax",  icon: Receipt    },
       { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
       { href: "/admin/media-kit",       label: "Media Kit",       icon: Megaphone  },
       { href: "/admin/ai-assistant",    label: "AI Assistant",    icon: Bot        },
@@ -99,7 +101,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "account", label: "Account", defaultOpen: false,
     items: [
-      { href: "/admin/messages",  label: "Messages",      icon: Inbox    },
+      { href: "/admin/messages",    label: "Messages",        icon: Inbox    },
+      { href: "/admin/compliance",  label: "Privacy & GDPR",  icon: Shield   },
       { href: "/admin/legal",     label: "My Site Legal", icon: Shield   },
       { href: "/admin/settings",  label: "Settings",      icon: Settings },
     ],

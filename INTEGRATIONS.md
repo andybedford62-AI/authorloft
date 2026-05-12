@@ -156,6 +156,8 @@ Configured at `/admin/newsletter-integration`. When a reader subscribes on the a
 
 | Feature | Description | Key Files |
 |---------|-------------|-----------|
+| Invoices & Tax | Annual income summary, per-transaction history, CSV export — `/admin/invoices` | `src/app/(admin)/admin/invoices/page.tsx`, `src/app/api/admin/invoices/**` |
+| Privacy & GDPR/CCPA | Full data export (JSON), subscriber export, account deletion request — `/admin/compliance` | `src/app/(admin)/admin/compliance/page.tsx`, `src/app/api/admin/compliance/**` |
 | Toast notifications | Global error/success toast system usable across all admin pages | `src/lib/use-toast.ts`, `src/components/toast-provider.tsx` |
 | Multi-tenancy | Author sites served via subdomain (`{slug}.authorloft.com`) or custom domain via Next.js middleware | `src/middleware.ts` |
 | Beta / access control | Beta mode toggle, invite codes, access request workflow | `src/app/api/auth/beta-status`, `/super-admin/access-requests` |
