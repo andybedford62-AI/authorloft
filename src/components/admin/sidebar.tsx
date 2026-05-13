@@ -127,7 +127,6 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },
   { href: "/super-admin/settings",         label: "Platform",        icon: Settings   },
   { href: "/super-admin/help",     label: "Help Centre",  icon: HelpCircle },
-  { href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", label: "Analytics", icon: BarChart2, external: true },
 ];
 
 // ── Theme token helper ───────────────────────────────────────────────────────

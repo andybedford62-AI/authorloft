@@ -3,7 +3,6 @@ import { authOptions } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { ToastProvider } from "@/components/toast-provider";
-import { PostHogIdentify } from "@/components/posthog-provider";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
 import { redirect } from "next/navigation";
@@ -71,7 +70,6 @@ export default async function AdminLayout({
 
   return (
     <AdminSessionProvider>
-      <PostHogIdentify />
       <ToastProvider />
       <div
         data-admin-theme={adminTheme}
