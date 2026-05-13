@@ -91,7 +91,7 @@ export function ArcsOverview({ books }: ArcsOverviewProps) {
           {arcsData.map((arc) => (
             <Link
               key={arc.arcId}
-              href={`/admin/books/${arc.bookId}/edit?tab=arc`}
+              href={`/admin/books/${arc.bookId}/edit?tab=arcs`}
               className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm transition-all group"
             >
               {arc.bookCover ? (

@@ -146,28 +146,34 @@ export default async function AdminFlipBooksPage() {
                   <p className="text-xs text-gray-500 line-clamp-2 flex-1">{book.description}</p>
                 )}
 
-                <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
+                <div className="mt-auto pt-2 border-t border-gray-100 space-y-2">
                   {/* Active/Hidden toggle */}
                   <FlipBookToggle id={book.id} initialActive={book.isActive} />
 
-                  <div className="flex items-center gap-2 ml-auto">
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-1.5">
                     <Link
                       href={`/admin/flip-books/${book.id}/edit`}
-                      className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium rounded-md transition-colors"
                     >
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Pencil className="h-3.5 w-3.5 flex-shrink-0" />
                       Edit
                     </Link>
-                    {book.flipBookUrl && (
+                    {book.flipBookUrl ? (
                       <a
                         href={book.flipBookUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
+                        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
                         Preview
                       </a>
+                    ) : (
+                      <span className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs text-gray-300 rounded-md cursor-not-allowed select-none">
+                        <ExternalLink className="h-3.5 w-3.5 flex-shrink-0" />
+                        Preview
+                      </span>
                     )}
                   </div>
                 </div>
