@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Plus, Check, X, Star } from "lucide-react";
-import { IconButton } from "@/components/admin/icon-button";
+import { Pencil, Trash2, Plus, Star, X } from "lucide-react";
 
 type Testimonial = {
   id: string;
@@ -16,85 +15,222 @@ type Testimonial = {
   displayOrder: number;
 };
 
-type EditState = {
+type FormState = {
   authorName: string;
   authorRole: string;
   quote: string;
-  rating: string;
-  image: string;
+  rating: number | null;
   displayOrder: string;
 };
 
-const emptyForm: EditState = { authorName: "", authorRole: "", quote: "", rating: "", image: "", displayOrder: "0" };
+const emptyForm: FormState = { authorName: "", authorRole: "", quote: "", rating: null, displayOrder: "0" };
+
+function StarPicker({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(value === n ? null : n)}
+          onMouseEnter={() => setHovered(n)}
+          onMouseLeave={() => setHovered(null)}
+          className="focus:outline-none"
+        >
+          <Star
+            className={`h-6 w-6 transition-colors ${
+              n <= (hovered ?? value ?? 0)
+                ? "fill-amber-400 text-amber-400"
+                : "text-gray-300"
+            }`}
+          />
+        </button>
+      ))}
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          className="ml-1 text-xs text-gray-400 hover:text-gray-600"
+        >
+          clear
+        </button>
+      )}
+    </div>
+  );
+}
+
+function TestimonialModal({
+  title,
+  form,
+  setForm,
+  onSave,
+  onClose,
+  saving,
+}: {
+  title: string;
+  form: FormState;
+  setForm: (f: FormState) => void;
+  onSave: () => void;
+  onClose: () => void;
+  saving: boolean;
+}) {
+  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
+  const labelCls = "block text-sm font-medium text-gray-700 mb-1.5";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Author Name <span className="text-red-500">*</span></label>
+              <input
+                autoFocus
+                value={form.authorName}
+                onChange={(e) => setForm({ ...form, authorName: e.target.value })}
+                placeholder="e.g. Jane Smith"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Role / Title <span className="text-gray-400 font-normal">(optional)</span></label>
+              <input
+                value={form.authorRole}
+                onChange={(e) => setForm({ ...form, authorRole: e.target.value })}
+                placeholder="e.g. Romance Author"
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Quote <span className="text-red-500">*</span></label>
+            <textarea
+              value={form.quote}
+              onChange={(e) => setForm({ ...form, quote: e.target.value })}
+              placeholder="Write the testimonial quote here…"
+              rows={4}
+              className={`${inputCls} resize-none leading-relaxed`}
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Star Rating <span className="text-gray-400 font-normal">(optional)</span></label>
+              <StarPicker value={form.rating} onChange={(v) => setForm({ ...form, rating: v })} />
+            </div>
+            <div>
+              <label className={labelCls}>Display Order</label>
+              <input
+                type="number"
+                value={form.displayOrder}
+                onChange={(e) => setForm({ ...form, displayOrder: e.target.value })}
+                className={inputCls}
+              />
+              <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            disabled={saving || !form.authorName.trim() || !form.quote.trim()}
+            className="px-5 py-2 text-sm font-medium bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+          >
+            {saving ? "Saving…" : "Save Testimonial"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials: Testimonial[] }) {
   const router = useRouter();
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [modal, setModal] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditState>(emptyForm);
-  const [adding, setAdding] = useState(false);
-  const [addForm, setAddForm] = useState<EditState>(emptyForm);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
+  function openAdd() {
+    setForm({ ...emptyForm, displayOrder: testimonials.length.toString() });
+    setModal("add");
+  }
+
+  function openEdit(t: Testimonial) {
+    setEditingId(t.id);
+    setForm({
+      authorName: t.authorName,
+      authorRole: t.authorRole ?? "",
+      quote: t.quote,
+      rating: t.rating,
+      displayOrder: t.displayOrder.toString(),
+    });
+    setModal("edit");
+  }
+
   async function handleAdd() {
-    if (!addForm.authorName.trim() || !addForm.quote.trim()) return;
     setSaving(true);
     const res = await fetch("/api/super-admin/testimonials", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        authorName: addForm.authorName.trim(),
-        authorRole: addForm.authorRole.trim() || null,
-        quote: addForm.quote.trim(),
-        rating: addForm.rating ? parseInt(addForm.rating) : null,
-        image: addForm.image.trim() || null,
-        displayOrder: testimonials.length,
+        authorName: form.authorName.trim(),
+        authorRole: form.authorRole.trim() || null,
+        quote: form.quote.trim(),
+        rating: form.rating,
+        displayOrder: parseInt(form.displayOrder) || 0,
       }),
     });
     if (res.ok) {
       const created = await res.json();
       setTestimonials((prev) => [...prev, created]);
-      setAddForm(emptyForm);
-      setAdding(false);
+      setModal(null);
       router.refresh();
     }
     setSaving(false);
   }
 
-  function startEdit(t: Testimonial) {
-    setEditingId(t.id);
-    setEditForm({
-      authorName: t.authorName,
-      authorRole: t.authorRole ?? "",
-      quote: t.quote,
-      rating: t.rating?.toString() ?? "",
-      image: t.image ?? "",
-      displayOrder: t.displayOrder.toString(),
-    });
-  }
-
-  async function handleSaveEdit(id: string) {
-    if (!editForm.authorName.trim() || !editForm.quote.trim()) return;
+  async function handleEdit() {
+    if (!editingId) return;
     setSaving(true);
-    const res = await fetch(`/api/super-admin/testimonials/${id}`, {
+    const res = await fetch(`/api/super-admin/testimonials/${editingId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        authorName: editForm.authorName.trim(),
-        authorRole: editForm.authorRole.trim() || null,
-        quote: editForm.quote.trim(),
-        rating: editForm.rating ? parseInt(editForm.rating) : null,
-        image: editForm.image.trim() || null,
-        displayOrder: parseInt(editForm.displayOrder) || 0,
+        authorName: form.authorName.trim(),
+        authorRole: form.authorRole.trim() || null,
+        quote: form.quote.trim(),
+        rating: form.rating,
+        displayOrder: parseInt(form.displayOrder) || 0,
       }),
     });
     if (res.ok) {
       const updated = await res.json();
-      setTestimonials((prev) => prev.map((t) => (t.id === id ? updated : t)));
-      setEditingId(null);
+      setTestimonials((prev) => prev.map((t) => (t.id === editingId ? updated : t)));
+      setModal(null);
       router.refresh();
     }
     setSaving(false);
@@ -110,7 +246,6 @@ export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials
     if (res.ok) {
       const updated = await res.json();
       setTestimonials((prev) => prev.map((x) => (x.id === t.id ? updated : x)));
-      router.refresh();
     }
     setTogglingId(null);
   }
@@ -124,31 +259,46 @@ export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials
     router.refresh();
   }
 
-  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
-
   return (
     <>
-      {/* Delete confirmation modal */}
+      {/* Add / Edit modal */}
+      {modal === "add" && (
+        <TestimonialModal
+          title="Add Testimonial"
+          form={form}
+          setForm={setForm}
+          onSave={handleAdd}
+          onClose={() => setModal(null)}
+          saving={saving}
+        />
+      )}
+      {modal === "edit" && (
+        <TestimonialModal
+          title="Edit Testimonial"
+          form={form}
+          setForm={setForm}
+          onSave={handleEdit}
+          onClose={() => setModal(null)}
+          saving={saving}
+        />
+      )}
+
+      {/* Delete confirmation */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 max-w-sm w-full mx-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 max-w-sm w-full">
             <h3 className="font-semibold text-gray-900 mb-2">Delete this testimonial?</h3>
-            <p className="text-sm text-gray-500 mb-6">
-              It will be removed from the marketing page.
-            </p>
+            <p className="text-sm text-gray-500 mb-6">It will be removed from the marketing page.</p>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setConfirmDelete(null)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
-              >
+              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
-                disabled={deletingId === confirmDelete}
+                disabled={!!deletingId}
                 className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50"
               >
-                {deletingId === confirmDelete ? "Deleting…" : "Delete"}
+                {deletingId ? "Deleting…" : "Delete"}
               </button>
             </div>
           </div>
@@ -158,243 +308,95 @@ export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">
-            Add testimonials to showcase on the marketing page. Active testimonials will display.
-            Use displayOrder to control which ones appear first.
+            Active testimonials (up to 3) appear on the marketing page in displayOrder order.
           </p>
-          {!adding && (
-            <button
-              onClick={() => { setAdding(true); setAddForm(emptyForm); }}
-              className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0 ml-4"
-            >
-              <Plus className="h-4 w-4" />
-              Add Testimonial
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0 ml-4"
+          >
+            <Plus className="h-4 w-4" />
+            Add Testimonial
+          </button>
+        </div>
+
+        {/* Cards */}
+        {testimonials.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
+            <Star className="h-8 w-8 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-400 text-sm">No testimonials yet.</p>
+            <button onClick={openAdd} className="mt-2 text-sm text-purple-600 hover:underline">
+              Add your first one →
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                className={`bg-white rounded-xl border p-4 transition-colors ${
+                  t.isActive ? "border-purple-200" : "border-gray-200"
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  {/* Active toggle */}
+                  <button
+                    onClick={() => handleToggle(t)}
+                    disabled={togglingId === t.id}
+                    title={t.isActive ? "Active — click to deactivate" : "Inactive — click to activate"}
+                    className={`relative inline-flex h-5 w-9 flex-shrink-0 mt-0.5 items-center rounded-full transition-colors disabled:opacity-40 ${
+                      t.isActive ? "bg-purple-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        t.isActive ? "translate-x-4" : "translate-x-0.5"
+                      }`}
+                    />
+                  </button>
 
-        {/* Table */}
-        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-gray-500 text-left border-b border-gray-200">
-                <th className="px-4 py-3 font-medium">Author</th>
-                <th className="px-4 py-3 font-medium hidden lg:table-cell">Quote</th>
-                <th className="px-4 py-3 font-medium text-center hidden sm:table-cell">Rating</th>
-                <th className="px-4 py-3 font-medium text-center hidden md:table-cell">Order</th>
-                <th className="px-4 py-3 font-medium text-center">Active</th>
-                <th className="px-4 py-3 font-medium"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {testimonials.map((t) => (
-                <tr key={t.id} className="bg-white hover:bg-gray-50 transition-colors">
-                  {editingId === t.id ? (
-                    <>
-                      <td className="px-4 py-3 space-y-2">
-                        <input
-                          value={editForm.authorName}
-                          onChange={(ev) => setEditForm((f) => ({ ...f, authorName: ev.target.value }))}
-                          placeholder="Author name"
-                          className={inputCls}
-                        />
-                        <input
-                          value={editForm.authorRole}
-                          onChange={(ev) => setEditForm((f) => ({ ...f, authorRole: ev.target.value }))}
-                          placeholder="Role (optional)"
-                          className={inputCls}
-                        />
-                      </td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <textarea
-                          value={editForm.quote}
-                          onChange={(ev) => setEditForm((f) => ({ ...f, quote: ev.target.value }))}
-                          placeholder="Testimonial quote"
-                          rows={2}
-                          className={`${inputCls} resize-none`}
-                        />
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <input
-                          type="number"
-                          min="1"
-                          max="5"
-                          value={editForm.rating}
-                          onChange={(ev) => setEditForm((f) => ({ ...f, rating: ev.target.value }))}
-                          placeholder="1-5"
-                          className={`${inputCls} text-center`}
-                        />
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <input
-                          type="number"
-                          value={editForm.displayOrder}
-                          onChange={(ev) => setEditForm((f) => ({ ...f, displayOrder: ev.target.value }))}
-                          className={`${inputCls} text-center`}
-                        />
-                      </td>
-                      <td className="px-4 py-3" />
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1 justify-end">
-                          <IconButton
-                            icon={<Check className="h-4 w-4" />}
-                            title="Save"
-                            variant="edit"
-                            onClick={() => handleSaveEdit(t.id)}
-                            disabled={saving}
-                          />
-                          <IconButton
-                            icon={<X className="h-4 w-4" />}
-                            title="Cancel"
-                            variant="delete"
-                            onClick={() => setEditingId(null)}
-                          />
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-sm text-gray-900">{t.authorName}</span>
+                      {t.authorRole && (
+                        <span className="text-xs text-gray-500">— {t.authorRole}</span>
+                      )}
+                      {t.rating && (
+                        <div className="flex items-center gap-0.5">
+                          {Array.from({ length: t.rating }).map((_, i) => (
+                            <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          ))}
                         </div>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-4 py-3">
-                        <div>
-                          <div className="font-medium text-gray-900">{t.authorName}</div>
-                          {t.authorRole && <div className="text-xs text-gray-500">{t.authorRole}</div>}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 hidden lg:table-cell line-clamp-2">
-                        "{t.quote.substring(0, 100)}{t.quote.length > 100 ? "…" : ""}"
-                      </td>
-                      <td className="px-4 py-3 text-center hidden sm:table-cell">
-                        {t.rating ? (
-                          <div className="flex items-center justify-center gap-1">
-                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            <span className="text-sm font-medium">{t.rating}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center hidden md:table-cell">
-                        <span className="text-sm font-medium text-gray-600">{t.displayOrder}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          onClick={() => handleToggle(t)}
-                          disabled={togglingId === t.id}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:opacity-40 ${
-                            t.isActive ? "bg-purple-600" : "bg-gray-200"
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                              t.isActive ? "translate-x-4" : "translate-x-0.5"
-                            }`}
-                          />
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1 justify-end">
-                          <IconButton
-                            icon={<Pencil className="h-4 w-4" />}
-                            title="Edit"
-                            variant="edit"
-                            onClick={() => startEdit(t)}
-                          />
-                          <IconButton
-                            icon={<Trash2 className="h-4 w-4" />}
-                            title="Delete"
-                            variant="delete"
-                            onClick={() => setConfirmDelete(t.id)}
-                          />
-                        </div>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
-
-              {/* Add row */}
-              {adding && (
-                <tr className="bg-purple-50">
-                  <td className="px-4 py-3 space-y-2">
-                    <input
-                      autoFocus
-                      value={addForm.authorName}
-                      onChange={(e) => setAddForm((f) => ({ ...f, authorName: e.target.value }))}
-                      placeholder="Author name"
-                      className={inputCls}
-                    />
-                    <input
-                      value={addForm.authorRole}
-                      onChange={(e) => setAddForm((f) => ({ ...f, authorRole: e.target.value }))}
-                      placeholder="Role (optional)"
-                      className={inputCls}
-                    />
-                  </td>
-                  <td className="px-4 py-3 hidden lg:table-cell">
-                    <textarea
-                      value={addForm.quote}
-                      onChange={(e) => setAddForm((f) => ({ ...f, quote: e.target.value }))}
-                      placeholder="Testimonial quote"
-                      rows={2}
-                      className={`${inputCls} resize-none`}
-                    />
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={addForm.rating}
-                      onChange={(e) => setAddForm((f) => ({ ...f, rating: e.target.value }))}
-                      placeholder="1-5"
-                      className={`${inputCls} text-center`}
-                    />
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <input
-                      type="number"
-                      value={addForm.displayOrder}
-                      onChange={(e) => setAddForm((f) => ({ ...f, displayOrder: e.target.value }))}
-                      placeholder="0"
-                      className={`${inputCls} text-center`}
-                    />
-                  </td>
-                  <td className="px-4 py-3" />
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 justify-end">
-                      <IconButton
-                        icon={<Check className="h-4 w-4" />}
-                        title="Save"
-                        variant="edit"
-                        onClick={handleAdd}
-                        disabled={saving || !addForm.authorName.trim() || !addForm.quote.trim()}
-                      />
-                      <IconButton
-                        icon={<X className="h-4 w-4" />}
-                        title="Cancel"
-                        variant="delete"
-                        onClick={() => setAdding(false)}
-                      />
+                      )}
+                      <span className="text-xs text-gray-400 ml-auto">Order: {t.displayOrder}</span>
                     </div>
-                  </td>
-                </tr>
-              )}
+                    <p className="text-sm text-gray-600 mt-1.5 leading-relaxed line-clamp-2">
+                      "{t.quote}"
+                    </p>
+                  </div>
 
-              {testimonials.length === 0 && !adding && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
-                    No testimonials yet.{" "}
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <button
-                      onClick={() => setAdding(true)}
-                      className="text-purple-600 hover:underline"
+                      onClick={() => openEdit(t)}
+                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                      title="Edit"
                     >
-                      Add your first one →
+                      <Pencil className="h-4 w-4" />
                     </button>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    <button
+                      onClick={() => setConfirmDelete(t.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
