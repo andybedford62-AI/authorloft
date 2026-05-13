@@ -185,14 +185,12 @@ async function getHeroImageUrl(): Promise<string> {
 }
 
 async function getTestimonials() {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/public/testimonials`, { next: { revalidate: 3600 } });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
-    return [];
-  }
+  return prisma.testimonial.findMany({
+    where: { isActive: true },
+    orderBy: { displayOrder: "asc" },
+    take: 3,
+    select: { id: true, authorName: true, authorRole: true, quote: true, rating: true, image: true },
+  }).catch(() => []);
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -343,9 +341,6 @@ export default async function MarketingPage() {
         </div>
       </section>
 
-      {/* ── Testimonials ───────────────────────────────────────────────────── */}
-      <TestimonialsSection testimonials={testimonials} />
-
       {/* ── Features ──────────────────────────────────────────────────────── */}
       <section id="features" className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -414,6 +409,9 @@ export default async function MarketingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Testimonials ───────────────────────────────────────────────────── */}
+      <TestimonialsSection testimonials={testimonials} />
 
       {/* ── Pricing ───────────────────────────────────────────────────────── */}
       <section id="pricing" className="py-24 bg-gray-50">
