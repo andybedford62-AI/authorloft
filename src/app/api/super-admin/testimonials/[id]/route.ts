@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -22,6 +23,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (isActive !== undefined)    data.isActive    = isActive;
   if (displayOrder !== undefined) data.displayOrder = displayOrder;
   const updated = await prisma.testimonial.update({ where: { id }, data });
+  revalidatePath("/");
   return NextResponse.json(updated);
 }
 
@@ -29,5 +31,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!await requireSuperAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   await prisma.testimonial.delete({ where: { id } });
+  revalidatePath("/");
   return NextResponse.json({ ok: true });
 }

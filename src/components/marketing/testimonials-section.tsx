@@ -32,7 +32,13 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
           </p>
         </ScrollReveal>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className={`grid gap-8 ${
+          testimonials.length === 1
+            ? "grid-cols-1 max-w-lg mx-auto"
+            : testimonials.length === 2
+            ? "sm:grid-cols-2 max-w-3xl mx-auto"
+            : "sm:grid-cols-2 lg:grid-cols-3"
+        }`}>
           {testimonials.map((testimonial, index) => (
             <ScrollReveal key={testimonial.id} delay={index * 80} direction={index % 3 === 1 ? "scale" : "up"}>
               <TestimonialCard testimonial={testimonial} />
