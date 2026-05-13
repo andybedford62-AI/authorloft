@@ -35,6 +35,7 @@ import {
   PlugZap,
   Receipt,
   HelpCircle,
+  Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -108,7 +109,8 @@ const NAV_GROUPS: NavGroup[] = [
     key: "account", label: "Account", defaultOpen: false,
     items: [
       { href: "/admin/messages",   label: "Messages",       icon: Inbox       },
-      { href: "/admin/help",       label: "Help Centre",    icon: HelpCircle  },
+      { href: "/admin/help",            label: "Help Centre",      icon: HelpCircle  },
+      { href: "/admin/contact-support", label: "Contact Support",  icon: Headphones  },
       { href: "/admin/compliance", label: "Privacy & GDPR", icon: Shield      },
       { href: "/admin/legal",      label: "My Site Legal",  icon: Shield      },
       { href: "/admin/settings",   label: "Settings",       icon: Settings    },

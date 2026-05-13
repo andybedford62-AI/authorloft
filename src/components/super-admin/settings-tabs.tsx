@@ -17,6 +17,7 @@ import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
 import { MarketingHeroImage } from "./marketing-hero-image";
 import { GhostUsersPanel } from "./ghost-users-panel";
+import { SupportEmailsPanel } from "./support-emails-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,15 @@ interface PlanStat {
   name: string;
   monthlyPriceCents: number;
   _count: { authors: number };
+}
+
+interface SupportEmailRow {
+  id: string;
+  label: string;
+  email: string;
+  description: string | null;
+  isActive: boolean;
+  sortOrder: number;
 }
 
 export interface SettingsTabsProps {
@@ -37,6 +47,7 @@ export interface SettingsTabsProps {
   maintenanceMode: boolean;
   maintenanceMessage: string;
   marketingHeroImageUrl: string | null;
+  supportEmails: SupportEmailRow[];
   /** Env var display values — secrets resolved server-side before passing to client */
   envValues: { label: string; value: string | undefined }[];
 }
@@ -44,11 +55,12 @@ export interface SettingsTabsProps {
 // ── Tab definitions ────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: "overview",      label: "Overview",      icon: Database },
-  { id: "onboarding",    label: "Onboarding",    icon: UserX    },
-  { id: "maintenance",   label: "Maintenance",   icon: WifiOff  },
-  { id: "marketing",     label: "Marketing",     icon: Image    },
-  { id: "configuration", label: "Configuration", icon: Globe    },
+  { id: "overview",      label: "Overview",        icon: Database },
+  { id: "onboarding",    label: "Onboarding",      icon: UserX    },
+  { id: "maintenance",   label: "Maintenance",     icon: WifiOff  },
+  { id: "marketing",     label: "Marketing",       icon: Image    },
+  { id: "emails",        label: "Email Addresses", icon: Mail     },
+  { id: "configuration", label: "Configuration",   icon: Globe    },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -83,6 +95,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
       {activeTab === "onboarding"    && <OnboardingTab />}
       {activeTab === "maintenance"   && <MaintenanceTab   {...props} />}
       {activeTab === "marketing"     && <MarketingTab     {...props} />}
+      {activeTab === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
       {activeTab === "configuration" && <ConfigurationTab {...props} />}
     </div>
   );

@@ -26,26 +26,20 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, email, subject, message } = body;
+  const { name, email, supportEmailId, subject, message } = body;
 
   if (!name?.trim())    return NextResponse.json({ error: "Name is required" },    { status: 400 });
   if (!email?.trim())   return NextResponse.json({ error: "Email is required" },   { status: 400 });
   if (!message?.trim()) return NextResponse.json({ error: "Message is required" }, { status: 400 });
 
-  // Fetch the platform contact email for potential SMTP notification
-  const settings = await prisma.platformSettings.findUnique({
-    where: { id: "singleton" },
-    select: { contactEmail: true },
-  }).catch(() => null);
-
-  // Store as a platform contact message (authorId points to the super admin author)
-  // For now we store in a generic log — a future enhancement can link to a
-  // dedicated PlatformContactMessage model.  We use the existing ContactMessage
-  // table with a sentinel authorId if we can resolve the super admin.
-  const superAdmin = await prisma.author.findFirst({
-    where: { isSuperAdmin: true },
-    select: { id: true },
-  });
+  // Resolve destination: selected SupportEmail → contactEmail → env fallback
+  const [supportEmail, settings, superAdmin] = await Promise.all([
+    supportEmailId
+      ? prisma.supportEmail.findUnique({ where: { id: supportEmailId }, select: { email: true, label: true } }).catch(() => null)
+      : null,
+    prisma.platformSettings.findUnique({ where: { id: "singleton" }, select: { contactEmail: true } }).catch(() => null),
+    prisma.author.findFirst({ where: { isSuperAdmin: true }, select: { id: true } }),
+  ]);
 
   if (superAdmin) {
     await prisma.contactMessage.create({
@@ -53,26 +47,26 @@ export async function POST(req: NextRequest) {
         authorId:    superAdmin.id,
         senderName:  name.trim(),
         senderEmail: email.trim(),
-        subject:     subject?.trim() || "Platform Contact",
+        subject:     subject?.trim() || (supportEmail ? `${supportEmail.label} Inquiry` : "Platform Contact"),
         message:     message.trim(),
       },
     });
   }
 
-  // Notify platform owner — fire-and-forget, never blocks the response
-  const notifyTo = settings?.contactEmail || process.env.SUPER_ADMIN_EMAIL;
+  const notifyTo = supportEmail?.email || settings?.contactEmail || process.env.SUPER_ADMIN_EMAIL;
   if (notifyTo) {
     const subjectLine = subject?.trim()
       ? `Contact: ${subject.trim()} — ${name.trim()}`
-      : `New contact from ${name.trim()}`;
+      : `New contact from ${name.trim()}${supportEmail ? ` [${supportEmail.label}]` : ""}`;
     sendMail({
-      to:       notifyTo,
-      subject:  subjectLine,
-      replyTo:  email.trim(),
-      text:     `Name: ${name.trim()}\nEmail: ${email.trim()}\nSubject: ${subject?.trim() || "(none)"}\n\n${message.trim()}`,
-      html:     `
+      to:      notifyTo,
+      subject: subjectLine,
+      replyTo: email.trim(),
+      text:    `Name: ${name.trim()}\nEmail: ${email.trim()}\nInquiry Type: ${supportEmail?.label || "General"}\nSubject: ${subject?.trim() || "(none)"}\n\n${message.trim()}`,
+      html:    `
         <p><strong>Name:</strong> ${esc(name.trim())}</p>
         <p><strong>Email:</strong> <a href="mailto:${esc(email.trim())}">${esc(email.trim())}</a></p>
+        <p><strong>Inquiry Type:</strong> ${esc(supportEmail?.label || "General")}</p>
         <p><strong>Subject:</strong> ${esc(subject?.trim() || "(none)")}</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0"/>
         <p style="white-space:pre-wrap">${esc(message.trim())}</p>

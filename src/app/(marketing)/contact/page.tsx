@@ -3,17 +3,33 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, ArrowLeft, Send, Check, Mail } from "lucide-react";
 
+type SupportEmailOption = { id: string; label: string; email: string; description: string | null };
+
 export default function MarketingContactPage() {
-  const [name,    setName]    = useState("");
-  const [email,   setEmail]   = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [sent,    setSent]    = useState(false);
-  const [error,   setError]   = useState("");
+  const [name,            setName]            = useState("");
+  const [email,           setEmail]           = useState("");
+  const [supportEmailId,  setSupportEmailId]  = useState("");
+  const [subject,         setSubject]         = useState("");
+  const [message,         setMessage]         = useState("");
+  const [sending,         setSending]         = useState(false);
+  const [sent,            setSent]            = useState(false);
+  const [error,           setError]           = useState("");
+  const [supportEmails,   setSupportEmails]   = useState<SupportEmailOption[]>([]);
+
+  useEffect(() => {
+    fetch("/api/public/support-emails")
+      .then((r) => r.json())
+      .then((data) => {
+        setSupportEmails(data);
+        if (data.length > 0) setSupportEmailId(data[0].id);
+      })
+      .catch(() => {});
+  }, []);
+
+  const selectedEmail = supportEmails.find((e) => e.id === supportEmailId);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,7 +40,7 @@ export default function MarketingContactPage() {
       const res = await fetch("/api/marketing/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, supportEmailId: supportEmailId || null, subject, message }),
       });
 
       if (res.ok) {
@@ -79,9 +95,14 @@ export default function MarketingContactPage() {
               <Check className="h-6 w-6 text-green-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Message sent!</h2>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 mb-2">
               Thanks for reaching out. We'll get back to you at <strong>{email}</strong> within one business day.
             </p>
+            {selectedEmail && (
+              <p className="text-sm text-gray-400 mb-6">
+                Your message was routed to <strong>{selectedEmail.label}</strong> ({selectedEmail.email}).
+              </p>
+            )}
             <Link href="/" className="text-sm font-medium text-blue-600 hover:text-blue-700">
               ← Back to AuthorLoft
             </Link>
@@ -123,6 +144,30 @@ export default function MarketingContactPage() {
               </div>
             </div>
 
+            {supportEmails.length > 0 && (
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Inquiry type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={supportEmailId}
+                  onChange={(e) => setSupportEmailId(e.target.value)}
+                  className={inputClass}
+                >
+                  {supportEmails.map((opt) => (
+                    <option key={opt.id} value={opt.id}>{opt.label}</option>
+                  ))}
+                </select>
+                {selectedEmail && (
+                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                    <Mail className="h-3 w-3" />
+                    Will be routed to <span className="font-medium text-gray-500">{selectedEmail.email}</span>
+                    {selectedEmail.description && <> — {selectedEmail.description}</>}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Subject</label>
               <input
@@ -153,11 +198,7 @@ export default function MarketingContactPage() {
               disabled={sending}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors disabled:opacity-60"
             >
-              {sending ? (
-                "Sending…"
-              ) : (
-                <><Send className="h-4 w-4" /> Send Message</>
-              )}
+              {sending ? "Sending…" : <><Send className="h-4 w-4" /> Send Message</>}
             </button>
           </form>
         )}

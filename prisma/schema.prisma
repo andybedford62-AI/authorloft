@@ -669,6 +669,19 @@ model AccessRequest {
   @@index([isRead])
 }
 
+// ─── Support Emails ───────────────────────────────────────────────────────────
+
+model SupportEmail {
+  id          String   @id @default(cuid())
+  label       String
+  email       String
+  description String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // ─── Platform Settings (singleton) ───────────────────────────────────────────
 
 model PlatformSettings {
