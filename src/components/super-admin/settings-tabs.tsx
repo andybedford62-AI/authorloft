@@ -12,12 +12,14 @@ import {
   Image,
   Settings,
   UserX,
+  Star,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
 import { MarketingHeroImage } from "./marketing-hero-image";
 import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
+import { TestimonialsPanel } from "./testimonials-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -37,6 +39,17 @@ interface SupportEmailRow {
   sortOrder: number;
 }
 
+interface TestimonialRow {
+  id: string;
+  authorName: string;
+  authorRole: string | null;
+  quote: string;
+  rating: number | null;
+  image: string | null;
+  isActive: boolean;
+  displayOrder: number;
+}
+
 export interface SettingsTabsProps {
   authorCount: number;
   bookCount: number;
@@ -48,6 +61,7 @@ export interface SettingsTabsProps {
   maintenanceMessage: string;
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
+  testimonials: TestimonialRow[];
   /** Env var display values — secrets resolved server-side before passing to client */
   envValues: { label: string; value: string | undefined }[];
 }
@@ -59,6 +73,7 @@ const TABS = [
   { id: "onboarding",    label: "Onboarding",      icon: UserX    },
   { id: "maintenance",   label: "Maintenance",     icon: WifiOff  },
   { id: "marketing",     label: "Marketing",       icon: Image    },
+  { id: "testimonials",  label: "Testimonials",    icon: Star     },
   { id: "emails",        label: "Email Addresses", icon: Mail     },
   { id: "configuration", label: "Configuration",   icon: Globe    },
 ] as const;
@@ -95,6 +110,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
       {activeTab === "onboarding"    && <OnboardingTab />}
       {activeTab === "maintenance"   && <MaintenanceTab   {...props} />}
       {activeTab === "marketing"     && <MarketingTab     {...props} />}
+      {activeTab === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
       {activeTab === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
       {activeTab === "configuration" && <ConfigurationTab {...props} />}
     </div>

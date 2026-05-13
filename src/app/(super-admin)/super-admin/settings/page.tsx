@@ -12,6 +12,7 @@ export default async function SuperAdminSettingsPage() {
     systemConfig,
     platformSettings,
     supportEmails,
+    testimonials,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -34,6 +35,7 @@ export default async function SuperAdminSettingsPage() {
       select: { marketingHeroImageUrl: true },
     }),
     prisma.supportEmail.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+    prisma.testimonial.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
   ]);
 
   // Build env display values server-side so secrets never reach the client bundle
@@ -63,6 +65,7 @@ export default async function SuperAdminSettingsPage() {
         maintenanceMessage={systemConfig.maintenanceMessage}
         marketingHeroImageUrl={platformSettings.marketingHeroImageUrl ?? null}
         supportEmails={supportEmails}
+        testimonials={testimonials}
         envValues={envValues}
       />
     </div>

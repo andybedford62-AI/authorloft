@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
+import { TestimonialsSection } from "@/components/marketing/testimonials-section";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 
@@ -183,10 +184,21 @@ async function getHeroImageUrl(): Promise<string> {
   }
 }
 
+async function getTestimonials() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/public/testimonials`, { next: { revalidate: 3600 } });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function MarketingPage() {
-  const [plans, heroImageUrl] = await Promise.all([getActivePlans(), getHeroImageUrl()]);
+  const [plans, heroImageUrl, testimonials] = await Promise.all([getActivePlans(), getHeroImageUrl(), getTestimonials()]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -330,6 +342,9 @@ export default async function MarketingPage() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* ── Testimonials ───────────────────────────────────────────────────── */}
+      <TestimonialsSection testimonials={testimonials} />
 
       {/* ── Features ──────────────────────────────────────────────────────── */}
       <section id="features" className="py-24 bg-gradient-to-b from-gray-50 to-white">
