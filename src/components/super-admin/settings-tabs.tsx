@@ -60,7 +60,8 @@ export interface SettingsTabsProps {
   planBreakdown: PlanStat[];
   maintenanceMode: boolean;
   maintenanceMessage: string;
-  newSignupNotifications: boolean;
+  newSignupNotifications:  boolean;
+  signupNotificationEmail: string;
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
@@ -209,7 +210,7 @@ function OnboardingTab() {
 
 // ── Maintenance tab ────────────────────────────────────────────────────────────
 
-function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications }: SettingsTabsProps) {
+function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail }: SettingsTabsProps) {
   return (
     <div className="space-y-4">
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -235,7 +236,7 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
         <p className="text-xs text-gray-500">
           Receive an email notification each time a new author creates an account — via email/password or Google sign-in.
         </p>
-        <SignupNotificationsToggle initialEnabled={newSignupNotifications} />
+        <SignupNotificationsToggle initialEnabled={newSignupNotifications} initialEmail={signupNotificationEmail} />
       </section>
     </div>
   );
