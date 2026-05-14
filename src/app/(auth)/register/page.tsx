@@ -135,6 +135,7 @@ function RegisterPageInner() {
   const [step1Error, setStep1Error] = useState("");
   const [step2Error, setStep2Error] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   // ── Step 0: invite code ─────────────────────────────────────────────────
   function handleInviteCode(e: React.FormEvent) {
@@ -194,17 +195,7 @@ function RegisterPageInner() {
         return;
       }
 
-      const signInResult = await signIn("credentials", {
-        email: email.toLowerCase().trim(),
-        password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        router.push("/login?registered=1");
-      } else {
-        router.push("/admin/dashboard");
-      }
+      setRegistered(true);
     } catch {
       setStep2Error("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -255,6 +246,41 @@ function RegisterPageInner() {
             Create your free author website
           </p>
         </div>
+
+        {/* ── Success: email verification prompt ── */}
+        {registered ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center space-y-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 mx-auto">
+              <svg className="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0-9.75 6.75L2.25 6.75" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Check your inbox!</h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              We sent a verification email to{" "}
+              <span className="font-medium text-gray-900">{email.toLowerCase().trim()}</span>.
+              <br />
+              Click the link in the email to activate your account.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+              You must verify your email before you can sign in.
+            </div>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center w-full mt-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Go to Sign In
+            </Link>
+            <p className="text-xs text-gray-400">
+              Didn&apos;t receive it? Check your spam folder or{" "}
+              <Link href="/resend-verification" className="text-blue-600 hover:underline">
+                resend the email
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
+        <>
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-6">
@@ -619,12 +645,16 @@ function RegisterPageInner() {
           )}
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
-            Sign in
-          </Link>
-        </p>
+        {!registered && (
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-blue-600 hover:underline font-medium">
+              Sign in
+            </Link>
+          </p>
+        )}
+        </>
+        )}
       </div>
 
       <RequestAccessModal
