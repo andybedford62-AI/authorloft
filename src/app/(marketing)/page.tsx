@@ -355,6 +355,14 @@ export default async function MarketingPage() {
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
               Purpose-built features that go way beyond a basic website builder.
             </p>
+            <div className="mt-4">
+              <Link
+                href="/features"
+                className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
+              >
+                See full feature listing <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
