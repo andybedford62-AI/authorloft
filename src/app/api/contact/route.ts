@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendMail } from "@/lib/mailer";
 
+function esc(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function safeHref(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? esc(url) : "#";
+  } catch {
+    return "#";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -75,9 +93,11 @@ export async function POST(req: NextRequest) {
     // ── Send email notification to author (if SMTP configured + contactEmail set) ──
     if (author.contactEmail) {
       const authorDisplayName = author.displayName || author.name;
-      const emailSubject = subject?.trim()
-        ? `New message: ${subject.trim()} — from ${name}`
-        : `New contact message from ${name}`;
+      const safeName    = name.replace(/[\r\n]/g, " ");
+      const safeSubject = subject?.trim().replace(/[\r\n]/g, " ");
+      const emailSubject = safeSubject
+        ? `New message: ${safeSubject} — from ${safeName}`
+        : `New contact message from ${safeName}`;
 
       const textBody = [
         `You have a new message on your AuthorLoft site.`,
@@ -111,15 +131,15 @@ export async function POST(req: NextRequest) {
             <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
               <tr>
                 <td style="padding: 6px 0; color:#6b7280; font-size:14px; width:80px;">From</td>
-                <td style="padding: 6px 0; font-size:14px; font-weight:500;">${name} &lt;${email}&gt;</td>
+                <td style="padding: 6px 0; font-size:14px; font-weight:500;">${esc(name)} &lt;${esc(email)}&gt;</td>
               </tr>
-              ${subject ? `<tr><td style="padding: 6px 0; color:#6b7280; font-size:14px;">Subject</td><td style="padding: 6px 0; font-size:14px;">${subject}</td></tr>` : ""}
-              ${website ? `<tr><td style="padding: 6px 0; color:#6b7280; font-size:14px;">Website</td><td style="padding: 6px 0; font-size:14px;"><a href="${website}" style="color:#2563EB;">${website}</a></td></tr>` : ""}
+              ${subject ? `<tr><td style="padding: 6px 0; color:#6b7280; font-size:14px;">Subject</td><td style="padding: 6px 0; font-size:14px;">${esc(subject)}</td></tr>` : ""}
+              ${website ? `<tr><td style="padding: 6px 0; color:#6b7280; font-size:14px;">Website</td><td style="padding: 6px 0; font-size:14px;"><a href="${safeHref(website)}" style="color:#2563EB;">${esc(website)}</a></td></tr>` : ""}
             </table>
-            <div style="background:#f9fafb; border: 1px solid #e5e7eb; border-radius:6px; padding:16px; font-size:14px; line-height:1.7; white-space: pre-wrap;">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            <div style="background:#f9fafb; border: 1px solid #e5e7eb; border-radius:6px; padding:16px; font-size:14px; line-height:1.7; white-space: pre-wrap;">${esc(message)}</div>
             <div style="margin-top:24px; padding-top:16px; border-top:1px solid #e5e7eb;">
-              <a href="mailto:${email}" style="display:inline-block; background:#2563EB; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; font-size:14px; font-weight:500;">
-                Reply to ${name}
+              <a href="mailto:${esc(email)}" style="display:inline-block; background:#2563EB; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; font-size:14px; font-weight:500;">
+                Reply to ${esc(name)}
               </a>
               <a href="${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/admin/messages" style="display:inline-block; margin-left:12px; color:#6b7280; font-size:13px; text-decoration:underline;">
                 View all messages

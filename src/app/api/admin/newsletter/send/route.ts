@@ -3,6 +3,29 @@ import { prisma } from "@/lib/db";
 import { canUseFeature } from "@/lib/plan-limits";
 import { Resend } from "resend";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import sanitizeHtml from "sanitize-html";
+
+const NEWSLETTER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [
+    "p", "br", "strong", "b", "em", "i", "u", "s",
+    "h1", "h2", "h3", "h4",
+    "ul", "ol", "li",
+    "a", "blockquote", "hr", "span", "div",
+  ],
+  allowedAttributes: {
+    a: ["href", "title", "target", "rel"],
+    span: ["style"],
+    p: ["style"],
+    div: ["style"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  transformTags: {
+    a: (tagName, attribs) => ({
+      tagName,
+      attribs: { ...attribs, rel: "noopener noreferrer" },
+    }),
+  },
+};
 
 function buildEmailHtml(opts: {
   authorName: string;
@@ -112,6 +135,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email body cannot be empty." }, { status: 400 });
   }
 
+  const safeHtmlBody = sanitizeHtml(htmlBody, NEWSLETTER_SANITIZE_OPTIONS);
+
   const author = await prisma.author.findUnique({
     where:  { id: authorId },
     select: { id: true, name: true, displayName: true, accentColor: true, slug: true, contactEmail: true },
@@ -156,8 +181,8 @@ export async function POST(req: NextRequest) {
         to:      sub.email,
         subject,
         replyTo,
-        html:    buildEmailHtml({ authorName, accentColor: author.accentColor || "#2563eb", subject, body: htmlBody, unsubscribeUrl, siteUrl }),
-        text:    htmlToPlainText(htmlBody) + `\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
+        html:    buildEmailHtml({ authorName, accentColor: author.accentColor || "#2563eb", subject, body: safeHtmlBody, unsubscribeUrl, siteUrl }),
+        text:    htmlToPlainText(safeHtmlBody) + `\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
       };
     });
 
