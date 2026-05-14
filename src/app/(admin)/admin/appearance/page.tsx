@@ -20,9 +20,6 @@ export default async function AppearancePage() {
 
   const tier = author.plan?.tier ?? "FREE";
 
-  // FREE authors have no theme choice — redirect to branding
-  if (tier === "FREE") redirect("/admin/branding");
-
   return (
     <div className="space-y-6">
       <div>
