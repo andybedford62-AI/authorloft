@@ -21,6 +21,7 @@ model SystemConfig {
   betaMessage             String   @default("")
   newSignupNotifications  Boolean  @default(true)
   signupNotificationEmail String   @default("")
+  defaultAiUsageCap       Int      @default(20)
   updatedAt               DateTime @updatedAt
 }
 

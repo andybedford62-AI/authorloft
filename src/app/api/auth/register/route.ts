@@ -185,11 +185,12 @@ export async function POST(req: NextRequest) {
     // ── Create account ──────────────────────────────────────────────────────
     const passwordHash = await hashPassword(password);
 
-    // Look up the FREE plan (may not be seeded in all environments — that's OK)
-    const freePlan = await prisma.plan.findFirst({
-      where: { tier: "FREE" },
-      select: { id: true },
-    });
+    // Look up the FREE plan and global AI cap default in parallel
+    const [freePlan, sysDefaults] = await Promise.all([
+      prisma.plan.findFirst({ where: { tier: "FREE" }, select: { id: true } }),
+      prisma.systemConfig.findUnique({ where: { id: "main" }, select: { defaultAiUsageCap: true } }),
+    ]);
+    const aiUsageCap = sysDefaults?.defaultAiUsageCap ?? 20;
 
     // Generate an email verification token (expires in 24 hours)
     const emailVerifyToken = randomBytes(32).toString("hex");
@@ -206,6 +207,7 @@ export async function POST(req: NextRequest) {
         emailVerifyToken,
         emailVerifyExpiry,
         termsAcceptedAt: new Date(),
+        aiUsageCap: aiUsageCap,
         ...(freePlan && { planId: freePlan.id }),
       },
     });

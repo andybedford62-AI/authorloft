@@ -13,10 +13,12 @@ import {
   Settings,
   UserX,
   Star,
+  Zap,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
 import { SignupNotificationsToggle } from "./signup-notifications-toggle";
+import { AiCapControl } from "./ai-cap-control";
 import { MarketingHeroImage } from "./marketing-hero-image";
 import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
@@ -62,6 +64,7 @@ export interface SettingsTabsProps {
   maintenanceMessage: string;
   newSignupNotifications:  boolean;
   signupNotificationEmail: string;
+  defaultAiUsageCap: number;
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
@@ -210,7 +213,7 @@ function OnboardingTab() {
 
 // ── Maintenance tab ────────────────────────────────────────────────────────────
 
-function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail }: SettingsTabsProps) {
+function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail, defaultAiUsageCap }: SettingsTabsProps) {
   return (
     <div className="space-y-4">
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -237,6 +240,18 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
           Receive an email notification each time a new author creates an account — via email/password or Google sign-in.
         </p>
         <SignupNotificationsToggle initialEnabled={newSignupNotifications} initialEmail={signupNotificationEmail} />
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Zap className="h-4 w-4 text-gray-400" />
+          AI Usage Baseline
+        </h2>
+        <p className="text-xs text-gray-500">
+          Default monthly AI call limit for all authors on Premium. Changing this cascades to every author whose
+          cap matches the current baseline — authors with individually customised caps are left unchanged.
+        </p>
+        <AiCapControl initialCap={defaultAiUsageCap} />
       </section>
     </div>
   );
