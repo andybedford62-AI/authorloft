@@ -64,10 +64,7 @@ export interface SettingsTabsProps {
   maintenanceMessage: string;
   newSignupNotifications:  boolean;
   signupNotificationEmail: string;
-<<<<<<< HEAD
   defaultAiUsageCap: number;
-=======
->>>>>>> a0d3c203f94bd1df28a14ca6767904d71a4a3240
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
@@ -216,11 +213,7 @@ function OnboardingTab() {
 
 // ── Maintenance tab ────────────────────────────────────────────────────────────
 
-<<<<<<< HEAD
 function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail, defaultAiUsageCap }: SettingsTabsProps) {
-=======
-function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail }: SettingsTabsProps) {
->>>>>>> a0d3c203f94bd1df28a14ca6767904d71a4a3240
   return (
     <div className="space-y-4">
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -247,7 +240,6 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
           Receive an email notification each time a new author creates an account — via email/password or Google sign-in.
         </p>
         <SignupNotificationsToggle initialEnabled={newSignupNotifications} initialEmail={signupNotificationEmail} />
-<<<<<<< HEAD
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -260,8 +252,6 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
           cap matches the current baseline — authors with individually customised caps are left unchanged.
         </p>
         <AiCapControl initialCap={defaultAiUsageCap} />
-=======
->>>>>>> a0d3c203f94bd1df28a14ca6767904d71a4a3240
       </section>
     </div>
   );
