@@ -98,14 +98,6 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
-    // Verify price exists and is recurring before attempting checkout
-    const stripePrice = await stripe.prices.retrieve(priceId);
-    const priceDebug = { id: stripePrice.id, type: stripePrice.type, recurring: stripePrice.recurring, active: stripePrice.active };
-    console.log("[stripe/subscribe] Price:", JSON.stringify(priceDebug));
-    if (stripePrice.type !== "recurring") {
-      return NextResponse.json({ error: "Price is not recurring.", debug: priceDebug }, { status: 500 });
-    }
-
     const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
@@ -117,8 +109,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
-    const msg = err?.message ?? String(err);
-    console.error("[stripe/subscribe] Error:", msg);
-    return NextResponse.json({ error: "Failed to start checkout.", debug: msg }, { status: 500 });
+    console.error("[stripe/subscribe] Error:", err?.message ?? err);
+    return NextResponse.json({ error: "Failed to start checkout." }, { status: 500 });
   }
 }
