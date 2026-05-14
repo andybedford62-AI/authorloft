@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, BellOff, Loader2, Check } from "lucide-react";
+import { Bell, BellOff, Check, Loader2 } from "lucide-react";
 
-type Props = { initialEnabled: boolean };
+type Props = {
+  initialEnabled: boolean;
+  initialEmail:   string;
+};
 
-export function SignupNotificationsToggle({ initialEnabled }: Props) {
+export function SignupNotificationsToggle({ initialEnabled, initialEmail }: Props) {
   const [enabled, setEnabled] = useState(initialEnabled);
+  const [email,   setEmail]   = useState(initialEmail);
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
   const [error,   setError]   = useState("");
 
-  async function toggle(value: boolean) {
+  async function save(newEnabled: boolean, newEmail: string) {
     setSaving(true);
     setError("");
     setSaved(false);
@@ -19,10 +23,10 @@ export function SignupNotificationsToggle({ initialEnabled }: Props) {
       const res = await fetch("/api/super-admin/beta", {
         method:  "PATCH",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ newSignupNotifications: value }),
+        body:    JSON.stringify({ newSignupNotifications: newEnabled, signupNotificationEmail: newEmail }),
       });
-      if (!res.ok) throw new Error("Failed to save");
-      setEnabled(value);
+      if (!res.ok) throw new Error();
+      setEnabled(newEnabled);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch {
@@ -33,24 +37,22 @@ export function SignupNotificationsToggle({ initialEnabled }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+
+      {/* Status + toggle row */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-            enabled
-              ? "bg-green-50 border-green-300 text-green-700"
-              : "bg-gray-100 border-gray-300 text-gray-500"
-          }`}>
-            {enabled
-              ? <><Bell className="h-3 w-3" /> NOTIFICATIONS ON</>
-              : <><BellOff className="h-3 w-3" /> NOTIFICATIONS OFF</>
-            }
-          </div>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+          enabled
+            ? "bg-green-50 border-green-300 text-green-700"
+            : "bg-gray-100 border-gray-300 text-gray-500"
+        }`}>
+          {enabled ? <Bell className="h-3 w-3" /> : <BellOff className="h-3 w-3" />}
+          {enabled ? "NOTIFICATIONS ON" : "NOTIFICATIONS OFF"}
         </div>
 
         <button
           type="button"
-          onClick={() => toggle(!enabled)}
+          onClick={() => save(!enabled, email)}
           disabled={saving}
           className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
             enabled
@@ -65,15 +67,40 @@ export function SignupNotificationsToggle({ initialEnabled }: Props) {
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        {saving && <p className="text-xs text-gray-400 flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" /> Saving…</p>}
-        {saved  && <p className="text-xs text-green-400 flex items-center gap-1"><Check className="h-3 w-3" /> Saved</p>}
-        {error  && <p className="text-xs text-red-400">{error}</p>}
+      {/* Email input */}
+      <div className="space-y-1.5">
+        <label className="block text-xs font-medium text-gray-600">
+          Notification Email <span className="text-gray-400">(receives alert on every new signup)</span>
+        </label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="w-full rounded-lg bg-white border border-gray-300 px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+        <p className="text-xs text-gray-400">
+          Notifications are sent even when this is different from your account email.
+        </p>
       </div>
 
-      <p className="text-xs text-gray-500">
-        When enabled, you will receive an email at <span className="text-gray-300">{process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL ?? "your admin email"}</span> whenever a new author creates an account.
-      </p>
+      {/* Save button */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => save(enabled, email)}
+          disabled={saving || !email.trim()}
+          className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving
+            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            : saved
+            ? <><Check className="h-3.5 w-3.5" /> Saved</>
+            : "Save"
+          }
+        </button>
+        {error && <p className="text-xs text-red-500">{error}</p>}
+      </div>
     </div>
   );
 }

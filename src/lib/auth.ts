@@ -167,10 +167,11 @@ export const authOptions: NextAuthOptions = {
           });
 
           // Send admin signup notification if enabled (fire-and-forget)
-          prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true } })
+          prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true, signupNotificationEmail: true } })
             .then((cfg) => {
-              if (cfg?.newSignupNotifications) {
+              if (cfg?.newSignupNotifications && cfg.signupNotificationEmail) {
                 sendNewSignupNotificationEmail({
+                  to:          cfg.signupNotificationEmail,
                   authorName:  baseName,
                   authorEmail: email,
                   slug:        finalSlug,

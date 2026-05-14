@@ -20,6 +20,7 @@ model SystemConfig {
   betaMode                Boolean  @default(false)
   betaMessage             String   @default("")
   newSignupNotifications  Boolean  @default(true)
+  signupNotificationEmail String   @default("")
   updatedAt               DateTime @updatedAt
 }
 

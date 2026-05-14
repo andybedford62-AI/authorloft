@@ -161,25 +161,26 @@ export async function sendSaleNotificationEmail({
 // ── New signup notification (to super admin) ─────────────────────────────────
 
 export async function sendNewSignupNotificationEmail({
+  to,
   authorName,
   authorEmail,
   slug,
   method,
 }: {
+  to: string;
   authorName: string;
   authorEmail: string;
   slug: string;
   method: "email" | "google";
 }) {
-  const adminEmail = process.env.SUPER_ADMIN_EMAIL;
-  if (!adminEmail) return;
+  if (!to) return;
 
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const profileUrl     = `https://www.${platformDomain}/super-admin/authors`;
   const siteUrl        = `https://${slug}.${platformDomain}`;
 
   return sendMail({
-    to: adminEmail,
+    to,
     subject: `New signup: ${authorName} (${authorEmail})`,
     text: [
       `A new author just signed up on AuthorLoft.`,
