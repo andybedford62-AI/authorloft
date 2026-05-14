@@ -839,7 +839,13 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
 
   useEffect(() => {
-    if (window.location.hash === "#billing") setActiveTab("billing");
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab") as SettingsTab | null;
+    if (tabParam && TABS.some((t) => t.id === tabParam)) {
+      setActiveTab(tabParam);
+    } else if (window.location.hash === "#billing") {
+      setActiveTab("billing");
+    }
   }, []);
 
   return (
