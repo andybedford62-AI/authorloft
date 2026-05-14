@@ -158,6 +158,83 @@ export async function sendSaleNotificationEmail({
   });
 }
 
+// ── New signup notification (to super admin) ─────────────────────────────────
+
+export async function sendNewSignupNotificationEmail({
+  authorName,
+  authorEmail,
+  slug,
+  method,
+}: {
+  authorName: string;
+  authorEmail: string;
+  slug: string;
+  method: "email" | "google";
+}) {
+  const adminEmail = process.env.SUPER_ADMIN_EMAIL;
+  if (!adminEmail) return;
+
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const profileUrl     = `https://www.${platformDomain}/super-admin/authors`;
+  const siteUrl        = `https://${slug}.${platformDomain}`;
+
+  return sendMail({
+    to: adminEmail,
+    subject: `New signup: ${authorName} (${authorEmail})`,
+    text: [
+      `A new author just signed up on AuthorLoft.`,
+      `Name:   ${authorName}`,
+      `Email:  ${authorEmail}`,
+      `Site:   ${siteUrl}`,
+      `Method: ${method === "google" ? "Google OAuth" : "Email / Password"}`,
+      `View all authors: ${profileUrl}`,
+    ].join("\n"),
+    html: wrapHtml("New Author Signup 🎉", `
+      <p style="margin:0 0 16px;">A new author just created an account on AuthorLoft.</p>
+
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#0369a1;">Name</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#111827;">${esc(authorName)}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #bae6fd;">
+              <span style="font-size:13px;color:#0369a1;">Email</span><br/>
+              <span style="font-size:14px;color:#374151;">${esc(authorEmail)}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #bae6fd;">
+              <span style="font-size:13px;color:#0369a1;">Author Site</span><br/>
+              <a href="${siteUrl}" style="font-size:14px;color:#1d4ed8;">${siteUrl}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #bae6fd;">
+              <span style="font-size:13px;color:#0369a1;">Signup Method</span><br/>
+              <span style="font-size:14px;color:#374151;">${method === "google" ? "Google OAuth" : "Email / Password"}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${profileUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              View All Authors
+            </a>
+          </td>
+        </tr>
+      </table>
+    `),
+  });
+}
+
 // ── Transactional helpers ────────────────────────────────────────────────────
 
 export async function sendPasswordResetEmail(to: string, token: string) {

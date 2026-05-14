@@ -3,7 +3,7 @@ import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
-import { sendVerificationEmail } from "@/lib/mailer";
+import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mailer";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const registrationAttempts = new Map<string, number[]>();
@@ -214,6 +214,20 @@ export async function POST(req: NextRequest) {
     sendVerificationEmail(author.email, emailVerifyToken).catch((err) => {
       console.error("[register] Failed to send verification email:", err);
     });
+
+    // Send admin signup notification if enabled (fire-and-forget)
+    prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true } })
+      .then((cfg) => {
+        if (cfg?.newSignupNotifications) {
+          sendNewSignupNotificationEmail({
+            authorName:  author.name,
+            authorEmail: author.email,
+            slug:        author.slug,
+            method:      "email",
+          }).catch((err) => console.error("[register] Failed to send signup notification:", err));
+        }
+      })
+      .catch(() => {});
 
     return NextResponse.json({ ok: true, slug: finalSlug });
   } catch (err) {

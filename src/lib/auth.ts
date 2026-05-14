@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
 import { generateCSRFToken } from "./csrf";
+import { sendNewSignupNotificationEmail } from "./mailer";
 import bcrypt from "bcryptjs";
 import { checkLoginRateLimit } from "./login-rate-limit";
 
@@ -164,6 +165,20 @@ export const authOptions: NextAuthOptions = {
               ...(freePlan && { planId: freePlan.id }),
             },
           });
+
+          // Send admin signup notification if enabled (fire-and-forget)
+          prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true } })
+            .then((cfg) => {
+              if (cfg?.newSignupNotifications) {
+                sendNewSignupNotificationEmail({
+                  authorName:  baseName,
+                  authorEmail: email,
+                  slug:        finalSlug,
+                  method:      "google",
+                }).catch((err) => console.error("[auth] Failed to send signup notification:", err));
+              }
+            })
+            .catch(() => {});
         }
         return true;
       } catch (err) {
