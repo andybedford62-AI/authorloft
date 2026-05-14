@@ -38,8 +38,8 @@ export function SignupNotificationsToggle({ initialEnabled }: Props) {
         <div className="flex items-center gap-3">
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border ${
             enabled
-              ? "bg-green-900/30 border-green-700 text-green-300"
-              : "bg-gray-800 border-gray-700 text-gray-400"
+              ? "bg-green-50 border-green-300 text-green-700"
+              : "bg-gray-100 border-gray-300 text-gray-500"
           }`}>
             {enabled
               ? <><Bell className="h-3 w-3" /> NOTIFICATIONS ON</>
@@ -52,10 +52,10 @@ export function SignupNotificationsToggle({ initialEnabled }: Props) {
           type="button"
           onClick={() => toggle(!enabled)}
           disabled={saving}
-          className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+          className={`relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
             enabled
-              ? "bg-green-600 focus:ring-green-500"
-              : "bg-gray-600 hover:bg-gray-500 focus:ring-gray-500"
+              ? "bg-green-600 hover:bg-green-700 focus:ring-green-500"
+              : "bg-gray-300 hover:bg-gray-400 focus:ring-gray-400"
           } ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <span className="sr-only">Toggle signup notifications</span>
