@@ -195,8 +195,13 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
-                {isFree ? "Get Started Free" : `Start ${plan.name}`}
+                {isFree ? "Get Started Free" : `Start Free → ${plan.name}`}
               </Link>
+              {!isFree && (
+                <p className="text-center text-xs text-gray-400 mt-2">
+                  Free account first, then upgrade — takes 2 minutes
+                </p>
+              )}
             </div>
           );
         })}

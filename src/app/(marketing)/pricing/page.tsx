@@ -151,18 +151,21 @@ export default async function PricingPage() {
                   </td>
                   <td className="px-6 py-4 text-center bg-blue-50/50">
                     <Link href="/register?plan=standard" className="text-sm font-semibold text-blue-600 hover:underline">
-                      Start Standard →
+                      Start free → Standard
                     </Link>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <Link href="/register?plan=premium" className="text-sm font-semibold text-purple-600 hover:underline">
-                      Go Premium →
+                      Start free → Premium
                     </Link>
                   </td>
                 </tr>
               </tfoot>
             </table>
           </div>
+          <p className="text-center text-sm text-gray-500 mt-6">
+            All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.
+          </p>
         </div>
       </section>
 

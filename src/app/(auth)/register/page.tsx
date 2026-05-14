@@ -93,6 +93,10 @@ function RegisterPageInner() {
   const betaMode    = betaStatus?.betaMode ?? false;
   const betaMessage = betaStatus?.betaMessage ?? "";
 
+  // Intended plan from marketing page (?plan=standard or ?plan=premium)
+  const intendedPlan = searchParams.get("plan")?.toLowerCase() ?? null;
+  const intendedPlanLabel = intendedPlan === "premium" ? "Premium" : intendedPlan === "standard" ? "Standard" : null;
+
   // Step 0 = invite code (beta only); Step 1 = account; Step 2 = site URL
   const [step, setStep] = useState<0 | 1 | 2>(1);
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -196,6 +200,9 @@ function RegisterPageInner() {
       }
 
       setRegistered(true);
+      if (intendedPlan) {
+        localStorage.setItem("intendedPlan", intendedPlan);
+      }
     } catch {
       setStep2Error("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -262,8 +269,15 @@ function RegisterPageInner() {
               <br />
               Click the link in the email to activate your account.
             </p>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-              You must verify your email before you can sign in.
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800 text-left space-y-1">
+              <p className="font-medium">Before you can sign in:</p>
+              <ol className="list-decimal list-inside space-y-1 text-amber-700">
+                <li>Verify your email by clicking the link we just sent</li>
+                <li>Sign in to your new account</li>
+                {intendedPlanLabel && (
+                  <li>Go to <span className="font-medium">Settings → Billing</span> to upgrade to {intendedPlanLabel}</li>
+                )}
+              </ol>
             </div>
             <Link
               href="/login"
