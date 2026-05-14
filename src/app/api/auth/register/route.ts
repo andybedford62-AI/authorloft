@@ -217,12 +217,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, slug: finalSlug });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    const stack = err instanceof Error ? err.stack : undefined;
-    console.error("[register] Error message:", message);
-    console.error("[register] Error stack:", stack);
+    console.error("[register] Error:", err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again.", debug: message },
+      { error: "Something went wrong. Please try again." },
       { status: 500 }
     );
   }
