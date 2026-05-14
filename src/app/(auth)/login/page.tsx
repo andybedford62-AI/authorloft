@@ -53,8 +53,8 @@ function LoginForm() {
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Sign in to your author dashboard</p>
           {justRegistered && (
-            <p className="mt-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-              Account created! Sign in to continue.
+            <p className="mt-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Almost there — check your email for a verification link before signing in.
             </p>
           )}
         </div>
