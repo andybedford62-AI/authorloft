@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as any).isSuperAdmin) return null;
-  return session;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!await requireSuperAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   const { authorName, authorRole, quote, rating, image, isActive, displayOrder } = await req.json();
   const data: Record<string, unknown> = {};
@@ -28,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!await requireSuperAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   await prisma.testimonial.delete({ where: { id } });
   revalidatePath("/");

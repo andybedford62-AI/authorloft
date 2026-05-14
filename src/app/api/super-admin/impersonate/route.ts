@@ -1,24 +1,13 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 const COOKIE = "al_impersonate";
 
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  const caller = await prisma.author.findUnique({
-    where: { id: (session.user as any).id },
-    select: { isSuperAdmin: true },
-  });
-  return caller?.isSuperAdmin ? session : null;
-}
-
 // POST /api/super-admin/impersonate — start impersonating an author
 export async function POST(req: NextRequest) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const superAdminId = await requireSuperAdminId();
+  if (!superAdminId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { authorId } = await req.json();
   if (!authorId) return NextResponse.json({ error: "authorId required" }, { status: 400 });
@@ -28,8 +17,6 @@ export async function POST(req: NextRequest) {
     select: { id: true },
   });
   if (!target) return NextResponse.json({ error: "Author not found" }, { status: 404 });
-
-  const superAdminId = (session.user as any).id as string;
 
   await prisma.impersonationLog.create({
     data: { superAdminId, targetAuthorId: authorId, action: "start" },
@@ -53,10 +40,9 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/super-admin/impersonate — stop impersonating
 export async function DELETE(req: NextRequest) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const superAdminId = await requireSuperAdminId();
+  if (!superAdminId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const superAdminId = (session.user as any).id as string;
   const targetAuthorId = req.cookies.get("al_impersonate")?.value;
 
   if (targetAuthorId) {

@@ -1,25 +1,13 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  const caller = await prisma.author.findUnique({
-    where: { id: (session.user as any).id },
-    select: { isSuperAdmin: true },
-  });
-  return caller?.isSuperAdmin ? session : null;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // GET /api/super-admin/authors/[id] — fetch single author for edit form
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const author = await prisma.author.findUnique({
@@ -56,8 +44,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const { isActive } = await req.json();
@@ -78,8 +65,7 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const body = await req.json();
@@ -143,13 +129,13 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const superAdminId = await requireSuperAdminId();
+  if (!superAdminId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
 
   // Safety: prevent super admin from deleting themselves
-  if ((session.user as any).id === id) {
+  if (superAdminId === id) {
     return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
   }
 
