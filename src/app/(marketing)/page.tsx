@@ -439,12 +439,20 @@ export default async function MarketingPage() {
             )}
           </ScrollReveal>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/pricing"
+              href="/features"
+              target="_blank"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
             >
-              View full feature comparison <ArrowRight className="h-3.5 w-3.5" />
+              See full feature listing <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <span className="hidden sm:block text-gray-300 text-xs">·</span>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              View pricing
             </Link>
           </div>
         </div>
