@@ -29,10 +29,13 @@ function SubscriptionSection() {
   const [interval, setInterval] = useState<"monthly" | "annual">("annual");
   const [busy,     setBusy]     = useState<string | null>(null); // priceId being loaded
   const [portalBusy, setPortalBusy] = useState(false);
+  const [intendedPlan, setIntendedPlan] = useState<string | null>(null);
   const toast = useToast();
 
   useEffect(() => {
     fetch("/api/admin/billing").then((r) => r.json()).then(setData).catch(() => {});
+    const stored = localStorage.getItem("intendedPlan");
+    if (stored) setIntendedPlan(stored);
   }, []);
 
   async function handleUpgrade(priceId: string) {
@@ -45,6 +48,7 @@ function SubscriptionSection() {
       });
       const json = await res.json();
       if (json.url) {
+        localStorage.removeItem("intendedPlan");
         window.open(json.url, "_blank");
       } else if (json.error) {
         toast("error", json.error);
@@ -104,6 +108,28 @@ function SubscriptionSection() {
         </div>
       ) : (
         <>
+          {/* Intended plan banner — shown after signup from marketing page */}
+          {intendedPlan && isFree && (
+            <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+              <Zap className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-blue-900">
+                  You&apos;re one step away from {intendedPlan.charAt(0).toUpperCase() + intendedPlan.slice(1)}!
+                </p>
+                <p className="text-xs text-blue-700 mt-0.5">
+                  Select the {intendedPlan.charAt(0).toUpperCase() + intendedPlan.slice(1)} plan below to complete your upgrade.
+                </p>
+              </div>
+              <button
+                onClick={() => { setIntendedPlan(null); localStorage.removeItem("intendedPlan"); }}
+                className="text-blue-400 hover:text-blue-600 text-xs flex-shrink-0"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           {/* Current plan */}
           <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-200">
             <div>
