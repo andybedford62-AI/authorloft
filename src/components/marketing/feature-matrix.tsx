@@ -10,7 +10,7 @@ type FeatureRow = {
   }>;
 };
 
-function buildFeatureRows(plans: PlanData[]): FeatureRow[] {
+function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
   // Group features by category
   const rows: FeatureRow[] = [
     {
@@ -111,7 +111,7 @@ function buildFeatureRows(plans: PlanData[]): FeatureRow[] {
           tiers: {
             FREE: "—",
             STANDARD: "—",
-            PREMIUM: "✓ (20/month)",
+            PREMIUM: `✓ (${aiCap}/month)`,
           },
         },
         {
@@ -184,10 +184,11 @@ function buildFeatureRows(plans: PlanData[]): FeatureRow[] {
 
 interface FeatureMatrixProps {
   plans: PlanData[];
+  defaultAiUsageCap?: number;
 }
 
-export function FeatureMatrix({ plans }: FeatureMatrixProps) {
-  const featureRows = buildFeatureRows(plans);
+export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixProps) {
+  const featureRows = buildFeatureRows(plans, defaultAiUsageCap);
   const tiers = ["FREE", "STANDARD", "PREMIUM"];
 
   return (

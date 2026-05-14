@@ -24,7 +24,8 @@ export const metadata: Metadata = {
 };
 
 async function getActivePlans() {
-  return prisma.plan.findMany({
+  const [plans, config] = await Promise.all([
+    prisma.plan.findMany({
     where: { isActive: true },
     select: {
       id: true,
@@ -46,12 +47,15 @@ async function getActivePlans() {
       flipBooksLimit: true,
       isDefault: true,
     },
-    orderBy: { sortOrder: "asc" },
-  });
+      orderBy: { sortOrder: "asc" },
+    }),
+    prisma.systemConfig.findUnique({ where: { id: "main" }, select: { defaultAiUsageCap: true } }),
+  ]);
+  return { plans, defaultAiUsageCap: config?.defaultAiUsageCap ?? 20 };
 }
 
 export default async function FeaturesPage() {
-  const plans = await getActivePlans().catch(() => []);
+  const { plans, defaultAiUsageCap } = await getActivePlans().catch(() => ({ plans: [], defaultAiUsageCap: 20 }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,7 +113,7 @@ export default async function FeaturesPage() {
       {/* Feature Matrix */}
       <section className="px-4 py-16 max-w-5xl mx-auto">
         {plans.length > 0 ? (
-          <FeatureMatrix plans={plans} />
+          <FeatureMatrix plans={plans} defaultAiUsageCap={defaultAiUsageCap} />
         ) : (
           <div className="text-center py-20 text-gray-400">
             <p>Feature data is being loaded. Check back soon.</p>
