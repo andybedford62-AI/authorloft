@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Zap } from "lucide-react";
+import Link from "next/link";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { LogoutButton } from "@/components/admin/logout-button";
 
@@ -79,6 +80,17 @@ export function AdminShell({
           <div className="flex-1" />
 
           <div className="flex items-center gap-3 sm:gap-4">
+            {/* Upgrade CTA — only for free plan users */}
+            {planTier === "FREE" && (
+              <Link
+                href="/admin/settings?tab=billing"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors flex-shrink-0"
+              >
+                <Zap className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Upgrade Plan</span>
+                <span className="sm:hidden">Upgrade</span>
+              </Link>
+            )}
             <span className="hidden sm:block text-sm text-gray-500 truncate max-w-[140px]">
               {authorName}
             </span>
