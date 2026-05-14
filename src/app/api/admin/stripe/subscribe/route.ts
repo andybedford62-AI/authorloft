@@ -98,7 +98,10 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
-    console.log("[stripe/subscribe] Creating session with priceId:", priceId, "authorId:", authorId);
+    // Verify price exists and is recurring before attempting checkout
+    const stripePrice = await stripe.prices.retrieve(priceId);
+    console.log("[stripe/subscribe] Price lookup:", priceId, "type:", stripePrice.type, "recurring:", JSON.stringify(stripePrice.recurring), "active:", stripePrice.active);
+
     const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
