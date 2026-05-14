@@ -30,7 +30,10 @@
       "Bash(git fetch *)",
       "Bash(git merge *)",
       "Bash(git commit *)",
-      "Bash(xargs grep -l \"Sign out\\\\|signOut\\\\|header\\\\|Header\\\\|sidebar\\\\|Sidebar\")"
+      "Bash(xargs grep -l \"Sign out\\\\|signOut\\\\|header\\\\|Header\\\\|sidebar\\\\|Sidebar\")",
+      "Bash(find /c/Users/andyb/Downloads/bookstage -type f -name \"*.ts\" -o -name \"*.js\" | grep -i stripe | head -20)",
+      "mcp__99261dc2-29ef-4781-b763-cf7331bc8af5__get_project",
+      "Bash(git pull *)"
     ]
   }
 }

@@ -18,6 +18,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       return NextResponse.json({ error: "Link has expired" }, { status: 403 });
     }
 
+    if (!reader.disclaimerAcknowledgedAt) {
+      return NextResponse.json({ error: "Disclaimer not acknowledged" }, { status: 403 });
+    }
+
     // Verify file belongs to this ARC
     const file = await prisma.arcFile.findFirst({
       where: { id: fileId, arcCopyId: reader.arcCopyId },
