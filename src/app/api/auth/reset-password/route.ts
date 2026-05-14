@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { passwordStrengthError } from "@/lib/password-validation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,9 @@ export async function POST(req: NextRequest) {
     if (!token || typeof token !== "string") {
       return NextResponse.json({ error: "Reset token is required." }, { status: 400 });
     }
-    if (!password || password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
+    const pwError = passwordStrengthError(password ?? "");
+    if (pwError) {
+      return NextResponse.json({ error: pwError }, { status: 400 });
     }
 
     // Find author with this token that hasn't expired

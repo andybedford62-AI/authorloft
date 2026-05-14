@@ -6,8 +6,6 @@ import { CheckCircle, Download, Loader2, Clock, ArrowLeft, Mail } from "lucide-r
 import { useCart } from "@/context/cart-context";
 
 interface OrderItem {
-  downloadToken: string;
-  downloadExpiry: string | null;
   downloadsLeft: number;
   hasFile: boolean;
   label: string;
@@ -15,6 +13,9 @@ interface OrderItem {
   fileName: string;
   bookTitle: string;
   bookSlug: string;
+  // populated after token fetch
+  downloadToken?: string;
+  downloadExpiry?: string | null;
 }
 
 interface OrderStatus {
@@ -65,11 +66,36 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
 
         setOrder(data);
 
-        if (data.status === "PENDING") {
+        if (data.status === "COMPLETED") {
+          // Fetch download tokens separately — requires email verification
+          try {
+            const tokenRes = await fetch("/api/orders/tokens", {
+              method:  "POST",
+              headers: { "Content-Type": "application/json" },
+              body:    JSON.stringify({ sessionId, email: data.customerEmail }),
+            });
+            if (tokenRes.ok) {
+              const { tokens } = await tokenRes.json();
+              // Merge tokens into items by bookSlug + label
+              const merged = data.items.map((item: OrderItem) => {
+                const match = tokens.find(
+                  (t: { bookSlug: string; label: string }) =>
+                    t.bookSlug === item.bookSlug && t.label === item.label
+                );
+                return match
+                  ? { ...item, downloadToken: match.downloadToken, downloadExpiry: match.downloadExpiry }
+                  : item;
+              });
+              setOrder({ ...data, items: merged });
+              return;
+            }
+          } catch {
+            // Non-fatal — order still shown, tokens just missing
+          }
+        } else {
           setAttempts((a) => {
             const next = a + 1;
             if (next < MAX_ATTEMPTS) {
-              // Poll again in 2 seconds
               setTimeout(checkStatus, 2000);
             }
             return next;
@@ -162,7 +188,7 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
 
           {order.items.map((item) => (
             <div
-              key={item.downloadToken}
+              key={item.bookSlug + item.label}
               className="rounded-xl border border-gray-200 p-4 space-y-3"
             >
               <div>
@@ -170,7 +196,7 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
                 <p className="text-sm text-gray-500">{item.label}</p>
               </div>
 
-              {item.hasFile ? (
+              {item.hasFile && item.downloadToken ? (
                 <>
                   <a
                     href={`/api/orders/download/${item.downloadToken}`}

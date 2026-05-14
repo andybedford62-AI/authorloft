@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mailer";
+import { passwordStrengthError } from "@/lib/password-validation";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const registrationAttempts = new Map<string, number[]>();
@@ -25,13 +26,6 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function passwordStrengthError(pw: string): string | null {
-  if (pw.length < 8)          return "Password must be at least 8 characters.";
-  if (!/[A-Z]/.test(pw))      return "Password must contain at least one uppercase letter.";
-  if (!/[0-9]/.test(pw))      return "Password must contain at least one number.";
-  if (!/[^A-Za-z0-9]/.test(pw)) return "Password must contain at least one special character (!@#$… etc).";
-  return null;
-}
 
 function isValidSlug(slug: string) {
   return /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug);

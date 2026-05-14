@@ -5,8 +5,9 @@ import { prisma } from "@/lib/db";
  * GET /api/orders/status?session_id=cs_xxx
  *
  * Polled by the success page to check if the Stripe webhook has
- * marked the order as COMPLETED. Returns download tokens once ready.
- * Security: the session_id is only known to the person who paid.
+ * marked the order as COMPLETED. Returns order metadata only — no
+ * download tokens. Tokens are gated behind POST /api/orders/tokens
+ * which requires email verification.
  */
 export async function GET(req: NextRequest) {
   const sessionId = req.nextUrl.searchParams.get("session_id");
@@ -21,8 +22,6 @@ export async function GET(req: NextRequest) {
       customerEmail: true,
       items: {
         select: {
-          downloadToken: true,
-          downloadExpiry: true,
           downloadCount: true,
           maxDownloads: true,
           fileKey: true,
@@ -45,15 +44,13 @@ export async function GET(req: NextRequest) {
     status: order.status,
     customerEmail: order.customerEmail,
     items: order.items.map((item) => ({
-      downloadToken:   item.downloadToken,
-      downloadExpiry:  item.downloadExpiry,
-      downloadsLeft:   item.maxDownloads - item.downloadCount,
-      hasFile:         !!item.fileKey,
-      label:           item.saleItem?.label ?? "Download",
-      format:          item.saleItem?.format ?? "EBOOK",
-      fileName:        item.saleItem?.fileName ?? item.book.slug,
-      bookTitle:       item.book.title,
-      bookSlug:        item.book.slug,
+      downloadsLeft: item.maxDownloads - item.downloadCount,
+      hasFile:       !!item.fileKey,
+      label:         item.saleItem?.label ?? "Download",
+      format:        item.saleItem?.format ?? "EBOOK",
+      fileName:      item.saleItem?.fileName ?? item.book.slug,
+      bookTitle:     item.book.title,
+      bookSlug:      item.book.slug,
     })),
   });
 }
