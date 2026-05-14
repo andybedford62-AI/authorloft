@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
+    console.log("[stripe/subscribe] Creating session with priceId:", priceId, "authorId:", authorId);
     const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
