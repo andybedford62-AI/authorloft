@@ -14,12 +14,13 @@ datasource db {
 // ─── System Config (singleton) ────────────────────────────────────────────────
 
 model SystemConfig {
-  id                 String   @id @default("main")
-  maintenanceMode    Boolean  @default(false)
-  maintenanceMessage String   @default("")
-  betaMode           Boolean  @default(false)
-  betaMessage        String   @default("")
-  updatedAt          DateTime @updatedAt
+  id                      String   @id @default("main")
+  maintenanceMode         Boolean  @default(false)
+  maintenanceMessage      String   @default("")
+  betaMode                Boolean  @default(false)
+  betaMessage             String   @default("")
+  newSignupNotifications  Boolean  @default(true)
+  updatedAt               DateTime @updatedAt
 }
 
 // ─── Beta Invite Codes ────────────────────────────────────────────────────────

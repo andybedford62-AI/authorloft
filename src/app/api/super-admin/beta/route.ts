@@ -16,7 +16,7 @@ export async function GET() {
     where:  { id: "main" },
     create: { id: "main" },
     update: {},
-    select: { betaMode: true, betaMessage: true },
+    select: { betaMode: true, betaMessage: true, newSignupNotifications: true },
   });
   return NextResponse.json(config);
 }
@@ -28,10 +28,11 @@ export async function PATCH(req: NextRequest) {
     where:  { id: "main" },
     create: { id: "main" },
     update: {
-      ...(body.betaMode    !== undefined && { betaMode:    body.betaMode    }),
-      ...(body.betaMessage !== undefined && { betaMessage: body.betaMessage }),
+      ...(body.betaMode               !== undefined && { betaMode:               body.betaMode               }),
+      ...(body.betaMessage            !== undefined && { betaMessage:            body.betaMessage            }),
+      ...(body.newSignupNotifications !== undefined && { newSignupNotifications: body.newSignupNotifications }),
     },
-    select: { betaMode: true, betaMessage: true },
+    select: { betaMode: true, betaMessage: true, newSignupNotifications: true },
   });
   return NextResponse.json(config);
 }
