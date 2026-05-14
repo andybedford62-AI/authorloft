@@ -100,7 +100,11 @@ export async function POST(req: NextRequest) {
 
     // Verify price exists and is recurring before attempting checkout
     const stripePrice = await stripe.prices.retrieve(priceId);
-    console.log("[stripe/subscribe] Price lookup:", priceId, "type:", stripePrice.type, "recurring:", JSON.stringify(stripePrice.recurring), "active:", stripePrice.active);
+    const priceDebug = { id: stripePrice.id, type: stripePrice.type, recurring: stripePrice.recurring, active: stripePrice.active };
+    console.log("[stripe/subscribe] Price:", JSON.stringify(priceDebug));
+    if (stripePrice.type !== "recurring") {
+      return NextResponse.json({ error: "Price is not recurring.", debug: priceDebug }, { status: 500 });
+    }
 
     const session = await createSubscriptionCheckoutSession({
       authorId,
