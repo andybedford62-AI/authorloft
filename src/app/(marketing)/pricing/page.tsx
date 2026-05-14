@@ -115,11 +115,25 @@ export default async function PricingPage() {
         )}
       </section>
 
+      {/* See All Features CTA */}
+      <section className="py-12 px-4 text-center">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-gray-600 mb-4">Want to see the complete feature breakdown?</p>
+          <Link
+            href="/features"
+            target="_blank"
+            className="inline-block bg-blue-100 text-blue-700 font-semibold px-6 py-3 rounded-lg hover:bg-blue-200 transition-colors"
+          >
+            See All Features →
+          </Link>
+        </div>
+      </section>
+
       {/* Feature comparison table */}
       <section className="py-16 bg-gray-50 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
-            Full feature comparison
+            Quick feature comparison
           </h2>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
