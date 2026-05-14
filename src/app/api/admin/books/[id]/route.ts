@@ -70,43 +70,45 @@ export async function PUT(
     }
   }
 
-  // Only one book may be featured at a time — clear the flag on all others first
-  if (isFeatured) {
-    await prisma.book.updateMany({
-      where: { authorId, id: { not: id }, isFeatured: true },
-      data:  { isFeatured: false },
+  const book = await prisma.$transaction(async (tx) => {
+    // Only one book may be featured at a time — clear the flag on all others first
+    if (isFeatured) {
+      await tx.book.updateMany({
+        where: { authorId, id: { not: id }, isFeatured: true },
+        data:  { isFeatured: false },
+      });
+    }
+
+    // Replace all genre assignments atomically with the book update
+    await tx.bookGenre.deleteMany({ where: { bookId: id } });
+
+    return tx.book.update({
+      where: { id },
+      data: {
+        title: title.trim(),
+        slug: slug.trim(),
+        subtitle: subtitle || null,
+        shortDescription: shortDescription || null,
+        description: description || null,
+        coverImageUrl: coverImageUrl || null,
+        priceCents: typeof priceCents === "number" ? priceCents : 0,
+        seriesId: seriesId || null,
+        isbn: isbn || null,
+        pageCount: pageCount || null,
+        availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
+        caption:       caption       || null,
+        releaseDate:   releaseDate ? new Date(releaseDate) : null,
+        flipBookUrl:   flipBookUrl   || null,
+        sampleContent: sampleContent || null,
+        isFeatured: isFeatured ?? false,
+        isPublished: isPublished ?? true,
+        directSalesEnabled: directSalesEnabled ?? false,
+        genres:
+          genreIds?.length > 0
+            ? { create: genreIds.map((genreId: string) => ({ genreId })) }
+            : undefined,
+      },
     });
-  }
-
-  // Replace all genre assignments
-  await prisma.bookGenre.deleteMany({ where: { bookId: id } });
-
-  const book = await prisma.book.update({
-    where: { id },
-    data: {
-      title: title.trim(),
-      slug: slug.trim(),
-      subtitle: subtitle || null,
-      shortDescription: shortDescription || null,
-      description: description || null,
-      coverImageUrl: coverImageUrl || null,
-      priceCents: typeof priceCents === "number" ? priceCents : 0,
-      seriesId: seriesId || null,
-      isbn: isbn || null,
-      pageCount: pageCount || null,
-      availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
-      caption:       caption       || null,
-      releaseDate:   releaseDate ? new Date(releaseDate) : null,
-      flipBookUrl:   flipBookUrl   || null,
-      sampleContent: sampleContent || null,
-      isFeatured: isFeatured ?? false,
-      isPublished: isPublished ?? true,
-      directSalesEnabled: directSalesEnabled ?? false,
-      genres:
-        genreIds?.length > 0
-          ? { create: genreIds.map((genreId: string) => ({ genreId })) }
-          : undefined,
-    },
   });
 
   return NextResponse.json(book);
