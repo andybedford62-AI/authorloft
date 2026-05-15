@@ -5,20 +5,7 @@ import { hashPassword } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mailer";
 import { passwordStrengthError } from "@/lib/password-validation";
-
-// ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
-const registrationAttempts = new Map<string, number[]>();
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const RATE_MAX       = 5;
-
-function checkRateLimit(ip: string): boolean {
-  const now      = Date.now();
-  const attempts = (registrationAttempts.get(ip) ?? []).filter(t => now - t < RATE_WINDOW_MS);
-  if (attempts.length >= RATE_MAX) return false;
-  attempts.push(now);
-  registrationAttempts.set(ip, attempts);
-  return true;
-}
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 
@@ -46,8 +33,9 @@ async function uniqueSlug(base: string): Promise<string> {
 export async function POST(req: NextRequest) {
   try {
     // ── Rate limit ──────────────────────────────────────────────────────────
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    const rlKey = getRateLimitKey(req, "ip", "register");
+    const rl = await checkRateLimit(rlKey, { maxRequests: 5, windowSeconds: 3600 });
+    if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many registration attempts. Please try again later." },
         { status: 429 }

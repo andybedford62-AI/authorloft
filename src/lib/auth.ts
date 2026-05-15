@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        if (!checkLoginRateLimit(credentials.email)) {
+        if (!(await checkLoginRateLimit(credentials.email))) {
           throw new Error("TooManyAttempts");
         }
 
