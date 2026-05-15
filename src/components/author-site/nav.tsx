@@ -169,7 +169,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
           {/* Join AuthorLoft CTA — shown to non-owners */}
           {!isOwner && (
             <a
-              href={`${platformBase}/register`}
+              href={platformBase}
               className="text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
               style={{ color: "#22c55e", borderColor: "#22c55e" }}
             >
@@ -250,7 +250,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
 
             {!isOwner && (
               <a
-                href={`${platformBase}/register`}
+                href={platformBase}
                 className="mt-1 text-center text-sm font-semibold px-4 py-2 rounded-md border transition-colors"
                 style={{ color: "#22c55e", borderColor: "#22c55e" }}
               >
