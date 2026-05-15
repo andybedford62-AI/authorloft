@@ -212,7 +212,7 @@ export function NewsletterClient({
                 {subscribers.map((sub) => {
                   const interestNames = sub.categoryPrefs
                     .map((id) => genreMap[id])
-                    .filter(Boolean);
+                    .filter((x): x is string => x !== undefined);
                   return (
                     <div
                       key={sub.id}

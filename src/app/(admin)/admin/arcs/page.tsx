@@ -56,7 +56,7 @@ export default async function ArcsPage() {
         },
       };
     })
-    .filter(Boolean);
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
     <div className="space-y-6">
