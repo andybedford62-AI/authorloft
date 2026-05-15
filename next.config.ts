@@ -31,11 +31,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
-  typescript: {
-    // Temporarily bypass type errors so the build succeeds.
-    // Re-enable strict checking once the site is confirmed working.
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       // Amazon product images (used in seed data)
