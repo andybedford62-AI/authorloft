@@ -121,7 +121,7 @@ export default function ArcDownloadPage() {
     );
   }
 
-  const isExpired = arc.arc.expiresAt && new Date() > new Date(arc.arc.expiresAt);
+  const isExpired = !!(arc.arc.expiresAt && new Date() > new Date(arc.arc.expiresAt));
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
