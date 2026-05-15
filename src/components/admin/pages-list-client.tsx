@@ -154,7 +154,7 @@ export function PagesListClient({ pages: initial }: PagesListClientProps) {
             <IconButton
               icon={<Trash2 className="h-4 w-4" />}
               title="Delete page"
-              variant="danger"
+              variant="delete"
               onClick={() => deletePage(page.id, page.title)}
               disabled={deleting === page.id}
               loading={deleting === page.id}
