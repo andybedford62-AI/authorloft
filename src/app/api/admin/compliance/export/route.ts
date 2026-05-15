@@ -34,7 +34,7 @@ export async function GET() {
     prisma.book.findMany({
       where: { authorId },
       select: {
-        id: true, title: true, subtitle: true, publishStatus: true,
+        id: true, title: true, subtitle: true, isPublished: true,
         priceCents: true, createdAt: true,
       },
     }),
