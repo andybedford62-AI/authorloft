@@ -32,18 +32,20 @@ import { prisma } from "@/lib/db";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "AuthorLoft — Build Your Author Website",
+  title: "Author Website Builder for Independent Authors | AuthorLoft",
   description:
-    "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required. Start free.",
+    "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
   openGraph: {
     type:        "website",
-    title:       "AuthorLoft — Build Your Author Website",
-    description: "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
+    title:       "Author Website Builder for Independent Authors | AuthorLoft",
+    description: "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
+    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft — author website builder for independent authors" }],
   },
   twitter: {
     card:        "summary_large_image",
-    title:       "AuthorLoft — Build Your Author Website",
-    description: "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
+    title:       "Author Website Builder for Independent Authors | AuthorLoft",
+    description: "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
+    images:      ["/og-home.png"],
   },
 };
 
@@ -195,6 +197,61 @@ async function getTestimonials() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+const softwareJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "AuthorLoft",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    description: "Free plan available — no credit card required",
+  },
+  description: "Author website builder with book catalog, direct sales, newsletter capture, flip books, and more.",
+  url: "https://www.authorloft.com",
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is AuthorLoft free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. AuthorLoft has a free plan with no credit card required. You can build your author website and go live in minutes at no cost.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Do I need coding skills to use AuthorLoft?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No coding skills needed. AuthorLoft is a no-code author website builder. Your site goes live instantly on your own subdomain.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I sell books directly on my author website?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Standard and Premium plans include direct ebook and PDF sales through your author website via secure Stripe checkout with instant download links.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I use a custom domain with AuthorLoft?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Every author gets a free subdomain instantly. You can connect your own custom domain on Standard and Premium plans.",
+      },
+    },
+  ],
+};
+
 export default async function MarketingPage() {
   const [plans, heroImageUrl, testimonials] = await Promise.all([getActivePlans(), getHeroImageUrl(), getTestimonials()]);
 
@@ -238,11 +295,11 @@ export default async function MarketingPage() {
             </div>
 
             <h1 className="animate-fade-up animate-delay-100 font-heading text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              Your books
+              Your author
               <br />
-              deserve a
+              website deserves
               <br />
-              <span className="text-shimmer">better home.</span>
+              <span className="text-shimmer">a better home.</span>
             </h1>
 
             <p className="animate-fade-up animate-delay-200 text-lg sm:text-xl text-blue-100/80 max-w-lg leading-relaxed">
@@ -286,7 +343,7 @@ export default async function MarketingPage() {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-lg w-full">
               <Image
                 src={heroImageUrl}
-                alt="Example author site built on AuthorLoft"
+                alt="Author website example built on AuthorLoft — book catalog and newsletter"
                 width={1092}
                 height={1404}
                 className="w-full h-auto"
@@ -307,7 +364,7 @@ export default async function MarketingPage() {
               Simple setup
             </div>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Live in three steps
+              Build your author website in three steps
             </h2>
             <p className="text-gray-500 text-lg max-w-md mx-auto">
               No developers. No agencies. No months of waiting.
@@ -350,7 +407,7 @@ export default async function MarketingPage() {
               Features
             </div>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Everything an author needs
+              Every tool an author website needs
             </h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
               Purpose-built features that go way beyond a basic website builder.
@@ -512,6 +569,9 @@ export default async function MarketingPage() {
           </div>
         </div>
       </footer>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <Script
         async
