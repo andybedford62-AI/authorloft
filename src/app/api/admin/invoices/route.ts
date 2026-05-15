@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       items: {
         include: {
           book:     { select: { title: true } },
-          saleItem: { select: { formatType: true } },
+          saleItem: { select: { format: true } },
         },
       },
     },
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
       discountCents: o.discountCents,
       items: o.items.map((i) => ({
         title:  i.book.title,
-        format: i.saleItem?.formatType ?? "—",
+        format: i.saleItem?.format ?? "—",
         cents:  i.priceCents,
       })),
     })),

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       items: {
         include: {
           book:     { select: { title: true } },
-          saleItem: { select: { formatType: true } },
+          saleItem: { select: { format: true } },
         },
       },
     },
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
   const rows = orders.map((o) => {
     const date     = o.createdAt.toISOString().split("T")[0];
     const books    = o.items.map((i) => i.book.title).join("; ");
-    const formats  = o.items.map((i) => i.saleItem?.formatType ?? "—").join("; ");
+    const formats  = o.items.map((i) => i.saleItem?.format ?? "—").join("; ");
     const discount = (o.discountCents / 100).toFixed(2);
     const total    = (o.totalCents / 100).toFixed(2);
 
