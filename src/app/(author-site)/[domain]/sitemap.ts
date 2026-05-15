@@ -103,7 +103,7 @@ export default async function sitemap({
   // Flip books
   if (author.navShowFlipBooks) {
     const flipBooks = await prisma.flipBook.findMany({
-      where: { authorId: author.id, isHidden: false },
+      where: { authorId: author.id, isActive: true },
       select: { slug: true, updatedAt: true },
     });
     if (flipBooks.length > 0) {
