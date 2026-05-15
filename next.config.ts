@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const ContentSecurityPolicy = [
   "default-src 'self'",
@@ -9,7 +10,7 @@ const ContentSecurityPolicy = [
   "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
@@ -76,4 +77,11 @@ async headers() {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  widenClientFileUpload: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});
