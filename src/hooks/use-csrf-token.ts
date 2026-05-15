@@ -27,8 +27,8 @@ export function useFetchWithCSRF() {
       const method = (options.method || "POST").toUpperCase();
       const stateChangingMethods = ["POST", "PUT", "DELETE", "PATCH"];
 
-      const headers: HeadersInit = {
-        ...options.headers,
+      const headers: Record<string, string> = {
+        ...(options.headers as Record<string, string>),
       };
 
       // Add CSRF token to state-changing requests
