@@ -34,7 +34,7 @@ export async function GET() {
     prisma.book.findMany({
       where: { authorId },
       select: {
-        id: true, title: true, subtitle: true, publishStatus: true,
+        id: true, title: true, subtitle: true, isPublished: true,
         priceCents: true, createdAt: true,
       },
     }),
@@ -50,7 +50,7 @@ export async function GET() {
     prisma.subscriber.count({ where: { authorId } }),
     prisma.post.findMany({
       where: { authorId },
-      select: { id: true, title: true, status: true, createdAt: true },
+      select: { id: true, title: true, isPublished: true, createdAt: true },
     }),
     prisma.authorPage.findMany({
       where: { authorId },

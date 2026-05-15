@@ -77,7 +77,7 @@ async function getDashboardData(authorId: string) {
           (plan.plan.maxBooks === -1 || plan.plan.maxBooks === null) ? "Unlimited books" : `Up to ${plan.plan.maxBooks} books`,
           plan.plan.customDomain ? "Custom domain" : null,
           plan.plan.salesEnabled ? "Sales enabled" : null,
-        ].filter(Boolean)
+        ].filter((x): x is string => x !== null)
       : ["Up to 5 books"],
   };
 }

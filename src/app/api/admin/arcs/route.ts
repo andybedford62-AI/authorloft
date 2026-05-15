@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
         },
       };
     })
-    .filter(Boolean);
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
   return NextResponse.json({ arcs });
 }

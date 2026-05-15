@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     await sendMail({
       to:      adminEmail,
       subject: `Account Deletion Request — ${author.name} (${author.slug})`,
+      text: `Account Deletion Request\nName: ${author.name}\nEmail: ${author.email}\nSlug: ${author.slug}\nReason: ${reason?.trim() || "Not provided"}\nRequested at: ${new Date().toISOString()}`,
       html:    `
         <p>An author has requested deletion of their account.</p>
         <ul>

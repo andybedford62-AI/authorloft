@@ -147,12 +147,12 @@ export default function AnalyticsPage() {
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 11, fill: "#9ca3af" }}
-                tickFormatter={(d: string) => d.slice(5)}
+                tickFormatter={(d) => String(d).slice(5)}
               />
               <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} allowDecimals={false} />
               <Tooltip
-                formatter={(v: number) => [v.toLocaleString(), "Views"]}
-                labelFormatter={(l: string) => `Date: ${l}`}
+                formatter={(v) => [(Number(v) || 0).toLocaleString(), "Views"]}
+                labelFormatter={(l) => `Date: ${l}`}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
               />
               <Line type="monotone" dataKey="views" stroke="#3b82f6" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />

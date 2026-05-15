@@ -30,7 +30,7 @@ export async function DELETE(
   await Promise.allSettled([
     record.fileKey      ? deleteFromSupabaseStorage("book-previews", record.fileKey)      : null,
     record.thumbnailFileKey ? deleteFromSupabaseStorage("book-previews", record.thumbnailFileKey) : null,
-  ].filter(Boolean));
+  ].filter((x): x is Promise<void> => x !== null));
 
   await prisma.bookPreviewMedia.delete({ where: { id } });
 
