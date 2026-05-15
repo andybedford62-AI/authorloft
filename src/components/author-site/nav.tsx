@@ -166,32 +166,32 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </button>
           )}
 
-          {/* Get Started CTA — shown to non-owners */}
+          {/* Join AuthorLoft CTA — shown to non-owners */}
           {!isOwner && (
             <a
-              href={platformBase}
+              href={`${platformBase}/register`}
               className="text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
-              style={{ color: accentColor, borderColor: accentColor }}
+              style={{ color: "#22c55e", borderColor: "#22c55e" }}
             >
-              Get Started
+              Join AuthorLoft
             </a>
           )}
         </div>
 
-        {/* ── Cart icon (always visible) ────────────────────────────────── */}
-        <button
-          onClick={openCart}
-          className="relative p-2 text-white/70 hover:text-white transition-colors"
-          aria-label={`Open cart${itemCount > 0 ? ` (${itemCount} item${itemCount === 1 ? "" : "s"})` : ""}`}
-        >
-          <ShoppingCart className="h-5 w-5" />
-          {itemCount > 0 && (
+        {/* ── Cart icon (only visible when items in cart) ───────────────── */}
+        {itemCount > 0 && (
+          <button
+            onClick={openCart}
+            className="relative p-2 text-white/70 hover:text-white transition-colors"
+            aria-label={`Open cart (${itemCount} item${itemCount === 1 ? "" : "s"})`}
+          >
+            <ShoppingCart className="h-5 w-5" />
             <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-white text-[10px] font-bold flex items-center justify-center leading-none"
               style={{ color: accentColor }}>
               {itemCount > 9 ? "9+" : itemCount}
             </span>
-          )}
-        </button>
+          </button>
+        )}
 
         {/* ── Mobile hamburger ──────────────────────────────────────────── */}
         <button
@@ -250,11 +250,11 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
 
             {!isOwner && (
               <a
-                href={platformBase}
+                href={`${platformBase}/register`}
                 className="mt-1 text-center text-sm font-semibold px-4 py-2 rounded-md border transition-colors"
-                style={{ color: accentColor, borderColor: accentColor }}
+                style={{ color: "#22c55e", borderColor: "#22c55e" }}
               >
-                Get Started
+                Join AuthorLoft
               </a>
             )}
           </nav>
