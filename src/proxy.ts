@@ -138,6 +138,19 @@ export async function proxy(req: NextRequest) {
   // Strip port for local dev comparison
   const hostnameWithoutPort = hostname.split(":")[0];
 
+  // ── Admin API auth guard (defense-in-depth) ─────────────────────────────
+  // Edge-level JWT check before requests reach serverless functions.
+  // Individual route handlers still perform their own auth checks.
+  if (url.pathname.startsWith("/api/admin/") || url.pathname.startsWith("/api/super-admin/")) {
+    const sessionToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!sessionToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (url.pathname.startsWith("/api/super-admin/") && !sessionToken.isSuperAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  }
+
   // ── API routes always pass through ──────────────────────────────────────
   // Auth, webhooks, and all API routes must never be rewritten regardless of
   // which domain the request arrives on (platform, subdomain, or custom domain).
