@@ -30,7 +30,7 @@ async function main() {
     where: { tier: "FREE" },
     update: {},
     create: {
-      name: "Free", tier: "FREE", maxBooks: 5, maxStorageMb: 100,
+      name: "Free", tier: "FREE", slug: "free", maxBooks: 5, maxStorageMb: 100,
       customDomain: false, salesEnabled: false, flipBooksLimit: 0, monthlyPriceCents: 0,
     },
   });
@@ -39,7 +39,7 @@ async function main() {
     where: { tier: "STANDARD" },
     update: {},
     create: {
-      name: "Standard", tier: "STANDARD", maxBooks: -1, maxStorageMb: 2000,
+      name: "Standard", tier: "STANDARD", slug: "standard", maxBooks: -1, maxStorageMb: 2000,
       customDomain: true, salesEnabled: true, flipBooksLimit: -1, monthlyPriceCents: 1200,
     },
   });
@@ -48,7 +48,7 @@ async function main() {
     where: { tier: "PREMIUM" },
     update: {},
     create: {
-      name: "Premium", tier: "PREMIUM", maxBooks: -1, maxStorageMb: 10000,
+      name: "Premium", tier: "PREMIUM", slug: "premium", maxBooks: -1, maxStorageMb: 10000,
       customDomain: true, salesEnabled: true, flipBooksLimit: -1,
       analyticsEnabled: true, monthlyPriceCents: 2900,
     },
