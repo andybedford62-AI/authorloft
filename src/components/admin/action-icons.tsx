@@ -32,7 +32,7 @@ export function EditAction({ onClick, disabled, loading }: ActionIconProps) {
       onClick={onClick}
       disabled={disabled}
       loading={loading}
-      variant="primary"
+      variant="edit"
     />
   );
 }
@@ -45,7 +45,7 @@ export function DeleteAction({ onClick, disabled, loading }: ActionIconProps) {
       onClick={onClick}
       disabled={disabled}
       loading={loading}
-      variant="danger"
+      variant="delete"
     />
   );
 }
@@ -58,7 +58,7 @@ export function AddAction({ onClick, disabled, loading }: ActionIconProps) {
       onClick={onClick}
       disabled={disabled}
       loading={loading}
-      variant="primary"
+      variant="add"
     />
   );
 }
@@ -88,7 +88,7 @@ export function SaveAction({
       disabled={disabled}
       loading={loading}
       type="submit"
-      variant="success"
+      variant="add"
     />
   );
 }
@@ -151,7 +151,7 @@ export function ArchiveAction({ onClick, disabled, loading }: ActionIconProps) {
       onClick={onClick}
       disabled={disabled}
       loading={loading}
-      variant="warning"
+      variant="edit"
     />
   );
 }
