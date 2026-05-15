@@ -168,7 +168,7 @@ async function getActivePlans() {
       featuredLabel: true, badgeColor: true,
       maxBooks: true, maxPosts: true, maxStorageMb: true,
       customDomain: true, salesEnabled: true, newsletter: true,
-      analyticsEnabled: true, flipBooksLimit: true, isDefault: true,
+      analyticsEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, isDefault: true,
     },
     orderBy: { sortOrder: "asc" },
   }).catch(() => []);

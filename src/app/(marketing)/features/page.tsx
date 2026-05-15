@@ -45,6 +45,7 @@ async function getActivePlans() {
       newsletter: true,
       analyticsEnabled: true,
       flipBooksLimit: true,
+      mediaKitEnabled: true,
       isDefault: true,
     },
       orderBy: { sortOrder: "asc" },

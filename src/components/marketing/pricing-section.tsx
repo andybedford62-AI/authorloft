@@ -22,6 +22,7 @@ export type PlanData = {
   newsletter: boolean;
   analyticsEnabled: boolean;
   flipBooksLimit: number;
+  mediaKitEnabled: boolean;
   isDefault: boolean;
 };
 
