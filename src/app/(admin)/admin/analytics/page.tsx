@@ -151,7 +151,7 @@ export default function AnalyticsPage() {
               />
               <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} allowDecimals={false} />
               <Tooltip
-                formatter={(v: number | undefined) => [(v ?? 0).toLocaleString(), "Views"]}
+                formatter={(v) => [(Number(v) || 0).toLocaleString(), "Views"]}
                 labelFormatter={(l: string) => `Date: ${l}`}
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
               />
