@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: "Invalid checkout request",
-          details: validationResult.error.errors.map((e) => ({
+          details: validationResult.error.issues.map((e) => ({
             field: e.path.join("."),
             message: e.message,
           })),
