@@ -31,7 +31,7 @@ async function main() {
     update: {},
     create: {
       name: "Free", tier: "FREE", maxBooks: 5, maxStorageMb: 100,
-      customDomain: false, salesEnabled: false, flipBooksEnabled: false, monthlyPriceCents: 0,
+      customDomain: false, salesEnabled: false, flipBooksLimit: 0, monthlyPriceCents: 0,
     },
   });
 
@@ -40,7 +40,7 @@ async function main() {
     update: {},
     create: {
       name: "Standard", tier: "STANDARD", maxBooks: -1, maxStorageMb: 2000,
-      customDomain: true, salesEnabled: true, flipBooksEnabled: true, monthlyPriceCents: 1200,
+      customDomain: true, salesEnabled: true, flipBooksLimit: -1, monthlyPriceCents: 1200,
     },
   });
 
@@ -49,7 +49,7 @@ async function main() {
     update: {},
     create: {
       name: "Premium", tier: "PREMIUM", maxBooks: -1, maxStorageMb: 10000,
-      customDomain: true, salesEnabled: true, flipBooksEnabled: true,
+      customDomain: true, salesEnabled: true, flipBooksLimit: -1,
       analyticsEnabled: true, monthlyPriceCents: 2900,
     },
   });
