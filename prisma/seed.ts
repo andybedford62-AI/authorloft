@@ -158,7 +158,7 @@ async function main() {
     const book = await prisma.book.upsert({
       where: { authorId_slug: { authorId: author.id, slug: data.slug } },
       update: {},
-      create: { authorId: author.id, isPublished: true, format: "EBOOK", externalBuyUrl: "#", ...data },
+      create: { authorId: author.id, isPublished: true, availableFormats: ["EBOOK"], externalBuyUrl: "#", ...data },
     });
     for (const genreId of genres) {
       await prisma.bookGenre.upsert({
