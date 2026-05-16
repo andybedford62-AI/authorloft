@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Mail, Save, Loader2, RotateCcw, Send } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Mail, Save, Loader2, RotateCcw, Send, Search, X } from "lucide-react";
+
+interface AuthorResult {
+  id:          string;
+  email:       string;
+  name:        string;
+  displayName: string | null;
+  slug:        string;
+}
 
 const DEFAULT_SUBJECT = "🎉 Welcome to AuthorLoft — your author site is live!";
 
@@ -43,12 +51,50 @@ export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const [error,      setError]      = useState("");
-  const [testEmail,  setTestEmail]  = useState("");
-  const [testName,   setTestName]   = useState("");
-  const [testSlug,   setTestSlug]   = useState("");
-  const [testSending, setTestSending] = useState(false);
-  const [testSent,   setTestSent]   = useState(false);
-  const [testError,  setTestError]  = useState("");
+  const [testEmail,    setTestEmail]    = useState("");
+  const [testName,     setTestName]     = useState("");
+  const [testSlug,     setTestSlug]     = useState("");
+  const [testSending,  setTestSending]  = useState(false);
+  const [testSent,     setTestSent]     = useState(false);
+  const [testError,    setTestError]    = useState("");
+  const [searchQuery,  setSearchQuery]  = useState("");
+  const [searchResults, setSearchResults] = useState<AuthorResult[]>([]);
+  const [searching,    setSearching]    = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState<AuthorResult | null>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleSearchChange(value: string) {
+    setSearchQuery(value);
+    setSelectedAuthor(null);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (value.length < 2) { setSearchResults([]); return; }
+    setSearching(true);
+    searchTimeout.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/super-admin/authors/search?q=${encodeURIComponent(value)}`);
+        const data = await res.json();
+        setSearchResults(data);
+      } catch {}
+      finally { setSearching(false); }
+    }, 300);
+  }
+
+  function selectAuthor(author: AuthorResult) {
+    setSelectedAuthor(author);
+    setTestEmail(author.email);
+    setTestName(author.displayName || author.name);
+    setTestSlug(author.slug);
+    setSearchQuery("");
+    setSearchResults([]);
+    setTestError("");
+  }
+
+  function clearSelection() {
+    setSelectedAuthor(null);
+    setTestEmail("");
+    setTestName("");
+    setTestSlug("");
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -163,30 +209,51 @@ export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
           Send a test
         </p>
         <p className="text-xs text-gray-500">
-          Send the current saved template to a specific email to preview how it looks. Variables will be resolved using the values below.
+          Search for an author to pre-fill their details, or enter an email manually.
         </p>
-        <div className="grid sm:grid-cols-3 gap-2">
-          <input
-            type="email"
-            value={testEmail}
-            onChange={e => setTestEmail(e.target.value)}
-            placeholder="Email address *"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <input
-            type="text"
-            value={testName}
-            onChange={e => setTestName(e.target.value)}
-            placeholder="Name (default: Test Author)"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <input
-            type="text"
-            value={testSlug}
-            onChange={e => setTestSlug(e.target.value)}
-            placeholder="Slug (default: test-author)"
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+
+        {/* Author search */}
+        <div className="relative">
+          {selectedAuthor ? (
+            <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
+              <div>
+                <p className="text-sm font-medium text-purple-900">{selectedAuthor.displayName || selectedAuthor.name}</p>
+                <p className="text-xs text-purple-600">{selectedAuthor.email} · {selectedAuthor.slug}.authorloft.com</p>
+              </div>
+              <button onClick={clearSelection} className="text-purple-400 hover:text-purple-600">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => handleSearchChange(e.target.value)}
+                  placeholder="Search by name, email, or slug…"
+                  className="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 animate-spin text-gray-400" />}
+              </div>
+              {searchResults.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  {searchResults.map(author => (
+                    <li key={author.id}>
+                      <button
+                        onClick={() => selectAuthor(author)}
+                        className="w-full text-left px-3 py-2.5 hover:bg-purple-50 transition-colors"
+                      >
+                        <p className="text-sm font-medium text-gray-900">{author.displayName || author.name}</p>
+                        <p className="text-xs text-gray-500">{author.email} · {author.slug}</p>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
         </div>
         {testError && <p className="text-xs text-red-600">{testError}</p>}
         <div className="flex items-center gap-3">
