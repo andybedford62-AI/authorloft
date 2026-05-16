@@ -9,8 +9,14 @@
 import { Resend } from "resend";
 import { prisma } from "./db";
 
-const FROM_ADDRESS         = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
-const WELCOME_FROM_ADDRESS = "AuthorLoft <welcome@authorloft.com>";
+const FROM_ADDRESS           = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
+const WELCOME_FROM_ADDRESS   = "AuthorLoft <welcome@authorloft.com>";
+const BROADCAST_FROM_ADDRESS = "AuthorLoft <hello@authorloft.com>";
+
+export function buildUnsubscribeLink(token: string): string {
+  const base = (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
+  return `${base}/api/unsubscribe/platform?token=${token}`;
+}
 
 export function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -931,4 +937,60 @@ export async function sendMail(opts: MailOptions): Promise<boolean> {
     console.error("[mailer] Failed to send email:", err);
     return false;
   }
+}
+
+// ── Platform broadcast email ──────────────────────────────────────────────────
+
+export function buildPlatformBroadcastEmail(opts: {
+  firstName: string;
+  subject: string;
+  body: string;
+  unsubscribeUrl: string;
+}): { html: string; text: string } {
+  const escapedBody = opts.body
+    .split("\n")
+    .map(line => `<p style="margin:0 0 10px;font-size:14px;color:#374151;line-height:1.6;">${esc(line) || "&nbsp;"}</p>`)
+    .join("\n");
+
+  const html = wrapHtml(opts.subject, `
+    ${escapedBody}
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+      <tr>
+        <td align="center" style="padding:8px 0 24px;">
+          <a href="${opts.unsubscribeUrl}"
+             style="font-size:12px;color:#9ca3af;text-decoration:underline;">
+            Unsubscribe from AuthorLoft announcements
+          </a>
+        </td>
+      </tr>
+    </table>
+  `);
+
+  const text = opts.body + `\n\n---\nUnsubscribe: ${opts.unsubscribeUrl}`;
+
+  return { html, text };
+}
+
+export function buildBroadcastMailPayload(opts: {
+  to: string;
+  firstName: string;
+  subject: string;
+  body: string;
+  unsubscribeToken: string;
+}) {
+  const unsubscribeUrl = buildUnsubscribeLink(opts.unsubscribeToken);
+  const resolvedBody   = opts.body.replace(/\{\{firstName\}\}/g, opts.firstName);
+  const { html, text } = buildPlatformBroadcastEmail({
+    firstName:      opts.firstName,
+    subject:        opts.subject,
+    body:           resolvedBody,
+    unsubscribeUrl,
+  });
+  return {
+    from:    BROADCAST_FROM_ADDRESS,
+    to:      opts.to,
+    subject: opts.subject,
+    html,
+    text,
+  };
 }

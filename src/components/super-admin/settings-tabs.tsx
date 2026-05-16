@@ -26,6 +26,7 @@ import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
 import { TestimonialsPanel } from "./testimonials-panel";
 import { WelcomeEmailPanel } from "./welcome-email-panel";
+import { MassEmailPanel } from "./mass-email-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -82,6 +83,7 @@ type SectionId =
   | "overview"
   | "emails"
   | "welcome-email"
+  | "mass-email"
   | "marketing"
   | "testimonials"
   | "maintenance"
@@ -110,6 +112,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Communications",
     items: [
       { id: "welcome-email", label: "Welcome Email",   icon: Zap           },
+      { id: "mass-email",    label: "Mass Email",      icon: MessageSquare },
       { id: "emails",        label: "Email Addresses", icon: Mail          },
     ],
   },
@@ -180,6 +183,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
         {active === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
         {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
         {active === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
+        {active === "mass-email"    && <MassEmailPanel />}
         {active === "configuration" && <ConfigurationTab {...props} />}
       </div>
     </div>

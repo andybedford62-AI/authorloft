@@ -1,0 +1,200 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Send, Loader2, History, Users } from "lucide-react";
+
+type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM";
+
+interface Broadcast {
+  id:             string;
+  subject:        string;
+  audienceFilter: string;
+  recipientCount: number;
+  sentAt:         string;
+}
+
+const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
+  { value: "ALL",      label: "All Authors"     },
+  { value: "FREE",     label: "Free Plan Only"  },
+  { value: "STANDARD", label: "Standard Plan"   },
+  { value: "PREMIUM",  label: "Premium Plan"    },
+];
+
+export function MassEmailPanel() {
+  const [subject,      setSubject]      = useState("");
+  const [body,         setBody]         = useState("");
+  const [audience,     setAudience]     = useState<AudienceFilter>("ALL");
+  const [count,        setCount]        = useState<number | null>(null);
+  const [sending,      setSending]      = useState(false);
+  const [result,       setResult]       = useState<{ sent: number; failed: number } | null>(null);
+  const [error,        setError]        = useState("");
+  const [history,      setHistory]      = useState<Broadcast[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+
+  // Load broadcast history
+  useEffect(() => {
+    fetch("/api/super-admin/broadcasts")
+      .then(r => r.json())
+      .then(setHistory)
+      .catch(() => {})
+      .finally(() => setLoadingHistory(false));
+  }, []);
+
+  // Live recipient count when audience changes
+  useEffect(() => {
+    setCount(null);
+    fetch(`/api/super-admin/broadcasts?count=1&filter=${audience}`)
+      .then(r => r.json())
+      .then(d => setCount(d.count))
+      .catch(() => setCount(null));
+  }, [audience]);
+
+  async function handleSend() {
+    if (!subject.trim() || !body.trim()) {
+      setError("Subject and body are required.");
+      return;
+    }
+    if (!confirm(`Send to ${count ?? "?"} authors (${audience})? This cannot be undone.`)) return;
+
+    setSending(true);
+    setError("");
+    setResult(null);
+    try {
+      const res = await fetch("/api/super-admin/broadcasts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, broadcastBody: body, audienceFilter: audience }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Send failed");
+      setResult({ sent: data.sent, failed: data.failed });
+      setSubject("");
+      setBody("");
+      // Refresh history
+      fetch("/api/super-admin/broadcasts").then(r => r.json()).then(setHistory).catch(() => {});
+    } catch (err: any) {
+      setError(err.message || "Failed to send broadcast.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+
+      {/* Compose */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Send className="h-4 w-4 text-gray-400" />
+          New Broadcast
+        </h2>
+        <p className="text-sm text-gray-500">
+          Send an announcement, offer, or update to your authors. An unsubscribe link is automatically included.
+          Use <code className="bg-gray-100 px-1 rounded text-xs">{"{{firstName}}"}</code> to personalise.
+        </p>
+
+        {/* Audience */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">Audience</label>
+          <div className="flex items-center gap-3">
+            <select
+              value={audience}
+              onChange={e => setAudience(e.target.value as AudienceFilter)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              {AUDIENCE_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <span className="flex items-center gap-1.5 text-sm text-gray-500">
+              <Users className="h-4 w-4 text-gray-400" />
+              {count === null ? "Counting…" : `${count.toLocaleString()} recipient${count !== 1 ? "s" : ""}`}
+            </span>
+          </div>
+        </div>
+
+        {/* Subject */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">Subject</label>
+          <input
+            type="text"
+            value={subject}
+            onChange={e => setSubject(e.target.value)}
+            placeholder="Email subject…"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+
+        {/* Body */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-gray-700">Body (plain text)</label>
+          <textarea
+            value={body}
+            onChange={e => setBody(e.target.value)}
+            rows={12}
+            placeholder={`Hi {{firstName}},\n\nYour message here…\n\n— The AuthorLoft Team`}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 resize-y"
+          />
+        </div>
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {result && (
+          <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+            Sent to {result.sent.toLocaleString()} author{result.sent !== 1 ? "s" : ""}.
+            {result.failed > 0 && ` ${result.failed} failed.`}
+          </p>
+        )}
+
+        <button
+          onClick={handleSend}
+          disabled={sending || count === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+        >
+          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {sending ? "Sending…" : `Send to ${count ?? "?"} authors`}
+        </button>
+      </div>
+
+      {/* History */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <History className="h-4 w-4 text-gray-400" />
+          Broadcast History
+        </h2>
+        {loadingHistory ? (
+          <p className="text-sm text-gray-400">Loading…</p>
+        ) : history.length === 0 ? (
+          <p className="text-sm text-gray-400">No broadcasts sent yet.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs font-semibold text-gray-500 border-b border-gray-100">
+                <th className="pb-2 font-medium">Date</th>
+                <th className="pb-2 font-medium">Subject</th>
+                <th className="pb-2 font-medium">Audience</th>
+                <th className="pb-2 font-medium text-right">Sent</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {history.map(b => (
+                <tr key={b.id} className="text-gray-700">
+                  <td className="py-2.5 pr-4 text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(b.sentAt).toLocaleDateString()}
+                  </td>
+                  <td className="py-2.5 pr-4 max-w-[240px] truncate">{b.subject}</td>
+                  <td className="py-2.5 pr-4">
+                    <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                      {b.audienceFilter}
+                    </span>
+                  </td>
+                  <td className="py-2.5 text-right font-medium">{b.recipientCount.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}

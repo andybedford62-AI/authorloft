@@ -151,6 +151,8 @@ model Author {
   emailProvider        String?        // "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN"
   emailProviderKey     String?        // API key for the connected email service
   emailProviderExtra   String?        // Provider-specific extra: Mailchimp audience ID or ActiveCampaign account URL
+  platformEmailOptOut  Boolean   @default(false)
+  platformEmailsToken  String    @unique @default(cuid())
   termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
   onboardingCompletedAt   DateTime?      // set when first book is created; null = never completed onboarding
   onboardingReminderSentAt DateTime?     // set when the day-7 nudge email is sent
@@ -555,6 +557,17 @@ model Campaign {
   author       Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
+}
+
+model PlatformBroadcast {
+  id             String   @id @default(cuid())
+  subject        String
+  body           String
+  audienceFilter String   @default("ALL")
+  recipientCount Int      @default(0)
+  sentAt         DateTime @default(now())
+  sentBy         String
+  createdAt      DateTime @default(now())
 }
 
 // ─── Orders & Sales ───────────────────────────────────────────────────────────

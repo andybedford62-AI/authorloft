@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
@@ -685,16 +685,91 @@ function AdminThemeSection() {
   );
 }
 
+// ── Email Preferences section ─────────────────────────────────────────────────
+
+function EmailPreferencesSection() {
+  const [optOut,   setOptOut]   = useState(false);
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
+  const [saved,    setSaved]    = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/email-preferences")
+      .then(r => r.json())
+      .then(d => setOptOut(d.optOut ?? false))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleToggle() {
+    const newValue = !optOut;
+    setSaving(true);
+    setSaved(false);
+    try {
+      await fetch("/api/admin/settings/email-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ optOut: newValue }),
+      });
+      setOptOut(newValue);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {}
+    finally { setSaving(false); }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <Bell className="h-4 w-4 text-gray-400" />
+        <h2 className="font-semibold text-gray-900">Platform Communications</h2>
+      </div>
+      <p className="text-sm text-gray-500">
+        Control whether you receive announcements, offers, and updates from the AuthorLoft team.
+      </p>
+
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      ) : (
+        <div className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <button
+              role="switch"
+              aria-checked={!optOut}
+              onClick={handleToggle}
+              disabled={saving}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 ${
+                !optOut ? "bg-[var(--accent)]" : "bg-gray-200"
+              }`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${!optOut ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className="text-sm font-medium text-gray-700">
+              {!optOut ? "Receiving platform emails" : "Opted out of platform emails"}
+            </span>
+            {saving && <Loader2 className="h-3.5 w-3.5 animate-spin text-gray-400" />}
+            {saved  && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+          </label>
+          <p className="text-xs text-gray-400">
+            You will always receive transactional emails (password resets, billing receipts, order confirmations) regardless of this setting.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // ── Tab types ────────────────────────────────────────────────────────────────
 
-type SettingsTab = "account" | "billing" | "integrations" | "appearance" | "danger";
+type SettingsTab = "account" | "billing" | "integrations" | "appearance" | "communications" | "danger";
 
 const TABS: { id: SettingsTab; label: string }[] = [
-  { id: "account",      label: "Account" },
-  { id: "billing",      label: "Billing" },
-  { id: "integrations", label: "Integrations" },
-  { id: "appearance",   label: "Appearance" },
-  { id: "danger",       label: "Danger Zone" },
+  { id: "account",        label: "Account"        },
+  { id: "billing",        label: "Billing"        },
+  { id: "integrations",   label: "Integrations"   },
+  { id: "appearance",     label: "Appearance"     },
+  { id: "communications", label: "Communications" },
+  { id: "danger",         label: "Danger Zone"    },
 ];
 
 // ── Account tab content ───────────────────────────────────────────────────────
@@ -888,6 +963,8 @@ export default function SettingsPage() {
       {activeTab === "integrations" && <AiKeySection />}
 
       {activeTab === "appearance" && <AdminThemeSection />}
+
+      {activeTab === "communications" && <EmailPreferencesSection />}
 
       {activeTab === "danger" && (
         <section className="bg-white rounded-xl border border-red-100 p-6">
