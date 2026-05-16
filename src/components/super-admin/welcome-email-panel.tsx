@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Save, Loader2, RotateCcw } from "lucide-react";
+import { Mail, Save, Loader2, RotateCcw, Send } from "lucide-react";
 
 const DEFAULT_SUBJECT = "🎉 Welcome to AuthorLoft — your author site is live!";
 
@@ -38,11 +38,17 @@ interface Props {
 }
 
 export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
-  const [subject, setSubject] = useState(initialSubject ?? DEFAULT_SUBJECT);
-  const [body,    setBody]    = useState(initialBody    ?? DEFAULT_BODY);
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
-  const [error,   setError]   = useState("");
+  const [subject,    setSubject]    = useState(initialSubject ?? DEFAULT_SUBJECT);
+  const [body,       setBody]       = useState(initialBody    ?? DEFAULT_BODY);
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
+  const [error,      setError]      = useState("");
+  const [testEmail,  setTestEmail]  = useState("");
+  const [testName,   setTestName]   = useState("");
+  const [testSlug,   setTestSlug]   = useState("");
+  const [testSending, setTestSending] = useState(false);
+  const [testSent,   setTestSent]   = useState(false);
+  const [testError,  setTestError]  = useState("");
 
   async function handleSave() {
     setSaving(true);
@@ -61,6 +67,27 @@ export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
       setError("Failed to save. Please try again.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleTestSend() {
+    if (!testEmail.trim()) { setTestError("Email address is required."); return; }
+    setTestSending(true);
+    setTestError("");
+    setTestSent(false);
+    try {
+      const res = await fetch("/api/super-admin/welcome-email/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: testEmail.trim(), name: testName.trim() || "Test Author", slug: testSlug.trim() || "test-author" }),
+      });
+      if (!res.ok) throw new Error("Send failed");
+      setTestSent(true);
+      setTimeout(() => setTestSent(false), 4000);
+    } catch {
+      setTestError("Failed to send test email.");
+    } finally {
+      setTestSending(false);
     }
   }
 
@@ -127,6 +154,52 @@ export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
           {saving ? "Saving…" : "Save"}
         </button>
         {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
+      </div>
+
+      {/* Test send */}
+      <div className="border-t border-gray-100 pt-5 space-y-3">
+        <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <Send className="h-3.5 w-3.5 text-gray-400" />
+          Send a test
+        </p>
+        <p className="text-xs text-gray-500">
+          Send the current saved template to a specific email to preview how it looks. Variables will be resolved using the values below.
+        </p>
+        <div className="grid sm:grid-cols-3 gap-2">
+          <input
+            type="email"
+            value={testEmail}
+            onChange={e => setTestEmail(e.target.value)}
+            placeholder="Email address *"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <input
+            type="text"
+            value={testName}
+            onChange={e => setTestName(e.target.value)}
+            placeholder="Name (default: Test Author)"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <input
+            type="text"
+            value={testSlug}
+            onChange={e => setTestSlug(e.target.value)}
+            placeholder="Slug (default: test-author)"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+        {testError && <p className="text-xs text-red-600">{testError}</p>}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleTestSend}
+            disabled={testSending}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          >
+            {testSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            {testSending ? "Sending…" : "Send test"}
+          </button>
+          {testSent && <span className="text-sm text-green-600 font-medium">Sent!</span>}
+        </div>
       </div>
     </div>
   );
