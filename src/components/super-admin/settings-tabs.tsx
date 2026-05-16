@@ -23,6 +23,7 @@ import { MarketingHeroImage } from "./marketing-hero-image";
 import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
 import { TestimonialsPanel } from "./testimonials-panel";
+import { WelcomeEmailPanel } from "./welcome-email-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -68,6 +69,8 @@ export interface SettingsTabsProps {
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
+  welcomeEmailSubject: string | null;
+  welcomeEmailBody:    string | null;
   /** Env var display values — secrets resolved server-side before passing to client */
   envValues: { label: string; value: string | undefined }[];
 }
@@ -81,6 +84,7 @@ const TABS = [
   { id: "marketing",     label: "Marketing",       icon: Image    },
   { id: "testimonials",  label: "Testimonials",    icon: Star     },
   { id: "emails",        label: "Email Addresses", icon: Mail     },
+  { id: "welcome-email", label: "Welcome Email",   icon: Zap      },
   { id: "configuration", label: "Configuration",   icon: Globe    },
 ] as const;
 
@@ -118,6 +122,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
       {activeTab === "marketing"     && <MarketingTab     {...props} />}
       {activeTab === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
       {activeTab === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
+      {activeTab === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
       {activeTab === "configuration" && <ConfigurationTab {...props} />}
     </div>
   );

@@ -8,18 +8,18 @@ import type { Metadata } from "next";
 export const revalidate = 3600; // fallback: refresh at most every hour
 
 export const metadata: Metadata = {
-  title: "Pricing | AuthorLoft",
+  title: "AuthorLoft Pricing — Free Author Website Builder",
   description:
-    "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+    "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
   openGraph: {
     type:        "website",
-    title:       "AuthorLoft Pricing — Free Plan Available",
-    description: "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+    title:       "AuthorLoft Pricing — Free Author Website Builder",
+    description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
   },
   twitter: {
     card:        "summary_large_image",
-    title:       "AuthorLoft Pricing — Free Plan Available",
-    description: "Simple, transparent pricing for every author. Start free and upgrade when you're ready to grow.",
+    title:       "AuthorLoft Pricing — Free Author Website Builder",
+    description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
   },
 };
 

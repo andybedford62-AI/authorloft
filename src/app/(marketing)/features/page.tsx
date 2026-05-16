@@ -8,18 +8,18 @@ import type { Metadata } from "next";
 export const revalidate = 3600; // refresh at most every hour
 
 export const metadata: Metadata = {
-  title: "All Features | AuthorLoft",
+  title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
   description:
-    "Complete feature matrix for AuthorLoft's FREE, STANDARD, and PREMIUM plans. Compare what's included at each tier.",
+    "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
   openGraph: {
     type: "website",
-    title: "AuthorLoft — Complete Feature Matrix",
-    description: "Compare features across all pricing tiers.",
+    title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
+    description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AuthorLoft — Complete Feature Matrix",
-    description: "Compare features across all pricing tiers.",
+    title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
+    description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
   },
 };
 

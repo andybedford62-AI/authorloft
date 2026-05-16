@@ -34,17 +34,17 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Author Website Builder for Independent Authors | AuthorLoft",
   description:
-    "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
+    "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
   openGraph: {
     type:        "website",
     title:       "Author Website Builder for Independent Authors | AuthorLoft",
-    description: "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
+    description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
     images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft — author website builder for independent authors" }],
   },
   twitter: {
     card:        "summary_large_image",
     title:       "Author Website Builder for Independent Authors | AuthorLoft",
-    description: "AuthorLoft is the author website builder built for indie authors. Book catalog, direct sales, newsletter capture — live in minutes. Free plan forever.",
+    description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
     images:      ["/og-home.png"],
   },
 };
@@ -295,11 +295,9 @@ export default async function MarketingPage() {
             </div>
 
             <h1 className="animate-fade-up animate-delay-100 font-heading text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              Your author
+              Your author website,
               <br />
-              website deserves
-              <br />
-              <span className="text-shimmer">a better home.</span>
+              <span className="text-shimmer">built for indie authors.</span>
             </h1>
 
             <p className="animate-fade-up animate-delay-200 text-lg sm:text-xl text-blue-100/80 max-w-lg leading-relaxed">

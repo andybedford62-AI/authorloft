@@ -7,8 +7,10 @@
  */
 
 import { Resend } from "resend";
+import { prisma } from "./db";
 
-const FROM_ADDRESS = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
+const FROM_ADDRESS         = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
+const WELCOME_FROM_ADDRESS = "AuthorLoft <welcome@authorloft.com>";
 
 export function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -63,6 +65,7 @@ export interface MailOptions {
   text: string;
   html?: string;
   replyTo?: string;
+  from?: string;
 }
 
 // ── Sale notification email (to author) ──────────────────────────────────────
@@ -263,50 +266,79 @@ export async function sendPasswordResetEmail(to: string, token: string) {
   });
 }
 
+const DEFAULT_WELCOME_SUBJECT = "🎉 Welcome to AuthorLoft — your author site is live!";
+const DEFAULT_WELCOME_BODY = `Hi {{firstName}},
+
+Congratulations — your AuthorLoft account is active and your author site is already live on the internet.
+
+Your site: {{siteUrl}}
+
+─── Your first 3 steps ───
+
+1. Add your books — Head to the Books menu and add your first title. Include a cover, description, and buy links.
+2. Personalise your site — Upload your author photo, write your bio, and set your accent colour in Appearance.
+3. Share your link — Post your site URL on social, add it to your email signature, and tell your readers.
+
+─── When you're ready to grow ───
+
+Your free plan is a great start. Here's what unlocks on Standard ($39.99/mo):
+• Sell books directly — Keep more revenue. No middlemen.
+• Custom domain — Use your own authorname.com address.
+• Unlimited books — No cap on your catalog.
+
+And on Premium ($79.99/mo): full analytics so you can see exactly who's finding you and where they come from.
+
+No pressure — upgrade whenever it makes sense.
+
+Questions? Just reply to this email — we read every one.
+
+— The AuthorLoft Team`;
+
+function substituteVars(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? `{{${key}}}`);
+}
+
+function plainTextToHtml(text: string): string {
+  return text
+    .split("\n")
+    .map(line => `<p style="margin:0 0 10px;font-size:14px;color:#374151;line-height:1.6;">${esc(line) || "&nbsp;"}</p>`)
+    .join("\n");
+}
+
 export async function sendWelcomeEmail(to: string, name: string, slug: string) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-  const dashboardUrl = `${baseUrl()}/admin/dashboard`;
-  const publicSiteUrl = `https://${slug}.${platformDomain}`;
-  const firstName = esc(name.split(" ")[0]);
+  const dashboardUrl   = `${baseUrl()}/admin/dashboard`;
+  const siteUrl        = `https://${slug}.${platformDomain}`;
+  const firstName      = name.split(" ")[0];
+
+  // Load custom template from DB (falls back to default if not set)
+  let subject = DEFAULT_WELCOME_SUBJECT;
+  let bodyText = DEFAULT_WELCOME_BODY;
+  try {
+    const config = await prisma.systemConfig.findUnique({
+      where:  { id: "main" },
+      select: { welcomeEmailSubject: true, welcomeEmailBody: true },
+    });
+    if (config?.welcomeEmailSubject) subject  = config.welcomeEmailSubject;
+    if (config?.welcomeEmailBody)    bodyText = config.welcomeEmailBody;
+  } catch {
+    // DB unavailable — use defaults
+  }
+
+  const vars = { firstName, siteUrl, dashboardUrl };
+  const resolvedSubject = substituteVars(subject,  vars);
+  const resolvedBody    = substituteVars(bodyText, vars);
 
   return sendMail({
     to,
-    subject: "Welcome to AuthorLoft — your author site is ready!",
-    text: [
-      `Hi ${firstName},`,
-      `Your email is verified and your AuthorLoft account is active.`,
-      `Your author site is live at: ${publicSiteUrl}`,
-      `Head to your dashboard to add books, customise your site, and more: ${dashboardUrl}`,
-      `— The AuthorLoft Team`,
-    ].join("\n\n"),
+    from:    WELCOME_FROM_ADDRESS,
+    subject: resolvedSubject,
+    text:    resolvedBody,
     html: wrapHtml("Welcome to AuthorLoft! 🎉", `
-      <p style="margin:0 0 16px;">Hi ${firstName},</p>
-      <p style="margin:0 0 16px;">
-        Your email is verified and your AuthorLoft account is all set.
-        Your author site is already live — here's what to do next.
-      </p>
-
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:20px;margin:0 0 24px;">
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding:6px 0;">
-              <span style="font-size:13px;color:#0369a1;font-weight:600;">🌐 Your author site</span><br/>
-              <a href="${publicSiteUrl}" style="font-size:15px;font-weight:600;color:#1e40af;text-decoration:none;">${publicSiteUrl}</a>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <p style="margin:0 0 8px;font-size:14px;color:#374151;font-weight:600;">Getting started:</p>
-      <ul style="margin:0 0 24px;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-        <li>Add your first book from the <strong>Books</strong> menu</li>
-        <li>Upload your author photo and bio in <strong>Appearance</strong></li>
-        <li>Share your site link with readers</li>
-      </ul>
-
+      ${plainTextToHtml(resolvedBody)}
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td align="center" style="padding:8px 0 24px;">
+          <td align="center" style="padding:16px 0 8px;">
             <a href="${dashboardUrl}"
                style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
               Go to My Dashboard
@@ -314,10 +346,6 @@ export async function sendWelcomeEmail(to: string, name: string, slug: string) {
           </td>
         </tr>
       </table>
-
-      <p style="margin:0;font-size:13px;color:#6b7280;text-align:center;">
-        Questions? Reply to this email — we're here to help.
-      </p>
     `),
   });
 }
@@ -886,7 +914,7 @@ export async function sendMail(opts: MailOptions): Promise<boolean> {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      from: FROM_ADDRESS,
+      from: opts.from ?? FROM_ADDRESS,
       to: opts.to,
       subject: opts.subject,
       text: opts.text,

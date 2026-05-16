@@ -22,6 +22,8 @@ model SystemConfig {
   newSignupNotifications  Boolean  @default(true)
   signupNotificationEmail String   @default("")
   defaultAiUsageCap       Int      @default(20)
+  welcomeEmailSubject     String?
+  welcomeEmailBody        String?
   updatedAt               DateTime @updatedAt
 }
 
