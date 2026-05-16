@@ -170,8 +170,8 @@ export function MassEmailPanel() {
                       <p className="text-sm font-medium text-gray-900">{t.name}</p>
                       <p className="text-xs text-gray-400 truncate">{t.subject}</p>
                     </button>
-                    <button onClick={() => deleteTemplate(t.id)} className="ml-3 text-gray-300 hover:text-red-500 transition-colors">
-                      <Trash2 className="h-3.5 w-3.5" />
+                    <button onClick={() => deleteTemplate(t.id)} className="ml-3 text-red-400 hover:text-red-600 transition-colors">
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </li>
                 ))}
