@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
   // ?count=1&filter=ALL — return recipient count estimate for the compose UI
   if (req.nextUrl.searchParams.get("count") === "1") {
     const filter = (req.nextUrl.searchParams.get("filter") ?? "ALL") as AudienceFilter;
-    const planFilter = filter !== "ALL" ? { plan: { tier: filter } } : {};
+    type PlanTier = "FREE" | "STANDARD" | "PREMIUM";
+    const planFilter = filter !== "ALL" ? { plan: { tier: filter as PlanTier } } : {};
     const count = await prisma.author.count({
       where: { platformEmailOptOut: false, emailVerified: { not: null }, isActive: true, ...planFilter },
     });
@@ -46,8 +47,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Build author query — exclude opted-out and unverified
+  type PlanTier = "FREE" | "STANDARD" | "PREMIUM";
   const planFilter = audienceFilter !== "ALL"
-    ? { plan: { tier: audienceFilter as AudienceFilter } }
+    ? { plan: { tier: audienceFilter as PlanTier } }
     : {};
 
   const authors = await prisma.author.findMany({
