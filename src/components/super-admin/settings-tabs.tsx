@@ -14,6 +14,8 @@ import {
   UserX,
   Star,
   Zap,
+  MessageSquare,
+  ChevronRight,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
@@ -71,64 +73,120 @@ export interface SettingsTabsProps {
   testimonials: TestimonialRow[];
   welcomeEmailSubject: string | null;
   welcomeEmailBody:    string | null;
-  /** Env var display values — secrets resolved server-side before passing to client */
   envValues: { label: string; value: string | undefined }[];
 }
 
-// ── Tab definitions ────────────────────────────────────────────────────────────
+// ── Nav structure ──────────────────────────────────────────────────────────────
 
-const TABS = [
-  { id: "overview",      label: "Overview",        icon: Database },
-  { id: "onboarding",    label: "Onboarding",      icon: UserX    },
-  { id: "maintenance",   label: "Maintenance",     icon: WifiOff  },
-  { id: "marketing",     label: "Marketing",       icon: Image    },
-  { id: "testimonials",  label: "Testimonials",    icon: Star     },
-  { id: "emails",        label: "Email Addresses", icon: Mail     },
-  { id: "welcome-email", label: "Welcome Email",   icon: Zap      },
-  { id: "configuration", label: "Configuration",   icon: Globe    },
-] as const;
+type SectionId =
+  | "overview"
+  | "emails"
+  | "welcome-email"
+  | "marketing"
+  | "testimonials"
+  | "maintenance"
+  | "onboarding"
+  | "configuration";
 
-type TabId = (typeof TABS)[number]["id"];
+interface NavItem {
+  id: SectionId;
+  label: string;
+  icon: React.ElementType;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Platform",
+    items: [
+      { id: "overview",      label: "Overview",        icon: Database      },
+    ],
+  },
+  {
+    label: "Communications",
+    items: [
+      { id: "welcome-email", label: "Welcome Email",   icon: Zap           },
+      { id: "emails",        label: "Email Addresses", icon: Mail          },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { id: "marketing",     label: "Marketing",       icon: Image         },
+      { id: "testimonials",  label: "Testimonials",    icon: Star          },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { id: "maintenance",   label: "Maintenance",     icon: WifiOff       },
+      { id: "onboarding",    label: "Onboarding",      icon: UserX         },
+      { id: "configuration", label: "Configuration",   icon: Globe         },
+    ],
+  },
+];
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function SettingsTabs(props: SettingsTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [active, setActive] = useState<SectionId>("overview");
+
+  const activeItem = NAV_GROUPS.flatMap(g => g.items).find(i => i.id === active);
 
   return (
-    <div className="space-y-6">
-      {/* Tab bar */}
-      <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px ${
-              activeTab === id
-                ? "border-purple-600 text-purple-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </button>
-        ))}
-      </div>
+    <div className="flex gap-6 min-h-[600px]">
 
-      {/* Tab panels */}
-      {activeTab === "overview"      && <OverviewTab      {...props} />}
-      {activeTab === "onboarding"    && <OnboardingTab />}
-      {activeTab === "maintenance"   && <MaintenanceTab   {...props} />}
-      {activeTab === "marketing"     && <MarketingTab     {...props} />}
-      {activeTab === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
-      {activeTab === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
-      {activeTab === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
-      {activeTab === "configuration" && <ConfigurationTab {...props} />}
+      {/* ── Sidebar ────────────────────────────────────────────────────── */}
+      <aside className="w-52 flex-shrink-0">
+        <nav className="space-y-6">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label}>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 mb-1">
+                {group.label}
+              </p>
+              <ul className="space-y-0.5">
+                {group.items.map(({ id, label, icon: Icon }) => (
+                  <li key={id}>
+                    <button
+                      onClick={() => setActive(id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left ${
+                        active === id
+                          ? "bg-purple-50 text-purple-700"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      <Icon className={`h-4 w-4 flex-shrink-0 ${active === id ? "text-purple-500" : "text-gray-400"}`} />
+                      {label}
+                      {active === id && <ChevronRight className="h-3 w-3 ml-auto text-purple-400" />}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      {/* ── Content area ───────────────────────────────────────────────── */}
+      <div className="flex-1 min-w-0">
+        {active === "overview"      && <OverviewTab      {...props} />}
+        {active === "onboarding"    && <OnboardingTab />}
+        {active === "maintenance"   && <MaintenanceTab   {...props} />}
+        {active === "marketing"     && <MarketingTab     {...props} />}
+        {active === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
+        {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
+        {active === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
+        {active === "configuration" && <ConfigurationTab {...props} />}
+      </div>
     </div>
   );
 }
 
-// ── Overview tab ───────────────────────────────────────────────────────────────
+// ── Overview ───────────────────────────────────────────────────────────────────
 
 function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, totalRevenueCents, planBreakdown }: SettingsTabsProps) {
   const stats = [
@@ -140,7 +198,6 @@ function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, tota
 
   return (
     <div className="space-y-6">
-      {/* Stats grid */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Database className="h-4 w-4 text-gray-400" />
@@ -159,13 +216,10 @@ function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, tota
         </div>
         <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
           <span className="text-sm text-gray-500">Total Platform Revenue</span>
-          <span className="text-lg font-bold text-green-600">
-            {formatCents(totalRevenueCents)}
-          </span>
+          <span className="text-lg font-bold text-green-600">{formatCents(totalRevenueCents)}</span>
         </div>
       </section>
 
-      {/* Plan distribution */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Users className="h-4 w-4 text-gray-400" />
@@ -183,10 +237,7 @@ function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, tota
                   </span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full bg-purple-500 transition-all"
-                    style={{ width: `${pct}%` }}
-                  />
+                  <div className="h-2 rounded-full bg-purple-500 transition-all" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             );
@@ -197,7 +248,7 @@ function OverviewTab({ authorCount, bookCount, subscriberCount, orderCount, tota
   );
 }
 
-// ── Onboarding tab ────────────────────────────────────────────────────────────
+// ── Onboarding ─────────────────────────────────────────────────────────────────
 
 function OnboardingTab() {
   return (
@@ -216,7 +267,7 @@ function OnboardingTab() {
   );
 }
 
-// ── Maintenance tab ────────────────────────────────────────────────────────────
+// ── Maintenance ────────────────────────────────────────────────────────────────
 
 function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifications, signupNotificationEmail, defaultAiUsageCap }: SettingsTabsProps) {
   return (
@@ -228,12 +279,8 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
         </h2>
         <p className="text-xs text-gray-500">
           When enabled, all logins and new registrations are blocked and visitors are redirected to the maintenance page.
-          The marketing site, demos, and email contact remain accessible.
         </p>
-        <MaintenanceToggle
-          initialMode={maintenanceMode}
-          initialMessage={maintenanceMessage}
-        />
+        <MaintenanceToggle initialMode={maintenanceMode} initialMessage={maintenanceMessage} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -242,7 +289,7 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
           New Signup Notifications
         </h2>
         <p className="text-xs text-gray-500">
-          Receive an email notification each time a new author creates an account — via email/password or Google sign-in.
+          Receive an email notification each time a new author creates an account.
         </p>
         <SignupNotificationsToggle initialEnabled={newSignupNotifications} initialEmail={signupNotificationEmail} />
       </section>
@@ -253,8 +300,7 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
           AI Usage Baseline
         </h2>
         <p className="text-xs text-gray-500">
-          Default monthly AI call limit for all authors on Premium. Changing this cascades to every author whose
-          cap matches the current baseline — authors with individually customised caps are left unchanged.
+          Default monthly AI call limit for all authors on Premium.
         </p>
         <AiCapControl initialCap={defaultAiUsageCap} />
       </section>
@@ -262,7 +308,7 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
   );
 }
 
-// ── Marketing tab ──────────────────────────────────────────────────────────────
+// ── Marketing ──────────────────────────────────────────────────────────────────
 
 function MarketingTab({ marketingHeroImageUrl }: SettingsTabsProps) {
   return (
@@ -281,12 +327,11 @@ function MarketingTab({ marketingHeroImageUrl }: SettingsTabsProps) {
   );
 }
 
-// ── Configuration tab ──────────────────────────────────────────────────────────
+// ── Configuration ──────────────────────────────────────────────────────────────
 
 function ConfigurationTab({ envValues }: SettingsTabsProps) {
   return (
     <div className="space-y-6">
-      {/* Env vars */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Globe className="h-4 w-4 text-gray-400" />
@@ -304,7 +349,6 @@ function ConfigurationTab({ envValues }: SettingsTabsProps) {
         </div>
       </section>
 
-      {/* Admin tools */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Settings className="h-4 w-4 text-gray-400" />
