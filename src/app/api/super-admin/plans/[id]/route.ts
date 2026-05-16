@@ -39,6 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     revalidatePath("/");
     revalidatePath("/pricing");
+    revalidatePath("/features");
     return NextResponse.json(plan);
   } catch (err: any) {
     if (err?.code === "P2002") return NextResponse.json({ error: "A plan with that slug already exists." }, { status: 400 });
