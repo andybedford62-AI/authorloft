@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     const author = await prisma.author.findUnique({
       where:  { id: authorId },
-      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true },
+      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true },
     });
     if (!author) return NextResponse.json({ error: "Author not found" }, { status: 404 });
 
@@ -98,6 +98,28 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
+    // Early bird discount — within 30 days of account creation
+    const daysSinceSignup = (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    const isEarlyBird = daysSinceSignup <= 30;
+
+    // Determine if the selected price is monthly or annual
+    const selectedPlan = await prisma.plan.findFirst({
+      where: {
+        OR: [
+          { stripePriceIdMonthly: priceId },
+          { stripePriceIdAnnual:  priceId },
+        ],
+      },
+      select: { stripePriceIdMonthly: true },
+    });
+    const isMonthly = selectedPlan?.stripePriceIdMonthly === priceId;
+
+    const earlyBirdCouponId = isEarlyBird
+      ? (isMonthly
+          ? process.env.STRIPE_EARLY_BIRD_COUPON_MONTHLY
+          : process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL)
+      : undefined;
+
     const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
@@ -105,6 +127,7 @@ export async function POST(req: NextRequest) {
       successUrl,
       cancelUrl,
       existingCustomerId: author.stripeCustomerId || undefined,
+      earlyBirdCouponId,
     });
 
     return NextResponse.json({ url: session.url });

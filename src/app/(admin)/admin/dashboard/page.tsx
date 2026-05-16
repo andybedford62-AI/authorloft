@@ -60,9 +60,19 @@ async function getDashboardData(authorId: string) {
     // Author plan
     prisma.author.findUnique({
       where: { id: authorId },
-      include: { plan: true },
+      select: {
+        createdAt: true,
+        plan: true,
+      },
     }),
   ]);
+
+  const planTier = plan?.plan?.tier ?? "FREE";
+  const daysSinceSignup = plan?.createdAt
+    ? (Date.now() - new Date(plan.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    : 999;
+  const showEarlyBirdBanner = planTier === "FREE" && daysSinceSignup <= 30;
+  const earlyBirdDaysLeft   = Math.max(0, Math.ceil(30 - daysSinceSignup));
 
   return {
     totalBooks,
@@ -79,6 +89,8 @@ async function getDashboardData(authorId: string) {
           plan.plan.salesEnabled ? "Sales enabled" : null,
         ].filter((x): x is string => x !== null)
       : ["Up to 5 books"],
+    showEarlyBirdBanner,
+    earlyBirdDaysLeft,
   };
 }
 
@@ -219,6 +231,25 @@ export default async function DashboardPage() {
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
+      )}
+
+      {/* Early bird upgrade banner */}
+      {data.showEarlyBirdBanner && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <p className="font-semibold text-amber-900 text-sm">Founding member offer — 20% off for your first 3 months</p>
+              <p className="text-xs text-amber-700 mt-0.5">Upgrade within {data.earlyBirdDaysLeft} day{data.earlyBirdDaysLeft !== 1 ? "s" : ""} to lock in your discount. Auto-applied at checkout.</p>
+            </div>
+          </div>
+          <a
+            href="/admin/settings?tab=billing"
+            className="flex-shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition-colors"
+          >
+            Upgrade Now
+          </a>
+        </div>
       )}
 
       {/* Header */}

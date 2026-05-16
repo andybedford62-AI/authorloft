@@ -67,6 +67,7 @@ export async function createSubscriptionCheckoutSession({
   successUrl,
   cancelUrl,
   existingCustomerId,
+  earlyBirdCouponId,
 }: {
   authorId: string;
   authorEmail: string;
@@ -74,26 +75,21 @@ export async function createSubscriptionCheckoutSession({
   successUrl: string;
   cancelUrl: string;
   existingCustomerId?: string;
+  earlyBirdCouponId?: string;
 }) {
-  // Use existing customer ID if available, otherwise Stripe will create one from email
-  // Note: If no customer ID exists, Stripe creates one on first successful payment
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "subscription",
     ...(existingCustomerId ? { customer: existingCustomerId } : { customer_email: authorEmail }),
-    line_items: [
-      {
-        price: planPriceId,
-        quantity: 1,
-      },
-    ],
-    metadata: {
-      authorId,
-      type: "plan_subscription",
-    },
-    allow_promotion_codes: true,
+    line_items: [{ price: planPriceId, quantity: 1 }],
+    metadata: { authorId, type: "plan_subscription" },
+    // Early bird: auto-apply coupon (mutually exclusive with allow_promotion_codes)
+    // Otherwise: let user enter any promo code they have
+    ...(earlyBirdCouponId
+      ? { discounts: [{ coupon: earlyBirdCouponId }] }
+      : { allow_promotion_codes: true }),
     success_url: successUrl,
-    cancel_url: cancelUrl,
+    cancel_url:  cancelUrl,
   });
 
   return session;
