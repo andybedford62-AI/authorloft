@@ -570,6 +570,15 @@ model PlatformBroadcast {
   createdAt      DateTime @default(now())
 }
 
+model BroadcastTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // ─── Orders & Sales ───────────────────────────────────────────────────────────
 
 enum OrderStatus {
