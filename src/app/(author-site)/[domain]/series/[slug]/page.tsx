@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BookCard } from "@/components/author-site/book-card";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -76,7 +77,7 @@ export default async function SeriesDetailPage({
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white">{series.name}</h1>
           {series.description && (
-            <p className="text-white/75 mt-2 max-w-xl">{series.description}</p>
+            <div className="text-white/75 mt-2 max-w-xl" dangerouslySetInnerHTML={{ __html: sanitize(series.description) }} />
           )}
           <p className="text-white/60 text-sm mt-3">
             {series.books.length} book{series.books.length !== 1 ? "s" : ""} in this series
