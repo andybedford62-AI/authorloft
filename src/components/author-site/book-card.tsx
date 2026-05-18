@@ -7,6 +7,7 @@ import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getRetailer } from "@/lib/retailers";
 import { CoverTilt } from "./cover-tilt";
+import { sanitize } from "@/lib/sanitize";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -248,9 +249,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
 
           {/* Description */}
           {book.shortDescription && (
-            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-              {book.shortDescription}
-            </p>
+            <div
+              className="text-sm text-gray-600 leading-relaxed line-clamp-3"
+              dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
+            />
           )}
 
           {/* Release date */}
@@ -303,7 +305,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
         )}
         <h3 className="font-semibold text-gray-900 text-sm leading-tight">{book.title}</h3>
         {book.shortDescription && (
-          <p className="text-xs text-gray-500 line-clamp-2 flex-1">{book.shortDescription}</p>
+          <div
+            className="text-xs text-gray-500 line-clamp-2 flex-1"
+            dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
+          />
         )}
 
         {/* Per-format direct sale items (card layout) */}
