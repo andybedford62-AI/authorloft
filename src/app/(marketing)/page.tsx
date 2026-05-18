@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import { TestimonialsSection } from "@/components/marketing/testimonials-section";
+import { FaqSection } from "@/components/marketing/faq-section";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 
@@ -195,6 +196,14 @@ async function getTestimonials() {
   }).catch(() => []);
 }
 
+async function getFaqs() {
+  return prisma.homepageFaq.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: { id: true, question: true, answer: true },
+  }).catch(() => []);
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const softwareJsonLd = {
@@ -213,47 +222,18 @@ const softwareJsonLd = {
   url: "https://www.authorloft.com",
 };
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Is AuthorLoft free?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. AuthorLoft has a free plan with no credit card required. You can build your author website and go live in minutes at no cost.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Do I need coding skills to use AuthorLoft?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "No coding skills needed. AuthorLoft is a no-code author website builder. Your site goes live instantly on your own subdomain.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can I sell books directly on my author website?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Standard and Premium plans include direct ebook and PDF sales through your author website via secure Stripe checkout with instant download links.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Can I use a custom domain with AuthorLoft?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Every author gets a free subdomain instantly. You can connect your own custom domain on Standard and Premium plans.",
-      },
-    },
-  ],
-};
-
 export default async function MarketingPage() {
-  const [plans, heroImageUrl, testimonials] = await Promise.all([getActivePlans(), getHeroImageUrl(), getTestimonials()]);
+  const [plans, heroImageUrl, testimonials, faqs] = await Promise.all([getActivePlans(), getHeroImageUrl(), getTestimonials(), getFaqs()]);
+
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  } : null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -521,6 +501,9 @@ export default async function MarketingPage() {
         </div>
       </section>
 
+      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
+      <FaqSection faqs={faqs} />
+
       {/* ── Final CTA ─────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 py-24">
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -569,7 +552,7 @@ export default async function MarketingPage() {
       </footer>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       <Script
         async

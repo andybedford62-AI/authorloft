@@ -16,6 +16,7 @@ import {
   Zap,
   MessageSquare,
   ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
@@ -25,6 +26,7 @@ import { MarketingHeroImage } from "./marketing-hero-image";
 import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
 import { TestimonialsPanel } from "./testimonials-panel";
+import { FaqsPanel } from "./faqs-panel";
 import { WelcomeEmailPanel } from "./welcome-email-panel";
 import { MassEmailPanel } from "./mass-email-panel";
 
@@ -57,6 +59,14 @@ interface TestimonialRow {
   displayOrder: number;
 }
 
+interface FaqRow {
+  id: string;
+  question: string;
+  answer: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
 export interface SettingsTabsProps {
   authorCount: number;
   bookCount: number;
@@ -72,6 +82,7 @@ export interface SettingsTabsProps {
   marketingHeroImageUrl: string | null;
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
+  faqs: FaqRow[];
   welcomeEmailSubject: string | null;
   welcomeEmailBody:    string | null;
   envValues: { label: string; value: string | undefined }[];
@@ -86,6 +97,7 @@ type SectionId =
   | "mass-email"
   | "marketing"
   | "testimonials"
+  | "faqs"
   | "maintenance"
   | "onboarding"
   | "configuration";
@@ -121,6 +133,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "marketing",     label: "Marketing",       icon: Image         },
       { id: "testimonials",  label: "Testimonials",    icon: Star          },
+      { id: "faqs",          label: "FAQs",            icon: HelpCircle    },
     ],
   },
   {
@@ -181,6 +194,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
         {active === "maintenance"   && <MaintenanceTab   {...props} />}
         {active === "marketing"     && <MarketingTab     {...props} />}
         {active === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
+        {active === "faqs"          && <FaqsPanel initialFaqs={props.faqs} />}
         {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
         {active === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
         {active === "mass-email"    && <MassEmailPanel />}
