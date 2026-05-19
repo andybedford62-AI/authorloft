@@ -273,35 +273,39 @@ export default async function MarketingPage() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer style={{ background: ML.bone, borderTop: `2px solid ${ML.ink}`, padding: '64px 60px 40px' }}>
+      <footer style={{ background: ML.bone, borderTop: `1px solid #DCDBD3`, padding: '28px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr repeat(3, 1fr)', gap: 32, marginBottom: 48 }}>
-            <div>
-              <div style={{ marginBottom: 12 }}>
-                <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={140} height={40} style={{ height: 36, width: 'auto' }} />
-              </div>
-              <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.slate }}>—— your name, your shelf ——</p>
+          {/* Top row: logo + inline links */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
+            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={120} height={34} style={{ height: 28, width: 'auto' }} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 0' }}>
+              {([
+                ['Features', '/features'],
+                ['Pricing',  '/pricing'],
+                ['Blog',     '#'],
+                ['Contact',  '/contact'],
+                ['Privacy',  '/privacy'],
+                ['Terms',    '/terms'],
+                ['GDPR',     '/gdpr'],
+                ['Demo',     'https://demo.authorloft.com'],
+              ] as [string, string][]).map(([label, href], i, arr) => (
+                <span key={label} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <Link
+                    href={href}
+                    style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: ML.slate, textDecoration: 'none', padding: '0 10px' }}
+                    {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  >{label}</Link>
+                  {i < arr.length - 1 && <span style={{ color: '#DCDBD3' }}>·</span>}
+                </span>
+              ))}
             </div>
-            {[
-              { label: 'Product',  links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '/#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
-              { label: 'Company',  links: [['About', '#'], ['Blog', '#'], ['Contact', '/contact'], ['Status', '#']] },
-              { label: 'Legal',    links: [['Privacy', '/privacy'], ['Terms', '/terms'], ['Security', '#'], ['GDPR', '#']] },
-            ].map((col) => (
-              <div key={col.label}>
-                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16, fontWeight: 600 }}>{col.label}</p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {col.links.map(([label, href]) => (
-                    <li key={label}><Link href={href} style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: ML.slate, textDecoration: 'none' }}>{label}</Link></li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
-          <div style={{ borderTop: `1px solid #DCDBD3`, paddingTop: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: ML.slate, margin: 0 }}>
+          {/* Bottom row: copyright + tagline */}
+          <div style={{ borderTop: `1px solid #DCDBD3`, paddingTop: 14, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 12, color: `${ML.slate}88`, margin: 0 }}>
               © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
             </p>
-            <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 14, color: `${ML.slate}88`, margin: 0 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: `${ML.slate}55`, margin: 0 }}>
               —— your name, your shelf ——
             </p>
           </div>
