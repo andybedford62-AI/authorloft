@@ -240,9 +240,9 @@ export default async function MarketingPage() {
 
       {/* ── Nav ───────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/AL_site_Logo-Blue.png" alt="AuthorLoft" width={160} height={48} className="h-10 w-auto" priority />
+            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" priority />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Features</a>
