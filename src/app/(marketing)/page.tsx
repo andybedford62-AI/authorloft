@@ -275,7 +275,7 @@ export default async function MarketingPage() {
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer style={{ background: ML.bone, borderTop: `2px solid ${ML.ink}`, padding: '64px 60px 40px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr repeat(4, 1fr)', gap: 32, marginBottom: 48 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr repeat(3, 1fr)', gap: 32, marginBottom: 48 }}>
             <div>
               <div style={{ marginBottom: 12 }}>
                 <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={140} height={40} style={{ height: 36, width: 'auto' }} />
@@ -283,10 +283,9 @@ export default async function MarketingPage() {
               <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.slate }}>—— your name, your shelf ——</p>
             </div>
             {[
-              { label: 'Product',    links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '/#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
-              { label: 'For Authors', links: [['Romance', '/#genres'], ['Fantasy', '/#genres'], ['Non-Fiction', '/#genres'], ['All genres', '/#genres']] },
-              { label: 'Company',    links: [['About', '#'], ['Blog', '#'], ['Contact', '/contact'], ['Status', '#']] },
-              { label: 'Legal',      links: [['Privacy', '/privacy'], ['Terms', '/terms'], ['Security', '#'], ['GDPR', '#']] },
+              { label: 'Product',  links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '/#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
+              { label: 'Company',  links: [['About', '#'], ['Blog', '#'], ['Contact', '/contact'], ['Status', '#']] },
+              { label: 'Legal',    links: [['Privacy', '/privacy'], ['Terms', '/terms'], ['Security', '#'], ['GDPR', '#']] },
             ].map((col) => (
               <div key={col.label}>
                 <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16, fontWeight: 600 }}>{col.label}</p>
