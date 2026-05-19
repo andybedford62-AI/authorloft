@@ -28,13 +28,13 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
 
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-11 w-auto" />
+            <img src="/authorloft-logo-new.png" alt="AuthorLoft" className="h-14 w-auto" />
           </Link>
 
           {author && (
