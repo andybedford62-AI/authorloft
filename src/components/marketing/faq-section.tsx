@@ -38,7 +38,7 @@ export function FaqSection({ faqs }: { faqs: FaqItem[] }) {
   if (faqs.length === 0) return null;
 
   return (
-    <section className="py-24 bg-white">
+    <section id="faq" className="py-24 bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <ScrollReveal className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
