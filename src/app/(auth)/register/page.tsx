@@ -203,6 +203,11 @@ function RegisterPageInner() {
       if (intendedPlan) {
         localStorage.setItem("intendedPlan", intendedPlan);
       }
+
+      // Fire Google Ads conversion event for signup
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "sign_up");
+      }
     } catch {
       setStep2Error("Something went wrong. Please try again.");
       setSubmitting(false);
