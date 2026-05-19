@@ -116,6 +116,7 @@ export default async function PricingPage() {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/#features" className="text-sm text-gray-600 hover:text-gray-900">Features</Link>
             <Link href="/pricing" className="text-sm font-medium text-blue-600">Pricing</Link>
+            <a href="/#faq" className="text-sm text-gray-600 hover:text-gray-900">FAQ</a>
             <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">Sign In</Link>
           </nav>
           <Link
