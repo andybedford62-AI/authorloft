@@ -183,8 +183,13 @@ export function MidnightHero() {
           <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
-          {[['#features', 'Features'], ['#how-it-works', 'How it works'], ['#pricing', 'Pricing'], ['#genres', 'For authors']].map(([href, label]) => (
-            <a key={href} href={href} style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>{label}</a>
+          {([
+            ['/features',    'Features'],
+            ['#how-it-works','How it works'],
+            ['/pricing',     'Pricing'],
+            ['#genres',      'For authors'],
+          ] as [string, string][]).map(([href, label]) => (
+            <Link key={href} href={href} style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>{label}</Link>
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

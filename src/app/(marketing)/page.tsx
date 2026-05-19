@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Globe, CreditCard, Search, Mail, Users, Shield } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { MidnightHero } from "@/components/marketing/midnight-hero";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
@@ -38,14 +38,14 @@ const HOW_IT_WORKS = [
 ];
 
 const FEATURES = [
-  { title: "Full Book Catalog",         description: "List every title with cover art, series grouping, genre hierarchy, pricing, and buy links." },
-  { title: "Series & Genre Hierarchy",  description: "Organize books with unlimited nesting — Fiction → Thriller → Underwater Thriller — as deep as you need." },
-  { title: "Your Own Domain",           description: "Get a subdomain instantly. Bring your own custom domain on Standard and Premium plans." },
-  { title: "Direct Sales",              description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links." },
-  { title: "Search & Filtering",        description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy." },
-  { title: "Newsletter Capture",        description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool." },
-  { title: "Flip Book Previews",        description: "Upload a PDF and give readers an interactive page-turn preview before they buy." },
-  { title: "Built for Authors",         description: "No coding required. A purpose-built admin panel makes managing your catalog effortless." },
+  { icon: BookOpen,   title: "Full Book Catalog",        description: "List every title with cover art, series grouping, genre hierarchy, pricing, and buy links." },
+  { icon: Layers,     title: "Series & Genre Hierarchy", description: "Organize books with unlimited nesting — Fiction → Thriller → Underwater Thriller — as deep as you need." },
+  { icon: Globe,      title: "Your Own Domain",          description: "Get a subdomain instantly. Bring your own custom domain on Standard and Premium plans." },
+  { icon: CreditCard, title: "Direct Sales",             description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links." },
+  { icon: Search,     title: "Search & Filtering",       description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy." },
+  { icon: Mail,       title: "Newsletter Capture",       description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool." },
+  { icon: Users,      title: "Flip Book Previews",       description: "Upload a PDF and give readers an interactive page-turn preview before they buy." },
+  { icon: Shield,     title: "Built for Authors",        description: "No coding required. A purpose-built admin panel makes managing your catalog effortless." },
 ];
 
 const GENRES = [
@@ -189,11 +189,13 @@ export default async function MarketingPage() {
             </Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-            {FEATURES.map((f, i) => (
+            {FEATURES.map(({ icon: Icon, title, description }, i) => (
               <div key={i} style={{ background: ML.pearl, borderRadius: 14, padding: '28px 24px', border: `1px solid #DCDBD3` }}>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: ML.ink, marginBottom: 14 }} />
-                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 18, fontWeight: 400, color: ML.ink, margin: '0 0 8px' }}>{f.title}</h3>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{f.description}</p>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: ML.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                  <Icon style={{ width: 20, height: 20, color: ML.brass2 }} />
+                </div>
+                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 18, fontWeight: 400, color: ML.ink, margin: '0 0 8px' }}>{title}</h3>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{description}</p>
               </div>
             ))}
           </div>
@@ -281,8 +283,8 @@ export default async function MarketingPage() {
               <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.slate }}>—— your name, your shelf ——</p>
             </div>
             {[
-              { label: 'Product',    links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
-              { label: 'For Authors', links: [['Romance', '#genres'], ['Fantasy', '#genres'], ['Non-Fiction', '#genres'], ['All genres', '#genres']] },
+              { label: 'Product',    links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '/#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
+              { label: 'For Authors', links: [['Romance', '/#genres'], ['Fantasy', '/#genres'], ['Non-Fiction', '/#genres'], ['All genres', '/#genres']] },
               { label: 'Company',    links: [['About', '#'], ['Blog', '#'], ['Contact', '/contact'], ['Status', '#']] },
               { label: 'Legal',      links: [['Privacy', '/privacy'], ['Terms', '/terms'], ['Security', '#'], ['GDPR', '#']] },
             ].map((col) => (
