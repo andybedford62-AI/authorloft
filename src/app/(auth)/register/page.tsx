@@ -204,9 +204,9 @@ function RegisterPageInner() {
         localStorage.setItem("intendedPlan", intendedPlan);
       }
 
-      // Fire Google Ads conversion event for signup
+      // Fire Google Ads signup conversion
       if (typeof window !== "undefined" && window.gtag) {
-        window.gtag("event", "sign_up");
+        window.gtag("event", "conversion", { send_to: "AW-18031958972/bEq6CJbgg6QcELy3p5ZD" });
       }
     } catch {
       setStep2Error("Something went wrong. Please try again.");
