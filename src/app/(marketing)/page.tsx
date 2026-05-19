@@ -1,34 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import {
-  BookOpen,
-  Globe,
-  CreditCard,
-  Users,
-  Search,
-  Layers,
-  Mail,
-  Shield,
-  ArrowRight,
-  ChevronRight,
-  Sparkles,
-  Tag,
-  Heart,
-  Zap,
-  Wand2,
-  Star,
-  Feather,
-  Lightbulb,
-  Check,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PricingSection } from "@/components/marketing/pricing-section";
-import { ScrollReveal } from "@/components/marketing/scroll-reveal";
-import { TestimonialsSection } from "@/components/marketing/testimonials-section";
-import { FaqSection } from "@/components/marketing/faq-section";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { MidnightHero } from "@/components/marketing/midnight-hero";
+import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
+import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
+import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
 
 export const revalidate = 3600;
 
@@ -50,112 +29,32 @@ export const metadata: Metadata = {
   },
 };
 
-// ── Data ─────────────────────────────────────────────────────────────────────
-
-const TRUST_ITEMS = [
-  { icon: Check, text: "Free plan, forever" },
-  { icon: Check, text: "No credit card required" },
-  { icon: Check, text: "Live in under 5 minutes" },
-];
+// ── Static content ────────────────────────────────────────────────────────────
 
 const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Create your account",
-    body: "Sign up free in seconds. No technical knowledge needed — just your name and email.",
-  },
-  {
-    step: "02",
-    title: "Add your books",
-    body: "Upload covers, write descriptions, link to retailers, and organise by series or genre.",
-  },
-  {
-    step: "03",
-    title: "Share with readers",
-    body: "Your site goes live instantly on your own subdomain. Add a custom domain whenever you're ready.",
-  },
+  { number: "I",   title: "Create your account",  body: "Sign up free in seconds. No technical knowledge needed — just your name and email." },
+  { number: "II",  title: "Add your books",        body: "Upload covers, write descriptions, link to retailers, and organise by series or genre." },
+  { number: "III", title: "Share with readers",    body: "Your site goes live instantly on your own subdomain. Add a custom domain whenever you're ready." },
 ];
 
-const AUTHOR_TYPES = [
-  {
-    icon: Heart,
-    genre: "Romance & Contemporary",
-    description: "Build a beautiful home for your series, capture subscriber emails, and sell direct to your most devoted readers.",
-    gradient: "linear-gradient(135deg, #ec4899, #f43f5e)",
-  },
-  {
-    icon: Zap,
-    genre: "Thriller & Mystery",
-    description: "Dark, dramatic themes with templates designed to create tension — from the moment a reader lands on your page.",
-    gradient: "linear-gradient(135deg, #dc2626, #7c3aed)",
-  },
-  {
-    icon: Wand2,
-    genre: "Fantasy & Sci-Fi",
-    description: "Showcase complex world-building with series pages, lore sections, and a catalog that grows with your universe.",
-    gradient: "linear-gradient(135deg, #7c3aed, #2563eb)",
-  },
-  {
-    icon: Star,
-    genre: "Children's & YA",
-    description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.",
-    gradient: "linear-gradient(135deg, #f59e0b, #10b981)",
-  },
-  {
-    icon: Feather,
-    genre: "Literary Fiction",
-    description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.",
-    gradient: "linear-gradient(135deg, #1e293b, #334155)",
-  },
-  {
-    icon: Lightbulb,
-    genre: "Non-Fiction & Memoir",
-    description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.",
-    gradient: "linear-gradient(135deg, #0891b2, #0d9488)",
-  },
+const FEATURES = [
+  { title: "Full Book Catalog",         description: "List every title with cover art, series grouping, genre hierarchy, pricing, and buy links." },
+  { title: "Series & Genre Hierarchy",  description: "Organize books with unlimited nesting — Fiction → Thriller → Underwater Thriller — as deep as you need." },
+  { title: "Your Own Domain",           description: "Get a subdomain instantly. Bring your own custom domain on Standard and Premium plans." },
+  { title: "Direct Sales",              description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links." },
+  { title: "Search & Filtering",        description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy." },
+  { title: "Newsletter Capture",        description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool." },
+  { title: "Flip Book Previews",        description: "Upload a PDF and give readers an interactive page-turn preview before they buy." },
+  { title: "Built for Authors",         description: "No coding required. A purpose-built admin panel makes managing your catalog effortless." },
 ];
 
-const features = [
-  {
-    icon: BookOpen,
-    title: "Full Book Catalog",
-    description: "List every title with cover art, series grouping, genre hierarchy, pricing, and buy links.",
-  },
-  {
-    icon: Layers,
-    title: "Series & Genre Hierarchy",
-    description: "Organize books with unlimited nesting — Fiction → Thriller → Underwater Thriller — as deep as you need.",
-  },
-  {
-    icon: Globe,
-    title: "Your Own Domain",
-    description: "Get a subdomain instantly. Bring your own custom domain on Standard and Premium plans.",
-  },
-  {
-    icon: CreditCard,
-    title: "Direct Sales",
-    description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links.",
-  },
-  {
-    icon: Search,
-    title: "Search & Filtering",
-    description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy.",
-  },
-  {
-    icon: Mail,
-    title: "Newsletter Capture",
-    description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool.",
-  },
-  {
-    icon: Users,
-    title: "Flip Book Previews",
-    description: "Upload a PDF and give readers an interactive page-turn preview before they buy.",
-  },
-  {
-    icon: Shield,
-    title: "Built for Authors",
-    description: "No coding required. A purpose-built admin panel makes managing your catalog effortless.",
-  },
+const GENRES = [
+  { name: "Romance & Contemporary", accent: "for the heart",  description: "Build a beautiful home for your series, capture subscriber emails, and sell direct to your most devoted readers.", bg: "#1B2B47" },
+  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark, dramatic themes with templates designed to create tension — from the moment a reader lands on your page.", bg: "#0F1A2D" },
+  { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase complex world-building with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
+  { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.", bg: "#3A5577" },
+  { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.", bg: "#2A3A55" },
+  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.", bg: "#B8893D" },
 ];
 
 // ── Server data ───────────────────────────────────────────────────────────────
@@ -173,18 +72,6 @@ async function getActivePlans() {
     },
     orderBy: { sortOrder: "asc" },
   }).catch(() => []);
-}
-
-async function getHeroImageUrl(): Promise<string> {
-  try {
-    const settings = await prisma.platformSettings.findUnique({
-      where:  { id: "singleton" },
-      select: { marketingHeroImageUrl: true },
-    });
-    return settings?.marketingHeroImageUrl || "/author-site-preview.png";
-  } catch {
-    return "/author-site-preview.png";
-  }
 }
 
 async function getTestimonials() {
@@ -223,7 +110,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, heroImageUrl, testimonials, faqs] = await Promise.all([getActivePlans(), getHeroImageUrl(), getTestimonials(), getFaqs()]);
+  const [plans, testimonials, faqs] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -235,318 +122,187 @@ export default async function MarketingPage() {
     })),
   } : null;
 
+  const ML = { midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD', pearl: '#F0EDE4', brass: '#B8893D', brass2: '#D4AE6A', copper: '#C26A4A', slate: '#5C6E89', mist: '#D4DDEB' };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: '100vh', background: ML.bone, fontFamily: 'inherit' }}>
 
-      {/* ── Nav ───────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" priority />
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Features</a>
-            <a href="#how-it-works" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">How it works</a>
-            <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Pricing</Link>
-            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Sign In</Link>
-          </nav>
-          <Link href="/register">
-            <Button size="sm" className="shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-px">
-              Get Started Free
-            </Button>
-          </Link>
-        </div>
-      </header>
+      {/* ── Hero (static animated design) ─────────────────────────────────── */}
+      <MidnightHero />
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#060d1f] via-[#0d1b3e] to-[#0a1a3a] text-white min-h-[92vh] flex items-center">
-        {/* Background blobs */}
-        <div className="absolute -top-48 -right-48 w-[36rem] h-[36rem] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-blue-400/5 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 grid lg:grid-cols-2 gap-16 items-center">
-
-          {/* Left — text */}
-          <div className="space-y-8">
-            <div className="animate-fade-up inline-flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5 text-sm font-medium text-blue-200">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              Now in early access — free plan available
-            </div>
-
-            <h1 className="animate-fade-up animate-delay-100 font-heading text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              Your author website,
-              <br />
-              <span className="text-shimmer">built for indie authors.</span>
-            </h1>
-
-            <p className="animate-fade-up animate-delay-200 text-lg sm:text-xl text-blue-100/80 max-w-lg leading-relaxed">
-              AuthorLoft gives every author a beautiful website — complete with book catalog,
-              newsletter, and digital storefront — up and running in minutes.
-            </p>
-
-            <div className="animate-fade-up animate-delay-300 flex flex-col sm:flex-row gap-3">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-950 hover:bg-blue-50 font-bold px-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto"
-                >
-                  Start for Free <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-              <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/25 text-white hover:bg-white/10 transition-all duration-300 w-full sm:w-auto"
-                >
-                  View Demo Site <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </a>
-            </div>
-
-            {/* Trust pills */}
-            <div className="animate-fade-up animate-delay-400 flex flex-wrap gap-4">
-              {TRUST_ITEMS.map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-1.5 text-sm text-blue-200/70">
-                  <Icon className="h-3.5 w-3.5 text-green-400" />
-                  {text}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right — author site screenshot */}
-          <div className="animate-fade-up animate-delay-200 hidden lg:flex justify-end items-start">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-lg w-full">
-              <Image
-                src={heroImageUrl}
-                alt="Author website example built on AuthorLoft — book catalog and newsletter"
-                width={1092}
-                height={1404}
-                className="w-full h-auto"
-                priority
-                unoptimized={heroImageUrl.startsWith("http")}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How it works ──────────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              Simple setup
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Build your author website in three steps
+      {/* ── Problem ────────────────────────────────────────────────────────── */}
+      <section style={{ background: ML.bone, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· The marketplace tax ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(40px, 5vw, 76px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+              You wrote the book.{' '}<span style={{ fontStyle: 'italic', color: ML.copper }}>They keep the readers.</span>
             </h2>
-            <p className="text-gray-500 text-lg max-w-md mx-auto">
-              No developers. No agencies. No months of waiting.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connector line on desktop */}
-            <div className="hidden md:block absolute top-10 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] h-px bg-gradient-to-r from-blue-200 via-blue-300 to-blue-200 pointer-events-none" />
-
-            {HOW_IT_WORKS.map(({ step, title, body }, i) => (
-              <ScrollReveal key={step} delay={i * 100} direction="up">
-                <div className="relative text-center space-y-4 px-4">
-                  <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25 mx-auto">
-                    <span className="text-2xl font-black tracking-tight">{step}</span>
-                  </div>
-                  <h3 className="font-heading text-xl font-bold text-gray-900">{title}</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm">{body}</p>
-                </div>
-              </ScrollReveal>
-            ))}
           </div>
-
-          <ScrollReveal className="text-center mt-14">
-            <Link href="/register">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                Create my free site <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* ── Features ──────────────────────────────────────────────────────── */}
-      <section id="features" className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              Features
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Every tool an author website needs
-            </h2>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              Purpose-built features that go way beyond a basic website builder.
-            </p>
-            <div className="mt-4">
-              <Link
-                href="/features"
-                className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
-              >
-                See full feature listing <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </ScrollReveal>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map(({ icon: Icon, title, description }, index) => (
-              <ScrollReveal key={title} delay={index * 60} direction={index % 2 === 0 ? "up" : "scale"}>
-                <div className="group h-full bg-white rounded-xl border border-gray-200 p-6 space-y-3 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 cursor-default">
-                  <div className="p-2.5 bg-blue-50 rounded-lg w-fit group-hover:bg-blue-100 group-hover:scale-110 transition-all duration-300">
-                    <Icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-300">
-                    {title}
-                  </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Who It's For ──────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Users className="h-3.5 w-3.5" />
-              Who It&apos;s For
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Built for every kind of author
-            </h2>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              Whether you write sweeping epics or slim novellas, AuthorLoft gives you a home that fits.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {AUTHOR_TYPES.map(({ icon: Icon, genre, description, gradient }, i) => (
-              <ScrollReveal key={genre} delay={i * 70} direction={i % 3 === 1 ? "scale" : "up"}>
-                <div className="group h-full bg-white rounded-2xl border border-gray-100 p-6 space-y-3 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300"
-                    style={{ background: gradient }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{genre}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Testimonials ───────────────────────────────────────────────────── */}
-      <TestimonialsSection testimonials={testimonials} />
-
-      {/* ── Pricing ───────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-24 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Tag className="h-3.5 w-3.5" />
-              Pricing
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-gray-500 text-lg">
-              Start free. Upgrade when you&apos;re ready to grow.
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal direction="scale">
-            {plans.length > 0 ? (
-              <PricingSection plans={plans} />
-            ) : (
-              <div className="text-center py-12 text-gray-400 text-sm">
-                Pricing plans coming soon.
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {[
+              { num: '30%', label: 'Lost to platform fees',        body: 'Most marketplaces take a cut. AuthorLoft takes nothing on any plan.' },
+              { num: '0',   label: 'Relationships you own',         body: 'When platforms close, your readers vanish. Here, your list is yours forever.' },
+              { num: 'wks', label: 'To get started elsewhere',      body: 'Squarespace, Kajabi, Shopify — all demand weeks of setup. AuthorLoft: minutes.' },
+            ].map((s, i) => (
+              <div key={i} style={{ borderRadius: 14, padding: '40px 36px', background: [ML.ink, ML.midnight, '#3A5577'][i], color: ML.bone }}>
+                <div style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(60px, 8vw, 100px)', lineHeight: 0.85, letterSpacing: '-0.04em', color: ML.brass2, marginBottom: 12 }}>{s.num}</div>
+                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: `${ML.bone}cc`, marginBottom: 10 }}>{s.label}</p>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, lineHeight: 1.6, color: `${ML.bone}cc` }}>{s.body}</p>
               </div>
-            )}
-          </ScrollReveal>
-
-          <div className="text-center mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/features"
-              target="_blank"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              See full feature listing <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <span className="hidden sm:block text-gray-300 text-xs">·</span>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              View pricing
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
-      <FaqSection faqs={faqs} />
-
-      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 py-24">
-        <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-400/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-8">
-          <ScrollReveal>
-            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white leading-tight">
-              Ready to build your author platform?
+      {/* ── Steps ──────────────────────────────────────────────────────────── */}
+      <section id="how-it-works" style={{ background: ML.bone, padding: '0 60px 120px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Simple setup ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+              Three steps to a <span style={{ fontStyle: 'italic', color: ML.copper }}>real bookshop</span> with your name on it.
             </h2>
-            <p className="text-blue-100/80 text-lg mt-4 max-w-xl mx-auto">
-              Join AuthorLoft free today. Your readers are looking for you — make it easy for them to find you.
-            </p>
-          </ScrollReveal>
-          <ScrollReveal delay={100}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-950 hover:bg-blue-50 font-bold px-10 shadow-2xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
-                >
-                  Start for Free <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-              <p className="text-blue-300/60 text-sm">No credit card · Free plan forever</p>
-            </div>
-          </ScrollReveal>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {HOW_IT_WORKS.map((step, i) => (
+              <div key={i} style={{ background: ML.pearl, borderRadius: 14, padding: '40px 36px' }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', border: `2px solid ${[ML.ink, ML.midnight, ML.copper][i]}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: [ML.ink, ML.midnight, ML.copper][i], marginBottom: 20 }}>{step.number}</div>
+                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 26, fontWeight: 400, color: ML.ink, margin: '0 0 12px' }}>{step.title}</h3>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{step.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-400 py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center">
-            <Image src="/AL_site_Logo-Dark_footer.png" alt="AuthorLoft" width={140} height={40} className="h-8 w-auto" />
+      {/* ── Features ───────────────────────────────────────────────────────── */}
+      <section id="features" style={{ background: ML.mist, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass, marginBottom: 16 }}>· Features ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 12px' }}>
+              Tools made <span style={{ fontStyle: 'italic', color: ML.copper }}>specifically</span> for the way authors publish.
+            </h2>
+            <Link href="/features" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+              See full feature listing →
+            </Link>
           </div>
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+            {FEATURES.map((f, i) => (
+              <div key={i} style={{ background: ML.pearl, borderRadius: 14, padding: '28px 24px', border: `1px solid #DCDBD3` }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: ML.ink, marginBottom: 14 }} />
+                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 18, fontWeight: 400, color: ML.ink, margin: '0 0 8px' }}>{f.title}</h3>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{f.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Genres ─────────────────────────────────────────────────────────── */}
+      <section id="genres" style={{ background: ML.bone, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Who it&apos;s for ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+              Romance to literary, <span style={{ fontStyle: 'italic', color: ML.copper }}>thriller to memoir</span> — a home for every shelf.
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+            {GENRES.map((g, i) => (
+              <div key={i} style={{ background: g.bg === ML.brass ? ML.brass : g.bg, borderRadius: 14, padding: '32px 28px', color: ML.bone, border: `1px solid rgba(232,229,221,0.1)` }}>
+                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 24, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
+                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: `${ML.bone}cc`, margin: 0 }}>{g.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials (dynamic) ─────────────────────────────────────────── */}
+      <MidnightTestimonialsSection testimonials={testimonials} />
+
+      {/* ── Pricing (dynamic) ──────────────────────────────────────────────── */}
+      <section id="pricing" style={{ background: ML.bone, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Pricing ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+              Start free. <span style={{ fontStyle: 'italic', color: ML.copper }}>Pay only when you sell.</span>
+            </h2>
+          </div>
+          <MidnightPricingSection plans={plans} />
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Link href="/pricing" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+              View full pricing comparison →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ (dynamic) ──────────────────────────────────────────────────── */}
+      <MidnightFaqSection faqs={faqs} />
+
+      {/* ── Final CTA ──────────────────────────────────────────────────────── */}
+      <section style={{ position: 'relative', overflow: 'hidden', background: ML.midnight, padding: '160px 60px', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', top: -80, right: -80, width: 400, height: 400, background: `radial-gradient(circle, ${ML.brass2}22, transparent 70%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
+          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 24 }}>· Ready? ·</p>
+          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(52px, 8vw, 120px)', fontWeight: 400, lineHeight: 0.88, letterSpacing: '-0.035em', color: ML.bone, margin: '0 0 24px' }}>
+            Put your name <span style={{ fontStyle: 'italic', color: ML.brass2 }}>on the door.</span>
+          </h2>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 19, lineHeight: 1.55, color: `${ML.bone}cc`, margin: '0 0 36px', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
+            Join AuthorLoft free today. Your readers are looking for you — make it easy for them to find you.
           </p>
-          <div className="flex gap-4 text-sm">
-            <Link href="/pricing" className="hover:text-white transition-colors duration-200">Pricing</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors duration-200">Privacy</Link>
-            <Link href="/terms"   className="hover:text-white transition-colors duration-200">Terms</Link>
-            <Link href="/contact" className="hover:text-white transition-colors duration-200">Contact</Link>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/register" style={{ padding: '15px 32px', fontFamily: 'inherit', fontSize: 15, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 12px 24px -10px rgba(184,137,61,0.5)' }}>
+              Start for Free <ArrowRight style={{ display: 'inline', width: 16, height: 16, marginLeft: 8 }} />
+            </Link>
+            <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer" style={{ padding: '15px 28px', fontFamily: 'inherit', fontSize: 15, fontWeight: 500, background: 'transparent', color: ML.bone, border: `1px solid rgba(232,229,221,0.35)`, borderRadius: 999, textDecoration: 'none' }}>
+              Browse live examples
+            </a>
+          </div>
+          <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 14, color: `${ML.bone}44`, marginTop: 32 }}>
+            — Closing the marketplace tab. Opening yours. —
+          </p>
+        </div>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <footer style={{ background: ML.bone, borderTop: `2px solid ${ML.ink}`, padding: '64px 60px 40px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr repeat(4, 1fr)', gap: 32, marginBottom: 48 }}>
+            <div>
+              <div style={{ marginBottom: 12 }}>
+                <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={140} height={40} style={{ height: 36, width: 'auto' }} />
+              </div>
+              <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.slate }}>—— your name, your shelf ——</p>
+            </div>
+            {[
+              { label: 'Product',    links: [['Features', '/features'], ['Pricing', '/pricing'], ['How it works', '#how-it-works'], ['Live examples', 'https://demo.authorloft.com']] },
+              { label: 'For Authors', links: [['Romance', '#genres'], ['Fantasy', '#genres'], ['Non-Fiction', '#genres'], ['All genres', '#genres']] },
+              { label: 'Company',    links: [['About', '#'], ['Blog', '#'], ['Contact', '/contact'], ['Status', '#']] },
+              { label: 'Legal',      links: [['Privacy', '/privacy'], ['Terms', '/terms'], ['Security', '#'], ['GDPR', '#']] },
+            ].map((col) => (
+              <div key={col.label}>
+                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16, fontWeight: 600 }}>{col.label}</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {col.links.map(([label, href]) => (
+                    <li key={label}><Link href={href} style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: ML.slate, textDecoration: 'none' }}>{label}</Link></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div style={{ borderTop: `1px solid #DCDBD3`, paddingTop: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: ML.slate, margin: 0 }}>
+              © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
+            </p>
+            <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 14, color: `${ML.slate}88`, margin: 0 }}>
+              —— your name, your shelf ——
+            </p>
           </div>
         </div>
       </footer>
