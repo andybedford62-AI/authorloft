@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { DEFAULT_PRIVACY } from "@/lib/legal-defaults";
@@ -50,12 +51,9 @@ export default async function PrivacyPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-600" />
-            <span className="font-bold text-gray-900">
-              Author<span className="text-blue-600">Loft</span>
-            </span>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center">
+            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
             <ArrowLeft className="h-4 w-4" /> Back

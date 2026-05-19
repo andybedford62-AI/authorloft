@@ -62,14 +62,14 @@ export default async function FeaturesPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
-              src="/AL_site_Logo-Blue.png"
+              src="/authorloft-logo-new.png"
               alt="AuthorLoft"
-              width={160}
-              height={48}
-              className="h-10 w-auto"
+              width={200}
+              height={57}
+              className="h-14 w-auto"
             />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
