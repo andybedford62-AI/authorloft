@@ -69,8 +69,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.stripe.com" />
         <link rel="dns-prefetch" href="https://q.stripe.com" />
+      </head>
+      <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        {children}
+        <ConsentBanner />
 
-        {/* Google Tag Manager / Google Ads Tracking */}
+        {/* Google Ads Tracking — must be in body, not head, for Next.js Script to render */}
         {process.env.NEXT_PUBLIC_GOOGLE_ADS_ID && (
           <>
             <Script
@@ -93,11 +98,6 @@ export default function RootLayout({
             />
           </>
         )}
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-        {children}
-        <ConsentBanner />
       </body>
     </html>
   );
