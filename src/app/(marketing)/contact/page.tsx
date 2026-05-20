@@ -58,12 +58,12 @@ export default function MarketingContactPage() {
   }
 
   const inputClass =
-    "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+    "w-full border border-[#DCDBD3] rounded-lg px-3 py-2.5 text-sm text-[#1B2B47] placeholder-[#8993A4] bg-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#B8893D] focus:border-transparent";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#E8E5DD]">
       {/* Nav */}
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
+      <header className="border-b border-[#DCDBD3] bg-[#E8E5DD] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
@@ -77,36 +77,36 @@ export default function MarketingContactPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
-            <Mail className="h-6 w-6 text-blue-600" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-blue-600">Get in Touch</span>
+            <Mail className="h-6 w-6 text-[#C26A4A]" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#C26A4A]">Get in Touch</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Contact AuthorLoft</h1>
-          <p className="text-gray-500 mt-2 max-w-lg">
+          <h1 className="text-3xl font-bold text-[#1B2B47]">Contact AuthorLoft</h1>
+          <p className="text-[#5C6E89] mt-2 max-w-lg">
             Have a question about our plans, need help with your account, or just want to say hello?
             Fill out the form and we'll get back to you within one business day.
           </p>
         </div>
 
         {sent ? (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-10 text-center">
-            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <Check className="h-6 w-6 text-green-600" />
+          <div className="bg-[#F0EDE4] border border-[#DCDBD3] rounded-2xl p-10 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#E8E5DD] flex items-center justify-center mx-auto mb-4">
+              <Check className="h-6 w-6 text-[#B8893D]" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Message sent!</h2>
-            <p className="text-gray-500 mb-2">
+            <h2 className="text-xl font-bold text-[#1B2B47] mb-2">Message sent!</h2>
+            <p className="text-[#5C6E89] mb-2">
               Thanks for reaching out. We'll get back to you at <strong>{email}</strong> within one business day.
             </p>
             {selectedEmail && (
-              <p className="text-sm text-gray-400 mb-6">
+              <p className="text-sm text-[#8993A4] mb-6">
                 Your message was routed to <strong>{selectedEmail.label}</strong> ({selectedEmail.email}).
               </p>
             )}
-            <Link href="/" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+            <Link href="/" className="text-sm font-medium text-[#C26A4A] hover:text-[#1B2B47]">
               ← Back to AuthorLoft
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5 bg-white border border-gray-200 rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 bg-[#F0EDE4] border border-[#DCDBD3] rounded-2xl p-8">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
                 {error}
@@ -115,7 +115,7 @@ export default function MarketingContactPage() {
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#1B2B47]">
                   Your name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -128,7 +128,7 @@ export default function MarketingContactPage() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#1B2B47]">
                   Email address <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -144,7 +144,7 @@ export default function MarketingContactPage() {
 
             {supportEmails.length > 0 && (
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-[#1B2B47]">
                   Inquiry type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -167,7 +167,7 @@ export default function MarketingContactPage() {
             )}
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">Subject</label>
+              <label className="block text-sm font-medium text-[#1B2B47]">Subject</label>
               <input
                 type="text"
                 value={subject}
@@ -178,7 +178,7 @@ export default function MarketingContactPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-[#1B2B47]">
                 Message <span className="text-red-500">*</span>
               </label>
               <textarea

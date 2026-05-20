@@ -19,7 +19,7 @@ function renderContent(text: string) {
     // Check if it's a heading (starts with **)
     if (para.startsWith("**") && para.endsWith("**") && para.indexOf("**", 2) === para.length - 2) {
       return (
-        <h2 key={i} className="text-lg font-bold text-gray-900 mt-8 mb-2">
+        <h2 key={i} className="text-lg font-bold text-[#1B2B47] mt-8 mb-2">
           {para.replace(/\*\*/g, "")}
         </h2>
       );
@@ -27,10 +27,10 @@ function renderContent(text: string) {
     // Inline bold
     const parts = para.split(/(\*\*[^*]+\*\*)/g);
     return (
-      <p key={i} className="text-gray-600 leading-relaxed">
+      <p key={i} className="text-[#5C6E89] leading-relaxed">
         {parts.map((part, j) =>
           part.startsWith("**") && part.endsWith("**")
-            ? <strong key={j} className="text-gray-800">{part.replace(/\*\*/g, "")}</strong>
+            ? <strong key={j} className="text-[#1B2B47]">{part.replace(/\*\*/g, "")}</strong>
             : part
         )}
       </p>
@@ -48,9 +48,9 @@ export default async function PrivacyPage() {
   const updatedAt  = settings?.privacyUpdatedAt ?? null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#E8E5DD]">
       {/* Nav */}
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
+      <header className="border-b border-[#DCDBD3] bg-[#E8E5DD] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
@@ -64,9 +64,9 @@ export default async function PrivacyPage() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
+          <h1 className="text-3xl font-bold text-[#1B2B47]">Privacy Policy</h1>
           {updatedAt && (
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm text-[#8993A4] mt-2">
               Last updated:{" "}
               {new Date(updatedAt).toLocaleDateString("en-US", {
                 year: "numeric", month: "long", day: "numeric",
@@ -79,9 +79,9 @@ export default async function PrivacyPage() {
           {renderContent(content)}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-center text-sm text-gray-400">
-          <Link href="/terms" className="hover:text-gray-700 transition-colors">Terms of Service →</Link>
-          <Link href="/contact" className="hover:text-gray-700 transition-colors">Contact us</Link>
+        <div className="mt-12 pt-8 border-t border-[#DCDBD3] flex justify-between items-center text-sm text-gray-400">
+          <Link href="/terms" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Terms of Service →</Link>
+          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Contact us</Link>
         </div>
       </div>
     </div>

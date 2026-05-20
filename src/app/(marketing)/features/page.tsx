@@ -59,9 +59,9 @@ export default async function FeaturesPage() {
   const { plans, defaultAiUsageCap } = await getActivePlans().catch(() => ({ plans: [], defaultAiUsageCap: 20 }));
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#E8E5DD]">
       {/* Nav */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-50 bg-[#E8E5DD] border-b border-[#DCDBD3]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
@@ -73,19 +73,19 @@ export default async function FeaturesPage() {
             />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/#features" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
               Features
             </Link>
-            <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/pricing" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
               Pricing
             </Link>
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/login" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
               Sign In
             </Link>
           </nav>
           <Link
             href="/register"
-            className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-[#B8893D] text-[#0F1A2D] text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#D4AE6A] transition-colors"
           >
             Get Started Free
           </Link>
@@ -97,15 +97,15 @@ export default async function FeaturesPage() {
         <div className="max-w-5xl mx-auto space-y-4">
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center gap-2 text-sm text-[#C26A4A] hover:text-[#1B2B47] font-medium"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to pricing
           </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1B2B47] mt-4">
             Complete Feature Comparison
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl">
+          <p className="text-lg text-[#5C6E89] max-w-2xl">
             See all the features available on each plan. Everything updates automatically as we add new features.
           </p>
         </div>
@@ -116,29 +116,29 @@ export default async function FeaturesPage() {
         {plans.length > 0 ? (
           <FeatureMatrix plans={plans} defaultAiUsageCap={defaultAiUsageCap} />
         ) : (
-          <div className="text-center py-20 text-gray-400">
+          <div className="text-center py-20 text-[#8993A4]">
             <p>Feature data is being loaded. Check back soon.</p>
           </div>
         )}
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-50 py-16 px-4">
+      <section className="bg-[#1B2B47] py-16 px-4">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Ready to get started?</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-[#1B2B47]">Ready to get started?</h2>
+          <p className="text-[#5C6E89]">
             All plans start with a free account. Upgrade anytime from your dashboard.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
             <Link
               href="/register"
-              className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-[#B8893D] text-[#0F1A2D] font-semibold px-6 py-3 rounded-lg hover:bg-[#D4AE6A] transition-colors"
             >
               Get Started Free
             </Link>
             <Link
               href="/pricing"
-              className="border border-gray-300 text-gray-900 font-semibold px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="border border-[#E8E5DD] text-[#E8E5DD] font-semibold px-6 py-3 rounded-lg hover:bg-[#E8E5DD] hover:text-[#1B2B47] transition-colors"
             >
               View Pricing
             </Link>
@@ -147,7 +147,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
+      <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3] text-[#5C6E89] py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center">
             <Image
@@ -160,13 +160,13 @@ export default async function FeaturesPage() {
           </div>
           <p className="text-sm">© {new Date().getFullYear()} AuthorLoft. Built for authors.</p>
           <div className="flex gap-4 text-sm">
-            <Link href="/privacy" className="hover:text-white transition-colors">
+            <Link href="/privacy" className="hover:text-[#1B2B47] transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
+            <Link href="/terms" className="hover:text-[#1B2B47] transition-colors">
               Terms
             </Link>
-            <Link href="/contact" className="hover:text-white transition-colors">
+            <Link href="/contact" className="hover:text-[#1B2B47] transition-colors">
               Contact
             </Link>
           </div>

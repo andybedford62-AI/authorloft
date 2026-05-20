@@ -126,9 +126,9 @@ export default function GdprPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#E8E5DD]">
       {/* Nav */}
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
+      <header className="border-b border-[#DCDBD3] bg-[#E8E5DD] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
@@ -142,9 +142,9 @@ export default function GdprPage() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">GDPR &amp; Your Data Rights</h1>
-          <p className="text-sm text-gray-400 mt-2">Last updated: {updatedAt}</p>
-          <p className="text-gray-600 mt-4 leading-relaxed">
+          <h1 className="text-3xl font-bold text-[#1B2B47]">GDPR &amp; Your Data Rights</h1>
+          <p className="text-sm text-[#8993A4] mt-2">Last updated: {updatedAt}</p>
+          <p className="text-[#5C6E89] mt-4 leading-relaxed">
             AuthorLoft is committed to protecting the personal data of everyone who uses our platform.
             This page explains how we comply with the General Data Protection Regulation (GDPR) and
             the UK GDPR, and how you can exercise your rights as a data subject.
@@ -156,15 +156,15 @@ export default function GdprPage() {
             const paragraphs = body.split(/\n\n+/);
             return (
               <div key={heading}>
-                <h2 className="text-lg font-bold text-gray-900 mb-3">{heading}</h2>
+                <h2 className="text-lg font-bold text-[#1B2B47] mb-3">{heading}</h2>
                 <div className="space-y-3">
                   {paragraphs.map((para, i) => {
                     const parts = para.split(/(\*\*[^*]+\*\*)/g);
                     return (
-                      <p key={i} className="text-gray-600 leading-relaxed">
+                      <p key={i} className="text-[#5C6E89] leading-relaxed">
                         {parts.map((part, j) =>
                           part.startsWith("**") && part.endsWith("**")
-                            ? <strong key={j} className="text-gray-800">{part.replace(/\*\*/g, "")}</strong>
+                            ? <strong key={j} className="text-[#1B2B47]">{part.replace(/\*\*/g, "")}</strong>
                             : part
                         )}
                       </p>
@@ -176,10 +176,10 @@ export default function GdprPage() {
           })}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-100 flex flex-wrap justify-between items-center gap-4 text-sm text-gray-400">
-          <Link href="/privacy" className="hover:text-gray-700 transition-colors">Privacy Policy →</Link>
-          <Link href="/terms"   className="hover:text-gray-700 transition-colors">Terms of Service →</Link>
-          <Link href="/contact" className="hover:text-gray-700 transition-colors">Contact us</Link>
+        <div className="mt-12 pt-8 border-t border-[#DCDBD3] flex flex-wrap justify-between items-center gap-4 text-sm text-gray-400">
+          <Link href="/privacy" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Privacy Policy →</Link>
+          <Link href="/terms"   className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Terms of Service →</Link>
+          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Contact us</Link>
         </div>
       </div>
     </div>
