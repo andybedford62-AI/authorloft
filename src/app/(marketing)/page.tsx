@@ -215,7 +215,7 @@ export default async function MarketingPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
             {GENRES.map((g, i) => (
-              <div key={i} style={{ background: g.bg === ML.brass ? ML.brass : g.bg, borderRadius: 14, padding: '32px 28px', color: ML.bone, border: `1px solid rgba(232,229,221,0.1)` }}>
+              <div key={i} style={{ background: g.bg, borderRadius: 14, padding: '32px 28px', color: ML.bone, border: `1px solid rgba(232,229,221,0.1)` }}>
                 <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 24, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
                 <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 13, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: `${ML.bone}cc`, margin: 0 }}>{g.description}</p>
