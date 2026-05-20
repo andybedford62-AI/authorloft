@@ -79,20 +79,17 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     if (!fileId) return NextResponse.json({ error: "Missing fileId" }, { status: 400 });
 
-    // Verify ARC belongs to author
-    const arc = await prisma.arcCopy.findFirst({
+    // Verify ARC belongs to author AND file belongs to this ARC
+    const file = await prisma.arcFile.findFirst({
       where: {
-        id: arcId,
-        bookId,
-        book: { authorId },
+        id: fileId,
+        arcCopyId: arcId,
+        arcCopy: { bookId, book: { authorId } },
       },
     });
-    if (!arc) return NextResponse.json({ error: "ARC not found" }, { status: 404 });
+    if (!file) return NextResponse.json({ error: "File not found" }, { status: 404 });
 
-    // Delete file (cascade deletes downloads)
-    await prisma.arcFile.delete({
-      where: { id: fileId },
-    });
+    await prisma.arcFile.delete({ where: { id: fileId } });
 
     auditLog({
       userId: authorId,

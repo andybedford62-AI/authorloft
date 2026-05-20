@@ -61,6 +61,7 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
     id: string; name: string; email: string; status: string;
     invitedAt: string | null; tokenExpiresAt: string | null;
   }>>([]);
+  const [readersLoading, setReadersLoading] = useState(false);
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteExpiry, setInviteExpiry] = useState("");
@@ -76,6 +77,11 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       const res = await fetch(`/api/admin/books/${bookId}/arc`, {
         headers: { "X-CSRF-Token": csrfToken },
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to load ARC");
+        return;
+      }
       const data = await res.json();
       if (data.arc) {
         setArc(data.arc);
@@ -90,13 +96,23 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
 
   async function loadReaders() {
     if (!arc) return;
+    setReadersLoading(true);
     try {
       const res = await fetch(`/api/admin/books/${bookId}/arc/${arc.id}/readers`, {
         headers: { "X-CSRF-Token": csrfToken },
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to load readers");
+        return;
+      }
       const data = await res.json();
       if (data.readers) setReaders(data.readers);
-    } catch {}
+    } catch {
+      setError("Failed to load readers");
+    } finally {
+      setReadersLoading(false);
+    }
   }
 
   async function inviteReader() {
@@ -185,7 +201,7 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       // Step 1 — get signed URL
       const urlRes = await fetch("/api/admin/upload/arc-file-url", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
         body: JSON.stringify({ arcId, bookId, fileName: item.file.name }),
       });
 
@@ -503,9 +519,15 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
       </div>
 
       {/* ── Sent log ── */}
-      {readers.length > 0 && (
-        <div className="border-t border-gray-200 pt-6 space-y-3">
-          <h3 className="font-semibold text-gray-900">Invite Log</h3>
+      <div className="border-t border-gray-200 pt-6 space-y-3">
+        <h3 className="font-semibold text-gray-900">Invite Log</h3>
+        {readersLoading ? (
+          <div className="flex items-center gap-2 py-4 text-gray-500 text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading readers…
+          </div>
+        ) : readers.length === 0 ? (
+          <p className="text-sm text-gray-400 py-2">No invites sent yet.</p>
+        ) : (
           <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
@@ -533,9 +555,11 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                         r.status === "REVIEWED"   ? "bg-purple-100 text-purple-700" :
-                        r.status === "DOWNLOADED" ? "bg-green-100 text-green-700" :
-                        r.status === "INVITED"    ? "bg-blue-100 text-blue-700" :
-                                                    "bg-gray-100 text-gray-600"
+                        r.status === "DOWNLOADED" ? "bg-green-100  text-green-700"  :
+                        r.status === "INVITED"    ? "bg-blue-100   text-blue-700"   :
+                        r.status === "PENDING"    ? "bg-yellow-100 text-yellow-700" :
+                        r.status === "DECLINED"   ? "bg-red-100    text-red-700"    :
+                                                    "bg-gray-100   text-gray-600"
                       }`}>
                         {r.status.charAt(0) + r.status.slice(1).toLowerCase()}
                       </span>
@@ -545,8 +569,8 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

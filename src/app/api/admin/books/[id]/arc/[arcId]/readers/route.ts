@@ -130,6 +130,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Send invite email
     const book = await prisma.book.findUnique({ where: { id: bookId }, select: { title: true } });
+    if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
     const baseUrl = (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
     const downloadUrl = `${baseUrl}/arc/${reader.token}`;
     const expiryLine = arc.expiresAt
@@ -138,20 +139,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     await sendMail({
       to: email,
-      subject: `You're invited to read an advance copy of "${book?.title}"`,
+      subject: `You're invited to read an advance copy of "${book.title}"`,
       text: [
         `Hi ${name},`,
-        `${author?.name ?? "An author"} has invited you to read an advance copy of "${book?.title}".`,
+        `${author?.name ?? "An author"} has invited you to read an advance copy of "${book.title}".`,
         arc.disclaimer ? arc.disclaimer : "",
         `Download your copy here: ${downloadUrl}`,
         arc.expiresAt ? `This link expires on ${new Date(arc.expiresAt).toLocaleDateString()}.` : "",
         `— ${author?.name ?? "AuthorLoft"}`,
       ].filter(Boolean).join("\n\n"),
-      html: wrapHtml(`You're invited to read "${esc(book?.title ?? "")}"`, `
+      html: wrapHtml(`You're invited to read "${esc(book.title ?? "")}"`, `
         <p style="margin:0 0 16px;">Hi ${esc(name)},</p>
         <p style="margin:0 0 16px;">
           <strong>${esc(author?.name ?? "An author")}</strong> has invited you to read an advance copy of
-          <strong>"${esc(book?.title ?? "")}"</strong> before it's published.
+          <strong>"${esc(book.title ?? "")}"</strong> before it's published.
         </p>
         ${arc.disclaimer ? `
         <div style="background:#f9fafb;border-left:3px solid #d1d5db;padding:12px 16px;margin:0 0 24px;font-size:13px;color:#6b7280;">

@@ -37,7 +37,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ toke
         id: arc.id,
         bookTitle: arc.book.title,
         disclaimer: arc.disclaimer,
-        expiresAt: reader.tokenExpiresAt?.toISOString() ?? null,
+        expiresAt: arc.expiresAt?.toISOString() ?? null,
+        tokenExpiresAt: reader.tokenExpiresAt?.toISOString() ?? null,
       },
       files: arc.files.map((f) => ({
         id: f.id,

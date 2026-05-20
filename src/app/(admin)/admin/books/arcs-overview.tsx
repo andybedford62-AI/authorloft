@@ -32,17 +32,21 @@ interface ArcsOverviewProps {
 export function ArcsOverview({ books }: ArcsOverviewProps) {
   const [arcsData, setArcsData] = useState<ArcData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
   useEffect(() => {
     async function fetchArcs() {
       try {
         const response = await fetch("/api/admin/arcs");
-        if (response.ok) {
-          const data = await response.json();
-          setArcsData(data.arcs || []);
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          setFetchError(data.error || "Failed to load ARCs");
+          return;
         }
-      } catch (error) {
-        console.error("Failed to fetch ARCs", error);
+        const data = await response.json();
+        setArcsData(data.arcs || []);
+      } catch {
+        setFetchError("Failed to load ARCs — please refresh the page");
       } finally {
         setLoading(false);
       }
@@ -55,6 +59,14 @@ export function ArcsOverview({ books }: ArcsOverviewProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <p className="text-gray-500">Loading ARCs...</p>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="rounded-xl bg-red-50 border border-red-200 p-6 text-center">
+        <p className="text-red-700 font-medium">{fetchError}</p>
       </div>
     );
   }

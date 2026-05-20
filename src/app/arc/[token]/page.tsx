@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 interface ArcData {
   reader: { id: string; name: string; email: string };
-  arc: { id: string; bookTitle: string; disclaimer?: string; expiresAt?: string };
+  arc: { id: string; bookTitle: string; disclaimer?: string; expiresAt?: string; tokenExpiresAt?: string };
   files: Array<{
     id: string;
     format: string;
@@ -121,7 +121,11 @@ export default function ArcDownloadPage() {
     );
   }
 
-  const isExpired = !!(arc.arc.expiresAt && new Date() > new Date(arc.arc.expiresAt));
+  const now = new Date();
+  const isExpired =
+    (!!arc.arc.expiresAt && now > new Date(arc.arc.expiresAt)) ||
+    (!!arc.arc.tokenExpiresAt && now > new Date(arc.arc.tokenExpiresAt));
+  const expiredAt = arc.arc.tokenExpiresAt ?? arc.arc.expiresAt;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -133,7 +137,7 @@ export default function ArcDownloadPage() {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
             <p className="text-red-800 font-medium">⚠️ This link has expired</p>
             <p className="text-red-700 text-sm mt-1">
-              Expired on {new Date(arc.arc.expiresAt!).toLocaleDateString()}
+              {expiredAt ? `Expired on ${new Date(expiredAt).toLocaleDateString()}` : "This link is no longer valid."}
             </p>
           </div>
         )}
