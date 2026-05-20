@@ -16,7 +16,7 @@ export async function generateMetadata({
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
   return {
-    title: "Blog",
+    title: "News",
     description: `News and updates from ${authorName}.`,
   };
 }
