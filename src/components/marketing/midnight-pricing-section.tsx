@@ -36,7 +36,7 @@ function buildFeatures(plan: PlanData): string[] {
 }
 
 export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
-  const [annual, setAnnual] = useState(true);
+  const [annual, setAnnual] = useState(false);
 
   if (plans.length === 0) {
     return (
