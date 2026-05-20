@@ -109,7 +109,7 @@ export default async function BlogPostPage({
           <div className="flex items-center gap-3 mb-3">
             <Newspaper className="h-5 w-5 text-white/70" />
             <span className="text-white/70 text-sm font-medium uppercase tracking-widest">
-              Blog &amp; News
+              News
             </span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight">
@@ -137,7 +137,7 @@ export default async function BlogPostPage({
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[var(--accent)] transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Blog
+          Back to News
         </Link>
 
         {/* Cover image */}
@@ -184,7 +184,7 @@ export default async function BlogPostPage({
           <Link href="/blog">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-1.5" />
-              Back to Blog
+              Back to News
             </Button>
           </Link>
         </div>
