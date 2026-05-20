@@ -76,7 +76,6 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
             });
             if (tokenRes.ok) {
               const { tokens } = await tokenRes.json();
-              // Merge tokens into items by bookSlug + label
               const merged = data.items.map((item: OrderItem) => {
                 const match = tokens.find(
                   (t: { bookSlug: string; label: string }) =>
@@ -89,8 +88,10 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
               setOrder({ ...data, items: merged });
               return;
             }
+            // Token fetch failed — order is complete but download links unavailable right now
+            setOrder({ ...data, _tokenError: true } as any);
           } catch {
-            // Non-fatal — order still shown, tokens just missing
+            setOrder({ ...data, _tokenError: true } as any);
           }
         } else {
           setAttempts((a) => {
@@ -216,6 +217,10 @@ export function SuccessClient({ sessionId, bookSlug, accentColor, clearOnMount }
                     <span>{item.downloadsLeft} download{item.downloadsLeft !== 1 ? "s" : ""} remaining</span>
                   </div>
                 </>
+              ) : (order as any)._tokenError ? (
+                <p className="text-sm text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                  Your download link will arrive by email shortly. If it doesn&apos;t arrive in 5 minutes, please contact support.
+                </p>
               ) : (
                 <p className="text-sm text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
                   Your file is being prepared. Check back shortly or watch your email.

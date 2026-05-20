@@ -57,9 +57,11 @@ export default function ArcDownloadPage() {
       });
       if (res.ok) {
         setDisclaimerAcknowledged(true);
+      } else {
+        setError("Could not save your agreement. Please try again.");
       }
-    } catch (err) {
-      console.error("Error acknowledging disclaimer");
+    } catch {
+      setError("Could not save your agreement. Please check your connection and try again.");
     }
   }
 

@@ -43,14 +43,23 @@ function ArticleItem({ article }: { article: Article }) {
 export default function HelpPage() {
   const [topics,      setTopics]      = useState<Topic[]>([]);
   const [loading,     setLoading]     = useState(true);
+  const [fetchError,  setFetchError]  = useState("");
   const [search,      setSearch]      = useState("");
   const [activeTopicId, setActiveTopicId] = useState<string | "all">("all");
 
   useEffect(() => {
-    fetch("/api/admin/help")
-      .then((r) => r.json())
-      .then((data) => { setTopics(data.topics ?? []); })
-      .finally(() => setLoading(false));
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/help");
+        if (!r.ok) { setFetchError("Could not load help articles."); return; }
+        const data = await r.json().catch(() => ({}));
+        setTopics(data.topics ?? []);
+      } catch {
+        setFetchError("Could not load help articles. Please refresh the page.");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   // Flatten all articles for search
@@ -71,6 +80,15 @@ export default function HelpPage() {
   const visibleTopics = activeTopicId === "all"
     ? topics
     : topics.filter((t) => t.id === activeTopicId);
+
+  if (fetchError) {
+    return (
+      <div className="max-w-4xl">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Help Centre</h1>
+        <div className="rounded-xl bg-red-50 border border-red-200 p-6 text-red-700">{fetchError}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-4xl">

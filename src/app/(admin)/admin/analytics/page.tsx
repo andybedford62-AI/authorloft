@@ -76,14 +76,26 @@ export default function AnalyticsPage() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/admin/analytics?days=${days}`)
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.error) throw new Error(json.error);
+    (async () => {
+      try {
+        const r = await fetch(`/api/admin/analytics?days=${days}`);
+        const json = await r.json().catch(() => ({}));
+        if (!r.ok || json.error) {
+          const msg = json.error ?? "";
+          setError(
+            msg === "Analytics not configured" || msg.includes("POSTHOG")
+              ? "Analytics not configured"
+              : "Failed to load analytics data"
+          );
+          return;
+        }
         setData(json);
-      })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
+      } catch {
+        setError("Failed to load analytics data");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [days]);
 
   const topReferrer = data?.referrers.find((r) => r.source !== "Direct")?.source ?? data?.referrers[0]?.source ?? "—";
