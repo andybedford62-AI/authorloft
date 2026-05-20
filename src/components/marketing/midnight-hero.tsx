@@ -235,7 +235,7 @@ export function MidnightHero() {
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: '#E8E5DD', opacity: 0.6, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             <span>↳ 5-minute setup</span>
-            <span>↳ 0% transaction fees</span>
+            <span>↳ go live immediately</span>
             <span>↳ keeps your list</span>
           </div>
         </div>

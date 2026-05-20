@@ -44,7 +44,7 @@ const FEATURES = [
   { icon: CreditCard, title: "Direct Sales",             description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links." },
   { icon: Search,     title: "Search & Filtering",       description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy." },
   { icon: Mail,       title: "Newsletter Capture",       description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool." },
-  { icon: Users,      title: "Flip Book Previews",       description: "Upload a PDF and give readers an interactive page-turn preview before they buy." },
+  { icon: Users,      title: "Flip Book Previews",       description: "Upload a URL link to your flipbook and give readers an interactive page-turn preview before they buy." },
   { icon: Shield,     title: "Built for Authors",        description: "No coding required. A purpose-built admin panel makes managing your catalog effortless." },
 ];
 
@@ -55,6 +55,8 @@ const GENRES = [
   { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.", bg: "#3A5577" },
   { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.", bg: "#2A3A55" },
   { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.", bg: "#B8893D" },
+  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark, oppressive futures — showcase the series, lore, and societal stakes that pull readers in.", bg: "#0F1A2D" },
+  { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries, breakthroughs, and complex ideas for general readers. Build authority with a catalog that speaks for your expertise.", bg: "#27406B" },
 ];
 
 // ── Server data ───────────────────────────────────────────────────────────────

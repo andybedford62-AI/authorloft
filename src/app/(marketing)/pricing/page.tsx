@@ -114,7 +114,7 @@ export default async function PricingPage() {
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">Features</Link>
+            <Link href="/features" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">Features</Link>
             <Link href="/pricing" className="text-sm font-medium text-[#C26A4A]">Pricing</Link>
             <a href="/#faq" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">FAQ</a>
             <Link href="/login" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">Sign In</Link>
