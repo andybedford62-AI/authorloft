@@ -16,7 +16,7 @@ export async function generateMetadata({
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
   return {
-    title: "Blog",
+    title: "News",
     description: `News and updates from ${authorName}.`,
   };
 }
@@ -50,7 +50,7 @@ export default async function BlogListPage({
 
       <PageBanner
         label={authorName}
-        title="Blog & News"
+        title="News"
         subtitle="Announcements, behind-the-scenes updates, and stories from the author."
         accentColor={accentColor}
       />
@@ -67,7 +67,7 @@ export default async function BlogListPage({
             {posts.map((post) => (
               <Link
                 key={post.id}
-                href={`/blog/${post.slug}`}
+                href={`/news/${post.slug}`}
                 className="group flex flex-col rounded-2xl border border-gray-100 bg-white hover:shadow-md hover:border-gray-200 transition-all duration-200 overflow-hidden"
               >
                 {/* Cover image */}
