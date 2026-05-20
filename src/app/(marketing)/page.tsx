@@ -54,7 +54,7 @@ const GENRES = [
   { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase complex world-building with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
   { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.", bg: "#3A5577" },
   { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.", bg: "#2A3A55" },
-  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.", bg: "#B8893D" },
+  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.", bg: "#3A5577" },
   { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark, oppressive futures — showcase the series, lore, and societal stakes that pull readers in.", bg: "#0F1A2D" },
   { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries, breakthroughs, and complex ideas for general readers. Build authority with a catalog that speaks for your expertise.", bg: "#27406B" },
 ];

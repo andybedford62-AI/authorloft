@@ -9,7 +9,7 @@ export function MidnightFaqSection({ faqs }: { faqs: FaqItem[] }) {
   if (faqs.length === 0) return null;
 
   return (
-    <section style={{ background: '#F0EDE4', padding: '120px 60px' }}>
+    <section id="faq" style={{ background: '#F0EDE4', padding: '120px 60px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 80, alignItems: 'start' }}>
         {/* Left — sticky intro */}
         <div style={{ position: 'sticky', top: 100 }}>
