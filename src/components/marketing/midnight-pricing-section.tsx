@@ -140,7 +140,7 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
                   transition: 'opacity 0.15s',
                 }}
               >
-                {plan.monthlyPriceCents === 0 ? 'Start for free' : 'Start 14-day trial'}
+                {plan.monthlyPriceCents === 0 ? 'Start for free →' : `Start free — ${plan.name} →`}
               </Link>
 
               {/* Features */}
