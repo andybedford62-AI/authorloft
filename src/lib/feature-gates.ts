@@ -10,6 +10,7 @@ export const TIER_RANK: Record<string, number> = {
 // Default gates — used when no config has been saved yet.
 export const DEFAULT_GATES: Record<string, string> = {
   "/admin/dashboard":    "FREE",
+  "/admin/arcs":         "STANDARD",
   "/admin/books":        "FREE",
   "/admin/flip-books":   "PREMIUM",   // premium-only from day one
   "/admin/specials":     "FREE",
@@ -42,6 +43,7 @@ export const FEATURE_PLAN_MAP: Record<
   "/admin/newsletter": { field: "newsletter",      enabledValue: true,  disabledValue: false },
   "/admin/media-kit":  { field: "mediaKitEnabled", enabledValue: true,  disabledValue: false },
   // Admin-only — no public-site Plan field to update:
+  "/admin/arcs":         null,
   "/admin/dashboard":    null,
   "/admin/books":        null,
   "/admin/sales":        null,

@@ -29,7 +29,7 @@ export default async function EditBookPage({
       where: { id: authorId },
       select: {
         stripeConnectOnboarded: true,
-        plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true } },
+        plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true, tier: true } },
       },
     }),
     prisma.bookPreviewMedia.findMany({
@@ -83,6 +83,7 @@ export default async function EditBookPage({
         genres={genres}
         audioEnabled={author?.plan?.audioEnabled ?? false}
         salesEnabled={author?.plan?.salesEnabled ?? false}
+        arcEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         stripeConnectOnboarded={author?.stripeConnectOnboarded ?? false}
         previewMedia={previewMedia}
       />

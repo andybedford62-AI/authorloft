@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { canUseArc } from "@/lib/plan-limits";
 
 export async function GET(req: NextRequest) {
   const authorId = await getAdminAuthorId();
@@ -8,15 +9,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const author = await prisma.author.findUnique({
-    where: { id: authorId },
-    select: { plan: { select: { tier: true } } },
-  });
-
-  const tier = author?.plan?.tier ?? "FREE";
-  if (tier === "FREE") {
-    return NextResponse.json({ error: "Upgrade required" }, { status: 403 });
-  }
+  const arcCheck = await canUseArc(authorId);
+  if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
   const books = await prisma.book.findMany({
     where: { authorId },

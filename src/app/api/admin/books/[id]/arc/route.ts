@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
+import { canUseArc } from "@/lib/plan-limits";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId } = await params;
 
@@ -60,6 +63,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId } = await params;
     const body = await req.json();
@@ -116,6 +121,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId } = await params;
 

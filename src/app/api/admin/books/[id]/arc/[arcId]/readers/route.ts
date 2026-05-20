@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
 import { sendMail, wrapHtml, esc } from "@/lib/mailer";
+import { canUseArc } from "@/lib/plan-limits";
 import crypto from "crypto";
 
 function generateToken(): string {
@@ -13,6 +14,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId, arcId } = await params;
 
@@ -68,6 +71,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const arcCheck = await canUseArc(authorId);
+    if (!arcCheck.allowed) return NextResponse.json({ error: arcCheck.reason }, { status: 403 });
 
     const { id: bookId, arcId } = await params;
     const body = await req.json();
