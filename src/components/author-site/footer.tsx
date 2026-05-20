@@ -52,7 +52,7 @@ function buildQuickLinks(
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
-  if (config?.navShowBlog)               links.push({ label: "Blog",       href: "/blog" });
+  if (config?.navShowBlog)               links.push({ label: "News",       href: "/news" });
 
   for (const page of customPages ?? []) {
     links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
