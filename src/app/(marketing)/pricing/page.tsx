@@ -71,7 +71,7 @@ const COMPETITOR_ROWS: Array<{
 }> = [
   { label: "Website Builder",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
   { label: "Unlimited Books & Series", authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "Limited", type: "limited" } },
-  { label: "Blog",                    authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "News Posts",              authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
   { label: "Events",                  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
   { label: "Reviews & Ratings",       authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
   { label: "Mailing List Builder",    authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
@@ -89,7 +89,7 @@ const COMPETITOR_ROWS: Array<{
 // Feature comparison table rows
 const COMPARISON_ROWS = [
   { label: "Books",              free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
-  { label: "Blog posts",         free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
+  { label: "News posts",         free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
   { label: "AuthorLoft subdomain",free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Custom domain",      free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Newsletter capture", free: "✓",         standard: "✓",          premium: "✓"          },

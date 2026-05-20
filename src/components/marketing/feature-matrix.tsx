@@ -25,7 +25,7 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
           },
         },
         {
-          name: "Blog Posts",
+          name: "News Posts",
           tiers: {
             FREE: plans.find(p => p.tier === "FREE")?.maxPosts === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "FREE")?.maxPosts || 5}`,
             STANDARD: plans.find(p => p.tier === "STANDARD")?.maxPosts === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "STANDARD")?.maxPosts || 5}`,
@@ -123,7 +123,7 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
           },
         },
         {
-          name: "  • Blog Ideas",
+          name: "  • News Ideas",
           tiers: {
             FREE: "—",
             STANDARD: "—",

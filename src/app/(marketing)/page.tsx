@@ -284,7 +284,7 @@ export default async function MarketingPage() {
               {([
                 ['Features', '/features'],
                 ['Pricing',  '/pricing'],
-                ['Blog',     '#'],
+
                 ['Contact',  '/contact'],
                 ['Privacy',  '/privacy'],
                 ['Terms',    '/terms'],

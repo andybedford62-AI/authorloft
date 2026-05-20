@@ -49,7 +49,7 @@ function formatAnnualTotal(annualCents: number) {
 function buildAutoFeatures(plan: PlanData): string[] {
   const f: string[] = [];
   f.push(plan.maxBooks === null ? "Unlimited books" : `Up to ${plan.maxBooks} book${plan.maxBooks === 1 ? "" : "s"}`);
-  if (plan.maxPosts === null && plan.tier !== "FREE") f.push("Unlimited blog posts");
+  if (plan.maxPosts === null && plan.tier !== "FREE") f.push("Unlimited news posts");
   else if (plan.maxPosts !== null) f.push(`Up to ${plan.maxPosts} published posts`);
   f.push(plan.customDomain ? "Custom domain" : "AuthorLoft subdomain");
   f.push(plan.newsletter ? "Newsletter campaigns" : "Newsletter capture");
