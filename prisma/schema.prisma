@@ -154,8 +154,9 @@ model Author {
   platformEmailOptOut  Boolean   @default(false)
   platformEmailsToken  String    @unique @default(cuid())
   termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
-  onboardingCompletedAt   DateTime?      // set when first book is created; null = never completed onboarding
-  onboardingReminderSentAt DateTime?     // set when the day-7 nudge email is sent
+  onboardingCompletedAt        DateTime?  // set when first book is created; null = never completed onboarding
+  onboardingEarlyReminderSentAt DateTime? // set when the day-3 nudge email is sent
+  onboardingReminderSentAt     DateTime?  // set when the day-7 nudge email is sent
   lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt

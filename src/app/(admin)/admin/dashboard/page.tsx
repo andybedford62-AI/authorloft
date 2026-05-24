@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { DashboardTracker } from "@/components/admin/dashboard-tracker";
+import { OnboardingModal } from "@/components/admin/onboarding-modal";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -235,6 +236,7 @@ export default async function DashboardPage() {
         bookCount={data.totalBooks}
         planTier={data.planTier}
       />
+      <OnboardingModal show={!allDone && data.totalBooks === 0} />
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />

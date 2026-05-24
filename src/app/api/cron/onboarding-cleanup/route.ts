@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendOnboardingReminderEmail } from "@/lib/mailer";
+import { sendOnboardingEarlyReminderEmail, sendOnboardingReminderEmail } from "@/lib/mailer";
 
 /**
  * GET /api/cron/onboarding-cleanup
  * Called by Vercel Cron nightly (see vercel.json).
  *
- * Two passes:
- *  1. Day-7 reminder — authors who verified email 7–8 days ago, never added a book,
- *     and haven't had a reminder sent yet.
- *  2. Day-14 delete — authors who verified email >14 days ago and still have no books.
+ * Three passes:
+ *  1. Day-3 early reminder — authors who verified email 3–4 days ago, never added a book,
+ *     and haven't had an early reminder sent yet.
+ *  2. Day-7 reminder — authors who verified email 7–8 days ago, never added a book,
+ *     and haven't had a (day-7) reminder sent yet.
+ *  3. Day-14 delete — authors who verified email >14 days ago and still have no books.
  *     Their email + slug are freed for re-signup.
  *
  * Super-admin accounts are always excluded.
@@ -20,12 +22,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const now     = new Date();
-  const day7    = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
-  const day8    = new Date(now.getTime() - 8  * 24 * 60 * 60 * 1000);
-  const day14   = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const now   = new Date();
+  const day3  = new Date(now.getTime() - 3  * 24 * 60 * 60 * 1000);
+  const day4  = new Date(now.getTime() - 4  * 24 * 60 * 60 * 1000);
+  const day7  = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000);
+  const day8  = new Date(now.getTime() - 8  * 24 * 60 * 60 * 1000);
+  const day14 = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-  // ── Pass 1: Send day-7 reminder ──────────────────────────────────────────────
+  // ── Pass 1: Send day-3 early reminder ────────────────────────────────────────
+  const needsEarlyReminder = await prisma.author.findMany({
+    where: {
+      isSuperAdmin:                  false,
+      onboardingCompletedAt:         null,
+      onboardingEarlyReminderSentAt: null,
+      emailVerified:                 { gte: day4, lte: day3 },
+      books:                         { none: {} },
+    },
+    select: { id: true, email: true, name: true, displayName: true, slug: true },
+  });
+
+  let earlyReminded = 0;
+  for (const author of needsEarlyReminder) {
+    const name = author.displayName || author.name;
+    sendOnboardingEarlyReminderEmail(author.email, name, author.slug)
+      .catch((e) => console.error(`[cron/onboarding-cleanup] Early reminder failed for ${author.id}:`, e));
+
+    await prisma.author.update({
+      where: { id: author.id },
+      data:  { onboardingEarlyReminderSentAt: now },
+    });
+    earlyReminded++;
+  }
+
+  // ── Pass 2: Send day-7 reminder ──────────────────────────────────────────────
   const needsReminder = await prisma.author.findMany({
     where: {
       isSuperAdmin:             false,
@@ -50,7 +79,7 @@ export async function GET(req: NextRequest) {
     reminded++;
   }
 
-  // ── Pass 2: Delete day-14 ghosts ─────────────────────────────────────────────
+  // ── Pass 3: Delete day-14 ghosts ─────────────────────────────────────────────
   const deleted = await prisma.author.deleteMany({
     where: {
       isSuperAdmin:          false,
@@ -61,8 +90,8 @@ export async function GET(req: NextRequest) {
   });
 
   console.log(
-    `[cron/onboarding-cleanup] reminded=${reminded} deleted=${deleted.count}`
+    `[cron/onboarding-cleanup] earlyReminded=${earlyReminded} reminded=${reminded} deleted=${deleted.count}`
   );
 
-  return NextResponse.json({ ok: true, reminded, deleted: deleted.count });
+  return NextResponse.json({ ok: true, earlyReminded, reminded, deleted: deleted.count });
 }

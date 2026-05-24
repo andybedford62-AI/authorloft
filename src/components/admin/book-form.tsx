@@ -99,7 +99,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
   if (value) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">Cover Image</label>
+        <label className="block text-sm font-medium text-gray-700">Cover Image <span className="font-normal text-gray-400">(optional)</span></label>
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt="Cover preview"
@@ -136,7 +136,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">Cover Image</label>
+      <label className="block text-sm font-medium text-gray-700">Cover Image <span className="font-normal text-gray-400">(optional)</span></label>
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -175,6 +175,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
         )}
       </div>
       {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
+      <p className="text-xs text-gray-400">You can skip this and add a cover later.</p>
       <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
         className="sr-only" onChange={handleFileChange} />
     </div>

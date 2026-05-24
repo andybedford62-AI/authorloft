@@ -826,6 +826,54 @@ export async function sendOnboardingReminderEmail(to: string, name: string, slug
   });
 }
 
+// ── Onboarding early reminder email — day 3 (to author) ──────────────────────
+
+export async function sendOnboardingEarlyReminderEmail(to: string, name: string, slug: string) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const dashboardUrl   = `${baseUrl()}/admin/books/new`;
+  const publicSiteUrl  = `https://${slug}.${platformDomain}`;
+  const firstName      = esc(name.split(" ")[0]);
+
+  return sendMail({
+    to,
+    subject: `${firstName}, your author site is live — add your first book`,
+    text: [
+      `Hi ${firstName},`,
+      `Your AuthorLoft site went live 3 days ago at ${publicSiteUrl}.`,
+      `The only thing missing is a book — once you add one, readers can find you and your site really comes together.`,
+      `It only takes a few minutes: ${dashboardUrl}`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml("Your site is live — add your first book", `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        Your AuthorLoft site went live 3 days ago at
+        <a href="${publicSiteUrl}" style="color:#1d4ed8;">${publicSiteUrl}</a> —
+        exciting stuff!
+      </p>
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        The only thing missing is a book. Once you add one, readers can discover you
+        and your site really comes to life. It only takes a few minutes.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:8px 0 28px;">
+            <a href="${dashboardUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              Add My First Book
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
+        Questions? Just reply to this email — we're happy to help.
+      </p>
+    `),
+  });
+}
+
 // ── Below-minimum pricing alert (to author) ──────────────────────────────────
 
 export async function sendBelowMinimumPricingAlert({
