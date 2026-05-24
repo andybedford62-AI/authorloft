@@ -79,7 +79,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    key: "marketing", label: "Marketing", defaultOpen: true,
+    key: "marketing", label: "Marketing", defaultOpen: false,
     items: [
       { href: "/admin/analytics",              label: "Analytics",       icon: BarChart2  },
       { href: "/admin/newsletter",             label: "Newsletter",      icon: Mail       },
@@ -99,7 +99,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    key: "customize", label: "Customize", defaultOpen: false,
+    key: "customize", label: "Customize", defaultOpen: true,
     items: [
       { href: "/admin/appearance", label: "Appearance", icon: Paintbrush },
       { href: "/admin/branding",   label: "Branding",   icon: Palette    },

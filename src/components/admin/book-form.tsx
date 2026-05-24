@@ -414,7 +414,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
 
     if (mode === "new" && saved?.id) {
       // Go straight to edit so the author can add Direct Sales items and Buy Links
-      router.push(`/admin/books/${saved.id}/edit`);
+      router.push(`/admin/books/${saved.id}/edit?new=1`);
     } else {
       router.push("/admin/books");
     }

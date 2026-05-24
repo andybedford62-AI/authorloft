@@ -118,13 +118,19 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
 
       {/* ── Standalone tab panels — mounted only when active ── */}
       {activeTab === "buy-links" && (
-        <div className="max-w-3xl">
+        <div className="max-w-3xl space-y-4">
+          <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600">
+            <strong>Buy Links</strong> — Add links to your book on Amazon, Apple Books, Kobo, and other retailers. Readers click through to purchase on those platforms. You don't receive payment here — the retailer does.
+          </div>
           <RetailerLinks bookId={book.id} />
         </div>
       )}
 
       {activeTab === "direct-sales" && (
-        <div className="max-w-3xl">
+        <div className="max-w-3xl space-y-4">
+          <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-800">
+            <strong>Direct Sales</strong> — Sell your eBook, PDF, or audio file directly from your AuthorLoft site. You set the price, readers pay and download instantly, and the money goes straight to you via Stripe.
+          </div>
           <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} stripeConnectOnboarded={stripeConnectOnboarded} />
         </div>
       )}

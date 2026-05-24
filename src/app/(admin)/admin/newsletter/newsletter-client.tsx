@@ -189,12 +189,25 @@ export function NewsletterClient({
       {tab === "subscribers" && (
         <>
           {subscribers.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-              <Users className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-              <p className="font-medium text-gray-500">No subscribers yet</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Readers can sign up through the newsletter form on your site.
-              </p>
+            <div className="bg-white rounded-xl border border-gray-200 p-10 text-center space-y-4">
+              <Users className="h-10 w-10 text-gray-200 mx-auto" />
+              <div>
+                <p className="font-semibold text-gray-700">No subscribers yet</p>
+                <p className="text-sm text-gray-400 mt-1 max-w-sm mx-auto">
+                  Your author site already has a built-in newsletter sign-up form. Share your site link with readers and they can subscribe directly.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 items-center text-sm">
+                <div className="rounded-lg bg-gray-50 border border-gray-100 px-4 py-3 text-left max-w-sm w-full space-y-1.5 text-gray-500">
+                  <p className="font-medium text-gray-700 text-xs uppercase tracking-wide">How readers subscribe</p>
+                  <p>1. Share your public author site link</p>
+                  <p>2. Readers click the newsletter sign-up form on your site</p>
+                  <p>3. They confirm via email — and they appear here</p>
+                </div>
+                <a href="/admin/newsletter-integration" className="text-xs text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                  Connect Mailchimp, Kit, or ActiveCampaign →
+                </a>
+              </div>
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
 import { generateCSRFToken } from "./csrf";
-import { sendNewSignupNotificationEmail } from "./mailer";
+import { sendNewSignupNotificationEmail, sendWelcomeEmail } from "./mailer";
 import { capturePostHog } from "./posthog";
 import bcrypt from "bcryptjs";
 import { checkLoginRateLimit } from "./login-rate-limit";
@@ -178,6 +178,11 @@ export const authOptions: NextAuthOptions = {
           });
 
           capturePostHog(newAuthor.id, "google_signup_completed", { signup_method: "google", plan_tier: "FREE", slug: finalSlug });
+
+          // Send welcome email (fire-and-forget)
+          sendWelcomeEmail(email, baseName, finalSlug).catch((err) =>
+            console.error("[auth] Failed to send Google welcome email:", err)
+          );
 
           // Send admin signup notification if enabled (fire-and-forget)
           prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true, signupNotificationEmail: true } })

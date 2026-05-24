@@ -2,12 +2,16 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BookEditTabsClient } from "@/components/admin/book-edit-tabs-client";
+import { CheckCircle2 } from "lucide-react";
 
 export default async function EditBookPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ new?: string }>;
 }) {
+  const { new: isNew } = await searchParams;
   const authorId = await getAdminAuthorId();
   const { id } = await params;
 
@@ -77,6 +81,25 @@ export default async function EditBookPage({
         <h1 className="text-2xl font-bold text-gray-900">Edit Book</h1>
         <p className="text-sm text-gray-500 mt-1">{book.title}</p>
       </div>
+
+      {/* First-time guidance banner */}
+      {isNew === "1" && (
+        <div className="rounded-xl bg-green-50 border border-green-200 p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-green-900 text-sm">Book created — here's what to do next</p>
+              <ul className="mt-2 space-y-1 text-sm text-green-800">
+                <li>1. <strong>Details tab</strong> — add a cover image and description so readers know what your book is about</li>
+                <li>2. <strong>Sales tab</strong> — upload your eBook or PDF and set a price to start selling directly</li>
+                <li>3. <strong>Distribution tab</strong> — add buy links for Amazon, Apple Books, or other retailers</li>
+              </ul>
+              <p className="mt-2 text-xs text-green-700">Everything auto-saves. Skip any step and come back later.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <BookEditTabsClient
         book={bookData}
         series={series}

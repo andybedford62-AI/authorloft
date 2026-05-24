@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, BookOpen } from "lucide-react";
+import { Plus, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
@@ -53,12 +53,34 @@ export default async function AdminBooksPage() {
         </Link>
       </div>
 
-      {/* Tabs + content */}
-      <AdminBooksTabs
-        books={books}
-        booksLayout={booksLayout}
-        planTier={planTier}
-      />
+      {/* Empty state — first time author */}
+      {books.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 px-8 py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 mb-5">
+            <BookOpen className="h-8 w-8 text-blue-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Add your first book</h2>
+          <p className="text-sm text-gray-500 max-w-sm mb-8">
+            Your catalog is empty. Add a book to bring your author site to life — it only takes a few minutes.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <Link href="/admin/books/new">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+                <Plus className="h-4 w-4" /> Add Your First Book
+              </Button>
+            </Link>
+            <Link href="/admin/branding" className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+              Set up your profile first <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <AdminBooksTabs
+          books={books}
+          booksLayout={booksLayout}
+          planTier={planTier}
+        />
+      )}
     </div>
   );
 }
