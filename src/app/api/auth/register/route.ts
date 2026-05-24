@@ -6,6 +6,7 @@ import { slugify } from "@/lib/utils";
 import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mailer";
 import { passwordStrengthError } from "@/lib/password-validation";
 import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { capturePostHog } from "@/lib/posthog";
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 
@@ -165,6 +166,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Create account ──────────────────────────────────────────────────────
+    capturePostHog(email.toLowerCase().trim(), "signup_started", { signup_method: "email" });
+
     const passwordHash = await hashPassword(password);
 
     // Look up the FREE plan and global AI cap default in parallel
@@ -193,6 +196,8 @@ export async function POST(req: NextRequest) {
         ...(freePlan && { planId: freePlan.id }),
       },
     });
+
+    capturePostHog(author.id, "signup_completed", { signup_method: "email", plan_tier: "FREE", slug: author.slug });
 
     // Send verification email (fire-and-forget — don't block the response)
     sendVerificationEmail(author.email, emailVerifyToken).catch((err) => {

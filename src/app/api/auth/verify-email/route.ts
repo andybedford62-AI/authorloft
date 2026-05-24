@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendWelcomeEmail } from "@/lib/mailer";
+import { capturePostHog } from "@/lib/posthog";
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
         emailVerifyToken: token,
         emailVerifyExpiry: { gt: new Date() },
       },
-      select: { id: true, email: true, name: true, slug: true, emailVerified: true },
+      select: { id: true, email: true, name: true, slug: true, emailVerified: true, createdAt: true },
     });
 
     if (!author) {
@@ -31,6 +32,12 @@ export async function GET(req: NextRequest) {
         emailVerifyExpiry: null,
       },
     });
+
+    // Only fire on first verification (emailVerified was null before the update above)
+    if (!author.emailVerified) {
+      const hoursSinceSignup = Math.round((Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60));
+      capturePostHog(author.id, "email_verified", { hours_since_signup: hoursSinceSignup });
+    }
 
     // Send welcome email only on first verification
     if (!author.emailVerified) {

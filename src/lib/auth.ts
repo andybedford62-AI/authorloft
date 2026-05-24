@@ -5,6 +5,7 @@ import { prisma } from "./db";
 import { slugify } from "./utils";
 import { generateCSRFToken } from "./csrf";
 import { sendNewSignupNotificationEmail } from "./mailer";
+import { capturePostHog } from "./posthog";
 import bcrypt from "bcryptjs";
 import { checkLoginRateLimit } from "./login-rate-limit";
 
@@ -88,6 +89,16 @@ export const authOptions: NextAuthOptions = {
           throw new Error("EmailNotVerified");
         }
 
+        // Fire first_login only on the very first successful sign-in
+        if (!author.lastLoginAt) {
+          const daysSinceSignup = Math.round((Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+          capturePostHog(author.id, "first_login", {
+            signup_method: "email",
+            plan_tier: author.plan?.tier ?? "FREE",
+            days_since_signup: daysSinceSignup,
+          });
+        }
+
         return {
           id:          author.id,
           email:       author.email,
@@ -153,7 +164,7 @@ export const authOptions: NextAuthOptions = {
           const slugBase  = slugify(baseName) || "author";
           const finalSlug = await uniqueSlug(slugBase.slice(0, 38));
 
-          await prisma.author.create({
+          const newAuthor = await prisma.author.create({
             data: {
               email,
               name:           baseName,
@@ -165,6 +176,8 @@ export const authOptions: NextAuthOptions = {
               ...(freePlan && { planId: freePlan.id }),
             },
           });
+
+          capturePostHog(newAuthor.id, "google_signup_completed", { signup_method: "google", plan_tier: "FREE", slug: finalSlug });
 
           // Send admin signup notification if enabled (fire-and-forget)
           prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true, signupNotificationEmail: true } })

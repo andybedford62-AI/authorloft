@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { canAddBook } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
   const authorId = await getAdminAuthorIdForApi();
@@ -87,10 +88,26 @@ export async function POST(req: NextRequest) {
   });
 
   // Mark onboarding complete on first book — protects the account from ghost-cleanup
-  await prisma.author.updateMany({
+  const { count: onboardingJustCompleted } = await prisma.author.updateMany({
     where: { id: authorId, onboardingCompletedAt: null },
     data:  { onboardingCompletedAt: new Date() },
   });
+
+  if (onboardingJustCompleted > 0) {
+    const author = await prisma.author.findUnique({
+      where:  { id: authorId },
+      select: { createdAt: true, plan: { select: { tier: true } } },
+    });
+    if (author) {
+      const daysSinceSignup = Math.round(
+        (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      capturePostHog(authorId, "first_book_created", {
+        days_since_signup: daysSinceSignup,
+        plan_tier: author.plan?.tier ?? "FREE",
+      });
+    }
+  }
 
   return NextResponse.json(book, { status: 201 });
 }

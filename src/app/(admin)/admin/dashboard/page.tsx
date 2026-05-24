@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { DashboardTracker } from "@/components/admin/dashboard-tracker";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -81,6 +82,7 @@ async function getDashboardData(authorId: string) {
     ordersThisMonth,
     recentOrders,
     books,
+    planTier,
     planName: plan?.plan?.name ?? "Free",
     planFeatures: plan?.plan
       ? [
@@ -228,6 +230,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 max-w-6xl">
+      <DashboardTracker
+        onboardingComplete={allDone}
+        bookCount={data.totalBooks}
+        planTier={data.planTier}
+      />
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
