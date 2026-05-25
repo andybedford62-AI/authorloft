@@ -206,7 +206,16 @@ export function PlatformPostForm({ post }: Props) {
 
       {/* Cover Image */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-700">Cover Image</h2>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <h2 className="text-sm font-semibold text-gray-700">Cover Image</h2>
+          <div className="text-xs text-gray-400 text-right leading-relaxed">
+            <span className="font-medium text-gray-500">Optimal:</span> 1200 × 630px (16:9)
+            <span className="mx-1.5 text-gray-300">·</span>
+            <span className="font-medium text-gray-500">Min:</span> 768 × 400px
+            <span className="mx-1.5 text-gray-300">·</span>
+            JPG, PNG or WebP
+          </div>
+        </div>
 
         {/* Tab switcher */}
         <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
