@@ -9,10 +9,18 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Blog — AuthorLoft",
   description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
+  alternates: { canonical: "/blog" },
   openGraph: {
     type:        "website",
     title:       "Blog — AuthorLoft",
-    description: "Tips, guides, and insights for independent authors.",
+    description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
+    images:      [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft Blog" }],
+  },
+  twitter: {
+    card:        "summary_large_image",
+    title:       "Blog — AuthorLoft",
+    description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
+    images:      ["/og-home.png"],
   },
 };
 

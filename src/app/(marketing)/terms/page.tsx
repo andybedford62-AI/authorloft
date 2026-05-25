@@ -8,8 +8,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service | AuthorLoft",
   description: "The terms and conditions that govern your use of AuthorLoft.",
+  alternates: { canonical: "/terms" },
   openGraph: { type: "website", title: "Terms of Service | AuthorLoft", description: "The terms and conditions that govern your use of AuthorLoft." },
-  twitter:    { card: "summary", title: "Terms of Service | AuthorLoft", description: "The terms and conditions that govern your use of AuthorLoft." },
+  twitter:    { card: "summary",  title: "Terms of Service | AuthorLoft", description: "The terms and conditions that govern your use of AuthorLoft." },
 };
 
 function renderContent(text: string) {

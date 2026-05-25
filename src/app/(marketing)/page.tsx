@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   title: "Author Website Builder for Independent Authors | AuthorLoft",
   description:
     "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
+  alternates: { canonical: "/" },
   openGraph: {
     type:        "website",
     title:       "Author Website Builder for Independent Authors | AuthorLoft",

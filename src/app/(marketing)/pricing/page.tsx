@@ -11,15 +11,18 @@ export const metadata: Metadata = {
   title: "AuthorLoft Pricing — Free Author Website Builder",
   description:
     "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+  alternates: { canonical: "/pricing" },
   openGraph: {
     type:        "website",
     title:       "AuthorLoft Pricing — Free Author Website Builder",
     description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+    images:      [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft pricing plans" }],
   },
   twitter: {
     card:        "summary_large_image",
     title:       "AuthorLoft Pricing — Free Author Website Builder",
     description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+    images:      ["/og-home.png"],
   },
 };
 

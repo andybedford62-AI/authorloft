@@ -8,8 +8,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | AuthorLoft",
   description: "How AuthorLoft collects, uses, and protects your personal information.",
+  alternates: { canonical: "/privacy" },
   openGraph: { type: "website", title: "Privacy Policy | AuthorLoft", description: "How AuthorLoft collects, uses, and protects your personal information." },
-  twitter:    { card: "summary", title: "Privacy Policy | AuthorLoft", description: "How AuthorLoft collects, uses, and protects your personal information." },
+  twitter:    { card: "summary",  title: "Privacy Policy | AuthorLoft", description: "How AuthorLoft collects, uses, and protects your personal information." },
 };
 
 function renderContent(text: string) {
