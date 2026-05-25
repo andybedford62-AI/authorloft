@@ -128,6 +128,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/settings",         label: "Platform",        icon: Settings   },
   { href: "/super-admin/help",             label: "Help Centre",     icon: HelpCircle },
   { href: "/super-admin/blog",             label: "Blog",            icon: Newspaper  },
+  { href: "/super-admin/social",           label: "Social Media",    icon: Users      },
 ];
 
 // ── Theme token helper ───────────────────────────────────────────────────────

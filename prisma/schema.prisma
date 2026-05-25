@@ -934,6 +934,52 @@ model ArcReaderDownload {
   @@unique([readerId, fileId])
 }
 
+// ─── Social Media ─────────────────────────────────────────────────────────────
+
+model SocialPlatformToken {
+  id             String    @id @default(cuid())
+  platform       String    // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
+  accessToken    String    @db.Text   // AES-256-GCM encrypted
+  accountId      String               // page ID / org ID / IG account ID
+  accountName    String               // human-readable name for UI
+  tokenExpiresAt DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([platform])
+}
+
+model SocialPost {
+  id          String            @id @default(cuid())
+  caption     String            @db.Text
+  mediaUrl    String?                      // Supabase public URL
+  mediaType   String?                      // "IMAGE" | null
+  platforms   String[]                     // ["LINKEDIN","FACEBOOK","INSTAGRAM"]
+  status      String            @default("DRAFT") // DRAFT|SCHEDULED|PUBLISHING|PUBLISHED|PARTIAL|FAILED
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  results     SocialPostResult[]
+
+  @@index([status, scheduledAt])
+}
+
+model SocialPostResult {
+  id             String     @id @default(cuid())
+  postId         String
+  post           SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  platform       String     // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
+  status         String     // "PENDING" | "PUBLISHED" | "FAILED"
+  platformPostId String?    // ID returned by the platform on success
+  error          String?    @db.Text
+  publishedAt    DateTime?
+  createdAt      DateTime   @default(now())
+
+  @@index([postId])
+}
+
 // ─── Platform Blog Posts ──────────────────────────────────────────────────────
 
 model PlatformPost {
