@@ -116,7 +116,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Content */}
         <div
-          className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-normal prose-headings:text-[#1B2B47] prose-p:text-[#3d3328] prose-p:leading-relaxed prose-a:text-[#C26A4A] prose-a:no-underline hover:prose-a:underline prose-strong:text-[#1B2B47] prose-blockquote:border-l-[#C26A4A] prose-blockquote:text-[#5C6E89]"
+          className="rich-content"
           dangerouslySetInnerHTML={{ __html: safeContent }}
         />
 
