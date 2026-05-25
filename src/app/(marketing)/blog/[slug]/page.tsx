@@ -4,17 +4,11 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { Clock, ArrowLeft, ArrowRight } from "lucide-react";
-import sanitizeHtml from "sanitize-html";
+import { sanitize } from "@/lib/sanitize";
+
+export const dynamic = "force-dynamic";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
-
-export async function generateStaticParams() {
-  const posts = await prisma.platformPost.findMany({
-    where:  { isPublished: true },
-    select: { slug: true },
-  }).catch(() => []);
-  return posts.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -47,10 +41,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post || !post.isPublished) notFound();
 
-  const safeContent = sanitizeHtml(post.content, {
-    allowedTags:       sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "h4", "figure", "figcaption"]),
-    allowedAttributes: { ...sanitizeHtml.defaults.allowedAttributes, img: ["src", "alt", "width", "height", "class"], "*": ["class"] },
-  });
+  const safeContent = sanitize(post.content);
 
   const jsonLd = {
     "@context":         "https://schema.org",
