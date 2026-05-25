@@ -288,6 +288,16 @@ export default async function PricingPage() {
         </div>
       </section>
 
+      {/* Have questions CTA */}
+      <section className="py-8 px-4 text-center bg-[#E8E5DD]">
+        <p className="text-sm text-[#8993A4]">
+          Not sure which plan is right for you?{" "}
+          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">
+            Contact us and we'll help →
+          </Link>
+        </p>
+      </section>
+
       {/* Footer */}
       <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3] text-[#5C6E89] py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">

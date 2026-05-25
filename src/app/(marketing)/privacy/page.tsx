@@ -56,7 +56,7 @@ export default async function PrivacyPage() {
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Back
+            <ArrowLeft className="h-4 w-4" /> AuthorLoft home
           </Link>
         </div>
       </header>
@@ -79,9 +79,18 @@ export default async function PrivacyPage() {
           {renderContent(content)}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-[#DCDBD3] flex justify-between items-center text-sm text-gray-400">
+        <div className="mt-12 pt-8 border-t border-[#DCDBD3] flex flex-wrap justify-between items-center gap-3 text-sm text-gray-400">
           <Link href="/terms" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Terms of Service →</Link>
+          <Link href="/gdpr"  className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">GDPR &amp; Data Rights →</Link>
           <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Contact us</Link>
+        </div>
+
+        {/* Register CTA */}
+        <div className="mt-8 rounded-xl bg-[#F0EDE4] border border-[#DCDBD3] px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-[#5C6E89]">Ready to build your author site?</p>
+          <Link href="/register" className="flex-shrink-0 bg-[#B8893D] text-[#0F1A2D] text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#D4AE6A] transition-colors">
+            Create your free account →
+          </Link>
         </div>
       </div>
     </div>

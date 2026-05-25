@@ -69,7 +69,7 @@ export default function MarketingContactPage() {
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Back
+            <ArrowLeft className="h-4 w-4" /> AuthorLoft home
           </Link>
         </div>
       </header>
@@ -101,8 +101,17 @@ export default function MarketingContactPage() {
                 Your message was routed to <strong>{selectedEmail.label}</strong> ({selectedEmail.email}).
               </p>
             )}
-            <Link href="/" className="text-sm font-medium text-[#C26A4A] hover:text-[#1B2B47]">
-              ← Back to AuthorLoft
+            <p className="text-sm text-[#8993A4] mb-5">While you wait, explore what AuthorLoft can do for your author career:</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+              <Link href="/features" className="px-4 py-2 rounded-lg bg-[#1B2B47] text-white text-sm font-semibold hover:bg-[#2a3f63] transition-colors">
+                Explore features →
+              </Link>
+              <Link href="/pricing" className="px-4 py-2 rounded-lg border border-[#DCDBD3] text-[#1B2B47] text-sm font-semibold hover:bg-[#DCDBD3] transition-colors">
+                View pricing plans
+              </Link>
+            </div>
+            <Link href="/" className="text-sm text-[#8993A4] hover:text-[#1B2B47] transition-colors">
+              ← Back to AuthorLoft home
             </Link>
           </div>
         ) : (
