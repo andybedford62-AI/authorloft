@@ -83,7 +83,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Blog
           </Link>
-          <
+          <a
             href="/#faq"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
