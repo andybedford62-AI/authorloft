@@ -26,6 +26,11 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
   const displayName = author?.displayName || author?.name || session?.user?.name || "My Account";
 
+  const hasBlogPosts = await prisma.platformPost.findFirst({
+    where:  { isPublished: true },
+    select: { id: true },
+  }).then((p) => !!p).catch(() => false);
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
@@ -76,6 +81,14 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Pricing
           </Link>
+          {hasBlogPosts && (
+            <Link
+              href="/blog"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Blog
+            </Link>
+          )}
           <a
             href="/#faq"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"

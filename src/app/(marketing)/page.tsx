@@ -93,6 +93,15 @@ async function getFaqs() {
   }).catch(() => []);
 }
 
+async function getLatestBlogPosts() {
+  return prisma.platformPost.findMany({
+    where:   { isPublished: true },
+    orderBy: { publishedAt: "desc" },
+    take:    3,
+    select:  { id: true, title: true, slug: true, excerpt: true, category: true, readTimeMinutes: true, publishedAt: true },
+  }).catch(() => []);
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const softwareJsonLd = {
@@ -112,7 +121,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs()]);
+  const [plans, testimonials, faqs, blogPosts] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -227,6 +236,39 @@ export default async function MarketingPage() {
 
       {/* ── Testimonials (dynamic) ─────────────────────────────────────────── */}
       <MidnightTestimonialsSection testimonials={testimonials} />
+
+      {/* ── Blog (dynamic — only shown when posts exist) ───────────────────── */}
+      {blogPosts.length > 0 && (
+        <section style={{ background: ML.pearl, padding: '120px 60px' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 48 }}>
+              <div>
+                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 12 }}>· From the blog ·</p>
+                <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 60px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+                  Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>independent authors</span>
+                </h2>
+              </div>
+              <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
+                All posts →
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+              {blogPosts.map((post) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} style={{ background: ML.bone, borderRadius: 14, padding: '28px 24px', border: `1px solid #DCDBD3`, textDecoration: 'none', display: 'block' }}>
+                  {post.category && (
+                    <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 10px' }}>{post.category}</p>
+                  )}
+                  <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.ink, margin: '0 0 10px', lineHeight: 1.25 }}>{post.title}</h3>
+                  {post.excerpt && (
+                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: '0 0 16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.excerpt}</p>
+                  )}
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass, margin: 0, letterSpacing: '0.04em' }}>Read more →</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Pricing (dynamic) ──────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: ML.bone, padding: '120px 60px' }}>
