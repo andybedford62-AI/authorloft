@@ -780,7 +780,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "tiptap-editor border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow",
+        "tiptap-editor border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow",
         resizable && "resize-y",
         className
       )}
