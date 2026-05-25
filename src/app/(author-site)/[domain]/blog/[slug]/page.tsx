@@ -19,7 +19,7 @@ export async function generateMetadata({
 
   const post = await prisma.post.findFirst({
     where: { authorId: author.id, slug, isPublished: true },
-    select: { title: true, excerpt: true, coverImageUrl: true, createdAt: true, updatedAt: true },
+    select: { title: true, excerpt: true, coverImageUrl: true, createdAt: true, updatedAt: true, seoTitle: true, metaDescription: true },
   });
 
   if (!post) return { title: "Post Not Found" };
@@ -28,15 +28,17 @@ export async function generateMetadata({
   const base         = getAuthorBaseUrl(author);
   const canonicalUrl = `${base}/blog/${slug}`;
   const ogImages     = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : [];
+  const metaTitle    = post.seoTitle        || post.title;
+  const metaDesc     = post.metaDescription || post.excerpt;
 
   return {
-    title:       post.title,
-    description: post.excerpt ?? undefined,
+    title:       metaTitle,
+    description: metaDesc ?? undefined,
     alternates:  { canonical: canonicalUrl },
     openGraph: {
       type:        "article",
-      title:       post.title,
-      description: post.excerpt ?? undefined,
+      title:       metaTitle,
+      description: metaDesc ?? undefined,
       publishedTime: post.createdAt.toISOString(),
       modifiedTime:  post.updatedAt.toISOString(),
       authors:       [authorName],
@@ -44,8 +46,8 @@ export async function generateMetadata({
     },
     twitter: {
       card:        ogImages.length > 0 ? "summary_large_image" : "summary",
-      title:       post.title,
-      description: post.excerpt ?? undefined,
+      title:       metaTitle,
+      description: metaDesc ?? undefined,
       ...(ogImages.length > 0 && { images: [ogImages[0].url] }),
     },
   };

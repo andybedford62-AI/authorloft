@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, slug, excerpt, content, coverImageUrl, isPublished } = body;
+  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -71,9 +71,12 @@ export async function POST(req: Request) {
       slug: slugClean,
       excerpt: excerpt?.trim() || null,
       content: content?.trim() || null,
-      coverImageUrl: coverImageUrl?.trim() || null,
-      isPublished: isPublished ?? false,
-      publishedAt: isPublished ? new Date() : null,
+      coverImageUrl:   coverImageUrl?.trim()   || null,
+      isPublished:     isPublished ?? false,
+      publishedAt:     isPublished ? new Date() : null,
+      seoTitle:        seoTitle?.trim()        || null,
+      metaDescription: metaDescription?.trim() || null,
+      focusKeyword:    focusKeyword?.trim()    || null,
     },
   });
 

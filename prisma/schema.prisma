@@ -509,19 +509,23 @@ model AuthorPage {
 // ─── Blog / News Posts ────────────────────────────────────────────────────────
 
 model Post {
-  id            String    @id @default(cuid())
-  authorId      String
-  title         String
-  slug          String
-  excerpt       String?   @db.Text
-  content       String?   @db.Text
-  coverImageUrl String?
-  publishedAt   DateTime?
-  isPublished   Boolean   @default(false)
-  views         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  author        Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  authorId        String
+  title           String
+  slug            String
+  excerpt         String?   @db.Text
+  content         String?   @db.Text
+  coverImageUrl   String?
+  publishedAt     DateTime?
+  isPublished     Boolean   @default(false)
+  views           Int       @default(0)
+  // SEO fields
+  seoTitle        String?                    // overrides title in <title> tag if set
+  metaDescription String?   @db.Text        // overrides excerpt in meta description if set
+  focusKeyword    String?                    // author's target keyword — guidance only
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, slug])
   @@index([authorId])

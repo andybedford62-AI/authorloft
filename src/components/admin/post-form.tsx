@@ -21,6 +21,9 @@ interface PostFormProps {
     content: string | null;
     coverImageUrl: string | null;
     isPublished: boolean;
+    seoTitle: string | null;
+    metaDescription: string | null;
+    focusKeyword: string | null;
   };
 }
 
@@ -41,12 +44,15 @@ export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const isEdit = !!post;
 
-  const [title,         setTitle]         = useState(post?.title         ?? "");
-  const [slug,          setSlug]          = useState(post?.slug          ?? "");
-  const [excerpt,       setExcerpt]       = useState(post?.excerpt       ?? "");
-  const [content,       setContent]       = useState(post?.content       ?? "");
-  const [coverImageUrl, setCoverImageUrl] = useState(post?.coverImageUrl ?? "");
-  const [isPublished,   setIsPublished]   = useState(post?.isPublished   ?? false);
+  const [title,           setTitle]           = useState(post?.title           ?? "");
+  const [slug,            setSlug]            = useState(post?.slug            ?? "");
+  const [excerpt,         setExcerpt]         = useState(post?.excerpt         ?? "");
+  const [content,         setContent]         = useState(post?.content         ?? "");
+  const [coverImageUrl,   setCoverImageUrl]   = useState(post?.coverImageUrl   ?? "");
+  const [isPublished,     setIsPublished]     = useState(post?.isPublished     ?? false);
+  const [seoTitle,        setSeoTitle]        = useState(post?.seoTitle        ?? "");
+  const [metaDescription, setMetaDescription] = useState(post?.metaDescription ?? "");
+  const [focusKeyword,    setFocusKeyword]    = useState(post?.focusKeyword    ?? "");
 
   const [saving,         setSaving]         = useState(false);
   const [error,          setError]          = useState("");
@@ -85,7 +91,7 @@ export function PostForm({ post }: PostFormProps) {
     setSaving(true);
     setError("");
 
-    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished };
+    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle: seoTitle || null, metaDescription: metaDescription || null, focusKeyword: focusKeyword || null };
     const url    = isEdit ? `/api/admin/blog/${post.id}` : "/api/admin/blog";
     const method = isEdit ? "PATCH" : "POST";
 
@@ -267,6 +273,65 @@ export function PostForm({ post }: PostFormProps) {
             {isPublished ? "Published — visible to readers" : "Draft — not visible to readers"}
           </span>
         </label>
+      </section>
+
+      {/* ── SEO ────────────────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900">SEO Settings</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Optional. Leave blank to use the post title and excerpt automatically.
+          </p>
+        </div>
+
+        {/* Focus Keyword */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Focus Keyword</label>
+          <input
+            type="text"
+            value={focusKeyword}
+            onChange={(e) => setFocusKeyword(e.target.value)}
+            placeholder="e.g. how to sell books online"
+            className={inputClass}
+          />
+          <p className="text-xs text-gray-400">The main keyword or phrase this post targets. Use it naturally in your title, headings, and body.</p>
+        </div>
+
+        {/* SEO Title */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">SEO Title</label>
+            <span className={`text-xs tabular-nums ${seoTitle.length > 60 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {seoTitle.length}/60
+            </span>
+          </div>
+          <input
+            type="text"
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            placeholder={title || "Overrides the post title in search results"}
+            className={inputClass}
+          />
+          <p className="text-xs text-gray-400">Ideal: 50–60 characters. Shown in Google search results instead of the post title.</p>
+        </div>
+
+        {/* Meta Description */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">Meta Description</label>
+            <span className={`text-xs tabular-nums ${metaDescription.length > 160 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {metaDescription.length}/160
+            </span>
+          </div>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value)}
+            rows={3}
+            placeholder={excerpt || "Overrides the excerpt in search result snippets"}
+            className={textareaClass}
+          />
+          <p className="text-xs text-gray-400">Ideal: 150–160 characters. Shown as the snippet under your title in Google search results.</p>
+        </div>
       </section>
 
       {/* ── Actions ────────────────────────────────────────────────────────── */}
