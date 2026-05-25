@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+
 export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" }) {
   // Reading cookies opts this component into dynamic rendering so the session
   // is never served from a stale static cache.
@@ -25,11 +26,6 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
   }
 
   const displayName = author?.displayName || author?.name || session?.user?.name || "My Account";
-
-  const hasBlogPosts = await prisma.platformPost.findFirst({
-    where:  { isPublished: true },
-    select: { id: true },
-  }).then((p) => !!p).catch(() => false);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -81,15 +77,13 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Pricing
           </Link>
-          {hasBlogPosts && (
-            <Link
-              href="/blog"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Blog
-            </Link>
-          )}
-          <a
+          <Link
+            href="/blog"
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            Blog
+          </Link>
+          <
             href="/#faq"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
