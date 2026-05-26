@@ -129,18 +129,14 @@ async function uploadImageToLinkedIn(
 export async function testLinkedInToken(
   accessToken: string,
 ): Promise<{ name: string; memberId: string }> {
-  const res = await fetch(
-    "https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName)",
-    {
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-        "X-Restli-Protocol-Version": "2.0.0",
-      },
-    }
-  );
+  // Use OpenID Connect userinfo endpoint (works with openid + profile scopes)
+  const res = await fetch("https://api.linkedin.com/v2/userinfo", {
+    headers: { "Authorization": `Bearer ${accessToken}` },
+  });
   if (!res.ok) throw new Error(`LinkedIn token test failed: ${res.status}`);
   const data = await res.json();
-  const name = [data.localizedFirstName, data.localizedLastName].filter(Boolean).join(" ")
-    || `LinkedIn Member`;
-  return { name, memberId: data.id };
+  const name = data.name || [data.given_name, data.family_name].filter(Boolean).join(" ") || "LinkedIn Member";
+  const memberId = data.sub;
+  if (!memberId) throw new Error("Could not retrieve LinkedIn member ID from token.");
+  return { name, memberId };
 }
