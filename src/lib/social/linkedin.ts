@@ -1,5 +1,7 @@
 /**
- * LinkedIn Organization posting via UGC Posts API.
+ * LinkedIn personal profile posting via UGC Posts API.
+ * Note: LinkedIn's Community Management API (for Company Pages) requires a paid
+ * LinkedIn partnership. We use w_member_social to post to a personal profile instead.
  * Docs: https://learn.microsoft.com/en-us/linkedin/marketing/integrations/community-management/shares/ugc-post-api
  */
 
@@ -8,20 +10,20 @@ export interface LinkedInPostResult {
 }
 
 /**
- * Post text (+ optional image) to a LinkedIn Organization page.
+ * Post text (+ optional image) to a LinkedIn personal profile.
  *
- * @param accessToken  Decrypted LinkedIn access token
- * @param organizationId  Numeric org ID (NOT the URN — we build the URN here)
- * @param caption  Post text
- * @param imageUrl  Optional public image URL (will be uploaded to LinkedIn first)
+ * @param accessToken  Decrypted LinkedIn access token (w_member_social scope)
+ * @param memberId     LinkedIn member ID (auto-fetched via testLinkedInToken)
+ * @param caption      Post text
+ * @param imageUrl     Optional public image URL (will be uploaded to LinkedIn first)
  */
 export async function postToLinkedIn(
   accessToken:    string,
-  organizationId: string,
+  memberId:       string,
   caption:        string,
   imageUrl?:      string | null,
 ): Promise<LinkedInPostResult> {
-  const authorUrn = `urn:li:organization:${organizationId}`;
+  const authorUrn = `urn:li:person:${memberId}`;
 
   let shareMediaCategory = "NONE";
   let media: object[] | undefined;
@@ -120,15 +122,15 @@ async function uploadImageToLinkedIn(
 }
 
 /**
- * Validates a LinkedIn token by fetching the org profile.
- * Returns the org name on success, throws on failure.
+ * Validates a LinkedIn token by fetching the member's profile.
+ * Returns { name, memberId } on success, throws on failure.
+ * Uses /v2/me — works with w_member_social scope (personal profile).
  */
 export async function testLinkedInToken(
-  accessToken:    string,
-  organizationId: string,
-): Promise<string> {
+  accessToken: string,
+): Promise<{ name: string; memberId: string }> {
   const res = await fetch(
-    `https://api.linkedin.com/v2/organizations/${organizationId}?projection=(localizedName)`,
+    "https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName)",
     {
       headers: {
         "Authorization": `Bearer ${accessToken}`,
@@ -138,5 +140,7 @@ export async function testLinkedInToken(
   );
   if (!res.ok) throw new Error(`LinkedIn token test failed: ${res.status}`);
   const data = await res.json();
-  return data.localizedName ?? `Organization ${organizationId}`;
+  const name = [data.localizedFirstName, data.localizedLastName].filter(Boolean).join(" ")
+    || `LinkedIn Member`;
+  return { name, memberId: data.id };
 }

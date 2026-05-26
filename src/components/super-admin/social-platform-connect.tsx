@@ -22,10 +22,11 @@ const PLATFORMS = [
     textColor:   "text-blue-700",
     borderColor: "border-blue-200",
     bgLight:     "bg-blue-50",
-    idLabel:     "Organization ID",
-    idHint:      "Numeric ID from your LinkedIn Company Page URL",
-    tokenHint:   "Access token from LinkedIn Developer Portal",
+    idLabel:     "LinkedIn Member ID",
+    idHint:      "Auto-detected from your access token",
+    tokenHint:   "Access token from LinkedIn Developer Portal (w_member_social scope)",
     docsUrl:     "https://www.linkedin.com/developers/apps",
+    autoId:      true,  // ID is fetched automatically from the token
   },
   {
     id:          "FACEBOOK",
@@ -65,9 +66,15 @@ function ConnectPanel({
   const [saving,      setSaving]      = useState(false);
   const [error,       setError]       = useState("");
 
+  const autoId = "autoId" in platformDef && platformDef.autoId;
+
   async function handleConnect() {
-    if (!accountId.trim() || !accessToken.trim()) {
+    if (!autoId && !accountId.trim()) {
       setError("Both fields are required.");
+      return;
+    }
+    if (!accessToken.trim()) {
+      setError("Access token is required.");
       return;
     }
     setSaving(true);
@@ -76,7 +83,7 @@ function ConnectPanel({
       const res = await fetch("/api/super-admin/social/tokens", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ platform: platformDef.id, accessToken, accountId }),
+        body:    JSON.stringify({ platform: platformDef.id, accessToken, accountId: autoId ? undefined : accountId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Connect failed");
@@ -102,11 +109,17 @@ function ConnectPanel({
 
       {error && <p className="text-xs text-red-600 bg-red-50 rounded px-2 py-1.5">{error}</p>}
 
-      <div className="space-y-1">
-        <label className="block text-xs font-medium text-gray-600">{platformDef.idLabel}</label>
-        <input type="text" value={accountId} onChange={(e) => setAccountId(e.target.value)}
-          placeholder={platformDef.idHint} className={inputCls} />
-      </div>
+      {autoId ? (
+        <p className="text-xs text-gray-500 bg-white rounded px-3 py-2 border border-gray-200">
+          ℹ️ Your LinkedIn Member ID will be detected automatically from your access token.
+        </p>
+      ) : (
+        <div className="space-y-1">
+          <label className="block text-xs font-medium text-gray-600">{platformDef.idLabel}</label>
+          <input type="text" value={accountId} onChange={(e) => setAccountId(e.target.value)}
+            placeholder={platformDef.idHint} className={inputCls} />
+        </div>
+      )}
       <div className="space-y-1">
         <label className="block text-xs font-medium text-gray-600">Access Token</label>
         <input type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)}
@@ -120,6 +133,11 @@ function ConnectPanel({
       >
         {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Testing & Connecting…</> : "Connect"}
       </button>
+      {autoId && (
+        <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1.5">
+          Posts to your personal LinkedIn profile. Company Page API requires a LinkedIn partnership.
+        </p>
+      )}
       <p className="text-xs text-gray-400">The token will be tested before saving. It is stored encrypted.</p>
     </div>
   );

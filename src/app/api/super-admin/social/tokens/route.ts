@@ -20,10 +20,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { platform, accessToken, accountId } = await req.json();
+  const { platform, accessToken, accountId: rawAccountId } = await req.json();
 
-  if (!platform || !accessToken?.trim() || !accountId?.trim()) {
-    return NextResponse.json({ error: "platform, accessToken, and accountId are required." }, { status: 400 });
+  if (!platform || !accessToken?.trim()) {
+    return NextResponse.json({ error: "platform and accessToken are required." }, { status: 400 });
+  }
+
+  // LinkedIn auto-fetches accountId; all others require it
+  if (platform !== "LINKEDIN" && !rawAccountId?.trim()) {
+    return NextResponse.json({ error: "accountId is required for this platform." }, { status: 400 });
   }
 
   const validPlatforms = ["LINKEDIN", "FACEBOOK", "INSTAGRAM"];
@@ -31,13 +36,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `platform must be one of: ${validPlatforms.join(", ")}` }, { status: 400 });
   }
 
-  // Test the token before saving
+  // Test the token before saving — LinkedIn auto-resolves accountId from the token
   let accountName: string;
+  let accountId: string = rawAccountId?.trim() ?? "";
   try {
     switch (platform) {
-      case "LINKEDIN":
-        accountName = await testLinkedInToken(accessToken, accountId);
+      case "LINKEDIN": {
+        const result = await testLinkedInToken(accessToken);
+        accountName = result.name;
+        accountId   = result.memberId;
         break;
+      }
       case "FACEBOOK":
         accountName = await testFacebookToken(accessToken, accountId);
         break;
