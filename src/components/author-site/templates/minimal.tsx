@@ -20,7 +20,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       {author.showHeroBanner !== false && (
         <HeroBanner
           author={author}
-          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null}
+          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null}
         />
       )}
 

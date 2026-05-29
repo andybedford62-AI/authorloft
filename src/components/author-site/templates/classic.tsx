@@ -28,7 +28,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
 
   // Featured book for hero: use heroFeaturedBook if set, otherwise fall back to isFeatured book
-  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null;
+  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
