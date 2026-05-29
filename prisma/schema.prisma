@@ -157,6 +157,7 @@ model Author {
   onboardingCompletedAt        DateTime?  // set when first book is created; null = never completed onboarding
   onboardingEarlyReminderSentAt DateTime? // set when the day-3 nudge email is sent
   onboardingReminderSentAt     DateTime?  // set when the day-7 nudge email is sent
+  hideNextStepsChecklist       Boolean   @default(false) // paid-plan authors can dismiss the Next Steps card
   lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt

@@ -3,6 +3,7 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { DashboardTracker } from "@/components/admin/dashboard-tracker";
 import { OnboardingController } from "@/components/admin/onboarding-controller";
+import { NextStepsCard } from "@/components/admin/next-steps-card";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -158,6 +159,7 @@ export default async function DashboardPage() {
         bio: true,
         onboardingCompletedAt: true,
         stripeConnectOnboarded: true,
+        hideNextStepsChecklist: true,
         plan: { select: { salesEnabled: true } },
         books: {
           where: { directSalesEnabled: true },
@@ -286,21 +288,12 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Optional next steps — shown after onboarding if Stripe / book file not yet set up */}
-      {authorMeta?.onboardingCompletedAt && optionalSteps.some((s) => !s.done) && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Next Steps</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Optional — set these up to enable direct book sales
-            </p>
-          </div>
-          <div className="divide-y divide-gray-50">
-            {optionalSteps.map((step) => (
-              <ChecklistRow key={step.label} step={step} optional />
-            ))}
-          </div>
-        </div>
+      {/* Optional next steps — paid plans only, dismissible, shown until complete or hidden */}
+      {authorMeta?.onboardingCompletedAt &&
+        data.planTier !== "FREE" &&
+        !authorMeta.hideNextStepsChecklist &&
+        optionalSteps.some((s) => !s.done) && (
+        <NextStepsCard steps={optionalSteps} />
       )}
 
       {/* Stats */}
