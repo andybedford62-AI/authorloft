@@ -16,27 +16,55 @@ const TEMPLATES = [
   {
     id:          "classic",
     name:        "Classic",
-    description: "Hero banner, author bio, books grid, series cards.",
-    preview:     { bg: "#faf7f2", primary: "#1e2a3a", accent: "#c89b3c" },
+    tagline:     "Author First",
+    description: "Hero banner → large author bio with photo → books → series.",
+    badges:      ["Hero banner", "Author bio", "Books grid", "Series"],
+    diagram: [
+      { label: "HERO BANNER",  h: 28, dark: true,   accent: false },
+      { label: "Author Bio",   h: 22, dark: false,  accent: false },
+      { label: "Books",        h: 20, dark: false,  accent: true  },
+      { label: "Series",       h: 14, dark: false,  accent: false },
+    ],
   },
   {
     id:          "minimal",
     name:        "Minimal",
-    description: "Clean and typographic — no hero banner, reduced chrome.",
-    preview:     { bg: "#ffffff", primary: "#0a0a0a", accent: "#6366f1" },
+    tagline:     "Books First",
+    description: "Slim author header → books catalog leads → bio below.",
+    badges:      ["No hero banner", "Books catalog first", "Compact bio", "Series"],
+    diagram: [
+      { label: "Author Header", h: 16, dark: false, accent: false },
+      { label: "Books Catalog", h: 36, dark: false, accent: true  },
+      { label: "Bio",           h: 14, dark: false, accent: false },
+      { label: "Series",        h: 12, dark: false, accent: false },
+    ],
   },
   {
     id:          "bold",
     name:        "Bold",
-    description: "High-contrast, dark author strip, large cover grid.",
-    preview:     { bg: "#111827", primary: "#f9fafb", accent: "#f59e0b" },
+    tagline:     "Book Spotlight",
+    description: "Hero banner → author strip → one featured book spotlight → grid.",
+    badges:      ["Hero banner", "Dark author strip", "Featured spotlight", "Books grid"],
+    diagram: [
+      { label: "HERO BANNER",    h: 22, dark: true,   accent: false },
+      { label: "Author Strip",   h: 14, dark: true,   accent: false },
+      { label: "★ SPOTLIGHT",    h: 26, dark: true,   accent: true  },
+      { label: "More Books",     h: 16, dark: false,  accent: false },
+    ],
   },
   {
     id:          "cinematic",
     name:        "🎬 Cinematic",
-    description: "Full-bleed portrait hero, gold accents, editorial layout.",
-    preview:     { bg: "#0A192F", primary: "#FBF6E9", accent: "#D4AF37" },
+    tagline:     "Editorial",
+    description: "Full-bleed portrait hero, press strip, featured release, editorial layout.",
+    badges:      ["Portrait hero", "Press strip", "Featured release", "About section"],
     isPremium:   true,
+    diagram: [
+      { label: "PORTRAIT HERO",   h: 36, dark: true,   accent: true  },
+      { label: "Press Strip",     h: 10, dark: true,   accent: false },
+      { label: "Featured Release",h: 22, dark: true,   accent: false },
+      { label: "Books + About",   h: 14, dark: true,   accent: false },
+    ],
   },
 ] as const;
 
@@ -225,12 +253,12 @@ export function AppearanceClient({
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
       )}
 
-      {/* ── Layout Templates ────────────────────────────────────────────────── */}
+      {/* ── Page Structure ──────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <div>
-          <h2 className="font-semibold text-gray-900">Layout Template</h2>
+          <h2 className="font-semibold text-gray-900">Page Structure</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            Controls the overall page structure and section arrangement. Click to apply instantly.
+            Controls which sections appear on your homepage and in what order. Click to apply instantly.
           </p>
         </div>
 
@@ -252,38 +280,69 @@ export function AppearanceClient({
                       : "border-gray-200 hover:border-blue-300 hover:shadow-md cursor-pointer"
                 )}
               >
-                {/* Mini preview */}
-                <div className="h-24 w-full relative overflow-hidden" style={{ background: tmpl.preview.bg }}>
-                  <div className="flex items-center justify-between px-3 py-2" style={{ background: tmpl.preview.primary + "dd" }}>
-                    <div className="h-1.5 w-10 rounded opacity-70" style={{ background: tmpl.preview.bg }} />
-                    <div className="w-2 h-2 rounded-full" style={{ background: tmpl.preview.accent }} />
-                  </div>
-                  <div className="px-3 pt-2 space-y-1.5">
-                    <div className="h-2.5 w-3/4 rounded" style={{ background: tmpl.preview.primary, opacity: 0.8 }} />
-                    <div className="h-1.5 w-1/2 rounded" style={{ background: tmpl.preview.primary, opacity: 0.3 }} />
-                  </div>
+                {/* Structural diagram */}
+                <div className="h-36 w-full bg-gray-100 p-2 flex flex-col gap-1 relative">
+                  {tmpl.diagram.map((row, i) => (
+                    <div
+                      key={i}
+                      className="w-full rounded flex items-center justify-center flex-shrink-0"
+                      style={{
+                        height:          `${row.h * (100 / tmpl.diagram.reduce((s, r) => s + r.h, 0))}%`,
+                        backgroundColor: row.accent ? "#3b82f620" : row.dark ? "#1f2937" : "#e5e7eb",
+                        border:          row.accent ? "1px solid #3b82f640" : "none",
+                      }}
+                    >
+                      <span
+                        className="text-[8px] font-bold uppercase tracking-widest truncate px-1"
+                        style={{ color: row.accent ? "#3b82f6" : row.dark ? "#9ca3af" : "#9ca3af" }}
+                      >
+                        {row.label}
+                      </span>
+                    </div>
+                  ))}
                   {isActive && !locked && (
                     <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shadow">
                       <Check className="w-3 h-3 text-white" />
                     </div>
                   )}
                   {isSaving && (
-                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded">
                       <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                     </div>
                   )}
                 </div>
+
+                {/* Card info */}
                 <div className="p-3 bg-white">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <h3 className="text-sm font-semibold text-gray-900">{tmpl.name}</h3>
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 leading-tight">{tmpl.name}</h3>
+                      <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 mt-0.5">{tmpl.tagline}</p>
+                    </div>
                     {isActive && !locked && (
-                      <span className="flex items-center gap-1 text-xs text-blue-600 font-medium">
+                      <span className="flex items-center gap-1 text-xs text-blue-600 font-medium flex-shrink-0 mt-0.5">
                         <CheckCircle2 className="w-3 h-3" /> Active
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500">{tmpl.description}</p>
+                  {/* Badge pills */}
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {tmpl.badges.map((badge) => (
+                      <span
+                        key={badge}
+                        className={cn(
+                          "text-[9px] font-medium px-1.5 py-0.5 rounded-full",
+                          badge.startsWith("No ") || badge === "Compact bio"
+                            ? "bg-gray-100 text-gray-400"
+                            : "bg-blue-50 text-blue-600"
+                        )}
+                      >
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
                 {locked && (
                   <div className="absolute inset-0 bg-white/60 flex flex-col items-center justify-center gap-1.5">
                     <div className="w-8 h-8 rounded-full bg-gray-800/75 flex items-center justify-center">
@@ -298,14 +357,23 @@ export function AppearanceClient({
             );
           })}
         </div>
+
+        {/* Tip separator */}
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-lg px-4 py-3">
+          <span className="text-base leading-none mt-0.5">💡</span>
+          <p className="text-xs text-amber-800">
+            <strong>Page Structure</strong> controls which sections appear and their order.{" "}
+            <strong>Colour Theme</strong> below controls how they look. Mix any combination freely.
+          </p>
+        </div>
       </section>
 
-      {/* ── Website Themes ──────────────────────────────────────────────────── */}
+      {/* ── Colour Theme ────────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <div>
-          <h2 className="font-semibold text-gray-900">Website Themes</h2>
+          <h2 className="font-semibold text-gray-900">Colour Theme</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            Sets the colour palette and typography across your entire site. Click to apply instantly.
+            Sets the colour palette across your entire site. Works with any page structure above. Click to apply instantly.
             {isFree && (
               <span className="ml-1 text-amber-600 font-medium">
                 Upgrade to Standard to unlock all themes.

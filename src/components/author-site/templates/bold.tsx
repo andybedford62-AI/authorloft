@@ -1,41 +1,51 @@
-// Bold Template — dramatic dark hero with oversized book covers dominating above the fold.
-// Designed for thriller, fantasy, and genre fiction authors.
+// Bold Template — "Spotlight" layout.
+// Hero → Author Strip → ONE Featured Book spotlight → remaining books grid → Series → Contact
+// Designed for authors who want one book to lead everything.
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight, BookOpen, ShoppingCart } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
-  const accentColor = author.accentColor;
-  const displayBooks = books.slice(0, 3);
+  const accentColor  = author.accentColor;
+  const authorName   = author.displayName || author.name;
+  const salesEnabled = author.plan?.salesEnabled ?? false;
+
+  // Spotlight book: resolve through books[] so we get the full BookForTemplate type
+  const spotlightBook: typeof books[0] | null = author.heroFeaturedBook
+    ? (books.find((b) => b.slug === author.heroFeaturedBook!.slug) ?? books.find((b) => b.isFeatured) ?? books[0] ?? null)
+    : (books.find((b) => b.isFeatured) ?? books[0] ?? null);
+
+  // Remaining books — exclude the spotlight book from the grid
+  const remainingBooks = books.filter((b) => b.id !== spotlightBook?.id).slice(0, 4);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
-      {/* ── Hero Banner ─────────────────────────────────────────────────── */}
+      {/* ── 1. Hero Banner ───────────────────────────────────────────────── */}
       {author.showHeroBanner !== false && (
         <HeroBanner
           author={author}
-          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null}
+          featuredBook={spotlightBook}
         />
       )}
 
-      {/* ── Author Strip ─────────────────────────────────────────────────── */}
-      <section className="bg-gray-900 text-white py-10 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10">
+      {/* ── 2. Author Strip ──────────────────────────────────────────────── */}
+      <section className="bg-gray-900 text-white py-8 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8">
           {author.profileImageUrl && (
-            <div className="flex-shrink-0 w-16 h-16 rounded-full overflow-hidden border-2 border-gray-700 relative">
-              <Image src={author.profileImageUrl} alt={author.name} fill className="object-cover" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-full overflow-hidden border-2 border-gray-700 relative">
+              <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />
             </div>
           )}
-          <div className="space-y-2 text-center sm:text-left">
-            <p className="text-sm text-gray-400 uppercase tracking-widest">About the Author</p>
+          <div className="space-y-1.5 text-center sm:text-left flex-1">
+            <p className="text-xs text-gray-400 uppercase tracking-widest">About the Author</p>
             <div
-              className="text-gray-300 leading-relaxed max-w-2xl text-sm rich-content"
+              className="text-gray-300 leading-relaxed text-sm rich-content max-w-2xl"
               dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
             <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
@@ -45,47 +55,147 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         </div>
       </section>
 
-      {/* ── Books Grid ───────────────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-baseline justify-between mb-8">
-            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight font-heading">
-              Featured Books
-            </h2>
-            <Link href="/books" className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
-              View All <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+      {/* ── 3. Featured Book Spotlight ────────────────────────────────────── */}
+      {spotlightBook && (
+        <section className="py-20 bg-gray-950">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
-            {displayBooks.map((book) => (
-              <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-3">
-                <div className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-100 relative shadow-md group-hover:shadow-xl transition-shadow duration-300">
-                  {book.coverImageUrl ? (
-                    <Image src={book.coverImageUrl} alt={book.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <BookOpen className="h-12 w-12 text-gray-300" />
-                    </div>
+            {/* Section label */}
+            <p className="text-xs font-semibold uppercase tracking-widest mb-10 text-center" style={{ color: accentColor }}>
+              Featured Release
+            </p>
+
+            <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+
+              {/* Book cover — large with shadow/glow */}
+              <div className="flex-shrink-0 w-56 md:w-72">
+                <Link href={`/books/${spotlightBook.slug}`} className="block group">
+                  <div
+                    className="relative rounded-2xl overflow-hidden shadow-2xl transition-transform duration-300 group-hover:scale-[1.02]"
+                    style={{ aspectRatio: "2/3", boxShadow: `0 25px 60px ${accentColor}40` }}
+                  >
+                    {spotlightBook.coverImageUrl ? (
+                      <Image
+                        src={spotlightBook.coverImageUrl}
+                        alt={spotlightBook.title}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                        <BookOpen className="h-16 w-16 text-gray-600" />
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              </div>
+
+              {/* Book details */}
+              <div className="flex-1 space-y-5 text-center md:text-left">
+
+                {/* Series label */}
+                {spotlightBook.series && (
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
+                    {spotlightBook.series.name}
+                  </p>
+                )}
+
+                {/* Title */}
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-heading leading-tight">
+                  {spotlightBook.title}
+                </h2>
+
+                {/* Subtitle */}
+                {spotlightBook.subtitle && (
+                  <p className="text-lg text-gray-400 font-light">{spotlightBook.subtitle}</p>
+                )}
+
+                {/* Description excerpt */}
+                {spotlightBook.shortDescription && (
+                  <p className="text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0 line-clamp-4">
+                    {spotlightBook.shortDescription}
+                  </p>
+                )}
+
+                {/* CTAs */}
+                <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start pt-2">
+                  <Link href={`/books/${spotlightBook.slug}`}>
+                    <Button
+                      size="lg"
+                      className="font-semibold text-white hover:opacity-90"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      View Book
+                    </Button>
+                  </Link>
+                  {salesEnabled && spotlightBook.priceCents > 0 && (
+                    <Link href={`/books/${spotlightBook.slug}`}>
+                      <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white">
+                        <ShoppingCart className="h-4 w-4 mr-1.5" />
+                        Buy Now
+                      </Button>
+                    </Link>
                   )}
-                  {/* Accent colour overlay on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{ backgroundColor: accentColor }} />
                 </div>
-                <div>
-                  <p className="font-bold text-gray-900 leading-snug line-clamp-2 group-hover:underline">
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 4. More Books Grid ────────────────────────────────────────────── */}
+      {remainingBooks.length > 0 && (
+        <section className="py-14 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="flex items-baseline justify-between mb-8">
+              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight font-heading">
+                More Books
+              </h2>
+              <Link
+                href="/books"
+                className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity"
+                style={{ color: accentColor }}
+              >
+                View All <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-8">
+              {remainingBooks.map((book) => (
+                <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-2.5">
+                  <div className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-100 relative shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                    {book.coverImageUrl ? (
+                      <Image
+                        src={book.coverImageUrl}
+                        alt={book.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <BookOpen className="h-10 w-10 text-gray-300" />
+                      </div>
+                    )}
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                      style={{ backgroundColor: accentColor }}
+                    />
+                  </div>
+                  <p className="font-bold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:underline">
                     {book.title}
                   </p>
                   {book.series && (
-                    <p className="text-xs mt-0.5" style={{ color: accentColor }}>{book.series.name}</p>
+                    <p className="text-xs" style={{ color: accentColor }}>{book.series.name}</p>
                   )}
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ── Series ──────────────────────────────────────────────────────── */}
+      {/* ── 5. Series ────────────────────────────────────────────────────── */}
       {series.length > 0 && (
         <section className="py-14 bg-gray-950 text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -111,7 +221,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         </section>
       )}
 
-      {/* ── Contact CTA ─────────────────────────────────────────────────── */}
+      {/* ── 6. Contact CTA ───────────────────────────────────────────────── */}
       <section className="py-10 bg-gray-950 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
@@ -120,11 +230,12 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
           </div>
           <Link href="/contact">
             <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
-              Contact {author.displayName || author.name}
+              Contact {authorName}
             </Button>
           </Link>
         </div>
       </section>
+
     </div>
   );
 }

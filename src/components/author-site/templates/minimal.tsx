@@ -1,96 +1,114 @@
-// Minimal Template (v3)
-// Structure: full-width accent banner → author bio → books grid → series → newsletter → contact CTA
+// Minimal Template — "Books First" layout.
+// Slim author header → full books catalog → compact bio → series → contact
+// No hero banner — the catalog leads, the author follows.
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen, ArrowRight } from "lucide-react";
+import { ChevronRight, BookOpen } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
-import { HeroBanner } from "@/components/author-site/hero-banner";
 import type { HomeTemplateProps } from "./types";
 
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
-  const displayBooks = books.slice(0, 3);
+  const authorName  = author.displayName || author.name;
+
+  // Show up to 6 books in the catalog grid
+  const displayBooks = books.slice(0, 6);
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
-      {/* ── 1. Hero Banner ──────────────────────────────────────────────── */}
-      {author.showHeroBanner !== false && (
-        <HeroBanner
-          author={author}
-          featuredBook={author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null}
-        />
-      )}
-
-      {/* ── 2. Author Bio ───────────────────────────────────────────────── */}
+      {/* ── 1. Slim Author Header (replaces hero banner) ──────────────────── */}
       <section className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-          <div className="flex flex-col sm:flex-row items-start gap-8 max-w-3xl">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <div className="flex items-center gap-5">
 
-            {/* Accent rule + bio */}
-            <div className="space-y-4 flex-1">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
-                <h2 className="text-xl font-bold text-gray-900 font-heading">
-                  About {author.displayName || author.name}
-                </h2>
+            {/* Small profile photo */}
+            {author.profileImageUrl ? (
+              <div className="flex-shrink-0 w-14 h-14 rounded-full overflow-hidden relative ring-2" style={{ "--tw-ring-color": accentColor + "50" } as React.CSSProperties}>
+                <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />
               </div>
+            ) : (
               <div
-                className="text-gray-600 leading-relaxed rich-content"
-                dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
-              />
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
-                style={{ color: accentColor }}
+                className="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white"
+                style={{ backgroundColor: accentColor }}
               >
-                Full biography <ChevronRight className="h-3.5 w-3.5" />
+                {authorName[0]}
+              </div>
+            )}
+
+            {/* Name + tagline */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold text-gray-900 font-heading truncate">{authorName}</h1>
+              {author.tagline && (
+                <p className="text-sm text-gray-500 mt-0.5 truncate">{author.tagline}</p>
+              )}
+            </div>
+
+            {/* Nav links */}
+            <div className="hidden sm:flex items-center gap-5 flex-shrink-0">
+              <Link href="/about" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">About</Link>
+              <Link href="/contact" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</Link>
+              <Link
+                href="/books"
+                className="text-sm font-semibold px-4 py-1.5 rounded-full text-white transition-opacity hover:opacity-85"
+                style={{ backgroundColor: accentColor }}
+              >
+                All Books
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 3. Books ────────────────────────────────────────────────────── */}
-      <section className="py-16" style={{ backgroundColor: `${accentColor}08` }}>
+      {/* ── 2. Books Catalog (leads the page) ────────────────────────────── */}
+      <section className="py-14 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-          <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center gap-4">
-              <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">Featured Books</h2>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentColor }}>
+                The Collection
+              </p>
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
             </div>
-            <Link
-              href="/books"
-              className="text-sm font-semibold flex items-center gap-1 transition-opacity hover:opacity-75"
-              style={{ color: accentColor }}
-            >
-              View All <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            {books.length > 6 && (
+              <Link
+                href="/books"
+                className="text-sm font-semibold flex items-center gap-1 hover:opacity-75 transition-opacity"
+                style={{ color: accentColor }}
+              >
+                View all {books.length} <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
+          {/* 3-column grid showing up to 6 books */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-8 max-w-4xl mx-auto">
             {displayBooks.map((book) => (
-              <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-3">
-                <div className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-200 relative shadow group-hover:shadow-lg transition-shadow duration-300">
+              <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-2.5">
+                <div className="aspect-[2/3] rounded-lg overflow-hidden bg-gray-200 relative shadow group-hover:shadow-lg transition-shadow duration-300">
                   {book.coverImageUrl ? (
                     <Image
                       src={book.coverImageUrl}
                       alt={book.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <BookOpen className="h-10 w-10 text-gray-300" />
                     </div>
                   )}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                    style={{ backgroundColor: accentColor }}
-                  />
+                  {book.caption && (
+                    <span
+                      className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      {book.caption}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:underline">
@@ -108,15 +126,13 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
         </div>
       </section>
 
-      {/* ── 4. Series ───────────────────────────────────────────────────── */}
+      {/* ── 3. Series ────────────────────────────────────────────────────── */}
       {series.length > 0 && (
-        <section className="py-14 bg-white border-t border-gray-100">
+        <section className="py-12 bg-white border-t border-gray-100">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-1 h-8 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">
-                Series
-              </h2>
+            <div className="flex items-center gap-3 mb-7">
+              <div className="w-1 h-7 rounded-full" style={{ backgroundColor: accentColor }} />
+              <h2 className="text-xl font-bold text-gray-900 font-heading">Series</h2>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -124,51 +140,16 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
                 <Link
                   key={s.id}
                   href={`/series/${s.slug}`}
-                  className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 hover:shadow-md transition-all duration-200"
-                  style={{ borderLeftWidth: "4px", borderLeftColor: accentColor }}
+                  className="group flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-100 bg-white hover:border-[var(--accent)] hover:shadow-sm transition-all duration-200"
+                  style={{ borderLeftWidth: "3px", borderLeftColor: accentColor }}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="font-semibold text-gray-900 group-hover:underline leading-snug">
-                        {s.name}
-                      </p>
-                      {s.description && (
-                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                          {s.description}
-                        </p>
-                      )}
-                      <p className="text-xs font-medium" style={{ color: accentColor }}>
-                        {s.books.length} book{s.books.length !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 flex-shrink-0 mt-0.5 text-gray-300 group-hover:text-[var(--accent)] transition-colors" />
+                  <div className="space-y-0.5">
+                    <p className="font-semibold text-gray-900 group-hover:text-[var(--accent)] transition-colors leading-snug text-sm">
+                      {s.name}
+                    </p>
+                    <p className="text-xs text-gray-400">{s.books.length} book{s.books.length !== 1 ? "s" : ""}</p>
                   </div>
-
-                  {/* Book cover thumbnails */}
-                  {s.books.length > 0 && (
-                    <div className="flex gap-1.5 mt-4">
-                      {s.books.slice(0, 4).map((b) => (
-                        <div
-                          key={b.id}
-                          className="w-9 h-12 rounded overflow-hidden bg-gray-100 relative flex-shrink-0 shadow-sm"
-                        >
-                          {b.coverImageUrl ? (
-                            <Image src={b.coverImageUrl} alt={b.title} fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full opacity-30" style={{ backgroundColor: accentColor }} />
-                          )}
-                        </div>
-                      ))}
-                      {s.books.length > 4 && (
-                        <div
-                          className="w-9 h-12 rounded flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                          style={{ backgroundColor: accentColor }}
-                        >
-                          +{s.books.length - 4}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-[var(--accent)] transition-colors flex-shrink-0" />
                 </Link>
               ))}
             </div>
@@ -176,7 +157,28 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
         </section>
       )}
 
-      {/* ── 5. Contact CTA ──────────────────────────────────────────────── */}
+      {/* ── 4. Compact Author Bio ─────────────────────────────────────────── */}
+      <section className="py-12 border-t border-gray-100" style={{ backgroundColor: accentColor + "08" }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
+            <h2 className="text-lg font-bold text-gray-900 font-heading">About {authorName}</h2>
+          </div>
+          <div
+            className="text-gray-600 leading-relaxed text-sm rich-content"
+            dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
+          />
+          <Link
+            href="/about"
+            className="inline-flex items-center gap-1 text-sm font-semibold mt-4 hover:underline"
+            style={{ color: accentColor }}
+          >
+            Full biography <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ── 5. Contact CTA ───────────────────────────────────────────────── */}
       <section className="py-10 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
@@ -184,15 +186,13 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
             <p className="text-gray-500 text-sm mt-0.5">Inquiries, collaborations, and media welcome.</p>
           </div>
           <Link href="/contact">
-            <Button
-              className="text-white hover:opacity-90"
-              style={{ backgroundColor: accentColor }}
-            >
-              Contact {author.displayName || author.name}
+            <Button className="text-white hover:opacity-90" style={{ backgroundColor: accentColor }}>
+              Contact {authorName}
             </Button>
           </Link>
         </div>
       </section>
+
     </div>
   );
 }
