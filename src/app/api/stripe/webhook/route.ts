@@ -21,11 +21,12 @@ async function revertThemeOnDowngrade(authorId: string, newPlanTier: string) {
   if (isThemeAllowed(author.siteTheme, newPlanTier)) return; // already valid
 
   // Determine the revert target
+  // Note: STANDARD now allows all themes incl. genre palettes, so only FREE triggers a revert.
   let revertTo: string;
   if (newPlanTier === "FREE") {
     revertTo = "modern-minimal";
   } else {
-    // STANDARD: genre palette → revert to saved baseTheme (or Classic Literary fallback)
+    // STANDARD allows all themes — fall back to saved baseTheme just in case
     const candidateBase = author.baseTheme ?? "classic-literary";
     revertTo = BASE_THEME_IDS.includes(candidateBase as any) ? candidateBase : "classic-literary";
   }

@@ -406,14 +406,14 @@ export function AppearanceClient({
         <div>
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
             Genre Colour Palettes
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2.5 py-0.5 rounded-full">
-              <Sparkles className="w-3 h-3" /> Premium
+            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3" /> Standard +
             </span>
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             8 hand-crafted palettes designed for specific book genres — each with a complete colour system.
-            {!isPremium && (
-              <span className="ml-1 text-purple-600 font-medium">Available on Premium plans only.</span>
+            {isFree && (
+              <span className="ml-1 text-blue-600 font-medium">Available on Standard and Premium plans.</span>
             )}
           </p>
         </div>
@@ -424,8 +424,8 @@ export function AppearanceClient({
               key={palette.id}
               theme={palette}
               isActive={selectedTheme === palette.id}
-              locked={!isPremium}
-              lockLabel="Upgrade to Premium"
+              locked={isFree}
+              lockLabel="Upgrade to Standard"
               saving={savingTheme === palette.id}
               onClick={() => handleSelectTheme(palette.id)}
             />

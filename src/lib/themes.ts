@@ -178,16 +178,16 @@ export function getThemeAccentHex(siteTheme: string | null | undefined): string 
 
 /**
  * Which themes are available per plan tier.
- * FREE   → Modern Minimal only
- * STANDARD → all 3 base themes
- * PREMIUM  → all base themes + all genre palettes
+ * FREE     → Modern Minimal only
+ * STANDARD → all base themes + all genre palettes
+ * PREMIUM  → everything (same themes, plus Cinematic layout)
  */
 export const BASE_THEME_IDS  = BASE_THEMES.map((t) => t.id);
 export const GENRE_PALETTE_IDS = GENRE_PALETTES.map((t) => t.id);
 
 export function isThemeAllowed(themeId: string, planTier: string): boolean {
   if (planTier === "PREMIUM") return true;
-  if (planTier === "STANDARD") return BASE_THEME_IDS.includes(themeId as ThemeId);
+  if (planTier === "STANDARD") return true; // Standard gets all themes incl. genre palettes
   // FREE — only Modern Minimal
   return themeId === "modern-minimal";
 }
