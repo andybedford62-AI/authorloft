@@ -82,6 +82,7 @@ export async function PUT(
     contactEmail,
     isActive,
     isSuperAdmin,
+    hideNextStepsChecklist,
     planId,
   } = body;
 
@@ -111,8 +112,9 @@ export async function PUT(
       ...(shortBio      !== undefined && { shortBio: shortBio || null }),
       ...(tagline       !== undefined && { tagline: tagline || null }),
       ...(contactEmail  !== undefined && { contactEmail: contactEmail || null }),
-      ...(typeof isActive     === "boolean" && { isActive }),
-      ...(typeof isSuperAdmin === "boolean" && { isSuperAdmin }),
+      ...(typeof isActive               === "boolean" && { isActive }),
+      ...(typeof isSuperAdmin           === "boolean" && { isSuperAdmin }),
+      ...(typeof hideNextStepsChecklist === "boolean" && { hideNextStepsChecklist }),
       ...(planId !== undefined && { planId: planId || null }),
     },
     select: {

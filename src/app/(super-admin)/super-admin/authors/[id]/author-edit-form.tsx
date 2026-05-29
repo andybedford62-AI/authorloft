@@ -28,6 +28,7 @@ type Author = {
   contactEmail: string | null;
   isActive: boolean;
   isSuperAdmin: boolean;
+  hideNextStepsChecklist: boolean;
   planId: string | null;
 };
 
@@ -89,9 +90,10 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
     shortBio:     author.shortBio     ?? "",
     tagline:      author.tagline      ?? "",
     contactEmail: author.contactEmail ?? "",
-    isActive:     author.isActive,
-    isSuperAdmin: author.isSuperAdmin,
-    planId:       author.planId       ?? "",
+    isActive:               author.isActive,
+    isSuperAdmin:           author.isSuperAdmin,
+    hideNextStepsChecklist: author.hideNextStepsChecklist,
+    planId:                 author.planId ?? "",
   });
 
   const [saving,  setSaving]  = useState(false);
@@ -334,7 +336,7 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
           </div>
 
           {/* Super admin toggle */}
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
             <div>
               <p className="text-sm font-medium text-gray-800">Super admin</p>
               <p className="text-xs text-gray-400">Grants access to the Super Admin area — use with caution</p>
@@ -351,6 +353,31 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                   form.isSuperAdmin ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Next Steps checklist hidden toggle */}
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium text-gray-800">Hide Next Steps checklist</p>
+              <p className="text-xs text-gray-400">
+                Author dismissed the dashboard checklist. Toggle off to restore it for support purposes.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.hideNextStepsChecklist}
+              onClick={() => set("hideNextStepsChecklist", !form.hideNextStepsChecklist)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                form.hideNextStepsChecklist ? "bg-amber-500" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  form.hideNextStepsChecklist ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>

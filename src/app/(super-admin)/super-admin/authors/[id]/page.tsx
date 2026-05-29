@@ -32,6 +32,7 @@ export default async function AuthorDetailPage({
         contactEmail: true,
         isActive: true,
         isSuperAdmin: true,
+        hideNextStepsChecklist: true,
         planId: true,
         createdAt: true,
         updatedAt: true,
