@@ -34,13 +34,17 @@ export default async function AuthorDetailPage({
         isSuperAdmin: true,
         hideNextStepsChecklist: true,
         planId: true,
+        trialPlanId: true,
+        trialStartsAt: true,
+        trialEndsAt: true,
         createdAt: true,
         updatedAt: true,
         aiUsageCount: true,
         aiUsageCap: true,
         aiUsageResetAt: true,
         aiApiKey: true,
-        plan: { select: { id: true, name: true, tier: true } },
+        plan:      { select: { id: true, name: true, tier: true } },
+        trialPlan: { select: { id: true, name: true, tier: true } },
         _count: {
           select: { books: true, subscribers: true, orders: true, posts: true },
         },
@@ -113,6 +117,9 @@ export default async function AuthorDetailPage({
         aiUsageCap={author.aiUsageCap}
         aiUsageResetAt={author.aiUsageResetAt}
         hasOwnKey={!!author.aiApiKey}
+        trialPlanId={author.trialPlanId}
+        trialStartsAt={author.trialStartsAt}
+        trialEndsAt={author.trialEndsAt}
       />
     </div>
   );

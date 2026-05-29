@@ -77,6 +77,7 @@ model Plan {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
   authors              Author[]
+  trialAuthors         Author[]           @relation("AuthorTrialPlan")
   subscriptions        AuthorSubscription[]
 }
 
@@ -158,6 +159,11 @@ model Author {
   onboardingEarlyReminderSentAt DateTime? // set when the day-3 nudge email is sent
   onboardingReminderSentAt     DateTime?  // set when the day-7 nudge email is sent
   hideNextStepsChecklist       Boolean   @default(false) // paid-plan authors can dismiss the Next Steps card
+  trialPlanId          String?        // plan ID for admin-assigned free trial
+  trialPlan            Plan?          @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
+  trialStartsAt        DateTime?      // when the trial began
+  trialEndsAt          DateTime?      // when the trial expires; null = not on a trial
+  trialExpiryReminderSentAt DateTime? // set when the 7-day warning email is sent
   lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt

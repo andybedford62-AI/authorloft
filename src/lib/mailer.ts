@@ -953,6 +953,144 @@ export async function sendBelowMinimumPricingAlert({
   });
 }
 
+// ── Trial expiry warning email (7 days before) ───────────────────────────────
+
+export async function sendTrialExpiryWarningEmail({
+  to,
+  authorName,
+  planName,
+  expiryDate,
+  daysRemaining,
+}: {
+  to: string;
+  authorName: string;
+  planName: string;
+  expiryDate: Date;
+  daysRemaining: number;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const billingUrl     = `https://www.${platformDomain}/admin/settings`;
+  const firstName      = esc(authorName.split(" ")[0]);
+  const dateStr        = expiryDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const dayWord        = daysRemaining === 1 ? "day" : "days";
+
+  return sendMail({
+    to,
+    subject: `Your ${planName} trial ends in ${daysRemaining} ${dayWord}`,
+    text: [
+      `Hi ${firstName},`,
+      `Just a heads-up — your complimentary ${planName} trial on AuthorLoft ends in ${daysRemaining} ${dayWord} (${dateStr}).`,
+      `After that, your account will revert to the Free plan. To keep all your ${planName} features, subscribe before the trial expires.`,
+      `Upgrade here: ${billingUrl}`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml(`Your ${planName} trial ends soon`, `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        Your complimentary <strong>${esc(planName)}</strong> trial is coming to an end.
+      </p>
+
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#1e40af;">Trial expires</span><br/>
+              <span style="font-size:16px;font-weight:700;color:#1e3a8a;">${dateStr}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #bfdbfe;">
+              <span style="font-size:13px;color:#1e40af;">Days remaining</span><br/>
+              <span style="font-size:16px;font-weight:700;color:#1e3a8a;">${daysRemaining} ${dayWord}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        After your trial ends, your account will automatically revert to the Free plan.
+        To keep all your <strong>${esc(planName)}</strong> features — including premium themes, custom domain, and direct sales — subscribe before ${dateStr}.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${billingUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Upgrade My Plan
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're happy to help.
+      </p>
+    `),
+  });
+}
+
+// ── Trial ended email ─────────────────────────────────────────────────────────
+
+export async function sendTrialEndedEmail({
+  to,
+  authorName,
+  planName,
+}: {
+  to: string;
+  authorName: string;
+  planName: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const billingUrl     = `https://www.${platformDomain}/admin/settings`;
+  const firstName      = esc(authorName.split(" ")[0]);
+
+  return sendMail({
+    to,
+    subject: `Your ${planName} trial has ended`,
+    text: [
+      `Hi ${firstName},`,
+      `Your complimentary ${planName} trial on AuthorLoft has ended. Your account has been moved back to the Free plan.`,
+      `To restore your ${planName} features, subscribe at any time: ${billingUrl}`,
+      `Your books and content are safe — nothing has been deleted.`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml(`Your ${planName} trial has ended`, `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">
+        Your complimentary <strong>${esc(planName)}</strong> trial on AuthorLoft has ended.
+        Your account has been moved back to the <strong>Free plan</strong>.
+      </p>
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <p style="margin:0;font-size:14px;color:#374151;">
+          <strong>Don't worry</strong> — all your books, posts, and content are safe.
+          Premium features (custom domain, premium themes, direct sales) are paused until you upgrade.
+        </p>
+      </div>
+
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">
+        Ready to continue with <strong>${esc(planName)}</strong>? Subscribe anytime to restore full access instantly.
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${billingUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              View Plans &amp; Upgrade
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're here to help.
+      </p>
+    `),
+  });
+}
+
 // ── Core sendMail ────────────────────────────────────────────────────────────
 
 /**

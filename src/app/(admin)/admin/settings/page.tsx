@@ -21,6 +21,8 @@ type BillingData = {
   currentTier: string; currentPlanName: string;
   subscription: { currentPeriodEnd: string | null; billingInterval: string; status: string } | null;
   isAdminAssigned: boolean;
+  isOnTrial:   boolean;
+  trialEndsAt: string | null;
   plans: BillingPlan[];
 };
 
@@ -83,8 +85,15 @@ function SubscriptionSection() {
     }
   }
 
-  const isFree        = !data || data.currentTier === "FREE";
+  const isFree          = !data || data.currentTier === "FREE";
   const isAdminAssigned = data?.isAdminAssigned ?? false;
+  const isOnTrial       = data?.isOnTrial ?? false;
+  const trialExpiryStr  = data?.trialEndsAt
+    ? new Date(data.trialEndsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : null;
+  const trialDaysLeft   = data?.trialEndsAt
+    ? Math.ceil((new Date(data.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : null;
 
   const renewalDate = data?.subscription?.currentPeriodEnd
     ? new Date(data.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
@@ -142,7 +151,13 @@ function SubscriptionSection() {
               {isFree && (
                 <p className="text-xs text-gray-400 mt-0.5">Free plan — upgrade to unlock more features</p>
               )}
-              {isAdminAssigned && (
+              {isOnTrial && trialExpiryStr && (
+                <p className="text-xs text-amber-600 mt-0.5 font-medium">
+                  Trial — expires {trialExpiryStr}
+                  {trialDaysLeft !== null && trialDaysLeft > 0 && ` (${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left)`}
+                </p>
+              )}
+              {isAdminAssigned && !isOnTrial && (
                 <p className="text-xs text-gray-400 mt-0.5">Plan assigned by admin</p>
               )}
             </div>

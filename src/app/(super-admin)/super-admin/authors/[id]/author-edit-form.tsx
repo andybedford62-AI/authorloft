@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Save, Loader2, CheckCircle, AlertTriangle,
-  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw,
+  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X,
 } from "lucide-react";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -35,10 +35,13 @@ type Author = {
 interface Props {
   author: Author;
   plans: Plan[];
-  aiUsageCount:  number;
-  aiUsageCap:    number;
+  aiUsageCount:   number;
+  aiUsageCap:     number;
   aiUsageResetAt: Date | null;
-  hasOwnKey:     boolean;
+  hasOwnKey:      boolean;
+  trialPlanId:    string | null;
+  trialStartsAt:  Date | null;
+  trialEndsAt:    Date | null;
 }
 
 function Section({ title, icon: Icon, children }: {
@@ -77,7 +80,7 @@ const inputClass =
 const textareaClass =
   "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none";
 
-export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey }: Props) {
+export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey, trialPlanId, trialStartsAt, trialEndsAt }: Props) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -99,6 +102,71 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
   const [saving,  setSaving]  = useState(false);
   const [status,  setStatus]  = useState<"idle" | "success" | "error">("idle");
   const [errMsg,  setErrMsg]  = useState("");
+
+  // Trial section state
+  const [currentTrialPlanId,  setCurrentTrialPlanId]  = useState<string | null>(trialPlanId);
+  const [currentTrialEndsAt,  setCurrentTrialEndsAt]  = useState<Date | null>(trialEndsAt ?? null);
+  const [trialSelectedPlanId, setTrialSelectedPlanId] = useState<string>(trialPlanId ?? "");
+  const [trialDuration,       setTrialDuration]       = useState<number>(3);
+  const [trialSaving,         setTrialSaving]         = useState(false);
+  const [trialStatus,         setTrialStatus]         = useState<"idle" | "success" | "error">("idle");
+  const [trialErrMsg,         setTrialErrMsg]         = useState("");
+
+  async function handleSetTrial() {
+    if (!trialSelectedPlanId) return;
+    setTrialSaving(true);
+    setTrialStatus("idle");
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}/trial`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ planId: trialSelectedPlanId, durationMonths: trialDuration }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCurrentTrialPlanId(trialSelectedPlanId);
+        setCurrentTrialEndsAt(new Date(data.trialEndsAt));
+        setTrialStatus("success");
+        setTimeout(() => setTrialStatus("idle"), 4000);
+      } else {
+        setTrialErrMsg(data.error || "Could not set trial.");
+        setTrialStatus("error");
+      }
+    } catch {
+      setTrialErrMsg("Network error.");
+      setTrialStatus("error");
+    } finally {
+      setTrialSaving(false);
+    }
+  }
+
+  async function handleClearTrial() {
+    setTrialSaving(true);
+    setTrialStatus("idle");
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}/trial`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ planId: null }),
+      });
+      if (res.ok) {
+        setCurrentTrialPlanId(null);
+        setCurrentTrialEndsAt(null);
+        setTrialSelectedPlanId("");
+        setTrialStatus("success");
+        setTimeout(() => setTrialStatus("idle"), 4000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setTrialErrMsg(data.error || "Could not clear trial.");
+        setTrialStatus("error");
+      }
+    } catch {
+      setTrialErrMsg("Network error.");
+      setTrialStatus("error");
+    } finally {
+      setTrialSaving(false);
+    }
+  }
 
   // AI Usage section state
   const [aiCap,      setAiCap]      = useState(aiUsageCap);
@@ -307,6 +375,102 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
             ) : null;
           })()}
         </Field>
+      </Section>
+
+      {/* ── Trial Upgrade ────────────────────────────────────────────── */}
+      <Section title="Trial Upgrade" icon={Gift}>
+        <div className="space-y-4">
+          {/* Active trial banner */}
+          {currentTrialPlanId && currentTrialEndsAt && (() => {
+            const daysLeft = Math.ceil((currentTrialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            const trialPlanName = plans.find((p) => p.id === currentTrialPlanId)?.name ?? "paid";
+            const expired = daysLeft <= 0;
+            return (
+              <div className={`flex items-start justify-between gap-4 rounded-xl border px-4 py-3 ${expired ? "bg-red-50 border-red-200" : "bg-green-50 border-green-200"}`}>
+                <div>
+                  <p className={`text-sm font-semibold ${expired ? "text-red-700" : "text-green-700"}`}>
+                    {expired ? "Trial expired" : `Active ${trialPlanName} trial`}
+                  </p>
+                  <p className={`text-xs mt-0.5 ${expired ? "text-red-500" : "text-green-600"}`}>
+                    {expired
+                      ? `Expired on ${currentTrialEndsAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`
+                      : `Expires ${currentTrialEndsAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} — ${daysLeft} day${daysLeft === 1 ? "" : "s"} remaining`
+                    }
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={trialSaving}
+                  onClick={handleClearTrial}
+                  className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                  title="End trial and revert to Free"
+                >
+                  <X className="h-3.5 w-3.5" /> End trial
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* No trial — set new one */}
+          {!currentTrialPlanId && (
+            <p className="text-sm text-gray-500">
+              No active trial. Grant this author a time-limited free upgrade below.
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Plan to trial">
+              <select
+                value={trialSelectedPlanId}
+                onChange={(e) => setTrialSelectedPlanId(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">— Select a plan —</option>
+                {plans.filter((p) => p.tier !== "FREE").map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name} ({plan.tier})
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Duration">
+              <select
+                value={trialDuration}
+                onChange={(e) => setTrialDuration(Number(e.target.value))}
+                className={inputClass}
+              >
+                {[1, 2, 3, 6, 12].map((m) => (
+                  <option key={m} value={m}>{m} month{m > 1 ? "s" : ""}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <button
+            type="button"
+            disabled={trialSaving || !trialSelectedPlanId}
+            onClick={handleSetTrial}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {trialSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
+            {currentTrialPlanId ? "Update Trial" : "Grant Trial"}
+          </button>
+
+          <p className="text-xs text-gray-400">
+            A trial sets the author's plan immediately. They'll receive a 7-day warning email before it expires, then auto-revert to Free.
+          </p>
+
+          {trialStatus === "success" && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" /> {currentTrialPlanId ? "Trial updated." : "Trial cleared — author is back on Free."}
+            </p>
+          )}
+          {trialStatus === "error" && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" /> {trialErrMsg}
+            </p>
+          )}
+        </div>
       </Section>
 
       {/* ── Account flags ────────────────────────────────────────────── */}
