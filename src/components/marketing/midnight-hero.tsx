@@ -185,6 +185,7 @@ export function MidnightHero() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           {([
             ['/features',    'Features'],
+            ['/blog',        'Blog'],
             ['#how-it-works','How it works'],
             ['/pricing',     'Pricing'],
             ['#genres',      'For authors'],

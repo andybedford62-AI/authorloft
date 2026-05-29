@@ -1,4 +1,5 @@
 import type { Testimonial } from './testimonials-section';
+import { sanitize } from '@/lib/sanitize';
 
 function StarRow({ rating }: { rating: number | null }) {
   if (!rating) return null;
@@ -36,9 +37,10 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
         {/* Lead testimonial */}
         <div style={{ background: '#F0EDE4', borderRadius: 18, padding: '48px 56px', marginBottom: 24, color: '#1B2B47' }}>
           <StarRow rating={lead.rating} />
-          <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.45, margin: '0 0 28px', color: '#1B2B47' }}>
-            &ldquo;{lead.quote}&rdquo;
-          </p>
+          <div
+            style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.45, margin: '0 0 28px', color: '#1B2B47' }}
+            dangerouslySetInnerHTML={{ __html: `“${sanitize(lead.quote)}”` }}
+          />
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#1B2B47', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E8E5DD', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
               {lead.authorName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
@@ -56,9 +58,10 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
             {rest.map((t) => (
               <div key={t.id} style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(232,229,221,0.15)', borderRadius: 14, padding: '24px 28px', color: '#E8E5DD' }}>
                 <StarRow rating={t.rating} />
-                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 15, lineHeight: 1.6, margin: '0 0 20px', opacity: 0.9 }}>
-                  &ldquo;{t.quote}&rdquo;
-                </p>
+                <div
+                  style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 15, lineHeight: 1.6, margin: '0 0 20px', opacity: 0.9 }}
+                  dangerouslySetInnerHTML={{ __html: `"${sanitize(t.quote)}"` }}
+                />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#D4AE6A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0F1A2D', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
                     {t.authorName.split(' ').map((n) => n[0]).join('').slice(0, 2)}

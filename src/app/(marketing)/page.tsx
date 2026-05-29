@@ -9,7 +9,7 @@ import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
 
-export const revalidate = 3600;
+export const revalidate = 300; // 5-minute cache — showcase/testimonials stay fresh without full SSR cost
 
 export const metadata: Metadata = {
   title: "Author Website Builder for Independent Authors | AuthorLoft",
