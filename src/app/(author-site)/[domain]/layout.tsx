@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { getTheme, getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
+import { getTheme, resolveAccentColor, isThemeAllowed } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { CartProvider } from "@/context/cart-context";
 import { CartDrawer } from "@/components/author-site/cart-drawer";
@@ -49,6 +49,7 @@ async function resolveAuthor(domain: string) {
       navShowContact: true,
       navShowMediaKit: true,
       siteTheme: true,
+      customAccentColor: true,
       isActive: true,
       plan: {
         select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true },
@@ -146,8 +147,12 @@ export default async function AuthorSiteLayout({
   const theme = getTheme(effectiveSiteTheme);
   const dataTheme = theme.dataTheme || undefined;
 
-  // Compute accent from theme — no longer from the author's stored accentColor field.
-  const accentColor = getThemeAccentHex(effectiveSiteTheme);
+  // Accent: PREMIUM authors may override with a custom colour; otherwise use theme accent.
+  const accentColor = resolveAccentColor({
+    planTier,
+    customAccentColor: author.customAccentColor,
+    siteTheme: effectiveSiteTheme,
+  });
   const authorWithAccent = { ...author, accentColor };
 
   return (

@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Loader2, Lock, Sparkles, CheckCircle2 } from "lucide-react";
+import { Check, Loader2, Lock, Sparkles, CheckCircle2, Palette, RotateCcw } from "lucide-react";
 import { BASE_THEMES, GENRE_PALETTES } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 
 interface AppearanceClientProps {
-  currentTheme:    string;
-  currentTemplate: string;
-  authorSlug:      string;
-  planTier:        string;
+  currentTheme:        string;
+  currentTemplate:     string;
+  authorSlug:          string;
+  planTier:            string;
+  currentCustomAccent: string | null;
 }
 
 const TEMPLATES = [
@@ -186,6 +187,7 @@ export function AppearanceClient({
   currentTemplate,
   authorSlug,
   planTier,
+  currentCustomAccent,
 }: AppearanceClientProps) {
   const [selectedTheme,    setSelectedTheme]    = useState(currentTheme);
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate);
@@ -193,9 +195,44 @@ export function AppearanceClient({
   const [savingTemplate,   setSavingTemplate]   = useState<string | null>(null);
   const [error,            setError]            = useState("");
 
+  // Custom accent (Premium)
+  const [customAccent,     setCustomAccent]     = useState<string>(currentCustomAccent ?? "#C0392B");
+  const [accentEnabled,    setAccentEnabled]    = useState<boolean>(!!currentCustomAccent);
+  const [savingAccent,     setSavingAccent]     = useState(false);
+  const [accentSaved,      setAccentSaved]      = useState(false);
+
   const isFree     = planTier === "FREE";
   const isStandard = planTier === "STANDARD" || planTier === "PREMIUM";
   const isPremium  = planTier === "PREMIUM";
+
+  async function saveCustomAccent(value: string | null) {
+    setSavingAccent(true);
+    setAccentSaved(false);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/appearance", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ customAccentColor: value }),
+      });
+      if (res.ok) {
+        setAccentSaved(true);
+        setTimeout(() => setAccentSaved(false), 2500);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "Could not save accent colour.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSavingAccent(false);
+    }
+  }
+
+  function handleClearAccent() {
+    setAccentEnabled(false);
+    saveCustomAccent(null);
+  }
 
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const siteUrl        = `https://${authorSlug}.${platformDomain}`;
@@ -431,6 +468,111 @@ export function AppearanceClient({
             />
           ))}
         </div>
+      </section>
+
+      {/* ── Custom Accent Colour (Premium) ───────────────────────────────────── */}
+      <section className="relative bg-white rounded-xl border border-gray-200 p-6 space-y-5 overflow-hidden">
+        <div>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Palette className="w-4 h-4 text-gray-400" />
+            Custom Accent Colour
+            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2.5 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3" /> Premium
+            </span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Override your theme&apos;s accent with any colour you like — applied to buttons, links, and highlights across your whole site.
+            {!isPremium && (
+              <span className="ml-1 text-purple-600 font-medium">Available on Premium plans only.</span>
+            )}
+          </p>
+        </div>
+
+        {isPremium && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Colour swatch + native picker */}
+              <label className="relative cursor-pointer">
+                <span
+                  className="block w-16 h-16 rounded-xl border border-gray-200 shadow-sm"
+                  style={{ backgroundColor: accentEnabled ? customAccent : "#e5e7eb" }}
+                />
+                <input
+                  type="color"
+                  value={customAccent}
+                  onChange={(e) => {
+                    setCustomAccent(e.target.value);
+                    setAccentEnabled(true);
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  aria-label="Pick accent colour"
+                />
+              </label>
+
+              {/* Hex input */}
+              <div className="space-y-1">
+                <label className="block text-xs font-medium text-gray-600">Hex value</label>
+                <input
+                  type="text"
+                  value={customAccent}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setCustomAccent(v.startsWith("#") ? v : `#${v}`);
+                    setAccentEnabled(true);
+                  }}
+                  placeholder="#C0392B"
+                  className="w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  maxLength={7}
+                />
+              </div>
+
+              {/* Save / clear */}
+              <div className="flex items-center gap-2 pt-5">
+                <button
+                  type="button"
+                  disabled={savingAccent || !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(customAccent)}
+                  onClick={() => { setAccentEnabled(true); saveCustomAccent(customAccent); }}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingAccent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  Apply Colour
+                </button>
+                {accentEnabled && (
+                  <button
+                    type="button"
+                    disabled={savingAccent}
+                    onClick={handleClearAccent}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                    title="Revert to theme accent"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" /> Use theme accent
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {accentSaved && (
+              <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 inline-flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Saved — your site now uses this accent.
+              </p>
+            )}
+            <p className="text-xs text-gray-400">
+              Your custom colour stays applied even if you switch themes. Clear it any time to return to the theme&apos;s built-in accent.
+            </p>
+          </div>
+        )}
+
+        {/* Lock overlay for non-Premium */}
+        {!isPremium && (
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-2">
+            <div className="w-11 h-11 rounded-full bg-gray-800/80 flex items-center justify-center">
+              <Lock className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-sm font-semibold text-white bg-gray-800/80 px-3 py-1 rounded-full">
+              Upgrade to Premium
+            </span>
+          </div>
+        )}
       </section>
 
       {/* ── View live site ───────────────────────────────────────────────────── */}

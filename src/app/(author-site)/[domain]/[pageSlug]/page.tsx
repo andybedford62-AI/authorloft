@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { FileText } from "lucide-react";
-import { getThemeAccentHex } from "@/lib/themes";
+import { resolveAccentColor } from "@/lib/themes";
 import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
@@ -18,7 +18,7 @@ async function resolveAuthorAndPage(domain: string, pageSlug: string) {
       where: {
         OR: [{ slug: domain }, { customDomain: domain }],
       },
-      select: { id: true, name: true, displayName: true, siteTheme: true },
+      select: { id: true, name: true, displayName: true, siteTheme: true, customAccentColor: true, plan: { select: { tier: true } } },
     });
 
     if (!author) return null;
@@ -38,7 +38,11 @@ async function resolveAuthorAndPage(domain: string, pageSlug: string) {
     });
 
     if (!page || !page.isVisible) return null;
-    const accentColor = getThemeAccentHex(author.siteTheme);
+    const accentColor = resolveAccentColor({
+      planTier: author.plan?.tier,
+      customAccentColor: author.customAccentColor,
+      siteTheme: author.siteTheme,
+    });
     return { author: { ...author, accentColor }, page };
   } catch (err) {
     console.error("[CustomPage] error:", err);

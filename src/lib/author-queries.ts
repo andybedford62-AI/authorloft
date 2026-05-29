@@ -1,7 +1,7 @@
 // Reusable database queries for the public author site
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
+import { resolveAccentColor, isThemeAllowed } from "@/lib/themes";
 
 export async function getAuthorByDomain(domain: string) {
   const author = await prisma.author.findFirst({
@@ -25,11 +25,17 @@ export async function getAuthorByDomain(domain: string) {
     ? author.siteTheme
     : planTier === "FREE" ? "modern-minimal" : "classic-literary";
 
-  // Compute accent from the effective theme — accentColor is no longer user-controlled.
+  // Accent: PREMIUM authors may override with a custom colour; everyone else gets the theme accent.
+  const accentColor = resolveAccentColor({
+    planTier,
+    customAccentColor: author.customAccentColor,
+    siteTheme: effectiveSiteTheme,
+  });
+
   return {
     ...author,
     siteTheme: effectiveSiteTheme,
-    accentColor: getThemeAccentHex(effectiveSiteTheme),
+    accentColor,
   };
 }
 

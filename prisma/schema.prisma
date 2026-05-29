@@ -100,6 +100,7 @@ model Author {
   heroTitle            String?
   heroSubtitle         String?
   accentColor          String         @default("#7B2D2D")  // legacy — no longer drives UI; kept for data safety
+  customAccentColor    String?        // PREMIUM custom accent override; null = use theme accent. Takes precedence over theme when Premium.
   baseTheme            String         @default("classic-literary") // last base theme before a genre palette was applied; used on plan downgrade
   tagline              String?
   linkedinUrl          String?

@@ -177,6 +177,22 @@ export function getThemeAccentHex(siteTheme: string | null | undefined): string 
 }
 
 /**
+ * Resolves the effective accent colour for an author across the public site.
+ * PREMIUM authors may override the theme accent with a custom hex colour;
+ * everyone else (and Premium authors who haven't set one) gets the theme accent.
+ */
+export function resolveAccentColor(opts: {
+  planTier:          string | null | undefined;
+  customAccentColor: string | null | undefined;
+  siteTheme:         string | null | undefined;
+}): string {
+  if (opts.planTier === "PREMIUM" && opts.customAccentColor) {
+    return opts.customAccentColor;
+  }
+  return getThemeAccentHex(opts.siteTheme);
+}
+
+/**
  * Which themes are available per plan tier.
  * FREE     → Modern Minimal only
  * STANDARD → all base themes + all genre palettes

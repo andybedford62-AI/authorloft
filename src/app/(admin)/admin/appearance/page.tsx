@@ -9,10 +9,11 @@ export default async function AppearancePage() {
   const author = await prisma.author.findUnique({
     where: { id: authorId },
     select: {
-      siteTheme:    true,
-      homeTemplate: true,
-      slug:         true,
-      plan:         { select: { tier: true } },
+      siteTheme:         true,
+      homeTemplate:      true,
+      slug:              true,
+      customAccentColor: true,
+      plan:              { select: { tier: true } },
     },
   });
 
@@ -33,6 +34,7 @@ export default async function AppearancePage() {
         currentTemplate={author.homeTemplate ?? "classic"}
         authorSlug={author.slug}
         planTier={tier}
+        currentCustomAccent={author.customAccentColor}
       />
     </div>
   );

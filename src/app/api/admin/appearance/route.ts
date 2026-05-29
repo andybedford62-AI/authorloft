@@ -62,6 +62,36 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, homeTemplate });
   }
 
+  // customAccentColor — PREMIUM only. Accepts a hex string or null (to clear).
+  if ("customAccentColor" in body) {
+    const { customAccentColor } = body;
+
+    // Validate: null (clear) or a valid 3/6-digit hex colour
+    const isValidHex = typeof customAccentColor === "string" && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(customAccentColor);
+    if (customAccentColor !== null && !isValidHex) {
+      return NextResponse.json({ error: "Invalid colour. Use a hex value like #C0392B." }, { status: 400 });
+    }
+
+    // Enforce Premium plan
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { plan: { select: { tier: true } } },
+    });
+    const tier = author?.plan?.tier ?? "FREE";
+    if (tier !== "PREMIUM") {
+      return NextResponse.json(
+        { error: "Custom accent colours are a Premium feature." },
+        { status: 403 }
+      );
+    }
+
+    await prisma.author.update({
+      where: { id: authorId },
+      data:  { customAccentColor: customAccentColor === null ? null : customAccentColor },
+    });
+    return NextResponse.json({ ok: true, customAccentColor });
+  }
+
   // booksLayout — list is free; grid/shelf require Standard or Premium
   const { booksLayout } = body;
   if (booksLayout !== undefined) {
