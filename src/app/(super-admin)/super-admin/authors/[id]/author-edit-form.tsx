@@ -358,19 +358,29 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
             </button>
           </div>
 
-          {/* Next Steps checklist hidden toggle */}
+          {/* Next Steps checklist — instant PATCH, no Save needed */}
           <div className="flex items-center justify-between py-2">
             <div>
               <p className="text-sm font-medium text-gray-800">Hide Next Steps checklist</p>
               <p className="text-xs text-gray-400">
-                Author dismissed the dashboard checklist. Toggle off to restore it for support purposes.
+                {form.hideNextStepsChecklist
+                  ? "Author has dismissed this card. Toggle off to restore it."
+                  : "Next Steps card is visible on the author's dashboard."}
               </p>
             </div>
             <button
               type="button"
               role="switch"
               aria-checked={form.hideNextStepsChecklist}
-              onClick={() => set("hideNextStepsChecklist", !form.hideNextStepsChecklist)}
+              onClick={async () => {
+                const next = !form.hideNextStepsChecklist;
+                set("hideNextStepsChecklist", next);
+                await fetch(`/api/super-admin/authors/${author.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ hideNextStepsChecklist: next }),
+                });
+              }}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                 form.hideNextStepsChecklist ? "bg-amber-500" : "bg-gray-200"
               }`}

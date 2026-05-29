@@ -39,7 +39,7 @@ export async function GET(
   return NextResponse.json(author);
 }
 
-// PATCH /api/super-admin/authors/[id] — toggle isActive (quick action from table)
+// PATCH /api/super-admin/authors/[id] — quick boolean toggles (table + edit form)
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -47,14 +47,15 @@ export async function PATCH(
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
-  const { isActive } = await req.json();
+  const { isActive, hideNextStepsChecklist } = await req.json();
 
   const author = await prisma.author.update({
     where: { id },
     data: {
-      ...(typeof isActive === "boolean" && { isActive }),
+      ...(typeof isActive               === "boolean" && { isActive }),
+      ...(typeof hideNextStepsChecklist === "boolean" && { hideNextStepsChecklist }),
     },
-    select: { id: true, name: true, slug: true, isActive: true },
+    select: { id: true, name: true, slug: true, isActive: true, hideNextStepsChecklist: true },
   });
 
   return NextResponse.json(author);
