@@ -168,16 +168,6 @@ export function OnboardingGuidedModal({
     router.refresh();
   }
 
-  // ── Shared modal shell ────────────────────────────────────────────────────
-
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
-        {children}
-      </div>
-    </div>
-  );
-
   // ── Step 1: Bio & Profile ─────────────────────────────────────────────────
 
   if (step === 1) {
@@ -469,6 +459,16 @@ export function OnboardingGuidedModal({
 }
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function StepProgress({ current, total }: { current: number; total: number }) {
   return (
