@@ -10,6 +10,7 @@ type ShowcaseAuthor = {
   tagline:         string | null;
   profileImageUrl: string | null;
   customDomain:    string | null;
+  showcaseStyle:   string;
   books: { coverImageUrl: string | null; title: string }[];
 };
 
@@ -23,8 +24,12 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
   const siteUrl = author.customDomain
     ? `https://${author.customDomain}`
     : `https://${author.slug}.${platformDomain}`;
-  const displayName = author.displayName || author.name;
-  const cover = author.books[0]?.coverImageUrl;
+  const displayName  = author.displayName || author.name;
+  const style        = author.showcaseStyle ?? "photo";
+  const showImage    = style !== "text";
+  const imageUrl     = style === "book"
+    ? (author.books[0]?.coverImageUrl ?? author.profileImageUrl)
+    : (author.profileImageUrl ?? author.books[0]?.coverImageUrl);
 
   return (
     <a
@@ -42,23 +47,29 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
         transition: 'transform 0.2s, box-shadow 0.2s',
       }}
     >
-      {/* Cover or profile image */}
-      <div style={{ height: 160, background: '#0a1220', position: 'relative', overflow: 'hidden' }}>
-        {cover ? (
-          <Image src={cover} alt={displayName} fill className="object-cover opacity-80" sizes="240px" />
-        ) : author.profileImageUrl ? (
-          <Image src={author.profileImageUrl} alt={displayName} fill className="object-cover opacity-80" sizes="240px" />
-        ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 48, color: ML.brass2, opacity: 0.6 }}>
-              {displayName[0]}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Image area — only for photo and book styles */}
+      {showImage && (
+        <div style={{ height: 160, background: '#0a1220', position: 'relative', overflow: 'hidden' }}>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={displayName}
+              fill
+              className={`opacity-85 ${style === "book" ? "object-contain p-3" : "object-cover"}`}
+              sizes="240px"
+            />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 48, color: ML.brass2, opacity: 0.5 }}>
+                {displayName[0]}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Info */}
-      <div style={{ padding: '16px 18px' }}>
+      <div style={{ padding: showImage ? '16px 18px' : '24px 18px' }}>
         <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 16, fontWeight: 600, color: ML.bone, margin: '0 0 4px', lineHeight: 1.3 }}>
           {displayName}
         </p>

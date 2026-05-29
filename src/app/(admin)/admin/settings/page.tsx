@@ -789,33 +789,49 @@ const TABS: { id: SettingsTab; label: string }[] = [
 
 // ── Showcase opt-in toggle ────────────────────────────────────────────────────
 
+type ShowcaseStyle = "photo" | "book" | "text";
+
+const SHOWCASE_STYLES: { value: ShowcaseStyle; label: string; description: string }[] = [
+  { value: "photo", label: "Profile photo",  description: "Your author photo, name, and tagline" },
+  { value: "book",  label: "Book cover",     description: "Your featured book cover, name, and tagline" },
+  { value: "text",  label: "Text only",      description: "Name and tagline only — no image" },
+];
+
 function ShowcaseToggle() {
   const [enabled,  setEnabled]  = useState<boolean | null>(null);
+  const [style,    setStyle]    = useState<ShowcaseStyle>("photo");
   const [saving,   setSaving]   = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     fetch("/api/admin/settings/showcase")
       .then((r) => r.json())
-      .then((d) => setEnabled(d.showInShowcase ?? false))
-      .catch(() => setEnabled(false));
+      .then((d) => {
+        setEnabled(d.showInShowcase ?? false);
+        setStyle(d.showcaseStyle ?? "photo");
+      })
+      .catch(() => { setEnabled(false); });
   }, []);
 
-  async function toggle() {
-    if (enabled === null) return;
-    const next = !enabled;
+  async function patch(updates: { showInShowcase?: boolean; showcaseStyle?: ShowcaseStyle }) {
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings/showcase", {
         method:  "PATCH",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ showInShowcase: next }),
+        body:    JSON.stringify(updates),
       });
       if (res.ok) {
-        setEnabled(next);
-        toast("success", next
-          ? "Your site may now appear in the AuthorLoft showcase."
-          : "Your site has been removed from the showcase.");
+        if (updates.showInShowcase !== undefined) {
+          setEnabled(updates.showInShowcase);
+          toast("success", updates.showInShowcase
+            ? "Your site will appear in the AuthorLoft showcase."
+            : "Your site has been removed from the showcase.");
+        }
+        if (updates.showcaseStyle !== undefined) {
+          setStyle(updates.showcaseStyle);
+          toast("success", "Display style updated.");
+        }
       } else {
         toast("error", "Could not update showcase setting.");
       }
@@ -827,22 +843,24 @@ function ShowcaseToggle() {
   }
 
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-1">
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
         <Globe className="h-4 w-4 text-gray-400" />
         Marketing Showcase
       </h2>
-      <p className="text-xs text-gray-400 mb-5">
-        Allow your author site to appear as a real example on the AuthorLoft marketing page, inspiring potential new authors.
+      <p className="text-xs text-gray-400">
+        Opt in to have your author site featured as a real example on the AuthorLoft homepage, inspiring potential new authors.
       </p>
-      <div className="flex items-center justify-between gap-4">
+
+      {/* Opt-in toggle */}
+      <div className="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
         <div>
           <p className="text-sm font-medium text-gray-800">
             {enabled ? "Featured in showcase" : "Not in showcase"}
           </p>
           <p className="text-xs text-gray-400 mt-0.5">
             {enabled
-              ? "Your site may be shown as an example to visitors on the AuthorLoft homepage."
+              ? "Your site is visible to visitors on the AuthorLoft homepage."
               : "Opt in to help inspire new authors by showcasing your site."}
           </p>
         </div>
@@ -851,7 +869,7 @@ function ShowcaseToggle() {
           role="switch"
           aria-checked={!!enabled}
           disabled={saving || enabled === null}
-          onClick={toggle}
+          onClick={() => patch({ showInShowcase: !enabled })}
           className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
             enabled ? "bg-blue-600" : "bg-gray-200"
           }`}
@@ -862,6 +880,33 @@ function ShowcaseToggle() {
           }
         </button>
       </div>
+
+      {/* Display style — only shown when opted in */}
+      {enabled && (
+        <div className="space-y-2 pt-1">
+          <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Display style</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {SHOWCASE_STYLES.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={saving}
+                onClick={() => { if (style !== opt.value) patch({ showcaseStyle: opt.value }); }}
+                className={`text-left px-4 py-3 rounded-xl border-2 transition-all text-sm disabled:opacity-50 ${
+                  style === opt.value
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <p className={`font-semibold text-sm ${style === opt.value ? "text-blue-700" : "text-gray-800"}`}>
+                  {opt.label}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{opt.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
