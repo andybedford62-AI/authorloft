@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { DashboardTracker } from "@/components/admin/dashboard-tracker";
-import { OnboardingModal } from "@/components/admin/onboarding-modal";
+import { OnboardingGuidedModal } from "@/components/admin/onboarding-guided-modal";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -151,10 +151,12 @@ export default async function DashboardPage() {
       select: {
         name: true,
         displayName: true,
+        slug: true,
         emailVerified: true,
         email: true,
         profileImageUrl: true,
         bio: true,
+        onboardingCompletedAt: true,
         stripeConnectOnboarded: true,
         plan: { select: { salesEnabled: true } },
         books: {
@@ -173,7 +175,8 @@ export default async function DashboardPage() {
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
-  const hasProfile     = !!(authorMeta?.profileImageUrl && authorMeta?.bio);
+  // Bio alone satisfies "complete profile" — photo is optional since new onboarding flow
+  const hasProfile     = !!authorMeta?.bio;
   const hasBook        = data.totalBooks > 0;
   const hasStripe      = !!authorMeta?.stripeConnectOnboarded;
   const hasFile        = !!(authorMeta?.books?.[0]?.directSaleItems?.length);
@@ -236,7 +239,11 @@ export default async function DashboardPage() {
         bookCount={data.totalBooks}
         planTier={data.planTier}
       />
-      <OnboardingModal show={!allDone && data.totalBooks === 0} />
+      {/* Guided onboarding modal — non-dismissible, shows until first book is created */}
+      <OnboardingGuidedModal
+        show={!authorMeta?.onboardingCompletedAt}
+        authorSlug={authorMeta?.slug ?? ""}
+      />
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
@@ -276,41 +283,19 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Getting Started checklist — hidden once all steps complete */}
-      {!allDone && (
+      {/* Optional next steps — shown after onboarding if Stripe / book file not yet set up */}
+      {authorMeta?.onboardingCompletedAt && optionalSteps.some((s) => !s.done) && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-gray-900">Getting Started</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {completedCount} of {requiredSteps.length} required steps complete
-              </p>
-            </div>
-            {/* Progress bar */}
-            <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 rounded-full transition-all"
-                style={{ width: `${(completedCount / requiredSteps.length) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="divide-y divide-gray-50">
-            {requiredSteps.map((step) => (
-              <ChecklistRow key={step.label} step={step} />
-            ))}
-          </div>
-
-          {/* Optional steps */}
-          <div className="border-t border-dashed border-gray-200">
-            <p className="px-5 pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              Optional — for direct sales
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">Next Steps</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Optional — set these up to enable direct book sales
             </p>
-            <div className="divide-y divide-gray-50">
-              {optionalSteps.map((step) => (
-                <ChecklistRow key={step.label} step={step} optional />
-              ))}
-            </div>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {optionalSteps.map((step) => (
+              <ChecklistRow key={step.label} step={step} optional />
+            ))}
           </div>
         </div>
       )}
