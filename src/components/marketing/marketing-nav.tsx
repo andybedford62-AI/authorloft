@@ -68,6 +68,12 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             Features
           </a>
           <Link
+            href="/blog"
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            Blog
+          </Link>
+          <Link
             href="/pricing"
             className={`text-sm transition-colors ${
               activePage === "pricing"
@@ -76,12 +82,6 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             }`}
           >
             Pricing
-          </Link>
-          <Link
-            href="/blog"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Blog
           </Link>
           <a
             href="/#faq"

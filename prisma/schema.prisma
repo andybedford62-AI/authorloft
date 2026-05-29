@@ -160,6 +160,7 @@ model Author {
   onboardingEarlyReminderSentAt DateTime? // set when the day-3 nudge email is sent
   onboardingReminderSentAt     DateTime?  // set when the day-7 nudge email is sent
   hideNextStepsChecklist       Boolean   @default(false) // paid-plan authors can dismiss the Next Steps card
+  showInShowcase               Boolean   @default(false) // author has opted in to being shown on the marketing page showcase
   trialPlanId          String?        // plan ID for admin-assigned free trial
   trialPlan            Plan?          @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
   trialStartsAt        DateTime?      // when the trial began

@@ -103,6 +103,33 @@ async function getLatestBlogPosts() {
   }).catch(() => []);
 }
 
+async function getShowcaseAuthors() {
+  return prisma.author.findMany({
+    where: {
+      showInShowcase: true,
+      isActive:       true,
+      books:          { some: { isPublished: true } },
+    },
+    select: {
+      id:             true,
+      slug:           true,
+      displayName:    true,
+      name:           true,
+      tagline:        true,
+      profileImageUrl:true,
+      customDomain:   true,
+      books: {
+        where:   { isPublished: true, coverImageUrl: { not: null } },
+        orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
+        take:    1,
+        select:  { coverImageUrl: true, title: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 8,
+  }).catch(() => []);
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const softwareJsonLd = {
@@ -122,7 +149,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs, blogPosts] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts()]);
+  const [plans, testimonials, faqs, blogPosts, showcaseAuthors] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -237,6 +264,94 @@ export default async function MarketingPage() {
 
       {/* ── Testimonials (dynamic) ─────────────────────────────────────────── */}
       <MidnightTestimonialsSection testimonials={testimonials} />
+
+      {/* ── Author Showcase (dynamic — only shown when authors have opted in) ─ */}
+      {showcaseAuthors.length > 0 && (
+        <section style={{ background: ML.ink, padding: '120px 60px' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 64 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 16 }}>· Real author sites ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4.5vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 16px' }}>
+                Built by <span style={{ fontStyle: 'italic', color: ML.brass2 }}>real authors</span>
+              </h2>
+              <p style={{ color: ML.mist, fontSize: 16, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
+                These sites were created by AuthorLoft authors. Click any to see a live example of what you can build.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20 }}>
+              {showcaseAuthors.map((author) => {
+                const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com';
+                const siteUrl = author.customDomain
+                  ? `https://${author.customDomain}`
+                  : `https://${author.slug}.${platformDomain}`;
+                const displayName = author.displayName || author.name;
+                const cover = author.books[0]?.coverImageUrl;
+
+                return (
+                  <a
+                    key={author.id}
+                    href={siteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'block',
+                      background: ML.midnight,
+                      border: `1px solid rgba(255,255,255,0.08)`,
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      textDecoration: 'none',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 16px 40px rgba(0,0,0,0.4)`; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+                  >
+                    {/* Book cover or profile image */}
+                    <div style={{ height: 160, background: '#0a1220', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
+                      {cover ? (
+                        <Image
+                          src={cover}
+                          alt={displayName}
+                          fill
+                          className="object-cover opacity-80"
+                          sizes="240px"
+                        />
+                      ) : author.profileImageUrl ? (
+                        <Image
+                          src={author.profileImageUrl}
+                          alt={displayName}
+                          fill
+                          className="object-cover opacity-80"
+                          sizes="240px"
+                        />
+                      ) : (
+                        <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 48, color: ML.brass2, opacity: 0.6 }}>
+                          {displayName[0]}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ padding: '16px 18px' }}>
+                      <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 16, fontWeight: 600, color: ML.bone, margin: '0 0 4px', lineHeight: 1.3 }}>
+                        {displayName}
+                      </p>
+                      {author.tagline && (
+                        <p style={{ fontSize: 12, color: ML.slate, margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } as React.CSSProperties}>
+                          {author.tagline}
+                        </p>
+                      )}
+                      <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: ML.brass2, marginTop: 10, letterSpacing: '0.05em' }}>
+                        View site →
+                      </p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Blog (dynamic — only shown when posts exist) ───────────────────── */}
       {blogPosts.length > 0 && (

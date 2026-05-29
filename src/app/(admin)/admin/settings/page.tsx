@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell } from "lucide-react";
+import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
@@ -787,6 +787,85 @@ const TABS: { id: SettingsTab; label: string }[] = [
   { id: "danger",         label: "Danger Zone"    },
 ];
 
+// ── Showcase opt-in toggle ────────────────────────────────────────────────────
+
+function ShowcaseToggle() {
+  const [enabled,  setEnabled]  = useState<boolean | null>(null);
+  const [saving,   setSaving]   = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    fetch("/api/admin/settings/showcase")
+      .then((r) => r.json())
+      .then((d) => setEnabled(d.showInShowcase ?? false))
+      .catch(() => setEnabled(false));
+  }, []);
+
+  async function toggle() {
+    if (enabled === null) return;
+    const next = !enabled;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/showcase", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ showInShowcase: next }),
+      });
+      if (res.ok) {
+        setEnabled(next);
+        toast("success", next
+          ? "Your site may now appear in the AuthorLoft showcase."
+          : "Your site has been removed from the showcase.");
+      } else {
+        toast("error", "Could not update showcase setting.");
+      }
+    } catch {
+      toast("error", "Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-1">
+        <Globe className="h-4 w-4 text-gray-400" />
+        Marketing Showcase
+      </h2>
+      <p className="text-xs text-gray-400 mb-5">
+        Allow your author site to appear as a real example on the AuthorLoft marketing page, inspiring potential new authors.
+      </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            {enabled ? "Featured in showcase" : "Not in showcase"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {enabled
+              ? "Your site may be shown as an example to visitors on the AuthorLoft homepage."
+              : "Opt in to help inspire new authors by showcasing your site."}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={!!enabled}
+          disabled={saving || enabled === null}
+          onClick={toggle}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+            enabled ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          {saving
+            ? <Loader2 className="h-3 w-3 animate-spin text-white absolute left-1/2 -translate-x-1/2" />
+            : <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+          }
+        </button>
+      </div>
+    </section>
+  );
+}
+
 // ── Account tab content ───────────────────────────────────────────────────────
 
 function AccountTab() {
@@ -859,6 +938,9 @@ function AccountTab() {
           </div>
         </div>
       </section>
+
+      {/* Marketing showcase opt-in */}
+      <ShowcaseToggle />
 
       {/* Change password */}
       <section className="bg-white rounded-xl border border-gray-200 p-6">

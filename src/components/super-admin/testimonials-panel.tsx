@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, Star, X } from "lucide-react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Testimonial = {
   id: string;
@@ -115,12 +116,10 @@ function TestimonialModal({
 
           <div>
             <label className={labelCls}>Quote <span className="text-red-500">*</span></label>
-            <textarea
+            <RichTextEditor
               value={form.quote}
-              onChange={(e) => setForm({ ...form, quote: e.target.value })}
-              placeholder="Write the testimonial quote here…"
-              rows={4}
-              className={`${inputCls} resize-none leading-relaxed`}
+              onChange={(val) => setForm({ ...form, quote: val })}
+              placeholder="Write the testimonial quote here… (supports bold, italic, links)"
             />
           </div>
 
@@ -370,9 +369,12 @@ export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials
                       )}
                       <span className="text-xs text-gray-400 ml-auto">Order: {t.displayOrder}</span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1.5 leading-relaxed line-clamp-2">
-                      "{t.quote}"
-                    </p>
+                    <p
+                      className="text-sm text-gray-600 mt-1.5 leading-relaxed line-clamp-2"
+                      dangerouslySetInnerHTML={{
+                        __html: `"${t.quote}"`,
+                      }}
+                    />
                   </div>
 
                   {/* Actions */}

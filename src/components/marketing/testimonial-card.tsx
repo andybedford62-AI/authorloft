@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
 
 export interface Testimonial {
   id: string;
@@ -26,10 +27,11 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
         </div>
       )}
 
-      {/* Quote */}
-      <p className="text-gray-700 leading-relaxed text-sm group-hover:text-gray-900 transition-colors duration-300">
-        "{testimonial.quote}"
-      </p>
+      {/* Quote — rendered as HTML to support RTE formatting (bold, italic, links) */}
+      <div
+        className="text-gray-700 leading-relaxed text-sm group-hover:text-gray-900 transition-colors duration-300 rich-content"
+        dangerouslySetInnerHTML={{ __html: sanitize(testimonial.quote) }}
+      />
 
       {/* Author info */}
       <div className="pt-4 border-t border-gray-100">
