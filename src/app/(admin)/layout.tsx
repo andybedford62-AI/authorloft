@@ -5,6 +5,7 @@ import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { ToastProvider } from "@/components/toast-provider";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
+import { TrialReminderBanner }   from "@/components/admin/trial-reminder-banner";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
@@ -40,6 +41,8 @@ export default async function AdminLayout({
         adminTheme:       true,
         termsAcceptedAt:  true,
         plan:             { select: { tier: true } },
+        trialEndsAt:      true,
+        trialPlan:        { select: { name: true } },
       },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
@@ -60,6 +63,9 @@ export default async function AdminLayout({
   const authorName   = authorRecord.displayName || authorRecord.name;
   const authorSlug   = authorRecord.slug;
   const planTier     = authorRecord.plan?.tier ?? "FREE";
+  const trialEndsAt  = authorRecord.trialEndsAt ?? null;
+  const trialPlanName = authorRecord.trialPlan?.name ?? null;
+  const isOnTrial    = !!trialEndsAt && trialEndsAt > new Date();
   const featureGates = (featureConfig?.gates as Record<string, string>) ?? {};
   const adminTheme   = (authorRecord.adminTheme === "dark" ? "dark" : "light") as "dark" | "light";
 
@@ -82,6 +88,11 @@ export default async function AdminLayout({
         {/* Renewal reminder — shown to the author (not during impersonation) */}
         {!impersonatedId && subscription?.currentPeriodEnd && (
           <RenewalReminderBanner currentPeriodEnd={subscription.currentPeriodEnd} />
+        )}
+
+        {/* Trial reminder — shown when author is on an admin-granted trial */}
+        {!impersonatedId && isOnTrial && trialEndsAt && trialPlanName && (
+          <TrialReminderBanner trialEndsAt={trialEndsAt} planName={trialPlanName} />
         )}
 
         <AdminShell
