@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { DashboardTracker } from "@/components/admin/dashboard-tracker";
-import { OnboardingGuidedModal } from "@/components/admin/onboarding-guided-modal";
+import { OnboardingController } from "@/components/admin/onboarding-controller";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -239,11 +239,14 @@ export default async function DashboardPage() {
         bookCount={data.totalBooks}
         planTier={data.planTier}
       />
-      {/* Guided onboarding modal — non-dismissible, shows until first book is created */}
-      <OnboardingGuidedModal
-        show={!authorMeta?.onboardingCompletedAt}
-        authorSlug={authorMeta?.slug ?? ""}
-      />
+      {/* Onboarding flow — modal + fallback checklist — shown until first book created */}
+      {!authorMeta?.onboardingCompletedAt && (
+        <OnboardingController
+          authorSlug={authorMeta?.slug ?? ""}
+          hasBio={hasProfile}
+          hasBook={hasBook}
+        />
+      )}
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />

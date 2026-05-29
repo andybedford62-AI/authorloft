@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   User, BookOpen, ChevronRight, ChevronLeft,
-  Upload, CheckCircle, ExternalLink, Loader2,
+  Upload, CheckCircle, ExternalLink, Loader2, X,
 } from "lucide-react";
 
 function toSlug(title: string): string {
@@ -34,9 +34,11 @@ interface BookState {
 export function OnboardingGuidedModal({
   show,
   authorSlug,
+  onDismiss,
 }: {
   show: boolean;
   authorSlug: string;
+  onDismiss?: () => void;
 }) {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -175,7 +177,14 @@ export function OnboardingGuidedModal({
       <Shell>
         <div className="p-8">
           {/* Progress indicator */}
-          <StepProgress current={1} total={2} />
+          <div className="flex items-start justify-between mb-0">
+            <StepProgress current={1} total={2} />
+            {onDismiss && (
+              <button onClick={onDismiss} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors -mt-1 -mr-1" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
             Welcome to AuthorLoft
@@ -292,7 +301,14 @@ export function OnboardingGuidedModal({
     return (
       <Shell>
         <div className="p-8">
-          <StepProgress current={2} total={2} />
+          <div className="flex items-start justify-between mb-0">
+            <StepProgress current={2} total={2} />
+            {onDismiss && (
+              <button onClick={onDismiss} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors -mt-1 -mr-1" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
           <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
             Almost there

@@ -94,6 +94,12 @@ export async function POST(req: NextRequest) {
   });
 
   if (onboardingJustCompleted > 0) {
+    // Auto-set as hero featured book if none is set — fills the hero section immediately
+    await prisma.author.updateMany({
+      where: { id: authorId, heroFeaturedBookId: null },
+      data:  { heroFeaturedBookId: book.id },
+    });
+
     const author = await prisma.author.findUnique({
       where:  { id: authorId },
       select: { createdAt: true, plan: { select: { tier: true } } },
