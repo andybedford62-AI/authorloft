@@ -174,7 +174,7 @@ export function MidnightHero() {
 
       {/* Deckled bottom edge — fills with showcase section colour for seamless transition */}
       <svg viewBox="0 0 1280 30" preserveAspectRatio="none" style={{ position: 'absolute', bottom: -1, left: 0, width: '100%', height: 30, zIndex: 3 }} aria-hidden="true">
-        <path d="M0 28 Q 80 18, 160 24 T 320 22 T 480 26 T 640 18 T 800 24 T 960 20 T 1120 22 T 1280 24 L 1280 30 L 0 30 Z" fill="#1B2B47" />
+        <path d="M0 28 Q 80 18, 160 24 T 320 22 T 480 26 T 640 18 T 800 24 T 960 20 T 1120 22 T 1280 24 L 1280 30 L 0 30 Z" fill="#B8893D" />
       </svg>
 
       {/* Nav */}
