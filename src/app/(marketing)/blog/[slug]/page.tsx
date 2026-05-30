@@ -13,24 +13,27 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.platformPost.findUnique({ where: { slug } }).catch(() => null);
+  const post = await prisma.platformPost.findUnique({ where: { slug }, select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, seoTitle: true, metaDescription: true } }).catch(() => null);
   if (!post || !post.isPublished) return {};
 
+  const metaTitle = post.seoTitle        ? `${post.seoTitle} — AuthorLoft Blog` : `${post.title} — AuthorLoft Blog`;
+  const metaDesc  = post.metaDescription || post.excerpt || undefined;
+
   return {
-    title:       `${post.title} — AuthorLoft Blog`,
-    description: post.excerpt || undefined,
+    title:       metaTitle,
+    description: metaDesc,
     alternates:  { canonical: `${BASE}/blog/${post.slug}` },
     openGraph: {
-      type:        "article",
-      title:       post.title,
-      description: post.excerpt || undefined,
-      images:      post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
+      type:          "article",
+      title:         metaTitle,
+      description:   metaDesc,
+      images:        post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
       publishedTime: post.publishedAt?.toISOString(),
     },
     twitter: {
       card:        "summary_large_image",
-      title:       post.title,
-      description: post.excerpt || undefined,
+      title:       metaTitle,
+      description: metaDesc,
       images:      post.coverImageUrl ? [post.coverImageUrl] : undefined,
     },
   };

@@ -18,6 +18,9 @@ type Post = {
   isPublished:     boolean;
   attachmentUrl:   string | null;
   attachmentLabel: string | null;
+  focusKeyword:    string | null;
+  seoTitle:        string | null;
+  metaDescription: string | null;
 };
 
 interface Props {
@@ -51,6 +54,9 @@ export function PlatformPostForm({ post }: Props) {
   const [isPublished,     setIsPublished]     = useState(post?.isPublished     ?? false);
   const [attachmentUrl,   setAttachmentUrl]   = useState(post?.attachmentUrl   ?? "");
   const [attachmentLabel, setAttachmentLabel] = useState(post?.attachmentLabel ?? "");
+  const [focusKeyword,    setFocusKeyword]    = useState(post?.focusKeyword    ?? "");
+  const [seoTitle,        setSeoTitle]        = useState(post?.seoTitle        ?? "");
+  const [metaDescription, setMetaDescription] = useState(post?.metaDescription ?? "");
 
   const [saving,      setSaving]      = useState(false);
   const [deleting,    setDeleting]    = useState(false);
@@ -100,7 +106,7 @@ export function PlatformPostForm({ post }: Props) {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, authorName, readTimeMinutes, isPublished, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null }),
+      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, authorName, readTimeMinutes, isPublished, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null, focusKeyword: focusKeyword || null, seoTitle: seoTitle || null, metaDescription: metaDescription || null }),
     });
 
     const json = await res.json();
@@ -396,6 +402,84 @@ export function PlatformPostForm({ post }: Props) {
             <span className="text-xs text-purple-400 flex-shrink-0">Preview</span>
           </div>
         )}
+      </div>
+
+      {/* ── SEO Settings ──────────────────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-700">SEO Settings</h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Optional. Leave blank to use the post title and excerpt automatically.
+          </p>
+        </div>
+
+        {/* Focus Keyword */}
+        <div className="space-y-2">
+          <label className={labelCls}>Focus Keyword</label>
+          <input
+            type="text"
+            value={focusKeyword}
+            onChange={(e) => setFocusKeyword(e.target.value)}
+            placeholder="e.g. author website builder"
+            className={inputCls}
+          />
+          <p className="text-xs text-gray-400">The main keyword or phrase this post targets.</p>
+          {/* Keyword placement tips */}
+          <div className="rounded-lg bg-purple-50 border border-purple-100 px-4 py-3 space-y-2">
+            <p className="text-xs font-semibold text-purple-800">💡 Where to use your focus keyword:</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+              {[
+                { tip: "Post title",              detail: "ideally in the first 5 words" },
+                { tip: "First 100 words of body", detail: "signals relevance early" },
+                { tip: "At least one H2 heading", detail: "Google reads headings heavily" },
+                { tip: "URL slug",                detail: "auto-generated from title" },
+                { tip: "SEO Title & Meta Desc",   detail: "fills the search snippet" },
+                { tip: "2–3× in the body",        detail: "naturally — never forced" },
+              ].map(({ tip, detail }) => (
+                <li key={tip} className="flex items-start gap-1.5 text-xs text-purple-700">
+                  <span className="mt-0.5 flex-shrink-0 text-purple-400">✓</span>
+                  <span><span className="font-medium">{tip}</span> — {detail}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* SEO Title */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className={labelCls}>SEO Title</label>
+            <span className={`text-xs tabular-nums ${seoTitle.length > 60 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {seoTitle.length}/60
+            </span>
+          </div>
+          <input
+            type="text"
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            placeholder={title || "Overrides the post title in Google search results"}
+            className={inputCls}
+          />
+          <p className="text-xs text-gray-400">Ideal: 50–60 characters. Shown in Google instead of the post title.</p>
+        </div>
+
+        {/* Meta Description */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className={labelCls}>Meta Description</label>
+            <span className={`text-xs tabular-nums ${metaDescription.length > 160 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {metaDescription.length}/160
+            </span>
+          </div>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value)}
+            rows={3}
+            placeholder={excerpt || "Overrides the excerpt in Google search result snippets"}
+            className={inputCls + " resize-none"}
+          />
+          <p className="text-xs text-gray-400">Ideal: 150–160 characters. The snippet shown under your title in Google.</p>
+        </div>
       </div>
 
       {/* Actions */}
