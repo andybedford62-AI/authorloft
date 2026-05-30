@@ -1021,3 +1021,24 @@ model PlatformPost {
   @@index([isPublished, publishedAt])
   @@index([displayOrder])
 }
+
+// ─── Platform Resources (curated author tool/community directory) ─────────────
+
+model PlatformResource {
+  id             String   @id @default(cuid())
+  name           String
+  category       String   @default("")
+  description    String   @default("") @db.Text
+  websiteUrl     String
+  logoUrl        String?                    // public image URL for logo
+  initials       String   @default("")      // 2-4 char fallback when no logo
+  avatarColor    String   @default("#1B2B47") // hex bg for initials avatar
+  isPartner      Boolean  @default(false)   // confirmed cross-promotion partner
+  isActive       Boolean  @default(true)    // hide without deleting
+  showOnHomepage Boolean  @default(false)   // show in homepage trusted resources strip
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isActive, displayOrder])
+}

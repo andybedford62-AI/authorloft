@@ -63,6 +63,14 @@ const GENRES = [
 
 // ── Server data ───────────────────────────────────────────────────────────────
 
+async function getHomepageResources() {
+  return prisma.platformResource.findMany({
+    where:   { isActive: true, showOnHomepage: true },
+    orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    select:  { id: true, name: true, category: true, websiteUrl: true, logoUrl: true, initials: true, avatarColor: true, isPartner: true },
+  }).catch(() => []);
+}
+
 async function getActivePlans() {
   return prisma.plan.findMany({
     where: { isActive: true },
@@ -151,7 +159,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs, blogPosts, showcaseAuthors] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors()]);
+  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -335,6 +343,45 @@ export default async function MarketingPage() {
 
       {/* ── FAQ (dynamic) ──────────────────────────────────────────────────── */}
       <MidnightFaqSection faqs={faqs} />
+
+      {/* ── Trusted Resources strip ────────────────────────────────────────── */}
+      {homepageResources.length > 0 && (
+        <section style={{ background: ML.ink, padding: '72px 60px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>
+                · Tools &amp; communities we recommend ·
+              </p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.02em', color: ML.bone, margin: '0 0 8px' }}>
+                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>indie author community</span>
+              </h2>
+              <Link href="/resources" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+                See all resources →
+              </Link>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+              {homepageResources.map((r) => (
+                <a key={r.id} href={r.websiteUrl} target="_blank" rel="noopener noreferrer"
+                  className="resource-chip"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '10px 18px', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 999, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                  {/* Avatar */}
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: r.logoUrl ? ML.bone : r.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: r.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
+                    {r.logoUrl
+                      ? <img src={r.logoUrl} alt={r.name} style={{ width: 28, height: 28, objectFit: 'contain', padding: 3 }} />
+                      : <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (r.initials?.length ?? 0) > 2 ? 8 : 11, fontWeight: 700, color: ML.bone }}>{r.initials || r.name[0]}</span>
+                    }
+                  </div>
+                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: ML.ink, whiteSpace: 'nowrap' }}>{r.name}</span>
+                  {r.isPartner && (
+                    <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.brass, background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999, padding: '2px 6px' }}>Partner</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+          <style>{`.resource-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }`}</style>
+        </section>
+      )}
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
       <section style={{ position: 'relative', overflow: 'hidden', background: ML.midnight, padding: '160px 60px', textAlign: 'center' }}>
