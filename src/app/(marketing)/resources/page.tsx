@@ -100,20 +100,21 @@ export default async function ResourcesPage() {
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
-                        <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, background: resource.logoUrl ? ML.bone : resource.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: resource.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18, marginBottom: 18 }}>
+                        {/* Logo — increased to 80×80 for readability */}
+                        <div style={{ flexShrink: 0, width: 80, height: 80, borderRadius: 16, background: resource.logoUrl ? '#fff' : resource.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #DCDBD3' }}>
                           {resource.logoUrl ? (
-                            <Image src={resource.logoUrl} alt={resource.name} width={52} height={52} style={{ objectFit: 'contain', padding: 6 }} />
+                            <Image src={resource.logoUrl} alt={resource.name} width={80} height={80} style={{ objectFit: 'contain', padding: 8 }} />
                           ) : (
-                            <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (resource.initials?.length ?? 0) > 2 ? 12 : 16, fontWeight: 600, color: ML.bone }}>
+                            <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (resource.initials?.length ?? 0) > 2 ? 16 : 22, fontWeight: 600, color: ML.bone }}>
                               {resource.initials || resource.name[0]}
                             </span>
                           )}
                         </div>
-                        <div style={{ flex: 1, paddingTop: 4 }}>
+                        <div style={{ flex: 1, paddingTop: 6 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: 0, lineHeight: 1.3 }}>{resource.name}</p>
-                            <ArrowUpRight style={{ width: 14, height: 14, color: ML.copper, flexShrink: 0 }} />
+                            <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 18, fontWeight: 400, color: ML.ink, margin: 0, lineHeight: 1.3 }}>{resource.name}</p>
+                            <ArrowUpRight style={{ width: 15, height: 15, color: ML.copper, flexShrink: 0 }} />
                           </div>
                         </div>
                       </div>
