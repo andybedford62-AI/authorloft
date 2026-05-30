@@ -171,6 +171,12 @@ export default async function MarketingPage() {
       {/* ── Hero (static animated design) ─────────────────────────────────── */}
       <MidnightHero />
 
+      {/* ── Author Showcase (moved up — first thing after hero) ───────────── */}
+      <AuthorShowcaseSection
+        authors={showcaseAuthors}
+        platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
+      />
+
       {/* ── Problem ────────────────────────────────────────────────────────── */}
       <section style={{ background: ML.bone, padding: '120px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -266,12 +272,6 @@ export default async function MarketingPage() {
 
       {/* ── Testimonials (dynamic) ─────────────────────────────────────────── */}
       <MidnightTestimonialsSection testimonials={testimonials} />
-
-      {/* ── Author Showcase (dynamic — only shown when authors have opted in) ─ */}
-      <AuthorShowcaseSection
-        authors={showcaseAuthors}
-        platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
-      />
 
       {/* ── Blog (dynamic — only shown when posts exist) ───────────────────── */}
       {blogPosts.length > 0 && (
