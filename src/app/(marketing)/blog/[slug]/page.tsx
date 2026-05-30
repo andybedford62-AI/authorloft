@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
-import { Clock, ArrowLeft, ArrowRight } from "lucide-react";
+import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
+import { PrintButton } from "./print-button";
 import { sanitize } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
@@ -119,6 +120,36 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           className="rich-content"
           dangerouslySetInnerHTML={{ __html: safeContent }}
         />
+
+        {/* ── Download + Print ─────────────────────────────────────────── */}
+        <div className="mt-12 pt-8 border-t border-[#DCDBD3] space-y-4 no-print">
+
+          {/* Downloadable resource — only shown if a URL was set */}
+          {post.attachmentUrl && (
+            <a
+              href={post.attachmentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 rounded-xl border-2 border-[#C26A4A]/20 hover:border-[#C26A4A]/60 bg-[#FBF8F4] hover:bg-[#F5EDE4] transition-colors group"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#C26A4A]/10 flex items-center justify-center">
+                <FileDown className="h-5 w-5 text-[#C26A4A]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors">
+                  {post.attachmentLabel || "Download Resource"}
+                </p>
+                <p className="text-xs text-[#9b8e7e] mt-0.5">Free download — opens in a new tab</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-[#9b8e7e] group-hover:text-[#C26A4A] transition-colors flex-shrink-0" />
+            </a>
+          )}
+
+          {/* Print button row */}
+          <div className="flex justify-end">
+            <PrintButton />
+          </div>
+        </div>
 
         {/* CTA */}
         <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">

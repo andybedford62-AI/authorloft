@@ -1008,6 +1008,9 @@ model PlatformPost {
   displayOrder    Int       @default(0)
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
+  // Downloadable resource
+  attachmentUrl   String?                    // external link or uploaded file URL
+  attachmentLabel String?                    // e.g. "Download Free Chapter"
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

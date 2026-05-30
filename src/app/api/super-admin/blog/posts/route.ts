@@ -16,7 +16,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { title, slug, excerpt, content, coverImageUrl, category, authorName, readTimeMinutes, isPublished } = await req.json();
+  const { title, slug, excerpt, content, coverImageUrl, category, authorName, readTimeMinutes, isPublished, attachmentUrl, attachmentLabel } = await req.json();
 
   if (!title?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: "Title and slug are required." }, { status: 400 });
@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
       displayOrder:    (maxOrder._max.displayOrder ?? -1) + 1,
       isPublished:     isPublished ?? false,
       publishedAt:     isPublished ? new Date() : null,
+      attachmentUrl:   attachmentUrl?.trim()   || null,
+      attachmentLabel: attachmentLabel?.trim() || null,
     },
   });
 

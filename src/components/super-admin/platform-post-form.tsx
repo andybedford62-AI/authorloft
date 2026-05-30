@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown } from "lucide-react";
 
 type Post = {
   id:              string;
@@ -16,6 +16,8 @@ type Post = {
   authorName:      string;
   readTimeMinutes: number;
   isPublished:     boolean;
+  attachmentUrl:   string | null;
+  attachmentLabel: string | null;
 };
 
 interface Props {
@@ -47,6 +49,8 @@ export function PlatformPostForm({ post }: Props) {
   const [authorName,      setAuthorName]      = useState(post?.authorName      ?? "AuthorLoft Team");
   const [readTimeMinutes, setReadTimeMinutes] = useState(post?.readTimeMinutes ?? 5);
   const [isPublished,     setIsPublished]     = useState(post?.isPublished     ?? false);
+  const [attachmentUrl,   setAttachmentUrl]   = useState(post?.attachmentUrl   ?? "");
+  const [attachmentLabel, setAttachmentLabel] = useState(post?.attachmentLabel ?? "");
 
   const [saving,      setSaving]      = useState(false);
   const [deleting,    setDeleting]    = useState(false);
@@ -96,7 +100,7 @@ export function PlatformPostForm({ post }: Props) {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, authorName, readTimeMinutes, isPublished }),
+      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, authorName, readTimeMinutes, isPublished, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null }),
     });
 
     const json = await res.json();
@@ -123,6 +127,19 @@ export function PlatformPostForm({ post }: Props) {
       >
         <ArrowLeft className="h-4 w-4" /> Back to Blog
       </button>
+
+      {/* ── Top save bar ─────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between gap-4">
+        <div />
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {isEdit ? "Save Changes" : "Create Post"}
+        </button>
+      </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{error}</div>
@@ -292,6 +309,7 @@ export function PlatformPostForm({ post }: Props) {
           placeholder="Write your post content here…"
           minHeight="400px"
           resizable
+          showSeoGuide
         />
       </div>
 
@@ -318,6 +336,66 @@ export function PlatformPostForm({ post }: Props) {
             </p>
           </div>
         </label>
+      </div>
+
+      {/* ── Downloadable Resource ─────────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <FileDown className="h-4 w-4 text-gray-400" />
+            Downloadable Resource
+            <span className="text-xs font-normal text-gray-400">— optional</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Attach a link to a downloadable file — a PDF, Google Doc, worksheet, checklist, etc.
+            A download button will appear at the bottom of this post for readers. Leave blank if not needed.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className={labelCls}>Document URL</label>
+          <div className="relative">
+            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="url"
+              value={attachmentUrl}
+              onChange={(e) => setAttachmentUrl(e.target.value)}
+              placeholder="https://docs.google.com/… or https://example.com/file.pdf"
+              className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+          <p className="text-xs text-gray-400">Google Docs, Google Drive, Dropbox, or a direct PDF link — any public URL.</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className={labelCls}>
+            Button Label
+            <span className="ml-1.5 font-normal text-gray-400">— shown to readers</span>
+          </label>
+          <input
+            type="text"
+            value={attachmentLabel}
+            onChange={(e) => setAttachmentLabel(e.target.value)}
+            placeholder="e.g. Download Free Guide  |  Get the Worksheet  |  View on Google Docs"
+            className={inputCls}
+            maxLength={80}
+          />
+          <p className="text-xs text-gray-400">Defaults to &ldquo;Download Resource&rdquo; if left blank.</p>
+        </div>
+
+        {/* Live preview */}
+        {attachmentUrl && (
+          <div className="rounded-lg border border-dashed border-purple-200 bg-purple-50 px-4 py-3 flex items-center gap-3">
+            <FileDown className="h-5 w-5 text-purple-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-purple-800">
+                {attachmentLabel || "Download Resource"}
+              </p>
+              <p className="text-xs text-purple-400 truncate">{attachmentUrl}</p>
+            </div>
+            <span className="text-xs text-purple-400 flex-shrink-0">Preview</span>
+          </div>
+        )}
       </div>
 
       {/* Actions */}

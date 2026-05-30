@@ -13,7 +13,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
-  const { title, slug, excerpt, content, coverImageUrl, category, authorName, readTimeMinutes, isPublished } = await req.json();
+  const { title, slug, excerpt, content, coverImageUrl, category, authorName, readTimeMinutes, isPublished, attachmentUrl, attachmentLabel } = await req.json();
 
   if (!title?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: "Title and slug are required." }, { status: 400 });
@@ -38,6 +38,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       readTimeMinutes: readTimeMinutes ?? 5,
       isPublished:     nowPublished,
       publishedAt:     nowPublished && !wasPublished ? new Date() : (nowPublished ? existing.publishedAt : null),
+      attachmentUrl:   attachmentUrl?.trim()   || null,
+      attachmentLabel: attachmentLabel?.trim() || null,
     },
   });
 
