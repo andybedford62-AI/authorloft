@@ -162,7 +162,7 @@ function BookStack() {
 // ── Main hero export ─────────────────────────────────────────────────────────
 export function MidnightHero() {
   return (
-    <section style={{ position: 'relative', background: '#0F1A2D', overflow: 'hidden', minHeight: '100vh' }}>
+    <section style={{ position: 'relative', background: '#0F1A2D', overflow: 'hidden', minHeight: '92vh' }}>
       <style>{`
         @keyframes mlBlink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes mlFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(20px,-10px)} 66%{transform:translate(-10px,8px)} }
@@ -172,9 +172,9 @@ export function MidnightHero() {
       <NebulaBG />
       <StarField />
 
-      {/* Deckled bottom edge */}
+      {/* Deckled bottom edge — fills with showcase section colour for seamless transition */}
       <svg viewBox="0 0 1280 30" preserveAspectRatio="none" style={{ position: 'absolute', bottom: -1, left: 0, width: '100%', height: 30, zIndex: 3 }} aria-hidden="true">
-        <path d="M0 28 Q 80 18, 160 24 T 320 22 T 480 26 T 640 18 T 800 24 T 960 20 T 1120 22 T 1280 24 L 1280 30 L 0 30 Z" fill="#E8E5DD" />
+        <path d="M0 28 Q 80 18, 160 24 T 320 22 T 480 26 T 640 18 T 800 24 T 960 20 T 1120 22 T 1280 24 L 1280 30 L 0 30 Z" fill="#1B2B47" />
       </svg>
 
       {/* Nav */}
