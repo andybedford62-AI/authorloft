@@ -7,8 +7,23 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
+        allow: ["/", "/blog", "/features", "/pricing", "/contact", "/privacy", "/terms", "/gdpr"],
+        disallow: [
+          "/admin",
+          "/super-admin",
+          "/api/",
+          "/auth/",
+          "/orders/",
+          "/_next",
+          "/maintenance",
+          "/arc/",
+        ],
+      },
+      // Google bot gets full access
+      {
+        userAgent: "Googlebot",
         allow: "/",
-        disallow: ["/admin", "/super-admin", "/api/"],
+        disallow: ["/admin", "/super-admin", "/api/", "/_next"],
       },
     ],
     sitemap: `https://www.${platformDomain}/sitemap.xml`,
