@@ -529,3 +529,54 @@ input[type="file"] {
   outline: 3px solid #3b82f6;
   border-radius: 8px;
 }
+
+/* ── Print styles ───────────────────────────────────────────────────────── */
+@media print {
+  /* Hide everything except the article content */
+  .no-print,
+  nav,
+  footer,
+  header {
+    display: none !important;
+  }
+
+  /* Clean up the page for print */
+  body {
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
+  }
+
+  /* Remove background colors from the banner */
+  section[style] {
+    background-color: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure title is black */
+  h1 { color: #000 !important; }
+
+  /* Clean up content area */
+  .rich-content {
+    max-width: 100%;
+  }
+
+  /* Force links to show their URL when printed */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+
+  /* Don't show URL for internal/nav links */
+  nav a[href]::after,
+  .no-print a[href]::after {
+    content: none;
+  }
+
+  /* Page break control */
+  img { max-width: 100%; page-break-inside: avoid; }
+  h2, h3 { page-break-after: avoid; }
+  p { orphans: 3; widows: 3; }
+}

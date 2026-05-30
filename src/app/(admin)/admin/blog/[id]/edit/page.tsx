@@ -27,6 +27,8 @@ export default async function EditPostPage({
       seoTitle: true,
       metaDescription: true,
       focusKeyword: true,
+      attachmentUrl: true,
+      attachmentLabel: true,
     },
   });
 

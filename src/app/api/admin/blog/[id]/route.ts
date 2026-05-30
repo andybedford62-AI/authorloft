@@ -30,7 +30,7 @@ export async function PATCH(
   if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword } = body;
+  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword, attachmentUrl, attachmentLabel } = body;
 
   if (title !== undefined && !title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -72,6 +72,8 @@ export async function PATCH(
       ...(seoTitle        !== undefined && { seoTitle:        seoTitle?.trim()        || null }),
       ...(metaDescription !== undefined && { metaDescription: metaDescription?.trim() || null }),
       ...(focusKeyword    !== undefined && { focusKeyword:    focusKeyword?.trim()    || null }),
+      ...(attachmentUrl   !== undefined && { attachmentUrl:   attachmentUrl?.trim()   || null }),
+      ...(attachmentLabel !== undefined && { attachmentLabel: attachmentLabel?.trim() || null }),
       publishedAt,
     },
   });

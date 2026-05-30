@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Save, Upload, X } from "lucide-react";
+import { Loader2, Save, Upload, X, Link as LinkIcon, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const RichTextEditor = dynamic(
@@ -24,6 +24,8 @@ interface PostFormProps {
     seoTitle: string | null;
     metaDescription: string | null;
     focusKeyword: string | null;
+    attachmentUrl: string | null;
+    attachmentLabel: string | null;
   };
 }
 
@@ -53,6 +55,8 @@ export function PostForm({ post }: PostFormProps) {
   const [seoTitle,        setSeoTitle]        = useState(post?.seoTitle        ?? "");
   const [metaDescription, setMetaDescription] = useState(post?.metaDescription ?? "");
   const [focusKeyword,    setFocusKeyword]    = useState(post?.focusKeyword    ?? "");
+  const [attachmentUrl,   setAttachmentUrl]   = useState(post?.attachmentUrl   ?? "");
+  const [attachmentLabel, setAttachmentLabel] = useState(post?.attachmentLabel ?? "");
 
   const [saving,         setSaving]         = useState(false);
   const [error,          setError]          = useState("");
@@ -91,7 +95,7 @@ export function PostForm({ post }: PostFormProps) {
     setSaving(true);
     setError("");
 
-    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle: seoTitle || null, metaDescription: metaDescription || null, focusKeyword: focusKeyword || null };
+    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle: seoTitle || null, metaDescription: metaDescription || null, focusKeyword: focusKeyword || null, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null };
     const url    = isEdit ? `/api/admin/blog/${post.id}` : "/api/admin/blog";
     const method = isEdit ? "PATCH" : "POST";
 
@@ -334,6 +338,75 @@ export function PostForm({ post }: PostFormProps) {
             {isPublished ? "Published — visible to readers" : "Draft — not visible to readers"}
           </span>
         </label>
+      </section>
+
+      {/* ── Downloadable Resource ─────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <FileDown className="h-4 w-4 text-gray-400" />
+            Downloadable Resource
+            <span className="text-xs font-normal text-gray-400 ml-1">— optional</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Attach a link to a downloadable file — a PDF, Google Doc, worksheet, checklist, etc.
+            A download button will appear at the bottom of this post for readers.
+            Leave blank if not needed.
+          </p>
+        </div>
+
+        {/* URL */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Document URL
+          </label>
+          <div className="relative">
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="url"
+              value={attachmentUrl}
+              onChange={(e) => setAttachmentUrl(e.target.value)}
+              placeholder="https://docs.google.com/… or https://example.com/file.pdf"
+              className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <p className="text-xs text-gray-400">
+            Paste any public URL — Google Docs, Google Drive, Dropbox, or a direct PDF link.
+          </p>
+        </div>
+
+        {/* Button label */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Button Label
+            <span className="ml-1.5 text-xs font-normal text-gray-400">shown to readers</span>
+          </label>
+          <input
+            type="text"
+            value={attachmentLabel}
+            onChange={(e) => setAttachmentLabel(e.target.value)}
+            placeholder="e.g. Download Free Chapter  |  Get the Worksheet  |  View on Google Docs"
+            className={inputClass}
+            maxLength={80}
+          />
+          <p className="text-xs text-gray-400">
+            Defaults to &ldquo;Download Resource&rdquo; if left blank.
+          </p>
+        </div>
+
+        {/* Preview */}
+        {attachmentUrl && (
+          <div className="rounded-lg border border-dashed border-blue-200 bg-blue-50 px-4 py-3 flex items-center gap-3">
+            <FileDown className="h-5 w-5 text-blue-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-blue-800">
+                {attachmentLabel || "Download Resource"}
+              </p>
+              <p className="text-xs text-blue-500 truncate">{attachmentUrl}</p>
+            </div>
+            <span className="text-xs text-blue-400">Preview</span>
+          </div>
+        )}
       </section>
 
       {/* ── SEO ────────────────────────────────────────────────────────────── */}

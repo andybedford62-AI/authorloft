@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword } = body;
+  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword, attachmentUrl, attachmentLabel } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -77,6 +77,8 @@ export async function POST(req: Request) {
       seoTitle:        seoTitle?.trim()        || null,
       metaDescription: metaDescription?.trim() || null,
       focusKeyword:    focusKeyword?.trim()    || null,
+      attachmentUrl:   attachmentUrl?.trim()   || null,
+      attachmentLabel: attachmentLabel?.trim() || null,
     },
   });
 

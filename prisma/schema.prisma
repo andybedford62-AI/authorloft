@@ -533,6 +533,9 @@ model Post {
   seoTitle        String?                    // overrides title in <title> tag if set
   metaDescription String?   @db.Text        // overrides excerpt in meta description if set
   focusKeyword    String?                    // author's target keyword — guidance only
+  // Downloadable resource
+  attachmentUrl   String?                    // external link or uploaded file URL
+  attachmentLabel String?                    // e.g. "Download Free Chapter"
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)

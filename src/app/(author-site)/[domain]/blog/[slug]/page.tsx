@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, CalendarDays, Newspaper } from "lucide-react";
+import { ArrowLeft, CalendarDays, Newspaper, FileDown } from "lucide-react";
+import { PrintButton } from "./print-button";
 import { sanitize } from "@/lib/sanitize";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
+
 
 export async function generateMetadata({
   params,
@@ -181,14 +183,46 @@ export default async function BlogPostPage({
           <p className="text-gray-400 italic">No content yet.</p>
         )}
 
-        {/* Back to blog */}
-        <div className="mt-14 pt-8 border-t border-gray-100">
-          <Link href="/blog">
-            <Button variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-1.5" />
-              Back to News
-            </Button>
-          </Link>
+        {/* ── Download + Print ─────────────────────────────────────────── */}
+        <div className="mt-12 pt-8 border-t border-gray-100 space-y-4 no-print">
+
+          {/* Downloadable resource — only shown if author added a link */}
+          {post.attachmentUrl && (
+            <a
+              href={post.attachmentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 rounded-xl border-2 hover:border-[var(--accent)] transition-colors group"
+              style={{ borderColor: `${accentColor}40` }}
+            >
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: `${accentColor}15` }}
+              >
+                <FileDown className="h-5 w-5" style={{ color: accentColor }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 group-hover:text-[var(--accent)] transition-colors">
+                  {post.attachmentLabel || "Download Resource"}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Free download — opens in a new tab
+                </p>
+              </div>
+              <ArrowLeft className="h-4 w-4 text-gray-300 group-hover:text-[var(--accent)] transition-colors rotate-180 flex-shrink-0" />
+            </a>
+          )}
+
+          {/* Print + Back row */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <Link href="/blog">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-1.5" />
+                Back to News
+              </Button>
+            </Link>
+            <PrintButton />
+          </div>
         </div>
       </div>
     </div>
