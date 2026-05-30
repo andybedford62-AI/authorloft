@@ -181,7 +181,7 @@ export function AuthorShowcaseSection({
         }
       `}</style>
 
-      <section style={{ background: ML.ink, padding: '100px 60px' }}>
+      <section style={{ background: '#27406B', padding: '100px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
           {/* ── Header ─────────────────────────────────────── */}

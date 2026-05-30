@@ -172,11 +172,6 @@ export function MidnightHero() {
       <NebulaBG />
       <StarField />
 
-      {/* Gold wave divider — taller + deeper for clear visual separation */}
-      <svg viewBox="0 0 1280 80" preserveAspectRatio="none" style={{ position: 'absolute', bottom: -1, left: 0, width: '100%', height: 80, zIndex: 3 }} aria-hidden="true">
-        <path d="M0 70 C 160 30, 320 60, 480 45 C 640 30, 800 65, 960 40 C 1080 20, 1200 55, 1280 45 L 1280 80 L 0 80 Z" fill="#B8893D" opacity="0.9" />
-        <path d="M0 80 C 160 50, 320 75, 480 62 C 640 48, 800 78, 960 60 C 1080 45, 1200 70, 1280 62 L 1280 80 L 0 80 Z" fill="#B8893D" opacity="0.5" />
-      </svg>
 
       {/* Nav */}
       <nav style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 60px' }}>
