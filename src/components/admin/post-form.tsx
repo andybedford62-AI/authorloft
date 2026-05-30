@@ -200,6 +200,40 @@ export function PostForm({ post }: PostFormProps) {
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900">Content</h2>
 
+        {/* Focus Keyword — shown here so it's top-of-mind while writing */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Focus Keyword
+            <span className="ml-1.5 text-xs font-normal text-gray-400">(the main search phrase this post targets)</span>
+          </label>
+          <input
+            type="text"
+            value={focusKeyword}
+            onChange={(e) => setFocusKeyword(e.target.value)}
+            placeholder="e.g. how to sell books online"
+            className={inputClass}
+          />
+          {/* Keyword placement checklist — always visible */}
+          <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 space-y-2">
+            <p className="text-xs font-semibold text-blue-800">💡 Where to place your focus keyword for best SEO:</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+              {[
+                { tip: "Post title",               detail: "ideally in the first 5 words" },
+                { tip: "First 100 words of body",  detail: "signals relevance early" },
+                { tip: "At least one H2 heading",  detail: "Google reads headings heavily" },
+                { tip: "URL slug",                 detail: "auto-generated from title" },
+                { tip: "SEO Title & Meta Desc",    detail: "fills in the search snippet" },
+                { tip: "2–3× in the body",         detail: "naturally — never forced" },
+              ].map(({ tip, detail }) => (
+                <li key={tip} className="flex items-start gap-1.5 text-xs text-blue-700">
+                  <span className="mt-0.5 flex-shrink-0 text-blue-400">✓</span>
+                  <span><span className="font-medium">{tip}</span> — {detail}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Post Body</label>
           <RichTextEditor
@@ -309,38 +343,6 @@ export function PostForm({ post }: PostFormProps) {
           <p className="text-xs text-gray-400 mt-0.5">
             Optional. Leave blank to use the post title and excerpt automatically.
           </p>
-        </div>
-
-        {/* Focus Keyword */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Focus Keyword</label>
-          <input
-            type="text"
-            value={focusKeyword}
-            onChange={(e) => setFocusKeyword(e.target.value)}
-            placeholder="e.g. how to sell books online"
-            className={inputClass}
-          />
-          <p className="text-xs text-gray-400">The main keyword or phrase this post targets.</p>
-          {/* Keyword placement checklist */}
-          <div className="mt-2 rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 space-y-1.5">
-            <p className="text-xs font-semibold text-blue-800">💡 Where to use your focus keyword:</p>
-            <ul className="space-y-1">
-              {[
-                "In the post title (ideally near the start)",
-                "In the first 100 words of the body",
-                "In at least one H2 or H3 subheading",
-                "In the SEO Title and Meta Description below",
-                "2–3 times naturally throughout the body (avoid stuffing)",
-                "In the URL slug (auto-generated from title)",
-              ].map((tip) => (
-                <li key={tip} className="flex items-start gap-2 text-xs text-blue-700">
-                  <span className="mt-0.5 flex-shrink-0">→</span>
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* SEO Title */}

@@ -791,50 +791,82 @@ export function RichTextEditor({
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
 
-      {/* Word count */}
+      {/* Word count + SEO guide */}
       {(() => {
         const wordCount = editor.getText().split(/\s+/).filter(Boolean).length;
         const SEO_MIN  = 1000;
         const SEO_GOOD = 1500;
 
-        // colour coding
-        const color =
-          wordCount >= SEO_GOOD ? "text-green-600" :
-          wordCount >= SEO_MIN  ? "text-amber-500" :
-          wordCount > 0         ? "text-red-500"   :
-          "text-gray-400";
-
-        const label =
-          wordCount >= SEO_GOOD ? "✓ Good for SEO" :
-          wordCount >= SEO_MIN  ? "Almost there — aim for 1,500+" :
-          wordCount > 0         ? "Too short — aim for 1,500+ words" :
-          "";
-
         // progress bar width capped at 100%
         const pct = Math.min(100, Math.round((wordCount / SEO_GOOD) * 100));
 
+        const barColor =
+          wordCount >= SEO_GOOD ? "bg-green-500" :
+          wordCount >= SEO_MIN  ? "bg-amber-400" :
+          wordCount > 0         ? "bg-red-400"   :
+          "bg-gray-200";
+
+        const statusColor =
+          wordCount >= SEO_GOOD ? "text-green-700 bg-green-50 border-green-200" :
+          wordCount >= SEO_MIN  ? "text-amber-700 bg-amber-50 border-amber-200" :
+          wordCount > 0         ? "text-red-700 bg-red-50 border-red-200"       :
+          "text-gray-400 bg-gray-50 border-gray-200";
+
+        const statusText =
+          wordCount >= SEO_GOOD ? "✓ Great length for Google ranking" :
+          wordCount >= SEO_MIN  ? "Almost there — a bit more to rank well" :
+          wordCount > 0         ? "Too short — Google prefers 1,500+ words" :
+          "Start writing to see word count";
+
         return (
-          <div className="px-3 py-2 bg-gray-50 border-t border-gray-200 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className={`font-medium ${color}`}>
-                {wordCount.toLocaleString()} words
-                {showSeoGuide && label ? <span className="ml-2 font-normal">{label}</span> : null}
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 space-y-3">
+
+            {/* Count + status badge */}
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-semibold text-gray-700">
+                {wordCount.toLocaleString()} <span className="font-normal text-gray-400">words</span>
               </span>
-              {showSeoGuide && (
-                <span className="text-gray-400">Target: 1,500+ words</span>
+              {wordCount > 0 && (
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusColor}`}>
+                  {statusText}
+                </span>
               )}
             </div>
+
             {showSeoGuide && (
-              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all ${
-                    wordCount >= SEO_GOOD ? "bg-green-500" :
-                    wordCount >= SEO_MIN  ? "bg-amber-400" :
-                    "bg-red-400"
-                  }`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
+              <>
+                {/* Progress bar */}
+                <div className="space-y-1">
+                  <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${barColor}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>0</span>
+                    <span>1,000</span>
+                    <span>1,500 (target)</span>
+                  </div>
+                </div>
+
+                {/* Color legend */}
+                <div className="flex flex-wrap gap-3 pt-1 border-t border-gray-200">
+                  <span className="text-xs text-gray-500 font-medium self-center">Word count guide:</span>
+                  <span className="flex items-center gap-1.5 text-xs text-red-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-red-400 flex-shrink-0" />
+                    Under 1,000 — too short, unlikely to rank
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-amber-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-amber-400 flex-shrink-0" />
+                    1,000–1,499 — getting there, may rank for low competition
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-green-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-green-500 flex-shrink-0" />
+                    1,500+ — good length, Google rewards comprehensive content
+                  </span>
+                </div>
+              </>
             )}
           </div>
         );
