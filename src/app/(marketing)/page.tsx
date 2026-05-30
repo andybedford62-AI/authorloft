@@ -275,34 +275,44 @@ export default async function MarketingPage() {
 
       {/* ── Blog (dynamic — only shown when posts exist) ───────────────────── */}
       {blogPosts.length > 0 && (
-        <section style={{ background: ML.pearl, padding: '120px 60px' }}>
+        <section style={{ background: ML.midnight, padding: '120px 60px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            {/* Centred heading — matches every other section on the page */}
+            {/* Centred heading on dark background */}
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 20px' }}>
-                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>independent authors</span>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 16 }}>· From the blog ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 20px' }}>
+                Guides for <span style={{ fontStyle: 'italic', color: ML.brass2 }}>independent authors</span>
               </h2>
               <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
-                Browse all {blogPosts.length > 0 ? 'posts' : ''} →
+                Browse all posts →
               </Link>
             </div>
-            {/* auto-fit collapses empty columns so cards stay centred */}
+            {/* Cards — light on dark for strong contrast */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
               {blogPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} style={{ background: ML.bone, borderRadius: 14, padding: '28px 24px', border: `1px solid #DCDBD3`, textDecoration: 'none', display: 'block' }}>
-                  {post.category && (
-                    <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 10px' }}>{post.category}</p>
-                  )}
-                  <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.ink, margin: '0 0 10px', lineHeight: 1.25 }}>{post.title}</h3>
-                  {post.excerpt && (
-                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: '0 0 16px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.excerpt}</p>
-                  )}
-                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass, margin: 0, letterSpacing: '0.04em' }}>Read more →</p>
+                <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: '28px 24px', border: '1px solid rgba(255,255,255,0.09)', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s' }}>
+                  <div>
+                    {post.category && (
+                      <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 12px' }}>{post.category}</p>
+                    )}
+                    <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.bone, margin: '0 0 12px', lineHeight: 1.3 }}>{post.title}</h3>
+                    {post.excerpt && (
+                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: `${ML.bone}88`, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{post.excerpt}</p>
+                    )}
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass2, margin: 0, letterSpacing: '0.06em' }}>Read more →</p>
                 </Link>
               ))}
             </div>
           </div>
+          <style>{`
+            .blog-card:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+              background: rgba(255,255,255,0.08) !important;
+              border-color: rgba(212,174,106,0.3) !important;
+            }
+          `}</style>
         </section>
       )}
 
