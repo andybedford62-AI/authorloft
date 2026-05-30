@@ -24,10 +24,10 @@ type Author = {
   _count: { books: number; subscribers: number; orders: number };
 };
 
-const TIER_VARIANT: Record<string, "success" | "default" | "warning"> = {
-  PREMIUM: "success",
-  STANDARD: "default",
-  FREE: "warning",
+const TIER_VARIANT: Record<string, "plan-premium" | "plan-standard" | "warning"> = {
+  PREMIUM:  "plan-premium",
+  STANDARD: "plan-standard",
+  FREE:     "warning",
 };
 
 // Helper to format relative time (e.g., "2 days ago", "1 hour ago", "Never")
