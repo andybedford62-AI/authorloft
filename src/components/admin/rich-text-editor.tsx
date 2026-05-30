@@ -29,8 +29,9 @@ interface RichTextEditorProps {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
-  minHeight?: string;  // e.g. "200px" — overrides the 320px default
-  resizable?: boolean; // allow vertical resize by the user
+  minHeight?: string;   // e.g. "200px" — overrides the 320px default
+  resizable?: boolean;  // allow vertical resize by the user
+  showSeoGuide?: boolean; // show color-coded word count + SEO target bar
 }
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────────
@@ -742,6 +743,7 @@ export function RichTextEditor({
   className,
   minHeight,
   resizable = false,
+  showSeoGuide = false,
 }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -790,14 +792,53 @@ export function RichTextEditor({
       <EditorContent editor={editor} />
 
       {/* Word count */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-t border-gray-200 text-xs text-gray-400">
-        <span>
-          {editor.storage.characterCount?.characters?.() ?? editor.getText().length} characters
-          &nbsp;·&nbsp;
-          {editor.getText().split(/\s+/).filter(Boolean).length} words
-        </span>
-        <span className="text-gray-300">HTML · TipTap</span>
-      </div>
+      {(() => {
+        const wordCount = editor.getText().split(/\s+/).filter(Boolean).length;
+        const SEO_MIN  = 1000;
+        const SEO_GOOD = 1500;
+
+        // colour coding
+        const color =
+          wordCount >= SEO_GOOD ? "text-green-600" :
+          wordCount >= SEO_MIN  ? "text-amber-500" :
+          wordCount > 0         ? "text-red-500"   :
+          "text-gray-400";
+
+        const label =
+          wordCount >= SEO_GOOD ? "✓ Good for SEO" :
+          wordCount >= SEO_MIN  ? "Almost there — aim for 1,500+" :
+          wordCount > 0         ? "Too short — aim for 1,500+ words" :
+          "";
+
+        // progress bar width capped at 100%
+        const pct = Math.min(100, Math.round((wordCount / SEO_GOOD) * 100));
+
+        return (
+          <div className="px-3 py-2 bg-gray-50 border-t border-gray-200 space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className={`font-medium ${color}`}>
+                {wordCount.toLocaleString()} words
+                {showSeoGuide && label ? <span className="ml-2 font-normal">{label}</span> : null}
+              </span>
+              {showSeoGuide && (
+                <span className="text-gray-400">Target: 1,500+ words</span>
+              )}
+            </div>
+            {showSeoGuide && (
+              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    wordCount >= SEO_GOOD ? "bg-green-500" :
+                    wordCount >= SEO_MIN  ? "bg-amber-400" :
+                    "bg-red-400"
+                  }`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

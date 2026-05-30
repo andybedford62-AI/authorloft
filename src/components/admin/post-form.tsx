@@ -116,8 +116,34 @@ export function PostForm({ post }: PostFormProps) {
     }
   }
 
+  // Shared save/cancel bar used at both top and bottom of the form
+  function ActionBar() {
+    return (
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={saving}>
+          {saving ? (
+            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+          ) : (
+            <><Save className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>
+          )}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push("/admin/blog")}
+          disabled={saving}
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+
+      {/* ── Top actions ────────────────────────────────────────────────────── */}
+      <ActionBar />
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
@@ -180,6 +206,7 @@ export function PostForm({ post }: PostFormProps) {
             value={content}
             onChange={setContent}
             placeholder="Write your post here…"
+            showSeoGuide
           />
           <p className="text-xs text-gray-400">Use the toolbar to add headings, bold/italic, lists, links, and more.</p>
         </div>
@@ -294,7 +321,26 @@ export function PostForm({ post }: PostFormProps) {
             placeholder="e.g. how to sell books online"
             className={inputClass}
           />
-          <p className="text-xs text-gray-400">The main keyword or phrase this post targets. Use it naturally in your title, headings, and body.</p>
+          <p className="text-xs text-gray-400">The main keyword or phrase this post targets.</p>
+          {/* Keyword placement checklist */}
+          <div className="mt-2 rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 space-y-1.5">
+            <p className="text-xs font-semibold text-blue-800">💡 Where to use your focus keyword:</p>
+            <ul className="space-y-1">
+              {[
+                "In the post title (ideally near the start)",
+                "In the first 100 words of the body",
+                "In at least one H2 or H3 subheading",
+                "In the SEO Title and Meta Description below",
+                "2–3 times naturally throughout the body (avoid stuffing)",
+                "In the URL slug (auto-generated from title)",
+              ].map((tip) => (
+                <li key={tip} className="flex items-start gap-2 text-xs text-blue-700">
+                  <span className="mt-0.5 flex-shrink-0">→</span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* SEO Title */}
@@ -334,24 +380,8 @@ export function PostForm({ post }: PostFormProps) {
         </div>
       </section>
 
-      {/* ── Actions ────────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving}>
-          {saving ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
-          ) : (
-            <><Save className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>
-          )}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/admin/blog")}
-          disabled={saving}
-        >
-          Cancel
-        </Button>
-      </div>
+      {/* ── Bottom actions ─────────────────────────────────────────────────── */}
+      <ActionBar />
     </form>
   );
 }
