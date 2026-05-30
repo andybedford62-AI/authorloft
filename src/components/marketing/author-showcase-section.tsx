@@ -22,13 +22,16 @@ const ML = {
 };
 
 function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; platformDomain: string }) {
-  const siteUrl = author.customDomain
+  const siteUrl     = author.customDomain
     ? `https://${author.customDomain}`
     : `https://${author.slug}.${platformDomain}`;
   const displayName = author.displayName || author.name;
   const style       = author.showcaseStyle ?? "photo";
-  const showImage   = style !== "text";
-  const imageUrl    = style === "book"
+  const isBook      = style === "book";
+  const isText      = style === "text";
+
+  // Image source: book style uses cover, otherwise use profile photo
+  const imageUrl = isBook
     ? (author.books[0]?.coverImageUrl ?? author.profileImageUrl)
     : (author.profileImageUrl ?? author.books[0]?.coverImageUrl);
 
@@ -39,79 +42,118 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
       rel="noopener noreferrer"
       className="showcase-card"
       style={{
-        display:        'block',
-        background:     ML.midnight,
-        border:         '1px solid rgba(255,255,255,0.10)',
-        borderRadius:   20,
+        display:        'flex',
+        flexDirection:  'row',
+        alignItems:     'stretch',
+        background:     '#0d1829',
+        border:         '1px solid rgba(255,255,255,0.09)',
+        borderRadius:   18,
         overflow:       'hidden',
         textDecoration: 'none',
         transition:     'transform 0.25s, box-shadow 0.25s, border-color 0.25s',
+        minHeight:      160,
       }}
     >
-      {/* Image area */}
-      {showImage && (
-        <div style={{ height: 220, background: '#080f1c', position: 'relative', overflow: 'hidden' }}>
+      {/* ── Left: image panel ─────────────────────────────── */}
+      {!isText && (
+        <div style={{
+          flexShrink:      0,
+          width:           isBook ? 110 : 148,
+          background:      isBook ? '#080e1a' : '#0a1320',
+          position:        'relative',
+          overflow:        'hidden',
+        }}>
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={displayName}
               fill
-              className={`opacity-90 transition-opacity hover:opacity-100 ${style === "book" ? "object-contain p-6" : "object-cover"}`}
-              sizes="(max-width: 768px) 100vw, 400px"
+              style={{
+                objectFit:      isBook ? 'contain' : 'cover',
+                objectPosition: isBook ? 'center'  : 'center 15%',
+                padding:        isBook ? '10px'    : '0',
+              }}
+              sizes="160px"
             />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 64, color: ML.brass2, opacity: 0.4 }}>
+            <div style={{
+              width: '100%', height: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 52, color: ML.brass2, opacity: 0.4 }}>
                 {displayName[0]}
               </span>
             </div>
           )}
-          {/* Gradient overlay at bottom */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, #0F1A2D, transparent)', pointerEvents: 'none' }} />
+          {/* subtle right-edge fade into card body */}
+          {!isBook && (
+            <div style={{
+              position: 'absolute', top: 0, right: 0, width: 32, height: '100%',
+              background: 'linear-gradient(to right, transparent, #0d1829)',
+              pointerEvents: 'none',
+            }} />
+          )}
         </div>
       )}
 
-      {/* Info */}
-      <div style={{ padding: showImage ? '20px 22px 22px' : '28px 22px' }}>
-        <p style={{
-          fontFamily: 'var(--font-heading, serif)',
-          fontSize:   18,
-          fontWeight: 400,
-          color:      ML.bone,
-          margin:     '0 0 6px',
-          lineHeight: 1.25,
-        }}>
-          {displayName}
-        </p>
-        {author.tagline && (
+      {/* ── Right: content ────────────────────────────────── */}
+      <div style={{
+        flex:           1,
+        padding:        isText ? '24px 24px' : '20px 22px',
+        display:        'flex',
+        flexDirection:  'column',
+        justifyContent: 'space-between',
+        minWidth:       0,
+      }}>
+        {/* Top: name + tagline */}
+        <div>
           <p style={{
-            fontFamily:          'Georgia, serif',
-            fontStyle:           'italic',
-            fontSize:            13,
-            color:               ML.slate,
-            margin:              '0 0 14px',
-            lineHeight:          1.55,
-            overflow:            'hidden',
-            display:             '-webkit-box',
-            WebkitLineClamp:     2,
-            WebkitBoxOrient:     'vertical',
-          } as React.CSSProperties}>
-            {author.tagline}
+            fontFamily: 'var(--font-heading, serif)',
+            fontSize:   19,
+            fontWeight: 400,
+            color:      ML.bone,
+            margin:     '0 0 6px',
+            lineHeight: 1.25,
+            whiteSpace: 'nowrap',
+            overflow:   'hidden',
+            textOverflow: 'ellipsis',
+          }}>
+            {displayName}
           </p>
-        )}
-        <span style={{
-          display:        'inline-flex',
-          alignItems:     'center',
-          gap:            6,
-          fontFamily:     'var(--font-geist-mono, monospace)',
-          fontSize:       11,
-          color:          ML.brass2,
-          letterSpacing:  '0.06em',
-          textTransform:  'uppercase',
-        }}>
-          Visit site
-          <span style={{ fontSize: 14 }}>→</span>
-        </span>
+          {author.tagline && (
+            <p style={{
+              fontFamily:      'Georgia, serif',
+              fontStyle:       'italic',
+              fontSize:        13,
+              color:           ML.slate,
+              margin:          0,
+              lineHeight:      1.55,
+              overflow:        'hidden',
+              display:         '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+            } as React.CSSProperties}>
+              {author.tagline}
+            </p>
+          )}
+        </div>
+
+        {/* Bottom: link */}
+        <div style={{ marginTop: 16 }}>
+          <span style={{
+            display:       'inline-flex',
+            alignItems:    'center',
+            gap:            6,
+            fontFamily:    'var(--font-geist-mono, monospace)',
+            fontSize:       11,
+            letterSpacing:  '0.1em',
+            textTransform:  'uppercase',
+            color:          ML.brass2,
+          }}>
+            Visit site
+            <span style={{ fontSize: 13, transition: 'transform 0.2s' }} className="showcase-arrow">→</span>
+          </span>
+        </div>
       </div>
     </a>
   );
@@ -130,17 +172,20 @@ export function AuthorShowcaseSection({
     <>
       <style>{`
         .showcase-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-          border-color: rgba(212,174,106,0.35) !important;
+          transform: translateY(-5px);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          border-color: rgba(212,174,106,0.4) !important;
+        }
+        .showcase-card:hover .showcase-arrow {
+          transform: translateX(3px);
         }
       `}</style>
 
       <section style={{ background: ML.ink, padding: '100px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+          {/* ── Header ─────────────────────────────────────── */}
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <p style={{
               fontFamily:    'var(--font-geist-mono, monospace)',
               fontSize:      11,
@@ -175,29 +220,24 @@ export function AuthorShowcaseSection({
             </p>
           </div>
 
-          {/* Cards grid */}
+          {/* ── Cards grid ─────────────────────────────────── */}
           <div style={{
             display:             'grid',
-            gridTemplateColumns: authors.length === 1
-              ? 'minmax(280px, 480px)'
-              : authors.length === 2
-              ? 'repeat(2, minmax(280px, 1fr))'
-              : 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap:                 24,
-            justifyContent:      authors.length <= 2 ? 'center' : undefined,
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap:                 20,
           }}>
             {authors.map((author) => (
               <ShowcaseCard key={author.id} author={author} platformDomain={platformDomain} />
             ))}
           </div>
 
-          {/* CTA */}
-          <div style={{ textAlign: 'center', marginTop: 56 }}>
+          {/* ── CTA ────────────────────────────────────────── */}
+          <div style={{ textAlign: 'center', marginTop: 52 }}>
             <p style={{
               fontFamily:    'Georgia, serif',
               fontStyle:     'italic',
               fontSize:      16,
-              color:         `${ML.bone}88`,
+              color:         `${ML.bone}77`,
               marginBottom:  24,
             }}>
               Yours could be next.
@@ -205,19 +245,18 @@ export function AuthorShowcaseSection({
             <Link
               href="/register"
               style={{
-                display:       'inline-flex',
-                alignItems:    'center',
-                gap:           10,
-                padding:       '14px 32px',
-                background:    ML.brass,
-                color:         ML.midnight,
-                fontFamily:    'inherit',
-                fontSize:      15,
-                fontWeight:    600,
-                borderRadius:  999,
-                textDecoration:'none',
-                boxShadow:     '0 8px 24px -8px rgba(184,137,61,0.6)',
-                transition:    'background 0.2s, transform 0.2s',
+                display:        'inline-flex',
+                alignItems:     'center',
+                gap:            10,
+                padding:        '14px 32px',
+                background:     ML.brass,
+                color:          ML.midnight,
+                fontFamily:     'inherit',
+                fontSize:       15,
+                fontWeight:     600,
+                borderRadius:   999,
+                textDecoration: 'none',
+                boxShadow:      '0 8px 24px -8px rgba(184,137,61,0.6)',
               }}
             >
               Build your site free
