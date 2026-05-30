@@ -275,32 +275,32 @@ export default async function MarketingPage() {
 
       {/* ── Blog (dynamic — only shown when posts exist) ───────────────────── */}
       {blogPosts.length > 0 && (
-        <section style={{ background: ML.midnight, padding: '120px 60px' }}>
+        <section style={{ background: ML.mist, padding: '120px 60px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            {/* Centred heading on dark background */}
+            {/* Centred heading — light mist background, dark ink text */}
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 16 }}>· From the blog ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 20px' }}>
-                Guides for <span style={{ fontStyle: 'italic', color: ML.brass2 }}>independent authors</span>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 20px' }}>
+                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>independent authors</span>
               </h2>
               <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
                 Browse all posts →
               </Link>
             </div>
-            {/* Cards — light on dark for strong contrast */}
+            {/* Cream cards on mist background — clear contrast, clean and warm */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
               {blogPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: '28px 24px', border: '1px solid rgba(255,255,255,0.09)', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s' }}>
+                <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ background: ML.bone, borderRadius: 16, padding: '28px 24px', border: '1px solid #DCDBD3', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}>
                   <div>
                     {post.category && (
                       <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 12px' }}>{post.category}</p>
                     )}
-                    <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.bone, margin: '0 0 12px', lineHeight: 1.3 }}>{post.title}</h3>
+                    <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.ink, margin: '0 0 12px', lineHeight: 1.3 }}>{post.title}</h3>
                     {post.excerpt && (
-                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: `${ML.bone}88`, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{post.excerpt}</p>
+                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: ML.slate, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{post.excerpt}</p>
                     )}
                   </div>
-                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass2, margin: 0, letterSpacing: '0.06em' }}>Read more →</p>
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass, margin: 0, letterSpacing: '0.06em' }}>Read more →</p>
                 </Link>
               ))}
             </div>
@@ -308,9 +308,8 @@ export default async function MarketingPage() {
           <style>{`
             .blog-card:hover {
               transform: translateY(-4px);
-              box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-              background: rgba(255,255,255,0.08) !important;
-              border-color: rgba(212,174,106,0.3) !important;
+              box-shadow: 0 12px 32px rgba(27,43,71,0.12);
+              border-color: ${ML.copper}66 !important;
             }
           `}</style>
         </section>

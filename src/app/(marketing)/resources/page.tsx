@@ -149,27 +149,28 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* ── Resources by category ─────────────────────────────────────── */}
-      <section style={{ padding: '72px 60px', maxWidth: 1200, margin: '0 auto' }}>
+      {/* ── Resources by category — dark midnight bg, cream cards ────────── */}
+      <section style={{ background: ML.midnight, padding: '72px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         {categories.map((category) => {
           const items   = RESOURCES.filter((r) => r.category === category);
           const catMeta = CATEGORY_META[category] ?? { accent: ML.brass2, label: category };
 
           return (
             <div key={category} style={{ marginBottom: 72 }}>
-              {/* Category divider */}
+              {/* Category divider — light accent line on dark bg */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: catMeta.accent, flexShrink: 0 }} />
                 <h2 style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: catMeta.accent, margin: 0 }}>
                   {category}
                 </h2>
-                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
-                <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>
                   {items.length}
                 </span>
               </div>
 
-              {/* Cards */}
+              {/* Cards — cream/bone on dark midnight = strong contrast */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
                 {items.map((resource) => (
                   <a
@@ -182,12 +183,12 @@ export default function ResourcesPage() {
                       display:        'flex',
                       flexDirection:  'column',
                       justifyContent: 'space-between',
-                      background:     'rgba(255,255,255,0.04)',
-                      border:         '1px solid rgba(255,255,255,0.09)',
+                      background:     ML.pearl,
+                      border:         `1px solid #DCDBD3`,
                       borderRadius:   18,
                       padding:        '24px',
                       textDecoration: 'none',
-                      transition:     'transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s',
+                      transition:     'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
                       position:       'relative',
                       overflow:       'hidden',
                       minHeight:      160,
@@ -195,8 +196,8 @@ export default function ResourcesPage() {
                   >
                     {/* Partner badge */}
                     {resource.isPartner && (
-                      <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center', gap: 5, background: `${ML.brass}25`, border: `1px solid ${ML.brass}50`, borderRadius: 999, padding: '4px 10px' }}>
-                        <Star style={{ width: 10, height: 10, color: ML.brass2, fill: ML.brass2 }} />
+                      <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center', gap: 5, background: `${ML.brass}20`, border: `1px solid ${ML.brass}50`, borderRadius: 999, padding: '4px 10px' }}>
+                        <Star style={{ width: 10, height: 10, color: ML.brass, fill: ML.brass }} />
                         <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', color: ML.brass2, fontWeight: 700 }}>
                           Featured Partner
                         </span>
@@ -205,8 +206,8 @@ export default function ResourcesPage() {
 
                     {/* Top: logo + name */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
-                      {/* Logo or initials */}
-                      <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, background: resource.logoUrl ? 'rgba(255,255,255,0.08)' : resource.color, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      {/* Logo or initials — dark avatar bg stays for contrast against cream card */}
+                      <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: 14, background: resource.logoUrl ? ML.bone : resource.color, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: resource.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
                         {resource.logoUrl ? (
                           <Image
                             src={resource.logoUrl}
@@ -222,28 +223,28 @@ export default function ResourcesPage() {
                         )}
                       </div>
 
-                      {/* Name */}
+                      {/* Name — dark ink on cream */}
                       <div style={{ flex: 1, paddingTop: 4 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.bone, margin: 0, lineHeight: 1.3 }}>
+                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: 0, lineHeight: 1.3 }}>
                             {resource.name}
                           </p>
-                          <ArrowUpRight style={{ width: 14, height: 14, color: catMeta.accent, flexShrink: 0 }} />
+                          <ArrowUpRight style={{ width: 14, height: 14, color: ML.copper, flexShrink: 0 }} />
                         </div>
                       </div>
                     </div>
 
-                    {/* Description */}
-                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 13.5, lineHeight: 1.65, color: `${ML.bone}99`, margin: '0 0 20px', flex: 1 }}>
+                    {/* Description — slate on cream */}
+                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 13.5, lineHeight: 1.65, color: ML.slate, margin: '0 0 20px', flex: 1 }}>
                       {resource.description}
                     </p>
 
                     {/* Footer: category chip + visit label */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: catMeta.accent, background: `${catMeta.accent}18`, border: `1px solid ${catMeta.accent}30`, borderRadius: 999, padding: '3px 10px' }}>
+                      <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: catMeta.accent, background: `${catMeta.accent}15`, border: `1px solid ${catMeta.accent}35`, borderRadius: 999, padding: '3px 10px' }}>
                         {catMeta.label}
                       </span>
-                      <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.08em', color: `${ML.bone}55` }}>
+                      <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.08em', color: ML.brass }}>
                         Visit →
                       </span>
                     </div>
@@ -253,6 +254,7 @@ export default function ResourcesPage() {
             </div>
           );
         })}
+        </div>
       </section>
 
       {/* ── Become a partner CTA ──────────────────────────────────────── */}
@@ -293,9 +295,8 @@ export default function ResourcesPage() {
       <style>{`
         .resource-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-          border-color: rgba(212,174,106,0.3) !important;
-          background: rgba(255,255,255,0.07) !important;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+          border-color: #C26A4A88 !important;
         }
         .partner-cta:hover {
           transform: translateY(-2px);
