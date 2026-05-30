@@ -360,10 +360,11 @@ export default async function MarketingPage() {
             <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={120} height={34} style={{ height: 28, width: 'auto' }} />
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 0' }}>
               {([
-                ['Features', '/features'],
-                ['Pricing',  '/pricing'],
-                ['Blog',     '/blog'],
-                ['Contact',  '/contact'],
+                ['Features',  '/features'],
+                ['Pricing',   '/pricing'],
+                ['Blog',      '/blog'],
+                ['Resources', '/resources'],
+                ['Contact',   '/contact'],
                 ['Privacy',  '/privacy'],
                 ['Terms',    '/terms'],
                 ['GDPR',     '/gdpr'],
