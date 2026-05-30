@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Home } from "lucide-react";
+import { useState, useRef } from "react";
+import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X } from "lucide-react";
 
 type Resource = {
   id: string; name: string; category: string; description: string;
@@ -26,10 +26,15 @@ export function ResourcesClient({ initial }: { initial: Resource[] }) {
   const [saving,  setSaving]      = useState(false);
   const [error,   setError]       = useState<string | null>(null);
   const [form,    setForm]        = useState<Omit<Resource,"id"|"displayOrder">>(EMPTY);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [togglingId,    setTogglingId]    = useState<string | null>(null);
+  const [logoTab,       setLogoTab]       = useState<"upload" | "url">("upload");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoUploadErr, setLogoUploadErr] = useState<string | null>(null);
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   function openNew() {
     setForm(EMPTY); setEditing(null); setIsNew(true); setError(null);
+    setLogoTab("upload"); setLogoUploadErr(null);
   }
 
   function openEdit(r: Resource) {
@@ -38,9 +43,29 @@ export function ResourcesClient({ initial }: { initial: Resource[] }) {
       avatarColor: r.avatarColor, isPartner: r.isPartner, isActive: r.isActive,
       showOnHomepage: r.showOnHomepage });
     setEditing(r); setIsNew(false); setError(null);
+    setLogoTab(r.logoUrl ? "url" : "upload"); setLogoUploadErr(null);
   }
 
-  function closeForm() { setEditing(null); setIsNew(false); setError(null); }
+  function closeForm() { setEditing(null); setIsNew(false); setError(null); setLogoUploadErr(null); }
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true); setLogoUploadErr(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res  = await fetch("/api/super-admin/blog/posts/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      setForm((prev) => ({ ...prev, logoUrl: data.url }));
+    } catch (err: any) {
+      setLogoUploadErr(err.message ?? "Upload failed. Please try again.");
+    } finally {
+      setLogoUploading(false);
+      if (logoFileRef.current) logoFileRef.current.value = "";
+    }
+  }
 
   async function handleSave() {
     if (!form.name.trim() || !form.websiteUrl.trim()) {
@@ -115,9 +140,47 @@ export function ResourcesClient({ initial }: { initial: Resource[] }) {
               <input className={inputCls} value={form.websiteUrl} onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })} placeholder="https://example.com" /></div>
             <div className="sm:col-span-2"><label className={labelCls}>Description</label>
               <textarea className={inputCls + " resize-none"} rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Short description shown on the resources page" /></div>
-            <div className="sm:col-span-2"><label className={labelCls}>Logo URL <span className="font-normal text-gray-400">— paste any public image URL; leave blank to show initials</span></label>
-              <input className={inputCls} value={form.logoUrl ?? ""} onChange={(e) => setForm({ ...form, logoUrl: e.target.value })} placeholder="https://example.com/logo.png" />
-              {form.logoUrl && <img src={form.logoUrl} alt="preview" className="mt-2 h-10 w-auto rounded border border-gray-200 object-contain p-1" />}
+            {/* ── Logo — upload or URL ──────────────────────────────── */}
+            <div className="sm:col-span-2 space-y-2">
+              <label className={labelCls}>Logo <span className="font-normal text-gray-400">— leave blank to show initials avatar</span></label>
+
+              {/* Tab switcher */}
+              <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+                {(["upload", "url"] as const).map((tab) => (
+                  <button key={tab} type="button" onClick={() => { setLogoTab(tab); setLogoUploadErr(null); }}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${logoTab === tab ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                    {tab === "upload" ? <><Upload className="h-3 w-3 inline mr-1" />Upload file</> : <><Link2 className="h-3 w-3 inline mr-1" />Paste URL</>}
+                  </button>
+                ))}
+              </div>
+
+              {logoTab === "upload" ? (
+                <div className="space-y-2">
+                  <input ref={logoFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" className="hidden" onChange={handleLogoUpload} />
+                  <button type="button" onClick={() => logoFileRef.current?.click()} disabled={logoUploading}
+                    className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-500 hover:border-purple-400 hover:text-purple-600 transition-colors disabled:opacity-50 w-full justify-center">
+                    {logoUploading ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</> : <><Upload className="h-4 w-4" /> Click to upload logo</>}
+                  </button>
+                  <p className="text-xs text-gray-400">JPG, PNG, WebP, GIF or SVG · max 8 MB</p>
+                  {logoUploadErr && <p className="text-xs text-red-600 bg-red-50 rounded px-3 py-2">{logoUploadErr}</p>}
+                </div>
+              ) : (
+                <div>
+                  <input className={inputCls} value={form.logoUrl ?? ""} onChange={(e) => setForm({ ...form, logoUrl: e.target.value })} placeholder="https://example.com/logo.png" />
+                  <p className="text-xs text-gray-400 mt-1">Paste any publicly accessible image URL</p>
+                </div>
+              )}
+
+              {/* Preview + clear */}
+              {form.logoUrl && (
+                <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-200 w-fit">
+                  <img src={form.logoUrl} alt="Logo preview" className="h-10 w-10 rounded object-contain border border-gray-200 p-1 bg-white" />
+                  <div className="text-xs text-gray-500 max-w-xs truncate">{form.logoUrl}</div>
+                  <button type="button" onClick={() => setForm({ ...form, logoUrl: "" })} className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
             <div><label className={labelCls}>Initials <span className="font-normal text-gray-400">fallback (2–4 chars)</span></label>
               <input className={inputCls} value={form.initials} onChange={(e) => setForm({ ...form, initials: e.target.value.slice(0,4) })} placeholder="e.g. Re" maxLength={4} /></div>
