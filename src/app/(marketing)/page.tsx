@@ -359,21 +359,24 @@ export default async function MarketingPage() {
                 See all resources →
               </Link>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
               {homepageResources.map((r) => (
                 <a key={r.id} href={r.websiteUrl} target="_blank" rel="noopener noreferrer"
                   className="resource-chip"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '10px 18px', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 999, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '12px 22px 12px 14px', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 999, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}>
                   {/* Avatar */}
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: r.logoUrl ? ML.bone : r.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: r.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: r.logoUrl ? ML.bone : r.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: r.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
                     {r.logoUrl
-                      ? <img src={r.logoUrl} alt={r.name} style={{ width: 28, height: 28, objectFit: 'contain', padding: 3 }} />
-                      : <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (r.initials?.length ?? 0) > 2 ? 8 : 11, fontWeight: 700, color: ML.bone }}>{r.initials || r.name[0]}</span>
+                      ? <img src={r.logoUrl} alt={r.name} style={{ width: 36, height: 36, objectFit: 'contain', padding: 4 }} />
+                      : <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (r.initials?.length ?? 0) > 2 ? 10 : 13, fontWeight: 700, color: ML.bone }}>{r.initials || r.name[0]}</span>
                     }
                   </div>
-                  <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: ML.ink, whiteSpace: 'nowrap' }}>{r.name}</span>
+                  <div>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: ML.ink, whiteSpace: 'nowrap', display: 'block', lineHeight: 1.2 }}>{r.name}</span>
+                    {r.category && <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.slate }}>{r.category}</span>}
+                  </div>
                   {r.isPartner && (
-                    <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.brass, background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999, padding: '2px 6px' }}>Partner</span>
+                    <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.brass, background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999, padding: '3px 8px' }}>Partner</span>
                   )}
                 </a>
               ))}
@@ -384,14 +387,14 @@ export default async function MarketingPage() {
       )}
 
       {/* ── Final CTA ──────────────────────────────────────────────────────── */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: ML.midnight, padding: '160px 60px', textAlign: 'center' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', background: ML.midnight, padding: '80px 60px', textAlign: 'center' }}>
         <div style={{ position: 'absolute', top: -80, right: -80, width: 400, height: 400, background: `radial-gradient(circle, ${ML.brass2}22, transparent 70%)`, pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
-          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 24 }}>· Ready? ·</p>
-          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(52px, 8vw, 120px)', fontWeight: 400, lineHeight: 0.88, letterSpacing: '-0.035em', color: ML.bone, margin: '0 0 24px' }}>
+          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready? ·</p>
+          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.03em', color: ML.bone, margin: '0 0 20px' }}>
             Put your name <span style={{ fontStyle: 'italic', color: ML.brass2 }}>on the door.</span>
           </h2>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 19, lineHeight: 1.55, color: `${ML.bone}cc`, margin: '0 0 36px', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.55, color: `${ML.bone}cc`, margin: '0 0 28px', maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
             Join AuthorLoft free today. Your readers are looking for you — make it easy for them to find you.
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
