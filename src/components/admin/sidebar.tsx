@@ -37,6 +37,7 @@ import {
   HelpCircle,
   Headphones,
   Globe,
+  Ticket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -123,6 +124,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/authors",          label: "All Authors",     icon: Users      },
   { href: "/super-admin/access-requests",  label: "Access Requests", icon: Inbox      },
   { href: "/super-admin/plans",            label: "Plans",           icon: CreditCard },
+  { href: "/super-admin/coupons",          label: "Coupons",         icon: Ticket     },
   { href: "/super-admin/feature-config",   label: "Feature Gates",   icon: Bot        },
   { href: "/admin/genres",                 label: "Genres",          icon: Tag        },
   { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },

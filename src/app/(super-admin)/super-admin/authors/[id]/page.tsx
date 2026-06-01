@@ -43,6 +43,7 @@ export default async function AuthorDetailPage({
         aiUsageCap: true,
         aiUsageResetAt: true,
         aiApiKey: true,
+        assignedCouponId: true,
         plan:      { select: { id: true, name: true, tier: true } },
         trialPlan: { select: { id: true, name: true, tier: true } },
         _count: {
@@ -120,6 +121,7 @@ export default async function AuthorDetailPage({
         trialPlanId={author.trialPlanId}
         trialStartsAt={author.trialStartsAt}
         trialEndsAt={author.trialEndsAt}
+        assignedCouponId={author.assignedCouponId ?? null}
       />
     </div>
   );

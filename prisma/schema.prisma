@@ -139,6 +139,7 @@ model Author {
   pressOutlets         String[]
   stripeCustomerId          String?
   stripeSubscriptionId      String?
+  assignedCouponId          String?   // Stripe coupon ID assigned by super-admin, auto-applied at next checkout
   stripeConnectAccountId    String?   // Stripe Express connected account ID (acct_xxx)
   stripeConnectOnboarded    Boolean   @default(false) // true once onboarding is complete
   planId               String?

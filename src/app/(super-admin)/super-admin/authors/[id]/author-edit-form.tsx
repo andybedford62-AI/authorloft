@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Save, Loader2, CheckCircle, AlertTriangle,
-  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X,
+  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X, Tag,
 } from "lucide-react";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -39,9 +39,10 @@ interface Props {
   aiUsageCap:     number;
   aiUsageResetAt: Date | null;
   hasOwnKey:      boolean;
-  trialPlanId:    string | null;
-  trialStartsAt:  Date | null;
-  trialEndsAt:    Date | null;
+  trialPlanId:      string | null;
+  trialStartsAt:    Date | null;
+  trialEndsAt:      Date | null;
+  assignedCouponId: string | null;
 }
 
 function Section({ title, icon: Icon, children }: {
@@ -80,7 +81,7 @@ const inputClass =
 const textareaClass =
   "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none";
 
-export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey, trialPlanId, trialStartsAt, trialEndsAt }: Props) {
+export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey, trialPlanId, trialStartsAt, trialEndsAt, assignedCouponId: initialCouponId }: Props) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -110,6 +111,13 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
   const [trialDuration,       setTrialDuration]       = useState<number>(3);
   const [trialSaving,         setTrialSaving]         = useState(false);
   const [trialStatus,         setTrialStatus]         = useState<"idle" | "success" | "error">("idle");
+
+  // Coupon section state
+  const [assignedCouponId,    setAssignedCouponId]    = useState<string | null>(initialCouponId);
+  const [couponInput,         setCouponInput]         = useState("");
+  const [couponSaving,        setCouponSaving]        = useState(false);
+  const [couponStatus,        setCouponStatus]        = useState<"idle" | "success" | "error">("idle");
+  const [couponErrMsg,        setCouponErrMsg]        = useState("");
   const [trialErrMsg,         setTrialErrMsg]         = useState("");
 
   async function handleSetTrial() {
@@ -468,6 +476,82 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
           {trialStatus === "error" && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" /> {trialErrMsg}
+            </p>
+          )}
+        </div>
+      </Section>
+
+      {/* ── Coupon Assignment ────────────────────────────────────────── */}
+      <Section title="Assign Coupon" icon={Tag}>
+        <div className="space-y-3">
+          <p className="text-xs text-gray-500">
+            Assign a Stripe coupon ID to this author. It will auto-apply the next time they start a subscription checkout. Create coupons first on the{" "}
+            <a href="/super-admin/coupons" className="text-purple-600 hover:underline">Coupons page</a>.
+          </p>
+
+          {assignedCouponId ? (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 border border-green-200">
+              <div>
+                <p className="text-xs font-medium text-green-800">Coupon assigned</p>
+                <code className="text-xs font-mono text-green-700">{assignedCouponId}</code>
+              </div>
+              <button
+                onClick={async () => {
+                  setCouponSaving(true); setCouponStatus("idle");
+                  const res = await fetch(`/api/super-admin/authors/${author.id}/coupon`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ couponId: null }),
+                  });
+                  setCouponSaving(false);
+                  if (res.ok) { setAssignedCouponId(null); setCouponStatus("success"); setCouponErrMsg(""); }
+                  else { setCouponStatus("error"); setCouponErrMsg("Failed to remove coupon."); }
+                }}
+                disabled={couponSaving}
+                className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-medium disabled:opacity-50"
+              >
+                {couponSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={couponInput}
+                onChange={e => setCouponInput(e.target.value)}
+                placeholder="Paste coupon ID (e.g. 0gNAZ9ms)"
+                className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <button
+                onClick={async () => {
+                  if (!couponInput.trim()) return;
+                  setCouponSaving(true); setCouponStatus("idle");
+                  const res = await fetch(`/api/super-admin/authors/${author.id}/coupon`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ couponId: couponInput.trim() }),
+                  });
+                  setCouponSaving(false);
+                  if (res.ok) { setAssignedCouponId(couponInput.trim()); setCouponInput(""); setCouponStatus("success"); setCouponErrMsg(""); }
+                  else { setCouponStatus("error"); setCouponErrMsg("Failed to assign coupon."); }
+                }}
+                disabled={couponSaving || !couponInput.trim()}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium disabled:opacity-50"
+              >
+                {couponSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Tag className="h-4 w-4" />}
+                Assign
+              </button>
+            </div>
+          )}
+
+          {couponStatus === "success" && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" /> {assignedCouponId ? "Coupon assigned." : "Coupon removed."}
+            </p>
+          )}
+          {couponStatus === "error" && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" /> {couponErrMsg}
             </p>
           )}
         </div>

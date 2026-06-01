@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     const author = await prisma.author.findUnique({
       where:  { id: authorId },
-      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true },
+      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true, assignedCouponId: true },
     });
     if (!author) return NextResponse.json({ error: "Author not found" }, { status: 404 });
 
@@ -98,10 +98,14 @@ export async function POST(req: NextRequest) {
     const successUrl = `${base}/admin/settings?subscribed=1`;
     const cancelUrl  = `${base}/admin/settings`;
 
+    // Assigned coupon takes priority — set by super-admin on this author's profile
+    const assignedCouponId = author.assignedCouponId ?? undefined;
+
     // Early bird discount — within 30 days of account creation, FREE users only (not trial conversions)
+    // Only applies when no assigned coupon is present
     const daysSinceSignup = (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     const isOnTrial = !!author.trialEndsAt && author.trialEndsAt > new Date();
-    const isEarlyBird = daysSinceSignup <= 30 && !isOnTrial;
+    const isEarlyBird = !assignedCouponId && daysSinceSignup <= 30 && !isOnTrial;
 
     // Determine if the selected price is monthly or annual
     const selectedPlan = await prisma.plan.findFirst({
@@ -121,6 +125,9 @@ export async function POST(req: NextRequest) {
           : process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL)
       : undefined;
 
+    // Use assigned coupon if present, otherwise fall back to early bird
+    const couponToApply = assignedCouponId ?? earlyBirdCouponId;
+
     const session = await createSubscriptionCheckoutSession({
       authorId,
       authorEmail: author.email,
@@ -128,22 +135,12 @@ export async function POST(req: NextRequest) {
       successUrl,
       cancelUrl,
       existingCustomerId: author.stripeCustomerId || undefined,
-      earlyBirdCouponId,
+      earlyBirdCouponId: couponToApply,
     });
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
-    console.error("[stripe/subscribe] FULL_ERROR:", JSON.stringify({
-      message: err?.message,
-      type: err?.type,
-      code: err?.code,
-      param: err?.param,
-      statusCode: err?.statusCode,
-    }));
-    // TEMP DEBUG — remove before going live
-    return NextResponse.json({
-      error: "Failed to start checkout.",
-      _debug: { message: err?.message, type: err?.type, code: err?.code, param: err?.param },
-    }, { status: 500 });
+    console.error("[stripe/subscribe] Error:", err?.message ?? err);
+    return NextResponse.json({ error: "Failed to start checkout." }, { status: 500 });
   }
 }
