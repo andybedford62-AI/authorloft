@@ -132,7 +132,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
-    console.error("[stripe/subscribe] Error:", err?.message ?? err);
+    console.error("[stripe/subscribe] FULL_ERROR:", JSON.stringify({
+      message: err?.message,
+      type: err?.type,
+      code: err?.code,
+      param: err?.param,
+      statusCode: err?.statusCode,
+      raw: err?.raw,
+    }));
     return NextResponse.json({ error: "Failed to start checkout." }, { status: 500 });
   }
 }
