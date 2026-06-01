@@ -138,8 +138,11 @@ export async function POST(req: NextRequest) {
       code: err?.code,
       param: err?.param,
       statusCode: err?.statusCode,
-      raw: err?.raw,
     }));
-    return NextResponse.json({ error: "Failed to start checkout." }, { status: 500 });
+    // TEMP DEBUG — remove before going live
+    return NextResponse.json({
+      error: "Failed to start checkout.",
+      _debug: { message: err?.message, type: err?.type, code: err?.code, param: err?.param },
+    }, { status: 500 });
   }
 }
