@@ -164,6 +164,8 @@ function SubscriptionSection() {
             <div className="flex flex-col items-end gap-1">
               {isFree ? (
                 <p className="text-xs text-gray-400">Upgrade to manage billing</p>
+              ) : isOnTrial ? (
+                <p className="text-xs text-amber-600 font-medium">Subscribe below to keep access</p>
               ) : isAdminAssigned ? (
                 <p className="text-xs text-gray-400">Contact support to manage billing</p>
               ) : (
@@ -179,8 +181,8 @@ function SubscriptionSection() {
             </div>
           </div>
 
-          {/* Upgrade options — only shown to free users */}
-          {isFree && data.plans.length > 0 && (
+          {/* Upgrade options — shown to free users and trial users */}
+          {(isFree || isOnTrial) && data.plans.length > 0 && (
             <>
               {/* Monthly / Annual toggle */}
               <div className="flex items-center gap-2">
@@ -261,7 +263,7 @@ function SubscriptionSection() {
                           ? <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
                           : !priceId
                           ? "Coming soon"
-                          : <><Zap className="h-4 w-4" /> Upgrade to {plan.name}</>
+                          : <><Zap className="h-4 w-4" /> {isOnTrial && data.currentTier === plan.tier ? `Subscribe · Keep ${plan.name}` : `Upgrade to ${plan.name}`}</>
                         }
                       </button>
                     </div>
