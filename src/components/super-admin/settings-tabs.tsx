@@ -29,6 +29,7 @@ import { TestimonialsPanel } from "./testimonials-panel";
 import { FaqsPanel } from "./faqs-panel";
 import { WelcomeEmailPanel } from "./welcome-email-panel";
 import { MassEmailPanel } from "./mass-email-panel";
+import { SeoPanel } from "./seo-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ type SectionId =
   | "marketing"
   | "testimonials"
   | "faqs"
+  | "seo"
   | "maintenance"
   | "onboarding"
   | "configuration";
@@ -134,6 +136,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "marketing",     label: "Marketing",       icon: Image         },
       { id: "testimonials",  label: "Testimonials",    icon: Star          },
       { id: "faqs",          label: "FAQs",            icon: HelpCircle    },
+      { id: "seo",           label: "Social Images",   icon: Globe         },
     ],
   },
   {
@@ -198,6 +201,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
         {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
         {active === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
         {active === "mass-email"    && <MassEmailPanel />}
+        {active === "seo"           && <SeoTab />}
         {active === "configuration" && <ConfigurationTab {...props} />}
       </div>
     </div>
@@ -341,6 +345,16 @@ function MarketingTab({ marketingHeroImageUrl }: SettingsTabsProps) {
         </p>
       </div>
       <MarketingHeroImage initialUrl={marketingHeroImageUrl} />
+    </section>
+  );
+}
+
+// ── SEO / Social Images ────────────────────────────────────────────────────────
+
+function SeoTab() {
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <SeoPanel />
     </section>
   );
 }

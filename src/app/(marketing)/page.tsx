@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
@@ -10,26 +11,29 @@ import { MidnightTestimonialsSection } from "@/components/marketing/midnight-tes
 import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 
-export const revalidate = 300; // 5-minute cache — showcase/testimonials stay fresh without full SSR cost
+export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Author Website Builder for Independent Authors | AuthorLoft",
-  description:
-    "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    type:        "website",
-    title:       "Author Website Builder for Independent Authors | AuthorLoft",
-    description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
-    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft — author website builder for independent authors" }],
-  },
-  twitter: {
-    card:        "summary_large_image",
-    title:       "Author Website Builder for Independent Authors | AuthorLoft",
-    description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
-    images:      ["/og-home.png"],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("home");
+  return {
+    title: "Author Website Builder for Independent Authors | AuthorLoft",
+    description:
+      "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
+    alternates: { canonical: "/" },
+    openGraph: {
+      type:        "website",
+      title:       "Author Website Builder for Independent Authors | AuthorLoft",
+      description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — author website builder for independent authors" }],
+    },
+    twitter: {
+      card:        "summary_large_image",
+      title:       "Author Website Builder for Independent Authors | AuthorLoft",
+      description: "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
+      images:      [ogImage],
+    },
+  };
+}
 
 // ── Static content ────────────────────────────────────────────────────────────
 

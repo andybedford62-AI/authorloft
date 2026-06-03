@@ -1,28 +1,32 @@
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { Clock, ArrowRight, BookOpen } from "lucide-react";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Blog — AuthorLoft",
-  description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
-  alternates: { canonical: "/blog" },
-  openGraph: {
-    type:        "website",
-    title:       "Blog — AuthorLoft",
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("blog");
+  return {
+    title: "Blog — AuthorLoft",
     description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
-    images:      [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft Blog" }],
-  },
-  twitter: {
-    card:        "summary_large_image",
-    title:       "Blog — AuthorLoft",
-    description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
-    images:      ["/og-home.png"],
-  },
-};
+    alternates: { canonical: "/blog" },
+    openGraph: {
+      type:        "website",
+      title:       "Blog — AuthorLoft",
+      description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
+      images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft Blog" }],
+    },
+    twitter: {
+      card:        "summary_large_image",
+      title:       "Blog — AuthorLoft",
+      description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
+      images:      [ogImage],
+    },
+  };
+}
 
 async function getPosts() {
   return prisma.platformPost.findMany({

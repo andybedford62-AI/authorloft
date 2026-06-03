@@ -4,27 +4,31 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { FeatureMatrix } from "@/components/marketing/feature-matrix";
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 
-export const revalidate = 3600; // refresh at most every hour
+export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
-  description:
-    "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
-  alternates: { canonical: "/features" },
-  openGraph: {
-    type:   "website",
-    title:  "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
-    description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
-    images: [{ url: "/og-home.png", width: 1200, height: 630, alt: "AuthorLoft features" }],
-  },
-  twitter: {
-    card:  "summary_large_image",
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("features");
+  return {
     title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
-    description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
-    images: ["/og-home.png"],
-  },
-};
+    description:
+      "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+    alternates: { canonical: "/features" },
+    openGraph: {
+      type:   "website",
+      title:  "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
+      description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft features" }],
+    },
+    twitter: {
+      card:  "summary_large_image",
+      title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
+      description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+      images: [ogImage],
+    },
+  };
+}
 
 async function getActivePlans() {
   const [plans, config] = await Promise.all([

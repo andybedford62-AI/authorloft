@@ -193,6 +193,14 @@ model Author {
   @@index([customDomain])
 }
 
+// ─── SEO Config ───────────────────────────────────────────────────────────────
+
+model SeoConfig {
+  id         String   @id // "home" | "blog" | "features" | "pricing" | "contact" | "resources"
+  ogImageUrl String?
+  updatedAt  DateTime @updatedAt
+}
+
 // ─── Author Subscription ──────────────────────────────────────────────────────
 
 model AuthorSubscription {

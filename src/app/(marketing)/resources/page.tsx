@@ -1,18 +1,34 @@
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Star } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 300; // re-fetch every 5 minutes
+export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Resources for Independent Authors | AuthorLoft",
-  description:
-    "A curated list of trusted tools, communities, and organisations that every independent author should know about.",
-  alternates: { canonical: "/resources" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("resources");
+  return {
+    title: "Resources for Independent Authors | AuthorLoft",
+    description:
+      "A curated list of trusted tools, communities, and organisations that every independent author should know about.",
+    alternates: { canonical: "/resources" },
+    openGraph: {
+      type:        "website",
+      title:       "Resources for Independent Authors | AuthorLoft",
+      description: "A curated list of trusted tools, communities, and organisations that every independent author should know about.",
+      images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft Resources" }],
+    },
+    twitter: {
+      card:        "summary_large_image",
+      title:       "Resources for Independent Authors | AuthorLoft",
+      description: "A curated list of trusted tools, communities, and organisations that every independent author should know about.",
+      images:      [ogImage],
+    },
+  };
+}
 
 const CATEGORY_META: Record<string, { accent: string; label: string }> = {
   "Community & Advocacy":  { accent: "#D4AE6A", label: "Community" },
