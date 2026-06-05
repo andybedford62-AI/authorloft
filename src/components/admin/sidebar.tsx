@@ -38,6 +38,7 @@ import {
   Headphones,
   Globe,
   Ticket,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -73,11 +74,12 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "content", label: "Content", defaultOpen: true,
     items: [
-      { href: "/admin/books",      label: "Books",       icon: BookOpen   },
-      { href: "/admin/flip-books", label: "Flip Books",  icon: BookMarked },
-      { href: "/admin/series",     label: "Series",      icon: Library    },
-      { href: "/admin/pages",      label: "Pages",       icon: FileText   },
-      { href: "/admin/blog",       label: "Blog / News", icon: Newspaper  },
+      { href: "/admin/books",      label: "Books",           icon: BookOpen   },
+      { href: "/admin/flip-books", label: "Flip Books",      icon: BookMarked },
+      { href: "/admin/series",     label: "Series",          icon: Library    },
+      { href: "/admin/pages",      label: "Pages",           icon: FileText   },
+      { href: "/admin/blog",       label: "Blog / News",     icon: Newspaper  },
+      { href: "/admin/feedback",   label: "Reader Feedback", icon: Star       },
     ],
   },
   {

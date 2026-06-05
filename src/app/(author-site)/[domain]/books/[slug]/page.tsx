@@ -9,6 +9,7 @@ import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
 import { BookBuySection } from "@/components/author-site/book-buy-section";
+import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -117,6 +118,11 @@ export default async function BookDetailPage({
       reviews: {
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         select: { id: true, quote: true, reviewerName: true, source: true, rating: true },
+      },
+      bookFeedback: {
+        where: { status: "APPROVED" },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, comment: true, reviewerName: true, rating: true },
       },
     },
   });
@@ -383,8 +389,15 @@ export default async function BookDetailPage({
               />
             )}
 
-            {/* Pull quotes / reviews */}
-            {book.reviews.length > 0 && (
+            {/* Reader feedback form */}
+            <BookFeedbackForm
+              bookSlug={book.slug}
+              domain={domain}
+              accentColor={accentColor}
+            />
+
+            {/* Pull quotes / reviews + approved reader feedback */}
+            {(book.reviews.length > 0 || book.bookFeedback.length > 0) && (
               <div className="pt-2 space-y-4">
                 <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">What Readers Are Saying</h2>
                 <div className="space-y-4">
@@ -412,6 +425,30 @@ export default async function BookDetailPage({
                         {review.source && (
                           <span className="text-gray-400">, {review.source}</span>
                         )}
+                      </footer>
+                    </blockquote>
+                  ))}
+                  {book.bookFeedback.map((fb) => (
+                    <blockquote
+                      key={fb.id}
+                      className="relative pl-5 border-l-4"
+                      style={{ borderColor: accentColor }}
+                    >
+                      <div className="flex gap-0.5 mb-1.5">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            className={`h-3.5 w-3.5 ${n <= fb.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                          />
+                        ))}
+                      </div>
+                      {fb.comment && (
+                        <p className="text-base text-gray-700 leading-relaxed italic">
+                          &ldquo;{fb.comment}&rdquo;
+                        </p>
+                      )}
+                      <footer className="mt-2 text-sm text-gray-500">
+                        — <span className="font-medium text-gray-700">{fb.reviewerName}</span>
                       </footer>
                     </blockquote>
                   ))}

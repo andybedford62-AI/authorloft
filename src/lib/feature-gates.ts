@@ -19,6 +19,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/pages":        "STANDARD",
   "/admin/blog":         "FREE",
   "/admin/messages":     "FREE",
+  "/admin/feedback":     "FREE",
   "/admin/newsletter":   "STANDARD",
   "/admin/sales":        "STANDARD",
   "direct-sales":        "STANDARD",  // gates Plan.salesEnabled (Direct Sales tab on books)
@@ -53,6 +54,7 @@ export const FEATURE_PLAN_MAP: Record<
   "/admin/pages":        null,
   "/admin/blog":         null,
   "/admin/messages":     null,
+  "/admin/feedback":     null,
   "/admin/appearance":   null,
   "/admin/branding":     null,
   "/admin/legal":        null,

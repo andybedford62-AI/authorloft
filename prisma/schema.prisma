@@ -335,6 +335,7 @@ model Book {
   audioTracks         BookAudioTrack[]
   previewMedia        BookPreviewMedia[]
   reviews             BookReview[]
+  bookFeedback        BookFeedback[]
   discountCodeBooks   DiscountCodeBook[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
   arcCopies           ArcCopy[]
@@ -433,6 +434,30 @@ model BookReview {
   updatedAt    DateTime @updatedAt
 
   @@index([bookId])
+}
+
+// ─── Book Feedback (Reader-Submitted) ────────────────────────────────────────
+
+enum BookFeedbackStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model BookFeedback {
+  id            String             @id @default(cuid())
+  bookId        String
+  book          Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  reviewerName  String
+  reviewerEmail String
+  rating        Int                // 1–5 required
+  comment       String?            @db.Text
+  status        BookFeedbackStatus @default(PENDING)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([bookId])
+  @@index([status])
 }
 
 // ─── Flip Books ───────────────────────────────────────────────────────────────
