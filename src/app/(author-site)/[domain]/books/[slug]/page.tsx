@@ -389,13 +389,6 @@ export default async function BookDetailPage({
               />
             )}
 
-            {/* Reader feedback form */}
-            <BookFeedbackForm
-              bookSlug={book.slug}
-              domain={domain}
-              accentColor={accentColor}
-            />
-
             {/* Pull quotes / reviews + approved reader feedback */}
             {(book.reviews.length > 0 || book.bookFeedback.length > 0) && (
               <div className="pt-2 space-y-4">
@@ -455,6 +448,13 @@ export default async function BookDetailPage({
                 </div>
               </div>
             )}
+
+            {/* Reader feedback form — below reviews */}
+            <BookFeedbackForm
+              bookSlug={book.slug}
+              domain={domain}
+              accentColor={accentColor}
+            />
 
             {/* Genres */}
             {book.genres.length > 0 && (

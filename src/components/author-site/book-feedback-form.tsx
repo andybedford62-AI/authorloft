@@ -55,24 +55,22 @@ export function BookFeedbackForm({ bookSlug, domain, accentColor }: BookFeedback
 
   if (submitted) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-5 text-center">
-        <p className="text-green-800 font-medium">Thank you for your feedback!</p>
-        <p className="text-green-700 text-sm mt-1">
-          Your rating has been submitted and is pending review.
-        </p>
+      <div className="rounded border border-green-200 bg-green-50 px-4 py-3 text-center">
+        <p className="text-green-800 text-sm font-medium">Thank you! Your feedback is pending review.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
-      <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">
-        Leave Your Feedback
+    <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3">
+      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+        Leave a Rating
       </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Name + Email + Stars on one row (desktop) */}
+        <div className="flex flex-wrap gap-2 items-end">
+          <div className="flex-1 min-w-[120px]">
+            <label className="block text-xs font-medium text-gray-600 mb-1">
               Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -80,12 +78,11 @@ export function BookFeedbackForm({ bookSlug, domain, accentColor }: BookFeedback
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-0 bg-white"
-              style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+              className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:outline-none bg-white"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="flex-1 min-w-[140px]">
+            <label className="block text-xs font-medium text-gray-600 mb-1">
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -93,64 +90,58 @@ export function BookFeedbackForm({ bookSlug, domain, accentColor }: BookFeedback
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-0 bg-white"
-              style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+              className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:outline-none bg-white"
             />
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rating <span className="text-red-500">*</span>
-          </label>
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setRating(n)}
-                onMouseEnter={() => setHoverRating(n)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="p-0.5 transition-transform hover:scale-110 focus:outline-none"
-                aria-label={`${n} star${n > 1 ? "s" : ""}`}
-              >
-                <Star
-                  className={`h-7 w-7 transition-colors ${
-                    n <= (hoverRating || rating)
-                      ? "fill-amber-400 text-amber-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              </button>
-            ))}
+          <div className="shrink-0">
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Rating <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setRating(n)}
+                  onMouseEnter={() => setHoverRating(n)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="p-0.5 transition-transform hover:scale-110 focus:outline-none"
+                  aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                >
+                  <Star
+                    className={`h-5 w-5 transition-colors ${
+                      n <= (hoverRating || rating)
+                        ? "fill-amber-400 text-amber-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Comment{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
-          </label>
+        {/* Comment + Submit on one row */}
+        <div className="flex gap-2 items-start">
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            rows={3}
+            rows={2}
             maxLength={2000}
-            placeholder="Share your thoughts about this book…"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none resize-none bg-white"
+            placeholder="Comment (optional)…"
+            className="flex-1 rounded border border-gray-300 px-2.5 py-1.5 text-sm focus:outline-none resize-none bg-white"
           />
+          <button
+            type="submit"
+            disabled={submitting}
+            className="shrink-0 px-4 py-1.5 rounded text-sm font-medium text-white transition-opacity disabled:opacity-60 hover:opacity-90 self-end"
+            style={{ backgroundColor: accentColor }}
+          >
+            {submitting ? "Sending…" : "Submit"}
+          </button>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="inline-flex items-center px-5 py-2 rounded-md text-sm font-medium text-white transition-opacity disabled:opacity-60 hover:opacity-90"
-          style={{ backgroundColor: accentColor }}
-        >
-          {submitting ? "Submitting…" : "Submit Feedback"}
-        </button>
+        {error && <p className="text-xs text-red-600">{error}</p>}
       </form>
     </div>
   );
