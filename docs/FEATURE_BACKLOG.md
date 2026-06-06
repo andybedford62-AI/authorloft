@@ -35,7 +35,11 @@ Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD
 
 ## Auth / Account
 
-- [ ] **"Remember me" checkbox on login** — checked = persistent (~30d, current default); unchecked = session cookie (log out on browser close). Optional: also shorten default session from 30d → 7d. *(small–medium, touches NextAuth)*. Deferred June 6, 2026 — current persistent login is working as intended; not a bug.
+- [ ] **Login persistence / "browser close doesn't log out" — flagged for future cleanup** *(raised June 6, 2026)*
+  - Current behavior: login is a persistent ~30-day cookie, so closing the browser / hard refresh does NOT sign the author out. This is standard and not a security bug (cookie is httpOnly + secure; sessions don't leak), but flagged to revisit.
+  - Preferred fix when we get to it: add a **"Remember me" checkbox** on login — checked = persistent (~30d); unchecked = session cookie that clears on browser close.
+  - Optional extra: shorten the default session window from 30d → 7d.
+  - *(small–medium, touches NextAuth `session`/cookie config — test login/logout across browsers after.)*
 
 ## Marketing & SEO
 
