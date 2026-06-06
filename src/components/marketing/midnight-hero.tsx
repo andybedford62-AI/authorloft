@@ -180,14 +180,18 @@ export function MidnightHero() {
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           {([
+            ['/bookstore',   'Bookstore'],
             ['/features',    'Features'],
             ['/blog',        'Blog'],
             ['#how-it-works','How it works'],
             ['/pricing',     'Pricing'],
             ['#genres',      'For authors'],
-          ] as [string, string][]).map(([href, label]) => (
-            <Link key={href} href={href} style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>{label}</Link>
-          ))}
+          ] as [string, string][]).map(([href, label]) => {
+            const isBookstore = href === '/bookstore';
+            return (
+              <Link key={href} href={href} style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: isBookstore ? '#E8B04B' : '#E8E5DD', fontWeight: isBookstore ? 600 : 400, opacity: isBookstore ? 1 : 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>{label}</Link>
+            );
+          })}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: '#E8E5DD', opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
