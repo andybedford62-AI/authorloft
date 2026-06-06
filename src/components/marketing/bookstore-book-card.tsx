@@ -1,4 +1,4 @@
-import { Star, BookOpen, ArrowRight } from "lucide-react";
+import { Star, BookOpen, ArrowRight, Sparkles } from "lucide-react";
 
 export type BookstoreBook = {
   id: string;
@@ -13,6 +13,9 @@ export type BookstoreBook = {
   averageRating: number | null;
   ratingCount: number;
   isNew: boolean;
+  featured: boolean;      // Premium author — priority placement + ribbon
+  views: number;          // for "Trending" row
+  authorBookCount: number;// how many of this author's books are in the store
   sortTimestamp: number;  // for "Newest" sort (releaseDate ?? createdAt)
 };
 
@@ -54,12 +57,19 @@ export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
           </div>
         )}
 
-        {/* NEW badge */}
-        {book.isNew && (
-          <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider text-[#1B2B47] bg-[#F0D9B5] px-2 py-1 rounded-full shadow-sm">
-            New
-          </span>
-        )}
+        {/* Badges (Featured + New) — stacked top-left */}
+        <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
+          {book.featured && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#3a2417] bg-gradient-to-r from-[#E8B04B] to-[#D4AE6A] px-2 py-1 rounded-full shadow-sm">
+              <Sparkles className="h-2.5 w-2.5" /> Featured
+            </span>
+          )}
+          {book.isNew && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B2B47] bg-[#F0D9B5] px-2 py-1 rounded-full shadow-sm">
+              New
+            </span>
+          )}
+        </div>
 
         {/* Price chip */}
         {price && (
@@ -76,6 +86,9 @@ export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
         </h3>
         <p className="text-xs text-[#9b8e7e] mt-1">
           by <span className="text-[#5C6E89]">{book.authorName}</span>
+          {book.authorBookCount > 1 && (
+            <span className="text-[#b6a88f]"> · {book.authorBookCount} books</span>
+          )}
         </p>
 
         {/* Rating — hidden until the book has approved ratings */}

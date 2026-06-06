@@ -95,7 +95,7 @@ export function BookstoreGrid({
       return true;
     });
 
-    // Sort
+    // Sort (Array.sort is stable, so ties keep server order = newest-created first)
     const sorted = [...result];
     if (sort === "newest") {
       sorted.sort((a, b) => b.sortTimestamp - a.sortTimestamp);
@@ -108,8 +108,10 @@ export function BookstoreGrid({
         if (br !== ar) return br - ar;
         return b.ratingCount - a.ratingCount;
       });
+    } else if (sort === "featured") {
+      // Premium authors' books float to the top
+      sorted.sort((a, b) => Number(b.featured) - Number(a.featured));
     }
-    // "featured" keeps the server order (newest-created first)
     return sorted;
   }, [books, search, selectedGenres, format, price, sort]);
 

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
+import { getBookstoreData } from "@/lib/bookstore";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
@@ -18,6 +19,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        0.7,
   }));
 
+  // Bookstore genre landing pages (only genres that actually have books)
+  const { genres } = await getBookstoreData().catch(() => ({ genres: [] as { slug: string }[] }));
+  const genreEntries: MetadataRoute.Sitemap = genres.map((g) => ({
+    url:             `${BASE}/bookstore/genre/${g.slug}`,
+    lastModified:    new Date(),
+    changeFrequency: "weekly" as const,
+    priority:        0.6,
+  }));
+
   return [
     // Core pages - highest priority
     { url: `${BASE}/`,         lastModified: new Date(), changeFrequency: "weekly",   priority: 1.0 },
@@ -26,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Bookstore - high priority discovery catalog
     { url: `${BASE}/bookstore`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
+    ...genreEntries,
 
     // Blog - high priority for SEO
     { url: `${BASE}/blog`,     lastModified: new Date(), changeFrequency: "weekly",   priority: 0.85 },

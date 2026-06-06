@@ -1,0 +1,173 @@
+import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { slugify } from "@/lib/utils";
+import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
+
+export type GenreCount = { name: string; slug: string; count: number };
+
+export type Spotlight = {
+  name: string;
+  url: string;
+  image: string;
+  bio: string;
+  bookCount: number;
+  sampleCovers: string[];
+} | null;
+
+export type BookstoreData = {
+  books: BookstoreBook[];
+  genres: GenreCount[];
+  stats: { books: number; authors: number; genres: number };
+  spotlight: Spotlight;
+};
+
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * Single source of truth for the public bookstore.
+ * Returns enriched, serializable book data plus derived genres, stats and a
+ * rotating author spotlight. Cached by the page's `revalidate`.
+ */
+export async function getBookstoreData(): Promise<BookstoreData> {
+  const rows = await prisma.book
+    .findMany({
+      where: {
+        listInBookstore: true,
+        isPublished: true,
+        author: {
+          isActive: true,
+          plan: { tier: { in: ["STANDARD", "PREMIUM"] } },
+        },
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        subtitle: true,
+        coverImageUrl: true,
+        availableFormats: true,
+        priceCents: true,
+        releaseDate: true,
+        createdAt: true,
+        views: true,
+        author: {
+          select: {
+            slug: true,
+            customDomain: true,
+            displayName: true,
+            name: true,
+            profileImageUrl: true,
+            shortBio: true,
+            bio: true,
+            plan: { select: { tier: true } },
+          },
+        },
+        genres: { select: { genre: { select: { name: true } } } },
+        directSaleItems: { where: { isActive: true }, select: { priceCents: true } },
+        bookFeedback: { where: { status: "APPROVED" }, select: { rating: true } },
+      },
+    })
+    .catch(() => []);
+
+  const now = Date.now();
+  const genreCounts = new Map<string, { name: string; count: number }>(); // slug -> {name,count}
+  const authorBookCount = new Map<string, number>(); // author slug -> count
+
+  // First pass: author book counts
+  for (const b of rows) {
+    authorBookCount.set(b.author.slug, (authorBookCount.get(b.author.slug) ?? 0) + 1);
+  }
+
+  const books: BookstoreBook[] = rows.map((b) => {
+    const salePrices = b.directSaleItems.map((d) => d.priceCents).filter((p) => p >= 0);
+    const lowestSale = salePrices.length > 0 ? Math.min(...salePrices) : null;
+    const priceCents = lowestSale !== null ? lowestSale : b.priceCents > 0 ? b.priceCents : null;
+
+    const ratings = b.bookFeedback.map((f) => f.rating).filter((r) => r >= 1 && r <= 5);
+    const ratingCount = ratings.length;
+    const averageRating =
+      ratingCount > 0
+        ? Math.round((ratings.reduce((a, c) => a + c, 0) / ratingCount) * 10) / 10
+        : null;
+
+    const genreNames = b.genres.map((g) => g.genre.name);
+    for (const name of genreNames) {
+      const trimmed = name.trim();
+      const slug = slugify(trimmed);
+      if (!slug) continue;
+      const existing = genreCounts.get(slug);
+      if (existing) existing.count += 1;
+      else genreCounts.set(slug, { name: trimmed, count: 1 });
+    }
+
+    const releaseMs = b.releaseDate ? new Date(b.releaseDate).getTime() : null;
+    const isNew = releaseMs !== null && now - releaseMs <= THIRTY_DAYS_MS && releaseMs <= now;
+    const sortTimestamp = releaseMs ?? new Date(b.createdAt).getTime();
+
+    return {
+      id: b.id,
+      title: b.title,
+      subtitle: b.subtitle,
+      coverImageUrl: b.coverImageUrl,
+      authorName: b.author.displayName || b.author.name,
+      bookUrl: `${getAuthorBaseUrl(b.author)}/books/${b.slug}`,
+      genres: genreNames,
+      formats: b.availableFormats ?? [],
+      priceCents,
+      averageRating,
+      ratingCount,
+      isNew,
+      featured: b.author.plan?.tier === "PREMIUM",
+      views: b.views ?? 0,
+      authorBookCount: authorBookCount.get(b.author.slug) ?? 1,
+      sortTimestamp,
+    };
+  });
+
+  const genres: GenreCount[] = Array.from(genreCounts.entries())
+    .map(([slug, { name, count }]) => ({ slug, name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+  const uniqueAuthors = new Set(rows.map((b) => b.author.slug));
+
+  // ── Rotating author spotlight: authors with a photo + bio, picked by day ──
+  const spotlightCandidates = new Map<
+    string,
+    { name: string; url: string; image: string; bio: string; bookCount: number; sampleCovers: string[] }
+  >();
+  for (const b of rows) {
+    const a = b.author;
+    const image = a.profileImageUrl;
+    const bio = a.shortBio || a.bio;
+    if (!image || !bio) continue;
+    const key = a.slug;
+    const entry = spotlightCandidates.get(key);
+    if (entry) {
+      entry.bookCount += 1;
+      if (b.coverImageUrl && entry.sampleCovers.length < 4) entry.sampleCovers.push(b.coverImageUrl);
+    } else {
+      spotlightCandidates.set(key, {
+        name: a.displayName || a.name,
+        url: getAuthorBaseUrl(a),
+        image,
+        bio: bio.length > 280 ? bio.slice(0, 277) + "…" : bio,
+        bookCount: 1,
+        sampleCovers: b.coverImageUrl ? [b.coverImageUrl] : [],
+      });
+    }
+  }
+  const candidateList = Array.from(spotlightCandidates.values());
+  let spotlight: Spotlight = null;
+  if (candidateList.length > 0) {
+    const dayOfYear = Math.floor((now - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    spotlight = candidateList[dayOfYear % candidateList.length];
+  }
+
+  return {
+    books,
+    genres,
+    stats: { books: books.length, authors: uniqueAuthors.size, genres: genres.length },
+    spotlight,
+  };
+}

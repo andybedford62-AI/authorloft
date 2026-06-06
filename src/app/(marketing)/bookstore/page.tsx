@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookMarked, ArrowRight } from "lucide-react";
-import { prisma } from "@/lib/db";
+import {
+  BookMarked,
+  ArrowRight,
+  Sparkles,
+  Clock,
+  TrendingUp,
+  PenLine,
+  Eye,
+  Store,
+  Library,
+  Tag,
+} from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
-import { getAuthorBaseUrl } from "@/lib/site-url";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
-import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { BookstoreRow } from "@/components/marketing/bookstore-row";
+import { BookstoreShare } from "@/components/marketing/bookstore-share";
+import { getBookstoreData } from "@/lib/bookstore";
 
 export const revalidate = 1800;
 
@@ -34,106 +45,23 @@ export const metadata: Metadata = {
   },
 };
 
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-
-async function getBookstoreBooks(): Promise<{ books: BookstoreBook[]; genres: string[] }> {
-  const rows = await prisma.book
-    .findMany({
-      where: {
-        listInBookstore: true,
-        isPublished: true,
-        author: {
-          isActive: true,
-          plan: { tier: { in: ["STANDARD", "PREMIUM"] } },
-        },
-      },
-      orderBy: [{ createdAt: "desc" }],
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        subtitle: true,
-        coverImageUrl: true,
-        availableFormats: true,
-        priceCents: true,
-        releaseDate: true,
-        createdAt: true,
-        author: {
-          select: { slug: true, customDomain: true, displayName: true, name: true },
-        },
-        genres: { select: { genre: { select: { name: true } } } },
-        directSaleItems: {
-          where: { isActive: true },
-          select: { priceCents: true },
-        },
-        bookFeedback: {
-          where: { status: "APPROVED" },
-          select: { rating: true },
-        },
-      },
-    })
-    .catch(() => []);
-
-  const now = Date.now();
-  const genreSet = new Map<string, string>(); // lowercased -> display name
-
-  const books: BookstoreBook[] = rows.map((b) => {
-    // Lowest active direct-sale price; fall back to the retail/display price.
-    const salefPrices = b.directSaleItems.map((d) => d.priceCents).filter((p) => p >= 0);
-    const lowestSale = salefPrices.length > 0 ? Math.min(...salefPrices) : null;
-    const priceCents = lowestSale !== null ? lowestSale : b.priceCents > 0 ? b.priceCents : null;
-
-    // Approved ratings → average + count
-    const ratings = b.bookFeedback.map((f) => f.rating).filter((r) => r >= 1 && r <= 5);
-    const ratingCount = ratings.length;
-    const averageRating =
-      ratingCount > 0 ? Math.round((ratings.reduce((a, c) => a + c, 0) / ratingCount) * 10) / 10 : null;
-
-    const genreNames = b.genres.map((g) => g.genre.name);
-    for (const name of genreNames) {
-      const key = name.trim().toLowerCase();
-      if (key && !genreSet.has(key)) genreSet.set(key, name.trim());
-    }
-
-    const releaseMs = b.releaseDate ? new Date(b.releaseDate).getTime() : null;
-    const isNew = releaseMs !== null && now - releaseMs <= THIRTY_DAYS_MS && releaseMs <= now;
-    const sortTimestamp = releaseMs ?? new Date(b.createdAt).getTime();
-
-    const authorName = b.author.displayName || b.author.name;
-    const bookUrl = `${getAuthorBaseUrl(b.author)}/books/${b.slug}`;
-
-    return {
-      id: b.id,
-      title: b.title,
-      subtitle: b.subtitle,
-      coverImageUrl: b.coverImageUrl,
-      authorName,
-      bookUrl,
-      genres: genreNames,
-      formats: b.availableFormats ?? [],
-      priceCents,
-      averageRating,
-      ratingCount,
-      isNew,
-      sortTimestamp,
-    };
-  });
-
-  const genres = Array.from(genreSet.values()).sort((a, b) => a.localeCompare(b));
-
-  return { books, genres };
-}
-
 export default async function BookstorePage() {
-  const { books, genres } = await getBookstoreBooks();
+  const { books, genres, stats, spotlight } = await getBookstoreData();
 
-  // ── Structured data: a CollectionPage wrapping an ItemList of books ──
+  // Derived rows
+  const newBooks = [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 12);
+  const anyViews = books.some((b) => b.views > 0);
+  const trending = anyViews
+    ? [...books].sort((a, b) => b.views - a.views).slice(0, 12)
+    : [];
+  const topGenres = genres.slice(0, 14);
+
+  // Structured data
   const collectionLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "AuthorLoft Bookstore",
-    description:
-      "Browse books from independent authors on AuthorLoft across every genre.",
+    description: "Browse books from independent authors on AuthorLoft across every genre.",
     url: `${BASE}/bookstore`,
     isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: BASE },
     mainEntity: {
@@ -164,6 +92,12 @@ export default async function BookstorePage() {
     },
   };
 
+  const steps = [
+    { icon: PenLine, title: "List your book", text: "Flip one toggle to add any published book to the shared catalog." },
+    { icon: Eye, title: "Get discovered", text: "Readers browse by genre, rating, and price across every author." },
+    { icon: Store, title: "Sell on your site", text: "Every link sends readers to your own AuthorLoft site to buy." },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F0EDE4]">
       <script
@@ -174,7 +108,6 @@ export default async function BookstorePage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-[#DCDBD3]">
-        {/* Warm "library shelf" gradient backdrop */}
         <div
           aria-hidden
           className="absolute inset-0"
@@ -183,7 +116,6 @@ export default async function BookstorePage() {
               "linear-gradient(135deg, #3a2417 0%, #5c3a22 35%, #7a4f2e 60%, #9c6a3d 100%)",
           }}
         />
-        {/* Subtle vertical "spines" texture + parchment veil */}
         <div
           aria-hidden
           className="absolute inset-0 opacity-[0.12]"
@@ -195,7 +127,6 @@ export default async function BookstorePage() {
         <div aria-hidden className="absolute inset-0 bg-[#1B2B47]/30" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-          {/* AuthorLoft logo badge */}
           <div className="flex justify-center mb-6">
             <span className="inline-flex items-center bg-white rounded-2xl px-5 py-3 shadow-lg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -212,8 +143,27 @@ export default async function BookstorePage() {
             A shared shelf of books from independent authors across every genre. Find your
             next read, then buy directly from each author&apos;s own site.
           </p>
+
+          <BookstoreShare url={`${BASE}/bookstore`} text="Discover books by independent authors on the AuthorLoft Bookstore" />
         </div>
       </section>
+
+      {/* ── Stat bar ─────────────────────────────────────────────────────── */}
+      <div className="bg-[#1B2B47]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-3 divide-x divide-white/10 text-center">
+          {[
+            { icon: Library, value: stats.books, label: stats.books === 1 ? "Book" : "Books" },
+            { icon: PenLine, value: stats.authors, label: stats.authors === 1 ? "Author" : "Authors" },
+            { icon: Tag, value: stats.genres, label: stats.genres === 1 ? "Genre" : "Genres" },
+          ].map(({ icon: Icon, value, label }) => (
+            <div key={label} className="flex flex-col items-center gap-1 px-2">
+              <Icon className="h-4 w-4 text-[#D4AE6A]" />
+              <span className="text-2xl sm:text-3xl font-serif text-white leading-none">{value}</span>
+              <span className="text-[11px] uppercase tracking-widest text-[#9fb0c9]">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── Trust line ───────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#DCDBD3]">
@@ -226,9 +176,124 @@ export default async function BookstorePage() {
         </div>
       </div>
 
-      {/* ── Grid + filters ───────────────────────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <BookstoreGrid books={books} allGenres={genres} />
+        {/* ── Author spotlight ───────────────────────────────────────────── */}
+        {spotlight && (
+          <section className="mb-12">
+            <div className="relative overflow-hidden rounded-3xl bg-[#27406B] text-white p-6 sm:p-8">
+              <p className="text-xs font-mono uppercase tracking-widest text-[#D4AE6A] mb-4">
+                · Author Spotlight ·
+              </p>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={spotlight.image}
+                  alt={spotlight.name}
+                  className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover border-4 border-white/15 shadow-lg flex-shrink-0"
+                />
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="font-serif text-2xl sm:text-3xl mb-1">{spotlight.name}</h2>
+                  <p className="text-xs text-[#9fb0c9] mb-3">
+                    {spotlight.bookCount} book{spotlight.bookCount !== 1 ? "s" : ""} in the bookstore
+                  </p>
+                  <p className="text-sm text-[#D4DDEB] leading-relaxed max-w-2xl">{spotlight.bio}</p>
+                  <a
+                    href={spotlight.url}
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#D4AE6A] hover:gap-2.5 transition-all"
+                  >
+                    Visit {spotlight.name}&apos;s site <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+                {spotlight.sampleCovers.length > 0 && (
+                  <div className="hidden lg:flex gap-2 flex-shrink-0">
+                    {spotlight.sampleCovers.slice(0, 3).map((c, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={c}
+                        alt=""
+                        className="h-32 w-auto rounded-lg shadow-md object-cover"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── New + Trending rows ────────────────────────────────────────── */}
+        <BookstoreRow
+          title="New on the Shelf"
+          icon={<Clock className="h-5 w-5 text-[#C26A4A]" />}
+          books={newBooks}
+        />
+        <BookstoreRow
+          title="Trending Now"
+          icon={<TrendingUp className="h-5 w-5 text-[#C26A4A]" />}
+          books={trending}
+        />
+
+        {/* ── Browse by genre ────────────────────────────────────────────── */}
+        {topGenres.length > 0 && (
+          <section className="mb-12">
+            <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-4">
+              <Tag className="h-5 w-5 text-[#C26A4A]" />
+              Browse by Genre
+            </h2>
+            <div className="flex flex-wrap gap-2.5">
+              {topGenres.map((g) => (
+                <Link
+                  key={g.slug}
+                  href={`/bookstore/genre/${g.slug}`}
+                  className="group inline-flex items-center gap-2 bg-white border border-[#DCDBD3] rounded-xl px-4 py-2.5 hover:border-[#C26A4A] hover:shadow-sm transition-all"
+                >
+                  <span className="text-sm font-medium text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors">
+                    {g.name}
+                  </span>
+                  <span className="text-xs text-[#9b8e7e] bg-[#F0EDE4] rounded-full px-2 py-0.5">
+                    {g.count}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Full catalog ───────────────────────────────────────────────── */}
+        <section>
+          <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
+            <Library className="h-5 w-5 text-[#C26A4A]" />
+            Browse All Books
+          </h2>
+          <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
+        </section>
+      </div>
+
+      {/* ── How it works (author signup nudge) ───────────────────────────── */}
+      <div className="bg-white border-y border-[#DCDBD3]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
+          <p className="text-center text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-2">
+            · For authors ·
+          </p>
+          <h2 className="text-center font-serif text-3xl text-[#1B2B47] mb-10">
+            How the Bookstore works
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {steps.map(({ icon: Icon, title, text }, i) => (
+              <div key={title} className="text-center">
+                <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-[#F0EDE4] mb-4">
+                  <Icon className="h-6 w-6 text-[#C26A4A]" />
+                  <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-[#1B2B47] text-white text-xs font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="font-serif text-lg text-[#1B2B47] mb-1">{title}</h3>
+                <p className="text-sm text-[#5C6E89] leading-relaxed max-w-xs mx-auto">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── Author CTA band ──────────────────────────────────────────────── */}
