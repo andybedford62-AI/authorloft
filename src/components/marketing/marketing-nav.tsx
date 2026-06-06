@@ -57,6 +57,12 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
         {/* Middle nav links */}
         <nav className="hidden md:flex items-center gap-6">
+          <Link
+            href="/bookstore"
+            className="text-sm font-medium text-[#C26A4A] hover:text-[#a8573a] transition-colors"
+          >
+            Bookstore
+          </Link>
           <a
             href="/#features"
             className={`text-sm transition-colors ${
@@ -67,12 +73,6 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Features
           </a>
-          <Link
-            href="/bookstore"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Bookstore
-          </Link>
           <Link
             href="/blog"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"

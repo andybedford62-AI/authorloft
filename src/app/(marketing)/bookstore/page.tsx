@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { BookMarked, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -125,8 +127,49 @@ async function getBookstoreBooks(): Promise<{ books: BookstoreBook[]; genres: st
 export default async function BookstorePage() {
   const { books, genres } = await getBookstoreBooks();
 
+  // ── Structured data: a CollectionPage wrapping an ItemList of books ──
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "AuthorLoft Bookstore",
+    description:
+      "Browse books from independent authors on AuthorLoft across every genre.",
+    url: `${BASE}/bookstore`,
+    isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: BASE },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: books.length,
+      itemListElement: books.slice(0, 100).map((b, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Book",
+          name: b.title,
+          url: b.bookUrl,
+          author: { "@type": "Person", name: b.authorName },
+          ...(b.coverImageUrl ? { image: b.coverImageUrl } : {}),
+          ...(b.averageRating !== null && b.ratingCount > 0
+            ? {
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: b.averageRating,
+                  ratingCount: b.ratingCount,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+              }
+            : {}),
+        },
+      })),
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F0EDE4]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
       <MarketingNav />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
@@ -152,6 +195,13 @@ export default async function BookstorePage() {
         <div aria-hidden className="absolute inset-0 bg-[#1B2B47]/30" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
+          {/* AuthorLoft logo badge */}
+          <div className="flex justify-center mb-6">
+            <span className="inline-flex items-center bg-white rounded-2xl px-5 py-3 shadow-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-12 w-auto" />
+            </span>
+          </div>
           <p className="text-xs font-mono uppercase tracking-widest text-[#F0D9B5] mb-3">
             · Discover independent authors ·
           </p>
@@ -165,9 +215,40 @@ export default async function BookstorePage() {
         </div>
       </section>
 
+      {/* ── Trust line ───────────────────────────────────────────────────── */}
+      <div className="bg-white border-b border-[#DCDBD3]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-2 text-center">
+          <BookMarked className="h-4 w-4 text-[#C26A4A] flex-shrink-0" />
+          <p className="text-xs sm:text-sm text-[#5C6E89]">
+            Every book here is published by an independent author on{" "}
+            <span className="font-semibold text-[#1B2B47]">AuthorLoft</span>.
+          </p>
+        </div>
+      </div>
+
       {/* ── Grid + filters ───────────────────────────────────────────────── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <BookstoreGrid books={books} allGenres={genres} />
+      </div>
+
+      {/* ── Author CTA band ──────────────────────────────────────────────── */}
+      <div className="bg-[#1B2B47] py-16 px-4 text-center">
+        <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">
+          · Are you an author? ·
+        </p>
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#E8E5DD] font-normal mb-4">
+          List your books in the <span className="italic text-[#D4AE6A]">AuthorLoft Bookstore</span>
+        </h2>
+        <p className="text-sm text-[#D4DDEB] mb-6 max-w-md mx-auto leading-relaxed">
+          Reach new readers through our shared catalog — then sell directly from your own
+          author site. Available on the Standard and Premium plans.
+        </p>
+        <Link
+          href="/register"
+          className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+        >
+          Get Started Free <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   );
