@@ -19,6 +19,10 @@ Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD
 - [ ] **"New books this week" email digest** — opt-in reader newsletter from the catalog. *(medium, needs job + template)*
 - [ ] **Quick-view modal** — peek at a book without leaving the bookstore. *(small)*
 - [ ] **Bookstore listing limits by tier** — e.g., STANDARD limited number of listings, PREMIUM unlimited + featured (pricing lever). *(small)*
+- [ ] **Clickable author name on book cards** — currently the whole card links to the book (can't nest links); consider restructuring so the author name links to their site separately. *(small)*
+- [ ] **Bookstore link in mobile nav** — the homepage hero nav is desktop-only (`hidden md:flex`), so the Bookstore link isn't visible on mobile there. Broader nav/mobile-menu consideration. *(small)*
+- [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
+- [ ] **"See Book" price wording** — cards currently omit price when none is set; original plan suggested a "See Book" label for retailer-only titles. Decide if wanted. *(trivial)*
 
 ---
 

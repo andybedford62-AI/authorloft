@@ -1,8 +1,16 @@
 # AuthorLoft Bookstore — Build Todo
 
-**Status:** Ready to build  
-**Est. Time:** 1.5 days (~12–14 hours)  
+**Status:** ✅ SHIPPED June 6, 2026 — live at `www.authorloft.com/bookstore`
 **Full Plan:** `.claude/plans/authorloft-bookstore.md`
+**Follow-ups:** tracked in `docs/FEATURE_BACKLOG.md`
+
+> All build sections (1–8) complete, plus showcase extras (stat bar, author spotlight,
+> New/Trending rows, genre landing pages, share buttons, JSON-LD/sitemap SEO, branding).
+> Deviations from original plan: format filter uses real `availableFormats`
+> (eBook/Paperback/Hardback/Audiobook); "Featured" sort replaced by a dedicated Premium
+> ribbon; author name on cards is not a separate link (whole card links to the book);
+> hero uses a CSS gradient instead of a bookshelf image. Content Import remains a future
+> item (see backlog).
 
 ---
 
