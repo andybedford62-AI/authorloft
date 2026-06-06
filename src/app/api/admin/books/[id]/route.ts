@@ -49,7 +49,7 @@ export async function PUT(
   const {
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId, priceCents,
-    isbn, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
+    isbn, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
     availableFormats, caption, releaseDate, flipBookUrl, sampleContent,
   } = body;
 
@@ -103,6 +103,7 @@ export async function PUT(
         isFeatured: isFeatured ?? false,
         isPublished: isPublished ?? true,
         directSalesEnabled: directSalesEnabled ?? false,
+        listInBookstore: listInBookstore ?? false,
         genres:
           genreIds?.length > 0
             ? { create: genreIds.map((genreId: string) => ({ genreId })) }

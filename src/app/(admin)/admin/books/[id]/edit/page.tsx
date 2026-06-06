@@ -66,6 +66,7 @@ export default async function EditBookPage({
     isFeatured: book.isFeatured,
     isPublished: book.isPublished,
     directSalesEnabled: book.directSalesEnabled,
+    listInBookstore: book.listInBookstore,
     genreIds: book.genres.map((g) => g.genreId),
     availableFormats: book.availableFormats ?? [],
     caption: book.caption ?? null,
@@ -106,6 +107,7 @@ export default async function EditBookPage({
         genres={genres}
         audioEnabled={author?.plan?.audioEnabled ?? false}
         salesEnabled={author?.plan?.salesEnabled ?? false}
+        bookstoreEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         arcEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         stripeConnectOnboarded={author?.stripeConnectOnboarded ?? false}
         previewMedia={previewMedia}

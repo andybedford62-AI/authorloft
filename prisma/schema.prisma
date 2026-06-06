@@ -322,6 +322,7 @@ model Book {
   isFeatured          Boolean              @default(false)
   isPublished         Boolean              @default(true)
   directSalesEnabled  Boolean              @default(false)
+  listInBookstore     Boolean              @default(false)  // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
   sortOrder           Int                  @default(0)
   views               Int                  @default(0)
   createdAt           DateTime             @default(now())

@@ -39,6 +39,7 @@ type BookData = {
   isFeatured: boolean;
   isPublished: boolean;
   directSalesEnabled: boolean;
+  listInBookstore: boolean;
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -52,6 +53,7 @@ type Props = {
   genres: Genre[];
   audioEnabled: boolean;
   salesEnabled: boolean;
+  bookstoreEnabled: boolean;
   arcEnabled: boolean;
   stripeConnectOnboarded: boolean;
   previewMedia: PreviewMedia[];
@@ -70,7 +72,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "arcs",          label: "ARC" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, arcEnabled, stripeConnectOnboarded, previewMedia }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, bookstoreEnabled, arcEnabled, stripeConnectOnboarded, previewMedia }: Props) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
@@ -114,6 +116,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         genres={genres}
         activeTab={activeTab}
         salesEnabled={salesEnabled}
+        bookstoreEnabled={bookstoreEnabled}
       />
 
       {/* ── Standalone tab panels — mounted only when active ── */}

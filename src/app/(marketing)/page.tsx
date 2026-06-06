@@ -424,6 +424,7 @@ export default async function MarketingPage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 0' }}>
               {([
                 ['Features',  '/features'],
+                ['Bookstore', '/bookstore'],
                 ['Pricing',   '/pricing'],
                 ['Blog',      '/blog'],
                 ['Resources', '/resources'],

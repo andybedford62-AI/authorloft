@@ -68,6 +68,12 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             Features
           </a>
           <Link
+            href="/bookstore"
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            Bookstore
+          </Link>
+          <Link
             href="/blog"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >

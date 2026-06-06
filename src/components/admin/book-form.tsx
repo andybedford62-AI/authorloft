@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock } from "lucide-react";
+import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -26,6 +26,7 @@ type BookData = {
   isFeatured: boolean;
   isPublished: boolean;
   directSalesEnabled: boolean;
+  listInBookstore: boolean;
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -39,6 +40,7 @@ type BookFormProps = {
   genres: Genre[];
   activeTab?: string; // injected by BookEditTabsClient; undefined = standalone (new book)
   salesEnabled?: boolean;
+  bookstoreEnabled?: boolean; // STANDARD+ may opt books into the public AuthorLoft Bookstore
 };
 
 // ── Cover upload widget ────────────────────────────────────────────────────────
@@ -195,7 +197,7 @@ function Req() {
 
 // ── BookForm ───────────────────────────────────────────────────────────────────
 
-export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true }: BookFormProps) {
+export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true, bookstoreEnabled = false }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -218,6 +220,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [isFeatured, setIsFeatured]               = useState(book?.isFeatured ?? false);
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
   const [directSalesEnabled, setDirectSalesEnabled] = useState(book?.directSalesEnabled ?? false);
+  const [listInBookstore, setListInBookstore]     = useState(book?.listInBookstore ?? false);
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
   const [availableFormats, setAvailableFormats]   = useState<string[]>(book?.availableFormats ?? []);
   const [caption, setCaption]                     = useState(book?.caption ?? "");
@@ -382,6 +385,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       isFeatured,
       isPublished,
       directSalesEnabled,
+      listInBookstore,
       genreIds: selectedGenres,
       availableFormats,
       caption:     caption || null,
@@ -823,6 +827,44 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
               <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to enable
               direct sales on your books.
             </div>
+          </div>
+        )}
+
+        {/* AuthorLoft Bookstore opt-in — edit mode only (new books redirect to edit) */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            {bookstoreEnabled ? (
+              <>
+                <div className="flex items-center gap-4 cursor-pointer select-none"
+                  onClick={() => setListInBookstore((v) => !v)}>
+                  <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${listInBookstore ? "bg-emerald-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${listInBookstore ? "translate-x-5" : "translate-x-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <Store className="h-3.5 w-3.5 text-emerald-600" />
+                      List in AuthorLoft Bookstore
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Feature this book in the public AuthorLoft Bookstore for cross-discovery. Readers click through to this book on your own site — no payment is taken there.
+                    </p>
+                  </div>
+                </div>
+                {listInBookstore && (
+                  <div className="ml-14 mt-2 rounded-lg p-3 text-xs bg-emerald-50 border border-emerald-100 text-emerald-700">
+                    Listed once this book is <strong>Published</strong>. Make sure it has a cover image and description so it looks its best in the catalog.
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-semibold">The AuthorLoft Bookstore requires a Standard plan or higher.</span>{" "}
+                  <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to list your books in the public bookstore for extra discovery.
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>}
