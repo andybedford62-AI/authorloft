@@ -33,6 +33,10 @@ Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD
 
 ---
 
+## Auth / Account
+
+- [ ] **"Remember me" checkbox on login** — checked = persistent (~30d, current default); unchecked = session cookie (log out on browser close). Optional: also shorten default session from 30d → 7d. *(small–medium, touches NextAuth)*. Deferred June 6, 2026 — current persistent login is working as intended; not a bug.
+
 ## Marketing & SEO
 
 - [ ] **Feature landing pages** — deferred until PostHog traffic data (~2026-07-01).
