@@ -48,11 +48,11 @@ export const metadata: Metadata = {
 export default async function BookstorePage() {
   const { books, genres, stats, spotlight } = await getBookstoreData();
 
-  // Derived rows
-  const newBooks = [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 12);
+  // Derived rows — capped at 6 so each stays on a single clean line
+  const newBooks = [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 6);
   const anyViews = books.some((b) => b.views > 0);
   const trending = anyViews
-    ? [...books].sort((a, b) => b.views - a.views).slice(0, 12)
+    ? [...books].sort((a, b) => b.views - a.views).slice(0, 6)
     : [];
   const topGenres = genres.slice(0, 14);
 
