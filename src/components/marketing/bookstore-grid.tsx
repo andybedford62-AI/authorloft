@@ -22,9 +22,8 @@ const PRICE_OPTIONS: { id: PriceFilter; label: string }[] = [
   { id: "u20", label: "Under $20" },
 ];
 
-type SortKey = "featured" | "newest" | "az" | "rated";
+type SortKey = "newest" | "az" | "rated";
 const SORT_OPTIONS: { id: SortKey; label: string }[] = [
-  { id: "featured", label: "Featured" },
   { id: "newest", label: "Newest" },
   { id: "az", label: "Title A–Z" },
   { id: "rated", label: "Highest Rated" },
@@ -41,7 +40,7 @@ export function BookstoreGrid({
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]); // lowercased genre names
   const [format, setFormat] = useState<string>("all");
   const [price, setPrice] = useState<PriceFilter>("all");
-  const [sort, setSort] = useState<SortKey>("featured");
+  const [sort, setSort] = useState<SortKey>("newest");
   const [page, setPage] = useState(1);
 
   // Only show format chips for formats that actually appear in the catalog
@@ -64,7 +63,7 @@ export function BookstoreGrid({
     setSelectedGenres([]);
     setFormat("all");
     setPrice("all");
-    setSort("featured");
+    setSort("newest");
     setPage(1);
   }
 
@@ -108,9 +107,6 @@ export function BookstoreGrid({
         if (br !== ar) return br - ar;
         return b.ratingCount - a.ratingCount;
       });
-    } else if (sort === "featured") {
-      // Premium authors' books float to the top
-      sorted.sort((a, b) => Number(b.featured) - Number(a.featured));
     }
     return sorted;
   }, [books, search, selectedGenres, format, price, sort]);

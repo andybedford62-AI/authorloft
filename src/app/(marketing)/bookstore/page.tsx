@@ -16,6 +16,7 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreShare } from "@/components/marketing/bookstore-share";
+import { BookstoreBookCard } from "@/components/marketing/bookstore-book-card";
 import { getBookstoreData } from "@/lib/bookstore";
 
 export const revalidate = 1800;
@@ -55,6 +56,17 @@ export default async function BookstorePage() {
     ? [...books].sort((a, b) => b.views - a.views).slice(0, 6)
     : [];
   const topGenres = genres.slice(0, 14);
+
+  // Featured = Premium authors' books, best-rated first
+  const featuredBooks = books
+    .filter((b) => b.featured)
+    .sort((a, b) => {
+      const ar = a.averageRating ?? -1;
+      const br = b.averageRating ?? -1;
+      if (br !== ar) return br - ar;
+      return b.sortTimestamp - a.sortTimestamp;
+    })
+    .slice(0, 6);
 
   // Structured data
   const collectionLd = {
@@ -217,6 +229,31 @@ export default async function BookstorePage() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Featured Books (Premium) — distinct gold band ──────────────── */}
+        {featuredBooks.length > 0 && (
+          <section className="mb-12">
+            <div className="rounded-3xl border border-[#E8C77E] bg-gradient-to-br from-[#FBF3E0] to-[#F2DFB4] p-6 sm:p-8 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#B8893D]" />
+                <h2 className="font-serif text-2xl text-[#1B2B47]">Featured Books</h2>
+                <span className="ml-1 text-[10px] font-bold uppercase tracking-wider text-[#7a5e2e] bg-[#E8C77E]/50 px-2 py-0.5 rounded-full">
+                  Premium authors
+                </span>
+              </div>
+              <p className="text-sm text-[#8a6d33] mt-1 mb-5">
+                Hand-picked standout titles from authors on our Premium plan.
+              </p>
+              <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x scroll-smooth">
+                {featuredBooks.map((b) => (
+                  <div key={b.id} className="w-40 sm:w-44 shrink-0 snap-start">
+                    <BookstoreBookCard book={b} />
+                  </div>
+                ))}
               </div>
             </div>
           </section>
