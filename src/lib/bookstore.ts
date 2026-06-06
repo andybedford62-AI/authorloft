@@ -23,6 +23,24 @@ export type BookstoreData = {
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
+/** Strip HTML tags + decode common entities so rich-text fields render as clean plain text. */
+function stripHtml(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&rsquo;/gi, "’")
+    .replace(/&lsquo;/gi, "‘")
+    .replace(/&ldquo;/gi, "“")
+    .replace(/&rdquo;/gi, "”")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /**
  * Single source of truth for the public bookstore.
  * Returns enriched, serializable book data plus derived genres, stats and a
@@ -139,7 +157,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
   for (const b of rows) {
     const a = b.author;
     const image = a.profileImageUrl;
-    const bio = a.shortBio || a.bio;
+    const bio = stripHtml(a.shortBio || a.bio || "");
     if (!image || !bio) continue;
     const key = a.slug;
     const entry = spotlightCandidates.get(key);

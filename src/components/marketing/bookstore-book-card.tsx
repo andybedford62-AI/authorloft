@@ -32,7 +32,7 @@ function formatPrice(cents: number | null): string | null {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
+export function BookstoreBookCard({ book, compact = false }: { book: BookstoreBook; compact?: boolean }) {
   const price = formatPrice(book.priceCents);
 
   return (
@@ -57,25 +57,30 @@ export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
           </div>
         )}
 
-        {/* Badges (Featured + New) — stacked top-left */}
-        <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
-          {book.featured && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#3a2417] bg-gradient-to-r from-[#E8B04B] to-[#D4AE6A] px-2 py-1 rounded-full shadow-sm">
-              <Sparkles className="h-2.5 w-2.5" /> Featured
-            </span>
-          )}
-          {book.isNew && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B2B47] bg-[#F0D9B5] px-2 py-1 rounded-full shadow-sm">
-              New
-            </span>
-          )}
-        </div>
+        {/* Cover overlays (badges + price) — hidden in compact mode */}
+        {!compact && (
+          <>
+            {/* Badges (Featured + New) — stacked top-left */}
+            <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
+              {book.featured && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#3a2417] bg-gradient-to-r from-[#E8B04B] to-[#D4AE6A] px-2 py-1 rounded-full shadow-sm">
+                  <Sparkles className="h-2.5 w-2.5" /> Featured
+                </span>
+              )}
+              {book.isNew && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B2B47] bg-[#F0D9B5] px-2 py-1 rounded-full shadow-sm">
+                  New
+                </span>
+              )}
+            </div>
 
-        {/* Price chip */}
-        {price && (
-          <span className="absolute top-2 right-2 text-xs font-semibold text-white bg-[#1B2B47]/85 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">
-            {price}
-          </span>
+            {/* Price chip */}
+            {price && (
+              <span className="absolute top-2 right-2 text-xs font-semibold text-white bg-[#1B2B47]/85 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">
+                {price}
+              </span>
+            )}
+          </>
         )}
       </div>
 
@@ -86,13 +91,13 @@ export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
         </h3>
         <p className="text-xs text-[#9b8e7e] mt-1">
           by <span className="text-[#5C6E89]">{book.authorName}</span>
-          {book.authorBookCount > 1 && (
+          {!compact && book.authorBookCount > 1 && (
             <span className="text-[#b6a88f]"> · {book.authorBookCount} books</span>
           )}
         </p>
 
-        {/* Rating — hidden until the book has approved ratings */}
-        {book.ratingCount > 0 && book.averageRating !== null && (
+        {/* Rating — hidden until the book has approved ratings (and never in compact) */}
+        {!compact && book.ratingCount > 0 && book.averageRating !== null && (
           <div className="flex items-center gap-1 mt-2">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((n) => (
@@ -112,8 +117,8 @@ export function BookstoreBookCard({ book }: { book: BookstoreBook }) {
           </div>
         )}
 
-        {/* Format badges */}
-        {book.formats.length > 0 && (
+        {/* Format badges — hidden in compact */}
+        {!compact && book.formats.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
             {book.formats.map((f) => (
               <span
