@@ -2,12 +2,12 @@ import { Heart } from "lucide-react";
 
 export function BookstoreHero() {
   return (
-    <div className="bg-blue-50 py-6 sm:py-8 px-4 sm:px-6 mb-8 rounded-xl">
+    <div className="bg-[#C5D3E6] py-6 sm:py-8 px-4 sm:px-6 mb-8 rounded-xl">
       <div className="max-w-5xl mx-auto text-center space-y-2 sm:space-y-3">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="p-2 bg-white border border-blue-200 rounded-full shadow-sm">
-            <Heart className="h-5 w-5 text-blue-600" />
+          <div className="p-2 bg-white border border-[#A9BDD6] rounded-full shadow-sm">
+            <Heart className="h-5 w-5 text-[#27406B]" />
           </div>
         </div>
 
