@@ -14,7 +14,7 @@ import {
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
-import { BookstoreShare } from "@/components/marketing/bookstore-share";
+import { BookstoreHeroSocial } from "@/components/marketing/bookstore-hero-social";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
 import { getBookstoreData } from "@/lib/bookstore";
 
@@ -144,7 +144,7 @@ export default async function BookstorePage() {
             next read, then buy directly from each author&apos;s own site.
           </p>
 
-          <BookstoreShare url={`${BASE}/bookstore`} text="Discover books by independent authors on the AuthorLoft Bookstore" />
+          <BookstoreHeroSocial />
         </div>
       </section>
 
