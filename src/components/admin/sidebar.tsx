@@ -39,6 +39,7 @@ import {
   Globe,
   Ticket,
   Star,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -134,7 +135,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/help",             label: "Help Centre",     icon: HelpCircle },
   { href: "/super-admin/blog",             label: "Blog",            icon: Newspaper  },
   { href: "/super-admin/resources",        label: "Resources",       icon: Globe      },
-  { href: "/super-admin/social",           label: "Social Media",    icon: Users      },
+  { href: "/super-admin/social",           label: "Social Media",    icon: Share2     },
 ];
 
 // ── Theme token helper ───────────────────────────────────────────────────────
