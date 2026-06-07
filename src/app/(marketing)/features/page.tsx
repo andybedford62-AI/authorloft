@@ -164,31 +164,7 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3] text-[#5C6E89] py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center">
-            <Image
-              src="/AL_site_Logo-Dark_footer.png"
-              alt="AuthorLoft"
-              width={140}
-              height={40}
-              className="h-8 w-auto"
-            />
-          </div>
-          <p className="text-sm">© {new Date().getFullYear()} AuthorLoft. Built for authors.</p>
-          <div className="flex gap-4 text-sm">
-            <Link href="/privacy" className="hover:text-[#1B2B47] transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-[#1B2B47] transition-colors">
-              Terms
-            </Link>
-            <Link href="/contact" className="hover:text-[#1B2B47] transition-colors">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* Footer is rendered once by the marketing layout (MarketingFooter) */}
     </div>
   );
 }

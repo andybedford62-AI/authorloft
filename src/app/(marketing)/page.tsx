@@ -3,9 +3,8 @@ import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
-import { ArrowRight, BookOpen, Layers, Globe, CreditCard, Search, Mail, Users, Shield, Linkedin, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Globe, CreditCard, Search, Mail, Users, Shield } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { getSocialLinks } from "@/lib/social-links";
 import { MidnightHero } from "@/components/marketing/midnight-hero";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
@@ -164,7 +163,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources, socialLinks] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(), getSocialLinks()]);
+  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -416,75 +415,7 @@ export default async function MarketingPage() {
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer style={{ background: ML.bone, borderTop: `1px solid #DCDBD3`, padding: '28px 60px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          {/* Top row: logo + inline links */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
-            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={120} height={34} style={{ height: 28, width: 'auto' }} />
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 0' }}>
-              {([
-                ['Features',  '/features'],
-                ['Bookstore', '/bookstore'],
-                ['Pricing',   '/pricing'],
-                ['Blog',      '/blog'],
-                ['Resources', '/resources'],
-                ['Contact',   '/contact'],
-                ['Privacy',  '/privacy'],
-                ['Terms',    '/terms'],
-                ['GDPR',     '/gdpr'],
-                ['Demo',     'https://demo.authorloft.com'],
-              ] as [string, string][]).map(([label, href], i, arr) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <Link
-                    href={href}
-                    style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: ML.slate, textDecoration: 'none', padding: '0 10px' }}
-                    {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  >{label}</Link>
-                  {i < arr.length - 1 && <span style={{ color: '#DCDBD3' }}>·</span>}
-                </span>
-              ))}
-            </div>
-          </div>
-          {/* Bottom row: copyright + social links + tagline */}
-          <div style={{ borderTop: `1px solid #DCDBD3`, paddingTop: 14, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 12, color: `${ML.slate}88`, margin: 0 }}>
-              © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
-            </p>
-            {socialLinks.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                {socialLinks.map((link) => {
-                  const IconMap: Record<string, React.ElementType> = {
-                    linkedin: Linkedin,
-                    facebook: Facebook,
-                    twitter: Twitter,
-                    instagram: Instagram,
-                    youtube: Youtube,
-                  };
-                  const Icon = IconMap[link.icon.toLowerCase()] || Globe;
-                  return (
-                    <a
-                      key={link.id}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={link.platform}
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: ML.slate, textDecoration: 'none', opacity: 0.6, transition: 'opacity 0.2s' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
-                    >
-                      <Icon style={{ width: 16, height: 16 }} />
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: `${ML.slate}55`, margin: 0 }}>
-              —— your name, your shelf ——
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer is rendered once by the marketing layout (MarketingFooter) */}
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
