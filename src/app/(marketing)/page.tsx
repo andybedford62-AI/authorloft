@@ -3,8 +3,9 @@ import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
-import { ArrowRight, BookOpen, Layers, Globe, CreditCard, Search, Mail, Users, Shield } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Globe, CreditCard, Search, Mail, Users, Shield, Linkedin, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getSocialLinks } from "@/lib/social-links";
 import { MidnightHero } from "@/components/marketing/midnight-hero";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
@@ -163,7 +164,7 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources()]);
+  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources, socialLinks] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(), getSocialLinks()]);
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -445,11 +446,39 @@ export default async function MarketingPage() {
               ))}
             </div>
           </div>
-          {/* Bottom row: copyright + tagline */}
+          {/* Bottom row: copyright + social links + tagline */}
           <div style={{ borderTop: `1px solid #DCDBD3`, paddingTop: 14, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 12, color: `${ML.slate}88`, margin: 0 }}>
               © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
             </p>
+            {socialLinks.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {socialLinks.map((link) => {
+                  const IconMap: Record<string, React.ElementType> = {
+                    linkedin: Linkedin,
+                    facebook: Facebook,
+                    twitter: Twitter,
+                    instagram: Instagram,
+                    youtube: Youtube,
+                  };
+                  const Icon = IconMap[link.icon.toLowerCase()] || Globe;
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={link.platform}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: ML.slate, textDecoration: 'none', opacity: 0.6, transition: 'opacity 0.2s' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+                    >
+                      <Icon style={{ width: 16, height: 16 }} />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
             <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: `${ML.slate}55`, margin: 0 }}>
               —— your name, your shelf ——
             </p>

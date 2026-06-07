@@ -799,6 +799,7 @@ model PlatformSettings {
   termsUpdatedAt        DateTime?
   contactEmail          String?
   marketingHeroImageUrl String?
+  socialLinks           Json      @default("[]")
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 }

@@ -1,6 +1,6 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** June 6, 2026  
+**Last Updated:** June 7, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
 
 ---
@@ -72,6 +72,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Reader Feedback Dashboard** (moderate ratings) | ✅ | ✅ | ✅ |
 | **Testimonials Display** (social proof on site) | ✅ | ✅ | ✅ |
 | **AuthorLoft Bookstore** (list books in public discovery catalog at /bookstore) | ❌ | ✅ | ✅ (Featured placement) |
+| — **Bookstore Search & Discovery** (prominent search, featured section, genre browse) | ❌ | ✅ | ✅ (Featured ribbon + visibility priority) |
 
 ---
 

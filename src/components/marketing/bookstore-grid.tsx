@@ -123,58 +123,59 @@ export function BookstoreGrid({
 
   return (
     <div>
-      {/* ── Controls ───────────────────────────────────────────────────── */}
+      {/* ── Search (Prominent) ─────────────────────────────────────────── */}
+      <div className="mb-6 sm:mb-8">
+        <div className="relative">
+          <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#C26A4A]" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Find books by title, author, or genre…"
+            className="w-full rounded-xl border-2 border-[#DCDBD3] bg-white pl-13 sm:pl-14 pr-4 sm:pr-5 py-3 sm:py-4 text-base sm:text-lg text-[#1B2B47] shadow-sm transition-all focus:border-[#C26A4A] focus:outline-none focus:ring-2 focus:ring-[#C26A4A]/20"
+          />
+        </div>
+      </div>
+
+      {/* ── Filters & sorts ────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-[#DCDBD3] p-4 sm:p-5 mb-8 space-y-4">
-        {/* Search + selects */}
-        <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9b8e7e]" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search by title, author, or genre…"
-              className="w-full rounded-lg border border-[#DCDBD3] bg-white pl-9 pr-3 py-2 text-sm text-[#1B2B47] shadow-sm focus:border-[#C26A4A] focus:outline-none focus:ring-1 focus:ring-[#C26A4A]"
-            />
-          </div>
-
-          <div className="flex gap-2 flex-wrap">
-            {availableFormats.length > 0 && (
-              <select
-                value={format}
-                onChange={(e) => { setFormat(e.target.value); setPage(1); }}
-                className={selectClass}
-                aria-label="Filter by format"
-              >
-                <option value="all">All formats</option>
-                {availableFormats.map((o) => (
-                  <option key={o.id} value={o.id}>{o.label}</option>
-                ))}
-              </select>
-            )}
-
+        {/* Format, price, sort selects */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-wrap">
+          {availableFormats.length > 0 && (
             <select
-              value={price}
-              onChange={(e) => { setPrice(e.target.value as PriceFilter); setPage(1); }}
+              value={format}
+              onChange={(e) => { setFormat(e.target.value); setPage(1); }}
               className={selectClass}
-              aria-label="Filter by price"
+              aria-label="Filter by format"
             >
-              {PRICE_OPTIONS.map((o) => (
+              <option value="all">All formats</option>
+              {availableFormats.map((o) => (
                 <option key={o.id} value={o.id}>{o.label}</option>
               ))}
             </select>
+          )}
 
-            <select
-              value={sort}
-              onChange={(e) => { setSort(e.target.value as SortKey); setPage(1); }}
-              className={selectClass}
-              aria-label="Sort books"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>{o.label}</option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={price}
+            onChange={(e) => { setPrice(e.target.value as PriceFilter); setPage(1); }}
+            className={selectClass}
+            aria-label="Filter by price"
+          >
+            {PRICE_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>{o.label}</option>
+            ))}
+          </select>
+
+          <select
+            value={sort}
+            onChange={(e) => { setSort(e.target.value as SortKey); setPage(1); }}
+            className={selectClass}
+            aria-label="Sort books"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>{o.label}</option>
+            ))}
+          </select>
         </div>
 
         {/* Genre chips */}

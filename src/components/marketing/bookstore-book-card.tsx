@@ -133,7 +133,7 @@ export function BookstoreBookCard({ book, compact = false }: { book: BookstoreBo
 
         {/* CTA */}
         <span className="mt-4 pt-3 border-t border-[#F0EDE4] inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] group-hover:gap-2 transition-all">
-          View Book <ArrowRight className="h-3 w-3" />
+          Buy on Author's Site <ArrowRight className="h-3 w-3" />
         </span>
       </div>
     </a>

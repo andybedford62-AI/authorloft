@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   User, BookOpen, ChevronRight, ChevronLeft,
-  Upload, CheckCircle, ExternalLink, Loader2, X,
+  Upload, CheckCircle, ExternalLink, Loader2, X, Store,
 } from "lucide-react";
 
 function toSlug(title: string): string {
@@ -460,6 +460,7 @@ export function OnboardingGuidedModal({
           <ul className="space-y-2">
             {[
               { icon: BookOpen, text: "Add more books and upload your files" },
+              { icon: Store,    text: "List your books in the AuthorLoft Bookstore (STANDARD+ feature)" },
               { icon: User,     text: "Connect Stripe to sell books directly" },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-2 text-xs text-gray-500">

@@ -17,6 +17,7 @@ import {
   MessageSquare,
   ChevronRight,
   HelpCircle,
+  Share2,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { MaintenanceToggle } from "./maintenance-toggle";
@@ -30,6 +31,7 @@ import { FaqsPanel } from "./faqs-panel";
 import { WelcomeEmailPanel } from "./welcome-email-panel";
 import { MassEmailPanel } from "./mass-email-panel";
 import { SeoPanel } from "./seo-panel";
+import { SocialLinksPanel } from "./social-links-panel";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -100,6 +102,7 @@ type SectionId =
   | "testimonials"
   | "faqs"
   | "seo"
+  | "social-links"
   | "maintenance"
   | "onboarding"
   | "configuration";
@@ -134,6 +137,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Content",
     items: [
       { id: "marketing",     label: "Marketing",       icon: Image         },
+      { id: "social-links",  label: "Social Links",    icon: Share2        },
       { id: "testimonials",  label: "Testimonials",    icon: Star          },
       { id: "faqs",          label: "FAQs",            icon: HelpCircle    },
       { id: "seo",           label: "Social Images",   icon: Globe         },
@@ -196,6 +200,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
         {active === "onboarding"    && <OnboardingTab />}
         {active === "maintenance"   && <MaintenanceTab   {...props} />}
         {active === "marketing"     && <MarketingTab     {...props} />}
+        {active === "social-links"  && <SocialLinksPanel />}
         {active === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
         {active === "faqs"          && <FaqsPanel initialFaqs={props.faqs} />}
         {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
