@@ -16,7 +16,6 @@ import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreShare } from "@/components/marketing/bookstore-share";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
-import { BookstoreFeaturedRow } from "@/components/marketing/bookstore-featured-row";
 import { getBookstoreData } from "@/lib/bookstore";
 
 export const revalidate = 1800;
@@ -180,9 +179,6 @@ export default async function BookstorePage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         {/* ── Mission statement hero ────────────────────────────────────── */}
         <BookstoreHero />
-
-        {/* ── Featured authors ──────────────────────────────────────────── */}
-        <BookstoreFeaturedRow books={books} />
 
         {/* ── Author spotlight ───────────────────────────────────────────── */}
         {spotlight && (
