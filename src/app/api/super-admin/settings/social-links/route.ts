@@ -62,17 +62,25 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const updated = await prisma.platformSettings.upsert({
-    where: { id: "singleton" },
-    create: {
-      id: "singleton",
-      socialLinks: socialLinks,
-    },
-    update: {
-      socialLinks: socialLinks,
-    },
-    select: { socialLinks: true },
-  });
+  try {
+    const updated = await prisma.platformSettings.upsert({
+      where: { id: "singleton" },
+      create: {
+        id: "singleton",
+        socialLinks: socialLinks,
+      },
+      update: {
+        socialLinks: socialLinks,
+      },
+      select: { socialLinks: true },
+    });
 
-  return NextResponse.json({ socialLinks: updated.socialLinks });
+    return NextResponse.json({ socialLinks: updated.socialLinks });
+  } catch (err) {
+    console.error("Failed to save social links:", err);
+    return NextResponse.json(
+      { error: "Failed to save social links. Please try again." },
+      { status: 500 }
+    );
+  }
 }

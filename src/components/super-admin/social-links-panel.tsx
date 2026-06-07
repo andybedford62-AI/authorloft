@@ -52,12 +52,13 @@ export function SocialLinksPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ socialLinks: newLinks }),
       });
+      // Parse body defensively — an empty/non-JSON response (e.g. a 500)
+      // must not surface as "Unexpected end of JSON input".
+      const data = await res.json().catch(() => null);
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to save social links");
+        throw new Error(data?.error || `Failed to save social links (${res.status})`);
       }
-      const data = await res.json();
-      setLinks((data.socialLinks as SocialLink[]) || []);
+      setLinks((data?.socialLinks as SocialLink[]) || []);
       setEditingId(null);
       setFormData({});
     } catch (err) {
