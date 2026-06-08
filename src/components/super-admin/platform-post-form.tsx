@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown } from "lucide-react";
+import { SUGGESTED_NEWS_CATEGORIES, SUGGESTED_BLOG_CATEGORIES } from "@/lib/post-categories";
 
 type Post = {
   id:              string;
@@ -26,6 +27,8 @@ type Post = {
 
 interface Props {
   post?: Post;
+  /** Distinct categories already used across posts — merged into the datalist. */
+  categorySuggestions?: string[];
 }
 
 function slugify(text: string) {
@@ -40,7 +43,7 @@ function slugify(text: string) {
 const inputCls  = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
 const labelCls  = "block text-xs font-semibold text-gray-600 mb-1.5";
 
-export function PlatformPostForm({ post }: Props) {
+export function PlatformPostForm({ post, categorySuggestions = [] }: Props) {
   const router = useRouter();
   const isEdit = !!post;
 
@@ -215,11 +218,24 @@ export function PlatformPostForm({ post }: Props) {
             <label className={labelCls}>Category</label>
             <input
               type="text"
+              list="post-category-options"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Author Tips"
+              placeholder={isNews ? "e.g. Announcements" : "e.g. Author Tips"}
               className={inputCls}
             />
+            <datalist id="post-category-options">
+              {Array.from(
+                new Set([
+                  ...(isNews ? SUGGESTED_NEWS_CATEGORIES : SUGGESTED_BLOG_CATEGORIES),
+                  ...categorySuggestions,
+                  ...(category ? [category] : []),
+                ])
+              ).map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+            <p className="text-xs text-gray-400">Pick a suggestion or type your own — used for filtering on the public page.</p>
           </div>
           <div className="space-y-1.5">
             <label className={labelCls}>Author Name</label>
