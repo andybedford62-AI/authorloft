@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Send, Check, Mail } from "lucide-react";
+import { Send, Check, Mail } from "lucide-react";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 
 type SupportEmailOption = { id: string; label: string; email: string; description: string | null };
@@ -61,18 +60,6 @@ export function ContactForm() {
 
   return (
     <div className="min-h-screen bg-[#E8E5DD]">
-      {/* Nav */}
-      <header className="border-b border-[#DCDBD3] bg-[#E8E5DD] sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
-          </Link>
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> AuthorLoft home
-          </Link>
-        </div>
-      </header>
-
       <MarketingPageHeader
         eyebrow="Get in touch"
         title={<>Contact <span className="italic text-[#D4AE6A]">AuthorLoft</span></>}

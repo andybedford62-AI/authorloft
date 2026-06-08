@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { FeatureMatrix } from "@/components/marketing/feature-matrix";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 
@@ -69,36 +70,7 @@ export default async function FeaturesPage() {
   return (
     <div className="min-h-screen bg-[#E8E5DD]">
       {/* Nav */}
-      <header className="sticky top-0 z-50 bg-[#E8E5DD] border-b border-[#DCDBD3]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/authorloft-logo-new.png"
-              alt="AuthorLoft"
-              width={200}
-              height={57}
-              className="h-14 w-auto"
-            />
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
-              Features
-            </Link>
-            <Link href="/pricing" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
-              Pricing
-            </Link>
-            <Link href="/login" className="text-sm text-[#5C6E89] hover:text-[#1B2B47] transition-colors">
-              Sign In
-            </Link>
-          </nav>
-          <Link
-            href="/register"
-            className="bg-[#B8893D] text-[#0F1A2D] text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#D4AE6A] transition-colors"
-          >
-            Get Started Free
-          </Link>
-        </div>
-      </header>
+      <MarketingNav activePage="features" />
 
       {/* Hero */}
       <MarketingPageHeader

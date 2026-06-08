@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ContactForm } from "./contact-form";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { getOgImage } from "@/lib/seo-config";
 
 export const dynamic = "force-dynamic";
@@ -26,5 +27,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function ContactPage() {
-  return <ContactForm />;
+  return (
+    <>
+      <MarketingNav />
+      <ContactForm />
+    </>
+  );
 }
