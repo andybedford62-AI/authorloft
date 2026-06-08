@@ -12,6 +12,7 @@ import {
   Tag,
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreHeroSocial } from "@/components/marketing/bookstore-hero-social";
@@ -106,49 +107,15 @@ export default async function BookstorePage() {
       />
       <MarketingNav />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-[#DCDBD3]">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, #3a2417 0%, #5c3a22 35%, #7a4f2e 60%, #9c6a3d 100%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 2px, transparent 2px, transparent 22px)",
-          }}
-        />
-        <div aria-hidden className="absolute inset-0 bg-[#1B2B47]/30" />
+      {/* ── Hero (unified brand band + banner) ───────────────────────────── */}
+      <MarketingPageHeader
+        eyebrow="Discover independent authors"
+        title={<>The AuthorLoft <span className="italic text-[#D4AE6A]">Bookstore</span></>}
+        subtitle="A shared shelf of books from independent authors across every genre. Find your next read, then buy directly from each author's own site."
+        backgroundImage="/bookstore-header.png"
+      />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-          <div className="flex justify-center mb-6">
-            <span className="inline-flex items-center bg-white rounded-2xl px-5 py-3 shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-12 w-auto" />
-            </span>
-          </div>
-          <p className="text-xs font-mono uppercase tracking-widest text-[#F0D9B5] mb-3">
-            · Discover independent authors ·
-          </p>
-          <h1 className="text-4xl sm:text-6xl font-serif text-white font-normal leading-tight drop-shadow-sm">
-            The AuthorLoft <span className="italic text-[#F0D9B5]">Bookstore</span>
-          </h1>
-          <p className="mt-5 text-base sm:text-lg text-[#F5ECDD] max-w-2xl mx-auto leading-relaxed">
-            A shared shelf of books from independent authors across every genre. Find your
-            next read, then buy directly from each author&apos;s own site.
-          </p>
-
-          <BookstoreHeroSocial />
-        </div>
-      </section>
-
-      {/* ── Stat bar ─────────────────────────────────────────────────────── */}
+      {/* ── Stat bar + social ────────────────────────────────────────────── */}
       <div className="bg-[#1B2B47]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-3 divide-x divide-white/10 text-center">
           {[
@@ -162,6 +129,9 @@ export default async function BookstorePage() {
               <span className="text-[11px] uppercase tracking-widest text-[#9fb0c9]">{label}</span>
             </div>
           ))}
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-5 -mt-1">
+          <BookstoreHeroSocial />
         </div>
       </div>
 
