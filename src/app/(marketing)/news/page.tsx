@@ -59,8 +59,7 @@ export default async function NewsIndexPage() {
         eyebrow="From the team"
         title={<>AuthorLoft <span className="italic text-[#D4AE6A]">News</span></>}
         subtitle="Product updates, new features, specials, and events — everything happening at AuthorLoft."
-        imageSrc="/news-page-logo.png"
-        imageAlt="AuthorLoft News"
+        backgroundImage="/news-header.png"
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">

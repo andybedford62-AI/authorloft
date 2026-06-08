@@ -3,6 +3,7 @@ import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BlogList } from "@/components/marketing/blog-list";
 import { BookOpen, ArrowRight } from "lucide-react";
 
@@ -48,26 +49,14 @@ export default async function BlogIndexPage() {
     <div className="min-h-screen bg-[#F0EDE4]">
       <MarketingNav />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+      <MarketingPageHeader
+        eyebrow="From the team"
+        title={<>The AuthorLoft <span className="italic text-[#D4AE6A]">Blog</span></>}
+        subtitle="Guides, strategies, and insights for independent authors building a direct connection with readers."
+        backgroundImage="/blog-header.png"
+      />
 
-        {/* Header */}
-        <div className="mb-10 flex items-center justify-between gap-6">
-          <div className="min-w-0">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-3">· From the team ·</p>
-            <h1 className="text-4xl sm:text-5xl font-serif text-[#1B2B47] font-normal leading-tight">
-              The AuthorLoft <span className="italic text-[#C26A4A]">Blog</span>
-            </h1>
-            <p className="mt-4 text-base text-[#5C6E89] max-w-xl">
-              Guides, strategies, and insights for independent authors building a direct connection with readers.
-            </p>
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/blog-page-logo.png"
-            alt="The AuthorLoft Blog"
-            className="hidden md:block max-h-44 w-auto rounded-xl flex-shrink-0"
-          />
-        </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
 
         {posts.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-2xl border border-[#DCDBD3]">

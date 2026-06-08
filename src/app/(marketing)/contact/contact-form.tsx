@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { BookOpen, ArrowLeft, Send, Check, Mail } from "lucide-react";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 
 type SupportEmailOption = { id: string; label: string; email: string; description: string | null };
 
@@ -72,19 +73,13 @@ export function ContactForm() {
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <Mail className="h-6 w-6 text-[#C26A4A]" />
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#C26A4A]">Get in Touch</span>
-          </div>
-          <h1 className="text-3xl font-bold text-[#1B2B47]">Contact AuthorLoft</h1>
-          <p className="text-[#5C6E89] mt-2 max-w-lg">
-            Have a question about our plans, need help with your account, or just want to say hello?
-            Fill out the form and we&apos;ll get back to you within one business day.
-          </p>
-        </div>
+      <MarketingPageHeader
+        eyebrow="Get in touch"
+        title={<>Contact <span className="italic text-[#D4AE6A]">AuthorLoft</span></>}
+        subtitle="Have a question about our plans, need help with your account, or just want to say hello? Fill out the form and we'll get back to you within one business day."
+      />
 
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         {sent ? (
           <div className="bg-[#F0EDE4] border border-[#DCDBD3] rounded-2xl p-10 text-center">
             <div className="w-12 h-12 rounded-full bg-[#E8E5DD] flex items-center justify-center mx-auto mb-4">

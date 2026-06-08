@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Star } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { prisma } from "@/lib/db";
 
 export const revalidate = 60;
@@ -60,18 +61,13 @@ export default async function ResourcesPage() {
       <MarketingNav />
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <section style={{ background: `linear-gradient(160deg, #1B2B47 0%, #0F1A2D 100%)`, padding: '100px 60px 80px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>
-            · Curated Resources ·
-          </p>
-          <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.03em', color: ML.bone, margin: '0 0 24px' }}>
-            Tools &amp; communities<br />
-            <span style={{ fontStyle: 'italic', color: ML.brass2 }}>every author should know.</span>
-          </h1>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.65, color: `${ML.bone}99`, maxWidth: 560, margin: '0 auto 32px' }}>
-            A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers.
-          </p>
+      <MarketingPageHeader
+        eyebrow="Curated Resources"
+        title={<>Tools &amp; communities <span className="italic text-[#D4AE6A]">every author should know</span></>}
+        subtitle="A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers."
+      />
+      <div style={{ background: ML.midnight, padding: '20px 24px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{ display: 'inline-flex', gap: 32, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 999, padding: '12px 32px' }}>
             <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass2 }}>{resources.length} resources</span>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
@@ -86,7 +82,7 @@ export default async function ResourcesPage() {
             )}
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ── Resources by category ─────────────────────────────────────── */}
       <section style={{ background: ML.midnight, padding: '72px 60px' }}>

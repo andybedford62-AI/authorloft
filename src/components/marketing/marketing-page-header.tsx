@@ -7,9 +7,15 @@ interface MarketingPageHeaderProps {
   title: ReactNode;
   /** Optional supporting line under the title. */
   subtitle?: string;
-  /** Optional square logo/badge shown on the right (md+). */
+  /** Optional square logo/badge shown on the right (md+). Ignored when backgroundImage is set. */
   imageSrc?: string;
   imageAlt?: string;
+  /**
+   * Optional wide banner image used as the band background (subject weighted right,
+   * calm space on the left). A navy scrim keeps the left-aligned text readable.
+   * When omitted, the band shows the clean navy gradient + texture.
+   */
+  backgroundImage?: string;
 }
 
 /**
@@ -20,41 +26,62 @@ interface MarketingPageHeaderProps {
  *
  * Accent a word in the title with: <span className="italic text-[#D4AE6A]">Word</span>
  */
-export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "" }: MarketingPageHeaderProps) {
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage }: MarketingPageHeaderProps) {
+  const hasBanner = !!backgroundImage;
+
   return (
     <section className="relative overflow-hidden bg-[#1B2B47]">
-      {/* Gradient base */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(120deg, #0F1A2D 0%, #1B2B47 55%, #27406B 100%)" }}
-      />
-      {/* Fine vertical threadlines for subtle texture */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 22px)",
-        }}
-      />
-      {/* Soft brass glow, top-right */}
-      <div
-        aria-hidden
-        className="absolute -top-24 -right-24 w-96 h-96 rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(212,174,106,0.18), transparent 70%)" }}
-      />
+      {hasBanner ? (
+        <>
+          {/* Banner image — subject weighted right, calm space left */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-right" />
+          {/* Navy scrim so the left-aligned text stays readable over the art */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.92) 28%, rgba(15,26,45,0.55) 52%, rgba(15,26,45,0.12) 72%, rgba(15,26,45,0) 100%)",
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Gradient base */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(120deg, #0F1A2D 0%, #1B2B47 55%, #27406B 100%)" }}
+          />
+          {/* Fine vertical threadlines for subtle texture */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 22px)",
+            }}
+          />
+          {/* Soft brass glow, top-right */}
+          <div
+            aria-hidden
+            className="absolute -top-24 -right-24 w-96 h-96 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(212,174,106,0.18), transparent 70%)" }}
+          />
+        </>
+      )}
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8">
-        <div className="min-w-0">
+      <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
+        <div className="min-w-0 max-w-xl">
           {eyebrow && (
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AE6A] mb-3">· {eyebrow} ·</p>
           )}
-          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight">{title}</h1>
+          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight drop-shadow-sm">{title}</h1>
           {subtitle && <p className="mt-4 text-base text-[#D4DDEB] max-w-xl leading-relaxed">{subtitle}</p>}
         </div>
 
-        {imageSrc && (
+        {imageSrc && !hasBanner && (
           <div className="hidden md:flex flex-shrink-0">
             <span className="inline-flex items-center justify-center bg-white rounded-2xl p-2 shadow-lg">
               {/* eslint-disable-next-line @next/next/no-img-element */}

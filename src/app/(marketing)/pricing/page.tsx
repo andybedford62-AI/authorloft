@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { PricingSection } from "@/components/marketing/pricing-section";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 
@@ -136,16 +137,11 @@ export default async function PricingPage() {
       </header>
 
       {/* Hero */}
-      <section className="py-16 sm:py-20 text-center px-4">
-        <div className="max-w-2xl mx-auto space-y-4">
-          <h1 className="text-4xl sm:text-5xl font-bold text-[#1B2B47]">
-            Simple, transparent pricing
-          </h1>
-          <p className="text-lg text-[#5C6E89] leading-relaxed">
-            Start free with no credit card. Upgrade when you're ready to grow your author platform.
-          </p>
-        </div>
-      </section>
+      <MarketingPageHeader
+        eyebrow="Plans & pricing"
+        title={<>Simple, <span className="italic text-[#D4AE6A]">transparent</span> pricing</>}
+        subtitle="Start free with no credit card. Upgrade when you're ready to grow your author platform."
+      />
 
       {/* Pricing cards — live from DB */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">

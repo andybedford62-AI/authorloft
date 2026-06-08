@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { FeatureMatrix } from "@/components/marketing/feature-matrix";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 
@@ -100,8 +101,13 @@ export default async function FeaturesPage() {
       </header>
 
       {/* Hero */}
-      <section className="py-12 sm:py-16 bg-gradient-to-b from-blue-50 to-white px-4">
-        <div className="max-w-5xl mx-auto space-y-4">
+      <MarketingPageHeader
+        eyebrow="Features"
+        title={<>Complete <span className="italic text-[#D4AE6A]">Feature</span> Comparison</>}
+        subtitle="See all the features available on each plan. Everything updates automatically as we add new features."
+      />
+      <div className="bg-[#E8E5DD] border-b border-[#DCDBD3] px-4">
+        <div className="max-w-5xl mx-auto py-3">
           <Link
             href="/pricing"
             className="inline-flex items-center gap-2 text-sm text-[#C26A4A] hover:text-[#1B2B47] font-medium"
@@ -109,14 +115,8 @@ export default async function FeaturesPage() {
             <ArrowLeft className="h-4 w-4" />
             Back to pricing
           </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#1B2B47] mt-4">
-            Complete Feature Comparison
-          </h1>
-          <p className="text-lg text-[#5C6E89] max-w-2xl">
-            See all the features available on each plan. Everything updates automatically as we add new features.
-          </p>
         </div>
-      </section>
+      </div>
 
       {/* Feature Matrix */}
       <section className="px-4 py-16 max-w-5xl mx-auto">
