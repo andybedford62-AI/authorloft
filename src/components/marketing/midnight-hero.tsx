@@ -183,6 +183,7 @@ export function MidnightHero() {
             ['/bookstore',   'Bookstore'],
             ['/features',    'Features'],
             ['/blog',        'Blog'],
+            ['/news',        'News'],
             ['#how-it-works','How it works'],
             ['/pricing',     'Pricing'],
             ['#genres',      'For authors'],

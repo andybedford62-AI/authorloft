@@ -51,14 +51,22 @@ export default async function BlogIndexPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
 
         {/* Header */}
-        <div className="mb-10">
-          <p className="text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-3">· From the team ·</p>
-          <h1 className="text-4xl sm:text-5xl font-serif text-[#1B2B47] font-normal leading-tight">
-            The AuthorLoft <span className="italic text-[#C26A4A]">Blog</span>
-          </h1>
-          <p className="mt-4 text-base text-[#5C6E89] max-w-xl">
-            Guides, strategies, and insights for independent authors building a direct connection with readers.
-          </p>
+        <div className="mb-10 flex items-center justify-between gap-6">
+          <div className="min-w-0">
+            <p className="text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-3">· From the team ·</p>
+            <h1 className="text-4xl sm:text-5xl font-serif text-[#1B2B47] font-normal leading-tight">
+              The AuthorLoft <span className="italic text-[#C26A4A]">Blog</span>
+            </h1>
+            <p className="mt-4 text-base text-[#5C6E89] max-w-xl">
+              Guides, strategies, and insights for independent authors building a direct connection with readers.
+            </p>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/blog-page-logo.png"
+            alt="The AuthorLoft Blog"
+            className="hidden md:block max-h-44 w-auto rounded-xl flex-shrink-0"
+          />
         </div>
 
         {posts.length === 0 ? (
