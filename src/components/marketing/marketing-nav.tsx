@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
 
 
 export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" }) {
@@ -63,8 +64,8 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Bookstore
           </Link>
-          <a
-            href="/#features"
+          <Link
+            href="/features"
             className={`text-sm transition-colors ${
               activePage === "features"
                 ? "font-medium text-blue-600"
@@ -72,7 +73,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             }`}
           >
             Features
-          </a>
+          </Link>
           <Link
             href="/blog"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
@@ -114,24 +115,27 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           )}
         </nav>
 
-        {/* Right CTA */}
-        {author ? (
-          /* Mobile: show Dashboard button on the right when logo area is too small */
-          <Link
-            href="/admin"
-            className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            Dashboard
-          </Link>
-        ) : (
-          <Link
-            href="/register"
-            className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Get Started Free
-          </Link>
-        )}
+        {/* Right CTA + mobile menu */}
+        <div className="flex items-center gap-2">
+          {author ? (
+            /* Mobile: show Dashboard button on the right when logo area is too small */
+            <Link
+              href="/admin"
+              className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Get Started Free
+            </Link>
+          )}
+          <MarketingMobileMenu isAuthor={!!author} />
+        </div>
       </div>
     </header>
   );

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo, useId } from 'react';
+import { HeroMobileMenu } from '@/components/marketing/hero-mobile-menu';
 
 // ── Nebula background ────────────────────────────────────────────────────────
 function NebulaBG() {
@@ -167,6 +168,11 @@ export function MidnightHero() {
         @keyframes mlBlink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes mlFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(20px,-10px)} 66%{transform:translate(-10px,8px)} }
         @keyframes mlPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        @media (max-width: 860px) {
+          .ml-hero-nav { padding: 16px 20px !important; }
+          .ml-hero-grid { grid-template-columns: 1fr !important; padding: 32px 22px 56px !important; gap: 24px !important; }
+          .ml-hero-showcase { display: none !important; }
+        }
       `}</style>
 
       <NebulaBG />
@@ -174,7 +180,7 @@ export function MidnightHero() {
 
 
       {/* Nav */}
-      <nav style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 60px' }}>
+      <nav className="ml-hero-nav" style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 60px' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
         </Link>
@@ -194,16 +200,17 @@ export function MidnightHero() {
             );
           })}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
           <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: '#E8E5DD', opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
           <Link href="/register" style={{ padding: '10px 20px', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, background: '#B8893D', color: '#0F1A2D', borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 14px -4px rgba(184,137,61,0.55)' }}>
             Start free →
           </Link>
         </div>
+        <HeroMobileMenu />
       </nav>
 
       {/* Content grid */}
-      <div style={{ position: 'relative', zIndex: 2, padding: '60px 60px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
+      <div className="ml-hero-grid" style={{ position: 'relative', zIndex: 2, padding: '60px 60px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
         {/* Left: copy */}
         <div style={{ color: '#E8E5DD' }}>
           {/* Badge */}
@@ -242,8 +249,10 @@ export function MidnightHero() {
           </div>
         </div>
 
-        {/* Right: book stack */}
-        <BookStack />
+        {/* Right: book stack (decorative — hidden on small screens) */}
+        <div className="ml-hero-showcase">
+          <BookStack />
+        </div>
       </div>
     </section>
   );
