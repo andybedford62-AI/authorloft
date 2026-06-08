@@ -29,6 +29,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Baked at build time so the super-admin build stamp can show when prod was deployed.
+  env: {
+    BUILD_TIME: new Date().toISOString(),
+  },
 async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

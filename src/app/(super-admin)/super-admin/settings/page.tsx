@@ -43,11 +43,23 @@ export default async function SuperAdminSettingsPage() {
 
   // Build env display values server-side so secrets never reach the client bundle
   const stripeKey = process.env.STRIPE_SECRET_KEY;
+
+  // Build stamp — which deploy is live (for support/debugging)
+  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
+  const buildTimeRaw = process.env.BUILD_TIME;
+  const buildTime = buildTimeRaw
+    ? new Date(buildTimeRaw).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
+    : undefined;
+
   const envValues = [
     { label: "Platform Domain", value: process.env.NEXT_PUBLIC_PLATFORM_DOMAIN },
     { label: "App URL",         value: process.env.NEXT_PUBLIC_APP_URL          },
     { label: "Stripe Mode",     value: stripeKey ? (stripeKey.startsWith("sk_live") ? "Live key configured" : "Test key configured") : undefined },
     { label: "S3 Bucket",       value: process.env.AWS_S3_BUCKET                },
+    { label: "Environment",     value: process.env.VERCEL_ENV                   },
+    { label: "Build Commit",    value: commitSha ? commitSha.slice(0, 7) : undefined },
+    { label: "Build Branch",    value: process.env.VERCEL_GIT_COMMIT_REF        },
+    { label: "Build Time",      value: buildTime                               },
   ];
 
   return (
