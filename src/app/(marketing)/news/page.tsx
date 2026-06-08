@@ -10,7 +10,7 @@ export const revalidate = 60;
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
 export const metadata: Metadata = {
-  title: "AuthorLoft News — Updates, Features & Announcements",
+  title: "News — Updates, Features & Announcements",
   description:
     "The latest from AuthorLoft: product updates, new features, specials, and events. Read current and past announcements from the team.",
   alternates: { canonical: `${BASE}/news` },

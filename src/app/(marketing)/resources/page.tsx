@@ -12,7 +12,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("resources");
   return {
-    title: "Resources for Independent Authors | AuthorLoft",
+    title: "Resources for Independent Authors",
     description:
       "A curated list of trusted tools, communities, and organisations that every independent author should know about.",
     alternates: { canonical: "/resources" },

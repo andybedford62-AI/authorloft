@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "GDPR & Your Data Rights | AuthorLoft",
+  title: "GDPR & Your Data Rights",
   description: "How AuthorLoft complies with the General Data Protection Regulation (GDPR) and your rights as a data subject.",
   alternates: { canonical: "/gdpr" },
   openGraph: { type: "website", title: "GDPR & Your Data Rights | AuthorLoft", description: "How AuthorLoft complies with GDPR and your rights as a data subject." },

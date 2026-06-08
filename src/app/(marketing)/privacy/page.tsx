@@ -6,7 +6,7 @@ import { DEFAULT_PRIVACY } from "@/lib/legal-defaults";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | AuthorLoft",
+  title: "Privacy Policy",
   description: "How AuthorLoft collects, uses, and protects your personal information.",
   alternates: { canonical: "/privacy" },
   openGraph: { type: "website", title: "Privacy Policy | AuthorLoft", description: "How AuthorLoft collects, uses, and protects your personal information." },

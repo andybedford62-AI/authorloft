@@ -6,7 +6,7 @@ import { DEFAULT_TERMS } from "@/lib/legal-defaults";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | AuthorLoft",
+  title: "Terms of Service",
   description: "The terms and conditions that govern your use of AuthorLoft.",
   alternates: { canonical: "/terms" },
   openGraph: { type: "website", title: "Terms of Service | AuthorLoft", description: "The terms and conditions that govern your use of AuthorLoft." },

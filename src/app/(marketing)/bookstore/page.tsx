@@ -25,7 +25,7 @@ const PLATFORM = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com";
 const BASE = `https://www.${PLATFORM}`;
 
 export const metadata: Metadata = {
-  title: "Bookstore — Discover Books by Independent Authors | AuthorLoft",
+  title: "Bookstore — Discover Books by Independent Authors",
   description:
     "Browse books from independent authors on AuthorLoft. Discover your next read across every genre — then buy directly from each author's own site.",
   alternates: { canonical: `${BASE}/bookstore` },

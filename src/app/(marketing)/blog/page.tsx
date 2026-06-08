@@ -12,7 +12,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("blog");
   return {
-    title: "Blog — AuthorLoft",
+    title: "Blog — Tips & Guides for Authors",
     description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
     alternates: { canonical: "/blog" },
     openGraph: {

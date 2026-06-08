@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }).catch(() => null);
   if (!post || !post.isPublished || !post.isNews) return {};
 
-  const metaTitle = post.seoTitle ? `${post.seoTitle} — AuthorLoft News` : `${post.title} — AuthorLoft News`;
+  const metaTitle = post.seoTitle || post.title;
   const metaDesc  = post.metaDescription || post.excerpt || undefined;
 
   return {

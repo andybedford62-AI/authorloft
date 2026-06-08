@@ -17,7 +17,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Author Website Builder for Independent Authors | AuthorLoft",
+    title: "Author Website Builder for Independent Authors",
     description:
       "The author website builder built for indie authors. Add your book catalog, sell direct to readers, and capture newsletter signups — live in minutes. Free forever.",
     alternates: { canonical: "/" },

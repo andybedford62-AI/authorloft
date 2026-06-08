@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("contact");
   return {
-    title: "Contact Us | AuthorLoft",
+    title: "Contact Us",
     description: "Get in touch with the AuthorLoft team. Questions about plans, your account, or anything else — we reply within one business day.",
     alternates: { canonical: "/contact" },
     openGraph: {

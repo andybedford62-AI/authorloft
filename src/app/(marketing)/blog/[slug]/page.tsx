@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await prisma.platformPost.findUnique({ where: { slug }, select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true } }).catch(() => null);
   if (!post || !post.isPublished || post.isNews) return {};
 
-  const metaTitle = post.seoTitle        ? `${post.seoTitle} — AuthorLoft Blog` : `${post.title} — AuthorLoft Blog`;
+  const metaTitle = post.seoTitle || post.title;
   const metaDesc  = post.metaDescription || post.excerpt || undefined;
 
   return {
