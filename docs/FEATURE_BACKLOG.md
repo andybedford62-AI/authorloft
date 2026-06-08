@@ -24,14 +24,6 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 
 ---
 
-## Site design / consistency (from the June 8 redesign)
-
-- [ ] **Homepage hero nav** — decide: keep the dark animated hero nav (distinct by design) or match the shared white `MarketingNav`. Also it's **desktop-only** (`hidden md:flex`), so links like Bookstore/News are hidden on mobile — needs a mobile menu. *(small–medium)*
-- [ ] **Mobile nav menu** — the marketing nav has no hamburger/mobile menu; the link row is hidden on small screens across the site. *(small–medium)*
-- [ ] **Nav "Features" link target** — currently points to `/#features` (homepage anchor) rather than the real `/features` page. Decide which. *(trivial)*
-
----
-
 ## AuthorLoft News (`/news`) — Phase 2 (email)
 
 Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture, search/filter). Deferred — see `docs/NEWSLETTER_PHASE2_PLAN.md`:
@@ -66,6 +58,7 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 ## Shipped (for reference)
 
+- ✅ **Mobile nav menus** — hamburger menu on the shared MarketingNav + a dark one on the homepage hero; homepage hero made mobile-responsive; "Features" link → /features page (June 8, 2026)
 - ✅ **Unified marketing chrome** — shared nav, footer, and brand-band page headers (banner images on Bookstore/Blog/News) across all marketing pages; dead-code cleanup (June 8, 2026)
 - ✅ **Blog/News search & filter** + searchable/sortable admin list + category datalist (June 8, 2026)
 - ✅ **Changelog, build stamp, monthly News recap routine** (June 8, 2026)

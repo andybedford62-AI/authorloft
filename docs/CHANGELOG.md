@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## June 8, 2026 — Marketing site polish
+- Unified the top nav, footer, and brand-band page headers across all marketing pages (banner images on Bookstore/Blog/News; navy gradient elsewhere)
+- Added mobile hamburger menus to both the shared nav and the homepage hero; made the homepage hero responsive on phones
+- "Features" nav link now points to the real /features page
+- Search/filter on the public Blog & News pages; searchable/sortable admin Blog & News list; category datalist in the editor
+- Removed dead code from the refactors
+
 ## June 8, 2026 — AuthorLoft News
 - Public `/news` page: company news/announcements archive, separate from the blog (grouped by year)
 - Blog ⇄ News CMS toggle — one editor routes a post to `/blog` or `/news`
