@@ -4,25 +4,43 @@ Running list of ideas and enhancements to consider for future builds. Not commit
 
 **How to use:** add new ideas under the right area with a one-line rationale and a rough effort/impact note. Keep it scannable.
 
+_Last cleaned: June 8, 2026._
+
 ---
 
 ## Bookstore (`/bookstore`)
 
-Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Follow-ups to consider:
+Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/header redesigned June 8. Open ideas:
 
-- [ ] **Remove or keep the gold "Featured" ribbon** on Premium authors' books in the main catalog grid — decide if the subtle Premium perk stays. *(trivial)*
-- [ ] **Match "Trending Now" to the gold band treatment** (currently plain style; auto-hidden until books have views). *(trivial)*
-- [ ] **Author Spotlight curation** — currently auto-rotates daily among authors with a photo + bio. Options: super-admin hand-pick, or make it **Premium-only** as another upgrade incentive. *(small–medium)*
-- [ ] **"Trending Now" needs view data** — relies on `Book.views`; confirm views are being tracked/incremented on author book pages so the row populates. *(verify)*
+- [ ] **Author Spotlight curation** — currently auto-rotates daily among authors with a photo + bio. Options: super-admin hand-pick, or make it **Premium-only** as an upgrade incentive. *(small–medium)*
+- [ ] **Verify "Trending Now" view data** — relies on `Book.views`; confirm views increment on author book pages so the row populates. *(verify)*
 - [ ] **Reader accounts + favorites/wishlists** — let readers save books. Powerful but heavy (no reader auth today). *(large)*
 - [ ] **Curated "Staff Picks" / collections** — super-admin curation UI for themed shelves. *(medium)*
-- [ ] **"New books this week" email digest** — opt-in reader newsletter from the catalog. *(medium, needs job + template)*
 - [ ] **Quick-view modal** — peek at a book without leaving the bookstore. *(small)*
 - [ ] **Bookstore listing limits by tier** — e.g., STANDARD limited number of listings, PREMIUM unlimited + featured (pricing lever). *(small)*
-- [ ] **Clickable author name on book cards** — currently the whole card links to the book (can't nest links); consider restructuring so the author name links to their site separately. *(small)*
-- [ ] **Bookstore link in mobile nav** — the homepage hero nav is desktop-only (`hidden md:flex`), so the Bookstore link isn't visible on mobile there. Broader nav/mobile-menu consideration. *(small)*
+- [ ] **Clickable author name on book cards** — whole card currently links to the book (can't nest links); restructure so the author name links to their site separately. *(small)*
+- [ ] **Unify genre-page headers** — `/bookstore/genre/[slug]` still uses its own older header; give it the shared brand band for consistency. *(small)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
-- [ ] **"See Book" price wording** — cards currently omit price when none is set; original plan suggested a "See Book" label for retailer-only titles. Decide if wanted. *(trivial)*
+
+---
+
+## Site design / consistency (from the June 8 redesign)
+
+- [ ] **Homepage hero nav** — decide: keep the dark animated hero nav (distinct by design) or match the shared white `MarketingNav`. Also it's **desktop-only** (`hidden md:flex`), so links like Bookstore/News are hidden on mobile — needs a mobile menu. *(small–medium)*
+- [ ] **Mobile nav menu** — the marketing nav has no hamburger/mobile menu; the link row is hidden on small screens across the site. *(small–medium)*
+- [ ] **Nav "Features" link target** — currently points to `/#features` (homepage anchor) rather than the real `/features` page. Decide which. *(trivial)*
+
+---
+
+## AuthorLoft News (`/news`) — Phase 2 (email)
+
+Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture, search/filter). Deferred — see `docs/NEWSLETTER_PHASE2_PLAN.md`:
+
+- [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
+- [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
+- [ ] **"Publish News post → also email subscribers"** one-click option. *(small)*
+- [ ] **RSS feed** for the news archive. *(small)*
+- [ ] **"New books this week" digest** — reader newsletter from the bookstore catalog; reuses the same email infra once Phase 2 lands. *(medium)*
 
 ---
 
@@ -35,39 +53,22 @@ Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD
 
 ## Auth / Account
 
-- [ ] **Login persistence / "browser close doesn't log out" — flagged for future cleanup** *(raised June 6, 2026)*
-  - Current behavior: login is a persistent ~30-day cookie, so closing the browser / hard refresh does NOT sign the author out. This is standard and not a security bug (cookie is httpOnly + secure; sessions don't leak), but flagged to revisit.
-  - Preferred fix when we get to it: add a **"Remember me" checkbox** on login — checked = persistent (~30d); unchecked = session cookie that clears on browser close.
-  - Optional extra: shorten the default session window from 30d → 7d.
-  - *(small–medium, touches NextAuth `session`/cookie config — test login/logout across browsers after.)*
+- [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*
+
+---
 
 ## Marketing & SEO
 
 - [ ] **Feature landing pages** — deferred until PostHog traffic data (~2026-07-01).
-- [ ] **Marketing blog** build-out — PlatformPost CMS already exists; expand content. (~16 hrs of content/work)
-
----
-
-## Housekeeping / tech debt
-
-- [ ] Update `docs/FEATURE_MATRIX.md` + memory to mark the Bookstore as shipped.
-- [ ] (See `docs/BUGFIX_TODO.md` — all currently resolved as of June 6, 2026.)
-
----
-
-## AuthorLoft News (`/news`) — Phase 2 follow-ups
-
-Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture). Deferred:
-
-- [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
-- [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
-- [ ] **"Publish News post → also email subscribers"** one-click option. *(small)*
-- [ ] Optional: filter `/news` by category, or an RSS feed for the news archive. *(small)*
+- [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
 
 ---
 
 ## Shipped (for reference)
 
+- ✅ **Unified marketing chrome** — shared nav, footer, and brand-band page headers (banner images on Bookstore/Blog/News) across all marketing pages; dead-code cleanup (June 8, 2026)
+- ✅ **Blog/News search & filter** + searchable/sortable admin list + category datalist (June 8, 2026)
+- ✅ **Changelog, build stamp, monthly News recap routine** (June 8, 2026)
 - ✅ **AuthorLoft News** Phase 1 — public /news archive, Blog/News CMS toggle, subscriber capture (no sending yet), sitemap (June 8, 2026)
 - ✅ **Company Social Links** — Super Admin CRUD, shared marketing footer, bookstore hero (June 7, 2026)
 - ✅ **Bookstore** discovery catalog with showcase sections, genre pages, SEO, branding (June 6, 2026)
