@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## June 8, 2026 — SEO
+- Fixed duplicated/over-long page titles (root template was doubling "AuthorLoft")
+- noindex on auth/utility pages (login, register, etc.) to clear thin-content flags
+- IndexNow: instant Bing/Yandex notification when a Blog or News post is published
+
 ## June 8, 2026 — Marketing site polish
 - Unified the top nav, footer, and brand-band page headers across all marketing pages (banner images on Bookstore/Blog/News; navy gradient elsewhere)
 - Added mobile hamburger menus to both the shared nav and the homepage hero; made the homepage hero responsive on phones
