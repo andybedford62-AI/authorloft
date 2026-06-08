@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
-import { PrintButton } from "./print-button";
 import { sanitize } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
@@ -13,16 +13,19 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.platformPost.findUnique({ where: { slug }, select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true } }).catch(() => null);
-  if (!post || !post.isPublished || post.isNews) return {};
+  const post = await prisma.platformPost.findUnique({
+    where: { slug },
+    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true },
+  }).catch(() => null);
+  if (!post || !post.isPublished || !post.isNews) return {};
 
-  const metaTitle = post.seoTitle        ? `${post.seoTitle} — AuthorLoft Blog` : `${post.title} — AuthorLoft Blog`;
+  const metaTitle = post.seoTitle ? `${post.seoTitle} — AuthorLoft News` : `${post.title} — AuthorLoft News`;
   const metaDesc  = post.metaDescription || post.excerpt || undefined;
 
   return {
     title:       metaTitle,
     description: metaDesc,
-    alternates:  { canonical: `${BASE}/blog/${post.slug}` },
+    alternates:  { canonical: `${BASE}/news/${post.slug}` },
     openGraph: {
       type:          "article",
       title:         metaTitle,
@@ -39,26 +42,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await prisma.platformPost.findUnique({ where: { slug } }).catch(() => null);
 
-  // News posts live at /news/[slug] — don't render them under /blog
-  if (!post || !post.isPublished || post.isNews) notFound();
+  // Must be a published News post — otherwise 404 (blog posts don't render here)
+  if (!post || !post.isPublished || !post.isNews) notFound();
 
   const safeContent = sanitize(post.content);
 
   const jsonLd = {
-    "@context":         "https://schema.org",
-    "@type":            "Article",
-    headline:           post.title,
-    description:        post.excerpt || undefined,
-    image:              post.coverImageUrl || undefined,
-    datePublished:      post.publishedAt?.toISOString(),
-    dateModified:       post.updatedAt.toISOString(),
-    author:             { "@type": "Organization", name: post.authorName },
-    publisher:          { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
-    mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/blog/${post.slug}` },
+    "@context":       "https://schema.org",
+    "@type":          "NewsArticle",
+    headline:         post.title,
+    description:      post.excerpt || undefined,
+    image:            post.coverImageUrl || undefined,
+    datePublished:    post.publishedAt?.toISOString(),
+    dateModified:     post.updatedAt.toISOString(),
+    author:           { "@type": "Organization", name: post.authorName },
+    publisher:        { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/news/${post.slug}` },
   };
 
   return (
@@ -66,10 +69,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <MarketingNav />
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-
         {/* Breadcrumb */}
-        <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to Blog
+        <Link href="/news" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to News
         </Link>
 
         {/* Meta */}
@@ -79,14 +81,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {post.category}
             </span>
           )}
-          <span className="flex items-center gap-1 text-xs text-[#9b8e7e]">
-            <Clock className="h-3 w-3" /> {post.readTimeMinutes} min read
-          </span>
           {post.publishedAt && (
             <span className="text-xs text-[#9b8e7e]">
               {new Date(post.publishedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </span>
           )}
+          <span className="flex items-center gap-1 text-xs text-[#9b8e7e]">
+            <Clock className="h-3 w-3" /> {post.readTimeMinutes} min read
+          </span>
         </div>
 
         {/* Title */}
@@ -111,7 +113,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           />
         )}
 
-        {/* Author */}
+        {/* Byline */}
         <div className="flex items-center gap-3 mb-10 pb-6 border-b border-[#DCDBD3]">
           <div className="w-8 h-8 rounded-full bg-[#1B2B47] flex items-center justify-center text-white text-sm font-serif font-normal">
             {post.authorName[0]}
@@ -120,16 +122,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Content */}
-        <div
-          className="rich-content"
-          dangerouslySetInnerHTML={{ __html: safeContent }}
-        />
+        <div className="rich-content" dangerouslySetInnerHTML={{ __html: safeContent }} />
 
-        {/* ── Download + Print ─────────────────────────────────────────── */}
-        <div className="mt-12 pt-8 border-t border-[#DCDBD3] space-y-4 no-print">
-
-          {/* Downloadable resource — only shown if a URL was set */}
-          {post.attachmentUrl && (
+        {/* Downloadable resource — only shown if a URL was set */}
+        {post.attachmentUrl && (
+          <div className="mt-12 pt-8 border-t border-[#DCDBD3]">
             <a
               href={post.attachmentUrl}
               target="_blank"
@@ -147,16 +144,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
               <ArrowRight className="h-4 w-4 text-[#9b8e7e] group-hover:text-[#C26A4A] transition-colors flex-shrink-0" />
             </a>
-          )}
-
-          {/* Print button row */}
-          <div className="flex justify-end">
-            <PrintButton />
           </div>
+        )}
+
+        {/* Subscribe */}
+        <div className="mt-12">
+          <NewsSubscribeForm source="news" variant="box" />
         </div>
 
         {/* CTA */}
-        <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">
+        <div className="mt-12 bg-[#1B2B47] rounded-2xl p-8 text-center">
           <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to start? ·</p>
           <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
             Build your author site <span className="italic text-[#D4AE6A]">in minutes</span>
@@ -171,7 +168,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             Get Started Free <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-
       </article>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

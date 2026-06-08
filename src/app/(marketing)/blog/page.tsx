@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function getPosts() {
   return prisma.platformPost.findMany({
-    where:   { isPublished: true },
+    where:   { isPublished: true, isNews: false },
     orderBy: { publishedAt: "desc" },
     select: {
       id: true, title: true, slug: true, excerpt: true, coverImageUrl: true,

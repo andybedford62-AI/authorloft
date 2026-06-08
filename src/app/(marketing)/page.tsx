@@ -10,6 +10,7 @@ import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
+import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 
 export const revalidate = 60;
 
@@ -412,6 +413,13 @@ export default async function MarketingPage() {
           <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 14, color: `${ML.bone}44`, marginTop: 32 }}>
             — Closing the marketplace tab. Opening yours. —
           </p>
+        </div>
+      </section>
+
+      {/* ── News subscribe ─────────────────────────────────────────────────── */}
+      <section style={{ background: ML.bone, padding: '64px 24px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <NewsSubscribeForm source="home" variant="box" />
         </div>
       </section>
 

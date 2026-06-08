@@ -11,7 +11,7 @@ export default async function SuperAdminBlogPage() {
   const posts = await prisma.platformPost.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
     select: {
-      id: true, title: true, slug: true, category: true, isPublished: true,
+      id: true, title: true, slug: true, category: true, isNews: true, isPublished: true,
       publishedAt: true, displayOrder: true, readTimeMinutes: true, createdAt: true,
     },
   });
@@ -20,9 +20,10 @@ export default async function SuperAdminBlogPage() {
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Platform Blog</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Blog &amp; News</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Manage blog posts for authorloft.com/blog. Drag rows to reorder priority in the CMS.
+            Manage posts for authorloft.com/blog and /news. Use the Post Type toggle in the editor to
+            choose where each post appears. Drag rows to reorder priority.
           </p>
         </div>
         <a

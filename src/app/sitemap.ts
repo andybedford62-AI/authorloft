@@ -5,15 +5,29 @@ import { getBookstoreData } from "@/lib/bookstore";
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch all published blog posts
+  // Fetch all published blog posts (exclude news — those live under /news)
   const blogPosts = await prisma.platformPost.findMany({
-    where:   { isPublished: true },
+    where:   { isPublished: true, isNews: false },
     select:  { slug: true, updatedAt: true, publishedAt: true },
     orderBy: { publishedAt: "desc" },
   }).catch(() => []);
 
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((p) => ({
     url:             `${BASE}/blog/${p.slug}`,
+    lastModified:    p.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority:        0.7,
+  }));
+
+  // Fetch all published news posts
+  const newsPosts = await prisma.platformPost.findMany({
+    where:   { isPublished: true, isNews: true },
+    select:  { slug: true, updatedAt: true, publishedAt: true },
+    orderBy: { publishedAt: "desc" },
+  }).catch(() => []);
+
+  const newsEntries: MetadataRoute.Sitemap = newsPosts.map((p) => ({
+    url:             `${BASE}/news/${p.slug}`,
     lastModified:    p.updatedAt,
     changeFrequency: "monthly" as const,
     priority:        0.7,
@@ -41,6 +55,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Blog - high priority for SEO
     { url: `${BASE}/blog`,     lastModified: new Date(), changeFrequency: "weekly",   priority: 0.85 },
     ...blogEntries,
+
+    // News - company updates/announcements
+    { url: `${BASE}/news`,     lastModified: new Date(), changeFrequency: "weekly",   priority: 0.8 },
+    ...newsEntries,
 
     // Resources - medium priority
     { url: `${BASE}/resources`, lastModified: new Date(), changeFrequency: "monthly",  priority: 0.7 },

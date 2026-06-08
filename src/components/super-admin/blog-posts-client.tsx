@@ -27,6 +27,7 @@ type Post = {
   title:           string;
   slug:            string;
   category:        string;
+  isNews:          boolean;
   isPublished:     boolean;
   publishedAt:     string | null;
   displayOrder:    number;
@@ -34,7 +35,7 @@ type Post = {
   createdAt:       string;
 };
 
-function SortableRow({ post, onDelete }: { post: Post; onDelete: (id: string) => void }) {
+function SortableRow({ post, onDelete, dragEnabled }: { post: Post; onDelete: (id: string) => void; dragEnabled: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: post.id });
 
   const style = {
@@ -51,18 +52,29 @@ function SortableRow({ post, onDelete }: { post: Post; onDelete: (id: string) =>
   return (
     <tr ref={setNodeRef} style={style} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
       <td className="py-3 px-3 w-8">
-        <button
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 touch-none p-0.5"
-          title="Drag to reorder"
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
+        {dragEnabled ? (
+          <button
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 touch-none p-0.5"
+            title="Drag to reorder"
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+        ) : (
+          <span className="block w-4" />
+        )}
       </td>
       <td className="py-3 px-3 max-w-xs">
         <span className="block text-sm font-medium text-gray-900 truncate">{post.title}</span>
-        <span className="text-xs text-gray-400 font-mono">/blog/{post.slug}</span>
+        <span className="text-xs text-gray-400 font-mono">/{post.isNews ? "news" : "blog"}/{post.slug}</span>
+      </td>
+      <td className="py-3 px-3">
+        {post.isNews ? (
+          <span className="inline-flex items-center text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded-full">News</span>
+        ) : (
+          <span className="inline-flex items-center text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-full">Blog</span>
+        )}
       </td>
       <td className="py-3 px-3 text-sm text-gray-500">{post.category || "—"}</td>
       <td className="py-3 px-3">
@@ -82,7 +94,7 @@ function SortableRow({ post, onDelete }: { post: Post; onDelete: (id: string) =>
         <div className="flex items-center justify-end gap-1">
           {post.isPublished && (
             <a
-              href={`/blog/${post.slug}`}
+              href={`/${post.isNews ? "news" : "blog"}/${post.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
@@ -111,11 +123,18 @@ function SortableRow({ post, onDelete }: { post: Post; onDelete: (id: string) =>
   );
 }
 
+type TypeFilter = "all" | "blog" | "news";
+
 export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
   const [posts,  setPosts]  = useState(initialPosts);
   const [saving, setSaving] = useState(false);
   const [error,  setError]  = useState<string | null>(null);
+  const [filter, setFilter] = useState<TypeFilter>("all");
   const router = useRouter();
+
+  const visiblePosts =
+    filter === "all" ? posts : posts.filter((p) => (filter === "news" ? p.isNews : !p.isNews));
+  const dragEnabled = filter === "all";
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -176,12 +195,31 @@ export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
 
   return (
     <div className="space-y-2">
+      {/* Type filter */}
+      <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+        {([
+          ["all",  `All (${posts.length})`],
+          ["blog", `Blog (${posts.filter((p) => !p.isNews).length})`],
+          ["news", `News (${posts.filter((p) => p.isNews).length})`],
+        ] as [TypeFilter, string][]).map(([id, label]) => (
+          <button
+            key={id}
+            onClick={() => setFilter(id)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              filter === id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center justify-between h-5">
         {saving && <p className="text-xs text-gray-400">Saving order…</p>}
         {error  && <p className="text-xs text-red-500">{error}</p>}
         {!saving && !error && <span />}
         <p className="text-xs text-gray-400">
-          {posts.filter((p) => p.isPublished).length} published · {posts.filter((p) => !p.isPublished).length} drafts
+          {visiblePosts.filter((p) => p.isPublished).length} published · {visiblePosts.filter((p) => !p.isPublished).length} drafts
         </p>
       </div>
 
@@ -191,6 +229,7 @@ export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="py-2.5 px-3 w-8" />
               <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+              <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
               <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
               <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
               <th className="py-2.5 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
@@ -199,10 +238,10 @@ export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
             </tr>
           </thead>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={posts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={visiblePosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
               <tbody>
-                {posts.map((post) => (
-                  <SortableRow key={post.id} post={post} onDelete={handleDelete} />
+                {visiblePosts.map((post) => (
+                  <SortableRow key={post.id} post={post} onDelete={handleDelete} dragEnabled={dragEnabled} />
                 ))}
               </tbody>
             </SortableContext>
@@ -211,7 +250,9 @@ export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
       </div>
 
       <p className="text-xs text-gray-400 px-1">
-        Drag rows to change CMS display order. The public blog always shows most recently published first.
+        {dragEnabled
+          ? "Drag rows to change CMS display order. Public pages always show most recently published first."
+          : "Switch to “All” to drag-reorder. Public pages always show most recently published first."}
       </p>
     </div>
   );

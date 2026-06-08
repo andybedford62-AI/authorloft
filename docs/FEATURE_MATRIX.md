@@ -150,6 +150,9 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Testimonials Manager** | Live | Add/edit/display social proof |
 | **Coupon Manager** | Live | Create & assign discount codes to authors |
 | **Early Bird Coupon** | Live | Auto-applied to new FREE users (30-day window) |
+| **Blog & News CMS** | Live | One editor; "Blog Article / News" toggle routes a post to /blog or /news |
+| **AuthorLoft News** | Live | Public /news archive (announcements, updates, specials, events); separate from /blog |
+| **News Subscribers** | Live | Public subscribe form (news page, footer, home) → platform subscriber list + CSV export. Email *sending* deferred (Phase 2) |
 | **Platform Settings** | Live | Logo, description, contact emails, testimonials |
 | **Analytics Dashboard** | Roadmap | Platform-wide metrics, user growth |
 | **Billing & Subscriptions** | Live | View active subscriptions, manage Stripe integration |

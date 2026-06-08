@@ -55,7 +55,20 @@ Shipped first version June 6, 2026 (discovery catalog, opt-in per book, STANDARD
 
 ---
 
+## AuthorLoft News (`/news`) — Phase 2 follow-ups
+
+Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture). Deferred:
+
+- [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
+- [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
+- [ ] **"Publish News post → also email subscribers"** one-click option. *(small)*
+- [ ] Optional: filter `/news` by category, or an RSS feed for the news archive. *(small)*
+
+---
+
 ## Shipped (for reference)
 
+- ✅ **AuthorLoft News** Phase 1 — public /news archive, Blog/News CMS toggle, subscriber capture (no sending yet), sitemap (June 8, 2026)
+- ✅ **Company Social Links** — Super Admin CRUD, shared marketing footer, bookstore hero (June 7, 2026)
 - ✅ **Bookstore** discovery catalog with showcase sections, genre pages, SEO, branding (June 6, 2026)
 - ✅ **Reader Feedback & Ratings** (book-level, moderated) (June 5, 2026)

@@ -1042,6 +1042,7 @@ model PlatformPost {
   authorName      String    @default("AuthorLoft Team")
   readTimeMinutes Int       @default(5)
   displayOrder    Int       @default(0)
+  isNews          Boolean   @default(false)   // true = AuthorLoft News (/news); false = blog article (/blog)
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
   // SEO fields
@@ -1056,6 +1057,25 @@ model PlatformPost {
 
   @@index([isPublished, publishedAt])
   @@index([displayOrder])
+  @@index([isNews, isPublished, publishedAt])
+}
+
+// ─── Platform Newsletter Subscribers (public AuthorLoft News list) ─────────────
+// Platform-scoped (no authorId). Captured from the public News page / footer /
+// home subscribe forms. Sending newsletters is a later phase; this just builds
+// the audience. Mirrors the GDPR token pattern of the author-scoped Subscriber.
+
+model PlatformSubscriber {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  isConfirmed      Boolean  @default(false)
+  confirmToken     String?  @unique
+  unsubscribeToken String   @default(cuid())
+  source           String?  // where they signed up: "news" | "footer" | "home"
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 // ─── Platform Resources (curated author tool/community directory) ─────────────

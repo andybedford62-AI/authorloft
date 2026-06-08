@@ -15,6 +15,7 @@ type Post = {
   category:        string;
   authorName:      string;
   readTimeMinutes: number;
+  isNews:          boolean;
   isPublished:     boolean;
   attachmentUrl:   string | null;
   attachmentLabel: string | null;
@@ -49,6 +50,7 @@ export function PlatformPostForm({ post }: Props) {
   const [content,         setContent]         = useState(post?.content         ?? "");
   const [coverImageUrl,   setCoverImageUrl]   = useState(post?.coverImageUrl   ?? "");
   const [category,        setCategory]        = useState(post?.category        ?? "");
+  const [isNews,          setIsNews]          = useState(post?.isNews          ?? false);
   const [authorName,      setAuthorName]      = useState(post?.authorName      ?? "AuthorLoft Team");
   const [readTimeMinutes, setReadTimeMinutes] = useState(post?.readTimeMinutes ?? 5);
   const [isPublished,     setIsPublished]     = useState(post?.isPublished     ?? false);
@@ -106,7 +108,7 @@ export function PlatformPostForm({ post }: Props) {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, authorName, readTimeMinutes, isPublished, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null, focusKeyword: focusKeyword || null, seoTitle: seoTitle || null, metaDescription: metaDescription || null }),
+      body: JSON.stringify({ title, slug, excerpt, content, coverImageUrl: coverImageUrl || null, category, isNews, authorName, readTimeMinutes, isPublished, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null, focusKeyword: focusKeyword || null, seoTitle: seoTitle || null, metaDescription: metaDescription || null }),
     });
 
     const json = await res.json();
@@ -154,6 +156,37 @@ export function PlatformPostForm({ post }: Props) {
       {/* Title + Slug */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <h2 className="text-sm font-semibold text-gray-700">Post Details</h2>
+
+        {/* Post type: Blog Article vs News */}
+        <div className="space-y-1.5">
+          <label className={labelCls}>Post Type</label>
+          <div className="inline-flex p-1 bg-gray-100 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setIsNews(false)}
+              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                !isNews ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Blog Article
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsNews(true)}
+              className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                isNews ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              News
+            </button>
+          </div>
+          <p className="text-xs text-gray-400">
+            {isNews
+              ? "Shows on the public AuthorLoft News page (/news) — for announcements, updates, specials, events."
+              : "Shows on the public Blog (/blog) — for evergreen tips, guides, and articles."}
+          </p>
+        </div>
+
         <div className="space-y-1.5">
           <label className={labelCls}>Title <span className="text-red-500">*</span></label>
           <input
@@ -167,7 +200,7 @@ export function PlatformPostForm({ post }: Props) {
         <div className="space-y-1.5">
           <label className={labelCls}>
             URL Slug <span className="text-red-500">*</span>
-            <span className="ml-2 text-gray-400 font-normal normal-case">/blog/{slug || "your-slug-here"}</span>
+            <span className="ml-2 text-gray-400 font-normal normal-case">{isNews ? "/news/" : "/blog/"}{slug || "your-slug-here"}</span>
           </label>
           <input
             type="text"
@@ -337,7 +370,7 @@ export function PlatformPostForm({ post }: Props) {
             <p className="text-sm font-medium text-gray-800">{isPublished ? "Published" : "Draft"}</p>
             <p className="text-xs text-gray-400 mt-0.5">
               {isPublished
-                ? "This post is live at authorloft.com/blog"
+                ? `This post is live at authorloft.com${isNews ? "/news" : "/blog"}`
                 : "Save as draft — not visible to the public yet"}
             </p>
           </div>

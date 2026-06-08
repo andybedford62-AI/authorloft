@@ -2,12 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Linkedin, Facebook, Twitter, Instagram, Youtube, Globe, type LucideIcon } from "lucide-react";
 import { getSocialLinks } from "@/lib/social-links";
+import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 
 const NAV_LINKS: [string, string][] = [
   ["Features", "/features"],
   ["Bookstore", "/bookstore"],
   ["Pricing", "/pricing"],
   ["Blog", "/blog"],
+  ["News", "/news"],
   ["Resources", "/resources"],
   ["Contact", "/contact"],
   ["Privacy", "/privacy"],
@@ -30,6 +32,17 @@ export async function MarketingFooter() {
   return (
     <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3]" style={{ padding: "28px 24px" }}>
       <div className="max-w-6xl mx-auto">
+        {/* Newsletter signup row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 mb-5 border-b border-[#DCDBD3]">
+          <div>
+            <p className="text-sm font-semibold text-[#1B2B47]" style={{ fontFamily: "Georgia, serif" }}>
+              Get AuthorLoft News in your inbox
+            </p>
+            <p className="text-xs text-[#5C6E89]">Updates, new features, specials &amp; events.</p>
+          </div>
+          <NewsSubscribeForm source="footer" variant="compact" />
+        </div>
+
         {/* Top row: logo + inline links */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <Image

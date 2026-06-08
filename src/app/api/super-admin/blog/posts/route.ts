@@ -7,7 +7,7 @@ export async function GET() {
   const posts = await prisma.platformPost.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
     select: {
-      id: true, title: true, slug: true, category: true, isPublished: true,
+      id: true, title: true, slug: true, category: true, isNews: true, isPublished: true,
       publishedAt: true, displayOrder: true, readTimeMinutes: true, createdAt: true,
     },
   });
@@ -16,7 +16,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { title, slug, excerpt, content, coverImageUrl, category, authorName, readTimeMinutes, isPublished, attachmentUrl, attachmentLabel, focusKeyword, seoTitle, metaDescription } = await req.json();
+  const { title, slug, excerpt, content, coverImageUrl, category, isNews, authorName, readTimeMinutes, isPublished, attachmentUrl, attachmentLabel, focusKeyword, seoTitle, metaDescription } = await req.json();
 
   if (!title?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: "Title and slug are required." }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       content:         content?.trim() ?? "",
       coverImageUrl:   coverImageUrl || null,
       category:        category?.trim() ?? "",
+      isNews:          isNews ?? false,
       authorName:      authorName?.trim() || "AuthorLoft Team",
       readTimeMinutes: readTimeMinutes ?? 5,
       displayOrder:    (maxOrder._max.displayOrder ?? -1) + 1,

@@ -133,7 +133,8 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },
   { href: "/super-admin/settings",         label: "Platform Settings", icon: Settings   },
   { href: "/super-admin/help",             label: "Help Centre",     icon: HelpCircle },
-  { href: "/super-admin/blog",             label: "Blog",            icon: Newspaper  },
+  { href: "/super-admin/blog",             label: "Blog & News",     icon: Newspaper  },
+  { href: "/super-admin/subscribers",      label: "News Subscribers", icon: Mail      },
   { href: "/super-admin/resources",        label: "Resources",       icon: Globe      },
   { href: "/super-admin/social",           label: "Social Media",    icon: Share2     },
 ];
