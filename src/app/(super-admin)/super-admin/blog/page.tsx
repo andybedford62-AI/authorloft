@@ -23,7 +23,7 @@ export default async function SuperAdminBlogPage() {
           <h1 className="text-2xl font-bold text-gray-900">Blog &amp; News</h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage posts for authorloft.com/blog and /news. Use the Post Type toggle in the editor to
-            choose where each post appears. Drag rows to reorder priority.
+            choose where each post appears. Search and sort columns to find what you need.
           </p>
         </div>
         <a

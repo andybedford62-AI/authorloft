@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";

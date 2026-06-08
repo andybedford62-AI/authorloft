@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { BookOpen, ArrowLeft, Send, Check, Mail } from "lucide-react";
+import { ArrowLeft, Send, Check, Mail } from "lucide-react";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 
 type SupportEmailOption = { id: string; label: string; email: string; description: string | null };
