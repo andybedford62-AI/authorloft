@@ -1,0 +1,71 @@
+import type { ReactNode } from "react";
+
+interface MarketingPageHeaderProps {
+  /** Small mono uppercase label above the title, e.g. "From the team". */
+  eyebrow?: string;
+  /** Page title. Pass a ReactNode so an accent word can be styled (see usage). */
+  title: ReactNode;
+  /** Optional supporting line under the title. */
+  subtitle?: string;
+  /** Optional square logo/badge shown on the right (md+). */
+  imageSrc?: string;
+  imageAlt?: string;
+}
+
+/**
+ * Shared "brand band" hero for secondary marketing pages (Bookstore, Blog, News,
+ * Pricing, Features, Resources, Contact). Full-bleed navy gradient with a brass
+ * hairline, an eyebrow label, a serif title, an optional subtitle, and an optional
+ * square logo in a white card. Gives every page a consistent, branded header.
+ *
+ * Accent a word in the title with: <span className="italic text-[#D4AE6A]">Word</span>
+ */
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "" }: MarketingPageHeaderProps) {
+  return (
+    <section className="relative overflow-hidden bg-[#1B2B47]">
+      {/* Gradient base */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(120deg, #0F1A2D 0%, #1B2B47 55%, #27406B 100%)" }}
+      />
+      {/* Fine vertical threadlines for subtle texture */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 22px)",
+        }}
+      />
+      {/* Soft brass glow, top-right */}
+      <div
+        aria-hidden
+        className="absolute -top-24 -right-24 w-96 h-96 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(212,174,106,0.18), transparent 70%)" }}
+      />
+
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8">
+        <div className="min-w-0">
+          {eyebrow && (
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AE6A] mb-3">· {eyebrow} ·</p>
+          )}
+          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight">{title}</h1>
+          {subtitle && <p className="mt-4 text-base text-[#D4DDEB] max-w-xl leading-relaxed">{subtitle}</p>}
+        </div>
+
+        {imageSrc && (
+          <div className="hidden md:flex flex-shrink-0">
+            <span className="inline-flex items-center justify-center bg-white rounded-2xl p-2 shadow-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imageSrc} alt={imageAlt} className="h-32 w-32 object-contain rounded-xl" />
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Brass hairline */}
+      <div aria-hidden className="relative h-[3px] bg-gradient-to-r from-transparent via-[#B8893D] to-transparent" />
+    </section>
+  );
+}

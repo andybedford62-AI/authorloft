@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { NewsList } from "@/components/marketing/news-list";
 
@@ -54,26 +55,15 @@ export default async function NewsIndexPage() {
     <div className="min-h-screen bg-[#F0EDE4]">
       <MarketingNav />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        {/* Header */}
-        <div className="mb-10 flex items-center justify-between gap-6">
-          <div className="min-w-0">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-3">· From the team ·</p>
-            <h1 className="text-4xl sm:text-5xl font-serif text-[#1B2B47] font-normal leading-tight">
-              AuthorLoft <span className="italic text-[#C26A4A]">News</span>
-            </h1>
-            <p className="mt-4 text-base text-[#5C6E89] max-w-xl">
-              Product updates, new features, specials, and events — everything happening at AuthorLoft.
-            </p>
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/news-page-logo.png"
-            alt="AuthorLoft News"
-            className="hidden md:block max-h-44 w-auto rounded-xl flex-shrink-0"
-          />
-        </div>
+      <MarketingPageHeader
+        eyebrow="From the team"
+        title={<>AuthorLoft <span className="italic text-[#D4AE6A]">News</span></>}
+        subtitle="Product updates, new features, specials, and events — everything happening at AuthorLoft."
+        imageSrc="/news-page-logo.png"
+        imageAlt="AuthorLoft News"
+      />
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Subscribe box */}
         <div className="mb-12">
           <NewsSubscribeForm source="news" variant="box" />
