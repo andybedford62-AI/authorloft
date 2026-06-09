@@ -52,6 +52,26 @@ const PLATFORMS = [
     tokenHint:   "Facebook Page access token (same token works for linked IG)",
     docsUrl:     "https://developers.facebook.com/apps",
   },
+  {
+    id:          "TWITTER",
+    label:       "X (Twitter)",
+    color:       "bg-black",
+    textColor:   "text-gray-900",
+    borderColor: "border-gray-300",
+    bgLight:     "bg-gray-50",
+    idLabel:     "",
+    idHint:      "",
+    tokenHint:   "",
+    docsUrl:     "https://developer.x.com/en/portal/dashboard",
+    // X needs 4 OAuth 1.0a credentials; account ID is auto-detected from them.
+    multiField:  true,
+    fields: [
+      { key: "apiKey",            label: "API Key",            hint: "Consumer Key from Keys and tokens" },
+      { key: "apiSecret",         label: "API Key Secret",     hint: "Consumer Secret" },
+      { key: "accessToken",       label: "Access Token",       hint: "Generated with Read+Write permissions" },
+      { key: "accessTokenSecret", label: "Access Token Secret", hint: "Generated with Read+Write permissions" },
+    ],
+  },
 ] as const;
 
 function ConnectPanel({
@@ -63,27 +83,46 @@ function ConnectPanel({
 }) {
   const [accountId,   setAccountId]   = useState("");
   const [accessToken, setAccessToken] = useState("");
+  const [fieldVals,   setFieldVals]   = useState<Record<string, string>>({});
   const [saving,      setSaving]      = useState(false);
   const [error,       setError]       = useState("");
 
-  const autoId = "autoId" in platformDef && platformDef.autoId;
+  const autoId     = "autoId" in platformDef && platformDef.autoId;
+  const multiField = "multiField" in platformDef && platformDef.multiField;
+  const fields     = "fields" in platformDef ? platformDef.fields : [];
 
   async function handleConnect() {
-    if (!autoId && !accountId.trim()) {
-      setError("Both fields are required.");
-      return;
-    }
-    if (!accessToken.trim()) {
-      setError("Access token is required.");
-      return;
+    // X / multi-credential platforms: collect the named fields into a JSON blob.
+    if (multiField) {
+      const missing = fields.filter((f) => !fieldVals[f.key]?.trim());
+      if (missing.length > 0) {
+        setError("All credential fields are required.");
+        return;
+      }
+    } else {
+      if (!autoId && !accountId.trim()) {
+        setError("Both fields are required.");
+        return;
+      }
+      if (!accessToken.trim()) {
+        setError("Access token is required.");
+        return;
+      }
     }
     setSaving(true);
     setError("");
     try {
+      const tokenPayload = multiField
+        ? JSON.stringify(Object.fromEntries(fields.map((f) => [f.key, fieldVals[f.key].trim()])))
+        : accessToken;
       const res = await fetch("/api/super-admin/social/tokens", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ platform: platformDef.id, accessToken, accountId: autoId ? undefined : accountId }),
+        body:    JSON.stringify({
+          platform:    platformDef.id,
+          accessToken: tokenPayload,
+          accountId:   autoId || multiField ? undefined : accountId,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Connect failed");
@@ -109,22 +148,45 @@ function ConnectPanel({
 
       {error && <p className="text-xs text-red-600 bg-red-50 rounded px-2 py-1.5">{error}</p>}
 
-      {autoId ? (
-        <p className="text-xs text-gray-500 bg-white rounded px-3 py-2 border border-gray-200">
-          ℹ️ Your LinkedIn Member ID will be detected automatically from your access token.
-        </p>
+      {multiField ? (
+        <>
+          <p className="text-xs text-gray-500 bg-white rounded px-3 py-2 border border-gray-200">
+            ℹ️ Set your X app to <strong>Read and Write</strong> permissions, then paste the 4 keys from the
+            Developer Portal → Keys and tokens tab. Your account is detected automatically.
+          </p>
+          {fields.map((f) => (
+            <div key={f.key} className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">{f.label}</label>
+              <input
+                type="password"
+                value={fieldVals[f.key] ?? ""}
+                onChange={(e) => setFieldVals((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                placeholder={f.hint}
+                className={inputCls}
+              />
+            </div>
+          ))}
+        </>
       ) : (
-        <div className="space-y-1">
-          <label className="block text-xs font-medium text-gray-600">{platformDef.idLabel}</label>
-          <input type="text" value={accountId} onChange={(e) => setAccountId(e.target.value)}
-            placeholder={platformDef.idHint} className={inputCls} />
-        </div>
+        <>
+          {autoId ? (
+            <p className="text-xs text-gray-500 bg-white rounded px-3 py-2 border border-gray-200">
+              ℹ️ Your LinkedIn Member ID will be detected automatically from your access token.
+            </p>
+          ) : (
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">{platformDef.idLabel}</label>
+              <input type="text" value={accountId} onChange={(e) => setAccountId(e.target.value)}
+                placeholder={platformDef.idHint} className={inputCls} />
+            </div>
+          )}
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-600">Access Token</label>
+            <input type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)}
+              placeholder={platformDef.tokenHint} className={inputCls} />
+          </div>
+        </>
       )}
-      <div className="space-y-1">
-        <label className="block text-xs font-medium text-gray-600">Access Token</label>
-        <input type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)}
-          placeholder={platformDef.tokenHint} className={inputCls} />
-      </div>
 
       <button
         onClick={handleConnect}

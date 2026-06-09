@@ -3,8 +3,9 @@ import { decryptToken }     from "@/lib/social/encrypt";
 import { postToLinkedIn }   from "@/lib/social/linkedin";
 import { postToFacebook }   from "@/lib/social/facebook";
 import { postToInstagram }  from "@/lib/social/instagram";
+import { postToTwitter, TwitterCredentials } from "@/lib/social/twitter";
 
-export type Platform = "LINKEDIN" | "FACEBOOK" | "INSTAGRAM";
+export type Platform = "LINKEDIN" | "FACEBOOK" | "INSTAGRAM" | "TWITTER";
 
 interface PublishTarget {
   platform:    Platform;
@@ -118,6 +119,12 @@ async function publishToOne(
     case "INSTAGRAM":
       if (!post.mediaUrl) throw new Error("Instagram requires an image — no media URL set on this post");
       return postToInstagram(target.accessToken, target.accountId, post.caption, post.mediaUrl);
+
+    case "TWITTER": {
+      // For Twitter the decrypted token is a JSON blob of the 4 OAuth 1.0a credentials.
+      const creds = JSON.parse(target.accessToken) as TwitterCredentials;
+      return postToTwitter(creds, post.caption, post.mediaUrl);
+    }
 
     default:
       throw new Error(`Unknown platform: ${target.platform}`);

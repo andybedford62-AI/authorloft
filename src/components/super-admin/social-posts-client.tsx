@@ -28,7 +28,7 @@ const STATUS_STYLES: Record<string, { label: string; cls: string; icon: React.Re
 };
 
 const PLATFORM_LABELS: Record<string, string> = {
-  LINKEDIN: "LI", FACEBOOK: "FB", INSTAGRAM: "IG",
+  LINKEDIN: "LI", FACEBOOK: "FB", INSTAGRAM: "IG", TWITTER: "X",
 };
 
 function StatusBadge({ status }: { status: string }) {

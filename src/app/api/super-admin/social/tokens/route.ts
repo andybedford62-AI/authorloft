@@ -5,6 +5,7 @@ import { encryptToken, decryptToken } from "@/lib/social/encrypt";
 import { testLinkedInToken }          from "@/lib/social/linkedin";
 import { testFacebookToken }          from "@/lib/social/facebook";
 import { testInstagramToken }         from "@/lib/social/instagram";
+import { testTwitterTokens, TwitterCredentials } from "@/lib/social/twitter";
 
 export async function GET() {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,12 +27,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "platform and accessToken are required." }, { status: 400 });
   }
 
-  // LinkedIn auto-fetches accountId; all others require it
-  if (platform !== "LINKEDIN" && !rawAccountId?.trim()) {
+  // LinkedIn & Twitter auto-resolve accountId from the credentials; others require it
+  const autoIdPlatforms = ["LINKEDIN", "TWITTER"];
+  if (!autoIdPlatforms.includes(platform) && !rawAccountId?.trim()) {
     return NextResponse.json({ error: "accountId is required for this platform." }, { status: 400 });
   }
 
-  const validPlatforms = ["LINKEDIN", "FACEBOOK", "INSTAGRAM"];
+  const validPlatforms = ["LINKEDIN", "FACEBOOK", "INSTAGRAM", "TWITTER"];
   if (!validPlatforms.includes(platform)) {
     return NextResponse.json({ error: `platform must be one of: ${validPlatforms.join(", ")}` }, { status: 400 });
   }
@@ -53,6 +55,14 @@ export async function POST(req: NextRequest) {
       case "INSTAGRAM":
         accountName = await testInstagramToken(accessToken, accountId);
         break;
+      case "TWITTER": {
+        // accessToken carries the 4 OAuth 1.0a credentials packed as JSON.
+        const creds  = JSON.parse(accessToken) as TwitterCredentials;
+        const result = await testTwitterTokens(creds);
+        accountName  = result.name;
+        accountId    = result.userId;
+        break;
+      }
       default:
         accountName = `Account ${accountId}`;
     }

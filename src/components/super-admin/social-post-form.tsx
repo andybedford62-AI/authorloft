@@ -18,12 +18,14 @@ const PLATFORM_LABELS: Record<string, string> = {
   LINKEDIN:  "LinkedIn",
   FACEBOOK:  "Facebook",
   INSTAGRAM: "Instagram",
+  TWITTER:   "X (Twitter)",
 };
 
 const CAPTION_LIMITS: Record<string, number> = {
   LINKEDIN:  3000,
   FACEBOOK:  63206,
   INSTAGRAM: 2200,
+  TWITTER:   280,
 };
 
 interface Props {

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "At least one platform must be selected." }, { status: 400 });
   }
 
-  const validPlatforms = ["LINKEDIN", "FACEBOOK", "INSTAGRAM"];
+  const validPlatforms = ["LINKEDIN", "FACEBOOK", "INSTAGRAM", "TWITTER"];
   const invalid = platforms.filter((p: string) => !validPlatforms.includes(p));
   if (invalid.length > 0) {
     return NextResponse.json({ error: `Invalid platforms: ${invalid.join(", ")}` }, { status: 400 });
