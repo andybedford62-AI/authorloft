@@ -14,7 +14,11 @@ export type ThemeId =
   | "childrens"
   | "literary"
   | "western"
-  | "cinematic";
+  | "cinematic"
+  // Subgenre palettes
+  | "aviation"
+  | "scuba-diving"
+  | "mountain-adventure";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -30,6 +34,7 @@ export interface ThemeDefinition {
   swatches?: string[];  // colour strip for genre palettes
   emoji?: string;
   mood?: string;
+  defaultHeroImageUrl?: string;  // curated fallback hero image when the author hasn't uploaded one
 }
 
 // ── Base Themes (Standard+) ──────────────────────────────────────────────────
@@ -165,7 +170,50 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
   },
 ];
 
-export const ALL_THEMES = [...BASE_THEMES, ...GENRE_PALETTES];
+// ── Subgenre Palettes (Standard+) ───────────────────────────────────────────
+// Specialised palettes for niche subgenres. Standard+ access (isPremium: false).
+// Added to over time — this is the first phase (aviation, scuba/underwater).
+
+export const SUBGENRE_PALETTES: ThemeDefinition[] = [
+  {
+    id: "aviation",
+    name: "Aviation / Flying Adventure",
+    description: "Open sky, chrome cockpit, golden-hour horizon — soaring and adventurous.",
+    isPremium: false,
+    dataTheme: "aviation",
+    emoji: "✈️",
+    mood: "Soaring, technical, golden-hour adventure",
+    preview: { bg: "#F0F4F8", primary: "#0E2A4A", accent: "#FF7A30" },
+    swatches: ["#0E2A4A", "#1B4D7E", "#4F9FD6", "#A9D6F0", "#F0F4F8", "#C9D6E0", "#FF7A30", "#FFB677", "#08182C"],
+    defaultHeroImageUrl: "/images/themes/aviation-hero.jpg",
+  },
+  {
+    id: "scuba-diving",
+    name: "Scuba / Underwater Adventure",
+    description: "Deep-reef teal with coral accents — immersive and exploratory.",
+    isPremium: false,
+    dataTheme: "scuba-diving",
+    emoji: "🤿",
+    mood: "Immersive, exploratory, deep-reef adventure",
+    preview: { bg: "#F2F9F8", primary: "#073B3F", accent: "#FF6F5E" },
+    swatches: ["#073B3F", "#0E5E5C", "#1FA8A0", "#7FE0D6", "#F2F9F8", "#CDEDE8", "#FF6F5E", "#FFB199", "#04282B"],
+    defaultHeroImageUrl: "/images/themes/scuba-diving-hero.jpg",
+  },
+  {
+    id: "mountain-adventure",
+    name: "Mountain / Outdoor Adventure",
+    description: "Granite peaks, pine forests, and glacier-blue horizons — rugged and expansive.",
+    isPremium: false,
+    dataTheme: "mountain-adventure",
+    emoji: "🏔️",
+    mood: "Rugged, expansive, alpine adventure",
+    preview: { bg: "#F3F5F2", primary: "#2E3D31", accent: "#4A90A4" },
+    swatches: ["#2E3D31", "#4F6B52", "#9CB89E", "#D6E2D7", "#F3F5F2", "#DCE3DD", "#4A90A4", "#A8D2DC", "#161F18"],
+    defaultHeroImageUrl: "/images/themes/mountain-adventure-hero.jpg",
+  },
+];
+
+export const ALL_THEMES = [...BASE_THEMES, ...GENRE_PALETTES, ...SUBGENRE_PALETTES];
 
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];
@@ -200,6 +248,7 @@ export function resolveAccentColor(opts: {
  */
 export const BASE_THEME_IDS  = BASE_THEMES.map((t) => t.id);
 export const GENRE_PALETTE_IDS = GENRE_PALETTES.map((t) => t.id);
+export const SUBGENRE_PALETTE_IDS = SUBGENRE_PALETTES.map((t) => t.id);
 
 export function isThemeAllowed(themeId: string, planTier: string): boolean {
   if (planTier === "PREMIUM") return true;

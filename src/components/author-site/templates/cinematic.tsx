@@ -84,7 +84,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
         {/* Text content — left side */}
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
-          <div className="max-w-[520px] space-y-6">
+          <div className="max-w-[380px] lg:max-w-[520px] space-y-6">
 
             {/* Eyebrow */}
             {heroEyebrow && (

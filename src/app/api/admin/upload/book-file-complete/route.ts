@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -19,6 +20,8 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: authorId });
+    if (_rl) return _rl;
 
     const body = await req.json();
     const { itemId, fileKey, fileName } = body;

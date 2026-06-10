@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { passwordStrengthError } from "@/lib/password-validation";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 export async function POST(req: NextRequest) {
+  // Defence-in-depth: cap token-guessing attempts per IP (tokens are 256-bit,
+  // but this blocks DB-load brute-force / enumeration attempts outright).
+  const limited = await enforceRateLimit(req, { bucket: "reset-pw", maxRequests: 10, windowSeconds: 900 });
+  if (limited) return limited;
+
   try {
     const { token, password } = await req.json();
 
@@ -52,6 +58,9 @@ export async function POST(req: NextRequest) {
 
 // GET — validate a token before showing the form (lets the page show an error early)
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, { bucket: "reset-pw-validate", maxRequests: 20, windowSeconds: 900 });
+  if (limited) return limited;
+
   const token = req.nextUrl.searchParams.get("token");
 
   if (!token) {

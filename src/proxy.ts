@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { validateCSRFToken } from "@/lib/csrf";
+import { validateCSRFToken, getCsrfSecret } from "@/lib/csrf";
 import { auditLog, getAuditContext, shouldAuditRoute, getAuditAction } from "@/lib/audit-logger";
 
 // AuthorLoft Multi-Tenant Middleware
@@ -94,7 +94,7 @@ export async function proxy(req: NextRequest) {
         const isValid = validateCSRFToken(
           csrfToken,
           sessionToken.sub || "",
-          process.env.NEXTAUTH_SECRET || ""
+          getCsrfSecret()
         );
 
         if (!isValid) {

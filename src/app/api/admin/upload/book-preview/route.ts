@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PreviewMediaType } from "@prisma/client";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 const LIMITS: Record<string, number> = {
   "image/jpeg": 5  * 1024 * 1024,
@@ -24,6 +25,8 @@ export async function POST(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: userId });
+  if (_rl) return _rl;
 
   let formData: FormData;
   try {

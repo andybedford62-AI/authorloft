@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
-import { generateCSRFToken } from "./csrf";
+import { generateCSRFToken, getCsrfSecret } from "./csrf";
 import { sendNewSignupNotificationEmail, sendWelcomeEmail } from "./mailer";
 import { capturePostHog } from "./posthog";
 import bcrypt from "bcryptjs";
@@ -230,7 +230,7 @@ export const authOptions: NextAuthOptions = {
 
       // Generate CSRF token for authenticated requests (regenerated on each token refresh)
       if (token.sub) {
-        token.csrfToken = generateCSRFToken(token.sub, process.env.NEXTAUTH_SECRET || "");
+        token.csrfToken = generateCSRFToken(token.sub, getCsrfSecret());
       }
 
       return token;
