@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { getTheme } from "@/lib/themes";
+import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
 import type { AuthorForTemplate } from "./templates/types";
 
 interface HeroBannerProps {
@@ -18,7 +19,13 @@ function getHeroColors(siteTheme: string) {
   const theme = getTheme(siteTheme);
   const darkBgThemes = ["dark-elegant", "scifi"];
   const bg = darkBgThemes.includes(siteTheme) ? theme.preview.bg : theme.preview.primary;
-  return { bg, accent: theme.preview.accent, defaultHeroImageUrl: theme.defaultHeroImageUrl };
+  // Hero image resolution: an explicit defaultHeroImageUrl wins; otherwise fall
+  // back to the naming convention /images/themes/{id}-hero.jpg if that file was
+  // present at build time (see THEME_HERO_IDS). No file → undefined → solid colour.
+  const heroImage =
+    theme.defaultHeroImageUrl ??
+    (THEME_HERO_IDS.includes(theme.id) ? `/images/themes/${theme.id}-hero.jpg` : undefined);
+  return { bg, accent: theme.preview.accent, defaultHeroImageUrl: heroImage };
 }
 
 /** Rough luminance check — returns true if color is light (use dark text on it). */

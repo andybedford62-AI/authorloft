@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "node scripts/gen-theme-hero-manifest.mjs && prisma generate && next build",
+    "gen:hero-manifest": "node scripts/gen-theme-hero-manifest.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
