@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import nodePath from "path";
 import fs from "fs/promises";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 const MAX_BYTES    = 5 * 1024 * 1024;
 const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -13,6 +14,8 @@ const SUPABASE_CONFIGURED =
 export async function POST(req: NextRequest) {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: authorId });
+  if (_rl) return _rl;
 
   let formData: FormData;
   try {

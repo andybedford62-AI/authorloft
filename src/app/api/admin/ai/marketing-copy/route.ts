@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getAiContext, incrementUsage } from "@/lib/ai-usage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 export async function POST(req: NextRequest) {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const _rl = await enforceRateLimit(req, { bucket: "ai", maxRequests: 20, windowSeconds: 60, userId: authorId });
+  if (_rl) return _rl;
 
   const ctx = await getAiContext(authorId);
   if (!ctx) return NextResponse.json({ error: "AI service is not configured." }, { status: 503 });

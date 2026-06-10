@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import nodePath from "path";
 import fs from "fs/promises";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 // Max 500 MB — large illustrated PDFs can be hefty
 const MAX_BYTES = 500 * 1024 * 1024;
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
   try {
   const authorId = await getAdminAuthorIdForApi();
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: authorId });
+  if (_rl) return _rl;
 
   let formData: FormData;
   try {
