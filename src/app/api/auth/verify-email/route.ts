@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendWelcomeEmail } from "@/lib/mailer";
 import { capturePostHog } from "@/lib/posthog";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 export async function GET(req: NextRequest) {
+  // Defence-in-depth: cap token-guessing attempts per IP (redirect to the
+  // invalid page on abuse rather than leak a distinct rate-limit signal).
+  const limited = await enforceRateLimit(req, { bucket: "verify-email", maxRequests: 20, windowSeconds: 900 });
+  if (limited) return NextResponse.redirect(new URL("/verify-email/invalid", req.url));
+
   const token = req.nextUrl.searchParams.get("token");
 
   if (!token) {
