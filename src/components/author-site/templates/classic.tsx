@@ -39,7 +39,8 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+      <section className="px-4 sm:px-6 py-16" style={{ backgroundColor: accentColor + "0c" }}>
+        <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
           {/* Text + credentials */}
@@ -91,6 +92,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               )}
             </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -153,7 +155,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
 
       {/* ── Browse by Series ────────────────────────────────────────────────── */}
       {series.length > 0 && (
-        <section className="bg-gray-50 py-16">
+        <section className="py-16" style={{ backgroundColor: accentColor + "0c" }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Explore</p>

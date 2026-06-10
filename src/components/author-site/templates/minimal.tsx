@@ -63,7 +63,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── 2. Books Catalog (leads the page) ────────────────────────────── */}
-      <section className="py-14 bg-gray-50">
+      <section className="py-14" style={{ backgroundColor: accentColor + "0c" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           <div className="flex items-center justify-between mb-8">
