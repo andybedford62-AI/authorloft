@@ -35,8 +35,25 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
   const { bg, accent, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
   const buyHref = featuredBook ? `/books/${featuredBook.slug}` : "/books";
-  const photoSrc = author.heroImageUrl || author.profileImageUrl || defaultHeroImageUrl;
+  // Author portrait — their own uploads only. The theme's scenic image is NOT a
+  // portrait stand-in; it's used as the full hero backdrop below (subgenre themes).
+  const photoSrc = author.heroImageUrl || author.profileImageUrl;
   const layout = author.heroLayout ?? "author-right";
+
+  // Subgenre palettes (mountain/scuba/aviation) ship a scenic image used as the
+  // full-bleed hero background, behind all content, with a dark overlay for text.
+  const sceneBg = defaultHeroImageUrl;
+  const SceneBackdrop = sceneBg ? (
+    <>
+      <div className="absolute inset-0">
+        <Image src={sceneBg} alt="" fill priority className="object-cover object-center" />
+      </div>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.58) 100%)" }}
+      />
+    </>
+  ) : null;
 
   // ── Classic layout (formerly "portrait") — accent bg, text left, book right ──
   if (layout === "portrait") {
@@ -46,6 +63,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
         style={{ backgroundColor: accent }}
         aria-label="Author hero"
       >
+        {SceneBackdrop}
         {/* Depth overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
         {/* Decorative blobs */}
@@ -202,6 +220,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
       style={{ background: bg }}
       aria-label="Author hero"
     >
+      {SceneBackdrop}
       {/* Soft accent glow */}
       <div
         className="absolute inset-0 pointer-events-none"
