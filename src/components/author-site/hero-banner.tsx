@@ -18,7 +18,7 @@ function getHeroColors(siteTheme: string) {
   const theme = getTheme(siteTheme);
   const darkBgThemes = ["dark-elegant", "scifi"];
   const bg = darkBgThemes.includes(siteTheme) ? theme.preview.bg : theme.preview.primary;
-  return { bg, accent: theme.preview.accent };
+  return { bg, accent: theme.preview.accent, defaultHeroImageUrl: theme.defaultHeroImageUrl };
 }
 
 /** Rough luminance check — returns true if color is light (use dark text on it). */
@@ -33,9 +33,9 @@ function isLightColor(hex: string): boolean {
 
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
-  const { bg, accent } = getHeroColors(author.siteTheme);
+  const { bg, accent, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
   const buyHref = featuredBook ? `/books/${featuredBook.slug}` : "/books";
-  const photoSrc = author.heroImageUrl || author.profileImageUrl;
+  const photoSrc = author.heroImageUrl || author.profileImageUrl || defaultHeroImageUrl;
   const layout = author.heroLayout ?? "author-right";
 
   // ── Classic layout (formerly "portrait") — accent bg, text left, book right ──

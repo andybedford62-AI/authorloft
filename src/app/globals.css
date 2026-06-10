@@ -168,6 +168,34 @@
   --font-body: var(--font-inter), 'Inter', sans-serif;
 }
 
+/* ── Subgenre palettes ──────────────────────────────────────────────────── */
+
+[data-theme='aviation'] {
+  --nav-bg: #0B1E33;
+  --background: 210 36% 96%;
+  --foreground: 219 30% 9%;
+  --primary: 212 68% 17%;
+  --primary-foreground: 210 36% 96%;
+  --muted-foreground: 211 16% 42%;
+  --accent: 21 100% 59%;
+  --border: 210 32% 88%;
+  --font-heading: var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='scuba-diving'] {
+  --nav-bg: #04282B;
+  --background: 171 37% 96%;
+  --foreground: 177 51% 8%;
+  --primary: 184 80% 14%;
+  --primary-foreground: 171 37% 96%;
+  --muted-foreground: 176 16% 37%;
+  --accent: 6 100% 68%;
+  --border: 170 36% 87%;
+  --font-heading: var(--font-playfair), serif;
+  --font-body: var(--font-inter), sans-serif;
+}
+
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
 .author-site .font-heading,
