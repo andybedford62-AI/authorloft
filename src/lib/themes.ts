@@ -17,7 +17,8 @@ export type ThemeId =
   | "cinematic"
   // Subgenre palettes
   | "aviation"
-  | "scuba-diving";
+  | "scuba-diving"
+  | "mountain-adventure";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -197,6 +198,18 @@ export const SUBGENRE_PALETTES: ThemeDefinition[] = [
     preview: { bg: "#F2F9F8", primary: "#073B3F", accent: "#FF6F5E" },
     swatches: ["#073B3F", "#0E5E5C", "#1FA8A0", "#7FE0D6", "#F2F9F8", "#CDEDE8", "#FF6F5E", "#FFB199", "#04282B"],
     defaultHeroImageUrl: "/images/themes/scuba-diving-hero.jpg",
+  },
+  {
+    id: "mountain-adventure",
+    name: "Mountain / Outdoor Adventure",
+    description: "Granite peaks, pine forests, and glacier-blue horizons — rugged and expansive.",
+    isPremium: false,
+    dataTheme: "mountain-adventure",
+    emoji: "🏔️",
+    mood: "Rugged, expansive, alpine adventure",
+    preview: { bg: "#F3F5F2", primary: "#2E3D31", accent: "#4A90A4" },
+    swatches: ["#2E3D31", "#4F6B52", "#9CB89E", "#D6E2D7", "#F3F5F2", "#DCE3DD", "#4A90A4", "#A8D2DC", "#161F18"],
+    defaultHeroImageUrl: "/images/themes/mountain-adventure-hero.jpg",
   },
 ];
 

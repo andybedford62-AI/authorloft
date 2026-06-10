@@ -196,6 +196,19 @@
   --font-body: var(--font-inter), sans-serif;
 }
 
+[data-theme='mountain-adventure'] {
+  --nav-bg: #161F18;
+  --background: 100 13% 96%;
+  --foreground: 133 17% 10%;
+  --primary: 132 14% 21%;
+  --primary-foreground: 100 13% 96%;
+  --muted-foreground: 128 10% 44%;
+  --accent: 193 38% 47%;
+  --border: 129 11% 88%;
+  --font-heading: var(--font-playfair), 'Playfair Display', serif;
+  --font-body: var(--font-inter), 'Inter', sans-serif;
+}
+
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
 .author-site .font-heading,
