@@ -4,14 +4,20 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 
-const LINKS: [string, string][] = [
+const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
   ["/features", "Features"],
+];
+
+const RESOURCES: [string, string][] = [
   ["/blog", "Blog"],
   ["/news", "News"],
-  ["/resources", "Resources"],
-  ["/pricing", "Pricing"],
   ["/faq", "FAQ"],
+  ["/resources", "Tools & Communities"],
+];
+
+const LINKS_BOTTOM: [string, string][] = [
+  ["/pricing", "Pricing"],
 ];
 
 /**
@@ -44,7 +50,31 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
           />
           <div className="absolute left-0 right-0 top-full z-50 bg-white border-b border-gray-100 shadow-md">
             <nav className="flex flex-col px-4 sm:px-6 py-2">
-              {LINKS.map(([href, label]) => (
+              {LINKS_TOP.map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="py-2.5 text-sm text-gray-700 hover:text-[#C26A4A] border-b border-gray-50 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Resources group */}
+              <p className="pt-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">Resources</p>
+              {RESOURCES.map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="py-2.5 pl-3 text-sm text-gray-700 hover:text-[#C26A4A] border-b border-gray-50 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {LINKS_BOTTOM.map(([href, label]) => (
                 <Link
                   key={href}
                   href={href}

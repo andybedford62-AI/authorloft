@@ -160,6 +160,37 @@ function BookStack() {
   );
 }
 
+// ── Hero nav dropdown (desktop) ──────────────────────────────────────────────
+function HeroNavDropdown({ label, items }: { label: string; items: [string, string][] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      style={{ position: 'relative' }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, background: 'none', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+      >
+        {label} <span style={{ fontSize: 9, opacity: 0.7, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, paddingTop: 8, zIndex: 50 }}>
+          <div style={{ minWidth: 210, background: '#0F1A2D', border: '1px solid rgba(232,229,221,0.18)', borderRadius: 14, padding: 8, boxShadow: '0 20px 44px -12px rgba(0,0,0,0.6)' }}>
+            {items.map(([href, l]) => (
+              <Link key={href} href={href} style={{ display: 'block', padding: '9px 12px', fontSize: 13, color: '#E8E5DD', textDecoration: 'none', borderRadius: 8 }}>
+                {l}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main hero export ─────────────────────────────────────────────────────────
 export function MidnightHero() {
   return (
@@ -185,21 +216,17 @@ export function MidnightHero() {
           <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
-          {([
-            ['/bookstore',   'Bookstore'],
-            ['/features',    'Features'],
-            ['/blog',        'Blog'],
-            ['/news',        'News'],
-            ['/faq',         'FAQ'],
-            ['#how-it-works','How it works'],
-            ['/pricing',     'Pricing'],
-            ['#genres',      'For authors'],
-          ] as [string, string][]).map(([href, label]) => {
-            const isBookstore = href === '/bookstore';
-            return (
-              <Link key={href} href={href} style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: isBookstore ? '#E8B04B' : '#E8E5DD', fontWeight: isBookstore ? 600 : 400, opacity: isBookstore ? 1 : 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>{label}</Link>
-            );
-          })}
+          <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, opacity: 1, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
+          <Link href="/features" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>Features</Link>
+          <HeroNavDropdown label="Resources" items={[
+            ['/blog',      'Blog'],
+            ['/news',      'News'],
+            ['/faq',       'FAQ'],
+            ['/resources', 'Tools & Communities'],
+          ]} />
+          <Link href="#how-it-works" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>How it works</Link>
+          <Link href="/pricing" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>Pricing</Link>
+          <Link href="#genres" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>For authors</Link>
         </div>
         <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
           <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: '#E8E5DD', opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>

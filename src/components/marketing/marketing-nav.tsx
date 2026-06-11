@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
+import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
 
 
 export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" }) {
@@ -74,24 +75,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Features
           </Link>
-          <Link
-            href="/blog"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/news"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            News
-          </Link>
-          <Link
-            href="/resources"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Resources
-          </Link>
+          <MarketingNavDropdown />
           <Link
             href="/pricing"
             className={`text-sm transition-colors ${
@@ -101,12 +85,6 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             }`}
           >
             Pricing
-          </Link>
-          <Link
-            href="/faq"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            FAQ
           </Link>
           {!author && (
             <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">

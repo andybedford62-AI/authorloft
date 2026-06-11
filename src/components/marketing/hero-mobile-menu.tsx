@@ -4,12 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
-const LINKS: [string, string][] = [
+const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
   ["/features", "Features"],
+];
+
+const RESOURCES: [string, string][] = [
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/faq", "FAQ"],
+  ["/resources", "Tools & Communities"],
+];
+
+const LINKS_BOTTOM: [string, string][] = [
   ["#how-it-works", "How it works"],
   ["/pricing", "Pricing"],
   ["#genres", "For authors"],
@@ -44,7 +51,31 @@ export function HeroMobileMenu() {
             padding: 8, boxShadow: "0 20px 44px -12px rgba(0,0,0,0.6)",
           }}
         >
-          {LINKS.map(([href, label]) => (
+          {LINKS_TOP.map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "#E8E5DD", textDecoration: "none", borderRadius: 8 }}
+            >
+              {label}
+            </Link>
+          ))}
+
+          {/* Resources group */}
+          <p style={{ padding: "10px 14px 4px", margin: 0, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(232,229,221,0.45)" }}>Resources</p>
+          {RESOURCES.map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              style={{ display: "block", padding: "10px 14px 10px 24px", fontSize: 14, color: "#E8E5DD", textDecoration: "none", borderRadius: 8 }}
+            >
+              {label}
+            </Link>
+          ))}
+
+          {LINKS_BOTTOM.map(([href, label]) => (
             <Link
               key={href}
               href={href}
