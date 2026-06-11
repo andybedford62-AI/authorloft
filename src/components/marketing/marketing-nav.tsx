@@ -102,12 +102,12 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Pricing
           </Link>
-          <a
-            href="/#faq"
+          <Link
+            href="/faq"
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
             FAQ
-          </a>
+          </Link>
           {!author && (
             <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
               Sign In

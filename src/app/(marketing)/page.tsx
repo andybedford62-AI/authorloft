@@ -100,12 +100,18 @@ async function getTestimonials() {
   }).catch(() => []);
 }
 
+const HOMEPAGE_FAQ_LIMIT = 10;
 async function getFaqs() {
-  return prisma.homepageFaq.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    select: { id: true, question: true, answer: true },
-  }).catch(() => []);
+  const [items, total] = await Promise.all([
+    prisma.homepageFaq.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: HOMEPAGE_FAQ_LIMIT,
+      select: { id: true, question: true, answer: true },
+    }).catch(() => []),
+    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
+  ]);
+  return { items, total };
 }
 
 async function getLatestBlogPosts() {
@@ -164,7 +170,9 @@ const softwareJsonLd = {
 };
 
 export default async function MarketingPage() {
-  const [plans, testimonials, faqs, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources()]);
+  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources()]);
+  const faqs = faqData.items;
+  const faqTotal = faqData.total;
 
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -347,7 +355,7 @@ export default async function MarketingPage() {
       </section>
 
       {/* ── FAQ (dynamic) ──────────────────────────────────────────────────── */}
-      <MidnightFaqSection faqs={faqs} />
+      <MidnightFaqSection faqs={faqs} hasMore={faqTotal > faqs.length} />
 
       {/* ── Trusted Resources strip ────────────────────────────────────────── */}
       {homepageResources.length > 0 && (

@@ -3,14 +3,18 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PlatformPostForm } from "@/components/super-admin/platform-post-form";
+import { getCategoryNames } from "@/lib/categories";
 
 async function getDistinctCategories(): Promise<string[]> {
-  const rows = await prisma.platformPost.findMany({
-    where: { category: { not: "" } },
-    select: { category: true },
-    distinct: ["category"],
-  }).catch(() => []);
-  return rows.map((r) => r.category).filter(Boolean);
+  const [rows, managed] = await Promise.all([
+    prisma.platformPost.findMany({
+      where: { category: { not: "" } },
+      select: { category: true },
+      distinct: ["category"],
+    }).catch(() => []),
+    getCategoryNames("blog"),
+  ]);
+  return Array.from(new Set([...managed, ...rows.map((r) => r.category).filter(Boolean)]));
 }
 
 export default async function NewBlogPostPage() {

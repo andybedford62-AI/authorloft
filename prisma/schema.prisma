@@ -768,10 +768,28 @@ model HomepageFaq {
   id        String   @id @default(cuid())
   question  String
   answer    String   @db.Text
+  category  String?  // Category slug (type = "faq"); null/empty → "General"
   sortOrder Int      @default(0)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Shared Categories (blog / resource / faq) ────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  type        String   // "blog" | "resource" | "faq"
+  name        String
+  slug        String
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([type, slug])
+  @@index([type, isActive])
 }
 
 // ─── Testimonials ─────────────────────────────────────────────────────────────

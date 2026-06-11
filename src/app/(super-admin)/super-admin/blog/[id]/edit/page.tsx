@@ -3,23 +3,27 @@ import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PlatformPostForm } from "@/components/super-admin/platform-post-form";
+import { getCategoryNames } from "@/lib/categories";
 
 export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || !(session.user as any).isSuperAdmin) redirect("/login");
 
   const { id } = await params;
-  const [post, categoryRows] = await Promise.all([
+  const [post, categoryRows, managed] = await Promise.all([
     prisma.platformPost.findUnique({ where: { id } }),
     prisma.platformPost.findMany({
       where: { category: { not: "" } },
       select: { category: true },
       distinct: ["category"],
     }).catch(() => []),
+    getCategoryNames("blog"),
   ]);
   if (!post) notFound();
 
-  const categorySuggestions = categoryRows.map((r) => r.category).filter(Boolean);
+  const categorySuggestions = Array.from(
+    new Set([...managed, ...categoryRows.map((r) => r.category).filter(Boolean)])
+  );
 
   return (
     <div className="space-y-6 max-w-4xl">

@@ -64,6 +64,7 @@ interface FaqRow {
   id: string;
   question: string;
   answer: string;
+  category: string | null;
   sortOrder: number;
   isActive: boolean;
 }

@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/db";
+import { getCategoryNames } from "@/lib/categories";
 import { ResourcesClient } from "./resources-client";
 
 export default async function ResourcesPage() {
-  const resources = await prisma.platformResource.findMany({
-    orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
-  });
+  const [resources, categoryOptions] = await Promise.all([
+    prisma.platformResource.findMany({
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    getCategoryNames("resource"),
+  ]);
   return (
     <div className="space-y-6">
       <div>
@@ -13,7 +17,7 @@ export default async function ResourcesPage() {
           Manage the curated tools and communities shown on the public /resources page and homepage strip.
         </p>
       </div>
-      <ResourcesClient initial={resources} />
+      <ResourcesClient initial={resources} categoryOptions={categoryOptions} />
     </div>
   );
 }

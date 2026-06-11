@@ -230,7 +230,7 @@ export function MidnightHero() {
           </h1>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 19, lineHeight: 1.55, color: '#E8E5DD', opacity: 0.85, margin: '0 0 32px', maxWidth: 480 }}>
-            The author website platform built for indie writers who refuse to pay rent on someone else&apos;s marketplace. Catalog, newsletter, direct sales — your name on the door.
+            The author website platform built for indie writers who want more — more control, more features, and more ways to promote and sell their books. Catalog, newsletter, direct sales — your name on the door.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28 }}>

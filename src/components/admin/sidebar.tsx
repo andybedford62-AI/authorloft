@@ -40,6 +40,7 @@ import {
   Ticket,
   Star,
   Share2,
+  FolderTree,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -136,6 +137,7 @@ const SUPER_ADMIN_ITEMS: NavItem[] = [
   { href: "/super-admin/blog",             label: "Blog & News",     icon: Newspaper  },
   { href: "/super-admin/subscribers",      label: "News Subscribers", icon: Mail      },
   { href: "/super-admin/resources",        label: "Resources",       icon: Globe      },
+  { href: "/super-admin/categories",       label: "Categories",      icon: FolderTree },
   { href: "/super-admin/social",           label: "Social Media",    icon: Share2     },
 ];
 

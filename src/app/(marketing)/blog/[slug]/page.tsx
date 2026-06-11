@@ -103,12 +103,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Cover Image */}
         {post.coverImageUrl && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={post.coverImageUrl}
-            alt={post.title}
-            className="w-full rounded-2xl object-cover h-64 sm:h-80 mb-10 border border-[#DCDBD3]"
-          />
+          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[#DCDBD3] bg-[#F0EDE4] overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.coverImageUrl}
+              alt={post.title}
+              className="w-full h-full object-contain"
+            />
+          </div>
         )}
 
         {/* Author */}

@@ -19,7 +19,7 @@ const EMPTY: Omit<Resource, "id" | "displayOrder"> = {
 const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500";
 const labelCls = "block text-xs font-semibold text-gray-600 mb-1";
 
-export function ResourcesClient({ initial }: { initial: Resource[] }) {
+export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Resource[]; categoryOptions?: string[] }) {
   const [resources, setResources] = useState<Resource[]>(initial);
   const [editing, setEditing]     = useState<Resource | null>(null);
   const [isNew,   setIsNew]       = useState(false);
@@ -135,7 +135,13 @@ export function ResourcesClient({ initial }: { initial: Resource[] }) {
             <div><label className={labelCls}>Name *</label>
               <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Reedsy" /></div>
             <div><label className={labelCls}>Category</label>
-              <input className={inputCls} value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Publishing Tools" /></div>
+              <input className={inputCls} list="resource-category-options" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Publishing Tools" />
+              <datalist id="resource-category-options">
+                {Array.from(new Set([...categoryOptions, ...(form.category ? [form.category] : [])])).map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+            </div>
             <div className="sm:col-span-2"><label className={labelCls}>Website URL *</label>
               <input className={inputCls} value={form.websiteUrl} onChange={(e) => setForm({ ...form, websiteUrl: e.target.value })} placeholder="https://example.com" /></div>
             <div className="sm:col-span-2"><label className={labelCls}>Description</label>

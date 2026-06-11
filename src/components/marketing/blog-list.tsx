@@ -14,12 +14,14 @@ function BlogCard({ post, featured }: { post: FilterablePost; featured: boolean 
       }`}
     >
       {post.coverImageUrl && (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={post.coverImageUrl}
-          alt={post.title}
-          className={`w-full object-cover ${featured ? "h-64 sm:h-80" : "h-44"}`}
-        />
+        <div className={`w-full bg-[#F0EDE4] ${featured ? "h-64 sm:h-80" : "h-44"}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.coverImageUrl}
+            alt={post.title}
+            className="w-full h-full object-contain"
+          />
+        </div>
       )}
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3 flex-wrap">

@@ -11,7 +11,7 @@ const LINKS: [string, string][] = [
   ["/news", "News"],
   ["/resources", "Resources"],
   ["/pricing", "Pricing"],
-  ["/#faq", "FAQ"],
+  ["/faq", "FAQ"],
 ];
 
 /**

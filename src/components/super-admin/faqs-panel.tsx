@@ -1,24 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, HelpCircle, X } from "lucide-react";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Faq = {
   id: string;
   question: string;
   answer: string;
+  category: string | null;
   sortOrder: number;
   isActive: boolean;
 };
 
+type FaqCategory = { id: string; name: string; slug: string };
+
 type FormState = {
   question: string;
   answer: string;
+  category: string;
   sortOrder: string;
 };
 
-const emptyForm: FormState = { question: "", answer: "", sortOrder: "0" };
+const emptyForm: FormState = { question: "", answer: "", category: "", sortOrder: "0" };
 
 function FaqModal({
   title,
@@ -27,6 +32,7 @@ function FaqModal({
   onSave,
   onClose,
   saving,
+  categories,
 }: {
   title: string;
   form: FormState;
@@ -34,6 +40,7 @@ function FaqModal({
   onSave: () => void;
   onClose: () => void;
   saving: boolean;
+  categories: FaqCategory[];
 }) {
   const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
   const labelCls = "block text-sm font-medium text-gray-700 mb-1.5";
@@ -62,24 +69,39 @@ function FaqModal({
 
           <div>
             <label className={labelCls}>Answer <span className="text-red-500">*</span></label>
-            <textarea
+            <RichTextEditor
               value={form.answer}
-              onChange={(e) => setForm({ ...form, answer: e.target.value })}
+              onChange={(html) => setForm({ ...form, answer: html })}
               placeholder="Write the answer here…"
-              rows={5}
-              className={`${inputCls} resize-none leading-relaxed`}
+              minHeight="160px"
             />
           </div>
 
-          <div>
-            <label className={labelCls}>Sort Order</label>
-            <input
-              type="number"
-              value={form.sortOrder}
-              onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
-              className={inputCls}
-            />
-            <p className="text-xs text-gray-400 mt-1">Lower numbers appear first on the page</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Category</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className={inputCls}
+              >
+                <option value="">General</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.slug}>{c.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">Groups this FAQ on the public /faq page</p>
+            </div>
+            <div>
+              <label className={labelCls}>Sort Order</label>
+              <input
+                type="number"
+                value={form.sortOrder}
+                onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
+                className={inputCls}
+              />
+              <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
+            </div>
           </div>
         </div>
 
@@ -103,6 +125,7 @@ function FaqModal({
 export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
   const router = useRouter();
   const [faqs, setFaqs] = useState<Faq[]>(initialFaqs);
+  const [categories, setCategories] = useState<FaqCategory[]>([]);
   const [modal, setModal] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -111,6 +134,16 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetch("/api/super-admin/categories?type=faq")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: FaqCategory[]) => setCategories(rows.filter(Boolean)))
+      .catch(() => {});
+  }, []);
+
+  const catName = (slug: string | null) =>
+    slug ? (categories.find((c) => c.slug === slug)?.name ?? slug) : null;
+
   function openAdd() {
     setForm({ ...emptyForm, sortOrder: faqs.length.toString() });
     setModal("add");
@@ -118,7 +151,7 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
 
   function openEdit(f: Faq) {
     setEditingId(f.id);
-    setForm({ question: f.question, answer: f.answer, sortOrder: f.sortOrder.toString() });
+    setForm({ question: f.question, answer: f.answer, category: f.category ?? "", sortOrder: f.sortOrder.toString() });
     setModal("edit");
   }
 
@@ -130,6 +163,7 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
       body: JSON.stringify({
         question:  form.question.trim(),
         answer:    form.answer.trim(),
+        category:  form.category || null,
         sortOrder: parseInt(form.sortOrder) || 0,
       }),
     });
@@ -151,6 +185,7 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
       body: JSON.stringify({
         question:  form.question.trim(),
         answer:    form.answer.trim(),
+        category:  form.category || null,
         sortOrder: parseInt(form.sortOrder) || 0,
       }),
     });
@@ -189,10 +224,10 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
   return (
     <>
       {modal === "add" && (
-        <FaqModal title="Add FAQ" form={form} setForm={setForm} onSave={handleAdd} onClose={() => setModal(null)} saving={saving} />
+        <FaqModal title="Add FAQ" form={form} setForm={setForm} onSave={handleAdd} onClose={() => setModal(null)} saving={saving} categories={categories} />
       )}
       {modal === "edit" && (
-        <FaqModal title="Edit FAQ" form={form} setForm={setForm} onSave={handleEdit} onClose={() => setModal(null)} saving={saving} />
+        <FaqModal title="Edit FAQ" form={form} setForm={setForm} onSave={handleEdit} onClose={() => setModal(null)} saving={saving} categories={categories} />
       )}
 
       {confirmDelete && (
@@ -258,9 +293,14 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm text-gray-900">{faq.question}</span>
+                      {catName(faq.category) && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+                          {catName(faq.category)}
+                        </span>
+                      )}
                       <span className="text-xs text-gray-400 ml-auto">Order: {faq.sortOrder}</span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{faq.answer}</p>
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{faq.answer.replace(/<[^>]+>/g, " ").trim()}</p>
                   </div>
 
                   <div className="flex items-center gap-1 flex-shrink-0">

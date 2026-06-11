@@ -256,7 +256,7 @@ export function PostForm({ post }: PostFormProps) {
           <h2 className="font-semibold text-gray-900">Cover Image</h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Shown as the banner at the top of the post and as the thumbnail on the blog listing page.
-            Any size works — the image auto-crops to fit. Landscape photos look best;
+            The whole image is always shown (never cropped). Landscape photos look best;
             ideal size is <strong className="text-gray-500">1200 × 630 px</strong> (2:1 ratio).
           </p>
         </div>
@@ -265,7 +265,7 @@ export function PostForm({ post }: PostFormProps) {
         {coverImageUrl ? (
           <div className="relative w-full rounded-xl overflow-hidden bg-gray-100 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt="Cover preview" className="w-full h-52 object-cover" />
+            <img src={coverImageUrl} alt="Cover preview" className="w-full h-52 object-contain" />
             <button
               type="button"
               onClick={() => { setCoverImageUrl(""); setCoverUploadErr(""); }}

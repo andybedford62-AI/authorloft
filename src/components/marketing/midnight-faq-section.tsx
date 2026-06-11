@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { FaqItem } from './faq-section';
 
-export function MidnightFaqSection({ faqs }: { faqs: FaqItem[] }) {
+export function MidnightFaqSection({ faqs, hasMore = false }: { faqs: FaqItem[]; hasMore?: boolean }) {
   const [openIdx, setOpenIdx] = useState(0);
 
   if (faqs.length === 0) return null;
@@ -26,6 +26,9 @@ export function MidnightFaqSection({ faqs }: { faqs: FaqItem[] }) {
               hello@authorloft.com
             </a>
           </p>
+          <a href="/faq" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 24, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1B2B47', fontWeight: 600, textDecoration: 'none', borderBottom: '2px solid #B8893D', paddingBottom: 2 }}>
+            {hasMore ? 'See all FAQs' : 'Browse the full FAQ page'} →
+          </a>
         </div>
 
         {/* Right — accordion */}
