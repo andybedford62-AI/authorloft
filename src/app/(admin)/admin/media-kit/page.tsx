@@ -3,7 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MediaKitForm } from "@/components/admin/media-kit-form";
 import { getAdminAuthorId } from "@/lib/admin-auth";
-import { Megaphone, ExternalLink } from "lucide-react";
+import { Megaphone, ExternalLink, Download } from "lucide-react";
 
 export const metadata = { title: "Media Kit" };
 
@@ -66,14 +66,28 @@ export default async function AdminMediaKitPage() {
             </p>
           </div>
         </div>
-        <a
-          href={publicUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors flex-shrink-0"
-        >
-          View public page <ExternalLink className="h-3.5 w-3.5" />
-        </a>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <a
+            href="/api/admin/media-kit/pdf"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          >
+            Download PDF <Download className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href={publicUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+          >
+            View public page <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-sm text-blue-800">
+        <strong>Download PDF</strong> generates a one-page press summary — your bio, photo, key
+        stats (books, subscribers, ratings, sales), and featured book covers — ready to attach
+        to pitch emails or share with podcast hosts and event organizers.
       </div>
 
       <MediaKitForm

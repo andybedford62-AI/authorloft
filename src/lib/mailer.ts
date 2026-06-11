@@ -1157,6 +1157,67 @@ export function buildPlatformBroadcastEmail(opts: {
   return { html, text };
 }
 
+// ── Pre-order launch notification (to reader who signed up) ──────────────────
+
+export async function sendPreOrderLaunchEmail({
+  to,
+  readerName,
+  bookTitle,
+  authorName,
+  bookUrl,
+  coverImageUrl,
+}: {
+  to: string;
+  readerName?: string | null;
+  bookTitle: string;
+  authorName: string;
+  bookUrl: string;
+  coverImageUrl?: string | null;
+}) {
+  const greeting = readerName ? `Hi ${esc(readerName)},` : "Hi there,";
+
+  return sendMail({
+    to,
+    subject: `It's here! "${bookTitle}" is now available`,
+    text: [
+      greeting,
+      `Great news — "${bookTitle}" by ${authorName} is now available!`,
+      ``,
+      `You signed up to be notified when this book launched, and the wait is over.`,
+      ``,
+      `Get it here: ${bookUrl}`,
+      ``,
+      `— ${authorName}`,
+    ].join("\n"),
+    html: wrapHtml("It's available now!", `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 20px;">
+        Great news — <strong>${esc(bookTitle)}</strong> by ${esc(authorName)} is now available!
+        You signed up to be notified when this book launched, and the wait is over.
+      </p>
+      ${coverImageUrl ? `
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding-bottom:20px;">
+          <img src="${coverImageUrl}" alt="${esc(bookTitle)}" style="max-width:160px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" />
+        </td></tr>
+      </table>` : ""}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${bookUrl}"
+               style="display:inline-block;background:#7c3aed;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Get the Book
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        You're receiving this because you signed up for launch notifications on ${esc(bookTitle)}.
+      </p>
+    `),
+  });
+}
+
 export function buildBroadcastMailPayload(opts: {
   to: string;
   firstName: string;

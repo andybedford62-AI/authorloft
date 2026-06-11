@@ -102,6 +102,22 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // ── Affiliate referral attribution (cookie set by AffiliateRefTracker) ───
+    let affiliateBookId: string | null = null;
+    let affiliateRefCode: string | null = null;
+    const refCookie = req.cookies.get("al_ref")?.value;
+    if (refCookie) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(refCookie));
+        if (parsed?.bookId && parsed?.refCode) {
+          affiliateBookId = String(parsed.bookId);
+          affiliateRefCode = String(parsed.refCode).slice(0, 60);
+        }
+      } catch {
+        // ignore malformed cookie
+      }
+    }
+
     if (saleItems.length === 0) {
       return NextResponse.json({ error: "No valid items found." }, { status: 404 });
     }
@@ -240,6 +256,11 @@ export async function POST(req: NextRequest) {
         saleItemId:  saleItemIds[0],
         bookId:      saleItems[0].book.id,
         hasBelowMinimumPricing: hasBelowMinimumPricing ? "true" : "false",
+        // Affiliate attribution — only meaningful if the referred book is in this order
+        ...(affiliateBookId && affiliateRefCode && saleItems.some((i) => i.book.id === affiliateBookId && i.book.affiliateEnabled) && {
+          affiliateBookId,
+          affiliateRefCode,
+        }),
       },
       success_url: successUrl,
       cancel_url:  cancelUrl,

@@ -10,6 +10,8 @@ import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
 import { BookBuySection } from "@/components/author-site/book-buy-section";
 import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
+import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-form";
+import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -137,6 +139,11 @@ export default async function BookDetailPage({
   const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
+  const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
+  const preOrderLaunchLabel = book.preOrderDate
+    ? new Date(book.preOrderDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    : null;
+
   const releaseDateFormatted = book.releaseDate
     ? new Date(book.releaseDate).toLocaleDateString("en-US", {
         year: "numeric", month: "long", day: "numeric",
@@ -186,6 +193,9 @@ export default async function BookDetailPage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {book.affiliateEnabled && (
+        <AffiliateRefTracker bookId={book.id} bookSlug={book.slug} domain={domain} />
+      )}
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}
@@ -316,8 +326,18 @@ export default async function BookDetailPage({
               />
             )}
 
+            {/* Pre-order / Coming Soon — replaces buy options until launch */}
+            {isPreOrderActive && (
+              <PreOrderSignupForm
+                bookSlug={book.slug}
+                domain={domain}
+                accentColor={accentColor}
+                launchLabel={preOrderLaunchLabel}
+              />
+            )}
+
             {/* Buy / Retailer buttons */}
-            {hasBuyOptions && (
+            {!isPreOrderActive && hasBuyOptions && (
               <BookBuySection>
                 <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                   <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>

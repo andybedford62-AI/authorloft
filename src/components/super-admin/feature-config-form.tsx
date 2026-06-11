@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag, ShoppingCart,
-  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe, Megaphone, Store,
+  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe, Megaphone, Store, CalendarClock,
 } from "lucide-react";
 import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 
@@ -27,6 +27,7 @@ const FEATURES = [
   { key: "/admin/messages",     label: "Messages",       icon: Inbox           },
   { key: "/admin/legal",        label: "My Site Legal",  icon: Shield          },
   { key: "/admin/newsletter",   label: "Newsletter",     icon: Mail            },
+  { key: "pre-orders",          label: "Pre-orders / Coming Soon", icon: CalendarClock },
   { key: "/admin/sales",        label: "Sales",          icon: ShoppingBag     },
   { key: "/admin/series",       label: "Series",         icon: Library         },
   { key: "/admin/seo-audit",    label: "SEO Audit",      icon: Search          },

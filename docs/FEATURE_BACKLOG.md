@@ -36,6 +36,18 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 ---
 
+## Author Empowerment — Pre-orders, Affiliate, Media Kit
+
+Sprint 1 shipped June 12, 2026 (see Shipped section). Open follow-ons:
+
+- [ ] **Auto-send pre-order launch email** — currently a manual "Send Launch Email" button on the book's Organisation tab; add a daily cron (`/api/cron/...`) that auto-sends when `preOrderDate` has passed and `isPreOrder` is still true (then flips `isPreOrder` off). *(small)*
+- [ ] **Reader-facing affiliate dashboard** — referral links/stats are currently author-only (no reader accounts exist). A magic-link or email-based portal for promoters to see their own clicks/earnings is a larger lift requiring reader auth. *(large)*
+- [ ] **Affiliate payouts** — earnings accrue in `AffiliateReferral.earningsCents` but there's no payout mechanism yet (Stripe Connect transfer or manual "mark as paid"). *(medium)*
+- [ ] **"Coming Soon" badge on book listing/bookstore cards** — book detail page shows the pre-order banner, but `/books` list and `/bookstore` cards don't yet flag pre-order titles. *(small)*
+- [ ] **Media Kit PDF — sales trend chart** — current PDF shows point-in-time stats; a 6-month sales trend sparkline would need chart-to-image rendering compatible with `@react-pdf/renderer`. *(medium)*
+
+---
+
 ## Content Import (authors migrating in)
 
 Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
@@ -71,6 +83,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ## Shipped (for reference)
 
+- ✅ **Author Empowerment Sprint 1** — Pre-orders/"Coming Soon" (STANDARD+, `pre-orders` gate, signup capture + manual launch email); Affiliate/Referral program (per-book toggle + commission %, `?ref=` link tracking, Stripe webhook attribution); Media Kit "Download PDF" (bio, photo, stats, featured covers via `@react-pdf/renderer`) (June 12, 2026)
 - ✅ **CSV Book Import** — `/admin/books/import` 4-step wizard (Upload → Map Columns → Preview → Done); Goodreads export auto-detect + downloadable AuthorLoft template; column mapper; ISBN enrichment via Google Books/Open Library; genre/series auto-create; imports as drafts; respects plan book limits (June 11, 2026)
 - ✅ **Newsletter & Bookstore listing → FREE** — both gates moved to FREE via Feature Gates; new `bookstore-listing` gate + `Plan.bookstoreListingEnabled` field replaces hardcoded STANDARD+ check (June 11, 2026)
 - ✅ **FAQ, Content Categories, Downloadable Resources, Vercel Firewall** — public `/faq` page (grouped + structured data); shared blog/resource/faq category system + admin CRUD + dynamic dropdowns; email-gated downloadable resources with secure proxy + leads; "Resources ▾" nav dropdown; full-image covers (blog/bookstore/Cinematic) + clickable Cinematic cover; Tiptap FAQ answers; Vercel Pro Firewall over Cloudflare (June 11, 2026)

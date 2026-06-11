@@ -13,6 +13,7 @@ const OPEN_LIMITS = {
   flipBooksLimit:  -1,  // unlimited when no plan assigned
   audioEnabled:    false,
   mediaKitEnabled: false,
+  preOrdersEnabled: true,
 };
 
 // ─── Core lookup ─────────────────────────────────────────────────────────────
@@ -100,7 +101,7 @@ export async function canAddFlipBook(
 
 export async function canUseFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled" | "preOrdersEnabled"
 ): Promise<{ allowed: boolean; reason?: string }> {
   const limits = await getAuthorPlanLimits(authorId);
 
@@ -111,6 +112,7 @@ export async function canUseFeature(
     analyticsEnabled: "analytics",
     audioEnabled:     "audio previews",
     mediaKitEnabled:  "media kit",
+    preOrdersEnabled: "pre-orders / coming soon",
   };
 
   if (!(limits as any)[feature]) {
@@ -145,7 +147,7 @@ export async function canUseArc(
 
 export async function assertFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled" | "preOrdersEnabled"
 ) {
   const result = await canUseFeature(authorId, feature);
   return result; // Caller decides how to respond

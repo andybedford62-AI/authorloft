@@ -1,6 +1,6 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** June 11, 2026  
+**Last Updated:** June 12, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
 
 ---
@@ -16,8 +16,8 @@ This document lists all features by plan tier (FREE, STANDARD, PREMIUM) organize
 
 **Pricing:**
 - **FREE** — Forever free, no credit card required
-- **STANDARD** — $29/month or $290/year (save 17%)
-- **PREMIUM** — $79/month or $799/year (save 15%)
+- **STANDARD** — $19.99/month or $199.99/year (save ~17%)
+- **PREMIUM** — $59.99/month or $599.99/year (save ~17%)
 
 Early bird discount (20% off) available to FREE users within 30 days of signup.
 
@@ -27,13 +27,15 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
-| **Books** (create, publish) | Unlimited | Unlimited | Unlimited |
+| **Books** (create, publish) | Up to 5 | Up to 20 | Unlimited |
 | **Books CSV Import** (bulk-import from Goodreads export or template, lands as drafts) | ✅ | ✅ | ✅ |
-| **Blog Posts** (create, publish) | Unlimited | Unlimited | Unlimited |
+| **Pre-orders / "Coming Soon"** (launch date + reader "Notify Me" signup + launch email) | ❌ | ✅ | ✅ |
+| **Blog Posts** (create, publish) | Up to 10 | Up to 100 | Unlimited |
 | **Book Reviews** (reader reviews on author site) | ✅ | ✅ | ✅ |
 | **Custom Book Pricing** (set per-book prices) | ✅ | ✅ | ✅ |
 | **Direct Digital Sales** (via Stripe) | ❌ | ✅ | ✅ |
 | **Sales Formats** (when Direct Sales enabled) | — | eBook, Print | eBook, Audio, Flipbook, Print |
+| **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book or sitewide) | ✅ (if Direct Sales enabled) | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |
@@ -47,7 +49,8 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
-| **Site URL** | authorloft.com subdomain | Custom domain | Custom domain |
+| **Site URL** | authorloft.com subdomain | Subdomain + custom domain option | Subdomain + custom domain option |
+| **Storage** (covers, files, images) | 100 MB | 20 GB | 50 GB |
 | **Site Themes** | 10+ pre-built themes | 10+ pre-built themes | 10+ pre-built themes |
 | **Logo Upload** | ✅ | ✅ | ✅ |
 | **Hero Banner** (customizable header image) | ✅ | ✅ | ✅ |
@@ -68,7 +71,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Newsletter Signup Form** | ✅ (full campaigns) | ✅ (full campaigns) | ✅ (full campaigns) |
 | **Newsletter Campaigns** (send to subscribers) | ✅ | ✅ | ✅ |
 | **Newsletter Integration** (3rd-party) | ❌ | ✅ (Resend, etc.) | ✅ (Resend, etc.) |
-| **Media Kit Page** (press kit for interviews) | ❌ | ✅ | ✅ |
+| **Media Kit Page** (press kit for interviews, downloadable PDF with stats) | ❌ | ✅ | ✅ |
 | **Contact Support Form** (reach platform) | ✅ | ✅ | ✅ |
 | **Reader Feedback Dashboard** (moderate ratings) | ✅ | ✅ | ✅ |
 | **Testimonials Display** (social proof on site) | ✅ | ✅ | ✅ |

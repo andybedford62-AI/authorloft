@@ -96,6 +96,27 @@ export async function POST(req: NextRequest) {
             }).catch((err) => console.error("[webhook] discountCode increment error:", err));
           }
 
+          // Affiliate referral attribution — credit the referrer for this sale
+          const { affiliateBookId, affiliateRefCode } = session.metadata ?? {};
+          if (affiliateBookId && affiliateRefCode) {
+            const referredItems = order.items.filter((it) => it.bookId === affiliateBookId);
+            const itemsTotalCents = referredItems.reduce((sum, it) => sum + it.priceCents, 0);
+            if (itemsTotalCents > 0) {
+              const book = await prisma.book.findUnique({
+                where: { id: affiliateBookId },
+                select: { affiliateEnabled: true, affiliateCommissionPercent: true },
+              });
+              if (book?.affiliateEnabled) {
+                const earningsCents = Math.round(itemsTotalCents * (book.affiliateCommissionPercent / 100));
+                await prisma.affiliateReferral.upsert({
+                  where: { bookId_refCode: { bookId: affiliateBookId, refCode: affiliateRefCode } },
+                  create: { bookId: affiliateBookId, refCode: affiliateRefCode, saleCount: 1, earningsCents },
+                  update: { saleCount: { increment: 1 }, earningsCents: { increment: earningsCents } },
+                }).catch((err) => console.error("[webhook] affiliateReferral upsert error:", err));
+              }
+            }
+          }
+
           // Set download expiry and ensure fileKey is populated on each item.
           // Pre-fetch all missing sale items in one query to avoid N+1.
           const expiry = generateDownloadExpiry(168);

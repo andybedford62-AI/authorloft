@@ -69,6 +69,7 @@ model Plan {
   newsletter           Boolean   @default(false)
   mediaKitEnabled      Boolean   @default(false)
   bookstoreListingEnabled Boolean @default(true)
+  preOrdersEnabled     Boolean   @default(true)
   featuresJson         String?
   badgeColor           String    @default("gray")
   featuredLabel        String?
@@ -189,6 +190,7 @@ model Author {
   discountCodes        DiscountCode[]
   impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
   impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
+  preOrderSignups      PreOrderSignup[]
 
   @@index([slug])
   @@index([customDomain])
@@ -324,6 +326,10 @@ model Book {
   isPublished         Boolean              @default(true)
   directSalesEnabled  Boolean              @default(false)
   listInBookstore     Boolean              @default(false)  // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
+  isPreOrder          Boolean              @default(false)  // shows "Coming Soon" + wishlist instead of buy buttons
+  preOrderDate        DateTime?            // expected release/launch date for pre-order books
+  affiliateEnabled    Boolean              @default(false)  // author opt-in to the referral/affiliate program for this book
+  affiliateCommissionPercent Int           @default(10)     // % of sale price credited to a referrer
   sortOrder           Int                  @default(0)
   views               Int                  @default(0)
   createdAt           DateTime             @default(now())
@@ -341,6 +347,8 @@ model Book {
   discountCodeBooks   DiscountCodeBook[]
   heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
   arcCopies           ArcCopy[]
+  preOrderSignups     PreOrderSignup[]
+  affiliateReferrals  AffiliateReferral[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -1129,6 +1137,46 @@ model PlatformSubscriber {
   createdAt        DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// ─── Pre-orders / Coming Soon ─────────────────────────────────────────────────
+// Captures reader emails for books marked isPreOrder so the author can notify
+// them on launch day. One signup per (book, email).
+
+model PreOrderSignup {
+  id         String    @id @default(cuid())
+  bookId     String
+  authorId   String
+  email      String
+  name       String?
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  book       Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  author     Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, email])
+  @@index([bookId])
+  @@index([authorId])
+}
+
+// ─── Affiliate / Referral Program ─────────────────────────────────────────────
+// Per-book referral codes an author generates for promoters/readers. Tracks
+// click-throughs (via ?ref=CODE) and resulting sales/earnings for revenue share.
+
+model AffiliateReferral {
+  id            String   @id @default(cuid())
+  bookId        String
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  refCode       String
+  label         String?
+  clicks        Int      @default(0)
+  saleCount     Int      @default(0)
+  earningsCents Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([bookId, refCode])
+  @@index([bookId])
 }
 
 // ─── Platform Resources (curated author tool/community directory) ─────────────

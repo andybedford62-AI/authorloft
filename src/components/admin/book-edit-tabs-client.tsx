@@ -11,6 +11,8 @@ import { BookPreviewMedia } from "@/components/admin/book-preview-media";
 import { BookReviews } from "@/components/admin/book-reviews";
 import { BookExcerptEditor } from "@/components/admin/book-excerpt-editor";
 import { ArcTab } from "@/components/admin/books/arc-tab";
+import { PreOrderSignups } from "@/components/admin/preorder-signups";
+import { AffiliateSettings } from "@/components/admin/affiliate-settings";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -40,6 +42,8 @@ type BookData = {
   isPublished: boolean;
   directSalesEnabled: boolean;
   listInBookstore: boolean;
+  isPreOrder: boolean;
+  preOrderDate: string | null;
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -54,25 +58,28 @@ type Props = {
   audioEnabled: boolean;
   salesEnabled: boolean;
   bookstoreEnabled: boolean;
+  preOrdersEnabled: boolean;
   arcEnabled: boolean;
   stripeConnectOnboarded: boolean;
   previewMedia: PreviewMedia[];
+  publicBaseUrl: string;
 };
 
-type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "media" | "reviews" | "excerpt" | "arcs";
+type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "affiliate" | "media" | "reviews" | "excerpt" | "arcs";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details",       label: "Details" },
   { id: "organisation",  label: "Organisation" },
   { id: "buy-links",     label: "Buy Links" },
   { id: "direct-sales",  label: "Direct Sales" },
+  { id: "affiliate",     label: "Affiliate" },
   { id: "media",         label: "Media" },
   { id: "reviews",       label: "Reviews" },
   { id: "excerpt",       label: "Excerpt" },
   { id: "arcs",          label: "ARC" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, bookstoreEnabled, arcEnabled, stripeConnectOnboarded, previewMedia }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, publicBaseUrl }: Props) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
@@ -99,6 +106,9 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
               {id === "direct-sales" && !salesEnabled && (
                 <Lock className="h-3 w-3 text-amber-400" />
               )}
+              {id === "affiliate" && !salesEnabled && (
+                <Lock className="h-3 w-3 text-amber-400" />
+              )}
               {id === "arcs" && !arcEnabled && (
                 <Lock className="h-3 w-3 text-amber-400" />
               )}
@@ -117,7 +127,15 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         activeTab={activeTab}
         salesEnabled={salesEnabled}
         bookstoreEnabled={bookstoreEnabled}
+        preOrdersEnabled={preOrdersEnabled}
       />
+
+      {/* ── Pre-order signups — shown below Organisation when "Coming Soon" is enabled ── */}
+      {activeTab === "organisation" && book.isPreOrder && (
+        <div className="max-w-3xl mt-6">
+          <PreOrderSignups bookId={book.id} />
+        </div>
+      )}
 
       {/* ── Standalone tab panels — mounted only when active ── */}
       {activeTab === "buy-links" && (
@@ -135,6 +153,12 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
             <strong>Direct Sales</strong> — Sell your eBook, PDF, or audio file directly from your AuthorLoft site. You set the price, readers pay and download instantly, and the money goes straight to you via Stripe.
           </div>
           <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} stripeConnectOnboarded={stripeConnectOnboarded} />
+        </div>
+      )}
+
+      {activeTab === "affiliate" && (
+        <div className="max-w-3xl">
+          <AffiliateSettings bookId={book.id} bookSlug={book.slug} publicBaseUrl={publicBaseUrl} salesEnabled={salesEnabled} />
         </div>
       )}
 

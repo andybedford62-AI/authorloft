@@ -24,6 +24,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/sales":        "STANDARD",
   "direct-sales":        "STANDARD",  // gates Plan.salesEnabled (Direct Sales tab on books)
   "bookstore-listing":   "FREE",      // gates Plan.bookstoreListingEnabled (AuthorLoft Bookstore opt-in)
+  "pre-orders":          "STANDARD",  // gates Plan.preOrdersEnabled (Coming Soon / pre-order books)
   "/admin/appearance":   "STANDARD",
   "/admin/branding":     "FREE",
   "/admin/legal":        "FREE",
@@ -45,6 +46,7 @@ export const FEATURE_PLAN_MAP: Record<
   "/admin/newsletter": { field: "newsletter",      enabledValue: true,  disabledValue: false },
   "/admin/media-kit":  { field: "mediaKitEnabled", enabledValue: true,  disabledValue: false },
   "bookstore-listing": { field: "bookstoreListingEnabled", enabledValue: true, disabledValue: false },
+  "pre-orders":        { field: "preOrdersEnabled", enabledValue: true, disabledValue: false },
   // Admin-only — no public-site Plan field to update:
   "/admin/arcs":         null,
   "/admin/dashboard":    null,

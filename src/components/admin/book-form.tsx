@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store } from "lucide-react";
+import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -28,6 +28,8 @@ type BookData = {
   isPublished: boolean;
   directSalesEnabled: boolean;
   listInBookstore: boolean;
+  isPreOrder: boolean;
+  preOrderDate: string | null; // YYYY-MM-DD string for the date input
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -42,6 +44,7 @@ type BookFormProps = {
   activeTab?: string; // injected by BookEditTabsClient; undefined = standalone (new book)
   salesEnabled?: boolean;
   bookstoreEnabled?: boolean; // STANDARD+ may opt books into the public AuthorLoft Bookstore
+  preOrdersEnabled?: boolean; // STANDARD+ may mark books "Coming Soon" and collect wishlist signups
 };
 
 // ── Cover upload widget ────────────────────────────────────────────────────────
@@ -198,7 +201,7 @@ function Req() {
 
 // ── BookForm ───────────────────────────────────────────────────────────────────
 
-export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true, bookstoreEnabled = false }: BookFormProps) {
+export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true, bookstoreEnabled = false, preOrdersEnabled = false }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -222,6 +225,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
   const [directSalesEnabled, setDirectSalesEnabled] = useState(book?.directSalesEnabled ?? false);
   const [listInBookstore, setListInBookstore]     = useState(book?.listInBookstore ?? false);
+  const [isPreOrder, setIsPreOrder]               = useState(book?.isPreOrder ?? false);
+  const [preOrderDate, setPreOrderDate]           = useState(book?.preOrderDate ?? "");
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
   const [availableFormats, setAvailableFormats]   = useState<string[]>(book?.availableFormats ?? []);
   const [caption, setCaption]                     = useState(book?.caption ?? "");
@@ -318,6 +323,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       isPublished,
       directSalesEnabled,
       listInBookstore,
+      isPreOrder,
+      preOrderDate: preOrderDate || null,
       genreIds: selectedGenres,
       availableFormats,
       caption:     caption || null,
@@ -794,6 +801,51 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 <div className="text-sm text-amber-800">
                   <span className="font-semibold">The AuthorLoft Bookstore requires a Standard plan or higher.</span>{" "}
                   <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to list your books in the public bookstore for extra discovery.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pre-order / Coming Soon — edit mode only */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            {preOrdersEnabled ? (
+              <>
+                <div className="flex items-center gap-4 cursor-pointer select-none"
+                  onClick={() => setIsPreOrder((v) => !v)}>
+                  <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${isPreOrder ? "bg-purple-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${isPreOrder ? "translate-x-5" : "translate-x-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <CalendarClock className="h-3.5 w-3.5 text-purple-600" />
+                      Pre-order / Coming Soon
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Show a "Coming Soon" banner with a notify-me signup form instead of buy buttons until the launch date.
+                    </p>
+                  </div>
+                </div>
+                {isPreOrder && (
+                  <div className="ml-14 mt-3 space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">Expected Launch Date</label>
+                    <input
+                      type="date"
+                      value={preOrderDate ?? ""}
+                      onChange={(e) => setPreOrderDate(e.target.value)}
+                      className="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                    />
+                    <p className="text-xs text-gray-400">Shown to readers as "Coming {`{date}`}". Leave blank to show "Coming Soon" without a date.</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-semibold">Pre-orders / Coming Soon requires a Standard plan or higher.</span>{" "}
+                  <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to build anticipation and collect reader signups before launch.
                 </div>
               </div>
             )}

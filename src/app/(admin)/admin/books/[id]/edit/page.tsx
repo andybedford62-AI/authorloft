@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BookEditTabsClient } from "@/components/admin/book-edit-tabs-client";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { CheckCircle2 } from "lucide-react";
 
 export default async function EditBookPage({
@@ -32,8 +33,10 @@ export default async function EditBookPage({
     prisma.author.findUnique({
       where: { id: authorId },
       select: {
+        slug: true,
+        customDomain: true,
         stripeConnectOnboarded: true,
-        plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true, tier: true } },
+        plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true, tier: true, preOrdersEnabled: true } },
       },
     }),
     prisma.bookPreviewMedia.findMany({
@@ -67,6 +70,10 @@ export default async function EditBookPage({
     isPublished: book.isPublished,
     directSalesEnabled: book.directSalesEnabled,
     listInBookstore: book.listInBookstore,
+    isPreOrder: book.isPreOrder,
+    preOrderDate: book.preOrderDate
+      ? book.preOrderDate.toISOString().split("T")[0]
+      : null,
     genreIds: book.genres.map((g) => g.genreId),
     availableFormats: book.availableFormats ?? [],
     caption: book.caption ?? null,
@@ -108,9 +115,11 @@ export default async function EditBookPage({
         audioEnabled={author?.plan?.audioEnabled ?? false}
         salesEnabled={author?.plan?.salesEnabled ?? false}
         bookstoreEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
+        preOrdersEnabled={author?.plan?.preOrdersEnabled ?? false}
         arcEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         stripeConnectOnboarded={author?.stripeConnectOnboarded ?? false}
         previewMedia={previewMedia}
+        publicBaseUrl={author ? getAuthorBaseUrl(author) : ""}
       />
     </div>
   );

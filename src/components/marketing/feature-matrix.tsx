@@ -2,6 +2,12 @@
 
 import type { PlanData } from "./pricing-section";
 
+export type FeatureMatrixPlanData = PlanData & {
+  bookstoreListingEnabled: boolean;
+  preOrdersEnabled: boolean;
+  audioEnabled: boolean;
+};
+
 type FeatureRow = {
   category: string;
   features: Array<{
@@ -10,7 +16,25 @@ type FeatureRow = {
   }>;
 };
 
-function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
+function planByTier(plans: FeatureMatrixPlanData[], tier: string) {
+  return plans.find((p) => p.tier === tier);
+}
+
+function formatLimit(value: number | null | undefined, fallback: number): string {
+  if (value === null || value === undefined) return "Unlimited";
+  return `Up to ${value || fallback}`;
+}
+
+function formatStorage(mb: number | null | undefined): string {
+  if (mb === null || mb === undefined) return "—";
+  return mb >= 1000 ? `${Math.round(mb / 1000)} GB` : `${mb} MB`;
+}
+
+function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): FeatureRow[] {
+  const free = planByTier(plans, "FREE");
+  const standard = planByTier(plans, "STANDARD");
+  const premium = planByTier(plans, "PREMIUM");
+
   // Group features by category
   const rows: FeatureRow[] = [
     {
@@ -19,41 +43,93 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
         {
           name: "Books",
           tiers: {
-            FREE: plans.find(p => p.tier === "FREE")?.maxBooks === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "FREE")?.maxBooks || 5}`,
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.maxBooks === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "STANDARD")?.maxBooks || 5}`,
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.maxBooks === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "PREMIUM")?.maxBooks || 5}`,
+            FREE: formatLimit(free?.maxBooks, 5),
+            STANDARD: formatLimit(standard?.maxBooks, 20),
+            PREMIUM: formatLimit(premium?.maxBooks, 0),
           },
         },
         {
-          name: "News Posts",
+          name: "Books CSV Import",
+          tiers: { FREE: "✓ Goodreads or template", STANDARD: "✓ Goodreads or template", PREMIUM: "✓ Goodreads or template" },
+        },
+        {
+          name: "Pre-orders / \"Coming Soon\"",
           tiers: {
-            FREE: plans.find(p => p.tier === "FREE")?.maxPosts === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "FREE")?.maxPosts || 5}`,
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.maxPosts === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "STANDARD")?.maxPosts || 5}`,
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.maxPosts === null ? "Unlimited" : `Up to ${plans.find(p => p.tier === "PREMIUM")?.maxPosts || 5}`,
+            FREE: "—",
+            STANDARD: standard?.preOrdersEnabled ? "✓" : "—",
+            PREMIUM: premium?.preOrdersEnabled ? "✓" : "—",
           },
+        },
+        {
+          name: "Blog Posts",
+          tiers: {
+            FREE: formatLimit(free?.maxPosts, 10),
+            STANDARD: formatLimit(standard?.maxPosts, 100),
+            PREMIUM: formatLimit(premium?.maxPosts, 0),
+          },
+        },
+        {
+          name: "Book Reviews & Reader Ratings",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
+          name: "Custom Book Pricing & Discount Codes",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
           name: "Direct Digital Sales",
           tiers: {
             FREE: "—",
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.salesEnabled ? "✓ (Stripe)" : "—",
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.salesEnabled ? "✓ (Stripe)" : "—",
+            STANDARD: standard?.salesEnabled ? "✓ (Stripe)" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓ (Stripe)" : "—",
           },
         },
         {
-          name: "Flip Books",
+          name: "Sales Formats",
           tiers: {
             FREE: "—",
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.flipBooksLimit !== 0 ? "✓" : "—",
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.flipBooksLimit !== 0 ? "✓ (Unlimited)" : "—",
+            STANDARD: standard?.salesEnabled ? "eBook, Print" : "—",
+            PREMIUM: premium?.salesEnabled ? "eBook, Audio, Flipbook, Print" : "—",
+          },
+        },
+        {
+          name: "Affiliate / Referral Program",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.salesEnabled ? "✓ Custom links + commission" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓ Custom links + commission" : "—",
+          },
+        },
+        {
+          name: "Shopping Cart",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.salesEnabled ? "✓ Multi-item" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓ Multi-item" : "—",
+          },
+        },
+        {
+          name: "Coupon Manager",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.salesEnabled ? "✓" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓" : "—",
           },
         },
         {
           name: "Audio Format",
           tiers: {
             FREE: "—",
-            STANDARD: "—",
-            PREMIUM: "✓",
+            STANDARD: standard?.audioEnabled ? "✓" : "—",
+            PREMIUM: premium?.audioEnabled ? "✓" : "—",
+          },
+        },
+        {
+          name: "Flip Books",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.flipBooksLimit !== 0 ? "✓" : "—",
+            PREMIUM: premium?.flipBooksLimit !== 0 ? "✓ Unlimited" : "—",
           },
         },
       ],
@@ -64,9 +140,17 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
         {
           name: "Site URL",
           tiers: {
-            FREE: "Subdomain",
-            STANDARD: "Custom domain",
-            PREMIUM: "Custom domain",
+            FREE: "AuthorLoft subdomain",
+            STANDARD: "Subdomain + custom domain",
+            PREMIUM: "Subdomain + custom domain",
+          },
+        },
+        {
+          name: "Storage",
+          tiers: {
+            FREE: formatStorage(free?.maxStorageMb),
+            STANDARD: formatStorage(standard?.maxStorageMb),
+            PREMIUM: formatStorage(premium?.maxStorageMb),
           },
         },
         {
@@ -78,28 +162,20 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
           },
         },
         {
-          name: "Logo Upload",
-          tiers: {
-            FREE: "✓",
-            STANDARD: "✓",
-            PREMIUM: "✓",
-          },
+          name: "Logo, Hero Banner & Social Links",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
-          name: "Hero Banner",
-          tiers: {
-            FREE: "✓",
-            STANDARD: "✓",
-            PREMIUM: "✓",
-          },
+          name: "About, Bio & Contact Pages",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
-          name: "Social Links",
-          tiers: {
-            FREE: "✓",
-            STANDARD: "✓",
-            PREMIUM: "✓",
-          },
+          name: "Legal / Disclaimer Page",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
+          name: "Dynamic OG Images",
+          tiers: { FREE: "—", STANDARD: "—", PREMIUM: "✓ Per-page social cards" },
         },
       ],
     },
@@ -115,7 +191,7 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
           },
         },
         {
-          name: "  • Book Descriptions",
+          name: "  • Book Descriptions, Blog Ideas & Marketing Copy",
           tiers: {
             FREE: "—",
             STANDARD: "—",
@@ -123,15 +199,7 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
           },
         },
         {
-          name: "  • News Ideas",
-          tiers: {
-            FREE: "—",
-            STANDARD: "—",
-            PREMIUM: "✓",
-          },
-        },
-        {
-          name: "  • Marketing Copy",
+          name: "  • Reader Feedback Analysis",
           tiers: {
             FREE: "—",
             STANDARD: "—",
@@ -146,34 +214,58 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
             PREMIUM: "✓",
           },
         },
+        {
+          name: "  • Meta Tags, Keyword Density & Internal Links",
+          tiers: {
+            FREE: "—",
+            STANDARD: "—",
+            PREMIUM: "✓",
+          },
+        },
       ],
     },
     {
-      category: "Marketing & Admin",
+      category: "Marketing & Communications",
       features: [
+        {
+          name: "Newsletter Signup Form",
+          tiers: { FREE: "✓ Full campaigns", STANDARD: "✓ Full campaigns", PREMIUM: "✓ Full campaigns" },
+        },
         {
           name: "Newsletter Campaigns",
           tiers: {
-            FREE: "—",
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.newsletter ? "✓" : "—",
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.newsletter ? "✓" : "—",
+            FREE: free?.newsletter ? "✓" : "—",
+            STANDARD: standard?.newsletter ? "✓" : "—",
+            PREMIUM: premium?.newsletter ? "✓" : "—",
+          },
+        },
+        {
+          name: "AuthorLoft Bookstore Listing",
+          tiers: {
+            FREE: free?.bookstoreListingEnabled ? "✓" : "—",
+            STANDARD: standard?.bookstoreListingEnabled ? "✓" : "—",
+            PREMIUM: premium?.bookstoreListingEnabled ? "✓ Featured placement" : "—",
           },
         },
         {
           name: "Sales Dashboard",
           tiers: {
             FREE: "—",
-            STANDARD: "✓",
-            PREMIUM: "✓",
+            STANDARD: standard?.salesEnabled ? "✓" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓" : "—",
           },
         },
         {
           name: "Media Kit Page",
           tiers: {
-            FREE: "—",
-            STANDARD: plans.find(p => p.tier === "STANDARD")?.mediaKitEnabled ? "✓" : "—",
-            PREMIUM: plans.find(p => p.tier === "PREMIUM")?.mediaKitEnabled ? "✓" : "—",
+            FREE: free?.mediaKitEnabled ? "✓" : "—",
+            STANDARD: standard?.mediaKitEnabled ? "✓ + downloadable PDF" : "—",
+            PREMIUM: premium?.mediaKitEnabled ? "✓ + downloadable PDF" : "—",
           },
+        },
+        {
+          name: "Testimonials Display",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
       ],
     },
@@ -183,7 +275,7 @@ function buildFeatureRows(plans: PlanData[], aiCap: number): FeatureRow[] {
 }
 
 interface FeatureMatrixProps {
-  plans: PlanData[];
+  plans: FeatureMatrixPlanData[];
   defaultAiUsageCap?: number;
 }
 
@@ -241,19 +333,25 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
 
       {/* Upcoming features */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Coming Soon</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">On the Roadmap</h2>
         <div className="bg-purple-50 rounded-lg border border-purple-200 p-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="font-semibold text-gray-900">Auto-Formatter</p>
-              <p className="text-sm text-gray-600">Format books for ePub, PDF, Kindle, print</p>
-              <p className="text-xs text-purple-600 mt-1">3-4 weeks</p>
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Email List Builder</p>
-              <p className="text-sm text-gray-600">Signup forms, sequences, campaigns</p>
-              <p className="text-xs text-purple-600 mt-1">5-6 weeks</p>
-            </div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { name: "Auto-Formatter", desc: "Convert your book to ePub, PDF, Kindle, and print formats" },
+              { name: "Affiliate Payouts", desc: "Send referral earnings directly via Stripe" },
+              { name: "Reader Analytics", desc: "Track reads, engagement, and retention" },
+              { name: "Email List Builder", desc: "Drag-and-drop forms and automated sequences" },
+              { name: "Social Media Uploader", desc: "Schedule posts to Instagram, TikTok, and more" },
+              { name: "Reader Tiers / Patreon", desc: "Membership tiers and exclusive content" },
+              { name: "Review Monitoring", desc: "Aggregate reviews from Amazon and Goodreads" },
+              { name: "Native PDF Flipbook", desc: "A smoother, mobile-friendly flipbook reader" },
+              { name: "Two-Factor Authentication", desc: "Extra account security for every plan" },
+            ].map((item) => (
+              <div key={item.name}>
+                <p className="font-semibold text-gray-900">{item.name}</p>
+                <p className="text-sm text-gray-600">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
