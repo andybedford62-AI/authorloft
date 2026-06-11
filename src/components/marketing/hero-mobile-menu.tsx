@@ -9,6 +9,7 @@ const LINKS: [string, string][] = [
   ["/features", "Features"],
   ["/blog", "Blog"],
   ["/news", "News"],
+  ["/faq", "FAQ"],
   ["#how-it-works", "How it works"],
   ["/pricing", "Pricing"],
   ["#genres", "For authors"],

@@ -11,6 +11,7 @@ const NAV_LINKS: [string, string][] = [
   ["Blog", "/blog"],
   ["News", "/news"],
   ["Resources", "/resources"],
+  ["FAQ", "/faq"],
   ["Contact", "/contact"],
   ["Privacy", "/privacy"],
   ["Terms", "/terms"],

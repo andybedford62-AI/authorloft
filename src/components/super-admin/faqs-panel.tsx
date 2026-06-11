@@ -47,15 +47,15 @@ function FaqModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-2xl mx-auto max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
           <h3 className="font-semibold text-gray-900">{title}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-4">
+        <div className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
           <div>
             <label className={labelCls}>Question <span className="text-red-500">*</span></label>
             <input
@@ -105,13 +105,13 @@ function FaqModal({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
             Cancel
           </button>
           <button
             onClick={onSave}
-            disabled={saving || !form.question.trim() || !form.answer.trim()}
+            disabled={saving || !form.question.trim() || !form.answer.replace(/<[^>]+>/g, "").trim()}
             className="px-5 py-2 text-sm font-medium bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-lg transition-colors"
           >
             {saving ? "Saving…" : "Save FAQ"}
