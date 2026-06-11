@@ -1,9 +1,36 @@
-Please verify any work to be performed before starting. We need to collaborate and make sure before changes are done.  Ask clarifying questions if needed.
+Please verify any work to be performed before starting. We need to collaborate
+and make sure before changes are done. Ask clarifying questions if needed.
 
-## Always do these when shipping work
+## Deployment workflow
+- Work flows dev → staging → prod: push to `dev`, test on staging.authorloft.com,
+  then promote to prod in Vercel. Never use vercel.app URLs for auth testing.
+- Do NOT use a local dev server — verify on staging.
+- Batch related changes and push together to minimize Vercel deployments.
+- Push cadence is the user's call: default is to confirm before committing/pushing,
+  but when the user says "push freely" proceed without asking until they say
+  otherwise. Always confirm before promoting to prod.
 
-- **Sitemap:** whenever a new public page/route is added (or a public route is removed/renamed), update `src/app/sitemap.ts` to match. Check the sitemap reflects new pages before considering the work done.
-- **Docs — accomplished:** log shipped/noteworthy work in `docs/CHANGELOG.md` (newest first, grouped by date; roll big efforts into one feature line).
-- **Docs — todo/backlog:** add future ideas or deferred items to `docs/FEATURE_BACKLOG.md`, and move shipped items into its "Shipped (for reference)" list so we don't lose track of what's done vs. parked.
+## Database & migrations (Supabase) — critical
+- Migrations are NOT auto-applied on deploy (build runs `prisma generate` only).
+  Apply schema changes directly to Supabase via MCP, or runtime throws
+  "column does not exist."
+- Every new table needs GRANT statements (anon, authenticated, postgres,
+  service_role) — match existing tables.
+- Additive changes (new nullable columns / new tables) are safe to apply to the
+  prod DB before the code is promoted.
 
-Keep these in sync as part of finishing a task — not as a separate later step.
+## Code conventions
+- Next.js: `params` in `[id]` routes is a Promise — use `const { id } = await params`.
+- Run `tsc --noEmit` (and `next build` for big changes) before pushing.
+- Read existing files/patterns before writing; match surrounding style.
+
+## Finishing a task — always keep in sync (not a later step)
+- Sitemap: update `src/app/sitemap.ts` for any new/removed/renamed public route.
+- Accomplished: log shipped work in `docs/CHANGELOG.md` (newest first, by date).
+- TODO/backlog: add future/deferred ideas to `docs/FEATURE_BACKLOG.md`; move
+  shipped items to its "Shipped (for reference)" list.
+- Test before declaring done.
+
+## Source of truth (check before planning features)
+- `docs/CHANGELOG.md` = shipped; `docs/FEATURE_BACKLOG.md` = planned/deferred.
+- `docs/FEATURE_MATRIX.md` = plan-tier feature matrix (FREE/STANDARD/PREMIUM).
