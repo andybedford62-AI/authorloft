@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## June 11, 2026 — FAQ, Content Categories, Downloadable Resources, Security
+_(built on dev/staging; prod promotion pending)_
+- **Public FAQ page** (`/faq`) grouped by category with FAQ structured data; homepage FAQ capped at 10 with a "See all FAQs" link; added to sitemap
+- **Content Categories** — shared category system (blog / resource / faq) with a Super-Admin CRUD panel; dynamic category dropdowns wired into the Blog, Resources, and FAQ editors (replaces hardcoded lists)
+- **Email-gated downloadable resources** — Super-Admin "Resource Downloads" CRUD (cover, RTE detail body, category, publish/email-gate toggles); public "Free Downloads" section on `/resources` grouped by category; secure proxy (`/api/downloads/[id]`) hides the raw file URL + counts downloads; one-time email gate (`al_download_unlock` cookie) captures a lead; recent-leads list in admin
+- **"Resources ▾" nav dropdown** — groups Blog, News, FAQ, and the relabeled "Tools & Communities" directory (hero + marketing nav, desktop + mobile); declutters the top nav
+- **Rich-text FAQ answers** (Tiptap) + scrollable FAQ admin modal
+- **Full-image covers** — blog headers, bookstore cards, and the Cinematic featured cover now use `object-contain` (whole image shows, no edge cropping)
+- **Cinematic template** — featured release cover is now a link to the book detail page with a hover zoom + accent glow
+- Marketing hero subhead copy refresh
+- **Security** — chose Vercel Pro Firewall over Cloudflare (DNS stays on Vercel, no migration risk): Bot Protection on + custom rate-limit rules on auth/lead/API endpoints; Cloudflare deferred unless bots persist
+
 ## June 8, 2026 — SEO
 - Fixed duplicated/over-long page titles (root template was doubling "AuthorLoft")
 - noindex on auth/utility pages (login, register, etc.) to clear thin-content flags

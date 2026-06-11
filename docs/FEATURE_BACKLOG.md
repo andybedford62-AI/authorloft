@@ -4,7 +4,7 @@ Running list of ideas and enhancements to consider for future builds. Not commit
 
 **How to use:** add new ideas under the right area with a one-line rationale and a rough effort/impact note. Keep it scannable.
 
-_Last cleaned: June 8, 2026._
+_Last cleaned: June 11, 2026._
 
 ---
 
@@ -56,8 +56,20 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 ---
 
+## Resources & Downloads (`/resources`)
+
+Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliate directory). Open ideas:
+
+- [ ] **Individual download detail pages** (`/resources/[slug]`) — render each download's RTE `body` as its own SEO landing page (currently downloads are cards only; the `body` field is captured but not surfaced publicly). Would also add per-download sitemap entries. *(small–medium)*
+- [ ] **Email the download file** in addition to the instant link — reuse the broadcast/mass-email infra so the lead has a copy. *(small)*
+- [ ] **Move gated files to Supabase signed URLs** (like orders/ARC downloads) if stronger control than hidden Drive links is needed later. *(medium)*
+- [ ] **Resources dropdown child label** — confirm "Tools & Communities" vs renaming once downloads are well established. *(trivial)*
+
+---
+
 ## Shipped (for reference)
 
+- ✅ **FAQ, Content Categories, Downloadable Resources, Vercel Firewall** — public `/faq` page (grouped + structured data); shared blog/resource/faq category system + admin CRUD + dynamic dropdowns; email-gated downloadable resources with secure proxy + leads; "Resources ▾" nav dropdown; full-image covers (blog/bookstore/Cinematic) + clickable Cinematic cover; Tiptap FAQ answers; Vercel Pro Firewall over Cloudflare (June 11, 2026)
 - ✅ **Mobile nav menus** — hamburger menu on the shared MarketingNav + a dark one on the homepage hero; homepage hero made mobile-responsive; "Features" link → /features page (June 8, 2026)
 - ✅ **Unified marketing chrome** — shared nav, footer, and brand-band page headers (banner images on Bookstore/Blog/News) across all marketing pages; dead-code cleanup (June 8, 2026)
 - ✅ **Blog/News search & filter** + searchable/sortable admin list + category datalist (June 8, 2026)
