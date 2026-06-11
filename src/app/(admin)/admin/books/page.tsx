@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, BookOpen, ArrowRight } from "lucide-react";
+import { Plus, BookOpen, ArrowRight, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
@@ -45,12 +45,20 @@ export default async function AdminBooksPage() {
             {books.length} title{books.length !== 1 ? "s" : ""} in your catalog
           </p>
         </div>
-        <Link href="/admin/books/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Book
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/books/import">
+            <Button variant="outline">
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+          </Link>
+          <Link href="/admin/books/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Book
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Empty state — first time author */}
@@ -67,6 +75,11 @@ export default async function AdminBooksPage() {
             <Link href="/admin/books/new">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
                 <Plus className="h-4 w-4" /> Add Your First Book
+              </Button>
+            </Link>
+            <Link href="/admin/books/import">
+              <Button variant="outline" className="gap-2">
+                <Upload className="h-4 w-4" /> Import from CSV
               </Button>
             </Link>
             <Link href="/admin/branding" className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">

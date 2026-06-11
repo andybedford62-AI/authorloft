@@ -1,6 +1,6 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** June 7, 2026  
+**Last Updated:** June 11, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
 
 ---
@@ -28,6 +28,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
 | **Books** (create, publish) | Unlimited | Unlimited | Unlimited |
+| **Books CSV Import** (bulk-import from Goodreads export or template, lands as drafts) | ✅ | ✅ | ✅ |
 | **Blog Posts** (create, publish) | Unlimited | Unlimited | Unlimited |
 | **Book Reviews** (reader reviews on author site) | ✅ | ✅ | ✅ |
 | **Custom Book Pricing** (set per-book prices) | ✅ | ✅ | ✅ |
@@ -64,15 +65,15 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
-| **Newsletter Signup Form** | ✅ (capture emails) | ✅ (full campaigns) | ✅ (full campaigns) |
-| **Newsletter Campaigns** (send to subscribers) | ❌ | ✅ | ✅ |
+| **Newsletter Signup Form** | ✅ (full campaigns) | ✅ (full campaigns) | ✅ (full campaigns) |
+| **Newsletter Campaigns** (send to subscribers) | ✅ | ✅ | ✅ |
 | **Newsletter Integration** (3rd-party) | ❌ | ✅ (Resend, etc.) | ✅ (Resend, etc.) |
 | **Media Kit Page** (press kit for interviews) | ❌ | ✅ | ✅ |
 | **Contact Support Form** (reach platform) | ✅ | ✅ | ✅ |
 | **Reader Feedback Dashboard** (moderate ratings) | ✅ | ✅ | ✅ |
 | **Testimonials Display** (social proof on site) | ✅ | ✅ | ✅ |
-| **AuthorLoft Bookstore** (list books in public discovery catalog at /bookstore) | ❌ | ✅ | ✅ (Featured placement) |
-| — **Bookstore Search & Discovery** (prominent search, featured section, genre browse) | ❌ | ✅ | ✅ (Featured ribbon + visibility priority) |
+| **AuthorLoft Bookstore** (list books in public discovery catalog at /bookstore) | ✅ | ✅ | ✅ (Featured placement) |
+| — **Bookstore Search & Discovery** (prominent search, featured section, genre browse) | ✅ | ✅ | ✅ (Featured ribbon + visibility priority) |
 
 ---
 

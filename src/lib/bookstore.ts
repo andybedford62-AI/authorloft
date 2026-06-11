@@ -54,7 +54,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
         isPublished: true,
         author: {
           isActive: true,
-          plan: { tier: { in: ["STANDARD", "PREMIUM"] } },
+          plan: { bookstoreListingEnabled: true },
         },
       },
       orderBy: [{ createdAt: "desc" }],

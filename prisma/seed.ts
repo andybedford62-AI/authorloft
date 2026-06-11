@@ -170,6 +170,60 @@ async function main() {
   }
 
   console.log("✓ Books created");
+
+  // ── Help Center ────────────────────────────────────────────────────────────
+  const seoTopic = await prisma.helpTopic.upsert({
+    where: { slug: "seo-discoverability" },
+    update: {},
+    create: {
+      title: "SEO & Discoverability",
+      slug: "seo-discoverability",
+      description: "Optimize your author site for search engines and readers",
+      icon: "Search",
+      sortOrder: 5,
+      isPublished: true,
+    },
+  });
+
+  await prisma.helpArticle.upsert({
+    where: { id: "sitemap-help-article" },
+    update: {},
+    create: {
+      id: "sitemap-help-article",
+      topicId: seoTopic.id,
+      question: "What is a sitemap and where do readers find mine?",
+      answer: `<h3>Your Author Sitemap</h3>
+<p>Every author site automatically includes a <strong>sitemap.xml</strong> file that helps search engines discover and index all your content.</p>
+
+<h3>Where to Find It</h3>
+<p>Your sitemap is available at:</p>
+<ul>
+  <li><strong>Using your slug:</strong> <code>https://yourauthor.authorloft.com/sitemap.xml</code></li>
+  <li><strong>Using custom domain:</strong> <code>https://yourdomain.com/sitemap.xml</code></li>
+</ul>
+
+<h3>What's Included</h3>
+<p>Your sitemap automatically includes:</p>
+<ul>
+  <li><strong>Home page</strong> – your author profile</li>
+  <li><strong>About page</strong> – if enabled in your site navigation</li>
+  <li><strong>Books & book pages</strong> – all published books (if books section is enabled)</li>
+  <li><strong>Blog posts</strong> – all published blog posts (if blog is enabled)</li>
+  <li><strong>Contact page</strong> – if enabled in navigation</li>
+  <li><strong>Flip books</strong> – any flip book pages (if enabled)</li>
+  <li><strong>Custom pages</strong> – any custom pages you've created</li>
+</ul>
+
+<h3>Why This Matters</h3>
+<p>Your sitemap helps search engines like Google understand the structure of your site and index your content faster. This improves your SEO and helps readers discover your books and writing.</p>
+
+<p><strong>The good news:</strong> This is completely automatic! Your sitemap updates whenever you publish new content, change page settings, or update your site.</p>`,
+      sortOrder: 1,
+      isPublished: true,
+    },
+  });
+
+  console.log("✓ Help articles created");
   console.log("\n✅ Database seeded successfully!");
   console.log("\n📧 Login credentials:");
   console.log("   Email:    andybedford62@gmail.com");

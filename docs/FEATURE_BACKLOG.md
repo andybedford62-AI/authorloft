@@ -38,8 +38,10 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 ## Content Import (authors migrating in)
 
-- [ ] **Books CSV import** with downloadable template (title, subtitle, description, cover URL, ISBN, price, genres, series, release date) + preview/confirm step. *(~3 days)* — see `docs/BOOKSTORE_TODO.md`
+Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
+
 - [ ] **WordPress XML import** for blog posts + books. *(~5 days)*
+- [ ] **Saved column-mapping presets** — let an author save a custom mapping for re-use on a second CSV from the same source. *(small)*
 
 ---
 
@@ -69,6 +71,8 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ## Shipped (for reference)
 
+- ✅ **CSV Book Import** — `/admin/books/import` 4-step wizard (Upload → Map Columns → Preview → Done); Goodreads export auto-detect + downloadable AuthorLoft template; column mapper; ISBN enrichment via Google Books/Open Library; genre/series auto-create; imports as drafts; respects plan book limits (June 11, 2026)
+- ✅ **Newsletter & Bookstore listing → FREE** — both gates moved to FREE via Feature Gates; new `bookstore-listing` gate + `Plan.bookstoreListingEnabled` field replaces hardcoded STANDARD+ check (June 11, 2026)
 - ✅ **FAQ, Content Categories, Downloadable Resources, Vercel Firewall** — public `/faq` page (grouped + structured data); shared blog/resource/faq category system + admin CRUD + dynamic dropdowns; email-gated downloadable resources with secure proxy + leads; "Resources ▾" nav dropdown; full-image covers (blog/bookstore/Cinematic) + clickable Cinematic cover; Tiptap FAQ answers; Vercel Pro Firewall over Cloudflare (June 11, 2026)
 - ✅ **Mobile nav menus** — hamburger menu on the shared MarketingNav + a dark one on the homepage hero; homepage hero made mobile-responsive; "Features" link → /features page (June 8, 2026)
 - ✅ **Unified marketing chrome** — shared nav, footer, and brand-band page headers (banner images on Bookstore/Blog/News) across all marketing pages; dead-code cleanup (June 8, 2026)

@@ -6,6 +6,7 @@ import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, Bo
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
+import { lookupByIsbn, isKdpIsbn, type IsbnLookupResult } from "@/lib/isbn-lookup";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Series = { id: string; name: string };
@@ -229,15 +230,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   // ── ISBN lookup state ─────────────────────────────────────────────────────
   const [isbnQuery,      setIsbnQuery]      = useState("");
   const [isbnLooking,    setIsbnLooking]    = useState(false);
-  const [isbnResult,     setIsbnResult]     = useState<{
-    title: string;
-    subtitle: string;
-    description: string;
-    coverUrl: string;
-    pageCount: number | null;
-    isbn13: string;
-    previewText: string; // author(s) line for the result card
-  } | null>(null);
+  const [isbnResult,     setIsbnResult]     = useState<IsbnLookupResult | null>(null);
   const [isbnError,      setIsbnError]      = useState("");
   const [isbnApplied,    setIsbnApplied]    = useState(false);
 
@@ -250,78 +243,17 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     setIsbnResult(null);
     setIsbnApplied(false);
 
-    // ── 1. Try Google Books ──────────────────────────────────────────────────
-    try {
-      const gbRes  = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(q)}&maxResults=1`);
-      const gbData = await gbRes.json();
-
-      if (gbData.items?.length) {
-        const vol  = gbData.items[0].volumeInfo ?? {};
-        const ids: { type: string; identifier: string }[] = vol.industryIdentifiers ?? [];
-        const isbn13Entry = ids.find((x) => x.type === "ISBN_13");
-        const isbn10Entry = ids.find((x) => x.type === "ISBN_10");
-
-        let coverUrl = vol.imageLinks?.thumbnail ?? vol.imageLinks?.smallThumbnail ?? "";
-        if (coverUrl) coverUrl = coverUrl.replace(/^http:/, "https:");
-
-        setIsbnResult({
-          title:       vol.title ?? "",
-          subtitle:    vol.subtitle ?? "",
-          description: vol.description ?? "",
-          coverUrl,
-          pageCount:   typeof vol.pageCount === "number" ? vol.pageCount : null,
-          isbn13:      isbn13Entry?.identifier ?? isbn10Entry?.identifier ?? q,
-          previewText: (vol.authors ?? []).join(", ") || "Unknown author",
-        });
-        setIsbnLooking(false);
-        return;
-      }
-    } catch {
-      // Google Books unavailable — fall through to Open Library
+    const result = await lookupByIsbn(q);
+    if (result) {
+      setIsbnResult(result);
+      setIsbnLooking(false);
+      return;
     }
 
-    // ── 2. Fallback: Open Library ────────────────────────────────────────────
-    // Covers Amazon KDP (979-8) and other self-published books not in Google Books
-    try {
-      const olRes  = await fetch(
-        `https://openlibrary.org/api/books?bibkeys=ISBN:${q}&format=json&jscmd=data`
-      );
-      const olData = await olRes.json();
-      const entry  = olData[`ISBN:${q}`];
-
-      if (entry) {
-        const authors  = (entry.authors ?? []).map((a: { name: string }) => a.name).join(", ");
-        const coverUrl = entry.cover?.large ?? entry.cover?.medium ?? entry.cover?.small ?? "";
-        const isbnList: string[] = entry.identifiers?.isbn_13 ?? entry.identifiers?.isbn_10 ?? [q];
-
-        // Open Library stores description as a plain string or { value: string }
-        const rawDesc   = entry.description;
-        const description =
-          typeof rawDesc === "string" ? rawDesc
-          : typeof rawDesc === "object" && rawDesc?.value ? rawDesc.value
-          : "";
-
-        setIsbnResult({
-          title:       entry.title ?? "",
-          subtitle:    entry.subtitle ?? "",
-          description,
-          coverUrl,
-          pageCount:   typeof entry.number_of_pages === "number" ? entry.number_of_pages : null,
-          isbn13:      isbnList[0] ?? q,
-          previewText: authors || "Unknown author",
-        });
-        setIsbnLooking(false);
-        return;
-      }
-    } catch {
-      // Open Library also unavailable
-    }
-
-    // ── 3. Not found in either source ────────────────────────────────────────
+    // Not found in either source
     setIsbn(q);
-    const isKdp = q.startsWith("9798");
     setIsbnError(
-      isKdp
+      isKdpIsbn(q)
         ? "This looks like an Amazon KDP ISBN (979-8‑…). KDP books often aren't in public databases — the ISBN has been filled in below. Please enter the title, description, and cover manually."
         : "No book found for that ISBN. The ISBN has been filled in below — please enter the remaining details manually."
     );

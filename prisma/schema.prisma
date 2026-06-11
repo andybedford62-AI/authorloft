@@ -68,6 +68,7 @@ model Plan {
   analyticsEnabled     Boolean   @default(false)
   newsletter           Boolean   @default(false)
   mediaKitEnabled      Boolean   @default(false)
+  bookstoreListingEnabled Boolean @default(true)
   featuresJson         String?
   badgeColor           String    @default("gray")
   featuredLabel        String?
