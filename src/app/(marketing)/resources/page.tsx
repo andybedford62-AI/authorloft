@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Star } from "lucide-react";
+import { ArrowUpRight, Star, FileDown } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { DownloadButton } from "@/components/marketing/download-button";
 import { prisma } from "@/lib/db";
 
 export const revalidate = 60;
@@ -48,13 +49,38 @@ const ML = {
 };
 
 export default async function ResourcesPage() {
-  const resources = await prisma.platformResource.findMany({
-    where:   { isActive: true },
-    orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
-  }).catch(() => []);
+  const [resources, downloads, downloadCats] = await Promise.all([
+    prisma.platformResource.findMany({
+      where:   { isActive: true },
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    }).catch(() => []),
+    prisma.resourceDownload.findMany({
+      where:   { isPublished: true },
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+      select:  { id: true, title: true, slug: true, description: true, category: true, coverImageUrl: true, requiresEmail: true },
+    }).catch(() => []),
+    prisma.category.findMany({
+      where:   { type: "resource", isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select:  { name: true, slug: true },
+    }).catch(() => []),
+  ]);
 
   const categories = [...new Set(resources.map((r) => r.category).filter(Boolean))];
   const partnerCount = resources.filter((r) => r.isPartner).length;
+
+  // Group published downloads by resource category (ordered), unknown → end.
+  const downloadCatName = new Map(downloadCats.map((c) => [c.slug, c.name]));
+  const downloadGroups = [
+    ...downloadCats.map((c) => c.slug),
+    ...[...new Set(downloads.map((d) => d.category))].filter((s) => !downloadCatName.has(s)),
+  ]
+    .map((slug) => ({
+      slug,
+      name: downloadCatName.get(slug) ?? slug,
+      items: downloads.filter((d) => d.category === slug),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <div style={{ minHeight: '100vh', background: ML.midnight }}>
@@ -84,9 +110,71 @@ export default async function ResourcesPage() {
         </div>
       </div>
 
+      {/* ── Free Downloads (email-gated) ──────────────────────────────── */}
+      {downloadGroups.length > 0 && (
+        <section style={{ background: ML.midnight, padding: '64px 60px 0' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 44 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Free Downloads ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: ML.bone, margin: 0 }}>
+                Checklists, guides &amp; templates<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>to grow your author business</span>
+              </h2>
+            </div>
+
+            {downloadGroups.map((group) => (
+              <div key={group.slug} style={{ marginBottom: 56 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                  <h3 style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, margin: 0 }}>{group.name}</h3>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                  <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{group.items.length}</span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                  {group.items.map((d) => (
+                    <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 18, overflow: 'hidden' }}>
+                      {d.coverImageUrl ? (
+                        <div style={{ width: '100%', height: 160, background: '#E8E2D5' }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={d.coverImageUrl} alt={d.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                      ) : (
+                        <div style={{ width: '100%', height: 84, background: `${ML.copper}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileDown style={{ width: 26, height: 26, color: ML.copper }} />
+                        </div>
+                      )}
+                      <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                        <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
+                        {d.description && (
+                          <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: '0 0 16px', flex: 1 }}>{d.description}</p>
+                        )}
+                        <DownloadButton
+                          id={d.id}
+                          title={d.title}
+                          requiresEmail={d.requiresEmail}
+                          className="mt-auto w-full inline-flex items-center justify-center gap-2 bg-[#1B2B47] text-[#E8E5DD] text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#27406B] transition-colors"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
+          </div>
+        </section>
+      )}
+
       {/* ── Resources by category ─────────────────────────────────────── */}
       <section style={{ background: ML.midnight, padding: '72px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          {downloadGroups.length > 0 && (
+            <div style={{ textAlign: 'center', marginBottom: 44 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; Communities ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: ML.bone, margin: 0 }}>
+                Trusted partners &amp; <span style={{ fontStyle: 'italic', color: ML.brass2 }}>where to go next</span>
+              </h2>
+            </div>
+          )}
           {categories.map((category) => {
             const items = resources.filter((r) => r.category === category);
             const cm    = catMeta(category);

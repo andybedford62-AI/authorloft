@@ -792,6 +792,40 @@ model Category {
   @@index([type, isActive])
 }
 
+// ─── Downloadable Resources (gated by email) ──────────────────────────────────
+
+model ResourceDownload {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  description   String?
+  body          String?   @db.Text // optional RTE detail content
+  category      String    // Category slug, type = "resource"
+  fileUrl       String    // Drive/Supabase/direct — never exposed raw to the client
+  coverImageUrl String?
+  requiresEmail Boolean   @default(true)
+  downloadCount Int       @default(0)
+  isPublished   Boolean   @default(true)
+  displayOrder  Int       @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isPublished, category])
+}
+
+model DownloadLead {
+  id         String   @id @default(cuid())
+  email      String
+  resourceId String?
+  source     String?  // "resource" | "blog"
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
 model Testimonial {
