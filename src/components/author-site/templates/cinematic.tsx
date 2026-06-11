@@ -182,21 +182,28 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                   >
                     01
                   </span>
-                  <div
-                    className="relative w-52 sm:w-64 aspect-[2/3] rounded-sm overflow-hidden"
+                  <Link
+                    href={`/books/${featuredBook.slug}`}
+                    aria-label={`View ${featuredBook.title}`}
+                    className="group relative block w-52 sm:w-64 aspect-[2/3] rounded-sm overflow-hidden"
                     style={{
                       transform: "perspective(800px) rotateY(-12deg) rotateX(3deg)",
                       boxShadow: "15px 20px 30px rgba(0,0,0,0.55), 4px 8px 12px rgba(0,0,0,0.35)",
                     }}
                   >
                     {featuredBook.coverImageUrl ? (
-                      <Image src={featuredBook.coverImageUrl} alt={featuredBook.title} fill className="object-cover" />
+                      <Image src={featuredBook.coverImageUrl} alt={featuredBook.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ background: NAVY_CARD }}>
                         <BookOpen className="w-16 h-16" style={{ color: accent + "55" }} />
                       </div>
                     )}
-                  </div>
+                    {/* Hover accent: inner border + gradient glow */}
+                    <span
+                      className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ boxShadow: `inset 0 0 0 2px ${accent}`, background: `linear-gradient(to top, ${accent}22, transparent 55%)` }}
+                    />
+                  </Link>
                 </div>
               </div>
 

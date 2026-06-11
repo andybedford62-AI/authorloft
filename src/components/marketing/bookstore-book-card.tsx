@@ -48,7 +48,7 @@ export function BookstoreBookCard({ book, compact = false }: { book: BookstoreBo
             src={book.coverImageUrl}
             alt={book.title}
             loading="lazy"
-            className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+            className="h-full w-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
           />
         ) : (
           <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-[#B6A88F]">
