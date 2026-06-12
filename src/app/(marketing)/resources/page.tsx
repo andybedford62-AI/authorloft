@@ -188,7 +188,7 @@ export default async function ResourcesPage() {
                   <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{items.length}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px, 100%), 1fr))', gap: 16 }}>
                   {items.map((resource) => (
                     <a key={resource.id} href={resource.websiteUrl} target="_blank" rel="noopener noreferrer"
                       className="resource-card"

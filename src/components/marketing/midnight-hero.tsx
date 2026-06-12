@@ -215,7 +215,7 @@ export function MidnightHero() {
         <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
+        <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, opacity: 1, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
           <Link href="/features" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8E5DD', fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, textDecoration: 'none' }}>Features</Link>
           <HeroNavDropdown label="Resources" items={[
