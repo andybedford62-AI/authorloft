@@ -33,9 +33,10 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
     <section className="relative overflow-hidden bg-[#1B2B47]">
       {hasBanner ? (
         <>
-          {/* Banner image — subject weighted right, calm space left */}
+          {/* Banner image — subject weighted right, calm space left. object-contain
+              shows the full image (no cropping); navy bg fills the remaining space. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-right" />
+          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain object-right" />
           {/* Navy scrim so the left-aligned text stays readable over the art —
               stays dark across the text column even on bright/light photos,
               then fades out toward the right where the image is the focus. */}

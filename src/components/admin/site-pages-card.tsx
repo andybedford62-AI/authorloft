@@ -41,6 +41,29 @@ export function SitePagesCard({ baseUrl, author, customPages }: Props) {
           </a>
         ))}
       </div>
+
+      <div className="flex items-center justify-between gap-3 flex-wrap px-5 py-3 border-t border-gray-100 bg-gray-50">
+        <p className="text-xs text-gray-500">
+          Submit this sitemap to{" "}
+          <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
+            Google Search Console
+          </a>
+          {" "}or{" "}
+          <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
+            Bing Webmaster Tools
+          </a>
+          {" "}to help search engines find your pages:
+        </p>
+        <a
+          href={`${baseUrl}/sitemap.xml`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-blue-600 hover:text-blue-700 bg-white border border-gray-200 rounded-full px-3 py-1.5"
+        >
+          {baseUrl}/sitemap.xml
+          <ExternalLink className="h-3 w-3 text-gray-400" />
+        </a>
+      </div>
     </div>
   );
 }
