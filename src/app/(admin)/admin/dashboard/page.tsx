@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
+import { SitePagesCard } from "@/components/admin/site-pages-card";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 async function getDashboardData(authorId: string) {
   const [
@@ -145,7 +147,7 @@ function ChecklistRow({
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
 
-  const [data, authorMeta] = await Promise.all([
+  const [data, authorMeta, customPages] = await Promise.all([
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
@@ -153,6 +155,7 @@ export default async function DashboardPage() {
         name: true,
         displayName: true,
         slug: true,
+        customDomain: true,
         emailVerified: true,
         email: true,
         profileImageUrl: true,
@@ -160,7 +163,14 @@ export default async function DashboardPage() {
         onboardingCompletedAt: true,
         stripeConnectOnboarded: true,
         hideNextStepsChecklist: true,
-        plan: { select: { salesEnabled: true } },
+        navShowAbout: true,
+        navShowBooks: true,
+        navShowSpecials: true,
+        navShowFlipBooks: true,
+        navShowBlog: true,
+        navShowContact: true,
+        navShowMediaKit: true,
+        plan: { select: { salesEnabled: true, flipBooksLimit: true, mediaKitEnabled: true } },
         books: {
           where: { directSalesEnabled: true },
           select: {
@@ -173,6 +183,11 @@ export default async function DashboardPage() {
           take: 1,
         },
       },
+    }),
+    prisma.authorPage.findMany({
+      where: { authorId, isVisible: true, showInNav: true },
+      select: { slug: true, title: true, navTitle: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
   ]);
 
@@ -294,6 +309,15 @@ export default async function DashboardPage() {
         !authorMeta.hideNextStepsChecklist &&
         optionalSteps.some((s) => !s.done) && (
         <NextStepsCard steps={optionalSteps} />
+      )}
+
+      {/* Your Site Pages — visual sitemap of the live author site */}
+      {authorMeta && (
+        <SitePagesCard
+          baseUrl={getAuthorBaseUrl({ slug: authorMeta.slug, customDomain: authorMeta.customDomain })}
+          author={authorMeta}
+          customPages={customPages}
+        />
       )}
 
       {/* Stats */}

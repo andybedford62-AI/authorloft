@@ -7,7 +7,6 @@ import { ChevronDown } from "lucide-react";
 const ITEMS: [string, string][] = [
   ["/blog", "Blog"],
   ["/news", "News"],
-  ["/faq", "FAQ"],
   ["/resources", "Tools & Communities"],
 ];
 

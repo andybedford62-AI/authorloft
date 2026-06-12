@@ -101,12 +101,12 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
                       <BookOpen className="h-10 w-10 text-gray-300" />
                     </div>
                   )}
-                  {book.caption && (
+                  {(book.caption || book.isPreOrder) && (
                     <span
                       className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
                       style={{ backgroundColor: accentColor }}
                     >
-                      {book.caption}
+                      {book.caption || "Coming Soon"}
                     </span>
                   )}
                 </div>

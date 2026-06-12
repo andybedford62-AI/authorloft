@@ -43,7 +43,6 @@ Sprint 1 shipped June 12, 2026 (see Shipped section). Open follow-ons:
 - [ ] **Auto-send pre-order launch email** — currently a manual "Send Launch Email" button on the book's Organisation tab; add a daily cron (`/api/cron/...`) that auto-sends when `preOrderDate` has passed and `isPreOrder` is still true (then flips `isPreOrder` off). *(small)*
 - [ ] **Reader-facing affiliate dashboard** — referral links/stats are currently author-only (no reader accounts exist). A magic-link or email-based portal for promoters to see their own clicks/earnings is a larger lift requiring reader auth. *(large)*
 - [ ] **Affiliate payouts** — earnings accrue in `AffiliateReferral.earningsCents` but there's no payout mechanism yet (Stripe Connect transfer or manual "mark as paid"). *(medium)*
-- [ ] **"Coming Soon" badge on book listing/bookstore cards** — book detail page shows the pre-order banner, but `/books` list and `/bookstore` cards don't yet flag pre-order titles. *(small)*
 - [ ] **Media Kit PDF — sales trend chart** — current PDF shows point-in-time stats; a 6-month sales trend sparkline would need chart-to-image rendering compatible with `@react-pdf/renderer`. *(medium)*
 
 ---
@@ -77,7 +76,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 - [ ] **Individual download detail pages** (`/resources/[slug]`) — render each download's RTE `body` as its own SEO landing page (currently downloads are cards only; the `body` field is captured but not surfaced publicly). Would also add per-download sitemap entries. *(small–medium)*
 - [ ] **Email the download file** in addition to the instant link — reuse the broadcast/mass-email infra so the lead has a copy. *(small)*
 - [ ] **Move gated files to Supabase signed URLs** (like orders/ARC downloads) if stronger control than hidden Drive links is needed later. *(medium)*
-- [ ] **Resources dropdown child label** — confirm "Tools & Communities" vs renaming once downloads are well established. *(trivial)*
+- [x] **Resources dropdown child label** — confirmed "Tools & Communities" matches the page content (tools, communities, organisations); keeping as-is. *(June 12, 2026)*
 
 ---
 

@@ -69,6 +69,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
         releaseDate: true,
         createdAt: true,
         views: true,
+        isPreOrder: true,
         author: {
           select: {
             slug: true,
@@ -136,6 +137,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
       averageRating,
       ratingCount,
       isNew,
+      isPreOrder: b.isPreOrder,
       featured: b.author.plan?.tier === "PREMIUM",
       views: b.views ?? 0,
       authorBookCount: authorBookCount.get(b.author.slug) ?? 1,

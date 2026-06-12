@@ -7,12 +7,12 @@ import { Menu, X, LayoutDashboard } from "lucide-react";
 const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
   ["/features", "Features"],
+  ["/faq", "FAQ"],
 ];
 
 const RESOURCES: [string, string][] = [
   ["/blog", "Blog"],
   ["/news", "News"],
-  ["/faq", "FAQ"],
   ["/resources", "Tools & Communities"],
 ];
 

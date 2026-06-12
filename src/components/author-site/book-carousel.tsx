@@ -68,10 +68,10 @@ function QuickViewModal({
 
             {/* Badge + series */}
             <div className="space-y-0.5">
-              {book.caption && (
+              {(book.caption || book.isPreOrder) && (
                 <p className="text-[10px] font-bold uppercase tracking-wider"
                   style={{ color: accentColor }}>
-                  {book.caption}
+                  {book.caption || "Coming Soon"}
                 </p>
               )}
               {book.series && (
@@ -226,13 +226,13 @@ export function BookCarousel({
                     </div>
                   )}
 
-                  {/* Caption badge */}
-                  {book.caption && (
+                  {/* Caption badge — falls back to "Coming Soon" for pre-order books */}
+                  {(book.caption || book.isPreOrder) && (
                     <span
                       className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
                       style={{ backgroundColor: accentColor }}
                     >
-                      {book.caption}
+                      {book.caption || "Coming Soon"}
                     </span>
                   )}
                 </CoverTilt>

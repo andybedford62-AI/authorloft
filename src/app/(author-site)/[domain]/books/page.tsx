@@ -58,6 +58,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
     retailerLinks: b.retailerLinks ?? [],
     directSaleItems: (b as any).directSaleItems ?? [],
     caption: b.caption ?? null,
+    isPreOrder: b.isPreOrder,
     saleInfo: saleMap.get(b.id) ?? null,
   }));
 

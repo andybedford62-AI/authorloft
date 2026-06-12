@@ -60,6 +60,19 @@ export default async function MediaKitPage({
         accentColor={accentColor}
       />
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 flex justify-center">
+        <a
+          href={`/api/author-site/media-kit/pdf?domain=${encodeURIComponent(domain)}`}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+          style={{ backgroundColor: accentColor }}
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download Full Media Kit (PDF)
+        </a>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-14">
 
         {/* Author Photo + Biography */}
@@ -143,6 +156,19 @@ export default async function MediaKitPage({
             <p className="text-xs text-gray-400 italic">
               Feel free to use this biography in print or digital publications.
             </p>
+
+            {bio && (
+              <a
+                href={`/api/author-site/media-kit/bio?domain=${encodeURIComponent(domain)}`}
+                className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-colors hover:bg-gray-50"
+                style={{ color: accentColor, borderColor: "#d1d5db" }}
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Download Biography (.txt)
+              </a>
+            )}
           </div>
         </section>
 

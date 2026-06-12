@@ -13,6 +13,7 @@ export type BookstoreBook = {
   averageRating: number | null;
   ratingCount: number;
   isNew: boolean;
+  isPreOrder: boolean;
   featured: boolean;      // Premium author — priority placement + ribbon
   views: number;          // for "Trending" row
   authorBookCount: number;// how many of this author's books are in the store
@@ -70,6 +71,11 @@ export function BookstoreBookCard({ book, compact = false }: { book: BookstoreBo
               {book.isNew && (
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B2B47] bg-[#F0D9B5] px-2 py-1 rounded-full shadow-sm">
                   New
+                </span>
+              )}
+              {book.isPreOrder && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-[#5C6E89] px-2 py-1 rounded-full shadow-sm">
+                  Coming Soon
                 </span>
               )}
             </div>

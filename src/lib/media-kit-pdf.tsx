@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function stripHtml(html: string | null): string {
+export function stripHtml(html: string | null): string {
   if (!html) return "";
   return html
     .replace(/<\/(p|div|h[1-6]|li)>/gi, "\n")

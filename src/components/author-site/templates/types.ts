@@ -36,6 +36,7 @@ export interface BookForTemplate {
   directSalesEnabled: boolean;
   externalBuyUrl: string | null;
   caption: string | null;
+  isPreOrder: boolean;
   releaseDate: Date | null;
   series: { id: string; name: string; slug: string } | null;
   retailerLinks: { id: string; retailer: string; label: string; url: string }[];

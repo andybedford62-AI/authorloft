@@ -8,7 +8,7 @@ import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-men
 import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
 
 
-export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" }) {
+export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" | "faq" }) {
   // Reading cookies opts this component into dynamic rendering so the session
   // is never served from a stale static cache.
   await cookies();
@@ -74,6 +74,16 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             }`}
           >
             Features
+          </Link>
+          <Link
+            href="/faq"
+            className={`text-sm transition-colors ${
+              activePage === "faq"
+                ? "font-medium text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            FAQ
           </Link>
           <MarketingNavDropdown />
           <Link

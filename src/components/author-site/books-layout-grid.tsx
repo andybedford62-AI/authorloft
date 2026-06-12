@@ -15,6 +15,8 @@ export interface GridBook {
   salesEnabled: boolean;
   directSalesEnabled?: boolean;
   directSaleItems?: DirectSaleItemPublic[];
+  caption?: string | null;
+  isPreOrder?: boolean;
 }
 
 interface Props {
@@ -57,6 +59,14 @@ export function BooksLayoutGrid({ books, accentColor }: Props) {
                 <div className="w-full h-full flex items-center justify-center">
                   <BookOpen className="h-10 w-10 text-gray-300" />
                 </div>
+              )}
+              {(book.caption || book.isPreOrder) && (
+                <span
+                  className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  {book.caption || "Coming Soon"}
+                </span>
               )}
             </div>
 

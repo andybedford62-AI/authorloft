@@ -39,6 +39,7 @@ interface BookCardProps {
     seriesSlug?: string | null;
     externalBuyUrl?: string | null;   // legacy single-URL field
     caption?: string | null;          // e.g. "New Release!", "Coming Soon!"
+    isPreOrder?: boolean;
     releaseDate?: Date | string | null;
     salesEnabled?: boolean;
     directSalesEnabled?: boolean;
@@ -163,10 +164,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
 
         {/* Content */}
         <div className="flex-1 space-y-2">
-          {/* Caption badge */}
-          {book.caption && (
+          {/* Caption badge — falls back to "Coming Soon" for pre-order books */}
+          {(book.caption || book.isPreOrder) && (
             <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentColor }}>
-              {book.caption}
+              {book.caption || "Coming Soon"}
             </p>
           )}
 
@@ -298,9 +299,9 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
         )}
       </div>
       <div className="p-4 flex flex-col gap-2 flex-1">
-        {book.caption && (
+        {(book.caption || book.isPreOrder) && (
           <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: accentColor }}>
-            {book.caption}
+            {book.caption || "Coming Soon"}
           </p>
         )}
         <h3 className="font-semibold text-gray-900 text-sm leading-tight">{book.title}</h3>
