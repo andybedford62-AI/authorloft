@@ -51,7 +51,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 |---------|------|----------|---------|
 | **Site URL** | authorloft.com subdomain | Subdomain + custom domain option | Subdomain + custom domain option |
 | **Storage** (covers, files, images) | 100 MB | 20 GB | 50 GB |
-| **Site Themes** | 10+ pre-built themes | 10+ pre-built themes | 10+ pre-built themes |
+| **Site Themes** | 3 base colour themes | 3 base + 12 genre/style palettes (15 total) | 15 themes + custom accent & secondary colour |
 | **Logo Upload** | ✅ | ✅ | ✅ |
 | **Hero Banner** (customizable header image) | ✅ | ✅ | ✅ |
 | **Bio & Contact Form** (on author site) | ✅ | ✅ | ✅ |
@@ -59,7 +59,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **About Page** (editable bio/background) | ✅ | ✅ | ✅ |
 | **Legal/Disclaimer Page** (Privacy, Terms) | ✅ | ✅ | ✅ |
 | **Page Builder** (create custom landing pages) | ❌ | ✅ | ✅ |
-| **Appearance & Themes** (admin panel) | ❌ | ✅ | ✅ |
+| **Appearance & Themes** (admin panel) | ✅ (3 base themes) | ✅ (+ genre/style palettes) | ✅ (+ custom accent & secondary colour, Cinematic layout) |
 | **Dynamic OG Images** (per-page social cards) | ❌ | ❌ | ✅ |
 
 ---
@@ -122,7 +122,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Account Settings** (email, password, profile) | ✅ | ✅ | ✅ |
 | **Billing & Subscription** (manage plan) | ✅ | ✅ | ✅ |
 | **Contact Support** (ticket form) | ✅ | ✅ | ✅ |
-| **Appearance & Branding** (theme, logo) | ❌ | ✅ | ✅ |
+| **Appearance & Branding** (theme, logo) | ✅ | ✅ | ✅ |
 | **Newsletter Settings** (list & templates) | ❌ | ✅ | ✅ |
 | **Coupon Assignment** (super admin assigns codes) | ❌ | ✅ | ✅ |
 | **Sales Dashboard** | ❌ | ✅ | ✅ |

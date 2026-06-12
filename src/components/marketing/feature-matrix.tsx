@@ -156,9 +156,9 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         {
           name: "Site Theme",
           tiers: {
-            FREE: "10+ themes",
-            STANDARD: "10+ themes",
-            PREMIUM: "10+ themes",
+            FREE: "3 colour themes",
+            STANDARD: "15 themes (+ genre palettes)",
+            PREMIUM: "15 themes + custom colours",
           },
         },
         {

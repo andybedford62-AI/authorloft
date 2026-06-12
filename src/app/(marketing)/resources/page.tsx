@@ -91,6 +91,7 @@ export default async function ResourcesPage() {
         eyebrow="Curated Resources"
         title={<>Tools &amp; communities <span className="italic text-[#D4AE6A]">every author should know</span></>}
         subtitle="A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers."
+        backgroundImage="/resources-header.png"
       />
       <div style={{ background: ML.midnight, padding: '20px 24px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>

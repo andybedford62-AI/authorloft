@@ -41,6 +41,9 @@ function isLightColor(hex: string): boolean {
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
   const { bg, accent, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
+  // PREMIUM two-tone override — falls back to accent-only styling when not set.
+  const secondary = author.secondaryColor || accent;
+  const hasSecondary = !!author.secondaryColor;
   const buyHref = featuredBook ? `/books/${featuredBook.slug}` : "/books";
   // Author portrait — their own uploads only. The theme's scenic image is NOT a
   // portrait stand-in; it's used as the full hero backdrop below (subgenre themes).
@@ -102,7 +105,8 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest border border-white/40 text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+                style={{ border: hasSecondary ? `1px solid ${secondary}80` : "1px solid rgba(255,255,255,0.4)" }}
               >
                 Learn More
               </Link>
@@ -228,11 +232,13 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
       aria-label="Author hero"
     >
       {SceneBackdrop}
-      {/* Soft accent glow */}
+      {/* Soft accent glow — two-tone blend when a Premium secondary colour is set */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 70% 60% at 50% 60%, ${accent}22 0%, transparent 70%)`,
+          background: hasSecondary
+            ? `radial-gradient(ellipse 60% 55% at 25% 35%, ${accent}22 0%, transparent 60%), radial-gradient(ellipse 60% 55% at 75% 75%, ${secondary}22 0%, transparent 60%)`
+            : `radial-gradient(ellipse 70% 60% at 50% 60%, ${accent}22 0%, transparent 70%)`,
         }}
       />
 
@@ -271,7 +277,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             <Link
               href="/about"
               className="w-full py-3 px-6 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
-              style={{ border: `2px solid ${accent}60`, color: "rgba(255,255,255,0.85)" }}
+              style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
               Learn More
             </Link>
@@ -323,7 +329,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             <Link
               href="/about"
               className="w-full py-3 px-4 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
-              style={{ border: `2px solid ${accent}60`, color: "rgba(255,255,255,0.85)" }}
+              style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
               Learn More
             </Link>

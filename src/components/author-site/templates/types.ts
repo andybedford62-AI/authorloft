@@ -11,6 +11,7 @@ export interface AuthorForTemplate {
   profileImageUrl: string | null;
   heroImageUrl: string | null;
   accentColor: string;
+  secondaryColor: string | null;
   siteTheme: string;
   heroTitle: string | null;
   heroSubtitle: string | null;

@@ -1,7 +1,7 @@
 // Reusable database queries for the public author site
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { resolveAccentColor, isThemeAllowed } from "@/lib/themes";
+import { resolveAccentColor, resolveSecondaryColor, isThemeAllowed } from "@/lib/themes";
 
 export async function getAuthorByDomain(domain: string) {
   const author = await prisma.author.findFirst({
@@ -19,7 +19,7 @@ export async function getAuthorByDomain(domain: string) {
   if (!author) notFound();
 
   // Enforce plan-based theme access at render time:
-  // FREE authors are locked to Modern Minimal regardless of what's stored.
+  // FREE authors are locked to one of the 3 base colour themes regardless of what's stored.
   const planTier = author.plan?.tier ?? "FREE";
   const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier)
     ? author.siteTheme
@@ -32,10 +32,17 @@ export async function getAuthorByDomain(domain: string) {
     siteTheme: effectiveSiteTheme,
   });
 
+  // Secondary/highlight: PREMIUM-only override for the hero banner two-tone treatment.
+  const secondaryColor = resolveSecondaryColor({
+    planTier,
+    customSecondaryColor: author.customSecondaryColor,
+  });
+
   return {
     ...author,
     siteTheme: effectiveSiteTheme,
     accentColor,
+    secondaryColor,
   };
 }
 

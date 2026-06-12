@@ -80,6 +80,7 @@ export default async function FeaturesPage() {
         eyebrow="Features"
         title={<>Complete <span className="italic text-[#D4AE6A]">Feature</span> Comparison</>}
         subtitle="See all the features available on each plan. Everything updates automatically as we add new features."
+        backgroundImage="/features-header.png"
       />
       <div className="bg-[#E8E5DD] border-b border-[#DCDBD3] px-4">
         <div className="max-w-5xl mx-auto py-3">

@@ -80,6 +80,7 @@ export default async function FaqPage() {
         eyebrow="FAQ"
         title={<>Frequently asked, <span className="italic text-[#D4AE6A]">plainly answered</span></>}
         subtitle="Everything you need to know about AuthorLoft — plans, publishing, selling direct, and getting set up."
+        backgroundImage="/faq-header.png"
       />
 
       <section style={{ maxWidth: 860, margin: "0 auto", padding: "72px 24px 96px" }}>

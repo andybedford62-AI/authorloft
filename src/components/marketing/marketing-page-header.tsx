@@ -36,13 +36,15 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
           {/* Banner image — subject weighted right, calm space left */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-right" />
-          {/* Navy scrim so the left-aligned text stays readable over the art */}
+          {/* Navy scrim so the left-aligned text stays readable over the art —
+              stays dark across the text column even on bright/light photos,
+              then fades out toward the right where the image is the focus. */}
           <div
             aria-hidden
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.92) 28%, rgba(15,26,45,0.55) 52%, rgba(15,26,45,0.12) 72%, rgba(15,26,45,0) 100%)",
+                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.96) 35%, rgba(15,26,45,0.82) 55%, rgba(15,26,45,0.45) 75%, rgba(15,26,45,0.08) 100%)",
             }}
           />
         </>
@@ -75,10 +77,10 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
       <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
         <div className="min-w-0 max-w-xl">
           {eyebrow && (
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AE6A] mb-3">· {eyebrow} ·</p>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AE6A] mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">· {eyebrow} ·</p>
           )}
-          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight drop-shadow-sm">{title}</h1>
-          {subtitle && <p className="mt-4 text-base text-[#D4DDEB] max-w-xl leading-relaxed">{subtitle}</p>}
+          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]">{title}</h1>
+          {subtitle && <p className="mt-4 text-base text-[#D4DDEB] max-w-xl leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">{subtitle}</p>}
         </div>
 
         {imageSrc && !hasBanner && (

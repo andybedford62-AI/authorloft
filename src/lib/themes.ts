@@ -66,14 +66,17 @@ export const BASE_THEMES: ThemeDefinition[] = [
   },
 ];
 
-// ── Genre Palettes (Premium only) ───────────────────────────────────────────
+// ── Genre & Style Palettes (Standard+) ──────────────────────────────────────
+// Merged genre + subgenre palettes — no internal premium/non-premium split.
+// Premium differentiation comes from custom accent/secondary colours and the
+// Cinematic page-structure template, not from palette access.
 
 export const GENRE_PALETTES: ThemeDefinition[] = [
   {
     id: "thriller",
     name: "Thriller / Suspense",
     description: "High-contrast, tense, cinematic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "thriller",
     emoji: "🎬",
     mood: "High-contrast, tense, cinematic",
@@ -84,7 +87,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "fantasy",
     name: "Epic Fantasy",
     description: "Mythic, luminous, magical",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "fantasy",
     emoji: "✨",
     mood: "Mythic, luminous, magical",
@@ -95,7 +98,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "romance",
     name: "Romance",
     description: "Warm, soft, emotional",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "romance",
     emoji: "💕",
     mood: "Warm, soft, emotional",
@@ -106,7 +109,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "scifi",
     name: "Science Fiction",
     description: "Neon, sleek, futuristic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "scifi",
     emoji: "🚀",
     mood: "Neon, sleek, futuristic",
@@ -117,7 +120,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "nautical",
     name: "Nautical / Marine",
     description: "Pressure, depth, cold metallic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "nautical",
     emoji: "🌊",
     mood: "Pressure, depth, cold metallic",
@@ -128,7 +131,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "childrens",
     name: "Children's Books",
     description: "Bright, friendly, playful",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "childrens",
     emoji: "🌈",
     mood: "Bright, friendly, playful",
@@ -139,7 +142,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "literary",
     name: "Literary Fiction",
     description: "Minimalist, elegant, muted",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "literary",
     emoji: "📖",
     mood: "Minimalist, elegant, muted",
@@ -150,7 +153,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "western",
     name: "Country / Western",
     description: "Rustic, warm, earthy",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "western",
     emoji: "🤠",
     mood: "Rustic, warm, earthy",
@@ -161,7 +164,7 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "cinematic",
     name: "Cinematic",
     description: "Deep navy editorial with gold accents — atmospheric and immersive.",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "cinematic",
     emoji: "🎬",
     mood: "Cinematic · Editorial · Atmospheric",
@@ -171,8 +174,9 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
 ];
 
 // ── Subgenre Palettes (Standard+) ───────────────────────────────────────────
-// Specialised palettes for niche subgenres. Standard+ access (isPremium: false).
-// Added to over time — this is the first phase (aviation, scuba/underwater).
+// Specialised palettes for niche subgenres — merged with GENRE_PALETTES above
+// into STYLE_PALETTES (no separate gating). Added to over time — this is the
+// first phase (aviation, scuba/underwater).
 
 export const SUBGENRE_PALETTES: ThemeDefinition[] = [
   {
@@ -213,7 +217,10 @@ export const SUBGENRE_PALETTES: ThemeDefinition[] = [
   },
 ];
 
-export const ALL_THEMES = [...BASE_THEMES, ...GENRE_PALETTES, ...SUBGENRE_PALETTES];
+/** Merged genre + subgenre palettes — single Standard+ collection, no internal split. */
+export const STYLE_PALETTES = [...GENRE_PALETTES, ...SUBGENRE_PALETTES];
+
+export const ALL_THEMES = [...BASE_THEMES, ...STYLE_PALETTES];
 
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];
@@ -241,20 +248,33 @@ export function resolveAccentColor(opts: {
 }
 
 /**
- * Which themes are available per plan tier.
- * FREE     → Modern Minimal only
- * STANDARD → all base themes + all genre palettes
- * PREMIUM  → everything (same themes, plus Cinematic layout)
+ * Resolves the Premium "secondary/highlight" colour override for the hero
+ * banner two-tone treatment. Returns null when not set (or not Premium) —
+ * callers should fall back to accent-only styling with no visual change.
  */
-export const BASE_THEME_IDS  = BASE_THEMES.map((t) => t.id);
-export const GENRE_PALETTE_IDS = GENRE_PALETTES.map((t) => t.id);
-export const SUBGENRE_PALETTE_IDS = SUBGENRE_PALETTES.map((t) => t.id);
+export function resolveSecondaryColor(opts: {
+  planTier:             string | null | undefined;
+  customSecondaryColor: string | null | undefined;
+}): string | null {
+  if (opts.planTier === "PREMIUM" && opts.customSecondaryColor) {
+    return opts.customSecondaryColor;
+  }
+  return null;
+}
+
+/**
+ * Which themes are available per plan tier.
+ * FREE     → all 3 base colour themes (Classic Literary, Modern Minimal, Dark Elegant)
+ * STANDARD → base themes + all genre/style palettes (STYLE_PALETTES)
+ * PREMIUM  → everything, plus Cinematic layout template + custom accent/secondary colours
+ */
+export const BASE_THEME_IDS = BASE_THEMES.map((t) => t.id);
+export const STYLE_PALETTE_IDS = STYLE_PALETTES.map((t) => t.id);
 
 export function isThemeAllowed(themeId: string, planTier: string): boolean {
-  if (planTier === "PREMIUM") return true;
-  if (planTier === "STANDARD") return true; // Standard gets all themes incl. genre palettes
-  // FREE — only Modern Minimal
-  return themeId === "modern-minimal";
+  if (planTier === "PREMIUM" || planTier === "STANDARD") return true;
+  // FREE — the 3 base colour themes only (no genre/style palettes)
+  return (BASE_THEME_IDS as string[]).includes(themeId);
 }
 
 /** The default theme for each plan tier (used on downgrade). */

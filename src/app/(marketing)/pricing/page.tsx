@@ -123,6 +123,7 @@ export default async function PricingPage() {
         eyebrow="Plans & pricing"
         title={<>Simple, <span className="italic text-[#D4AE6A]">transparent</span> pricing</>}
         subtitle="Start free with no credit card. Upgrade when you're ready to grow your author platform."
+        backgroundImage="/pricing-header.png"
       />
 
       {/* Pricing cards — live from DB */}
