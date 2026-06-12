@@ -9,10 +9,17 @@ export function MidnightFaqSection({ faqs, hasMore = false }: { faqs: FaqItem[];
   if (faqs.length === 0) return null;
 
   return (
-    <section id="faq" style={{ background: '#F0EDE4', padding: '120px 60px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 80, alignItems: 'start' }}>
+    <section id="faq" style={{ background: '#F0EDE4', padding: '120px 60px' }} className="ml-faq-section">
+      <style>{`
+        @media (max-width: 860px) {
+          .ml-faq-section { padding: 60px 24px !important; }
+          .ml-faq-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .ml-faq-intro { position: static !important; }
+        }
+      `}</style>
+      <div className="ml-faq-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 80, alignItems: 'start' }}>
         {/* Left — sticky intro */}
-        <div style={{ position: 'sticky', top: 100 }}>
+        <div className="ml-faq-intro" style={{ position: 'sticky', top: 100 }}>
           <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C26A4A', marginBottom: 20 }}>
             · FAQ ·
           </p>
