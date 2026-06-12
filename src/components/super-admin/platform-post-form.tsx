@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown } from "lucide-react";
-import { SUGGESTED_NEWS_CATEGORIES, SUGGESTED_BLOG_CATEGORIES } from "@/lib/post-categories";
 
 type Post = {
   id:              string;
@@ -27,8 +26,10 @@ type Post = {
 
 interface Props {
   post?: Post;
-  /** Distinct categories already used across posts — merged into the datalist. */
-  categorySuggestions?: string[];
+  /** Active Content Categories (A–Z) for Blog posts. */
+  blogCategories?: string[];
+  /** Active Content Categories (A–Z) for News posts. */
+  newsCategories?: string[];
 }
 
 function slugify(text: string) {
@@ -43,7 +44,7 @@ function slugify(text: string) {
 const inputCls  = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
 const labelCls  = "block text-xs font-semibold text-gray-600 mb-1.5";
 
-export function PlatformPostForm({ post, categorySuggestions = [] }: Props) {
+export function PlatformPostForm({ post, blogCategories = [], newsCategories = [] }: Props) {
   const router = useRouter();
   const isEdit = !!post;
 
@@ -166,7 +167,10 @@ export function PlatformPostForm({ post, categorySuggestions = [] }: Props) {
           <div className="inline-flex p-1 bg-gray-100 rounded-lg">
             <button
               type="button"
-              onClick={() => setIsNews(false)}
+              onClick={() => {
+                setIsNews(false);
+                if (category && !blogCategories.includes(category)) setCategory("");
+              }}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 !isNews ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
@@ -175,7 +179,10 @@ export function PlatformPostForm({ post, categorySuggestions = [] }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => setIsNews(true)}
+              onClick={() => {
+                setIsNews(true);
+                if (category && !newsCategories.includes(category)) setCategory("");
+              }}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 isNews ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
               }`}
@@ -216,26 +223,30 @@ export function PlatformPostForm({ post, categorySuggestions = [] }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-1.5">
             <label className={labelCls}>Category</label>
-            <input
-              type="text"
-              list="post-category-options"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder={isNews ? "e.g. Announcements" : "e.g. Author Tips"}
-              className={inputCls}
-            />
-            <datalist id="post-category-options">
-              {Array.from(
-                new Set([
-                  ...(isNews ? SUGGESTED_NEWS_CATEGORIES : SUGGESTED_BLOG_CATEGORIES),
-                  ...categorySuggestions,
-                  ...(category ? [category] : []),
-                ])
-              ).map((c) => (
-                <option key={c} value={c} />
-              ))}
-            </datalist>
-            <p className="text-xs text-gray-400">Pick a suggestion or type your own — used for filtering on the public page.</p>
+            {(() => {
+              const options = isNews ? newsCategories : blogCategories;
+              const withCurrent = category && !options.includes(category) ? [...options, category] : options;
+              return (
+                <>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={inputCls}
+                  >
+                    <option value="">Select a category…</option>
+                    {withCurrent.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  {options.length === 0 && (
+                    <p className="text-xs text-amber-600">
+                      No {isNews ? "News" : "Blog"} categories exist yet. Add some under Content Categories first.
+                    </p>
+                  )}
+                </>
+              );
+            })()}
+            <p className="text-xs text-gray-400">Used for filtering on the public page.</p>
           </div>
           <div className="space-y-1.5">
             <label className={labelCls}>Author Name</label>

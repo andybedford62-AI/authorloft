@@ -10,7 +10,7 @@ export default async function CategoriesPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Content Categories</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage the shared categories used to organise Blog posts, Resources, and FAQs.
+          Manage the shared categories used to organise Blog posts, News posts, Resources, and FAQs.
           Categories appear as dropdowns in the relevant editors and group content on the public pages.
         </p>
       </div>

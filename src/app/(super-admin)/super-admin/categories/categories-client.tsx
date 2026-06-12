@@ -8,9 +8,10 @@ type Category = {
   description: string | null; sortOrder: number; isActive: boolean;
 };
 
-type CatType = "blog" | "resource" | "faq";
+type CatType = "blog" | "resource" | "faq" | "news";
 const TYPES: { key: CatType; label: string; hint: string }[] = [
-  { key: "blog",     label: "Blog",      hint: "Topics for blog & news posts" },
+  { key: "blog",     label: "Blog",      hint: "Topics for blog posts" },
+  { key: "news",     label: "News",      hint: "Topics for news posts" },
   { key: "resource", label: "Resources", hint: "Sections for downloadable resources" },
   { key: "faq",      label: "FAQ",       hint: "Groups for the public FAQ page" },
 ];

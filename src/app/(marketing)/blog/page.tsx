@@ -4,7 +4,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
-import { BlogList } from "@/components/marketing/blog-list";
+import { BlogIndex } from "@/components/marketing/blog-index";
 import { BookOpen, ArrowRight } from "lucide-react";
 
 export const revalidate = 60;
@@ -56,7 +56,7 @@ export default async function BlogIndexPage() {
         backgroundImage="/blog-header.png"
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
 
         {posts.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-2xl border border-[#DCDBD3]">
@@ -64,7 +64,7 @@ export default async function BlogIndexPage() {
             <p className="text-[#5C6E89]">Posts coming soon. Check back shortly.</p>
           </div>
         ) : (
-          <BlogList posts={posts} />
+          <BlogIndex posts={posts} />
         )}
       </div>
 

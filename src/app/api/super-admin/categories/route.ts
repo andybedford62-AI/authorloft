@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
-const TYPES = ["blog", "resource", "faq"] as const;
+const TYPES = ["blog", "resource", "faq", "news"] as const;
 type CatType = (typeof TYPES)[number];
 
 function slugify(s: string) {
@@ -16,10 +16,12 @@ function slugify(s: string) {
 export async function GET(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const type = req.nextUrl.searchParams.get("type");
-  const where = type && TYPES.includes(type as CatType) ? { type } : {};
+  const where = type && TYPES.includes(type as CatType)
+    ? { type, isActive: true }
+    : { isActive: true };
   const categories = await prisma.category.findMany({
     where,
-    orderBy: [{ type: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+    orderBy: [{ type: "asc" }, { name: "asc" }],
   });
   return NextResponse.json(categories);
 }

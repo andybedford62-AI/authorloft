@@ -17,7 +17,7 @@ export default async function ResourcesPage() {
           Manage the curated tools and communities shown on the public /resources page and homepage strip.
         </p>
       </div>
-      <ResourcesClient initial={resources} categoryOptions={categoryOptions} />
+      <ResourcesClient initial={resources} categoryOptions={[...categoryOptions].sort((a, b) => a.localeCompare(b))} />
     </div>
   );
 }

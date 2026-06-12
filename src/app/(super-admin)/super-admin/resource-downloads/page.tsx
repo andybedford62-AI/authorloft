@@ -27,7 +27,7 @@ export default async function ResourceDownloadsPage() {
       </div>
       <DownloadsClient
         initial={downloads}
-        categories={categories.map((c) => ({ name: c.name, slug: c.slug }))}
+        categories={[...categories].sort((a, b) => a.name.localeCompare(b.name)).map((c) => ({ name: c.name, slug: c.slug }))}
       />
 
       {/* Recent download leads */}
