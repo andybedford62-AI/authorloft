@@ -40,7 +40,7 @@ function BlogCard({ post }: { post: FilterablePost }) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="group flex flex-col gap-4">
-      <div className="relative w-full aspect-[3/2] overflow-hidden rounded-br-[36px] shadow-[8px_12px_26px_rgba(10,25,47,0.14)] bg-[#1B2B47]">
+      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-br-[36px] shadow-[8px_12px_26px_rgba(10,25,47,0.14)] bg-[#1B2B47]">
         {post.coverImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

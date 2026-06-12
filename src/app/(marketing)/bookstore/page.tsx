@@ -15,7 +15,6 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
-import { BookstoreHeroSocial } from "@/components/marketing/bookstore-hero-social";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
 import { getBookstoreData } from "@/lib/bookstore";
 
@@ -129,9 +128,6 @@ export default async function BookstorePage() {
               <span className="text-[11px] uppercase tracking-widest text-[#9fb0c9]">{label}</span>
             </div>
           ))}
-        </div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-5 -mt-1">
-          <BookstoreHeroSocial />
         </div>
       </div>
 

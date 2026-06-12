@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import type { SortKey } from "./use-post-filters";
 
 interface PostFilterControlsProps {
@@ -29,7 +29,7 @@ const SORT_OPTIONS: { id: SortKey; label: string }[] = [
 ];
 
 const selectCls =
-  "rounded-lg border border-[#DCDBD3] bg-white px-3 py-2 text-sm text-[#1B2B47] shadow-sm focus:border-[#C26A4A] focus:outline-none focus:ring-1 focus:ring-[#C26A4A]";
+  "appearance-none text-sm font-medium text-[#1B2B47] bg-white border border-[#DCDBD3] rounded-full pl-4 pr-9 py-2 cursor-pointer hover:border-[#D4AE6A] transition-colors";
 
 export function PostFilterControls({
   search, onSearch, categories, category, onCategory, sort, onSort,
@@ -38,84 +38,102 @@ export function PostFilterControls({
 }: PostFilterControlsProps) {
   return (
     <div className="mb-8">
-      {/* Prominent search */}
-      <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#C26A4A]" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-          placeholder={searchPlaceholder}
-          className="w-full rounded-xl border-2 border-[#DCDBD3] bg-white pl-12 pr-4 py-3 text-base text-[#1B2B47] shadow-sm transition-all focus:border-[#C26A4A] focus:outline-none focus:ring-2 focus:ring-[#C26A4A]/20"
-        />
+      {/* Category tabs */}
+      <div className="flex flex-wrap gap-x-7 gap-y-1 border-b border-[#DCDBD3]">
+        <button
+          type="button"
+          onClick={() => onCategory("")}
+          className={`relative pb-3.5 text-sm font-semibold transition-colors ${
+            category === "" ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
+          }`}
+        >
+          All
+          <span
+            className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
+              category === "" ? "scale-x-100" : "scale-x-0"
+            }`}
+          />
+        </button>
+        {categories.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => onCategory(c)}
+            className={`relative pb-3.5 text-sm font-semibold transition-colors ${
+              category === c ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
+            }`}
+          >
+            {c}
+            <span
+              className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
+                category === c ? "scale-x-100" : "scale-x-0"
+              }`}
+            />
+          </button>
+        ))}
       </div>
 
-      {/* Category chips + sort/year */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-        {categories.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onCategory("")}
-              className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                category === ""
-                  ? "bg-[#C26A4A] text-white border-[#C26A4A]"
-                  : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]"
-              }`}
-            >
-              All
-            </button>
-            {categories.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => onCategory(category === c ? "" : c)}
-                className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                  category === c
-                    ? "bg-[#C26A4A] text-white border-[#C26A4A]"
-                    : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-5 mt-5">
+        <p className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#5C6E89]">
+          {resultCount === 0 ? "No results" : `Showing ${resultCount} of ${total}`}
+          {category ? ` in ${category}` : ""}
+        </p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <label className="flex items-center gap-2 border-b-[1.5px] border-[#DCDBD3] focus-within:border-[#D4AE6A] py-1.5 min-w-[220px] transition-colors">
+            <Search className="h-4 w-4 text-[#5C6E89]" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => onSearch(e.target.value)}
+              placeholder={searchPlaceholder}
+              aria-label="Search"
+              className="border-none outline-none bg-transparent text-sm w-full placeholder:text-[#5C6E89]"
+            />
+          </label>
           {years && years.length > 0 && onYear && (
-            <select value={year ?? ""} onChange={(e) => onYear(e.target.value)} className={selectCls} aria-label="Filter by year">
-              <option value="">All years</option>
-              {years.map((y) => (
-                <option key={y} value={y}>{y}</option>
+            <div className="relative">
+              <select
+                value={year ?? ""}
+                onChange={(e) => onYear(e.target.value)}
+                aria-label="Filter by year"
+                className={selectCls}
+              >
+                <option value="">All years</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5C6E89] pointer-events-none" />
+            </div>
+          )}
+          <div className="relative">
+            <select
+              value={sort}
+              onChange={(e) => onSort(e.target.value as SortKey)}
+              aria-label="Sort"
+              className={selectCls}
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.id} value={o.id}>{o.label}</option>
               ))}
             </select>
-          )}
-          <select value={sort} onChange={(e) => onSort(e.target.value as SortKey)} className={selectCls} aria-label="Sort">
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id}>{o.label}</option>
-            ))}
-          </select>
+            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5C6E89] pointer-events-none" />
+          </div>
         </div>
       </div>
 
-      {/* Result count + clear */}
-      <div className="flex items-center justify-between mt-4">
-        <p className="text-sm text-[#5C6E89]">
-          {resultCount === 0
-            ? "No results"
-            : `Showing ${resultCount} of ${total}`}
-        </p>
-        {isFiltering && (
+      {isFiltering && (
+        <div className="flex justify-end mt-2">
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] hover:text-[#1B2B47] transition-colors"
+            className="text-xs font-bold uppercase tracking-[0.1em] text-[#B8893D] hover:text-[#1B2B47] transition-colors"
           >
-            <X className="h-3.5 w-3.5" /> Clear filters
+            Clear filters
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
