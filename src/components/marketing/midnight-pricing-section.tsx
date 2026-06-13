@@ -71,7 +71,7 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
       </div>
 
       {/* Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 16, alignItems: 'start' }}>
         {plans.map((plan, i) => {
           const isFeatured = plan.featuredLabel !== null || plan.tier === 'STANDARD';
           const price = annual

@@ -207,7 +207,7 @@ export default async function MarketingPage() {
               You wrote the book.{' '}<span style={{ fontStyle: 'italic', color: ML.copper }}>They keep the readers.</span>
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 16 }}>
             {[
               { num: '30%', label: 'Lost to platform fees',        body: 'Most marketplaces take a cut. AuthorLoft takes nothing on any plan.' },
               { num: '0',   label: 'Relationships you own',         body: 'When platforms close, your readers vanish. Here, your list is yours forever.' },
@@ -232,7 +232,7 @@ export default async function MarketingPage() {
               Three steps to a <span style={{ fontStyle: 'italic', color: ML.copper }}>real bookshop</span> with your name on it.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 16 }}>
             {HOW_IT_WORKS.map((step, i) => (
               <div key={i} style={{ background: ML.pearl, borderRadius: 14, padding: '40px 36px' }}>
                 <div style={{ width: 56, height: 56, borderRadius: '50%', border: `2px solid ${[ML.ink, ML.midnight, ML.copper][i]}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: [ML.ink, ML.midnight, ML.copper][i], marginBottom: 20 }}>{step.number}</div>
@@ -256,7 +256,7 @@ export default async function MarketingPage() {
               See full feature listing →
             </Link>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))', gap: 12 }}>
             {FEATURES.map(({ icon: Icon, title, description }, i) => (
               <div key={i} style={{ background: ML.pearl, borderRadius: 14, padding: '28px 24px', border: `1px solid #DCDBD3` }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: ML.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
@@ -279,7 +279,7 @@ export default async function MarketingPage() {
               Romance to literary, <span style={{ fontStyle: 'italic', color: ML.copper }}>thriller to memoir</span> — a home for every shelf.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 12 }}>
             {GENRES.map((g, i) => (
               <div key={i} style={{ background: g.bg, borderRadius: 14, padding: '32px 28px', color: ML.bone, border: `1px solid rgba(232,229,221,0.1)` }}>
                 <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 24, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
@@ -309,7 +309,7 @@ export default async function MarketingPage() {
               </Link>
             </div>
             {/* Cream cards on mist background — clear contrast, clean and warm */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 16 }}>
               {blogPosts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ background: ML.bone, borderRadius: 16, padding: '28px 24px', border: '1px solid #DCDBD3', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}>
                   <div>

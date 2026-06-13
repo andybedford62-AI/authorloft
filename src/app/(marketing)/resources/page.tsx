@@ -130,7 +130,7 @@ export default async function ResourcesPage() {
                   <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{group.items.length}</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 16 }}>
                   {group.items.map((d) => (
                     <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 18, overflow: 'hidden' }}>
                       {d.coverImageUrl ? (

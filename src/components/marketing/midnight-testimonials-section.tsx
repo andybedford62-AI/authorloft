@@ -20,7 +20,14 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
   const [lead, ...rest] = testimonials;
 
   return (
-    <section style={{ background: '#27406B', padding: '120px 60px' }}>
+    <section style={{ background: '#27406B', padding: '120px 60px' }} className="ml-testimonials-section">
+      <style>{`
+        @media (max-width: 860px) {
+          .ml-testimonials-section { padding: 60px 24px !important; }
+          .ml-testimonials-grid { grid-template-columns: 1fr !important; }
+          .ml-testimonials-lead { padding: 28px 24px !important; }
+        }
+      `}</style>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: 64 }}>
@@ -35,7 +42,7 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
         </div>
 
         {/* Lead testimonial */}
-        <div style={{ background: '#F0EDE4', borderRadius: 18, padding: '48px 56px', marginBottom: 24, color: '#1B2B47' }}>
+        <div className="ml-testimonials-lead" style={{ background: '#F0EDE4', borderRadius: 18, padding: '48px 56px', marginBottom: 24, color: '#1B2B47' }}>
           <StarRow rating={lead.rating} />
           <div
             style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.45, margin: '0 0 28px', color: '#1B2B47' }}
@@ -54,7 +61,7 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
 
         {/* Secondary cards */}
         {rest.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(rest.length, 3)}, 1fr)`, gap: 16 }}>
+          <div className="ml-testimonials-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(rest.length, 3)}, 1fr)`, gap: 16 }}>
             {rest.map((t) => (
               <div key={t.id} style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(232,229,221,0.15)', borderRadius: 14, padding: '24px 28px', color: '#E8E5DD' }}>
                 <StarRow rating={t.rating} />
