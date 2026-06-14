@@ -41,6 +41,7 @@ import {
   Share2,
   FolderTree,
   Download,
+  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -126,22 +127,42 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-const SUPER_ADMIN_ITEMS: NavItem[] = [
-  { href: "/super-admin/authors",          label: "All Authors",     icon: Users      },
-  { href: "/super-admin/access-requests",  label: "Access Requests", icon: Inbox      },
-  { href: "/super-admin/plans",            label: "Plans",           icon: CreditCard },
-  { href: "/super-admin/coupons",          label: "Coupons",         icon: Ticket     },
-  { href: "/super-admin/feature-config",   label: "Feature Gates",   icon: Bot        },
-  { href: "/admin/genres",                 label: "Genres",          icon: Tag        },
-  { href: "/super-admin/legal",            label: "Legal",           icon: Shield     },
-  { href: "/super-admin/settings",         label: "Platform Settings", icon: Settings   },
-  { href: "/super-admin/help",             label: "Help Centre",     icon: HelpCircle },
-  { href: "/super-admin/blog",             label: "Blog & News",     icon: Newspaper  },
-  { href: "/super-admin/subscribers",      label: "News Subscribers", icon: Mail      },
-  { href: "/super-admin/resources",        label: "Resources",       icon: Globe      },
-  { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download },
-  { href: "/super-admin/categories",       label: "Content Categories", icon: FolderTree },
-  { href: "/super-admin/social",           label: "Social Media",    icon: Share2     },
+const SUPER_ADMIN_GROUPS: NavGroup[] = [
+  {
+    key: "sa-authors", label: "Authors", defaultOpen: true,
+    items: [
+      { href: "/super-admin/authors",         label: "All Authors",     icon: Users },
+      { href: "/super-admin/access-requests", label: "Access Requests", icon: Inbox },
+    ],
+  },
+  {
+    key: "sa-billing", label: "Billing & Plans", defaultOpen: false,
+    items: [
+      { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard        },
+      { href: "/super-admin/coupons",        label: "Coupons",       icon: Ticket            },
+      { href: "/super-admin/feature-config", label: "Feature Gates", icon: SlidersHorizontal },
+    ],
+  },
+  {
+    key: "sa-marketing", label: "Marketing", defaultOpen: false,
+    items: [
+      { href: "/super-admin/blog",               label: "Blog & News",        icon: Newspaper },
+      { href: "/super-admin/subscribers",        label: "News Subscribers",   icon: Mail      },
+      { href: "/super-admin/resources",          label: "Resources",          icon: Globe     },
+      { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download  },
+      { href: "/super-admin/social",             label: "Social Media",       icon: Share2    },
+    ],
+  },
+  {
+    key: "sa-platform", label: "Platform", defaultOpen: false,
+    items: [
+      { href: "/super-admin/categories", label: "Content Categories", icon: FolderTree },
+      { href: "/admin/genres",           label: "Genres",             icon: Tag        },
+      { href: "/super-admin/help",       label: "Help Articles",      icon: HelpCircle },
+      { href: "/super-admin/legal",      label: "Platform Legal",     icon: Shield     },
+      { href: "/super-admin/settings",   label: "Platform Settings",  icon: Settings   },
+    ],
+  },
 ];
 
 // ── Theme token helper ───────────────────────────────────────────────────────
@@ -315,6 +336,77 @@ function NavGroupSection({
   );
 }
 
+// ── Super-admin collapsible group ────────────────────────────────────────────
+// Like NavGroupSection but with no feature-gating (super admins see everything)
+// and purple active styling to set the elevated section apart.
+
+function SuperNavGroupSection({
+  group, pathname, t,
+}: {
+  group: NavGroup;
+  pathname: string;
+  t: ReturnType<typeof tokens>;
+}) {
+  const storageKey = `admin-nav-${group.key}`;
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined") return group.defaultOpen;
+    const saved = localStorage.getItem(storageKey);
+    return saved !== null ? saved === "true" : group.defaultOpen;
+  });
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    localStorage.setItem(storageKey, String(next));
+  };
+
+  const hasActive = group.items.some((it) => pathname.startsWith(it.href));
+  useEffect(() => {
+    if (hasActive) {
+      setOpen(true);
+      localStorage.setItem(storageKey, "true");
+    }
+  }, [hasActive, storageKey]);
+
+  return (
+    <div>
+      <button
+        onClick={toggle}
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-colors",
+          t.groupBtn
+        )}
+      >
+        <span className={t.superLabel}>{group.label}</span>
+        <ChevronDown
+          className={cn("h-3.5 w-3.5 transition-transform duration-200", t.superLabel, open && "rotate-180")}
+        />
+      </button>
+
+      {open && (
+        <div className="mt-0.5 space-y-0.5">
+          {group.items.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  active ? t.superActive : t.superItem
+                )}
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main sidebar ─────────────────────────────────────────────────────────────
 
 export function AdminSidebar({
@@ -327,25 +419,7 @@ export function AdminSidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [superOpen, setSuperOpen] = useState(false);
   const t = tokens(adminTheme);
-
-  // Load super-admin group open state from localStorage
-  useEffect(() => {
-    if (!isSuperAdmin) return;
-    const saved = localStorage.getItem("admin-nav-superadmin");
-    if (saved !== null) setSuperOpen(saved === "true");
-    else {
-      const hasActive = SUPER_ADMIN_ITEMS.some((it) => pathname.startsWith(it.href));
-      if (hasActive) setSuperOpen(true);
-    }
-  }, [isSuperAdmin, pathname]);
-
-  const toggleSuper = () => {
-    const next = !superOpen;
-    setSuperOpen(next);
-    localStorage.setItem("admin-nav-superadmin", String(next));
-  };
 
   useEffect(() => {
     fetch("/api/admin/messages?filter=inbox")
@@ -432,54 +506,34 @@ export function AdminSidebar({
           />
         ))}
 
-        {/* Super Admin collapsible section */}
+        {/* Super Admin section — pinned dashboard + grouped collapsibles */}
         {isSuperAdmin && (
           <>
             <div className={cn("h-px mx-1", t.divider)} />
-            <div>
-              <button
-                onClick={toggleSuper}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-colors",
-                  t.groupBtn
-                )}
-              >
-                <span className={t.superLabel}>Super Admin</span>
-                <ChevronDown
-                  className={cn("h-3.5 w-3.5 transition-transform duration-200", t.superLabel, superOpen && "rotate-180")}
-                />
-              </button>
+            <p className={cn("px-3 pt-1 text-[10px] font-bold uppercase tracking-widest", t.superLabel)}>
+              Super Admin
+            </p>
 
-              {superOpen && (
-                <div className="mt-0.5 space-y-0.5">
-                  {SUPER_ADMIN_ITEMS.map(({ href, label, icon: Icon, external }) => {
-                    const active = !external && pathname.startsWith(href) &&
-                      (href !== "/admin/dashboard");
-                    const cls = cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                      active ? t.superActive : t.superItem
-                    );
-                    return external ? (
-                      <a
-                        key={href}
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cls}
-                      >
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {label}
-                      </a>
-                    ) : (
-                      <Link key={href} href={href} className={cls}>
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {label}
-                      </Link>
-                    );
-                  })}
-                </div>
+            {/* Platform Dashboard — pinned, exact-match active */}
+            <Link
+              href="/super-admin"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                pathname === "/super-admin" ? t.superActive : t.superItem
               )}
-            </div>
+            >
+              <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+              Platform Dashboard
+            </Link>
+
+            {SUPER_ADMIN_GROUPS.map((group) => (
+              <SuperNavGroupSection
+                key={group.key}
+                group={group}
+                pathname={pathname}
+                t={t}
+              />
+            ))}
           </>
         )}
       </nav>
