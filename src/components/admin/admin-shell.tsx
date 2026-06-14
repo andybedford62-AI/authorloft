@@ -15,6 +15,7 @@ interface AdminShellProps {
   featureGates?: Record<string, string>;
   adminTheme:    "dark" | "light";
   bg: { header: string; headerBorder: string };
+  headerBadge?:  React.ReactNode;
   children:      React.ReactNode;
 }
 
@@ -26,6 +27,7 @@ export function AdminShell({
   featureGates,
   adminTheme,
   bg,
+  headerBadge,
   children,
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
@@ -76,6 +78,8 @@ export function AdminShell({
           >
             <Menu className="h-5 w-5" />
           </button>
+
+          {headerBadge}
 
           <div className="flex-1" />
 

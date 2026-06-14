@@ -158,10 +158,10 @@ export function SettingsTabs(props: SettingsTabsProps) {
   const activeItem = NAV_GROUPS.flatMap(g => g.items).find(i => i.id === active);
 
   return (
-    <div className="flex gap-6 min-h-[600px]">
+    <div className="flex flex-col lg:flex-row gap-6 min-h-[600px]">
 
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
-      <aside className="w-52 flex-shrink-0">
+      <aside className="w-full lg:w-52 flex-shrink-0">
         <nav className="space-y-6">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>

@@ -2,9 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/sidebar";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
-import { LogoutButton } from "@/components/admin/logout-button";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 
@@ -49,38 +48,25 @@ export default async function SuperAdminLayout({
     <AdminSessionProvider>
       <div
         data-admin-theme={adminTheme}
-        className="flex min-h-screen"
+        className="flex min-h-screen flex-col"
         style={{ background: bg.outer }}
       >
-        <AdminSidebar
+        <AdminShell
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={true}
           planTier={planTier}
           featureGates={featureGates}
           adminTheme={adminTheme}
-        />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header
-            className="h-16 border-b flex items-center px-6 flex-shrink-0"
-            style={{ background: bg.header, borderColor: bg.headerBorder }}
-          >
+          bg={{ header: bg.header, headerBorder: bg.headerBorder }}
+          headerBadge={
             <span className="text-xs font-semibold uppercase tracking-widest text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">
               Super Admin
             </span>
-            <div className="flex-1" />
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">{authorName}</span>
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-700">
-                {authorName[0]}
-              </div>
-              <LogoutButton />
-            </div>
-          </header>
-          <main className="flex-1 p-6 overflow-y-auto">
-            {children}
-          </main>
-        </div>
+          }
+        >
+          {children}
+        </AdminShell>
       </div>
     </AdminSessionProvider>
   );
