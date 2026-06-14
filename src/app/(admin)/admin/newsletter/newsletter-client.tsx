@@ -204,7 +204,7 @@ export function NewsletterClient({
                   <p>2. Readers click the newsletter sign-up form on your site</p>
                   <p>3. They confirm via email — and they appear here</p>
                 </div>
-                <a href="/admin/newsletter-integration" className="text-xs text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                <a href="/admin/newsletter?tab=integrations" className="text-xs text-blue-600 hover:text-blue-700 underline underline-offset-2">
                   Connect Mailchimp, Kit, or ActiveCampaign →
                 </a>
               </div>

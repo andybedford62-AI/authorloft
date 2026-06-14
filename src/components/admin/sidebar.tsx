@@ -32,10 +32,9 @@ import {
   Lock,
   BarChart2,
   Megaphone,
-  PlugZap,
   Receipt,
   HelpCircle,
-  Headphones,
+  Scale,
   Globe,
   Ticket,
   Star,
@@ -75,52 +74,54 @@ interface SidebarProps {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    key: "content", label: "Content", defaultOpen: true,
+    key: "catalog", label: "Catalog", defaultOpen: true,
     items: [
-      { href: "/admin/books",      label: "Books",           icon: BookOpen   },
-      { href: "/admin/flip-books", label: "Flip Books",      icon: BookMarked },
-      { href: "/admin/series",     label: "Series",          icon: Library    },
-      { href: "/admin/pages",      label: "Pages",           icon: FileText   },
-      { href: "/admin/blog",       label: "Blog / News",     icon: Newspaper  },
-      { href: "/admin/feedback",   label: "Reader Feedback", icon: Star       },
+      { href: "/admin/books",      label: "Books",      icon: BookOpen   },
+      { href: "/admin/series",     label: "Series",     icon: Library    },
+      { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked },
     ],
   },
   {
-    key: "marketing", label: "Marketing", defaultOpen: false,
+    key: "website", label: "Website", defaultOpen: true,
     items: [
-      { href: "/admin/analytics",              label: "Analytics",       icon: BarChart2  },
-      { href: "/admin/newsletter",             label: "Newsletter",      icon: Mail       },
-      { href: "/admin/newsletter-integration", label: "Email Integration", icon: PlugZap  },
-      { href: "/admin/media-kit",              label: "Media Kit",       icon: Megaphone  },
-      { href: "/admin/ai-assistant",           label: "AI Assistant",    icon: Bot        },
-      { href: "/admin/seo-audit",              label: "SEO Audit",       icon: Search     },
+      { href: "/admin/pages",      label: "Pages",       icon: FileText  },
+      { href: "/admin/blog",       label: "Blog / News", icon: Newspaper },
+      { href: "/admin/appearance", label: "Appearance",  icon: Paintbrush },
+      { href: "/admin/branding",   label: "Branding",    icon: Palette   },
+      { href: "/admin/legal",      label: "Legal Pages", icon: Scale     },
+    ],
+  },
+  {
+    key: "audience", label: "Audience", defaultOpen: false,
+    items: [
+      { href: "/admin/messages",   label: "Messages",          icon: Inbox     },
+      { href: "/admin/feedback",   label: "Reader Feedback",   icon: Star      },
+      { href: "/admin/newsletter", label: "Email & Newsletter", icon: Mail     },
+      { href: "/admin/media-kit",  label: "Media Kit",         icon: Megaphone },
     ],
   },
   {
     key: "sales", label: "Sales", defaultOpen: false,
     items: [
       { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
-      { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
       { href: "/admin/specials",       label: "Specials",       icon: Sparkles    },
+      { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
       { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },
     ],
   },
   {
-    key: "customize", label: "Customize", defaultOpen: true,
+    key: "tools", label: "Tools", defaultOpen: false,
     items: [
-      { href: "/admin/appearance", label: "Appearance", icon: Paintbrush },
-      { href: "/admin/branding",   label: "Branding",   icon: Palette    },
+      { href: "/admin/ai-assistant", label: "AI Assistant", icon: Bot    },
+      { href: "/admin/seo-audit",    label: "SEO Audit",    icon: Search },
     ],
   },
   {
     key: "account", label: "Account", defaultOpen: false,
     items: [
-      { href: "/admin/messages",   label: "Messages",       icon: Inbox       },
-      { href: "/admin/help",            label: "Help Centre",      icon: HelpCircle  },
-      { href: "/admin/contact-support", label: "Contact Support",  icon: Headphones  },
-      { href: "/admin/compliance", label: "Privacy & GDPR", icon: Shield      },
-      { href: "/admin/legal",      label: "My Site Legal",  icon: Shield      },
-      { href: "/admin/settings",   label: "Settings",       icon: Settings    },
+      { href: "/admin/settings",   label: "Settings",            icon: Settings   },
+      { href: "/admin/compliance", label: "Reader Privacy (GDPR)", icon: Shield   },
+      { href: "/admin/help",       label: "Help & Support",      icon: HelpCircle },
     ],
   },
 ];
@@ -393,7 +394,7 @@ export function AdminSidebar({
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
 
-        {/* Dashboard — always visible, no group */}
+        {/* Dashboard & Analytics — always visible, pinned, no group */}
         <Link
           href="/admin/dashboard"
           className={cn(
@@ -403,6 +404,16 @@ export function AdminSidebar({
         >
           <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
           Dashboard
+        </Link>
+        <Link
+          href="/admin/analytics"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+            pathname.startsWith("/admin/analytics") ? t.navActive : t.navItem
+          )}
+        >
+          <BarChart2 className="h-4 w-4 flex-shrink-0" />
+          Analytics
         </Link>
 
         <div className={cn("h-px mx-1", t.divider)} />

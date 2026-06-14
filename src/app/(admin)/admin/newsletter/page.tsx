@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { NewsletterClient } from "./newsletter-client";
+import { NewsletterTabs } from "./newsletter-tabs";
 import { getThemeAccentHex } from "@/lib/themes";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
@@ -48,20 +49,24 @@ export default async function NewsletterPage() {
   const confirmedCount = subscribers.filter((s) => s.isConfirmed).length;
 
   return (
-    <NewsletterClient
-      subscribers={subscribers.map((s) => ({
-        ...s,
-        subscribedAt: s.subscribedAt.toISOString(),
-      }))}
-      genres={genres}
-      genreMap={genreMap}
-      confirmedCount={confirmedCount}
-      accentColor={getThemeAccentHex(author?.siteTheme)}
-      authorName={author?.displayName || author?.name || ""}
-      campaigns={campaigns.map((c) => ({
-        ...c,
-        sentAt: c.sentAt.toISOString(),
-      }))}
+    <NewsletterTabs
+      newsletter={
+        <NewsletterClient
+          subscribers={subscribers.map((s) => ({
+            ...s,
+            subscribedAt: s.subscribedAt.toISOString(),
+          }))}
+          genres={genres}
+          genreMap={genreMap}
+          confirmedCount={confirmedCount}
+          accentColor={getThemeAccentHex(author?.siteTheme)}
+          authorName={author?.displayName || author?.name || ""}
+          campaigns={campaigns.map((c) => ({
+            ...c,
+            sentAt: c.sentAt.toISOString(),
+          }))}
+        />
+      }
     />
   );
 }
