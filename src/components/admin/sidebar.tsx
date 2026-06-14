@@ -429,7 +429,7 @@ export function AdminSidebar({
   }, [pathname]);
 
   return (
-    <aside className={cn("w-64 flex-shrink-0 min-h-screen flex flex-col border-r", t.sidebar)}>
+    <aside className={cn("w-64 flex-shrink-0 h-full flex flex-col border-r", t.sidebar)}>
 
       {/* Logo */}
       <div className={cn("h-16 flex items-center px-4 gap-2 border-b", t.logoBorder)}>
