@@ -161,7 +161,7 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
           return (
             <div
               key={key}
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-3.5"
+              className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white border border-gray-200 rounded-xl px-5 py-3.5"
             >
               <div className="flex items-center gap-3">
                 <Icon className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -179,7 +179,7 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
                 </div>
               </div>
 
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap">
                 {TIERS.map((tier) => {
                   const isSelected = current === tier;
                   return (
