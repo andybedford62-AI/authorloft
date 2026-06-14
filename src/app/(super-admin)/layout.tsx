@@ -51,6 +51,8 @@ export default async function SuperAdminLayout({
         className="flex min-h-screen flex-col"
         style={{ background: bg.outer }}
       >
+        {/* Reuse the author AdminShell so super-admin inherits the same
+            mobile drawer + hamburger + responsive header. */}
         <AdminShell
           authorName={authorName}
           authorSlug={authorSlug}
