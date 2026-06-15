@@ -1218,6 +1218,132 @@ export async function sendPreOrderLaunchEmail({
   });
 }
 
+// ── Gated resource download delivery (to the lead) ───────────────────────────
+
+export async function sendResourceDownloadEmail({
+  to,
+  title,
+  fileUrl,
+  coverImageUrl,
+}: {
+  to: string;
+  title: string;
+  fileUrl: string;
+  coverImageUrl?: string | null;
+}) {
+  const resourcesUrl = `${baseUrl()}/resources`;
+
+  return sendMail({
+    to,
+    from: BROADCAST_FROM_ADDRESS,
+    subject: `Your download: ${title}`,
+    text: [
+      `Hi there,`,
+      `Thanks for downloading "${title}" from AuthorLoft.`,
+      `Here's your copy — keep this email so you can grab it again anytime:`,
+      fileUrl,
+      `Browse more free resources: ${resourcesUrl}`,
+      `— The AuthorLoft Team`,
+    ].join("\n\n"),
+    html: wrapHtml("Your download is ready", `
+      <p style="margin:0 0 16px;">Hi there,</p>
+      <p style="margin:0 0 20px;">
+        Thanks for downloading <strong>${esc(title)}</strong> from AuthorLoft.
+        Here's your copy — keep this email so you can grab it again anytime.
+      </p>
+      ${coverImageUrl ? `
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding-bottom:20px;">
+          <img src="${coverImageUrl}" alt="${esc(title)}" style="max-width:200px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.12);" />
+        </td></tr>
+      </table>` : ""}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${fileUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Download ${esc(title)}
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">If the button doesn't work, paste this link into your browser:</p>
+      <p style="margin:0 0 20px;font-size:13px;word-break:break-all;"><a href="${fileUrl}" style="color:#2563eb;">${fileUrl}</a></p>
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Looking for more? <a href="${resourcesUrl}" style="color:#6b7280;">Browse all free resources</a>.
+      </p>
+    `),
+  });
+}
+
+// ── News issue email (to a platform News subscriber) ─────────────────────────
+
+export function buildPlatformUnsubscribeLink(token: string): string {
+  return `${baseUrl()}/api/newsletter/unsubscribe/platform?token=${token}`;
+}
+
+export function buildNewsIssueMailPayload(opts: {
+  to: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverImageUrl?: string | null;
+  unsubscribeToken: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const postUrl       = `https://www.${platformDomain}/news/${opts.slug}`;
+  const unsubscribeUrl = buildPlatformUnsubscribeLink(opts.unsubscribeToken);
+  const blurb = opts.excerpt?.trim() || "Read the latest from AuthorLoft News.";
+
+  const html = wrapHtml(opts.title, `
+    ${opts.coverImageUrl ? `
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td align="center" style="padding-bottom:20px;">
+        <img src="${opts.coverImageUrl}" alt="${esc(opts.title)}" style="max-width:100%;border-radius:8px;" />
+      </td></tr>
+    </table>` : ""}
+    <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.7;">${esc(blurb)}</p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:4px 0 24px;">
+          <a href="${postUrl}"
+             style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+            Read it on AuthorLoft
+          </a>
+        </td>
+      </tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+      <tr>
+        <td align="center" style="padding:8px 0 0;">
+          <a href="${unsubscribeUrl}" style="font-size:12px;color:#9ca3af;text-decoration:underline;">
+            Unsubscribe from AuthorLoft News
+          </a>
+        </td>
+      </tr>
+    </table>
+  `);
+
+  const text = [
+    opts.title,
+    "",
+    blurb,
+    "",
+    `Read it: ${postUrl}`,
+    "",
+    `---`,
+    `Unsubscribe: ${unsubscribeUrl}`,
+  ].join("\n");
+
+  return {
+    from:    BROADCAST_FROM_ADDRESS,
+    to:      opts.to,
+    subject: opts.title,
+    html,
+    text,
+  };
+}
+
 export function buildBroadcastMailPayload(opts: {
   to: string;
   firstName: string;

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { BookstoreBookCard, type BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { BookstoreQuickView } from "@/components/marketing/bookstore-quick-view";
 
 const PER_PAGE = 24;
 
@@ -42,6 +43,7 @@ export function BookstoreGrid({
   const [price, setPrice] = useState<PriceFilter>("all");
   const [sort, setSort] = useState<SortKey>("newest");
   const [page, setPage] = useState(1);
+  const [quickViewBook, setQuickViewBook] = useState<BookstoreBook | null>(null);
 
   // Only show format chips for formats that actually appear in the catalog
   const availableFormats = useMemo(() => {
@@ -245,7 +247,7 @@ export function BookstoreGrid({
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {pageItems.map((b) => (
-            <BookstoreBookCard key={b.id} book={b} />
+            <BookstoreBookCard key={b.id} book={b} onQuickView={setQuickViewBook} />
           ))}
         </div>
       )}
@@ -287,6 +289,8 @@ export function BookstoreGrid({
           </button>
         </div>
       )}
+
+      <BookstoreQuickView book={quickViewBook} onClose={() => setQuickViewBook(null)} />
     </div>
   );
 }

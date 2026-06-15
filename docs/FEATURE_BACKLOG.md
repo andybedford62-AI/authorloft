@@ -16,9 +16,9 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [x] **Verify "Trending Now" view data** — was broken: `Book.views` was never incremented, so the row never showed. Fixed June 14, 2026 by adding a view increment on author book-page visits. *(done)*
 - [ ] **Reader accounts + favorites/wishlists** — let readers save books. Powerful but heavy (no reader auth today). *(large)*
 - [ ] **Curated "Staff Picks" / collections** — super-admin curation UI for themed shelves. *(medium)*
-- [ ] **Quick-view modal** — peek at a book without leaving the bookstore. *(small)*
+- [x] **Quick-view modal** — shipped June 15, 2026; a "Quick view" button on each catalog card opens a modal (cover, blurb, rating, formats, price, genres, author link, buy CTA) without leaving the bookstore. *(done)*
 - [ ] **Bookstore listing limits by tier** — e.g., STANDARD limited number of listings, PREMIUM unlimited + featured (pricing lever). *(small)*
-- [ ] **Clickable author name on book cards** — whole card currently links to the book (can't nest links); restructure so the author name links to their site separately. *(small)*
+- [x] **Clickable author name on book cards** — shipped June 15, 2026; restructured the card with a stretched-link pattern so the whole card still opens the book while the author name links separately to their site. *(done)*
 - [x] **Unify genre-page headers** — shipped June 15, 2026; `/bookstore/genre/[slug]` now uses the shared `MarketingPageHeader` brand band (same banner as the main Bookstore page) with an "All books" breadcrumb. *(done)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
 
@@ -30,7 +30,7 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 - [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
 - [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
-- [ ] **"Publish News post → also email subscribers"** one-click option. *(small)*
+- [x] **"Publish News post → also email subscribers"** — shipped June 15, 2026; a checkbox on published News posts emails the issue (headline, excerpt, cover, read link) to confirmed `PlatformSubscriber`s once, with a new platform unsubscribe route + `PlatformPost.newsEmailedAt` double-send guard. *(done)*
 - [x] **RSS feed** for the news archive — shipped June 14, 2026 (`/news/rss.xml`, advertised via alternate link on `/news`). *(done)*
 - [ ] **"New books this week" digest** — reader newsletter from the bookstore catalog; reuses the same email infra once Phase 2 lands. *(medium)*
 
@@ -52,7 +52,7 @@ Sprint 1 shipped June 12, 2026 (see Shipped section). Open follow-ons:
 Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 - [ ] **WordPress XML import** for blog posts + books. *(~5 days)*
-- [ ] **Saved column-mapping presets** — let an author save a custom mapping for re-use on a second CSV from the same source. *(small)*
+- [x] **Saved column-mapping presets** — shipped June 15, 2026; the import wizard's Map step can save/load/delete named column mappings (browser-local) for re-use on another CSV from the same source. *(done)*
 
 ---
 
@@ -74,7 +74,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliate directory). Open ideas:
 
 - [ ] **Individual download detail pages** (`/resources/[slug]`) — render each download's RTE `body` as its own SEO landing page (currently downloads are cards only; the `body` field is captured but not surfaced publicly). Would also add per-download sitemap entries. *(small–medium)*
-- [ ] **Email the download file** in addition to the instant link — reuse the broadcast/mass-email infra so the lead has a copy. *(small)*
+- [x] **Email the download file** — shipped June 15, 2026; unlocking a gated resource now also emails the lead a copy of the download link (best-effort, never blocks the unlock). *(done)*
 - [ ] **Move gated files to Supabase signed URLs** (like orders/ARC downloads) if stronger control than hidden Drive links is needed later. *(medium)*
 - [x] **Resources dropdown child label** — confirmed "Tools & Communities" matches the page content (tools, communities, organisations); keeping as-is. *(June 12, 2026)*
 

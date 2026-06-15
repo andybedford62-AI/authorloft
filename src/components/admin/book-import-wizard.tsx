@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Papa from "papaparse";
 import {
   UploadCloud, FileText, ArrowRight, ArrowLeft, Loader2, CheckCircle2,
-  AlertTriangle, Sparkles, Download, RotateCcw,
+  AlertTriangle, Sparkles, Download, RotateCcw, Save, BookmarkPlus, Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,9 @@ import {
   type MappedBookRow, detectMapping, mapRow,
   MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE_BYTES,
 } from "@/lib/csv-import";
+import {
+  loadPresets, savePreset, deletePreset, type MappingPreset,
+} from "@/lib/csv-import-presets";
 import { lookupByIsbn } from "@/lib/isbn-lookup";
 
 type Step = "upload" | "map" | "preview" | "results";
@@ -51,6 +54,40 @@ export function BookImportWizard({ existingGenres, existingSeries, remainingSlot
 
   // Map
   const [mapError, setMapError] = useState("");
+
+  // Saved mapping presets (browser-local)
+  const [presets, setPresets] = useState<MappingPreset[]>([]);
+  const [presetName, setPresetName] = useState("");
+  const [presetMsg, setPresetMsg] = useState("");
+  useEffect(() => { setPresets(loadPresets()); }, []);
+
+  function applyPreset(name: string) {
+    if (!name) return;
+    const preset = presets.find((p) => p.name === name);
+    if (!preset) return;
+    // Only keep mappings whose column actually exists in this file's headers.
+    const next: ColumnMapping = {};
+    for (const [field, header] of Object.entries(preset.mapping)) {
+      if (header && headers.includes(header)) next[field as BookFieldKey] = header;
+    }
+    setMapping(next);
+    setMapError("");
+    setPresetMsg(`Applied "${name}" — adjust any unmatched columns below.`);
+  }
+
+  function handleSavePreset() {
+    const name = presetName.trim();
+    if (!name) { setPresetMsg("Enter a name for this preset."); return; }
+    if (Object.keys(mapping).length === 0) { setPresetMsg("Map at least one column before saving."); return; }
+    setPresets(savePreset(name, mapping));
+    setPresetName("");
+    setPresetMsg(`Saved "${name}".`);
+  }
+
+  function handleDeletePreset(name: string) {
+    setPresets(deletePreset(name));
+    setPresetMsg(`Deleted "${name}".`);
+  }
 
   // Preview
   const [mappedRows, setMappedRows] = useState<MappedBookRow[]>([]);
@@ -310,6 +347,62 @@ export function BookImportWizard({ existingGenres, existingSeries, remainingSlot
               <span>{parseWarning}</span>
             </div>
           )}
+
+          {/* Saved mapping presets (browser-local) */}
+          <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-gray-600">
+              <BookmarkPlus className="h-3.5 w-3.5" /> Saved mappings
+              <span className="font-normal text-gray-400">— reuse a mapping for another CSV from the same source (saved in this browser)</span>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+              {presets.length > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <select
+                    defaultValue=""
+                    onChange={(e) => { applyPreset(e.target.value); e.target.value = ""; }}
+                    className={selectClass + " sm:w-56"}
+                    aria-label="Load a saved mapping"
+                  >
+                    <option value="">Load a saved mapping…</option>
+                    {presets.map((p) => (
+                      <option key={p.name} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 flex-1">
+                <input
+                  type="text"
+                  value={presetName}
+                  onChange={(e) => setPresetName(e.target.value)}
+                  placeholder="Name this mapping…"
+                  maxLength={40}
+                  className={selectClass + " flex-1"}
+                />
+                <Button type="button" size="sm" variant="outline" onClick={handleSavePreset}>
+                  <Save className="h-3.5 w-3.5 mr-1.5" /> Save
+                </Button>
+              </div>
+            </div>
+            {presets.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {presets.map((p) => (
+                  <span key={p.name} className="inline-flex items-center gap-1 rounded-full bg-white border border-gray-200 pl-2.5 pr-1 py-0.5 text-xs text-gray-600">
+                    {p.name}
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePreset(p.name)}
+                      className="rounded-full p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-50"
+                      aria-label={`Delete ${p.name}`}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            {presetMsg && <p className="text-xs text-gray-500">{presetMsg}</p>}
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {BOOK_FIELDS.map((field) => (

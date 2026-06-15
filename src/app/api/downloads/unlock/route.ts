@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import { UNLOCK_COOKIE, UNLOCK_COOKIE_MAX_AGE } from "@/lib/downloads";
+import { sendResourceDownloadEmail } from "@/lib/mailer";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,15 +18,35 @@ export async function POST(req: NextRequest) {
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("x-real-ip") || null;
 
+  const cleanEmail = String(email).trim().toLowerCase();
+
   // Store the lead (best-effort — never block the unlock on a write error).
   await prisma.downloadLead.create({
     data: {
-      email: String(email).trim().toLowerCase(),
+      email: cleanEmail,
       resourceId: resourceId ? String(resourceId) : null,
       source: source ? String(source) : "resource",
       ipAddress: ip,
     },
   }).catch(() => {});
+
+  // Email the lead a copy of the download link (best-effort — never block the unlock).
+  if (resourceId) {
+    const resource = await prisma.resourceDownload
+      .findUnique({
+        where: { id: String(resourceId) },
+        select: { title: true, fileUrl: true, coverImageUrl: true, isPublished: true },
+      })
+      .catch(() => null);
+    if (resource?.isPublished && resource.fileUrl) {
+      await sendResourceDownloadEmail({
+        to: cleanEmail,
+        title: resource.title,
+        fileUrl: resource.fileUrl,
+        coverImageUrl: resource.coverImageUrl,
+      }).catch(() => {});
+    }
+  }
 
   const res = NextResponse.json({ ok: true });
   res.cookies.set(UNLOCK_COOKIE, "1", {

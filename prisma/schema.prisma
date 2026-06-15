@@ -1114,6 +1114,8 @@ model PlatformPost {
   // Downloadable resource
   attachmentUrl   String?                    // external link or uploaded file URL
   attachmentLabel String?                    // e.g. "Download Free Chapter"
+  // News email — set when this News post is emailed to platform subscribers (guards against double-send)
+  newsEmailedAt   DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

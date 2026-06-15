@@ -229,15 +229,15 @@ export default async function PricingPage() {
                     <span className="block text-xs font-semibold text-[#B8893D] mt-0.5">FREE</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
-                    Tertulia
+                    <Link href="/compare/tertulia" className="hover:text-[#C26A4A] hover:underline transition-colors">Tertulia</Link>
                     <span className="block text-xs font-normal text-[#8993A4] mt-0.5">$7.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
-                    StoryOrigin
+                    <Link href="/compare/storyorigin" className="hover:text-[#C26A4A] hover:underline transition-colors">StoryOrigin</Link>
                     <span className="block text-xs font-normal text-[#8993A4] mt-0.5">~$20/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
-                    BookFunnel
+                    <Link href="/compare/bookfunnel" className="hover:text-[#C26A4A] hover:underline transition-colors">BookFunnel</Link>
                     <span className="block text-xs font-normal text-[#8993A4] mt-0.5">~$49/mo</span>
                   </th>
                 </tr>

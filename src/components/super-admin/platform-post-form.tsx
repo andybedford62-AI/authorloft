@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown, CheckCircle2 } from "lucide-react";
 
 type Post = {
   id:              string;
@@ -22,6 +22,7 @@ type Post = {
   focusKeyword:    string | null;
   seoTitle:        string | null;
   metaDescription: string | null;
+  newsEmailedAt:   string | null;
 };
 
 interface Props {
@@ -63,6 +64,10 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
   const [focusKeyword,    setFocusKeyword]    = useState(post?.focusKeyword    ?? "");
   const [seoTitle,        setSeoTitle]        = useState(post?.seoTitle        ?? "");
   const [metaDescription, setMetaDescription] = useState(post?.metaDescription ?? "");
+
+  const [emailSubscribers, setEmailSubscribers] = useState(false);
+  const [newsEmailedAt,    setNewsEmailedAt]    = useState(post?.newsEmailedAt ?? null);
+  const [emailResult,      setEmailResult]      = useState<string | null>(null);
 
   const [saving,      setSaving]      = useState(false);
   const [deleting,    setDeleting]    = useState(false);
@@ -116,9 +121,32 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
     });
 
     const json = await res.json();
-    setSaving(false);
 
-    if (!res.ok) { setError(json.error ?? "Save failed."); return; }
+    if (!res.ok) { setSaving(false); setError(json.error ?? "Save failed."); return; }
+
+    // One-click: email this News issue to confirmed subscribers, if requested.
+    if (emailSubscribers && isNews && isPublished && !newsEmailedAt && json.id) {
+      try {
+        const emailRes = await fetch(`/api/super-admin/blog/posts/${json.id}/email`, { method: "POST" });
+        const emailJson = await emailRes.json();
+        setSaving(false);
+        if (!emailRes.ok) {
+          setEmailResult(`Saved, but the email didn't send: ${emailJson.error ?? "Unknown error."}`);
+        } else {
+          setNewsEmailedAt(new Date().toISOString());
+          setEmailResult(`Saved and emailed to ${emailJson.sent} subscriber${emailJson.sent === 1 ? "" : "s"}${emailJson.failed ? ` (${emailJson.failed} failed)` : ""}.`);
+        }
+        setEmailSubscribers(false);
+        router.refresh();
+        return; // stay on the page so the result is visible
+      } catch {
+        setSaving(false);
+        setEmailResult("Saved, but the email request failed. You can retry from this page.");
+        return;
+      }
+    }
+
+    setSaving(false);
     router.push("/super-admin/blog");
     router.refresh();
   }
@@ -402,6 +430,36 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
             </p>
           </div>
         </label>
+
+        {/* Email News subscribers — only for published News posts */}
+        {isNews && isPublished && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            {newsEmailedAt ? (
+              <p className="text-sm text-gray-600 flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                Emailed to News subscribers on {new Date(newsEmailedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.
+              </p>
+            ) : (
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={emailSubscribers}
+                  onChange={(e) => setEmailSubscribers(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Email this issue to News subscribers on save</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Sends a one-time email with the headline, excerpt, and a link to confirmed subscribers. Can only be sent once per post.
+                  </p>
+                </div>
+              </label>
+            )}
+            {emailResult && (
+              <p className="text-xs text-gray-600 mt-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">{emailResult}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Downloadable Resource ─────────────────────────────────────────── */}

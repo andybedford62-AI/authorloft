@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, X, Minus } from "lucide-react";
+import { Check, X, Minus, ArrowLeft } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import type { Cell, ComparisonData } from "@/lib/comparison-data";
@@ -33,6 +33,14 @@ export function ComparisonPage({ data }: { data: ComparisonData }) {
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        {/* Back to pricing */}
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5C6E89] hover:text-[#C26A4A] transition-colors mb-8"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to pricing &amp; comparisons
+        </Link>
+
         {/* TL;DR */}
         <section className="mb-12">
           <p className="text-lg text-[#3d3328] leading-relaxed">{data.tldr}</p>

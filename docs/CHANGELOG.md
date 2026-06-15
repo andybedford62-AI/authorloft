@@ -13,12 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## June 15, 2026 — Backlog batch: 5 small features
+_(not yet promoted to prod)_
+- **Clickable author name on bookstore cards** — the card was a single wrapping link, so the author name couldn't be its own link. Restructured `bookstore-book-card.tsx` with a stretched-link pattern: the whole card still opens the book, while the author name links separately to the author's site. Added `authorUrl` to the bookstore data. Applies to grid + New/Trending rows
+- **Bookstore quick-view modal** — a "Quick view" button on each catalog card opens a modal (cover, blurb, rating, formats, price, genres, author link, "Buy on Author's Site" CTA) without leaving the store. New `bookstore-quick-view.tsx`; state lifted into the (already client) `BookstoreGrid`; closes on backdrop/Esc with body-scroll lock. Added a stripped `description` to the bookstore data
+- **Email the gated download** — unlocking an email-gated resource now also emails the lead a copy of the download link (`sendResourceDownloadEmail`), in addition to the instant link. Best-effort — never blocks the unlock
+- **Saved CSV column-mapping presets** — the Book import wizard's Map step can now save/load/delete named column mappings for re-use on another CSV from the same source. Browser-local (`localStorage`, `src/lib/csv-import-presets.ts`) — no account binding, no migration
+- **Publish News post → email subscribers (one-click)** — a checkbox on published News posts emails the issue (headline, excerpt, cover, read link) to confirmed `PlatformSubscriber`s, reusing the broadcast batch infra. New `POST /api/super-admin/blog/posts/[id]/email`, a platform-subscriber unsubscribe route (`/api/newsletter/unsubscribe/platform`), and a `PlatformPost.newsEmailedAt` timestamp that guards against double-sends. **DB:** additive nullable column `PlatformPost.newsEmailedAt` (apply to Supabase before promoting)
+
 ## June 15, 2026 — GEO: comparison pages (BookFunnel, StoryOrigin, Tertulia)
 _(not yet promoted to prod)_
 - **Three "vs" comparison landing pages** (GEO/SEO assets from the AI-visibility plan): `/compare/bookfunnel`, `/compare/storyorigin`, `/compare/tertulia`. Each has the shared brand-band header, "choose which" cards, a feature comparison table, core-difference prose, and an FAQ section with `FAQPage` structured data (high-value for AI extraction)
 - **Refactored to a single dynamic route** `/compare/[competitor]` + a `comparison-data.tsx` source of truth and a shared `ComparisonPage` component (the original static bookfunnel page was folded in). Adding a competitor is now a data-only change; `sitemap.ts` generates entries from the same list
 - **Accuracy checked** against each product's real positioning (web-verified): BookFunnel = delivery/reader-magnets; StoryOrigin = author marketing toolkit (newsletter swaps — credited as its win); Tertulia = reader discovery app with a basic author site that links out to retailers. Comparisons are fair, not hit pieces
 - **Meta descriptions trimmed to ≤155 chars** (the BookFunnel one was 174); brandless titles (template brands once), canonicals, OG images; pricing page links to all three
+- **Cross-linking** — the pricing comparison grid's column headers (Tertulia/StoryOrigin/BookFunnel) now link to their `/compare/*` page, and each comparison page has a "← Back to pricing & comparisons" link at the top (previously only the bottom-CTA "See pricing" existed)
 
 ## June 15, 2026 — Genre page SEO title fix
 _(not yet promoted to prod)_
