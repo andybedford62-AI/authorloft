@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Tag } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { getBookstoreData } from "@/lib/bookstore";
 import { slugify } from "@/lib/utils";
@@ -87,34 +88,22 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
       />
       <MarketingNav />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-[#DCDBD3]">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(135deg, #3a2417 0%, #5c3a22 40%, #7a4f2e 100%)" }}
-        />
-        <div aria-hidden className="absolute inset-0 bg-[#1B2B47]/30" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
-          <Link
-            href="/bookstore"
-            className="inline-flex items-center gap-1.5 text-sm text-[#F0D9B5] hover:text-white transition-colors mb-4"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> All books
-          </Link>
-          <p className="text-xs font-mono uppercase tracking-widest text-[#F0D9B5] mb-2 flex items-center gap-1.5">
-            <Tag className="h-3.5 w-3.5" /> Genre
-          </p>
-          <h1 className="text-3xl sm:text-5xl font-serif text-white font-normal leading-tight drop-shadow-sm">
-            {name}
-          </h1>
-          <p className="mt-3 text-sm sm:text-base text-[#F5ECDD]">
-            {filtered.length} book{filtered.length !== 1 ? "s" : ""} from independent authors
-          </p>
-        </div>
-      </section>
+      {/* Hero — unified brand band (matches the main Bookstore page) */}
+      <MarketingPageHeader
+        eyebrow="Bookstore Genre"
+        title={name}
+        subtitle={`${filtered.length} book${filtered.length !== 1 ? "s" : ""} from independent authors.`}
+        backgroundImage="/bookstore-header.png"
+      />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <Link
+          href="/bookstore"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6b5f53] hover:text-[#1B2B47] transition-colors mb-6"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> All books
+        </Link>
+
         <BookstoreGrid books={filtered} allGenres={[]} />
 
         {/* Interlink to other genres (SEO + discovery) */}

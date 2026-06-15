@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## June 15, 2026 — Unify bookstore genre-page header
+_(not yet promoted to prod)_
+- **Genre pages use the shared brand band** — `/bookstore/genre/[slug]` had its own older brown-gradient hero; it now uses the shared `MarketingPageHeader` (same navy band + `/bookstore-header.png` banner as the main Bookstore/Blog/News pages), with the genre name as the title and an "All books" breadcrumb above the grid
+
 ## June 14, 2026 — Quick wins: dashboard/nav fixes, book views, News RSS
 _(not yet promoted to prod)_
 - **Dashboard "Upgrade" no longer shows on Premium** — the Current Plan card always rendered an "Upgrade" button; it now shows "Manage" on PREMIUM (and links to `?tab=billing`), "Upgrade" on FREE/STANDARD

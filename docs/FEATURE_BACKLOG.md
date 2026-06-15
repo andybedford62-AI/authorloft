@@ -19,7 +19,7 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [ ] **Quick-view modal** — peek at a book without leaving the bookstore. *(small)*
 - [ ] **Bookstore listing limits by tier** — e.g., STANDARD limited number of listings, PREMIUM unlimited + featured (pricing lever). *(small)*
 - [ ] **Clickable author name on book cards** — whole card currently links to the book (can't nest links); restructure so the author name links to their site separately. *(small)*
-- [ ] **Unify genre-page headers** — `/bookstore/genre/[slug]` still uses its own older header; give it the shared brand band for consistency. *(small)*
+- [x] **Unify genre-page headers** — shipped June 15, 2026; `/bookstore/genre/[slug]` now uses the shared `MarketingPageHeader` brand band (same banner as the main Bookstore page) with an "All books" breadcrumb. *(done)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
 
 ---
