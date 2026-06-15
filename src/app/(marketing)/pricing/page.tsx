@@ -271,6 +271,11 @@ export default async function PricingPage() {
           <p className="text-center text-xs text-[#8993A4] mt-4">
             Competitor features based on publicly listed plans as of May 2026. Features subject to change.
           </p>
+          <p className="text-center text-sm mt-3">
+            <Link href="/compare/bookfunnel" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">
+              Read the full AuthorLoft vs BookFunnel comparison →
+            </Link>
+          </p>
         </div>
       </section>
 

@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## June 15, 2026 — GEO: AuthorLoft vs BookFunnel comparison page
+_(not yet promoted to prod)_
+- **New `/compare/bookfunnel` comparison page** — first Generative Engine Optimization (GEO) / SEO asset from the AI-visibility plan. Shared brand-band header, "choose which" cards, feature comparison table (from the pricing matrix), core-difference prose, and an FAQ section with `FAQPage` structured data (high-value for AI extraction). Brandless title (template-branded once), canonical, OG image; added to `sitemap.ts`; linked from the pricing page's competitor table. Scalable pattern for future `vs storyorigin` / `vs tertulia` pages
+
 ## June 15, 2026 — Genre page SEO title fix
 _(not yet promoted to prod)_
 - **Bookstore genre `<title>` fixed** — genre pages were the only page hardcoding the brand in the top-level title, so the root `%s | AuthorLoft` template produced a doubled brand ("… | AuthorLoft Bookstore | AuthorLoft") plus a "Books Books" redundancy and dropped the apostrophe (slug-derived "Childrens" vs "Children's"). `generateMetadata` now uses the real genre name, avoids the duplicate "Books", and sets a brandless title so the template brands it once. (SEO audit also confirmed: sitemap covers all public pages incl. blog/news/genre, no admin URLs leak, robots disallows private areas, all 15 marketing pages carry canonicals)

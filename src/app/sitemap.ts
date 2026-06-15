@@ -52,6 +52,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/bookstore`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
     ...genreEntries,
 
+    // Comparison / "vs" landing pages (SEO + GEO)
+    { url: `${BASE}/compare/bookfunnel`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
+
     // Blog - high priority for SEO
     { url: `${BASE}/blog`,     lastModified: new Date(), changeFrequency: "weekly",   priority: 0.85 },
     ...blogEntries,
