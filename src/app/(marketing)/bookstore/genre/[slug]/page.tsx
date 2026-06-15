@@ -27,21 +27,27 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const name = titleCaseFromSlug(slug);
-  const title = `${name} Books by Independent Authors | AuthorLoft Bookstore`;
-  const description = `Discover ${name.toLowerCase()} books from independent authors on AuthorLoft. Browse, then buy directly from each author's own site.`;
+  // Use the real genre name (correct apostrophes/casing); fall back to the slug.
+  const { genres } = await getBookstoreData().catch(() => ({ genres: [] as { slug: string; name: string }[] }));
+  const name = genres.find((g) => g.slug === slug)?.name ?? titleCaseFromSlug(slug);
+  // Avoid "Books Books" when the genre name already ends in "Book(s)".
+  const lead = /books?$/i.test(name) ? name : `${name} Books`;
+  // Brandless page title — the root layout template appends " | AuthorLoft".
+  const pageTitle = `${lead} by Independent Authors`;
+  const ogTitle = `${lead} — AuthorLoft Bookstore`;
+  const description = `Discover ${lead.toLowerCase()} from independent authors on AuthorLoft. Browse, then buy directly from each author's own site.`;
   return {
-    title,
+    title: pageTitle,
     description,
     alternates: { canonical: `${BASE}/bookstore/genre/${slug}` },
     openGraph: {
       type: "website",
-      title,
+      title: ogTitle,
       description,
       url: `${BASE}/bookstore/genre/${slug}`,
-      images: [{ url: `${BASE}/og-home.png`, width: 1200, height: 630, alt: `${name} books on AuthorLoft` }],
+      images: [{ url: `${BASE}/og-home.png`, width: 1200, height: 630, alt: `${lead} on AuthorLoft` }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [`${BASE}/og-home.png`] },
+    twitter: { card: "summary_large_image", title: ogTitle, description, images: [`${BASE}/og-home.png`] },
   };
 }
 
