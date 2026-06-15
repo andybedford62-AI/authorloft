@@ -15,6 +15,7 @@ line rather than listing every commit.
 
 ## June 15, 2026 — Unify bookstore genre-page header
 _(not yet promoted to prod)_
+- **Super Admin nav: Content Categories moved Platform → Marketing** — it powers the blog/news/resource/FAQ category dropdowns, so it sits more naturally under Marketing alongside Blog & News and Resources
 - **Genre pages use the shared brand band** — `/bookstore/genre/[slug]` had its own older brown-gradient hero; it now uses the shared `MarketingPageHeader` (same navy band + `/bookstore-header.png` banner as the main Bookstore/Blog/News pages), with the genre name as the title and an "All books" breadcrumb above the grid
 
 ## June 14, 2026 — Quick wins: dashboard/nav fixes, book views, News RSS

@@ -149,14 +149,14 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
       { href: "/super-admin/blog",               label: "Blog & News",        icon: Newspaper },
       { href: "/super-admin/subscribers",        label: "News Subscribers",   icon: Mail      },
       { href: "/super-admin/resources",          label: "Resources",          icon: Globe     },
-      { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download  },
-      { href: "/super-admin/social",             label: "Social Media",       icon: Share2    },
+      { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download   },
+      { href: "/super-admin/categories",         label: "Content Categories", icon: FolderTree },
+      { href: "/super-admin/social",             label: "Social Media",       icon: Share2     },
     ],
   },
   {
     key: "sa-platform", label: "Platform", defaultOpen: false,
     items: [
-      { href: "/super-admin/categories", label: "Content Categories", icon: FolderTree },
       { href: "/admin/genres",           label: "Genres",             icon: Tag        },
       { href: "/super-admin/help",       label: "Help Articles",      icon: HelpCircle },
       { href: "/super-admin/legal",      label: "Platform Legal",     icon: Shield     },
