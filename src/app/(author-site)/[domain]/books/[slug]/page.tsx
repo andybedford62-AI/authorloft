@@ -131,6 +131,12 @@ export default async function BookDetailPage({
 
   if (!book) notFound();
 
+  // Increment view count (fire-and-forget) so the bookstore "Trending Now"
+  // row — which sorts by Book.views — has data to populate.
+  prisma.book
+    .update({ where: { id: book.id }, data: { views: { increment: 1 } } })
+    .catch(() => {});
+
   const salesEnabled        = author.plan?.salesEnabled ?? false;
   const audioEnabled        = author.plan?.audioEnabled ?? false;
   const hasDirectSaleItems  = salesEnabled && book.directSalesEnabled && book.directSaleItems.length > 0;

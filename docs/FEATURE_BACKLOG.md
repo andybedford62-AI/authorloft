@@ -13,7 +13,7 @@ _Last cleaned: June 11, 2026._
 Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/header redesigned June 8. Open ideas:
 
 - [ ] **Author Spotlight curation** — currently auto-rotates daily among authors with a photo + bio. Options: super-admin hand-pick, or make it **Premium-only** as an upgrade incentive. *(small–medium)*
-- [ ] **Verify "Trending Now" view data** — relies on `Book.views`; confirm views increment on author book pages so the row populates. *(verify)*
+- [x] **Verify "Trending Now" view data** — was broken: `Book.views` was never incremented, so the row never showed. Fixed June 14, 2026 by adding a view increment on author book-page visits. *(done)*
 - [ ] **Reader accounts + favorites/wishlists** — let readers save books. Powerful but heavy (no reader auth today). *(large)*
 - [ ] **Curated "Staff Picks" / collections** — super-admin curation UI for themed shelves. *(medium)*
 - [ ] **Quick-view modal** — peek at a book without leaving the bookstore. *(small)*
@@ -31,7 +31,7 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 - [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
 - [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
 - [ ] **"Publish News post → also email subscribers"** one-click option. *(small)*
-- [ ] **RSS feed** for the news archive. *(small)*
+- [x] **RSS feed** for the news archive — shipped June 14, 2026 (`/news/rss.xml`, advertised via alternate link on `/news`). *(done)*
 - [ ] **"New books this week" digest** — reader newsletter from the bookstore catalog; reuses the same email infra once Phase 2 lands. *(medium)*
 
 ---

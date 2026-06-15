@@ -536,27 +536,28 @@ export function AdminSidebar({
             ))}
           </>
         )}
-      </nav>
 
-      {/* Bottom: theme indicator + sign out */}
-      <div className={cn("px-3 py-4 border-t space-y-1", t.bottomBorder)}>
-        {/* Subtle theme indicator */}
-        <div className={cn("flex items-center gap-2 px-3 py-1.5 text-xs", t.authorLabel)}>
-          {adminTheme === "dark"
-            ? <><Moon className="h-3.5 w-3.5" /> Dark mode</>
-            : <><Sun  className="h-3.5 w-3.5" /> Light mode</>}
-          <Link href="/admin/settings" className="ml-auto underline underline-offset-2 hover:opacity-80">
-            Change
-          </Link>
+        {/* Theme indicator + sign out — flow directly after the menu items
+            (not pinned to the bottom) so they shift as groups open/close */}
+        <div className={cn("h-px mx-1 mt-1", t.divider)} />
+        <div className="space-y-1 pt-1">
+          <div className={cn("flex items-center gap-2 px-3 py-1.5 text-xs", t.authorLabel)}>
+            {adminTheme === "dark"
+              ? <><Moon className="h-3.5 w-3.5" /> Dark mode</>
+              : <><Sun  className="h-3.5 w-3.5" /> Light mode</>}
+            <Link href="/admin/settings" className="ml-auto underline underline-offset-2 hover:opacity-80">
+              Change
+            </Link>
+          </div>
+          <button
+            className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
+            onClick={() => signOut({ callbackUrl: "https://www.authorloft.com/login" })}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
         </div>
-        <button
-          className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
-          onClick={() => signOut({ callbackUrl: "https://www.authorloft.com/login" })}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
-      </div>
+      </nav>
     </aside>
   );
 }

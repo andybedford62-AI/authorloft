@@ -13,7 +13,10 @@ export const metadata: Metadata = {
   title: "News — Updates, Features & Announcements",
   description:
     "The latest from AuthorLoft: product updates, new features, specials, and events. Read current and past announcements from the team.",
-  alternates: { canonical: `${BASE}/news` },
+  alternates: {
+    canonical: `${BASE}/news`,
+    types: { "application/rss+xml": [{ url: `${BASE}/news/rss.xml`, title: "AuthorLoft News" }] },
+  },
   openGraph: {
     type: "website",
     title: "AuthorLoft News — Updates, Features & Announcements",

@@ -437,9 +437,9 @@ export default async function DashboardPage() {
                   {(data.planFeatures as string[]).join(" · ")}
                 </p>
               </div>
-              <Link href="/admin/settings">
+              <Link href="/admin/settings?tab=billing">
                 <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-                  Upgrade
+                  {data.planTier === "PREMIUM" ? "Manage" : "Upgrade"}
                 </Button>
               </Link>
             </div>
