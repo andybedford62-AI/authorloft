@@ -1,0 +1,709 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: This XML file does not appear to have any style information associated with it. The document tree is shown below.
+  - generic [ref=e4]:
+    - generic [ref=e7]:
+      - text: <urlset
+      - generic [ref=e8]: xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      - text: ">"
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e13]: <url>
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: <loc>
+            - text: https://www.staging.authorloft.com/
+            - generic [ref=e17]: </loc>
+          - generic [ref=e18]:
+            - generic [ref=e19]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e20]: </lastmod>
+          - generic [ref=e21]:
+            - generic [ref=e22]: <changefreq>
+            - text: weekly
+            - generic [ref=e23]: </changefreq>
+          - generic [ref=e24]:
+            - generic [ref=e25]: <priority>
+            - text: "1"
+            - generic [ref=e26]: </priority>
+        - generic [ref=e28]: </url>
+      - generic [ref=e29]:
+        - generic [ref=e32]: <url>
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: <loc>
+            - text: https://www.staging.authorloft.com/features
+            - generic [ref=e36]: </loc>
+          - generic [ref=e37]:
+            - generic [ref=e38]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e39]: </lastmod>
+          - generic [ref=e40]:
+            - generic [ref=e41]: <changefreq>
+            - text: monthly
+            - generic [ref=e42]: </changefreq>
+          - generic [ref=e43]:
+            - generic [ref=e44]: <priority>
+            - text: "0.9"
+            - generic [ref=e45]: </priority>
+        - generic [ref=e47]: </url>
+      - generic [ref=e48]:
+        - generic [ref=e51]: <url>
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]: <loc>
+            - text: https://www.staging.authorloft.com/pricing
+            - generic [ref=e55]: </loc>
+          - generic [ref=e56]:
+            - generic [ref=e57]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e58]: </lastmod>
+          - generic [ref=e59]:
+            - generic [ref=e60]: <changefreq>
+            - text: monthly
+            - generic [ref=e61]: </changefreq>
+          - generic [ref=e62]:
+            - generic [ref=e63]: <priority>
+            - text: "0.9"
+            - generic [ref=e64]: </priority>
+        - generic [ref=e66]: </url>
+      - generic [ref=e67]:
+        - generic [ref=e70]: <url>
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: <loc>
+            - text: https://www.staging.authorloft.com/bookstore
+            - generic [ref=e74]: </loc>
+          - generic [ref=e75]:
+            - generic [ref=e76]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e77]: </lastmod>
+          - generic [ref=e78]:
+            - generic [ref=e79]: <changefreq>
+            - text: weekly
+            - generic [ref=e80]: </changefreq>
+          - generic [ref=e81]:
+            - generic [ref=e82]: <priority>
+            - text: "0.85"
+            - generic [ref=e83]: </priority>
+        - generic [ref=e85]: </url>
+      - generic [ref=e86]:
+        - generic [ref=e89]: <url>
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]: <loc>
+            - text: https://www.staging.authorloft.com/bookstore/genre/childrens-books
+            - generic [ref=e93]: </loc>
+          - generic [ref=e94]:
+            - generic [ref=e95]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e96]: </lastmod>
+          - generic [ref=e97]:
+            - generic [ref=e98]: <changefreq>
+            - text: weekly
+            - generic [ref=e99]: </changefreq>
+          - generic [ref=e100]:
+            - generic [ref=e101]: <priority>
+            - text: "0.6"
+            - generic [ref=e102]: </priority>
+        - generic [ref=e104]: </url>
+      - generic [ref=e105]:
+        - generic [ref=e108]: <url>
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]: <loc>
+            - text: https://www.staging.authorloft.com/bookstore/genre/psychological-thriller
+            - generic [ref=e112]: </loc>
+          - generic [ref=e113]:
+            - generic [ref=e114]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e115]: </lastmod>
+          - generic [ref=e116]:
+            - generic [ref=e117]: <changefreq>
+            - text: weekly
+            - generic [ref=e118]: </changefreq>
+          - generic [ref=e119]:
+            - generic [ref=e120]: <priority>
+            - text: "0.6"
+            - generic [ref=e121]: </priority>
+        - generic [ref=e123]: </url>
+      - generic [ref=e124]:
+        - generic [ref=e127]: <url>
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]: <loc>
+            - text: https://www.staging.authorloft.com/bookstore/genre/reading-books
+            - generic [ref=e131]: </loc>
+          - generic [ref=e132]:
+            - generic [ref=e133]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e134]: </lastmod>
+          - generic [ref=e135]:
+            - generic [ref=e136]: <changefreq>
+            - text: weekly
+            - generic [ref=e137]: </changefreq>
+          - generic [ref=e138]:
+            - generic [ref=e139]: <priority>
+            - text: "0.6"
+            - generic [ref=e140]: </priority>
+        - generic [ref=e142]: </url>
+      - generic [ref=e143]:
+        - generic [ref=e146]: <url>
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e149]: <loc>
+            - text: https://www.staging.authorloft.com/bookstore/genre/thriller
+            - generic [ref=e150]: </loc>
+          - generic [ref=e151]:
+            - generic [ref=e152]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e153]: </lastmod>
+          - generic [ref=e154]:
+            - generic [ref=e155]: <changefreq>
+            - text: weekly
+            - generic [ref=e156]: </changefreq>
+          - generic [ref=e157]:
+            - generic [ref=e158]: <priority>
+            - text: "0.6"
+            - generic [ref=e159]: </priority>
+        - generic [ref=e161]: </url>
+      - generic [ref=e162]:
+        - generic [ref=e165]: <url>
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - generic [ref=e168]: <loc>
+            - text: https://www.staging.authorloft.com/blog
+            - generic [ref=e169]: </loc>
+          - generic [ref=e170]:
+            - generic [ref=e171]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e172]: </lastmod>
+          - generic [ref=e173]:
+            - generic [ref=e174]: <changefreq>
+            - text: weekly
+            - generic [ref=e175]: </changefreq>
+          - generic [ref=e176]:
+            - generic [ref=e177]: <priority>
+            - text: "0.85"
+            - generic [ref=e178]: </priority>
+        - generic [ref=e180]: </url>
+      - generic [ref=e181]:
+        - generic [ref=e184]: <url>
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e187]: <loc>
+            - text: https://www.staging.authorloft.com/blog/pre-orders-101-build-buzz-before-launch-day
+            - generic [ref=e188]: </loc>
+          - generic [ref=e189]:
+            - generic [ref=e190]: <lastmod>
+            - text: 2026-06-12T17:45:22.951Z
+            - generic [ref=e191]: </lastmod>
+          - generic [ref=e192]:
+            - generic [ref=e193]: <changefreq>
+            - text: monthly
+            - generic [ref=e194]: </changefreq>
+          - generic [ref=e195]:
+            - generic [ref=e196]: <priority>
+            - text: "0.7"
+            - generic [ref=e197]: </priority>
+        - generic [ref=e199]: </url>
+      - generic [ref=e200]:
+        - generic [ref=e203]: <url>
+        - generic [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]: <loc>
+            - text: https://www.staging.authorloft.com/blog/arc-programs-without-the-spreadsheet-chaos
+            - generic [ref=e207]: </loc>
+          - generic [ref=e208]:
+            - generic [ref=e209]: <lastmod>
+            - text: 2026-06-12T17:39:52.546Z
+            - generic [ref=e210]: </lastmod>
+          - generic [ref=e211]:
+            - generic [ref=e212]: <changefreq>
+            - text: monthly
+            - generic [ref=e213]: </changefreq>
+          - generic [ref=e214]:
+            - generic [ref=e215]: <priority>
+            - text: "0.7"
+            - generic [ref=e216]: </priority>
+        - generic [ref=e218]: </url>
+      - generic [ref=e219]:
+        - generic [ref=e222]: <url>
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - generic [ref=e225]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-upload-epub-file-to-nook-readers
+            - generic [ref=e226]: </loc>
+          - generic [ref=e227]:
+            - generic [ref=e228]: <lastmod>
+            - text: 2026-06-12T17:51:05.138Z
+            - generic [ref=e229]: </lastmod>
+          - generic [ref=e230]:
+            - generic [ref=e231]: <changefreq>
+            - text: monthly
+            - generic [ref=e232]: </changefreq>
+          - generic [ref=e233]:
+            - generic [ref=e234]: <priority>
+            - text: "0.7"
+            - generic [ref=e235]: </priority>
+        - generic [ref=e237]: </url>
+      - generic [ref=e238]:
+        - generic [ref=e241]: <url>
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - generic [ref=e244]: <loc>
+            - text: https://www.staging.authorloft.com/blog/direct-sales-for-authors
+            - generic [ref=e245]: </loc>
+          - generic [ref=e246]:
+            - generic [ref=e247]: <lastmod>
+            - text: 2026-06-11T14:11:22.152Z
+            - generic [ref=e248]: </lastmod>
+          - generic [ref=e249]:
+            - generic [ref=e250]: <changefreq>
+            - text: monthly
+            - generic [ref=e251]: </changefreq>
+          - generic [ref=e252]:
+            - generic [ref=e253]: <priority>
+            - text: "0.7"
+            - generic [ref=e254]: </priority>
+        - generic [ref=e256]: </url>
+      - generic [ref=e257]:
+        - generic [ref=e260]: <url>
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - generic [ref=e263]: <loc>
+            - text: https://www.staging.authorloft.com/blog/can-you-write-a-book-using-chatgpt
+            - generic [ref=e264]: </loc>
+          - generic [ref=e265]:
+            - generic [ref=e266]: <lastmod>
+            - text: 2026-06-08T20:58:19.040Z
+            - generic [ref=e267]: </lastmod>
+          - generic [ref=e268]:
+            - generic [ref=e269]: <changefreq>
+            - text: monthly
+            - generic [ref=e270]: </changefreq>
+          - generic [ref=e271]:
+            - generic [ref=e272]: <priority>
+            - text: "0.7"
+            - generic [ref=e273]: </priority>
+        - generic [ref=e275]: </url>
+      - generic [ref=e276]:
+        - generic [ref=e279]: <url>
+        - generic [ref=e280]:
+          - generic [ref=e281]:
+            - generic [ref=e282]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-sell-your-book-directly-to-readers-without-amazon-taking-a-cut
+            - generic [ref=e283]: </loc>
+          - generic [ref=e284]:
+            - generic [ref=e285]: <lastmod>
+            - text: 2026-06-08T21:58:58.367Z
+            - generic [ref=e286]: </lastmod>
+          - generic [ref=e287]:
+            - generic [ref=e288]: <changefreq>
+            - text: monthly
+            - generic [ref=e289]: </changefreq>
+          - generic [ref=e290]:
+            - generic [ref=e291]: <priority>
+            - text: "0.7"
+            - generic [ref=e292]: </priority>
+        - generic [ref=e294]: </url>
+      - generic [ref=e295]:
+        - generic [ref=e298]: <url>
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - generic [ref=e301]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-price-your-ebook-direct-sales
+            - generic [ref=e302]: </loc>
+          - generic [ref=e303]:
+            - generic [ref=e304]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e305]: </lastmod>
+          - generic [ref=e306]:
+            - generic [ref=e307]: <changefreq>
+            - text: monthly
+            - generic [ref=e308]: </changefreq>
+          - generic [ref=e309]:
+            - generic [ref=e310]: <priority>
+            - text: "0.7"
+            - generic [ref=e311]: </priority>
+        - generic [ref=e313]: </url>
+      - generic [ref=e314]:
+        - generic [ref=e317]: <url>
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - generic [ref=e320]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-set-up-direct-ebook-sales
+            - generic [ref=e321]: </loc>
+          - generic [ref=e322]:
+            - generic [ref=e323]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e324]: </lastmod>
+          - generic [ref=e325]:
+            - generic [ref=e326]: <changefreq>
+            - text: monthly
+            - generic [ref=e327]: </changefreq>
+          - generic [ref=e328]:
+            - generic [ref=e329]: <priority>
+            - text: "0.7"
+            - generic [ref=e330]: </priority>
+        - generic [ref=e332]: </url>
+      - generic [ref=e333]:
+        - generic [ref=e336]: <url>
+        - generic [ref=e337]:
+          - generic [ref=e338]:
+            - generic [ref=e339]: <loc>
+            - text: https://www.staging.authorloft.com/blog/authors-guide-to-gdpr-reader-data
+            - generic [ref=e340]: </loc>
+          - generic [ref=e341]:
+            - generic [ref=e342]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e343]: </lastmod>
+          - generic [ref=e344]:
+            - generic [ref=e345]: <changefreq>
+            - text: monthly
+            - generic [ref=e346]: </changefreq>
+          - generic [ref=e347]:
+            - generic [ref=e348]: <priority>
+            - text: "0.7"
+            - generic [ref=e349]: </priority>
+        - generic [ref=e351]: </url>
+      - generic [ref=e352]:
+        - generic [ref=e355]: <url>
+        - generic [ref=e356]:
+          - generic [ref=e357]:
+            - generic [ref=e358]: <loc>
+            - text: https://www.staging.authorloft.com/blog/why-authors-leaving-amazon-kdp-direct-sales
+            - generic [ref=e359]: </loc>
+          - generic [ref=e360]:
+            - generic [ref=e361]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e362]: </lastmod>
+          - generic [ref=e363]:
+            - generic [ref=e364]: <changefreq>
+            - text: monthly
+            - generic [ref=e365]: </changefreq>
+          - generic [ref=e366]:
+            - generic [ref=e367]: <priority>
+            - text: "0.7"
+            - generic [ref=e368]: </priority>
+        - generic [ref=e370]: </url>
+      - generic [ref=e371]:
+        - generic [ref=e374]: <url>
+        - generic [ref=e375]:
+          - generic [ref=e376]:
+            - generic [ref=e377]: <loc>
+            - text: https://www.staging.authorloft.com/blog/self-publishing-vs-amazon-kdp
+            - generic [ref=e378]: </loc>
+          - generic [ref=e379]:
+            - generic [ref=e380]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e381]: </lastmod>
+          - generic [ref=e382]:
+            - generic [ref=e383]: <changefreq>
+            - text: monthly
+            - generic [ref=e384]: </changefreq>
+          - generic [ref=e385]:
+            - generic [ref=e386]: <priority>
+            - text: "0.7"
+            - generic [ref=e387]: </priority>
+        - generic [ref=e389]: </url>
+      - generic [ref=e390]:
+        - generic [ref=e393]: <url>
+        - generic [ref=e394]:
+          - generic [ref=e395]:
+            - generic [ref=e396]: <loc>
+            - text: https://www.staging.authorloft.com/blog/author-branding
+            - generic [ref=e397]: </loc>
+          - generic [ref=e398]:
+            - generic [ref=e399]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e400]: </lastmod>
+          - generic [ref=e401]:
+            - generic [ref=e402]: <changefreq>
+            - text: monthly
+            - generic [ref=e403]: </changefreq>
+          - generic [ref=e404]:
+            - generic [ref=e405]: <priority>
+            - text: "0.7"
+            - generic [ref=e406]: </priority>
+        - generic [ref=e408]: </url>
+      - generic [ref=e409]:
+        - generic [ref=e412]: <url>
+        - generic [ref=e413]:
+          - generic [ref=e414]:
+            - generic [ref=e415]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-sell-books-directly-to-readers
+            - generic [ref=e416]: </loc>
+          - generic [ref=e417]:
+            - generic [ref=e418]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e419]: </lastmod>
+          - generic [ref=e420]:
+            - generic [ref=e421]: <changefreq>
+            - text: monthly
+            - generic [ref=e422]: </changefreq>
+          - generic [ref=e423]:
+            - generic [ref=e424]: <priority>
+            - text: "0.7"
+            - generic [ref=e425]: </priority>
+        - generic [ref=e427]: </url>
+      - generic [ref=e428]:
+        - generic [ref=e431]: <url>
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - generic [ref=e434]: <loc>
+            - text: https://www.staging.authorloft.com/blog/author-needs-a-website-in-2026
+            - generic [ref=e435]: </loc>
+          - generic [ref=e436]:
+            - generic [ref=e437]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e438]: </lastmod>
+          - generic [ref=e439]:
+            - generic [ref=e440]: <changefreq>
+            - text: monthly
+            - generic [ref=e441]: </changefreq>
+          - generic [ref=e442]:
+            - generic [ref=e443]: <priority>
+            - text: "0.7"
+            - generic [ref=e444]: </priority>
+        - generic [ref=e446]: </url>
+      - generic [ref=e447]:
+        - generic [ref=e450]: <url>
+        - generic [ref=e451]:
+          - generic [ref=e452]:
+            - generic [ref=e453]: <loc>
+            - text: https://www.staging.authorloft.com/blog/how-to-build-email-list-as-author
+            - generic [ref=e454]: </loc>
+          - generic [ref=e455]:
+            - generic [ref=e456]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e457]: </lastmod>
+          - generic [ref=e458]:
+            - generic [ref=e459]: <changefreq>
+            - text: monthly
+            - generic [ref=e460]: </changefreq>
+          - generic [ref=e461]:
+            - generic [ref=e462]: <priority>
+            - text: "0.7"
+            - generic [ref=e463]: </priority>
+        - generic [ref=e465]: </url>
+      - generic [ref=e466]:
+        - generic [ref=e469]: <url>
+        - generic [ref=e470]:
+          - generic [ref=e471]:
+            - generic [ref=e472]: <loc>
+            - text: https://www.staging.authorloft.com/blog/7-things-every-author-website-needs
+            - generic [ref=e473]: </loc>
+          - generic [ref=e474]:
+            - generic [ref=e475]: <lastmod>
+            - text: 2026-06-08T14:21:25.044Z
+            - generic [ref=e476]: </lastmod>
+          - generic [ref=e477]:
+            - generic [ref=e478]: <changefreq>
+            - text: monthly
+            - generic [ref=e479]: </changefreq>
+          - generic [ref=e480]:
+            - generic [ref=e481]: <priority>
+            - text: "0.7"
+            - generic [ref=e482]: </priority>
+        - generic [ref=e484]: </url>
+      - generic [ref=e485]:
+        - generic [ref=e488]: <url>
+        - generic [ref=e489]:
+          - generic [ref=e490]:
+            - generic [ref=e491]: <loc>
+            - text: https://www.staging.authorloft.com/news
+            - generic [ref=e492]: </loc>
+          - generic [ref=e493]:
+            - generic [ref=e494]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e495]: </lastmod>
+          - generic [ref=e496]:
+            - generic [ref=e497]: <changefreq>
+            - text: weekly
+            - generic [ref=e498]: </changefreq>
+          - generic [ref=e499]:
+            - generic [ref=e500]: <priority>
+            - text: "0.8"
+            - generic [ref=e501]: </priority>
+        - generic [ref=e503]: </url>
+      - generic [ref=e504]:
+        - generic [ref=e507]: <url>
+        - generic [ref=e508]:
+          - generic [ref=e509]:
+            - generic [ref=e510]: <loc>
+            - text: https://www.staging.authorloft.com/news/whats-new-june-2026
+            - generic [ref=e511]: </loc>
+          - generic [ref=e512]:
+            - generic [ref=e513]: <lastmod>
+            - text: 2026-06-12T19:45:03.798Z
+            - generic [ref=e514]: </lastmod>
+          - generic [ref=e515]:
+            - generic [ref=e516]: <changefreq>
+            - text: monthly
+            - generic [ref=e517]: </changefreq>
+          - generic [ref=e518]:
+            - generic [ref=e519]: <priority>
+            - text: "0.7"
+            - generic [ref=e520]: </priority>
+        - generic [ref=e522]: </url>
+      - generic [ref=e523]:
+        - generic [ref=e526]: <url>
+        - generic [ref=e527]:
+          - generic [ref=e528]:
+            - generic [ref=e529]: <loc>
+            - text: https://www.staging.authorloft.com/news/authorloft-is-live
+            - generic [ref=e530]: </loc>
+          - generic [ref=e531]:
+            - generic [ref=e532]: <lastmod>
+            - text: 2026-06-12T19:46:21.348Z
+            - generic [ref=e533]: </lastmod>
+          - generic [ref=e534]:
+            - generic [ref=e535]: <changefreq>
+            - text: monthly
+            - generic [ref=e536]: </changefreq>
+          - generic [ref=e537]:
+            - generic [ref=e538]: <priority>
+            - text: "0.7"
+            - generic [ref=e539]: </priority>
+        - generic [ref=e541]: </url>
+      - generic [ref=e542]:
+        - generic [ref=e545]: <url>
+        - generic [ref=e546]:
+          - generic [ref=e547]:
+            - generic [ref=e548]: <loc>
+            - text: https://www.staging.authorloft.com/news/whats-new-may-2026
+            - generic [ref=e549]: </loc>
+          - generic [ref=e550]:
+            - generic [ref=e551]: <lastmod>
+            - text: 2026-06-12T19:45:19.450Z
+            - generic [ref=e552]: </lastmod>
+          - generic [ref=e553]:
+            - generic [ref=e554]: <changefreq>
+            - text: monthly
+            - generic [ref=e555]: </changefreq>
+          - generic [ref=e556]:
+            - generic [ref=e557]: <priority>
+            - text: "0.7"
+            - generic [ref=e558]: </priority>
+        - generic [ref=e560]: </url>
+      - generic [ref=e561]:
+        - generic [ref=e564]: <url>
+        - generic [ref=e565]:
+          - generic [ref=e566]:
+            - generic [ref=e567]: <loc>
+            - text: https://www.staging.authorloft.com/resources
+            - generic [ref=e568]: </loc>
+          - generic [ref=e569]:
+            - generic [ref=e570]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e571]: </lastmod>
+          - generic [ref=e572]:
+            - generic [ref=e573]: <changefreq>
+            - text: monthly
+            - generic [ref=e574]: </changefreq>
+          - generic [ref=e575]:
+            - generic [ref=e576]: <priority>
+            - text: "0.7"
+            - generic [ref=e577]: </priority>
+        - generic [ref=e579]: </url>
+      - generic [ref=e580]:
+        - generic [ref=e583]: <url>
+        - generic [ref=e584]:
+          - generic [ref=e585]:
+            - generic [ref=e586]: <loc>
+            - text: https://www.staging.authorloft.com/faq
+            - generic [ref=e587]: </loc>
+          - generic [ref=e588]:
+            - generic [ref=e589]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e590]: </lastmod>
+          - generic [ref=e591]:
+            - generic [ref=e592]: <changefreq>
+            - text: monthly
+            - generic [ref=e593]: </changefreq>
+          - generic [ref=e594]:
+            - generic [ref=e595]: <priority>
+            - text: "0.7"
+            - generic [ref=e596]: </priority>
+        - generic [ref=e598]: </url>
+      - generic [ref=e599]:
+        - generic [ref=e602]: <url>
+        - generic [ref=e603]:
+          - generic [ref=e604]:
+            - generic [ref=e605]: <loc>
+            - text: https://www.staging.authorloft.com/contact
+            - generic [ref=e606]: </loc>
+          - generic [ref=e607]:
+            - generic [ref=e608]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e609]: </lastmod>
+          - generic [ref=e610]:
+            - generic [ref=e611]: <changefreq>
+            - text: yearly
+            - generic [ref=e612]: </changefreq>
+          - generic [ref=e613]:
+            - generic [ref=e614]: <priority>
+            - text: "0.6"
+            - generic [ref=e615]: </priority>
+        - generic [ref=e617]: </url>
+      - generic [ref=e618]:
+        - generic [ref=e621]: <url>
+        - generic [ref=e622]:
+          - generic [ref=e623]:
+            - generic [ref=e624]: <loc>
+            - text: https://www.staging.authorloft.com/privacy
+            - generic [ref=e625]: </loc>
+          - generic [ref=e626]:
+            - generic [ref=e627]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e628]: </lastmod>
+          - generic [ref=e629]:
+            - generic [ref=e630]: <changefreq>
+            - text: yearly
+            - generic [ref=e631]: </changefreq>
+          - generic [ref=e632]:
+            - generic [ref=e633]: <priority>
+            - text: "0.4"
+            - generic [ref=e634]: </priority>
+        - generic [ref=e636]: </url>
+      - generic [ref=e637]:
+        - generic [ref=e640]: <url>
+        - generic [ref=e641]:
+          - generic [ref=e642]:
+            - generic [ref=e643]: <loc>
+            - text: https://www.staging.authorloft.com/terms
+            - generic [ref=e644]: </loc>
+          - generic [ref=e645]:
+            - generic [ref=e646]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e647]: </lastmod>
+          - generic [ref=e648]:
+            - generic [ref=e649]: <changefreq>
+            - text: yearly
+            - generic [ref=e650]: </changefreq>
+          - generic [ref=e651]:
+            - generic [ref=e652]: <priority>
+            - text: "0.4"
+            - generic [ref=e653]: </priority>
+        - generic [ref=e655]: </url>
+      - generic [ref=e656]:
+        - generic [ref=e659]: <url>
+        - generic [ref=e660]:
+          - generic [ref=e661]:
+            - generic [ref=e662]: <loc>
+            - text: https://www.staging.authorloft.com/gdpr
+            - generic [ref=e663]: </loc>
+          - generic [ref=e664]:
+            - generic [ref=e665]: <lastmod>
+            - text: 2026-06-15T10:52:39.842Z
+            - generic [ref=e666]: </lastmod>
+          - generic [ref=e667]:
+            - generic [ref=e668]: <changefreq>
+            - text: yearly
+            - generic [ref=e669]: </changefreq>
+          - generic [ref=e670]:
+            - generic [ref=e671]: <priority>
+            - text: "0.4"
+            - generic [ref=e672]: </priority>
+        - generic [ref=e674]: </url>
+    - generic [ref=e676]: </urlset>

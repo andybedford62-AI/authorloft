@@ -1,0 +1,174 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - button "Audience" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Audience
+          - img [ref=e54]
+        - generic [ref=e56]:
+          - button "Sales" [ref=e57] [cursor=pointer]:
+            - generic [ref=e58]: Sales
+            - img [ref=e59]
+          - generic [ref=e61]:
+            - link "Sales" [ref=e62] [cursor=pointer]:
+              - /url: /admin/sales
+              - img [ref=e63]
+              - text: Sales
+            - link "Specials" [ref=e66] [cursor=pointer]:
+              - /url: /admin/specials
+              - img [ref=e67]
+              - text: Specials
+            - link "Discount Codes" [ref=e70] [cursor=pointer]:
+              - /url: /admin/discount-codes
+              - img [ref=e71]
+              - text: Discount Codes
+            - link "Invoices & Tax" [ref=e74] [cursor=pointer]:
+              - /url: /admin/invoices
+              - img [ref=e75]
+              - text: Invoices & Tax
+        - button "Tools" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: Tools
+          - img [ref=e81]
+        - button "Account" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]: Account
+          - img [ref=e86]
+        - paragraph [ref=e89]: Super Admin
+        - link "Platform Dashboard" [ref=e90] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e91]
+          - text: Platform Dashboard
+        - generic [ref=e96]:
+          - button "Authors" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: Authors
+            - img [ref=e99]
+          - generic [ref=e101]:
+            - link "All Authors" [ref=e102] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e103]
+              - text: All Authors
+            - link "Access Requests" [ref=e108] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e109]
+              - text: Access Requests
+        - button "Billing & Plans" [ref=e113] [cursor=pointer]:
+          - generic [ref=e114]: Billing & Plans
+          - img [ref=e115]
+        - generic [ref=e117]:
+          - button "Marketing" [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: Marketing
+            - img [ref=e120]
+          - generic [ref=e122]:
+            - link "Blog & News" [ref=e123] [cursor=pointer]:
+              - /url: /super-admin/blog
+              - img [ref=e124]
+              - text: Blog & News
+            - link "News Subscribers" [ref=e127] [cursor=pointer]:
+              - /url: /super-admin/subscribers
+              - img [ref=e128]
+              - text: News Subscribers
+            - link "Resources" [ref=e131] [cursor=pointer]:
+              - /url: /super-admin/resources
+              - img [ref=e132]
+              - text: Resources
+            - link "Resource Downloads" [ref=e135] [cursor=pointer]:
+              - /url: /super-admin/resource-downloads
+              - img [ref=e136]
+              - text: Resource Downloads
+            - link "Social Media" [ref=e139] [cursor=pointer]:
+              - /url: /super-admin/social
+              - img [ref=e140]
+              - text: Social Media
+        - button "Platform" [ref=e147] [cursor=pointer]:
+          - generic [ref=e148]: Platform
+          - img [ref=e149]
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - img [ref=e153]
+          - text: Light mode
+          - link "Change" [ref=e159] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+          - text: Sign Out
+    - generic [ref=e164]:
+      - banner [ref=e165]:
+        - button "Open navigation" [ref=e166] [cursor=pointer]:
+          - img [ref=e167]
+        - generic [ref=e168]: Super Admin
+        - generic [ref=e169]:
+          - generic [ref=e170]: A
+          - button "Sign out" [ref=e171] [cursor=pointer]:
+            - img [ref=e172]
+      - main [ref=e175]:
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - heading "News Subscribers" [level=1] [ref=e178]
+            - paragraph [ref=e179]: People who signed up for AuthorLoft News on the public site. Email sending is not enabled yet — this is the audience list you're building now.
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - img [ref=e183]
+                - generic [ref=e186]: "2"
+                - text: subscribers
+              - button "Export CSV" [ref=e187] [cursor=pointer]:
+                - img [ref=e188]
+                - text: Export CSV
+            - table [ref=e192]:
+              - rowgroup [ref=e193]:
+                - row "Email Name Source Subscribed" [ref=e194]:
+                  - columnheader "Email" [ref=e195]
+                  - columnheader "Name" [ref=e196]
+                  - columnheader "Source" [ref=e197]
+                  - columnheader "Subscribed" [ref=e198]
+              - rowgroup [ref=e199]:
+                - row "muneshyadavmuneshkumar7@gmail.com — footer Jun 14, 2026" [ref=e200]:
+                  - cell "muneshyadavmuneshkumar7@gmail.com" [ref=e201]
+                  - cell "—" [ref=e202]
+                  - cell "footer" [ref=e203]
+                  - cell "Jun 14, 2026" [ref=e204]
+                - row "andybedford62@gmail.com — news Jun 8, 2026" [ref=e205]:
+                  - cell "andybedford62@gmail.com" [ref=e206]
+                  - cell "—" [ref=e207]
+                  - cell "news" [ref=e208]
+                  - cell "Jun 8, 2026" [ref=e209]
+  - alert [ref=e210]

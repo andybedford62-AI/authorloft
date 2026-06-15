@@ -1,0 +1,414 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - button "Audience" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Audience
+          - img [ref=e54]
+        - generic [ref=e56]:
+          - button "Sales" [ref=e57] [cursor=pointer]:
+            - generic [ref=e58]: Sales
+            - img [ref=e59]
+          - generic [ref=e61]:
+            - link "Sales" [ref=e62] [cursor=pointer]:
+              - /url: /admin/sales
+              - img [ref=e63]
+              - text: Sales
+            - link "Specials" [ref=e66] [cursor=pointer]:
+              - /url: /admin/specials
+              - img [ref=e67]
+              - text: Specials
+            - link "Discount Codes" [ref=e70] [cursor=pointer]:
+              - /url: /admin/discount-codes
+              - img [ref=e71]
+              - text: Discount Codes
+            - link "Invoices & Tax" [ref=e74] [cursor=pointer]:
+              - /url: /admin/invoices
+              - img [ref=e75]
+              - text: Invoices & Tax
+        - button "Tools" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: Tools
+          - img [ref=e81]
+        - button "Account" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]: Account
+          - img [ref=e86]
+        - paragraph [ref=e89]: Super Admin
+        - link "Platform Dashboard" [ref=e90] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e91]
+          - text: Platform Dashboard
+        - generic [ref=e96]:
+          - button "Authors" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: Authors
+            - img [ref=e99]
+          - generic [ref=e101]:
+            - link "All Authors" [ref=e102] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e103]
+              - text: All Authors
+            - link "Access Requests" [ref=e108] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e109]
+              - text: Access Requests
+        - button "Billing & Plans" [ref=e113] [cursor=pointer]:
+          - generic [ref=e114]: Billing & Plans
+          - img [ref=e115]
+        - button "Marketing" [ref=e118] [cursor=pointer]:
+          - generic [ref=e119]: Marketing
+          - img [ref=e120]
+        - button "Platform" [ref=e123] [cursor=pointer]:
+          - generic [ref=e124]: Platform
+          - img [ref=e125]
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - img [ref=e129]
+          - text: Light mode
+          - link "Change" [ref=e135] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e136] [cursor=pointer]:
+          - img [ref=e137]
+          - text: Sign Out
+    - generic [ref=e140]:
+      - banner [ref=e141]:
+        - button "Open navigation" [ref=e142] [cursor=pointer]:
+          - img [ref=e143]
+        - generic [ref=e144]: Super Admin
+        - generic [ref=e145]:
+          - generic [ref=e146]: A
+          - button "Sign out" [ref=e147] [cursor=pointer]:
+            - img [ref=e148]
+      - main [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - heading "All Authors" [level=1] [ref=e154]
+            - paragraph [ref=e155]: Every author account on the AuthorLoft platform.
+          - generic [ref=e156]:
+            - generic [ref=e157]:
+              - img [ref=e159]
+              - generic [ref=e164]:
+                - paragraph [ref=e165]: "10"
+                - paragraph [ref=e166]: Total Authors
+            - generic [ref=e167]:
+              - img [ref=e169]
+              - generic [ref=e174]:
+                - paragraph [ref=e175]: "10"
+                - paragraph [ref=e176]: Active
+            - generic [ref=e177]:
+              - img [ref=e179]
+              - generic [ref=e181]:
+                - paragraph [ref=e182]: "19"
+                - paragraph [ref=e183]: Total Books
+            - generic [ref=e184]:
+              - img [ref=e186]
+              - generic [ref=e189]:
+                - paragraph [ref=e190]: $0.00
+                - paragraph [ref=e191]: Platform Revenue
+          - table [ref=e193]:
+            - rowgroup [ref=e194]:
+              - row "Author Actions" [ref=e195]:
+                - columnheader "Author" [ref=e196]
+                - columnheader "Actions" [ref=e197]
+            - rowgroup [ref=e198]:
+              - row "T Tina Williams andybedford62+tw@gmail.com tinawilliams.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e199]:
+                - cell "T Tina Williams andybedford62+tw@gmail.com tinawilliams.authorloft.com" [ref=e200]:
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: T
+                    - generic [ref=e203]:
+                      - paragraph [ref=e205]: Tina Williams
+                      - paragraph [ref=e206]: andybedford62+tw@gmail.com
+                      - paragraph [ref=e207]: tinawilliams.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e208]:
+                  - generic [ref=e209]:
+                    - button "Impersonate author" [ref=e210] [cursor=pointer]:
+                      - img [ref=e211]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e215] [cursor=pointer]:
+                      - /url: https://tinawilliams.staging.authorloft.com
+                      - button "View live site" [ref=e216]:
+                        - img [ref=e217]
+                        - generic: View live site
+                    - link "Edit author" [ref=e221] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpr3trj10002js04flx8oaop
+                      - button "Edit author" [ref=e222]:
+                        - img [ref=e223]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e226] [cursor=pointer]:
+                      - img [ref=e227]
+                      - generic: Delete author
+              - row "V Vusimzi Faku vusimzi.mavusana@gmail.com vusimzi-faku.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e230]:
+                - cell "V Vusimzi Faku vusimzi.mavusana@gmail.com vusimzi-faku.authorloft.com" [ref=e231]:
+                  - generic [ref=e232]:
+                    - generic [ref=e233]: V
+                    - generic [ref=e234]:
+                      - paragraph [ref=e236]: Vusimzi Faku
+                      - paragraph [ref=e237]: vusimzi.mavusana@gmail.com
+                      - paragraph [ref=e238]: vusimzi-faku.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e239]:
+                  - generic [ref=e240]:
+                    - button "Impersonate author" [ref=e241] [cursor=pointer]:
+                      - img [ref=e242]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e246] [cursor=pointer]:
+                      - /url: https://vusimzi-faku.staging.authorloft.com
+                      - button "View live site" [ref=e247]:
+                        - img [ref=e248]
+                        - generic: View live site
+                    - link "Edit author" [ref=e252] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpooczfz0002l804zhjt2h60
+                      - button "Edit author" [ref=e253]:
+                        - img [ref=e254]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e257] [cursor=pointer]:
+                      - img [ref=e258]
+                      - generic: Delete author
+              - row "t thorson abib thorceles@gmail.com thorson-abib.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e261]:
+                - cell "t thorson abib thorceles@gmail.com thorson-abib.authorloft.com" [ref=e262]:
+                  - generic [ref=e263]:
+                    - generic [ref=e264]: t
+                    - generic [ref=e265]:
+                      - paragraph [ref=e267]: thorson abib
+                      - paragraph [ref=e268]: thorceles@gmail.com
+                      - paragraph [ref=e269]: thorson-abib.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e270]:
+                  - generic [ref=e271]:
+                    - button "Impersonate author" [ref=e272] [cursor=pointer]:
+                      - img [ref=e273]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e277] [cursor=pointer]:
+                      - /url: https://thorson-abib.staging.authorloft.com
+                      - button "View live site" [ref=e278]:
+                        - img [ref=e279]
+                        - generic: View live site
+                    - link "Edit author" [ref=e283] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpiim54u0002jr04yp7ws8oi
+                      - button "Edit author" [ref=e284]:
+                        - img [ref=e285]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e288] [cursor=pointer]:
+                      - img [ref=e289]
+                      - generic: Delete author
+              - row "J JERRY ASHUKEM EGBE princejefferson1@gmail.com jerry-ashukem-egbe.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e292]:
+                - cell "J JERRY ASHUKEM EGBE princejefferson1@gmail.com jerry-ashukem-egbe.authorloft.com" [ref=e293]:
+                  - generic [ref=e294]:
+                    - generic [ref=e295]: J
+                    - generic [ref=e296]:
+                      - paragraph [ref=e298]: JERRY ASHUKEM EGBE
+                      - paragraph [ref=e299]: princejefferson1@gmail.com
+                      - paragraph [ref=e300]: jerry-ashukem-egbe.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e301]:
+                  - generic [ref=e302]:
+                    - button "Impersonate author" [ref=e303] [cursor=pointer]:
+                      - img [ref=e304]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e308] [cursor=pointer]:
+                      - /url: https://jerry-ashukem-egbe.staging.authorloft.com
+                      - button "View live site" [ref=e309]:
+                        - img [ref=e310]
+                        - generic: View live site
+                    - link "Edit author" [ref=e314] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpbcrud50002l804xb7ja1bd
+                      - button "Edit author" [ref=e315]:
+                        - img [ref=e316]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e319] [cursor=pointer]:
+                      - img [ref=e320]
+                      - generic: Delete author
+              - row "J Juan el flaco Varela juanelflacovarela@gmail.com juan-el-flaco-varela.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e323]:
+                - cell "J Juan el flaco Varela juanelflacovarela@gmail.com juan-el-flaco-varela.authorloft.com" [ref=e324]:
+                  - generic [ref=e325]:
+                    - generic [ref=e326]: J
+                    - generic [ref=e327]:
+                      - paragraph [ref=e329]: Juan el flaco Varela
+                      - paragraph [ref=e330]: juanelflacovarela@gmail.com
+                      - paragraph [ref=e331]: juan-el-flaco-varela.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e332]:
+                  - generic [ref=e333]:
+                    - button "Impersonate author" [ref=e334] [cursor=pointer]:
+                      - img [ref=e335]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e339] [cursor=pointer]:
+                      - /url: https://juan-el-flaco-varela.staging.authorloft.com
+                      - button "View live site" [ref=e340]:
+                        - img [ref=e341]
+                        - generic: View live site
+                    - link "Edit author" [ref=e345] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpai6dwx0002jv04s3py0aa7
+                      - button "Edit author" [ref=e346]:
+                        - img [ref=e347]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e350] [cursor=pointer]:
+                      - img [ref=e351]
+                      - generic: Delete author
+              - row "Y Yilbert Sanchez yilbertsanchez04@gmail.com yilbert-sanchezhttps.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e354]:
+                - cell "Y Yilbert Sanchez yilbertsanchez04@gmail.com yilbert-sanchezhttps.authorloft.com" [ref=e355]:
+                  - generic [ref=e356]:
+                    - generic [ref=e357]: "Y"
+                    - generic [ref=e358]:
+                      - paragraph [ref=e360]: Yilbert Sanchez
+                      - paragraph [ref=e361]: yilbertsanchez04@gmail.com
+                      - paragraph [ref=e362]: yilbert-sanchezhttps.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e363]:
+                  - generic [ref=e364]:
+                    - button "Impersonate author" [ref=e365] [cursor=pointer]:
+                      - img [ref=e366]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e370] [cursor=pointer]:
+                      - /url: https://yilbert-sanchezhttps.staging.authorloft.com
+                      - button "View live site" [ref=e371]:
+                        - img [ref=e372]
+                        - generic: View live site
+                    - link "Edit author" [ref=e376] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmpagxnyt0002l1049jki89ms
+                      - button "Edit author" [ref=e377]:
+                        - img [ref=e378]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e381] [cursor=pointer]:
+                      - img [ref=e382]
+                      - generic: Delete author
+              - row "A Anita Bedford awbedford07@gmail.com anitabedford.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e385]:
+                - cell "A Anita Bedford awbedford07@gmail.com anitabedford.authorloft.com" [ref=e386]:
+                  - generic [ref=e387]:
+                    - generic [ref=e388]: A
+                    - generic [ref=e389]:
+                      - paragraph [ref=e391]: Anita Bedford
+                      - paragraph [ref=e392]: awbedford07@gmail.com
+                      - paragraph [ref=e393]: anitabedford.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e394]:
+                  - generic [ref=e395]:
+                    - button "Impersonate author" [ref=e396] [cursor=pointer]:
+                      - img [ref=e397]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e401] [cursor=pointer]:
+                      - /url: https://anitabedford.staging.authorloft.com
+                      - button "View live site" [ref=e402]:
+                        - img [ref=e403]
+                        - generic: View live site
+                    - link "Edit author" [ref=e407] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmnxmxh6m0001la04cbkkuq95
+                      - button "Edit author" [ref=e408]:
+                        - img [ref=e409]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e412] [cursor=pointer]:
+                      - img [ref=e413]
+                      - generic: Delete author
+              - row "R Ray Tunstall ray.tunstall@gmail.com raytunstall.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e416]:
+                - cell "R Ray Tunstall ray.tunstall@gmail.com raytunstall.authorloft.com" [ref=e417]:
+                  - generic [ref=e418]:
+                    - generic [ref=e419]: R
+                    - generic [ref=e420]:
+                      - paragraph [ref=e422]: Ray Tunstall
+                      - paragraph [ref=e423]: ray.tunstall@gmail.com
+                      - paragraph [ref=e424]: raytunstall.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e425]:
+                  - generic [ref=e426]:
+                    - button "Impersonate author" [ref=e427] [cursor=pointer]:
+                      - img [ref=e428]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e432] [cursor=pointer]:
+                      - /url: https://raytunstall.staging.authorloft.com
+                      - button "View live site" [ref=e433]:
+                        - img [ref=e434]
+                        - generic: View live site
+                    - link "Edit author" [ref=e438] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmp83ehk80001js042pc17qga
+                      - button "Edit author" [ref=e439]:
+                        - img [ref=e440]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e443] [cursor=pointer]:
+                      - img [ref=e444]
+                      - generic: Delete author
+              - row "V Victoria Chase demo@authorloft.com demo.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e447]:
+                - cell "V Victoria Chase demo@authorloft.com demo.authorloft.com" [ref=e448]:
+                  - generic [ref=e449]:
+                    - generic [ref=e450]: V
+                    - generic [ref=e451]:
+                      - paragraph [ref=e453]: Victoria Chase
+                      - paragraph [ref=e454]: demo@authorloft.com
+                      - paragraph [ref=e455]: demo.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e456]:
+                  - generic [ref=e457]:
+                    - button "Impersonate author" [ref=e458] [cursor=pointer]:
+                      - img [ref=e459]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e463] [cursor=pointer]:
+                      - /url: https://demo.staging.authorloft.com
+                      - button "View live site" [ref=e464]:
+                        - img [ref=e465]
+                        - generic: View live site
+                    - link "Edit author" [ref=e469] [cursor=pointer]:
+                      - /url: /super-admin/authors/demo_author_victoria
+                      - button "Edit author" [ref=e470]:
+                        - img [ref=e471]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e474] [cursor=pointer]:
+                      - img [ref=e475]
+                      - generic: Delete author
+              - row "A Anthony Bedford SA andybedford62@gmail.com apbedford.authorloft.com Impersonate author View live site Edit author Delete author" [ref=e478]:
+                - cell "A Anthony Bedford SA andybedford62@gmail.com apbedford.authorloft.com" [ref=e479]:
+                  - generic [ref=e480]:
+                    - generic [ref=e481]: A
+                    - generic [ref=e482]:
+                      - generic [ref=e483]:
+                        - paragraph [ref=e484]: Anthony Bedford
+                        - generic [ref=e485]: SA
+                      - paragraph [ref=e486]: andybedford62@gmail.com
+                      - paragraph [ref=e487]: apbedford.authorloft.com
+                - cell "Impersonate author View live site Edit author Delete author" [ref=e488]:
+                  - generic [ref=e489]:
+                    - button "Impersonate author" [ref=e490] [cursor=pointer]:
+                      - img [ref=e491]
+                      - generic: Impersonate author
+                    - link "View live site" [ref=e495] [cursor=pointer]:
+                      - /url: https://apbedford.staging.authorloft.com
+                      - button "View live site" [ref=e496]:
+                        - img [ref=e497]
+                        - generic: View live site
+                    - link "Edit author" [ref=e501] [cursor=pointer]:
+                      - /url: /super-admin/authors/cmmxvffbq00049fs8jp0e34uc
+                      - button "Edit author" [ref=e502]:
+                        - img [ref=e503]
+                        - generic: Edit author
+                    - button "Delete author" [ref=e506] [cursor=pointer]:
+                      - img [ref=e507]
+                      - generic: Delete author
+  - alert [ref=e510]

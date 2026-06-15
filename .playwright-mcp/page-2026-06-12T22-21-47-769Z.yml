@@ -1,0 +1,198 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "AuthorLoft" [ref=e7]
+        - button "Open menu" [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+    - generic [ref=e12]:
+      - img [ref=e13]
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: · From the team ·
+        - heading "AuthorLoft News" [level=1] [ref=e18]
+        - paragraph [ref=e19]: Product updates, new features, specials, and events — everything happening at AuthorLoft.
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - heading "Get AuthorLoft News in your inbox" [level=3] [ref=e24]
+        - paragraph [ref=e25]: Product updates, new features, specials, and events — no spam, unsubscribe anytime.
+        - generic [ref=e26]:
+          - textbox "you@example.com" [ref=e27]
+          - button "Subscribe" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+            - text: Subscribe
+        - paragraph [ref=e32]:
+          - text: By subscribing you agree to our
+          - link "Privacy Policy" [ref=e33] [cursor=pointer]:
+            - /url: /privacy
+          - text: .
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - button "All" [ref=e37] [cursor=pointer]: All
+            - button "General Announcement" [ref=e39] [cursor=pointer]: General Announcement
+            - button "What's New" [ref=e40] [cursor=pointer]: What's New
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Showing 3 of 3
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - img [ref=e45]
+                - textbox "Search" [ref=e48]:
+                  - /placeholder: Search news by title, summary, or category…
+              - generic [ref=e49]:
+                - combobox "Filter by year" [ref=e50] [cursor=pointer]:
+                  - option "All years" [selected]
+                  - option "2026"
+                - img
+              - generic [ref=e51]:
+                - combobox "Sort" [ref=e52] [cursor=pointer]:
+                  - option "Newest" [selected]
+                  - option "Oldest"
+                  - option "Title A–Z"
+                - img
+        - generic [ref=e54]:
+          - heading "2026" [level=2] [ref=e55]
+          - generic [ref=e56]:
+            - 'link "What''s New at AuthorLoft — June 2026 What''s New June 8, 2026 3 min What''s New at AuthorLoft — June 2026 A big month at AuthorLoft: a new Bookstore to help readers discover you, reader ratings and reviews, and the AuthorLoft News page you''re reading right now. Read more" [ref=e57] [cursor=pointer]':
+              - /url: /news/whats-new-june-2026
+              - img "What's New at AuthorLoft — June 2026" [ref=e58]
+              - generic [ref=e59]:
+                - generic [ref=e60]:
+                  - generic [ref=e61]: What's New
+                  - generic [ref=e62]: June 8, 2026
+                  - generic [ref=e63]:
+                    - img [ref=e64]
+                    - text: 3 min
+                - heading "What's New at AuthorLoft — June 2026" [level=3] [ref=e67]
+                - paragraph [ref=e68]: "A big month at AuthorLoft: a new Bookstore to help readers discover you, reader ratings and reviews, and the AuthorLoft News page you're reading right now."
+                - generic [ref=e69]:
+                  - text: Read more
+                  - img [ref=e70]
+            - 'link "AuthorLoft is Live: A Home of Your Own General Announcement June 1, 2026 3 min AuthorLoft is Live: A Home of Your Own Today we launch AuthorLoft — a place where independent authors own their website, their readers, and every sale. Here''s what you can do from day one. Read more" [ref=e72] [cursor=pointer]':
+              - /url: /news/authorloft-is-live
+              - 'img "AuthorLoft is Live: A Home of Your Own" [ref=e73]'
+              - generic [ref=e74]:
+                - generic [ref=e75]:
+                  - generic [ref=e76]: General Announcement
+                  - generic [ref=e77]: June 1, 2026
+                  - generic [ref=e78]:
+                    - img [ref=e79]
+                    - text: 3 min
+                - 'heading "AuthorLoft is Live: A Home of Your Own" [level=3] [ref=e82]'
+                - paragraph [ref=e83]: Today we launch AuthorLoft — a place where independent authors own their website, their readers, and every sale. Here's what you can do from day one.
+                - generic [ref=e84]:
+                  - text: Read more
+                  - img [ref=e85]
+            - 'link "What''s New at AuthorLoft — May 2026 What''s New May 31, 2026 3 min What''s New at AuthorLoft — May 2026 A look at what we shipped in May: stronger site branding, better SEO for your content, a smoother getting-started experience, and a new author tools directory. Read more" [ref=e87] [cursor=pointer]':
+              - /url: /news/whats-new-may-2026
+              - img "What's New at AuthorLoft — May 2026" [ref=e88]
+              - generic [ref=e89]:
+                - generic [ref=e90]:
+                  - generic [ref=e91]: What's New
+                  - generic [ref=e92]: May 31, 2026
+                  - generic [ref=e93]:
+                    - img [ref=e94]
+                    - text: 3 min
+                - heading "What's New at AuthorLoft — May 2026" [level=3] [ref=e97]
+                - paragraph [ref=e98]: "A look at what we shipped in May: stronger site branding, better SEO for your content, a smoother getting-started experience, and a new author tools directory."
+                - generic [ref=e99]:
+                  - text: Read more
+                  - img [ref=e100]
+  - contentinfo [ref=e102]:
+    - generic [ref=e103]:
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - paragraph [ref=e106]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e107]: Updates, new features, specials & events.
+        - generic [ref=e108]:
+          - textbox "Your email" [ref=e109]
+          - button "Subscribe" [ref=e110] [cursor=pointer]:
+            - img [ref=e111]
+            - text: Subscribe
+      - generic [ref=e114]:
+        - img "AuthorLoft" [ref=e115]
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - link "Features" [ref=e118] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e119]: ·
+          - generic [ref=e120]:
+            - link "Bookstore" [ref=e121] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e122]: ·
+          - generic [ref=e123]:
+            - link "Pricing" [ref=e124] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e125]: ·
+          - generic [ref=e126]:
+            - link "Blog" [ref=e127] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e128]: ·
+          - generic [ref=e129]:
+            - link "News" [ref=e130] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e131]: ·
+          - generic [ref=e132]:
+            - link "Resources" [ref=e133] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e134]: ·
+          - generic [ref=e135]:
+            - link "FAQ" [ref=e136] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e137]: ·
+          - generic [ref=e138]:
+            - link "Contact" [ref=e139] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e140]: ·
+          - generic [ref=e141]:
+            - link "Privacy" [ref=e142] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e143]: ·
+          - generic [ref=e144]:
+            - link "Terms" [ref=e145] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e146]: ·
+          - generic [ref=e147]:
+            - link "GDPR" [ref=e148] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e149]: ·
+          - link "Demo" [ref=e151] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e152]:
+        - paragraph [ref=e153]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e154]:
+          - link "LinkedIn" [ref=e155] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e156]
+          - link "FaceBook" [ref=e160] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e161]
+          - link "Instagram" [ref=e163] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e164]
+        - paragraph [ref=e167]: —— your name, your shelf ——
+  - alert [ref=e168]
+  - dialog [ref=e169]:
+    - generic [ref=e170]:
+      - generic [ref=e171]:
+        - img [ref=e172]
+        - generic [ref=e174]:
+          - generic [ref=e175]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e176] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e177] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e178]:
+        - button "I understand" [ref=e179] [cursor=pointer]
+        - button "Dismiss" [ref=e180] [cursor=pointer]:
+          - img [ref=e181]
+  - generic [ref=e185]:
+    - paragraph [ref=e186]: We use Google Analytics to measure campaign performance and improve your experience. No personal data is shared without your consent.
+    - generic [ref=e187]:
+      - button "Decline" [ref=e188] [cursor=pointer]
+      - button "Accept" [ref=e189] [cursor=pointer]
+      - button [ref=e190] [cursor=pointer]:
+        - img [ref=e191]

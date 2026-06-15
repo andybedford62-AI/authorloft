@@ -1,0 +1,354 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "AuthorLoft" [ref=e7]
+        - button "Open menu" [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+    - generic [ref=e12]:
+      - img [ref=e13]
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: · Features ·
+        - heading "Complete Feature Comparison" [level=1] [ref=e18]
+        - paragraph [ref=e19]: See all the features available on each plan. Everything updates automatically as we add new features.
+    - link "Back to pricing" [ref=e23] [cursor=pointer]:
+      - /url: /pricing
+      - img [ref=e24]
+      - text: Back to pricing
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - heading "Publishing & Content" [level=2] [ref=e29]
+        - table [ref=e31]:
+          - rowgroup [ref=e32]:
+            - row "Feature FREE STANDARD PREMIUM" [ref=e33]:
+              - columnheader "Feature" [ref=e34]
+              - columnheader "FREE" [ref=e35]
+              - columnheader "STANDARD" [ref=e36]
+              - columnheader "PREMIUM" [ref=e37]
+          - rowgroup [ref=e38]:
+            - row "Books Up to 5 Up to 20 Unlimited" [ref=e39]:
+              - cell "Books" [ref=e40]
+              - cell "Up to 5" [ref=e41]
+              - cell "Up to 20" [ref=e42]
+              - cell "Unlimited" [ref=e43]
+            - row "Books CSV Import ✓ Goodreads or template ✓ Goodreads or template ✓ Goodreads or template" [ref=e44]:
+              - cell "Books CSV Import" [ref=e45]
+              - cell "✓ Goodreads or template" [ref=e46]
+              - cell "✓ Goodreads or template" [ref=e47]
+              - cell "✓ Goodreads or template" [ref=e48]
+            - row "Pre-orders / \"Coming Soon\" — ✓ ✓" [ref=e49]:
+              - cell "Pre-orders / \"Coming Soon\"" [ref=e50]
+              - cell "—" [ref=e51]
+              - cell "✓" [ref=e52]
+              - cell "✓" [ref=e53]
+            - row "Blog Posts Up to 10 Up to 100 Unlimited" [ref=e54]:
+              - cell "Blog Posts" [ref=e55]
+              - cell "Up to 10" [ref=e56]
+              - cell "Up to 100" [ref=e57]
+              - cell "Unlimited" [ref=e58]
+            - row "Book Reviews & Reader Ratings ✓ ✓ ✓" [ref=e59]:
+              - cell "Book Reviews & Reader Ratings" [ref=e60]
+              - cell "✓" [ref=e61]
+              - cell "✓" [ref=e62]
+              - cell "✓" [ref=e63]
+            - row "Custom Book Pricing & Discount Codes ✓ ✓ ✓" [ref=e64]:
+              - cell "Custom Book Pricing & Discount Codes" [ref=e65]
+              - cell "✓" [ref=e66]
+              - cell "✓" [ref=e67]
+              - cell "✓" [ref=e68]
+            - row "Direct Digital Sales — ✓ (Stripe) ✓ (Stripe)" [ref=e69]:
+              - cell "Direct Digital Sales" [ref=e70]
+              - cell "—" [ref=e71]
+              - cell "✓ (Stripe)" [ref=e72]
+              - cell "✓ (Stripe)" [ref=e73]
+            - row "Sales Formats — eBook, Print eBook, Audio, Flipbook, Print" [ref=e74]:
+              - cell "Sales Formats" [ref=e75]
+              - cell "—" [ref=e76]
+              - cell "eBook, Print" [ref=e77]
+              - cell "eBook, Audio, Flipbook, Print" [ref=e78]
+            - row "Affiliate / Referral Program — ✓ Custom links + commission ✓ Custom links + commission" [ref=e79]:
+              - cell "Affiliate / Referral Program" [ref=e80]
+              - cell "—" [ref=e81]
+              - cell "✓ Custom links + commission" [ref=e82]
+              - cell "✓ Custom links + commission" [ref=e83]
+            - row "Shopping Cart — ✓ Multi-item ✓ Multi-item" [ref=e84]:
+              - cell "Shopping Cart" [ref=e85]
+              - cell "—" [ref=e86]
+              - cell "✓ Multi-item" [ref=e87]
+              - cell "✓ Multi-item" [ref=e88]
+            - row "Coupon Manager — ✓ ✓" [ref=e89]:
+              - cell "Coupon Manager" [ref=e90]
+              - cell "—" [ref=e91]
+              - cell "✓" [ref=e92]
+              - cell "✓" [ref=e93]
+            - row "Audio Format — — ✓" [ref=e94]:
+              - cell "Audio Format" [ref=e95]
+              - cell "—" [ref=e96]
+              - cell "—" [ref=e97]
+              - cell "✓" [ref=e98]
+            - row "Flip Books — — ✓ Unlimited" [ref=e99]:
+              - cell "Flip Books" [ref=e100]
+              - cell "—" [ref=e101]
+              - cell "—" [ref=e102]
+              - cell "✓ Unlimited" [ref=e103]
+      - generic [ref=e104]:
+        - heading "Site & Branding" [level=2] [ref=e105]
+        - table [ref=e107]:
+          - rowgroup [ref=e108]:
+            - row "Feature FREE STANDARD PREMIUM" [ref=e109]:
+              - columnheader "Feature" [ref=e110]
+              - columnheader "FREE" [ref=e111]
+              - columnheader "STANDARD" [ref=e112]
+              - columnheader "PREMIUM" [ref=e113]
+          - rowgroup [ref=e114]:
+            - row "Site URL AuthorLoft subdomain Subdomain + custom domain Subdomain + custom domain" [ref=e115]:
+              - cell "Site URL" [ref=e116]
+              - cell "AuthorLoft subdomain" [ref=e117]
+              - cell "Subdomain + custom domain" [ref=e118]
+              - cell "Subdomain + custom domain" [ref=e119]
+            - row "Storage 100 MB 20 GB 50 GB" [ref=e120]:
+              - cell "Storage" [ref=e121]
+              - cell "100 MB" [ref=e122]
+              - cell "20 GB" [ref=e123]
+              - cell "50 GB" [ref=e124]
+            - row "Site Theme 3 colour themes 15 themes (+ genre palettes) 15 themes + custom colours" [ref=e125]:
+              - cell "Site Theme" [ref=e126]
+              - cell "3 colour themes" [ref=e127]
+              - cell "15 themes (+ genre palettes)" [ref=e128]
+              - cell "15 themes + custom colours" [ref=e129]
+            - row "Logo, Hero Banner & Social Links ✓ ✓ ✓" [ref=e130]:
+              - cell "Logo, Hero Banner & Social Links" [ref=e131]
+              - cell "✓" [ref=e132]
+              - cell "✓" [ref=e133]
+              - cell "✓" [ref=e134]
+            - row "About, Bio & Contact Pages ✓ ✓ ✓" [ref=e135]:
+              - cell "About, Bio & Contact Pages" [ref=e136]
+              - cell "✓" [ref=e137]
+              - cell "✓" [ref=e138]
+              - cell "✓" [ref=e139]
+            - row "Legal / Disclaimer Page ✓ ✓ ✓" [ref=e140]:
+              - cell "Legal / Disclaimer Page" [ref=e141]
+              - cell "✓" [ref=e142]
+              - cell "✓" [ref=e143]
+              - cell "✓" [ref=e144]
+            - row "Dynamic OG Images — — ✓ Per-page social cards" [ref=e145]:
+              - cell "Dynamic OG Images" [ref=e146]
+              - cell "—" [ref=e147]
+              - cell "—" [ref=e148]
+              - cell "✓ Per-page social cards" [ref=e149]
+      - generic [ref=e150]:
+        - heading "AI & Automation" [level=2] [ref=e151]
+        - table [ref=e153]:
+          - rowgroup [ref=e154]:
+            - row "Feature FREE STANDARD PREMIUM" [ref=e155]:
+              - columnheader "Feature" [ref=e156]
+              - columnheader "FREE" [ref=e157]
+              - columnheader "STANDARD" [ref=e158]
+              - columnheader "PREMIUM" [ref=e159]
+          - rowgroup [ref=e160]:
+            - row "AI Assistant — — ✓ (30/month)" [ref=e161]:
+              - cell "AI Assistant" [ref=e162]
+              - cell "—" [ref=e163]
+              - cell "—" [ref=e164]
+              - cell "✓ (30/month)" [ref=e165]
+            - row "• Book Descriptions, Blog Ideas & Marketing Copy — — ✓" [ref=e166]:
+              - cell "• Book Descriptions, Blog Ideas & Marketing Copy" [ref=e167]
+              - cell "—" [ref=e168]
+              - cell "—" [ref=e169]
+              - cell "✓" [ref=e170]
+            - row "• Reader Feedback Analysis — — ✓" [ref=e171]:
+              - cell "• Reader Feedback Analysis" [ref=e172]
+              - cell "—" [ref=e173]
+              - cell "—" [ref=e174]
+              - cell "✓" [ref=e175]
+            - row "SEO Audit Tool — — ✓" [ref=e176]:
+              - cell "SEO Audit Tool" [ref=e177]
+              - cell "—" [ref=e178]
+              - cell "—" [ref=e179]
+              - cell "✓" [ref=e180]
+            - row "• Meta Tags, Keyword Density & Internal Links — — ✓" [ref=e181]:
+              - cell "• Meta Tags, Keyword Density & Internal Links" [ref=e182]
+              - cell "—" [ref=e183]
+              - cell "—" [ref=e184]
+              - cell "✓" [ref=e185]
+      - generic [ref=e186]:
+        - heading "Marketing & Communications" [level=2] [ref=e187]
+        - table [ref=e189]:
+          - rowgroup [ref=e190]:
+            - row "Feature FREE STANDARD PREMIUM" [ref=e191]:
+              - columnheader "Feature" [ref=e192]
+              - columnheader "FREE" [ref=e193]
+              - columnheader "STANDARD" [ref=e194]
+              - columnheader "PREMIUM" [ref=e195]
+          - rowgroup [ref=e196]:
+            - row "Newsletter Signup Form ✓ Full campaigns ✓ Full campaigns ✓ Full campaigns" [ref=e197]:
+              - cell "Newsletter Signup Form" [ref=e198]
+              - cell "✓ Full campaigns" [ref=e199]
+              - cell "✓ Full campaigns" [ref=e200]
+              - cell "✓ Full campaigns" [ref=e201]
+            - row "Newsletter Campaigns — ✓ ✓" [ref=e202]:
+              - cell "Newsletter Campaigns" [ref=e203]
+              - cell "—" [ref=e204]
+              - cell "✓" [ref=e205]
+              - cell "✓" [ref=e206]
+            - row "AuthorLoft Bookstore Listing ✓ ✓ ✓ Featured placement" [ref=e207]:
+              - cell "AuthorLoft Bookstore Listing" [ref=e208]
+              - cell "✓" [ref=e209]
+              - cell "✓" [ref=e210]
+              - cell "✓ Featured placement" [ref=e211]
+            - row "Sales Dashboard — ✓ ✓" [ref=e212]:
+              - cell "Sales Dashboard" [ref=e213]
+              - cell "—" [ref=e214]
+              - cell "✓" [ref=e215]
+              - cell "✓" [ref=e216]
+            - row "Media Kit Page — ✓ + downloadable PDF ✓ + downloadable PDF" [ref=e217]:
+              - cell "Media Kit Page" [ref=e218]
+              - cell "—" [ref=e219]
+              - cell "✓ + downloadable PDF" [ref=e220]
+              - cell "✓ + downloadable PDF" [ref=e221]
+            - row "Testimonials Display ✓ ✓ ✓" [ref=e222]:
+              - cell "Testimonials Display" [ref=e223]
+              - cell "✓" [ref=e224]
+              - cell "✓" [ref=e225]
+              - cell "✓" [ref=e226]
+      - generic [ref=e227]:
+        - heading "On the Roadmap" [level=2] [ref=e228]
+        - generic [ref=e230]:
+          - generic [ref=e231]:
+            - paragraph [ref=e232]: Auto-Formatter
+            - paragraph [ref=e233]: Convert your book to ePub, PDF, Kindle, and print formats
+          - generic [ref=e234]:
+            - paragraph [ref=e235]: Affiliate Payouts
+            - paragraph [ref=e236]: Send referral earnings directly via Stripe
+          - generic [ref=e237]:
+            - paragraph [ref=e238]: Reader Analytics
+            - paragraph [ref=e239]: Track reads, engagement, and retention
+          - generic [ref=e240]:
+            - paragraph [ref=e241]: Email List Builder
+            - paragraph [ref=e242]: Drag-and-drop forms and automated sequences
+          - generic [ref=e243]:
+            - paragraph [ref=e244]: Social Media Uploader
+            - paragraph [ref=e245]: Schedule posts to Instagram, TikTok, and more
+          - generic [ref=e246]:
+            - paragraph [ref=e247]: Reader Tiers / Patreon
+            - paragraph [ref=e248]: Membership tiers and exclusive content
+          - generic [ref=e249]:
+            - paragraph [ref=e250]: Review Monitoring
+            - paragraph [ref=e251]: Aggregate reviews from Amazon and Goodreads
+          - generic [ref=e252]:
+            - paragraph [ref=e253]: Native PDF Flipbook
+            - paragraph [ref=e254]: A smoother, mobile-friendly flipbook reader
+          - generic [ref=e255]:
+            - paragraph [ref=e256]: Two-Factor Authentication
+            - paragraph [ref=e257]: Extra account security for every plan
+    - generic [ref=e259]:
+      - heading "Ready to get started?" [level=2] [ref=e260]
+      - paragraph [ref=e261]: All plans start with a free account. Upgrade anytime from your dashboard.
+      - generic [ref=e262]:
+        - link "Get Started Free" [ref=e263] [cursor=pointer]:
+          - /url: /register
+        - link "View Pricing" [ref=e264] [cursor=pointer]:
+          - /url: /pricing
+    - paragraph [ref=e266]:
+      - text: Have questions about AuthorLoft?
+      - link "Contact us →" [ref=e267] [cursor=pointer]:
+        - /url: /contact
+  - contentinfo [ref=e268]:
+    - generic [ref=e269]:
+      - generic [ref=e270]:
+        - generic [ref=e271]:
+          - paragraph [ref=e272]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e273]: Updates, new features, specials & events.
+        - generic [ref=e274]:
+          - textbox "Your email" [ref=e275]
+          - button "Subscribe" [ref=e276] [cursor=pointer]:
+            - img [ref=e277]
+            - text: Subscribe
+      - generic [ref=e280]:
+        - img "AuthorLoft" [ref=e281]
+        - generic [ref=e282]:
+          - generic [ref=e283]:
+            - link "Features" [ref=e284] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e285]: ·
+          - generic [ref=e286]:
+            - link "Bookstore" [ref=e287] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e288]: ·
+          - generic [ref=e289]:
+            - link "Pricing" [ref=e290] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e291]: ·
+          - generic [ref=e292]:
+            - link "Blog" [ref=e293] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e294]: ·
+          - generic [ref=e295]:
+            - link "News" [ref=e296] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e297]: ·
+          - generic [ref=e298]:
+            - link "Resources" [ref=e299] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e300]: ·
+          - generic [ref=e301]:
+            - link "FAQ" [ref=e302] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e303]: ·
+          - generic [ref=e304]:
+            - link "Contact" [ref=e305] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e306]: ·
+          - generic [ref=e307]:
+            - link "Privacy" [ref=e308] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e309]: ·
+          - generic [ref=e310]:
+            - link "Terms" [ref=e311] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e312]: ·
+          - generic [ref=e313]:
+            - link "GDPR" [ref=e314] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e315]: ·
+          - link "Demo" [ref=e317] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e318]:
+        - paragraph [ref=e319]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e320]:
+          - link "LinkedIn" [ref=e321] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e322]
+          - link "FaceBook" [ref=e326] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e327]
+          - link "Instagram" [ref=e329] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e330]
+        - paragraph [ref=e333]: —— your name, your shelf ——
+  - alert [ref=e334]
+  - dialog [ref=e335]:
+    - generic [ref=e336]:
+      - generic [ref=e337]:
+        - img [ref=e338]
+        - generic [ref=e340]:
+          - generic [ref=e341]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e342] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e343] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e344]:
+        - button "I understand" [ref=e345] [cursor=pointer]
+        - button "Dismiss" [ref=e346] [cursor=pointer]:
+          - img [ref=e347]
+  - generic [ref=e351]:
+    - paragraph [ref=e352]: We use Google Analytics to measure campaign performance and improve your experience. No personal data is shared without your consent.
+    - generic [ref=e353]:
+      - button "Decline" [ref=e354] [cursor=pointer]
+      - button "Accept" [ref=e355] [cursor=pointer]
+      - button [ref=e356] [cursor=pointer]:
+        - img [ref=e357]

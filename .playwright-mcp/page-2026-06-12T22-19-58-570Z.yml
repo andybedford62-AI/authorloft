@@ -1,0 +1,476 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "AuthorLoft" [ref=e7]
+        - button "Open menu" [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+    - generic [ref=e12]:
+      - img [ref=e13]
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: · Plans & pricing ·
+        - heading "Simple, transparent pricing" [level=1] [ref=e18]
+        - paragraph [ref=e19]: Start free with no credit card. Upgrade when you're ready to grow your author platform.
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]: Monthly
+        - switch [ref=e25] [cursor=pointer]
+        - generic [ref=e27]: Annual
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e31]: Limited Features
+          - generic [ref=e32]:
+            - heading "Free" [level=3] [ref=e33]
+            - generic [ref=e34]:
+              - generic [ref=e35]: $0
+              - generic [ref=e36]: /forever
+            - paragraph [ref=e37]: This is a FREE plan that limits users to a minimum functionality.
+          - list [ref=e38]:
+            - listitem [ref=e39]:
+              - img [ref=e40]
+              - generic [ref=e42]: Up to 5 books
+            - listitem [ref=e43]:
+              - img [ref=e44]
+              - generic [ref=e46]: Up to 10 blog posts
+            - listitem [ref=e47]:
+              - img [ref=e48]
+              - generic [ref=e50]: AuthorLoft subdomain
+            - listitem [ref=e51]:
+              - img [ref=e52]
+              - generic [ref=e54]: Standard page/theme
+            - listitem [ref=e55]:
+              - img [ref=e56]
+              - generic [ref=e58]: Newsletter campaigns
+            - listitem [ref=e59]:
+              - img [ref=e60]
+              - generic [ref=e62]: AuthorLoft Bookstore listing
+            - listitem [ref=e63]:
+              - img [ref=e64]
+              - generic [ref=e66]: Media kit
+            - listitem [ref=e67]:
+              - img [ref=e68]
+              - generic [ref=e70]: Contact form
+            - listitem [ref=e71]:
+              - img [ref=e72]
+              - generic [ref=e74]: 100 MB storage
+          - link "Get Started Free" [ref=e75] [cursor=pointer]:
+            - /url: /register
+        - generic [ref=e76]:
+          - generic [ref=e78]: Most Popular
+          - generic [ref=e79]:
+            - heading "Standard" [level=3] [ref=e80]
+            - generic [ref=e81]:
+              - generic [ref=e82]: $19.99
+              - generic [ref=e83]: /mo
+            - paragraph [ref=e84]: This plan is for beginner authors who may not have many books to advertise or who are just starting.
+          - list [ref=e85]:
+            - listitem [ref=e86]:
+              - img [ref=e87]
+              - generic [ref=e89]: Up to 20 books
+            - listitem [ref=e90]:
+              - img [ref=e91]
+              - generic [ref=e93]: Up to 100 blog posts
+            - listitem [ref=e94]:
+              - img [ref=e95]
+              - generic [ref=e97]: AuthorLoft subdomain -OR- your own Custom domain
+            - listitem [ref=e98]:
+              - img [ref=e99]
+              - generic [ref=e101]: Customize page & themes
+            - listitem [ref=e102]:
+              - img [ref=e103]
+              - generic [ref=e105]: Newsletter campaigns
+            - listitem [ref=e106]:
+              - img [ref=e107]
+              - generic [ref=e109]: Direct digital sales (Stripe)
+            - listitem [ref=e110]:
+              - img [ref=e111]
+              - generic [ref=e113]: ARC management
+            - listitem [ref=e114]:
+              - img [ref=e115]
+              - generic [ref=e117]: Email Integration
+            - listitem [ref=e118]:
+              - img [ref=e119]
+              - generic [ref=e121]: Contact form
+            - listitem [ref=e122]:
+              - img [ref=e123]
+              - generic [ref=e125]: 20 GB storage
+          - link "Start Free → Standard" [ref=e126] [cursor=pointer]:
+            - /url: /register?plan=standard
+          - paragraph [ref=e127]: Free account first, then upgrade — takes 2 minutes
+        - generic [ref=e128]:
+          - generic [ref=e130]: Unlimited Features
+          - generic [ref=e131]:
+            - heading "Premium" [level=3] [ref=e132]
+            - generic [ref=e133]:
+              - generic [ref=e134]: $59.99
+              - generic [ref=e135]: /mo
+            - paragraph [ref=e136]: This plan provides complete access to all tools and features, offering a full author web presence with a variety of shareable assets.
+          - list [ref=e137]:
+            - listitem [ref=e138]:
+              - img [ref=e139]
+              - generic [ref=e141]: Unlimited books
+            - listitem [ref=e142]:
+              - img [ref=e143]
+              - generic [ref=e145]: Unlimited blog posts
+            - listitem [ref=e146]:
+              - img [ref=e147]
+              - generic [ref=e149]: AuthorLoft subdomain -OR- your own Custom domain
+            - listitem [ref=e150]:
+              - img [ref=e151]
+              - generic [ref=e153]: Customize page & themes
+            - listitem [ref=e154]:
+              - img [ref=e155]
+              - generic [ref=e157]: MP3/WAV narrations & excerpts
+            - listitem [ref=e158]:
+              - img [ref=e159]
+              - generic [ref=e161]: Newsletter campaigns
+            - listitem [ref=e162]:
+              - img [ref=e163]
+              - generic [ref=e165]: ARC management
+            - listitem [ref=e166]:
+              - img [ref=e167]
+              - generic [ref=e169]: Email Integration
+            - listitem [ref=e170]:
+              - img [ref=e171]
+              - generic [ref=e173]: AI assistant / SEO audit
+            - listitem [ref=e174]:
+              - img [ref=e175]
+              - generic [ref=e177]: Direct digital sales (Stripe)
+            - listitem [ref=e178]:
+              - img [ref=e179]
+              - generic [ref=e181]: Flip book Integration
+            - listitem [ref=e182]:
+              - img [ref=e183]
+              - generic [ref=e185]: Analytics dashboard
+            - listitem [ref=e186]:
+              - img [ref=e187]
+              - generic [ref=e189]: Contact form
+            - listitem [ref=e190]:
+              - img [ref=e191]
+              - generic [ref=e193]: 50 GB storage
+          - link "Start Free → Premium" [ref=e194] [cursor=pointer]:
+            - /url: /register?plan=premium
+          - paragraph [ref=e195]: Free account first, then upgrade — takes 2 minutes
+      - paragraph [ref=e196]: No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee
+      - generic [ref=e197]:
+        - heading "Common questions" [level=3] [ref=e198]
+        - generic [ref=e199]:
+          - paragraph [ref=e200]: Can I switch plans later?
+          - paragraph [ref=e201]: Yes — upgrade or downgrade at any time. Changes take effect immediately. If you upgrade mid-cycle you're charged a prorated amount.
+        - generic [ref=e202]:
+          - paragraph [ref=e203]: What happens if I exceed my book limit?
+          - paragraph [ref=e204]: You can still view and edit existing books, but you won't be able to add new ones until you upgrade or remove a book.
+        - generic [ref=e205]:
+          - paragraph [ref=e206]: Do I need a payment processor for digital sales?
+          - paragraph [ref=e207]: Yes — direct sales use Stripe. You connect your own Stripe account so payments go directly to you. AuthorLoft does not take a transaction cut.
+        - generic [ref=e208]:
+          - paragraph [ref=e209]: Can I use my own domain name?
+          - paragraph [ref=e210]: Custom domains are available on Standard and Premium plans. You point your domain's DNS to AuthorLoft and we handle the rest.
+        - generic [ref=e211]:
+          - paragraph [ref=e212]: Is there a contract or lock-in?
+          - paragraph [ref=e213]: No contract, no lock-in. Monthly plans can be cancelled anytime. Annual plans are billed yearly and include a 30-day money-back window.
+    - generic [ref=e215]:
+      - paragraph [ref=e216]: Want to see the complete feature breakdown?
+      - link "See All Features →" [ref=e217] [cursor=pointer]:
+        - /url: /features
+    - generic [ref=e219]:
+      - heading "Quick feature comparison" [level=2] [ref=e220]
+      - table [ref=e222]:
+        - rowgroup [ref=e223]:
+          - row "Feature Free Standard Premium" [ref=e224]:
+            - columnheader "Feature" [ref=e225]
+            - columnheader "Free" [ref=e226]
+            - columnheader "Standard" [ref=e227]
+            - columnheader "Premium" [ref=e228]
+        - rowgroup [ref=e229]:
+          - row "Books Up to 5 Unlimited Unlimited" [ref=e230]:
+            - cell "Books" [ref=e231]
+            - cell "Up to 5" [ref=e232]
+            - cell "Unlimited" [ref=e233]
+            - cell "Unlimited" [ref=e234]
+          - row "News posts Up to 5 Unlimited Unlimited" [ref=e235]:
+            - cell "News posts" [ref=e236]
+            - cell "Up to 5" [ref=e237]
+            - cell "Unlimited" [ref=e238]
+            - cell "Unlimited" [ref=e239]
+          - row "AuthorLoft subdomain ✓ ✓ ✓" [ref=e240]:
+            - cell "AuthorLoft subdomain" [ref=e241]
+            - cell "✓" [ref=e242]
+            - cell "✓" [ref=e243]
+            - cell "✓" [ref=e244]
+          - row "Custom domain — ✓ ✓" [ref=e245]:
+            - cell "Custom domain" [ref=e246]
+            - cell "—" [ref=e247]
+            - cell "✓" [ref=e248]
+            - cell "✓" [ref=e249]
+          - row "Newsletter capture ✓ ✓ ✓" [ref=e250]:
+            - cell "Newsletter capture" [ref=e251]
+            - cell "✓" [ref=e252]
+            - cell "✓" [ref=e253]
+            - cell "✓" [ref=e254]
+          - row "Newsletter campaigns — ✓ ✓" [ref=e255]:
+            - cell "Newsletter campaigns" [ref=e256]
+            - cell "—" [ref=e257]
+            - cell "✓" [ref=e258]
+            - cell "✓" [ref=e259]
+          - row "Direct digital sales — ✓ ✓" [ref=e260]:
+            - cell "Direct digital sales" [ref=e261]
+            - cell "—" [ref=e262]
+            - cell "✓" [ref=e263]
+            - cell "✓" [ref=e264]
+          - row "Flip book previews — ✓ ✓" [ref=e265]:
+            - cell "Flip book previews" [ref=e266]
+            - cell "—" [ref=e267]
+            - cell "✓" [ref=e268]
+            - cell "✓" [ref=e269]
+          - row "Sales analytics — — ✓" [ref=e270]:
+            - cell "Sales analytics" [ref=e271]
+            - cell "—" [ref=e272]
+            - cell "—" [ref=e273]
+            - cell "✓" [ref=e274]
+          - row "Contact form ✓ ✓ ✓" [ref=e275]:
+            - cell "Contact form" [ref=e276]
+            - cell "✓" [ref=e277]
+            - cell "✓" [ref=e278]
+            - cell "✓" [ref=e279]
+          - row "Support Community Priority Priority" [ref=e280]:
+            - cell "Support" [ref=e281]
+            - cell "Community" [ref=e282]
+            - cell "Priority" [ref=e283]
+            - cell "Priority" [ref=e284]
+        - rowgroup [ref=e285]:
+          - row "Get started → Start free → Standard Start free → Premium" [ref=e286]:
+            - cell [ref=e287]
+            - cell "Get started →" [ref=e288]:
+              - link "Get started →" [ref=e289] [cursor=pointer]:
+                - /url: /register
+            - cell "Start free → Standard" [ref=e290]:
+              - link "Start free → Standard" [ref=e291] [cursor=pointer]:
+                - /url: /register?plan=standard
+            - cell "Start free → Premium" [ref=e292]:
+              - link "Start free → Premium" [ref=e293] [cursor=pointer]:
+                - /url: /register?plan=premium
+      - paragraph [ref=e294]: All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.
+    - generic [ref=e296]:
+      - generic [ref=e297]:
+        - paragraph [ref=e298]: How we compare
+        - heading "AuthorLoft vs. the competition" [level=2] [ref=e299]
+        - paragraph [ref=e300]: Our free plan includes more features than competitors' paid tiers — so you can grow without paying extra.
+      - table [ref=e302]:
+        - rowgroup [ref=e303]:
+          - row "Feature AuthorLoft FREE Tertulia $7.99/mo StoryOrigin ~$20/mo BookFunnel ~$49/mo" [ref=e304]:
+            - columnheader "Feature" [ref=e305]
+            - columnheader "AuthorLoft FREE" [ref=e306]:
+              - text: AuthorLoft
+              - generic [ref=e307]: FREE
+            - columnheader "Tertulia $7.99/mo" [ref=e308]:
+              - text: Tertulia
+              - generic [ref=e309]: $7.99/mo
+            - columnheader "StoryOrigin ~$20/mo" [ref=e310]:
+              - text: StoryOrigin
+              - generic [ref=e311]: ~$20/mo
+            - columnheader "BookFunnel ~$49/mo" [ref=e312]:
+              - text: BookFunnel
+              - generic [ref=e313]: ~$49/mo
+        - rowgroup [ref=e314]:
+          - row "Website Builder ✓ ✓ ✓ ✗" [ref=e315]:
+            - cell "Website Builder" [ref=e316]
+            - cell "✓" [ref=e317]
+            - cell "✓" [ref=e318]
+            - cell "✓" [ref=e319]
+            - cell "✗" [ref=e320]
+          - row "Unlimited Books & Series ✓ ✓ ✓ Limited" [ref=e321]:
+            - cell "Unlimited Books & Series" [ref=e322]
+            - cell "✓" [ref=e323]
+            - cell "✓" [ref=e324]
+            - cell "✓" [ref=e325]
+            - cell "Limited" [ref=e326]
+          - row "News Posts ✓ ✓ ✓ ✗" [ref=e327]:
+            - cell "News Posts" [ref=e328]
+            - cell "✓" [ref=e329]
+            - cell "✓" [ref=e330]
+            - cell "✓" [ref=e331]
+            - cell "✗" [ref=e332]
+          - row "Events ✓ ✓ ✓ ✗" [ref=e333]:
+            - cell "Events" [ref=e334]
+            - cell "✓" [ref=e335]
+            - cell "✓" [ref=e336]
+            - cell "✓" [ref=e337]
+            - cell "✗" [ref=e338]
+          - row "Reviews & Ratings ✓ ✓ ✓ ✗" [ref=e339]:
+            - cell "Reviews & Ratings" [ref=e340]
+            - cell "✓" [ref=e341]
+            - cell "✓" [ref=e342]
+            - cell "✓" [ref=e343]
+            - cell "✗" [ref=e344]
+          - row "Mailing List Builder ✓ ✓ ✓ ✓" [ref=e345]:
+            - cell "Mailing List Builder" [ref=e346]
+            - cell "✓" [ref=e347]
+            - cell "✓" [ref=e348]
+            - cell "✓" [ref=e349]
+            - cell "✓" [ref=e350]
+          - row "Custom Pages ✓ ✓ ✓ ✗" [ref=e351]:
+            - cell "Custom Pages" [ref=e352]
+            - cell "✓" [ref=e353]
+            - cell "✓" [ref=e354]
+            - cell "✓" [ref=e355]
+            - cell "✗" [ref=e356]
+          - row "Analytics ✓ ✓ ✓ ✓" [ref=e357]:
+            - cell "Analytics" [ref=e358]
+            - cell "✓" [ref=e359]
+            - cell "✓" [ref=e360]
+            - cell "✓" [ref=e361]
+            - cell "✓" [ref=e362]
+          - row "Custom Domain ✓ ✓ ✓ ✗" [ref=e363]:
+            - cell "Custom Domain" [ref=e364]
+            - cell "✓" [ref=e365]
+            - cell "✓" [ref=e366]
+            - cell "✓" [ref=e367]
+            - cell "✗" [ref=e368]
+          - row "eBook Sales ✓ ✗ ✓ ✓" [ref=e369]:
+            - cell "eBook Sales" [ref=e370]
+            - cell "✓" [ref=e371]
+            - cell "✗" [ref=e372]
+            - cell "✓" [ref=e373]
+            - cell "✓" [ref=e374]
+          - row "Audiobook Sales ✓ ✗ ✗ Limited" [ref=e375]:
+            - cell "Audiobook Sales" [ref=e376]
+            - cell "✓" [ref=e377]
+            - cell "✗" [ref=e378]
+            - cell "✗" [ref=e379]
+            - cell "Limited" [ref=e380]
+          - row "Print Book Sales ✓ ✗ ✗ Limited" [ref=e381]:
+            - cell "Print Book Sales" [ref=e382]
+            - cell "✓" [ref=e383]
+            - cell "✗" [ref=e384]
+            - cell "✗" [ref=e385]
+            - cell "Limited" [ref=e386]
+          - row "Email Campaigns ✓ ✗ ✓ ✗" [ref=e387]:
+            - cell "Email Campaigns" [ref=e388]
+            - cell "✓" [ref=e389]
+            - cell "✗" [ref=e390]
+            - cell "✓" [ref=e391]
+            - cell "✗" [ref=e392]
+          - row "Reader Magnets ✓ ✗ ✓ ✓" [ref=e393]:
+            - cell "Reader Magnets" [ref=e394]
+            - cell "✓" [ref=e395]
+            - cell "✗" [ref=e396]
+            - cell "✓" [ref=e397]
+            - cell "✓" [ref=e398]
+          - row "3rd-Party Integrations ✓ ✗ ✓ ✓" [ref=e399]:
+            - cell "3rd-Party Integrations" [ref=e400]
+            - cell "✓" [ref=e401]
+            - cell "✗" [ref=e402]
+            - cell "✓" [ref=e403]
+            - cell "✓" [ref=e404]
+        - rowgroup [ref=e405]:
+          - row "Basic / entry plan compared Start Free → Requires a paid plan to access most features" [ref=e406]:
+            - cell "Basic / entry plan compared" [ref=e407]
+            - cell "Start Free →" [ref=e408]:
+              - link "Start Free →" [ref=e409] [cursor=pointer]:
+                - /url: /register
+            - cell "Requires a paid plan to access most features" [ref=e410]
+      - paragraph [ref=e411]: Competitor features based on publicly listed plans as of May 2026. Features subject to change.
+    - paragraph [ref=e413]:
+      - text: Not sure which plan is right for you?
+      - link "Contact us and we'll help →" [ref=e414] [cursor=pointer]:
+        - /url: /contact
+  - contentinfo [ref=e415]:
+    - generic [ref=e416]:
+      - generic [ref=e417]:
+        - generic [ref=e418]:
+          - paragraph [ref=e419]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e420]: Updates, new features, specials & events.
+        - generic [ref=e421]:
+          - textbox "Your email" [ref=e422]
+          - button "Subscribe" [ref=e423] [cursor=pointer]:
+            - img [ref=e424]
+            - text: Subscribe
+      - generic [ref=e427]:
+        - img "AuthorLoft" [ref=e428]
+        - generic [ref=e429]:
+          - generic [ref=e430]:
+            - link "Features" [ref=e431] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e432]: ·
+          - generic [ref=e433]:
+            - link "Bookstore" [ref=e434] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e435]: ·
+          - generic [ref=e436]:
+            - link "Pricing" [ref=e437] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e438]: ·
+          - generic [ref=e439]:
+            - link "Blog" [ref=e440] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e441]: ·
+          - generic [ref=e442]:
+            - link "News" [ref=e443] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e444]: ·
+          - generic [ref=e445]:
+            - link "Resources" [ref=e446] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e447]: ·
+          - generic [ref=e448]:
+            - link "FAQ" [ref=e449] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e450]: ·
+          - generic [ref=e451]:
+            - link "Contact" [ref=e452] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e453]: ·
+          - generic [ref=e454]:
+            - link "Privacy" [ref=e455] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e456]: ·
+          - generic [ref=e457]:
+            - link "Terms" [ref=e458] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e459]: ·
+          - generic [ref=e460]:
+            - link "GDPR" [ref=e461] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e462]: ·
+          - link "Demo" [ref=e464] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e465]:
+        - paragraph [ref=e466]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e467]:
+          - link "LinkedIn" [ref=e468] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e469]
+          - link "FaceBook" [ref=e473] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e474]
+          - link "Instagram" [ref=e476] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e477]
+        - paragraph [ref=e480]: —— your name, your shelf ——
+  - alert [ref=e481]
+  - dialog [ref=e482]:
+    - generic [ref=e483]:
+      - generic [ref=e484]:
+        - img [ref=e485]
+        - generic [ref=e487]:
+          - generic [ref=e488]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e489] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e490] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e491]:
+        - button "I understand" [ref=e492] [cursor=pointer]
+        - button "Dismiss" [ref=e493] [cursor=pointer]:
+          - img [ref=e494]
+  - generic [ref=e498]:
+    - paragraph [ref=e499]: We use Google Analytics to measure campaign performance and improve your experience. No personal data is shared without your consent.
+    - generic [ref=e500]:
+      - button "Decline" [ref=e501] [cursor=pointer]
+      - button "Accept" [ref=e502] [cursor=pointer]
+      - button [ref=e503] [cursor=pointer]:
+        - img [ref=e504]

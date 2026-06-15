@@ -1,0 +1,268 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - button "Audience" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Audience
+          - img [ref=e54]
+        - generic [ref=e56]:
+          - button "Sales" [ref=e57] [cursor=pointer]:
+            - generic [ref=e58]: Sales
+            - img [ref=e59]
+          - generic [ref=e61]:
+            - link "Sales" [ref=e62] [cursor=pointer]:
+              - /url: /admin/sales
+              - img [ref=e63]
+              - text: Sales
+            - link "Specials" [ref=e66] [cursor=pointer]:
+              - /url: /admin/specials
+              - img [ref=e67]
+              - text: Specials
+            - link "Discount Codes" [ref=e70] [cursor=pointer]:
+              - /url: /admin/discount-codes
+              - img [ref=e71]
+              - text: Discount Codes
+            - link "Invoices & Tax" [ref=e74] [cursor=pointer]:
+              - /url: /admin/invoices
+              - img [ref=e75]
+              - text: Invoices & Tax
+        - button "Tools" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: Tools
+          - img [ref=e81]
+        - button "Account" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]: Account
+          - img [ref=e86]
+        - paragraph [ref=e89]: Super Admin
+        - link "Platform Dashboard" [ref=e90] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e91]
+          - text: Platform Dashboard
+        - generic [ref=e96]:
+          - button "Authors" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: Authors
+            - img [ref=e99]
+          - generic [ref=e101]:
+            - link "All Authors" [ref=e102] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e103]
+              - text: All Authors
+            - link "Access Requests" [ref=e108] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e109]
+              - text: Access Requests
+        - button "Billing & Plans" [ref=e113] [cursor=pointer]:
+          - generic [ref=e114]: Billing & Plans
+          - img [ref=e115]
+        - generic [ref=e117]:
+          - button "Marketing" [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: Marketing
+            - img [ref=e120]
+          - generic [ref=e122]:
+            - link "Blog & News" [ref=e123] [cursor=pointer]:
+              - /url: /super-admin/blog
+              - img [ref=e124]
+              - text: Blog & News
+            - link "News Subscribers" [ref=e127] [cursor=pointer]:
+              - /url: /super-admin/subscribers
+              - img [ref=e128]
+              - text: News Subscribers
+            - link "Resources" [ref=e131] [cursor=pointer]:
+              - /url: /super-admin/resources
+              - img [ref=e132]
+              - text: Resources
+            - link "Resource Downloads" [ref=e135] [cursor=pointer]:
+              - /url: /super-admin/resource-downloads
+              - img [ref=e136]
+              - text: Resource Downloads
+            - link "Social Media" [ref=e139] [cursor=pointer]:
+              - /url: /super-admin/social
+              - img [ref=e140]
+              - text: Social Media
+        - generic [ref=e146]:
+          - button "Platform" [ref=e147] [cursor=pointer]:
+            - generic [ref=e148]: Platform
+            - img [ref=e149]
+          - generic [ref=e151]:
+            - link "Content Categories" [ref=e152] [cursor=pointer]:
+              - /url: /super-admin/categories
+              - img [ref=e153]
+              - text: Content Categories
+            - link "Genres" [ref=e158] [cursor=pointer]:
+              - /url: /admin/genres
+              - img [ref=e159]
+              - text: Genres
+            - link "Help Articles" [ref=e162] [cursor=pointer]:
+              - /url: /super-admin/help
+              - img [ref=e163]
+              - text: Help Articles
+            - link "Platform Legal" [ref=e166] [cursor=pointer]:
+              - /url: /super-admin/legal
+              - img [ref=e167]
+              - text: Platform Legal
+            - link "Platform Settings" [ref=e169] [cursor=pointer]:
+              - /url: /super-admin/settings
+              - img [ref=e170]
+              - text: Platform Settings
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - img [ref=e175]
+          - text: Light mode
+          - link "Change" [ref=e181] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e182] [cursor=pointer]:
+          - img [ref=e183]
+          - text: Sign Out
+    - generic [ref=e186]:
+      - banner [ref=e187]:
+        - button "Open navigation" [ref=e188] [cursor=pointer]:
+          - img [ref=e189]
+        - generic [ref=e190]: Super Admin
+        - generic [ref=e191]:
+          - generic [ref=e192]: A
+          - button "Sign out" [ref=e193] [cursor=pointer]:
+            - img [ref=e194]
+      - main [ref=e197]:
+        - generic [ref=e198]:
+          - generic [ref=e199]:
+            - heading "Platform Settings" [level=1] [ref=e200]
+            - paragraph [ref=e201]: Overview and configuration of the AuthorLoft platform.
+          - generic [ref=e202]:
+            - complementary [ref=e203]:
+              - navigation [ref=e204]:
+                - generic [ref=e205]:
+                  - paragraph [ref=e206]: Platform
+                  - list [ref=e207]:
+                    - listitem [ref=e208]:
+                      - button "Overview" [ref=e209] [cursor=pointer]:
+                        - img [ref=e210]
+                        - text: Overview
+                        - img [ref=e214]
+                - generic [ref=e216]:
+                  - paragraph [ref=e217]: Communications
+                  - list [ref=e218]:
+                    - listitem [ref=e219]:
+                      - button "Welcome Email" [ref=e220] [cursor=pointer]:
+                        - img [ref=e221]
+                        - text: Welcome Email
+                    - listitem [ref=e223]:
+                      - button "Mass Email" [ref=e224] [cursor=pointer]:
+                        - img [ref=e225]
+                        - text: Mass Email
+                    - listitem [ref=e227]:
+                      - button "Email Addresses" [ref=e228] [cursor=pointer]:
+                        - img [ref=e229]
+                        - text: Email Addresses
+                - generic [ref=e232]:
+                  - paragraph [ref=e233]: Content
+                  - list [ref=e234]:
+                    - listitem [ref=e235]:
+                      - button "Marketing" [ref=e236] [cursor=pointer]:
+                        - img [ref=e237]
+                        - text: Marketing
+                    - listitem [ref=e241]:
+                      - button "Testimonials" [ref=e242] [cursor=pointer]:
+                        - img [ref=e243]
+                        - text: Testimonials
+                    - listitem [ref=e245]:
+                      - button "FAQs" [ref=e246] [cursor=pointer]:
+                        - img [ref=e247]
+                        - text: FAQs
+                    - listitem [ref=e250]:
+                      - button "Social Images" [ref=e251] [cursor=pointer]:
+                        - img [ref=e252]
+                        - text: Social Images
+                - generic [ref=e255]:
+                  - paragraph [ref=e256]: System
+                  - list [ref=e257]:
+                    - listitem [ref=e258]:
+                      - button "Maintenance" [ref=e259] [cursor=pointer]:
+                        - img [ref=e260]
+                        - text: Maintenance
+                    - listitem [ref=e267]:
+                      - button "Onboarding" [ref=e268] [cursor=pointer]:
+                        - img [ref=e269]
+                        - text: Onboarding
+                    - listitem [ref=e274]:
+                      - button "Configuration" [ref=e275] [cursor=pointer]:
+                        - img [ref=e276]
+                        - text: Configuration
+            - generic [ref=e280]:
+              - generic [ref=e281]:
+                - heading "Platform Overview" [level=2] [ref=e282]:
+                  - img [ref=e283]
+                  - text: Platform Overview
+                - generic [ref=e287]:
+                  - generic [ref=e288]:
+                    - img [ref=e290]
+                    - paragraph [ref=e295]: "10"
+                    - paragraph [ref=e296]: Total Authors
+                  - generic [ref=e297]:
+                    - img [ref=e299]
+                    - paragraph [ref=e301]: "19"
+                    - paragraph [ref=e302]: Total Books
+                  - generic [ref=e303]:
+                    - img [ref=e305]
+                    - paragraph [ref=e308]: "3"
+                    - paragraph [ref=e309]: Total Subscribers
+                  - generic [ref=e310]:
+                    - img [ref=e312]
+                    - paragraph [ref=e315]: "0"
+                    - paragraph [ref=e316]: Completed Orders
+                - generic [ref=e317]:
+                  - generic [ref=e318]: Total Platform Revenue
+                  - generic [ref=e319]: $0.00
+              - generic [ref=e320]:
+                - heading "Author Distribution by Plan" [level=2] [ref=e321]:
+                  - img [ref=e322]
+                  - text: Author Distribution by Plan
+                - generic [ref=e327]:
+                  - generic [ref=e329]:
+                    - generic [ref=e330]: Free
+                    - generic [ref=e331]: 6 authors (60%)
+                  - generic [ref=e335]:
+                    - generic [ref=e336]: Standard
+                    - generic [ref=e337]: 2 authors (20%)
+                  - generic [ref=e341]:
+                    - generic [ref=e342]: Premium
+                    - generic [ref=e343]: 2 authors (20%)
+  - alert [ref=e346]

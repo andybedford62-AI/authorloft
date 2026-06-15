@@ -1,0 +1,133 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "AuthorLoft" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "AuthorLoft" [ref=e6]
+      - button "Open menu" [ref=e9] [cursor=pointer]:
+        - img [ref=e10]
+  - generic [ref=e11]:
+    - generic [ref=e17]:
+      - paragraph [ref=e18]: · Get in touch ·
+      - heading "Contact AuthorLoft" [level=1] [ref=e19]
+      - paragraph [ref=e20]: Have a question about our plans, need help with your account, or just want to say hello? Fill out the form and we'll get back to you within one business day.
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: Your name *
+            - textbox "Jane Smith" [ref=e27]
+          - generic [ref=e28]:
+            - generic [ref=e29]: Email address *
+            - textbox "jane@example.com" [ref=e30]
+        - generic [ref=e31]:
+          - generic [ref=e32]: Subject
+          - textbox "What can we help you with?" [ref=e33]
+        - generic [ref=e34]:
+          - generic [ref=e35]: Message *
+          - textbox "Tell us more…" [ref=e36]
+        - button "Send Message" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - text: Send Message
+      - generic [ref=e41]:
+        - link "Privacy Policy" [ref=e42] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms of Service" [ref=e43] [cursor=pointer]:
+          - /url: /terms
+  - contentinfo [ref=e44]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - paragraph [ref=e48]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e49]: Updates, new features, specials & events.
+        - generic [ref=e50]:
+          - textbox "Your email" [ref=e51]
+          - button "Subscribe" [ref=e52] [cursor=pointer]:
+            - img [ref=e53]
+            - text: Subscribe
+      - generic [ref=e56]:
+        - img "AuthorLoft" [ref=e57]
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - link "Features" [ref=e60] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e61]: ·
+          - generic [ref=e62]:
+            - link "Bookstore" [ref=e63] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e64]: ·
+          - generic [ref=e65]:
+            - link "Pricing" [ref=e66] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e67]: ·
+          - generic [ref=e68]:
+            - link "Blog" [ref=e69] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e70]: ·
+          - generic [ref=e71]:
+            - link "News" [ref=e72] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e73]: ·
+          - generic [ref=e74]:
+            - link "Resources" [ref=e75] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e76]: ·
+          - generic [ref=e77]:
+            - link "FAQ" [ref=e78] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e79]: ·
+          - generic [ref=e80]:
+            - link "Contact" [ref=e81] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e82]: ·
+          - generic [ref=e83]:
+            - link "Privacy" [ref=e84] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e85]: ·
+          - generic [ref=e86]:
+            - link "Terms" [ref=e87] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e88]: ·
+          - generic [ref=e89]:
+            - link "GDPR" [ref=e90] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e91]: ·
+          - link "Demo" [ref=e93] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e94]:
+        - paragraph [ref=e95]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e96]:
+          - link "LinkedIn" [ref=e97] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e98]
+          - link "FaceBook" [ref=e102] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e103]
+          - link "Instagram" [ref=e105] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e106]
+        - paragraph [ref=e109]: —— your name, your shelf ——
+  - alert [ref=e110]
+  - dialog [ref=e111]:
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - img [ref=e114]
+        - generic [ref=e116]:
+          - generic [ref=e117]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e118] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e119] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e120]:
+        - button "I understand" [ref=e121] [cursor=pointer]
+        - button "Dismiss" [ref=e122] [cursor=pointer]:
+          - img [ref=e123]
+  - generic [ref=e127]:
+    - paragraph [ref=e128]: We use Google Analytics to measure campaign performance and improve your experience. No personal data is shared without your consent.
+    - generic [ref=e129]:
+      - button "Decline" [ref=e130] [cursor=pointer]
+      - button "Accept" [ref=e131] [cursor=pointer]
+      - button [ref=e132] [cursor=pointer]:
+        - img [ref=e133]

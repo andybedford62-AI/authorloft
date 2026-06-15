@@ -1,0 +1,153 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - img "AuthorLoft" [ref=e6]
+        - generic [ref=e7]:
+          - generic [ref=e8]: Admin
+          - generic [ref=e9]: Premium
+      - generic [ref=e10]:
+        - paragraph [ref=e11]: Your Site
+        - paragraph [ref=e12]: Anthony Bedford
+        - link "View live site" [ref=e13] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e14]
+      - navigation [ref=e18]:
+        - link "Dashboard" [ref=e19] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e20]
+          - text: Dashboard
+        - link "Analytics" [ref=e25] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e26]
+          - text: Analytics
+        - generic [ref=e28]:
+          - button "Catalog" [ref=e29] [cursor=pointer]:
+            - generic [ref=e30]: Catalog
+            - img [ref=e31]
+          - generic [ref=e33]:
+            - link "Books" [ref=e34] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e35]
+              - text: Books
+            - link "Series" [ref=e37] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e38]
+              - text: Series
+            - link "Flip Books" [ref=e40] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e41]
+              - text: Flip Books
+        - generic [ref=e44]:
+          - button "Website" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]: Website
+            - img [ref=e47]
+          - generic [ref=e49]:
+            - link "Pages" [ref=e50] [cursor=pointer]:
+              - /url: /admin/pages
+              - img [ref=e51]
+              - text: Pages
+            - link "Blog / News" [ref=e54] [cursor=pointer]:
+              - /url: /admin/blog
+              - img [ref=e55]
+              - text: Blog / News
+            - link "Appearance" [ref=e58] [cursor=pointer]:
+              - /url: /admin/appearance
+              - img [ref=e59]
+              - text: Appearance
+            - link "Branding" [ref=e63] [cursor=pointer]:
+              - /url: /admin/branding
+              - img [ref=e64]
+              - text: Branding
+        - button "Audience" [ref=e71] [cursor=pointer]:
+          - generic [ref=e72]: Audience
+          - img [ref=e73]
+        - button "Sales" [ref=e76] [cursor=pointer]:
+          - generic [ref=e77]: Sales
+          - img [ref=e78]
+        - button "Tools" [ref=e81] [cursor=pointer]:
+          - generic [ref=e82]: Tools
+          - img [ref=e83]
+        - button "Account" [ref=e86] [cursor=pointer]:
+          - generic [ref=e87]: Account
+          - img [ref=e88]
+        - paragraph [ref=e91]: Super Admin
+        - link "Platform Dashboard" [ref=e92] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e93]
+          - text: Platform Dashboard
+        - generic [ref=e98]:
+          - button "Authors" [ref=e99] [cursor=pointer]:
+            - generic [ref=e100]: Authors
+            - img [ref=e101]
+          - generic [ref=e103]:
+            - link "All Authors" [ref=e104] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e105]
+              - text: All Authors
+            - link "Access Requests" [ref=e110] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e111]
+              - text: Access Requests
+        - button "Billing & Plans" [ref=e115] [cursor=pointer]:
+          - generic [ref=e116]: Billing & Plans
+          - img [ref=e117]
+        - button "Marketing" [ref=e120] [cursor=pointer]:
+          - generic [ref=e121]: Marketing
+          - img [ref=e122]
+        - button "Platform" [ref=e125] [cursor=pointer]:
+          - generic [ref=e126]: Platform
+          - img [ref=e127]
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - img [ref=e131]
+          - text: Light mode
+          - link "Change" [ref=e137] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e138] [cursor=pointer]:
+          - img [ref=e139]
+          - text: Sign Out
+    - generic [ref=e142]:
+      - banner [ref=e143]:
+        - generic [ref=e144]: Super Admin
+        - generic [ref=e145]:
+          - generic [ref=e146]: Anthony Bedford
+          - generic [ref=e147]: A
+          - button "Sign out" [ref=e148] [cursor=pointer]:
+            - img [ref=e149]
+      - main [ref=e152]:
+        - generic [ref=e153]:
+          - heading "Dashboard" [level=1] [ref=e154]
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - paragraph [ref=e157]: Total Authors
+              - paragraph [ref=e158]: "10"
+            - generic [ref=e159]:
+              - paragraph [ref=e160]: Active Plans
+              - paragraph [ref=e161]: "3"
+            - generic [ref=e162]:
+              - paragraph [ref=e163]: On Paid Plans
+              - paragraph [ref=e164]: "0"
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - heading "Subscribers by Plan" [level=2] [ref=e167]
+              - link "Manage Plans →" [ref=e168] [cursor=pointer]:
+                - /url: /super-admin/plans
+            - generic [ref=e169]:
+              - generic [ref=e170]:
+                - generic [ref=e171]: Free
+                - generic [ref=e172]:
+                  - text: "0"
+                  - generic [ref=e173]: subscribers
+              - generic [ref=e174]:
+                - generic [ref=e175]: Standard
+                - generic [ref=e176]:
+                  - text: "0"
+                  - generic [ref=e177]: subscribers
+              - generic [ref=e178]:
+                - generic [ref=e179]: Premium
+                - generic [ref=e180]:
+                  - text: "0"
+                  - generic [ref=e181]: subscribers
+  - alert [ref=e182]

@@ -1,0 +1,345 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - button "Audience" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Audience
+          - img [ref=e54]
+        - button "Sales" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Sales
+          - img [ref=e59]
+        - button "Tools" [ref=e62] [cursor=pointer]:
+          - generic [ref=e63]: Tools
+          - img [ref=e64]
+        - button "Account" [ref=e67] [cursor=pointer]:
+          - generic [ref=e68]: Account
+          - img [ref=e69]
+        - paragraph [ref=e72]: Super Admin
+        - link "Platform Dashboard" [ref=e73] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e74]
+          - text: Platform Dashboard
+        - generic [ref=e79]:
+          - button "Authors" [ref=e80] [cursor=pointer]:
+            - generic [ref=e81]: Authors
+            - img [ref=e82]
+          - generic [ref=e84]:
+            - link "All Authors" [ref=e85] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e86]
+              - text: All Authors
+            - link "Access Requests" [ref=e91] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e92]
+              - text: Access Requests
+        - button "Billing & Plans" [ref=e96] [cursor=pointer]:
+          - generic [ref=e97]: Billing & Plans
+          - img [ref=e98]
+        - button "Marketing" [ref=e101] [cursor=pointer]:
+          - generic [ref=e102]: Marketing
+          - img [ref=e103]
+        - button "Platform" [ref=e106] [cursor=pointer]:
+          - generic [ref=e107]: Platform
+          - img [ref=e108]
+      - generic [ref=e110]:
+        - generic [ref=e111]:
+          - img [ref=e112]
+          - text: Light mode
+          - link "Change" [ref=e118] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e119] [cursor=pointer]:
+          - img [ref=e120]
+          - text: Sign Out
+    - generic [ref=e123]:
+      - banner [ref=e124]:
+        - button "Open navigation" [ref=e125] [cursor=pointer]:
+          - img [ref=e126]
+        - generic [ref=e127]:
+          - generic [ref=e128]: A
+          - button "Sign out" [ref=e129] [cursor=pointer]:
+            - img [ref=e130]
+      - main [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e136]:
+              - heading "Books" [level=1] [ref=e137]
+              - paragraph [ref=e138]: 13 titles in your catalog
+            - generic [ref=e139]:
+              - link "Import" [ref=e140] [cursor=pointer]:
+                - /url: /admin/books/import
+                - button "Import" [ref=e141]:
+                  - img [ref=e142]
+                  - text: Import
+              - link "Add Book" [ref=e145] [cursor=pointer]:
+                - /url: /admin/books/new
+                - button "Add Book" [ref=e146]:
+                  - img [ref=e147]
+                  - text: Add Book
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - button "My Books" [ref=e150] [cursor=pointer]:
+                - img [ref=e151]
+                - text: My Books
+              - button "Book Shelf" [ref=e153] [cursor=pointer]:
+                - img [ref=e154]
+                - text: Book Shelf
+              - button "ARC" [ref=e157] [cursor=pointer]:
+                - img [ref=e158]
+                - text: ARC
+            - generic [ref=e161]:
+              - generic [ref=e163]:
+                - text: Drag
+                - img [ref=e164]
+                - text: to reorder · the top 3 published books appear on your homepage
+              - table [ref=e171]:
+                - rowgroup [ref=e172]:
+                  - row "Book" [ref=e173]:
+                    - columnheader [ref=e174]
+                    - columnheader "Book" [ref=e175]
+                    - columnheader [ref=e176]
+                - rowgroup [ref=e177]:
+                  - row "1 The Weight of Water Coming Soon! Edit" [ref=e178]:
+                    - cell "1" [ref=e179]:
+                      - generic [ref=e180]:
+                        - img [ref=e181]
+                        - generic [ref=e188]: "1"
+                    - cell "The Weight of Water Coming Soon!" [ref=e189]:
+                      - link "The Weight of Water Coming Soon!" [ref=e190] [cursor=pointer]:
+                        - /url: /admin/books/cmq9zj2j40001js04rkv5v1ok/edit
+                        - generic [ref=e193]:
+                          - paragraph [ref=e194]: The Weight of Water
+                          - generic [ref=e195]: Coming Soon!
+                    - cell "Edit" [ref=e196]:
+                      - link "Edit" [ref=e198] [cursor=pointer]:
+                        - /url: /admin/books/cmq9zj2j40001js04rkv5v1ok/edit
+                        - button "Edit" [ref=e199]:
+                          - img [ref=e200]
+                          - generic: Edit
+                  - row "2 The Surge Below ** Newly Released! ** A Psychological Survival Thriller Edit" [ref=e203]:
+                    - cell "2" [ref=e204]:
+                      - generic [ref=e205]:
+                        - img [ref=e206]
+                        - generic [ref=e213]: "2"
+                    - cell "The Surge Below ** Newly Released! ** A Psychological Survival Thriller" [ref=e214]:
+                      - link "The Surge Below ** Newly Released! ** A Psychological Survival Thriller" [ref=e215] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfgdp000o9fs8dwxx3fhp/edit
+                        - generic [ref=e217]:
+                          - generic [ref=e218]:
+                            - paragraph [ref=e219]: The Surge Below
+                            - img [ref=e220]
+                            - generic [ref=e222]: "** Newly Released! **"
+                          - paragraph [ref=e223]: A Psychological Survival Thriller
+                    - cell "Edit" [ref=e224]:
+                      - link "Edit" [ref=e226] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfgdp000o9fs8dwxx3fhp/edit
+                        - button "Edit" [ref=e227]:
+                          - img [ref=e228]
+                          - generic: Edit
+                  - row "3 Into the Deep A Psychological Dive Thriller Edit" [ref=e231]:
+                    - cell "3" [ref=e232]:
+                      - generic [ref=e233]:
+                        - img [ref=e234]
+                        - generic [ref=e241]: "3"
+                    - cell "Into the Deep A Psychological Dive Thriller" [ref=e242]:
+                      - link "Into the Deep A Psychological Dive Thriller" [ref=e243] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfgwz000q9fs8fntx7zsr/edit
+                        - generic [ref=e245]:
+                          - paragraph [ref=e247]: Into the Deep
+                          - paragraph [ref=e248]: A Psychological Dive Thriller
+                    - cell "Edit" [ref=e249]:
+                      - link "Edit" [ref=e251] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfgwz000q9fs8fntx7zsr/edit
+                        - button "Edit" [ref=e252]:
+                          - img [ref=e253]
+                          - generic: Edit
+                  - row "Build, Vibe, Scale New The Introvert’s Guide to Dominating the SaaS Market Through “Ghost” Marketing and Social SEO Edit" [ref=e256]:
+                    - cell [ref=e257]:
+                      - img [ref=e259]
+                    - cell "Build, Vibe, Scale New The Introvert’s Guide to Dominating the SaaS Market Through “Ghost” Marketing and Social SEO" [ref=e266]:
+                      - link "Build, Vibe, Scale New The Introvert’s Guide to Dominating the SaaS Market Through “Ghost” Marketing and Social SEO" [ref=e267] [cursor=pointer]:
+                        - /url: /admin/books/cmoxb87990001ld04mlvt4134/edit
+                        - generic [ref=e269]:
+                          - generic [ref=e270]:
+                            - paragraph [ref=e271]: Build, Vibe, Scale
+                            - generic [ref=e272]: New
+                          - paragraph [ref=e273]: The Introvert’s Guide to Dominating the SaaS Market Through “Ghost” Marketing and Social SEO
+                    - cell "Edit" [ref=e274]:
+                      - link "Edit" [ref=e276] [cursor=pointer]:
+                        - /url: /admin/books/cmoxb87990001ld04mlvt4134/edit
+                        - button "Edit" [ref=e277]:
+                          - img [ref=e278]
+                          - generic: Edit
+                  - row "The Sovereign Founder Building Autonomous Micro-SaaS Growth Systems with AI Agents Edit" [ref=e281]:
+                    - cell [ref=e282]:
+                      - img [ref=e284]
+                    - cell "The Sovereign Founder Building Autonomous Micro-SaaS Growth Systems with AI Agents" [ref=e291]:
+                      - link "The Sovereign Founder Building Autonomous Micro-SaaS Growth Systems with AI Agents" [ref=e292] [cursor=pointer]:
+                        - /url: /admin/books/cmpbfomqk0001l804w7jkkzw6/edit
+                        - generic [ref=e294]:
+                          - paragraph [ref=e296]: The Sovereign Founder
+                          - paragraph [ref=e297]: Building Autonomous Micro-SaaS Growth Systems with AI Agents
+                    - cell "Edit" [ref=e298]:
+                      - link "Edit" [ref=e300] [cursor=pointer]:
+                        - /url: /admin/books/cmpbfomqk0001l804w7jkkzw6/edit
+                        - button "Edit" [ref=e301]:
+                          - img [ref=e302]
+                          - generic: Edit
+                  - row "Build a Solid SaaS App A Beginner’s Guide to Planning, Building, and Launching Edit" [ref=e305]:
+                    - cell [ref=e306]:
+                      - img [ref=e308]
+                    - cell "Build a Solid SaaS App A Beginner’s Guide to Planning, Building, and Launching" [ref=e315]:
+                      - link "Build a Solid SaaS App A Beginner’s Guide to Planning, Building, and Launching" [ref=e316] [cursor=pointer]:
+                        - /url: /admin/books/cmpbfrnlu0003l8046wywazrl/edit
+                        - generic [ref=e318]:
+                          - paragraph [ref=e320]: Build a Solid SaaS App
+                          - paragraph [ref=e321]: A Beginner’s Guide to Planning, Building, and Launching
+                    - cell "Edit" [ref=e322]:
+                      - link "Edit" [ref=e324] [cursor=pointer]:
+                        - /url: /admin/books/cmpbfrnlu0003l8046wywazrl/edit
+                        - button "Edit" [ref=e325]:
+                          - img [ref=e326]
+                          - generic: Edit
+                  - row "Finley the Friendly Dolphin The Adventures of Finley Edit" [ref=e329]:
+                    - cell [ref=e330]:
+                      - img [ref=e332]
+                    - cell "Finley the Friendly Dolphin The Adventures of Finley" [ref=e339]:
+                      - link "Finley the Friendly Dolphin The Adventures of Finley" [ref=e340] [cursor=pointer]:
+                        - /url: /admin/books/cmn2c55rq00099fvs4go9gqpe/edit
+                        - generic [ref=e342]:
+                          - paragraph [ref=e344]: Finley the Friendly Dolphin
+                          - paragraph [ref=e345]: The Adventures of Finley
+                    - cell "Edit" [ref=e346]:
+                      - link "Edit" [ref=e348] [cursor=pointer]:
+                        - /url: /admin/books/cmn2c55rq00099fvs4go9gqpe/edit
+                        - button "Edit" [ref=e349]:
+                          - img [ref=e350]
+                          - generic: Edit
+                  - row "Crabby's Ocean Friends A Grumpy Crab Learns the Magic of Kindness Edit" [ref=e353]:
+                    - cell [ref=e354]:
+                      - img [ref=e356]
+                    - cell "Crabby's Ocean Friends A Grumpy Crab Learns the Magic of Kindness" [ref=e363]:
+                      - link "Crabby's Ocean Friends A Grumpy Crab Learns the Magic of Kindness" [ref=e364] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfhri000w9fs8jdut762r/edit
+                        - generic [ref=e366]:
+                          - paragraph [ref=e368]: Crabby's Ocean Friends
+                          - paragraph [ref=e369]: A Grumpy Crab Learns the Magic of Kindness
+                    - cell "Edit" [ref=e370]:
+                      - link "Edit" [ref=e372] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfhri000w9fs8jdut762r/edit
+                        - button "Edit" [ref=e373]:
+                          - img [ref=e374]
+                          - generic: Edit
+                  - row "Benny's Big Bubbling Day Edit" [ref=e377]:
+                    - cell [ref=e378]:
+                      - img [ref=e380]
+                    - cell "Benny's Big Bubbling Day" [ref=e387]:
+                      - link "Benny's Big Bubbling Day" [ref=e388] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfhhz000u9fs81ybmnlt7/edit
+                        - paragraph [ref=e392]: Benny's Big Bubbling Day
+                    - cell "Edit" [ref=e393]:
+                      - link "Edit" [ref=e395] [cursor=pointer]:
+                        - /url: /admin/books/cmmxvfhhz000u9fs81ybmnlt7/edit
+                        - button "Edit" [ref=e396]:
+                          - img [ref=e397]
+                          - generic: Edit
+                  - row "Sammy the Seastar Big Dreams Edit" [ref=e400]:
+                    - cell [ref=e401]:
+                      - img [ref=e403]
+                    - cell "Sammy the Seastar Big Dreams" [ref=e410]:
+                      - link "Sammy the Seastar Big Dreams" [ref=e411] [cursor=pointer]:
+                        - /url: /admin/books/cmoil6yjc0001k304rkxzjbd2/edit
+                        - generic [ref=e413]:
+                          - paragraph [ref=e415]: Sammy the Seastar
+                          - paragraph [ref=e416]: Big Dreams
+                    - cell "Edit" [ref=e417]:
+                      - link "Edit" [ref=e419] [cursor=pointer]:
+                        - /url: /admin/books/cmoil6yjc0001k304rkxzjbd2/edit
+                        - button "Edit" [ref=e420]:
+                          - img [ref=e421]
+                          - generic: Edit
+                  - row "Sammy the Starfish Coloring Book Edit" [ref=e424]:
+                    - cell [ref=e425]:
+                      - img [ref=e427]
+                    - cell "Sammy the Starfish Coloring Book" [ref=e434]:
+                      - link "Sammy the Starfish Coloring Book" [ref=e435] [cursor=pointer]:
+                        - /url: /admin/books/cmoilqm2s0003k3048euftb7p/edit
+                        - generic [ref=e437]:
+                          - paragraph [ref=e439]: Sammy the Starfish
+                          - paragraph [ref=e440]: Coloring Book
+                    - cell "Edit" [ref=e441]:
+                      - link "Edit" [ref=e443] [cursor=pointer]:
+                        - /url: /admin/books/cmoilqm2s0003k3048euftb7p/edit
+                        - button "Edit" [ref=e444]:
+                          - img [ref=e445]
+                          - generic: Edit
+                  - row "Tilly the Turtle’s Ocean Adventures Days Full of Fun with Friends Edit" [ref=e448]:
+                    - cell [ref=e449]:
+                      - img [ref=e451]
+                    - cell "Tilly the Turtle’s Ocean Adventures Days Full of Fun with Friends" [ref=e458]:
+                      - link "Tilly the Turtle’s Ocean Adventures Days Full of Fun with Friends" [ref=e459] [cursor=pointer]:
+                        - /url: /admin/books/cmn2by7tp00059fvsrlcz1mtt/edit
+                        - generic [ref=e461]:
+                          - paragraph [ref=e463]: Tilly the Turtle’s Ocean Adventures
+                          - paragraph [ref=e464]: Days Full of Fun with Friends
+                    - cell "Edit" [ref=e465]:
+                      - link "Edit" [ref=e467] [cursor=pointer]:
+                        - /url: /admin/books/cmn2by7tp00059fvsrlcz1mtt/edit
+                        - button "Edit" [ref=e468]:
+                          - img [ref=e469]
+                          - generic: Edit
+                  - 'row "The Scuba Starter Kit: Everything You Need to Know Your Family Guide to Underwater Exploration, Safety & Fun! Edit" [ref=e472]':
+                    - cell [ref=e473]:
+                      - img [ref=e475]
+                    - 'cell "The Scuba Starter Kit: Everything You Need to Know Your Family Guide to Underwater Exploration, Safety & Fun!" [ref=e482]':
+                      - 'link "The Scuba Starter Kit: Everything You Need to Know Your Family Guide to Underwater Exploration, Safety & Fun!" [ref=e483] [cursor=pointer]':
+                        - /url: /admin/books/cmoxbzc2g0003l404uftgkcwy/edit
+                        - generic [ref=e485]:
+                          - paragraph [ref=e487]: "The Scuba Starter Kit: Everything You Need to Know"
+                          - paragraph [ref=e488]: Your Family Guide to Underwater Exploration, Safety & Fun!
+                    - cell "Edit" [ref=e489]:
+                      - link "Edit" [ref=e491] [cursor=pointer]:
+                        - /url: /admin/books/cmoxbzc2g0003l404uftgkcwy/edit
+                        - button "Edit" [ref=e492]:
+                          - img [ref=e493]
+                          - generic: Edit
+  - alert [ref=e496]

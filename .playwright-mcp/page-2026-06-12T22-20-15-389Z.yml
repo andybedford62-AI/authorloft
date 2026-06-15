@@ -1,0 +1,241 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "AuthorLoft" [ref=e7]
+        - button "Open menu" [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+    - generic [ref=e12]:
+      - img [ref=e13]
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: · Curated Resources ·
+        - heading "Tools & communities every author should know" [level=1] [ref=e18]
+        - paragraph [ref=e19]: A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers.
+    - generic [ref=e23]:
+      - generic [ref=e24]: 8 resources
+      - generic [ref=e25]: ·
+      - generic [ref=e26]: 5 categories
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - heading "Checklists" [level=2] [ref=e32]
+          - generic [ref=e34]: "2"
+        - generic [ref=e35]:
+          - link "CL Author Website Checklist A clean, professional checklist outlining the essential elements every author website should include, followed by what AuthorLoft.com provides beyond the basics. Checklists Visit →" [ref=e36] [cursor=pointer]:
+            - /url: https://docs.google.com/document/d/18PztRc_D48WEL4qv8ZkInSRcofRFXshy/edit?usp=sharing&ouid=100373913738300273519&rtpof=true&sd=true
+            - generic [ref=e37]:
+              - generic [ref=e39]: CL
+              - generic [ref=e41]:
+                - paragraph [ref=e42]: Author Website Checklist
+                - img [ref=e43]
+            - paragraph [ref=e46]: A clean, professional checklist outlining the essential elements every author website should include, followed by what AuthorLoft.com provides beyond the basics.
+            - generic [ref=e47]:
+              - generic [ref=e48]: Checklists
+              - generic [ref=e49]: Visit →
+          - link "CL Book Launch Checklist A complete, professional checklist covering every stage of a successful book launch—from pre-launch preparation to post-launch momentum. Checklists Visit →" [ref=e50] [cursor=pointer]:
+            - /url: https://docs.google.com/document/d/18PztRc_D48WEL4qv8ZkInSRcofRFXshy/edit?usp=sharing&ouid=100373913738300273519&rtpof=true&sd=true
+            - generic [ref=e51]:
+              - generic [ref=e53]: CL
+              - generic [ref=e55]:
+                - paragraph [ref=e56]: Book Launch Checklist
+                - img [ref=e57]
+            - paragraph [ref=e60]: A complete, professional checklist covering every stage of a successful book launch—from pre-launch preparation to post-launch momentum.
+            - generic [ref=e61]:
+              - generic [ref=e62]: Checklists
+              - generic [ref=e63]: Visit →
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - heading "Guide" [level=2] [ref=e67]
+          - generic [ref=e69]: "1"
+        - link "CL AuthorLoft Branded Direct Sales Guide A polished, AuthorLoft-branded guide designed to help authors confidently launch and grow their direct sales channel using modern tools, cinematic design, and reader‑first strategy. Guide Visit →" [ref=e71] [cursor=pointer]:
+          - /url: https://docs.google.com/document/d/161ydYaCRVcVSLfV7y3wFQisbkJT9B7oJ/edit?usp=sharing&ouid=100373913738300273519&rtpof=true&sd=true
+          - generic [ref=e72]:
+            - generic [ref=e74]: CL
+            - generic [ref=e76]:
+              - paragraph [ref=e77]: AuthorLoft Branded Direct Sales Guide
+              - img [ref=e78]
+          - paragraph [ref=e81]: A polished, AuthorLoft-branded guide designed to help authors confidently launch and grow their direct sales channel using modern tools, cinematic design, and reader‑first strategy.
+          - generic [ref=e82]:
+            - generic [ref=e83]: Guide
+            - generic [ref=e84]: Visit →
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - heading "Publishing Tools" [level=2] [ref=e88]
+          - generic [ref=e90]: "1"
+        - link "Reedsy Reedsy A marketplace connecting authors with professional editors, designers, and marketers. Also offers free courses, a manuscript formatter, and an active community. Tools Visit →" [ref=e92] [cursor=pointer]:
+          - /url: https://reedsy.com
+          - generic [ref=e93]:
+            - img "Reedsy" [ref=e95]
+            - generic [ref=e97]:
+              - paragraph [ref=e98]: Reedsy
+              - img [ref=e99]
+          - paragraph [ref=e102]: A marketplace connecting authors with professional editors, designers, and marketers. Also offers free courses, a manuscript formatter, and an active community.
+          - generic [ref=e103]:
+            - generic [ref=e104]: Tools
+            - generic [ref=e105]: Visit →
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - heading "Education & Advice" [level=2] [ref=e109]
+          - generic [ref=e111]: "2"
+        - generic [ref=e112]:
+          - link "JF Jane Friedman One of the most respected voices in publishing. Jane's blog covers every aspect of the author career — from querying agents to building a direct-to-reader business. Education Visit →" [ref=e113] [cursor=pointer]:
+            - /url: https://www.janefriedman.com
+            - generic [ref=e114]:
+              - generic [ref=e116]: JF
+              - generic [ref=e118]:
+                - paragraph [ref=e119]: Jane Friedman
+                - img [ref=e120]
+            - paragraph [ref=e123]: One of the most respected voices in publishing. Jane's blog covers every aspect of the author career — from querying agents to building a direct-to-reader business.
+            - generic [ref=e124]:
+              - generic [ref=e125]: Education
+              - generic [ref=e126]: Visit →
+          - link "CP The Creative Penn Joanna Penn's podcast and blog are essential for any indie author. Covers writing, publishing, marketing, and building a sustainable author business. Education Visit →" [ref=e127] [cursor=pointer]:
+            - /url: https://www.thecreativepenn.com
+            - generic [ref=e128]:
+              - generic [ref=e130]: CP
+              - generic [ref=e132]:
+                - paragraph [ref=e133]: The Creative Penn
+                - img [ref=e134]
+            - paragraph [ref=e137]: Joanna Penn's podcast and blog are essential for any indie author. Covers writing, publishing, marketing, and building a sustainable author business.
+            - generic [ref=e138]:
+              - generic [ref=e139]: Education
+              - generic [ref=e140]: Visit →
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - heading "Marketing & Discovery" [level=2] [ref=e144]
+          - generic [ref=e145]: "2"
+        - generic [ref=e146]:
+          - link "Kp Kindlepreneur The go-to resource for book marketing, Amazon optimisation, and self-publishing strategy. Practical, data-driven advice from Dave Chesson. Marketing Visit →" [ref=e147] [cursor=pointer]:
+            - /url: https://kindlepreneur.com
+            - generic [ref=e148]:
+              - generic [ref=e150]: Kp
+              - generic [ref=e152]:
+                - paragraph [ref=e153]: Kindlepreneur
+                - img [ref=e154]
+            - paragraph [ref=e157]: The go-to resource for book marketing, Amazon optimisation, and self-publishing strategy. Practical, data-driven advice from Dave Chesson.
+            - generic [ref=e158]:
+              - generic [ref=e159]: Marketing
+              - generic [ref=e160]: Visit →
+          - link "WW Written Word Media Connects authors with over 500,000 eager readers through book promotions including Freebooksy, Bargain Booksy, and RedFeather Romance. Marketing Visit →" [ref=e161] [cursor=pointer]:
+            - /url: https://www.writtenwordmedia.com
+            - generic [ref=e162]:
+              - generic [ref=e164]: WW
+              - generic [ref=e166]:
+                - paragraph [ref=e167]: Written Word Media
+                - img [ref=e168]
+            - paragraph [ref=e171]: Connects authors with over 500,000 eager readers through book promotions including Freebooksy, Bargain Booksy, and RedFeather Romance.
+            - generic [ref=e172]:
+              - generic [ref=e173]: Marketing
+              - generic [ref=e174]: Visit →
+    - generic [ref=e176]:
+      - paragraph [ref=e177]: · Work with us ·
+      - heading "Serve independent authors? Let's work together." [level=2] [ref=e178]:
+        - text: Serve independent authors?
+        - text: Let's work together.
+      - paragraph [ref=e179]: We are open to cross-promotional partnerships with organisations and tools that genuinely help indie authors. Featured partners are listed here with their logo, promoted to our growing author community, and highlighted across our platform.
+      - link "Get in touch →" [ref=e180] [cursor=pointer]:
+        - /url: mailto:hello@authorloft.com?subject=Partnership%20inquiry%20%E2%80%94%20AuthorLoft%20Resources
+      - paragraph [ref=e181]: hello@authorloft.com
+    - paragraph [ref=e183]:
+      - text: Resources listed here are editorially selected. AuthorLoft is not compensated for standard listings. ·
+      - link "Back to AuthorLoft →" [ref=e184] [cursor=pointer]:
+        - /url: /
+  - contentinfo [ref=e185]:
+    - generic [ref=e186]:
+      - generic [ref=e187]:
+        - generic [ref=e188]:
+          - paragraph [ref=e189]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e190]: Updates, new features, specials & events.
+        - generic [ref=e191]:
+          - textbox "Your email" [ref=e192]
+          - button "Subscribe" [ref=e193] [cursor=pointer]:
+            - img [ref=e194]
+            - text: Subscribe
+      - generic [ref=e197]:
+        - img "AuthorLoft" [ref=e198]
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - link "Features" [ref=e201] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e202]: ·
+          - generic [ref=e203]:
+            - link "Bookstore" [ref=e204] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e205]: ·
+          - generic [ref=e206]:
+            - link "Pricing" [ref=e207] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e208]: ·
+          - generic [ref=e209]:
+            - link "Blog" [ref=e210] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e211]: ·
+          - generic [ref=e212]:
+            - link "News" [ref=e213] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e214]: ·
+          - generic [ref=e215]:
+            - link "Resources" [ref=e216] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e217]: ·
+          - generic [ref=e218]:
+            - link "FAQ" [ref=e219] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e220]: ·
+          - generic [ref=e221]:
+            - link "Contact" [ref=e222] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e223]: ·
+          - generic [ref=e224]:
+            - link "Privacy" [ref=e225] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e226]: ·
+          - generic [ref=e227]:
+            - link "Terms" [ref=e228] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e229]: ·
+          - generic [ref=e230]:
+            - link "GDPR" [ref=e231] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e232]: ·
+          - link "Demo" [ref=e234] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e235]:
+        - paragraph [ref=e236]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e237]:
+          - link "LinkedIn" [ref=e238] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e239]
+          - link "FaceBook" [ref=e243] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e244]
+          - link "Instagram" [ref=e246] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e247]
+        - paragraph [ref=e250]: —— your name, your shelf ——
+  - alert [ref=e251]
+  - dialog [ref=e252]:
+    - generic [ref=e253]:
+      - generic [ref=e254]:
+        - img [ref=e255]
+        - generic [ref=e257]:
+          - generic [ref=e258]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e259] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e260] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e261]:
+        - button "I understand" [ref=e262] [cursor=pointer]
+        - button "Dismiss" [ref=e263] [cursor=pointer]:
+          - img [ref=e264]
+  - generic [ref=e268]:
+    - paragraph [ref=e269]: We use Google Analytics to measure campaign performance and improve your experience. No personal data is shared without your consent.
+    - generic [ref=e270]:
+      - button "Decline" [ref=e271] [cursor=pointer]
+      - button "Accept" [ref=e272] [cursor=pointer]
+      - button [ref=e273] [cursor=pointer]:
+        - img [ref=e274]

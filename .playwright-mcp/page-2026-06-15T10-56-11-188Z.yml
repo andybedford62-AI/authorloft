@@ -1,0 +1,357 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+            - /url: /
+            - img "AuthorLoft" [ref=e7]
+          - generic [ref=e8]: "|"
+          - generic [ref=e9]:
+            - generic [ref=e10]: Anthony Bedford
+            - link "Dashboard" [ref=e11] [cursor=pointer]:
+              - /url: /admin
+              - img [ref=e12]
+              - text: Dashboard
+        - navigation [ref=e17]:
+          - link "Bookstore" [ref=e18] [cursor=pointer]:
+            - /url: /bookstore
+          - link "Features" [ref=e19] [cursor=pointer]:
+            - /url: /features
+          - link "FAQ" [ref=e20] [cursor=pointer]:
+            - /url: /faq
+          - button "Resources" [ref=e22] [cursor=pointer]:
+            - text: Resources
+            - img [ref=e23]
+          - link "Pricing" [ref=e25] [cursor=pointer]:
+            - /url: /pricing
+    - generic [ref=e26]:
+      - img [ref=e27]
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: · Discover independent authors ·
+        - heading "The AuthorLoft Bookstore" [level=1] [ref=e32]
+        - paragraph [ref=e33]: A shared shelf of books from independent authors across every genre. Find your next read, then buy directly from each author's own site.
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - img [ref=e38]
+        - generic [ref=e40]: "4"
+        - generic [ref=e41]: Books
+      - generic [ref=e42]:
+        - img [ref=e43]
+        - generic [ref=e45]: "3"
+        - generic [ref=e46]: Authors
+      - generic [ref=e47]:
+        - img [ref=e48]
+        - generic [ref=e51]: "4"
+        - generic [ref=e52]: Genres
+    - generic [ref=e54]:
+      - img [ref=e55]
+      - paragraph [ref=e58]: Every book here is published by an independent author on AuthorLoft.
+    - generic [ref=e59]:
+      - generic [ref=e61]:
+        - img [ref=e64]
+        - heading "Support authors who care about readers" [level=2] [ref=e66]
+        - paragraph [ref=e67]: Buy directly from independent voices. No middlemen, no algorithms—just stories from writers who are genuinely grateful for every reader.
+      - generic [ref=e69]:
+        - paragraph [ref=e70]: · Author Spotlight ·
+        - generic [ref=e71]:
+          - img "Victoria Chase" [ref=e72]
+          - generic [ref=e73]:
+            - heading "Victoria Chase" [level=2] [ref=e74]
+            - paragraph [ref=e75]: 1 book in the bookstore
+            - paragraph [ref=e76]: Victoria Chase writes pulse-pounding psychological thrillers set in the Pacific Northwest. With over half a million readers worldwide, her novels blend atmospheric suspense with unforgettable characters.
+            - link "Visit Victoria Chase's site" [ref=e77] [cursor=pointer]:
+              - /url: https://demo.staging.authorloft.com
+              - text: Visit Victoria Chase's site
+              - img [ref=e78]
+      - generic [ref=e82]:
+        - heading "New on the Shelf" [level=2] [ref=e83]:
+          - img [ref=e84]
+          - text: New on the Shelf
+        - paragraph [ref=e87]: The latest titles added to the bookstore.
+        - generic [ref=e89]:
+          - link "Crossing Currents Crossing Currents by Tina Williams Buy on Author's Site" [ref=e91] [cursor=pointer]:
+            - /url: https://tinawilliams.staging.authorloft.com/books/crossing-currents
+            - img "Crossing Currents" [ref=e93]
+            - generic [ref=e94]:
+              - heading "Crossing Currents" [level=3] [ref=e95]
+              - paragraph [ref=e96]: by Tina Williams
+              - generic [ref=e97]:
+                - text: Buy on Author's Site
+                - img [ref=e98]
+          - link "The Blackwood Deception The Blackwood Deception by Victoria Chase Buy on Author's Site" [ref=e101] [cursor=pointer]:
+            - /url: https://demo.staging.authorloft.com/books/the-blackwood-deception
+            - img "The Blackwood Deception" [ref=e103]
+            - generic [ref=e104]:
+              - heading "The Blackwood Deception" [level=3] [ref=e105]
+              - paragraph [ref=e106]: by Victoria Chase
+              - generic [ref=e107]:
+                - text: Buy on Author's Site
+                - img [ref=e108]
+          - link "Crabby's Ocean Friends Crabby's Ocean Friends by Anthony Bedford Buy on Author's Site" [ref=e111] [cursor=pointer]:
+            - /url: https://apbedford.staging.authorloft.com/books/crabbys-ocean-friends
+            - img "Crabby's Ocean Friends" [ref=e113]
+            - generic [ref=e114]:
+              - heading "Crabby's Ocean Friends" [level=3] [ref=e115]
+              - paragraph [ref=e116]: by Anthony Bedford
+              - generic [ref=e117]:
+                - text: Buy on Author's Site
+                - img [ref=e118]
+          - link "The Surge Below The Surge Below by Anthony Bedford Buy on Author's Site" [ref=e121] [cursor=pointer]:
+            - /url: https://apbedford.staging.authorloft.com/books/the-surge-below
+            - img "The Surge Below" [ref=e123]
+            - generic [ref=e124]:
+              - heading "The Surge Below" [level=3] [ref=e125]
+              - paragraph [ref=e126]: by Anthony Bedford
+              - generic [ref=e127]:
+                - text: Buy on Author's Site
+                - img [ref=e128]
+      - generic [ref=e130]:
+        - heading "Browse by Genre" [level=2] [ref=e131]:
+          - img [ref=e132]
+          - text: Browse by Genre
+        - generic [ref=e135]:
+          - link "Children's Books 1" [ref=e136] [cursor=pointer]:
+            - /url: /bookstore/genre/childrens-books
+            - generic [ref=e137]: Children's Books
+            - generic [ref=e138]: "1"
+          - link "Psychological Thriller 1" [ref=e139] [cursor=pointer]:
+            - /url: /bookstore/genre/psychological-thriller
+            - generic [ref=e140]: Psychological Thriller
+            - generic [ref=e141]: "1"
+          - link "Reading Books 1" [ref=e142] [cursor=pointer]:
+            - /url: /bookstore/genre/reading-books
+            - generic [ref=e143]: Reading Books
+            - generic [ref=e144]: "1"
+          - link "Thriller 1" [ref=e145] [cursor=pointer]:
+            - /url: /bookstore/genre/thriller
+            - generic [ref=e146]: Thriller
+            - generic [ref=e147]: "1"
+      - generic [ref=e148]:
+        - heading "Browse All Books" [level=2] [ref=e149]:
+          - img [ref=e150]
+          - text: Browse All Books
+        - generic [ref=e152]:
+          - generic [ref=e154]:
+            - img [ref=e155]
+            - textbox "Find books by title, author, or genre…" [ref=e158]
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - combobox "Filter by format" [ref=e161] [cursor=pointer]:
+                - option "All formats" [selected]
+                - option "eBook"
+                - option "Paperback"
+              - combobox "Filter by price" [ref=e162] [cursor=pointer]:
+                - option "Any price" [selected]
+                - option "Free"
+                - option "Under $5"
+                - option "Under $10"
+                - option "Under $20"
+              - combobox "Sort books" [ref=e163] [cursor=pointer]:
+                - option "Newest" [selected]
+                - option "Title A–Z"
+                - option "Highest Rated"
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - img [ref=e166]
+                - text: "Genres:"
+              - button "Children's Books" [ref=e167] [cursor=pointer]
+              - button "Psychological Thriller" [ref=e168] [cursor=pointer]
+              - button "Reading Books" [ref=e169] [cursor=pointer]
+              - button "Thriller" [ref=e170] [cursor=pointer]
+          - paragraph [ref=e172]: Showing 4 of 4 books
+          - generic [ref=e173]:
+            - link "Crossing Currents $6.99 Crossing Currents by Tina Williams eBook Paperback Buy on Author's Site" [ref=e174] [cursor=pointer]:
+              - /url: https://tinawilliams.staging.authorloft.com/books/crossing-currents
+              - generic [ref=e175]:
+                - img "Crossing Currents" [ref=e176]
+                - generic [ref=e177]: $6.99
+              - generic [ref=e178]:
+                - heading "Crossing Currents" [level=3] [ref=e179]
+                - paragraph [ref=e180]: by Tina Williams
+                - generic [ref=e181]:
+                  - generic [ref=e182]: eBook
+                  - generic [ref=e183]: Paperback
+                - generic [ref=e184]:
+                  - text: Buy on Author's Site
+                  - img [ref=e185]
+            - link "The Blackwood Deception Featured $14.99 The Blackwood Deception by Victoria Chase Buy on Author's Site" [ref=e187] [cursor=pointer]:
+              - /url: https://demo.staging.authorloft.com/books/the-blackwood-deception
+              - generic [ref=e188]:
+                - img "The Blackwood Deception" [ref=e189]
+                - generic [ref=e191]:
+                  - img [ref=e192]
+                  - text: Featured
+                - generic [ref=e195]: $14.99
+              - generic [ref=e196]:
+                - heading "The Blackwood Deception" [level=3] [ref=e197]
+                - paragraph [ref=e198]: by Victoria Chase
+                - generic [ref=e199]:
+                  - text: Buy on Author's Site
+                  - img [ref=e200]
+            - link "Crabby's Ocean Friends Featured $2.99 Crabby's Ocean Friends by Anthony Bedford · 2 books 5.0 (1) eBook Paperback Buy on Author's Site" [ref=e202] [cursor=pointer]:
+              - /url: https://apbedford.staging.authorloft.com/books/crabbys-ocean-friends
+              - generic [ref=e203]:
+                - img "Crabby's Ocean Friends" [ref=e204]
+                - generic [ref=e206]:
+                  - img [ref=e207]
+                  - text: Featured
+                - generic [ref=e210]: $2.99
+              - generic [ref=e211]:
+                - heading "Crabby's Ocean Friends" [level=3] [ref=e212]
+                - paragraph [ref=e213]:
+                  - text: by Anthony Bedford
+                  - generic [ref=e214]: · 2 books
+                - generic [ref=e215]:
+                  - generic [ref=e216]:
+                    - img [ref=e217]
+                    - img [ref=e219]
+                    - img [ref=e221]
+                    - img [ref=e223]
+                    - img [ref=e225]
+                  - generic [ref=e227]: 5.0 (1)
+                - generic [ref=e228]:
+                  - generic [ref=e229]: eBook
+                  - generic [ref=e230]: Paperback
+                - generic [ref=e231]:
+                  - text: Buy on Author's Site
+                  - img [ref=e232]
+            - link "The Surge Below Featured $12.49 The Surge Below by Anthony Bedford · 2 books Paperback eBook Buy on Author's Site" [ref=e234] [cursor=pointer]:
+              - /url: https://apbedford.staging.authorloft.com/books/the-surge-below
+              - generic [ref=e235]:
+                - img "The Surge Below" [ref=e236]
+                - generic [ref=e238]:
+                  - img [ref=e239]
+                  - text: Featured
+                - generic [ref=e242]: $12.49
+              - generic [ref=e243]:
+                - heading "The Surge Below" [level=3] [ref=e244]
+                - paragraph [ref=e245]:
+                  - text: by Anthony Bedford
+                  - generic [ref=e246]: · 2 books
+                - generic [ref=e247]:
+                  - generic [ref=e248]: Paperback
+                  - generic [ref=e249]: eBook
+                - generic [ref=e250]:
+                  - text: Buy on Author's Site
+                  - img [ref=e251]
+    - generic [ref=e254]:
+      - paragraph [ref=e255]: · For authors ·
+      - heading "How the Bookstore works" [level=2] [ref=e256]
+      - generic [ref=e257]:
+        - generic [ref=e258]:
+          - generic [ref=e259]:
+            - img [ref=e260]
+            - generic [ref=e262]: "1"
+          - heading "List your book" [level=3] [ref=e263]
+          - paragraph [ref=e264]: Flip one toggle to add any published book to the shared catalog.
+        - generic [ref=e265]:
+          - generic [ref=e266]:
+            - img [ref=e267]
+            - generic [ref=e270]: "2"
+          - heading "Get discovered" [level=3] [ref=e271]
+          - paragraph [ref=e272]: Readers browse by genre, rating, and price across every author.
+        - generic [ref=e273]:
+          - generic [ref=e274]:
+            - img [ref=e275]
+            - generic [ref=e279]: "3"
+          - heading "Sell on your site" [level=3] [ref=e280]
+          - paragraph [ref=e281]: Every link sends readers to your own AuthorLoft site to buy.
+    - generic [ref=e282]:
+      - paragraph [ref=e283]: · Are you an author? ·
+      - heading "List your books in the AuthorLoft Bookstore" [level=2] [ref=e284]
+      - paragraph [ref=e285]: Reach new readers through our shared catalog — then sell directly from your own author site. Available on the Standard and Premium plans.
+      - link "Get Started Free" [ref=e286] [cursor=pointer]:
+        - /url: /register
+        - text: Get Started Free
+        - img [ref=e287]
+  - contentinfo [ref=e289]:
+    - generic [ref=e290]:
+      - generic [ref=e291]:
+        - generic [ref=e292]:
+          - paragraph [ref=e293]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e294]: Updates, new features, specials & events.
+        - generic [ref=e295]:
+          - textbox "Your email" [ref=e296]
+          - button "Subscribe" [ref=e297] [cursor=pointer]:
+            - img [ref=e298]
+            - text: Subscribe
+      - generic [ref=e301]:
+        - img "AuthorLoft" [ref=e302]
+        - generic [ref=e303]:
+          - generic [ref=e304]:
+            - link "Features" [ref=e305] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e306]: ·
+          - generic [ref=e307]:
+            - link "Bookstore" [ref=e308] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e309]: ·
+          - generic [ref=e310]:
+            - link "Pricing" [ref=e311] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e312]: ·
+          - generic [ref=e313]:
+            - link "Blog" [ref=e314] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e315]: ·
+          - generic [ref=e316]:
+            - link "News" [ref=e317] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e318]: ·
+          - generic [ref=e319]:
+            - link "Resources" [ref=e320] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e321]: ·
+          - generic [ref=e322]:
+            - link "FAQ" [ref=e323] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e324]: ·
+          - generic [ref=e325]:
+            - link "Contact" [ref=e326] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e327]: ·
+          - generic [ref=e328]:
+            - link "Privacy" [ref=e329] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e330]: ·
+          - generic [ref=e331]:
+            - link "Terms" [ref=e332] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e333]: ·
+          - generic [ref=e334]:
+            - link "GDPR" [ref=e335] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e336]: ·
+          - link "Demo" [ref=e338] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e339]:
+        - paragraph [ref=e340]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e341]:
+          - link "LinkedIn" [ref=e342] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e343]
+          - link "FaceBook" [ref=e347] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e348]
+          - link "Instagram" [ref=e350] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e351]
+        - paragraph [ref=e354]: —— your name, your shelf ——
+  - alert [ref=e355]
+  - dialog [ref=e356]:
+    - generic [ref=e357]:
+      - generic [ref=e358]:
+        - img [ref=e359]
+        - generic [ref=e361]:
+          - generic [ref=e362]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e363] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e364] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e365]:
+        - button "I understand" [ref=e366] [cursor=pointer]
+        - button "Dismiss" [ref=e367] [cursor=pointer]:
+          - img [ref=e368]

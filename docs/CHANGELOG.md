@@ -13,9 +13,12 @@ line rather than listing every commit.
 
 ---
 
-## June 15, 2026 — GEO: AuthorLoft vs BookFunnel comparison page
+## June 15, 2026 — GEO: comparison pages (BookFunnel, StoryOrigin, Tertulia)
 _(not yet promoted to prod)_
-- **New `/compare/bookfunnel` comparison page** — first Generative Engine Optimization (GEO) / SEO asset from the AI-visibility plan. Shared brand-band header, "choose which" cards, feature comparison table (from the pricing matrix), core-difference prose, and an FAQ section with `FAQPage` structured data (high-value for AI extraction). Brandless title (template-branded once), canonical, OG image; added to `sitemap.ts`; linked from the pricing page's competitor table. Scalable pattern for future `vs storyorigin` / `vs tertulia` pages
+- **Three "vs" comparison landing pages** (GEO/SEO assets from the AI-visibility plan): `/compare/bookfunnel`, `/compare/storyorigin`, `/compare/tertulia`. Each has the shared brand-band header, "choose which" cards, a feature comparison table, core-difference prose, and an FAQ section with `FAQPage` structured data (high-value for AI extraction)
+- **Refactored to a single dynamic route** `/compare/[competitor]` + a `comparison-data.tsx` source of truth and a shared `ComparisonPage` component (the original static bookfunnel page was folded in). Adding a competitor is now a data-only change; `sitemap.ts` generates entries from the same list
+- **Accuracy checked** against each product's real positioning (web-verified): BookFunnel = delivery/reader-magnets; StoryOrigin = author marketing toolkit (newsletter swaps — credited as its win); Tertulia = reader discovery app with a basic author site that links out to retailers. Comparisons are fair, not hit pieces
+- **Meta descriptions trimmed to ≤155 chars** (the BookFunnel one was 174); brandless titles (template brands once), canonicals, OG images; pricing page links to all three
 
 ## June 15, 2026 — Genre page SEO title fix
 _(not yet promoted to prod)_

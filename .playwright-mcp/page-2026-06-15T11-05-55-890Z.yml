@@ -1,0 +1,194 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "AuthorLoft" [ref=e6] [cursor=pointer]:
+            - /url: /
+            - img "AuthorLoft" [ref=e7]
+          - generic [ref=e8]: "|"
+          - generic [ref=e9]:
+            - generic [ref=e10]: Anthony Bedford
+            - link "Dashboard" [ref=e11] [cursor=pointer]:
+              - /url: /admin
+              - img [ref=e12]
+              - text: Dashboard
+        - navigation [ref=e17]:
+          - link "Bookstore" [ref=e18] [cursor=pointer]:
+            - /url: /bookstore
+          - link "Features" [ref=e19] [cursor=pointer]:
+            - /url: /features
+          - link "FAQ" [ref=e20] [cursor=pointer]:
+            - /url: /faq
+          - button "Resources" [ref=e22] [cursor=pointer]:
+            - text: Resources
+            - img [ref=e23]
+          - link "Pricing" [ref=e25] [cursor=pointer]:
+            - /url: /pricing
+    - generic [ref=e26]:
+      - img [ref=e27]
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: · Bookstore Genre ·
+        - heading "Children's Books" [level=1] [ref=e32]
+        - paragraph [ref=e33]: 1 book from independent authors.
+    - generic [ref=e35]:
+      - link "All books" [ref=e36] [cursor=pointer]:
+        - /url: /bookstore
+        - img [ref=e37]
+        - text: All books
+      - generic [ref=e39]:
+        - generic [ref=e41]:
+          - img [ref=e42]
+          - textbox "Find books by title, author, or genre…" [ref=e45]
+        - generic [ref=e47]:
+          - combobox "Filter by format" [ref=e48] [cursor=pointer]:
+            - option "All formats" [selected]
+            - option "eBook"
+            - option "Paperback"
+          - combobox "Filter by price" [ref=e49] [cursor=pointer]:
+            - option "Any price" [selected]
+            - option "Free"
+            - option "Under $5"
+            - option "Under $10"
+            - option "Under $20"
+          - combobox "Sort books" [ref=e50] [cursor=pointer]:
+            - option "Newest" [selected]
+            - option "Title A–Z"
+            - option "Highest Rated"
+        - paragraph [ref=e52]: Showing 1 of 1 book
+        - link "Crabby's Ocean Friends Featured $2.99 Crabby's Ocean Friends by Anthony Bedford · 2 books 5.0 (1) eBook Paperback Buy on Author's Site" [ref=e54] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com/books/crabbys-ocean-friends
+          - generic [ref=e55]:
+            - img "Crabby's Ocean Friends" [ref=e56]
+            - generic [ref=e58]:
+              - img [ref=e59]
+              - text: Featured
+            - generic [ref=e62]: $2.99
+          - generic [ref=e63]:
+            - heading "Crabby's Ocean Friends" [level=3] [ref=e64]
+            - paragraph [ref=e65]:
+              - text: by Anthony Bedford
+              - generic [ref=e66]: · 2 books
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - img [ref=e69]
+                - img [ref=e71]
+                - img [ref=e73]
+                - img [ref=e75]
+                - img [ref=e77]
+              - generic [ref=e79]: 5.0 (1)
+            - generic [ref=e80]:
+              - generic [ref=e81]: eBook
+              - generic [ref=e82]: Paperback
+            - generic [ref=e83]:
+              - text: Buy on Author's Site
+              - img [ref=e84]
+      - generic [ref=e86]:
+        - heading "Explore other genres" [level=2] [ref=e87]
+        - generic [ref=e88]:
+          - link "Psychological Thriller 1" [ref=e89] [cursor=pointer]:
+            - /url: /bookstore/genre/psychological-thriller
+            - generic [ref=e90]: Psychological Thriller
+            - generic [ref=e91]: "1"
+          - link "Reading Books 1" [ref=e92] [cursor=pointer]:
+            - /url: /bookstore/genre/reading-books
+            - generic [ref=e93]: Reading Books
+            - generic [ref=e94]: "1"
+          - link "Thriller 1" [ref=e95] [cursor=pointer]:
+            - /url: /bookstore/genre/thriller
+            - generic [ref=e96]: Thriller
+            - generic [ref=e97]: "1"
+    - generic [ref=e98]:
+      - heading "Write children's books? List your book free." [level=2] [ref=e99]
+      - link "Get Started Free" [ref=e100] [cursor=pointer]:
+        - /url: /register
+  - contentinfo [ref=e101]:
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - paragraph [ref=e105]: Get AuthorLoft News in your inbox
+          - paragraph [ref=e106]: Updates, new features, specials & events.
+        - generic [ref=e107]:
+          - textbox "Your email" [ref=e108]
+          - button "Subscribe" [ref=e109] [cursor=pointer]:
+            - img [ref=e110]
+            - text: Subscribe
+      - generic [ref=e113]:
+        - img "AuthorLoft" [ref=e114]
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - link "Features" [ref=e117] [cursor=pointer]:
+              - /url: /features
+            - generic [ref=e118]: ·
+          - generic [ref=e119]:
+            - link "Bookstore" [ref=e120] [cursor=pointer]:
+              - /url: /bookstore
+            - generic [ref=e121]: ·
+          - generic [ref=e122]:
+            - link "Pricing" [ref=e123] [cursor=pointer]:
+              - /url: /pricing
+            - generic [ref=e124]: ·
+          - generic [ref=e125]:
+            - link "Blog" [ref=e126] [cursor=pointer]:
+              - /url: /blog
+            - generic [ref=e127]: ·
+          - generic [ref=e128]:
+            - link "News" [ref=e129] [cursor=pointer]:
+              - /url: /news
+            - generic [ref=e130]: ·
+          - generic [ref=e131]:
+            - link "Resources" [ref=e132] [cursor=pointer]:
+              - /url: /resources
+            - generic [ref=e133]: ·
+          - generic [ref=e134]:
+            - link "FAQ" [ref=e135] [cursor=pointer]:
+              - /url: /faq
+            - generic [ref=e136]: ·
+          - generic [ref=e137]:
+            - link "Contact" [ref=e138] [cursor=pointer]:
+              - /url: /contact
+            - generic [ref=e139]: ·
+          - generic [ref=e140]:
+            - link "Privacy" [ref=e141] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e142]: ·
+          - generic [ref=e143]:
+            - link "Terms" [ref=e144] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e145]: ·
+          - generic [ref=e146]:
+            - link "GDPR" [ref=e147] [cursor=pointer]:
+              - /url: /gdpr
+            - generic [ref=e148]: ·
+          - link "Demo" [ref=e150] [cursor=pointer]:
+            - /url: https://demo.authorloft.com
+      - generic [ref=e151]:
+        - paragraph [ref=e152]: © 2026 AuthorLoft. Built for authors, by someone who actually loves books.
+        - generic [ref=e153]:
+          - link "LinkedIn" [ref=e154] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/authorloft/
+            - img [ref=e155]
+          - link "FaceBook" [ref=e159] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61589513229124
+            - img [ref=e160]
+          - link "Instagram" [ref=e162] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e163]
+        - paragraph [ref=e166]: —— your name, your shelf ——
+  - alert [ref=e167]
+  - dialog [ref=e168]:
+    - generic [ref=e169]:
+      - generic [ref=e170]:
+        - img [ref=e171]
+        - generic [ref=e173]:
+          - generic [ref=e174]: We've updated our Privacy Policy and Terms of Service.
+          - text: Please review the changes.
+          - link "Privacy Policy" [ref=e175] [cursor=pointer]:
+            - /url: /privacy
+          - text: ·
+          - link "Terms of Service" [ref=e176] [cursor=pointer]:
+            - /url: /terms
+      - generic [ref=e177]:
+        - button "I understand" [ref=e178] [cursor=pointer]
+        - button "Dismiss" [ref=e179] [cursor=pointer]:
+          - img [ref=e180]

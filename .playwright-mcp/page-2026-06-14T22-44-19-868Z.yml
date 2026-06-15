@@ -1,0 +1,500 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - generic [ref=e51]:
+          - button "Audience" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: Audience
+            - img [ref=e54]
+          - generic [ref=e56]:
+            - link "Messages" [ref=e57] [cursor=pointer]:
+              - /url: /admin/messages
+              - img [ref=e58]
+              - text: Messages
+            - link "Reader Feedback" [ref=e61] [cursor=pointer]:
+              - /url: /admin/feedback
+              - img [ref=e62]
+              - text: Reader Feedback
+            - link "Email & Newsletter" [ref=e64] [cursor=pointer]:
+              - /url: /admin/newsletter
+              - img [ref=e65]
+              - text: Email & Newsletter
+            - link "Media Kit" [ref=e68] [cursor=pointer]:
+              - /url: /admin/media-kit
+              - img [ref=e69]
+              - text: Media Kit
+        - generic [ref=e72]:
+          - button "Sales" [ref=e73] [cursor=pointer]:
+            - generic [ref=e74]: Sales
+            - img [ref=e75]
+          - generic [ref=e77]:
+            - link "Sales" [ref=e78] [cursor=pointer]:
+              - /url: /admin/sales
+              - img [ref=e79]
+              - text: Sales
+            - link "Specials" [ref=e82] [cursor=pointer]:
+              - /url: /admin/specials
+              - img [ref=e83]
+              - text: Specials
+            - link "Discount Codes" [ref=e86] [cursor=pointer]:
+              - /url: /admin/discount-codes
+              - img [ref=e87]
+              - text: Discount Codes
+            - link "Invoices & Tax" [ref=e90] [cursor=pointer]:
+              - /url: /admin/invoices
+              - img [ref=e91]
+              - text: Invoices & Tax
+        - button "Tools" [ref=e95] [cursor=pointer]:
+          - generic [ref=e96]: Tools
+          - img [ref=e97]
+        - generic [ref=e99]:
+          - button "Account" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]: Account
+            - img [ref=e102]
+          - generic [ref=e104]:
+            - link "Settings" [ref=e105] [cursor=pointer]:
+              - /url: /admin/settings
+              - img [ref=e106]
+              - text: Settings
+            - link "Reader Privacy (GDPR)" [ref=e109] [cursor=pointer]:
+              - /url: /admin/compliance
+              - img [ref=e110]
+              - text: Reader Privacy (GDPR)
+            - link "Help & Support" [ref=e112] [cursor=pointer]:
+              - /url: /admin/help
+              - img [ref=e113]
+              - text: Help & Support
+        - paragraph [ref=e117]: Super Admin
+        - link "Platform Dashboard" [ref=e118] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e119]
+          - text: Platform Dashboard
+        - generic [ref=e124]:
+          - button "Authors" [ref=e125] [cursor=pointer]:
+            - generic [ref=e126]: Authors
+            - img [ref=e127]
+          - generic [ref=e129]:
+            - link "All Authors" [ref=e130] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e131]
+              - text: All Authors
+            - link "Access Requests" [ref=e136] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e137]
+              - text: Access Requests
+        - generic [ref=e140]:
+          - button "Billing & Plans" [ref=e141] [cursor=pointer]:
+            - generic [ref=e142]: Billing & Plans
+            - img [ref=e143]
+          - generic [ref=e145]:
+            - link "Plans" [ref=e146] [cursor=pointer]:
+              - /url: /super-admin/plans
+              - img [ref=e147]
+              - text: Plans
+            - link "Coupons" [ref=e149] [cursor=pointer]:
+              - /url: /super-admin/coupons
+              - img [ref=e150]
+              - text: Coupons
+            - link "Feature Gates" [ref=e152] [cursor=pointer]:
+              - /url: /super-admin/feature-config
+              - img [ref=e153]
+              - text: Feature Gates
+        - generic [ref=e154]:
+          - button "Marketing" [ref=e155] [cursor=pointer]:
+            - generic [ref=e156]: Marketing
+            - img [ref=e157]
+          - generic [ref=e159]:
+            - link "Blog & News" [ref=e160] [cursor=pointer]:
+              - /url: /super-admin/blog
+              - img [ref=e161]
+              - text: Blog & News
+            - link "News Subscribers" [ref=e164] [cursor=pointer]:
+              - /url: /super-admin/subscribers
+              - img [ref=e165]
+              - text: News Subscribers
+            - link "Resources" [ref=e168] [cursor=pointer]:
+              - /url: /super-admin/resources
+              - img [ref=e169]
+              - text: Resources
+            - link "Resource Downloads" [ref=e172] [cursor=pointer]:
+              - /url: /super-admin/resource-downloads
+              - img [ref=e173]
+              - text: Resource Downloads
+            - link "Social Media" [ref=e176] [cursor=pointer]:
+              - /url: /super-admin/social
+              - img [ref=e177]
+              - text: Social Media
+        - generic [ref=e183]:
+          - button "Platform" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]: Platform
+            - img [ref=e186]
+          - generic [ref=e188]:
+            - link "Content Categories" [ref=e189] [cursor=pointer]:
+              - /url: /super-admin/categories
+              - img [ref=e190]
+              - text: Content Categories
+            - link "Genres" [ref=e195] [cursor=pointer]:
+              - /url: /admin/genres
+              - img [ref=e196]
+              - text: Genres
+            - link "Help Articles" [ref=e199] [cursor=pointer]:
+              - /url: /super-admin/help
+              - img [ref=e200]
+              - text: Help Articles
+            - link "Platform Legal" [ref=e203] [cursor=pointer]:
+              - /url: /super-admin/legal
+              - img [ref=e204]
+              - text: Platform Legal
+            - link "Platform Settings" [ref=e206] [cursor=pointer]:
+              - /url: /super-admin/settings
+              - img [ref=e207]
+              - text: Platform Settings
+      - generic [ref=e210]:
+        - generic [ref=e211]:
+          - img [ref=e212]
+          - text: Light mode
+          - link "Change" [ref=e218] [cursor=pointer]:
+            - /url: /admin/settings
+        - button "Sign Out" [ref=e219] [cursor=pointer]:
+          - img [ref=e220]
+          - text: Sign Out
+    - generic [ref=e223]:
+      - banner [ref=e224]:
+        - button "Open navigation" [ref=e225] [cursor=pointer]:
+          - img [ref=e226]
+        - generic [ref=e227]: Super Admin
+        - generic [ref=e228]:
+          - generic [ref=e229]: A
+          - button "Sign out" [ref=e230] [cursor=pointer]:
+            - img [ref=e231]
+      - main [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - generic [ref=e237]:
+              - heading "Feature Gates" [level=1] [ref=e238]
+              - paragraph [ref=e239]: Set the minimum plan tier required to access each admin menu item. Changes apply to all authors on next page load.
+            - button "Save Changes" [ref=e240] [cursor=pointer]:
+              - img [ref=e241]
+              - text: Save Changes
+          - generic [ref=e245]:
+            - generic [ref=e246]: FREE
+            - generic [ref=e247]: STANDARD
+            - generic [ref=e248]: PREMIUM
+            - generic [ref=e249]: — higher tiers inherit lower-tier access
+            - generic [ref=e251]: DISABLED
+            - generic [ref=e252]: — hidden from all users including Premium
+            - generic [ref=e254]:
+              - img [ref=e255]
+              - text: Public site
+            - generic [ref=e258]: — also updates the public author site instantly
+          - generic [ref=e259]:
+            - generic [ref=e260]:
+              - generic [ref=e261]:
+                - img [ref=e262]
+                - generic [ref=e265]:
+                  - generic [ref=e267]: AI Assistant
+                  - generic [ref=e268]: /admin/ai-assistant
+              - generic [ref=e269]:
+                - button "FREE" [ref=e270] [cursor=pointer]
+                - button "STANDARD" [ref=e271] [cursor=pointer]
+                - button "PREMIUM" [ref=e272] [cursor=pointer]
+                - button "DISABLED" [ref=e273] [cursor=pointer]
+            - generic [ref=e274]:
+              - generic [ref=e275]:
+                - img [ref=e276]
+                - generic [ref=e280]:
+                  - generic [ref=e282]: Appearance
+                  - generic [ref=e283]: /admin/appearance
+              - generic [ref=e284]:
+                - button "FREE" [ref=e285] [cursor=pointer]
+                - button "STANDARD" [ref=e286] [cursor=pointer]
+                - button "PREMIUM" [ref=e287] [cursor=pointer]
+                - button "DISABLED" [ref=e288] [cursor=pointer]
+            - generic [ref=e289]:
+              - generic [ref=e290]:
+                - img [ref=e291]
+                - generic [ref=e293]:
+                  - generic [ref=e295]: ARCs
+                  - generic [ref=e296]: /admin/arcs
+              - generic [ref=e297]:
+                - button "FREE" [ref=e298] [cursor=pointer]
+                - button "STANDARD" [ref=e299] [cursor=pointer]
+                - button "PREMIUM" [ref=e300] [cursor=pointer]
+                - button "DISABLED" [ref=e301] [cursor=pointer]
+            - generic [ref=e302]:
+              - generic [ref=e303]:
+                - img [ref=e304]
+                - generic [ref=e307]:
+                  - generic [ref=e309]: Blog / News
+                  - generic [ref=e310]: /admin/blog
+              - generic [ref=e311]:
+                - button "FREE" [ref=e312] [cursor=pointer]
+                - button "STANDARD" [ref=e313] [cursor=pointer]
+                - button "PREMIUM" [ref=e314] [cursor=pointer]
+                - button "DISABLED" [ref=e315] [cursor=pointer]
+            - generic [ref=e316]:
+              - generic [ref=e317]:
+                - img [ref=e318]
+                - generic [ref=e320]:
+                  - generic [ref=e322]: Books
+                  - generic [ref=e323]: /admin/books
+              - generic [ref=e324]:
+                - button "FREE" [ref=e325] [cursor=pointer]
+                - button "STANDARD" [ref=e326] [cursor=pointer]
+                - button "PREMIUM" [ref=e327] [cursor=pointer]
+                - button "DISABLED" [ref=e328] [cursor=pointer]
+            - generic [ref=e329]:
+              - generic [ref=e330]:
+                - img [ref=e331]
+                - generic [ref=e337]:
+                  - generic [ref=e339]: Branding
+                  - generic [ref=e340]: /admin/branding
+              - generic [ref=e341]:
+                - button "FREE" [ref=e342] [cursor=pointer]
+                - button "STANDARD" [ref=e343] [cursor=pointer]
+                - button "PREMIUM" [ref=e344] [cursor=pointer]
+                - button "DISABLED" [ref=e345] [cursor=pointer]
+            - generic [ref=e346]:
+              - generic [ref=e347]:
+                - img [ref=e348]
+                - generic [ref=e352]:
+                  - generic [ref=e353]:
+                    - generic [ref=e354]: Bookstore Listing
+                    - generic [ref=e355]:
+                      - img [ref=e356]
+                      - text: Public site
+                  - generic [ref=e359]: bookstore-listing
+              - generic [ref=e360]:
+                - button "FREE" [ref=e361] [cursor=pointer]
+                - button "STANDARD" [ref=e362] [cursor=pointer]
+                - button "PREMIUM" [ref=e363] [cursor=pointer]
+                - button "DISABLED" [ref=e364] [cursor=pointer]
+            - generic [ref=e365]:
+              - generic [ref=e366]:
+                - img [ref=e367]
+                - generic [ref=e370]:
+                  - generic [ref=e372]: Custom Pages
+                  - generic [ref=e373]: /admin/pages
+              - generic [ref=e374]:
+                - button "FREE" [ref=e375] [cursor=pointer]
+                - button "STANDARD" [ref=e376] [cursor=pointer]
+                - button "PREMIUM" [ref=e377] [cursor=pointer]
+                - button "DISABLED" [ref=e378] [cursor=pointer]
+            - generic [ref=e379]:
+              - generic [ref=e380]:
+                - img [ref=e381]
+                - generic [ref=e386]:
+                  - generic [ref=e388]: Dashboard
+                  - generic [ref=e389]: /admin/dashboard
+              - generic [ref=e390]:
+                - button "FREE" [ref=e391] [cursor=pointer]
+                - button "STANDARD" [ref=e392] [cursor=pointer]
+                - button "PREMIUM" [ref=e393] [cursor=pointer]
+                - button "DISABLED" [ref=e394] [cursor=pointer]
+            - generic [ref=e395]:
+              - generic [ref=e396]:
+                - img [ref=e397]
+                - generic [ref=e401]:
+                  - generic [ref=e402]:
+                    - generic [ref=e403]: Direct Sales
+                    - generic [ref=e404]:
+                      - img [ref=e405]
+                      - text: Public site
+                  - generic [ref=e408]: direct-sales
+              - generic [ref=e409]:
+                - button "FREE" [ref=e410] [cursor=pointer]
+                - button "STANDARD" [ref=e411] [cursor=pointer]
+                - button "PREMIUM" [ref=e412] [cursor=pointer]
+                - button "DISABLED" [ref=e413] [cursor=pointer]
+            - generic [ref=e414]:
+              - generic [ref=e415]:
+                - img [ref=e416]
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: Flip Books
+                    - generic [ref=e422]:
+                      - img [ref=e423]
+                      - text: Public site
+                  - generic [ref=e426]: /admin/flip-books
+              - generic [ref=e427]:
+                - button "FREE" [ref=e428] [cursor=pointer]
+                - button "STANDARD" [ref=e429] [cursor=pointer]
+                - button "PREMIUM" [ref=e430] [cursor=pointer]
+                - button "DISABLED" [ref=e431] [cursor=pointer]
+            - generic [ref=e432]:
+              - generic [ref=e433]:
+                - img [ref=e434]
+                - generic [ref=e437]:
+                  - generic [ref=e439]: Genres
+                  - generic [ref=e440]: /admin/genres
+              - generic [ref=e441]:
+                - button "FREE" [ref=e442] [cursor=pointer]
+                - button "STANDARD" [ref=e443] [cursor=pointer]
+                - button "PREMIUM" [ref=e444] [cursor=pointer]
+                - button "DISABLED" [ref=e445] [cursor=pointer]
+            - generic [ref=e446]:
+              - generic [ref=e447]:
+                - img [ref=e448]
+                - generic [ref=e451]:
+                  - generic [ref=e452]:
+                    - generic [ref=e453]: Media Kit
+                    - generic [ref=e454]:
+                      - img [ref=e455]
+                      - text: Public site
+                  - generic [ref=e458]: /admin/media-kit
+              - generic [ref=e459]:
+                - button "FREE" [ref=e460] [cursor=pointer]
+                - button "STANDARD" [ref=e461] [cursor=pointer]
+                - button "PREMIUM" [ref=e462] [cursor=pointer]
+                - button "DISABLED" [ref=e463] [cursor=pointer]
+            - generic [ref=e464]:
+              - generic [ref=e465]:
+                - img [ref=e466]
+                - generic [ref=e469]:
+                  - generic [ref=e471]: Messages
+                  - generic [ref=e472]: /admin/messages
+              - generic [ref=e473]:
+                - button "FREE" [ref=e474] [cursor=pointer]
+                - button "STANDARD" [ref=e475] [cursor=pointer]
+                - button "PREMIUM" [ref=e476] [cursor=pointer]
+                - button "DISABLED" [ref=e477] [cursor=pointer]
+            - generic [ref=e478]:
+              - generic [ref=e479]:
+                - img [ref=e480]
+                - generic [ref=e482]:
+                  - generic [ref=e484]: My Site Legal
+                  - generic [ref=e485]: /admin/legal
+              - generic [ref=e486]:
+                - button "FREE" [ref=e487] [cursor=pointer]
+                - button "STANDARD" [ref=e488] [cursor=pointer]
+                - button "PREMIUM" [ref=e489] [cursor=pointer]
+                - button "DISABLED" [ref=e490] [cursor=pointer]
+            - generic [ref=e491]:
+              - generic [ref=e492]:
+                - img [ref=e493]
+                - generic [ref=e496]:
+                  - generic [ref=e497]:
+                    - generic [ref=e498]: Newsletter
+                    - generic [ref=e499]:
+                      - img [ref=e500]
+                      - text: Public site
+                  - generic [ref=e503]: /admin/newsletter
+              - generic [ref=e504]:
+                - button "FREE" [ref=e505] [cursor=pointer]
+                - button "STANDARD" [ref=e506] [cursor=pointer]
+                - button "PREMIUM" [ref=e507] [cursor=pointer]
+                - button "DISABLED" [ref=e508] [cursor=pointer]
+            - generic [ref=e509]:
+              - generic [ref=e510]:
+                - img [ref=e511]
+                - generic [ref=e515]:
+                  - generic [ref=e516]:
+                    - generic [ref=e517]: Pre-orders / Coming Soon
+                    - generic [ref=e518]:
+                      - img [ref=e519]
+                      - text: Public site
+                  - generic [ref=e522]: pre-orders
+              - generic [ref=e523]:
+                - button "FREE" [ref=e524] [cursor=pointer]
+                - button "STANDARD" [ref=e525] [cursor=pointer]
+                - button "PREMIUM" [ref=e526] [cursor=pointer]
+                - button "DISABLED" [ref=e527] [cursor=pointer]
+            - generic [ref=e528]:
+              - generic [ref=e529]:
+                - img [ref=e530]
+                - generic [ref=e533]:
+                  - generic [ref=e535]: Sales
+                  - generic [ref=e536]: /admin/sales
+              - generic [ref=e537]:
+                - button "FREE" [ref=e538] [cursor=pointer]
+                - button "STANDARD" [ref=e539] [cursor=pointer]
+                - button "PREMIUM" [ref=e540] [cursor=pointer]
+                - button "DISABLED" [ref=e541] [cursor=pointer]
+            - generic [ref=e542]:
+              - generic [ref=e543]:
+                - img [ref=e544]
+                - generic [ref=e546]:
+                  - generic [ref=e548]: Series
+                  - generic [ref=e549]: /admin/series
+              - generic [ref=e550]:
+                - button "FREE" [ref=e551] [cursor=pointer]
+                - button "STANDARD" [ref=e552] [cursor=pointer]
+                - button "PREMIUM" [ref=e553] [cursor=pointer]
+                - button "DISABLED" [ref=e554] [cursor=pointer]
+            - generic [ref=e555]:
+              - generic [ref=e556]:
+                - img [ref=e557]
+                - generic [ref=e560]:
+                  - generic [ref=e562]: SEO Audit
+                  - generic [ref=e563]: /admin/seo-audit
+              - generic [ref=e564]:
+                - button "FREE" [ref=e565] [cursor=pointer]
+                - button "STANDARD" [ref=e566] [cursor=pointer]
+                - button "PREMIUM" [ref=e567] [cursor=pointer]
+                - button "DISABLED" [ref=e568] [cursor=pointer]
+            - generic [ref=e569]:
+              - generic [ref=e570]:
+                - img [ref=e571]
+                - generic [ref=e574]:
+                  - generic [ref=e576]: Settings
+                  - generic [ref=e577]: /admin/settings
+              - generic [ref=e578]:
+                - button "FREE" [ref=e579] [cursor=pointer]
+                - button "STANDARD" [ref=e580] [cursor=pointer]
+                - button "PREMIUM" [ref=e581] [cursor=pointer]
+                - button "DISABLED" [ref=e582] [cursor=pointer]
+            - generic [ref=e583]:
+              - generic [ref=e584]:
+                - img [ref=e585]
+                - generic [ref=e588]:
+                  - generic [ref=e590]: Specials
+                  - generic [ref=e591]: /admin/specials
+              - generic [ref=e592]:
+                - button "FREE" [ref=e593] [cursor=pointer]
+                - button "STANDARD" [ref=e594] [cursor=pointer]
+                - button "PREMIUM" [ref=e595] [cursor=pointer]
+                - button "DISABLED" [ref=e596] [cursor=pointer]
+          - button "Save Changes" [ref=e598] [cursor=pointer]:
+            - img [ref=e599]
+            - text: Save Changes
+  - alert [ref=e603]

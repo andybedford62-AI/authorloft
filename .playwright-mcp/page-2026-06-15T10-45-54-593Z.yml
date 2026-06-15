@@ -1,0 +1,382 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - img "AuthorLoft" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Admin
+          - generic [ref=e11]: Premium
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Your Site
+        - paragraph [ref=e14]: Anthony Bedford
+        - link "View live site" [ref=e15] [cursor=pointer]:
+          - /url: https://apbedford.staging.authorloft.com
+          - text: View live site
+          - img [ref=e16]
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/dashboard
+          - img [ref=e22]
+          - text: Dashboard
+        - link "Analytics" [ref=e27] [cursor=pointer]:
+          - /url: /admin/analytics
+          - img [ref=e28]
+          - text: Analytics
+        - generic [ref=e30]:
+          - button "Catalog" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: Catalog
+            - img [ref=e33]
+          - generic [ref=e35]:
+            - link "Books" [ref=e36] [cursor=pointer]:
+              - /url: /admin/books
+              - img [ref=e37]
+              - text: Books
+            - link "Series" [ref=e39] [cursor=pointer]:
+              - /url: /admin/series
+              - img [ref=e40]
+              - text: Series
+            - link "Flip Books" [ref=e42] [cursor=pointer]:
+              - /url: /admin/flip-books
+              - img [ref=e43]
+              - text: Flip Books
+        - button "Website" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Website
+          - img [ref=e49]
+        - generic [ref=e51]:
+          - button "Audience" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: Audience
+            - img [ref=e54]
+          - generic [ref=e56]:
+            - link "Messages" [ref=e57] [cursor=pointer]:
+              - /url: /admin/messages
+              - img [ref=e58]
+              - text: Messages
+            - link "Reader Feedback" [ref=e61] [cursor=pointer]:
+              - /url: /admin/feedback
+              - img [ref=e62]
+              - text: Reader Feedback
+            - link "Email & Newsletter" [ref=e64] [cursor=pointer]:
+              - /url: /admin/newsletter
+              - img [ref=e65]
+              - text: Email & Newsletter
+            - link "Media Kit" [ref=e68] [cursor=pointer]:
+              - /url: /admin/media-kit
+              - img [ref=e69]
+              - text: Media Kit
+        - generic [ref=e72]:
+          - button "Sales" [ref=e73] [cursor=pointer]:
+            - generic [ref=e74]: Sales
+            - img [ref=e75]
+          - generic [ref=e77]:
+            - link "Sales" [ref=e78] [cursor=pointer]:
+              - /url: /admin/sales
+              - img [ref=e79]
+              - text: Sales
+            - link "Specials" [ref=e82] [cursor=pointer]:
+              - /url: /admin/specials
+              - img [ref=e83]
+              - text: Specials
+            - link "Discount Codes" [ref=e86] [cursor=pointer]:
+              - /url: /admin/discount-codes
+              - img [ref=e87]
+              - text: Discount Codes
+            - link "Invoices & Tax" [ref=e90] [cursor=pointer]:
+              - /url: /admin/invoices
+              - img [ref=e91]
+              - text: Invoices & Tax
+        - button "Tools" [ref=e95] [cursor=pointer]:
+          - generic [ref=e96]: Tools
+          - img [ref=e97]
+        - generic [ref=e99]:
+          - button "Account" [ref=e100] [cursor=pointer]:
+            - generic [ref=e101]: Account
+            - img [ref=e102]
+          - generic [ref=e104]:
+            - link "Settings" [ref=e105] [cursor=pointer]:
+              - /url: /admin/settings
+              - img [ref=e106]
+              - text: Settings
+            - link "Reader Privacy (GDPR)" [ref=e109] [cursor=pointer]:
+              - /url: /admin/compliance
+              - img [ref=e110]
+              - text: Reader Privacy (GDPR)
+            - link "Help & Support" [ref=e112] [cursor=pointer]:
+              - /url: /admin/help
+              - img [ref=e113]
+              - text: Help & Support
+        - paragraph [ref=e117]: Super Admin
+        - link "Platform Dashboard" [ref=e118] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e119]
+          - text: Platform Dashboard
+        - generic [ref=e124]:
+          - button "Authors" [ref=e125] [cursor=pointer]:
+            - generic [ref=e126]: Authors
+            - img [ref=e127]
+          - generic [ref=e129]:
+            - link "All Authors" [ref=e130] [cursor=pointer]:
+              - /url: /super-admin/authors
+              - img [ref=e131]
+              - text: All Authors
+            - link "Access Requests" [ref=e136] [cursor=pointer]:
+              - /url: /super-admin/access-requests
+              - img [ref=e137]
+              - text: Access Requests
+        - generic [ref=e140]:
+          - button "Billing & Plans" [ref=e141] [cursor=pointer]:
+            - generic [ref=e142]: Billing & Plans
+            - img [ref=e143]
+          - generic [ref=e145]:
+            - link "Plans" [ref=e146] [cursor=pointer]:
+              - /url: /super-admin/plans
+              - img [ref=e147]
+              - text: Plans
+            - link "Coupons" [ref=e149] [cursor=pointer]:
+              - /url: /super-admin/coupons
+              - img [ref=e150]
+              - text: Coupons
+            - link "Feature Gates" [ref=e152] [cursor=pointer]:
+              - /url: /super-admin/feature-config
+              - img [ref=e153]
+              - text: Feature Gates
+        - generic [ref=e154]:
+          - button "Marketing" [ref=e155] [cursor=pointer]:
+            - generic [ref=e156]: Marketing
+            - img [ref=e157]
+          - generic [ref=e159]:
+            - link "Blog & News" [ref=e160] [cursor=pointer]:
+              - /url: /super-admin/blog
+              - img [ref=e161]
+              - text: Blog & News
+            - link "News Subscribers" [ref=e164] [cursor=pointer]:
+              - /url: /super-admin/subscribers
+              - img [ref=e165]
+              - text: News Subscribers
+            - link "Resources" [ref=e168] [cursor=pointer]:
+              - /url: /super-admin/resources
+              - img [ref=e169]
+              - text: Resources
+            - link "Resource Downloads" [ref=e172] [cursor=pointer]:
+              - /url: /super-admin/resource-downloads
+              - img [ref=e173]
+              - text: Resource Downloads
+            - link "Social Media" [ref=e176] [cursor=pointer]:
+              - /url: /super-admin/social
+              - img [ref=e177]
+              - text: Social Media
+        - generic [ref=e183]:
+          - button "Platform" [ref=e184] [cursor=pointer]:
+            - generic [ref=e185]: Platform
+            - img [ref=e186]
+          - generic [ref=e188]:
+            - link "Content Categories" [ref=e189] [cursor=pointer]:
+              - /url: /super-admin/categories
+              - img [ref=e190]
+              - text: Content Categories
+            - link "Genres" [ref=e195] [cursor=pointer]:
+              - /url: /admin/genres
+              - img [ref=e196]
+              - text: Genres
+            - link "Help Articles" [ref=e199] [cursor=pointer]:
+              - /url: /super-admin/help
+              - img [ref=e200]
+              - text: Help Articles
+            - link "Platform Legal" [ref=e203] [cursor=pointer]:
+              - /url: /super-admin/legal
+              - img [ref=e204]
+              - text: Platform Legal
+            - link "Platform Settings" [ref=e206] [cursor=pointer]:
+              - /url: /super-admin/settings
+              - img [ref=e207]
+              - text: Platform Settings
+        - generic [ref=e211]:
+          - generic [ref=e212]:
+            - img [ref=e213]
+            - text: Light mode
+            - link "Change" [ref=e219] [cursor=pointer]:
+              - /url: /admin/settings
+          - button "Sign Out" [ref=e220] [cursor=pointer]:
+            - img [ref=e221]
+            - text: Sign Out
+    - generic [ref=e224]:
+      - banner [ref=e225]:
+        - generic [ref=e226]:
+          - generic [ref=e227]: Anthony Bedford
+          - generic [ref=e228]: A
+          - button "Sign out" [ref=e229] [cursor=pointer]:
+            - img [ref=e230]
+            - generic [ref=e233]: Sign out
+      - main [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - generic [ref=e237]:
+              - heading "Dashboard" [level=1] [ref=e238]
+              - paragraph [ref=e239]: Welcome back, Anthony
+            - link "Add Book" [ref=e240] [cursor=pointer]:
+              - /url: /admin/books/new
+              - button "Add Book" [ref=e241]:
+                - img [ref=e242]
+                - text: Add Book
+          - generic [ref=e243]:
+            - generic [ref=e244]:
+              - heading "Your Site Pages" [level=2] [ref=e245]:
+                - img [ref=e246]
+                - text: Your Site Pages
+              - link "Visit site" [ref=e249] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com
+                - text: Visit site
+                - img [ref=e250]
+            - generic [ref=e254]:
+              - link "Home" [ref=e255] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/
+                - text: Home
+                - img [ref=e256]
+              - link "Books" [ref=e260] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/books
+                - text: Books
+                - img [ref=e261]
+              - link "Specials" [ref=e265] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/specials
+                - text: Specials
+                - img [ref=e266]
+              - link "Flip Books" [ref=e270] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/flip-books
+                - text: Flip Books
+                - img [ref=e271]
+              - link "News" [ref=e275] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/blog
+                - text: News
+                - img [ref=e276]
+              - link "About" [ref=e280] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/about
+                - text: About
+                - img [ref=e281]
+              - link "Contact" [ref=e285] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/contact
+                - text: Contact
+                - img [ref=e286]
+              - link "Media Kit" [ref=e290] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/media-kit
+                - text: Media Kit
+                - img [ref=e291]
+            - generic [ref=e295]:
+              - paragraph [ref=e296]:
+                - text: Submit this sitemap to
+                - link "Google Search Console" [ref=e297] [cursor=pointer]:
+                  - /url: https://search.google.com/search-console
+                - text: or
+                - link "Bing Webmaster Tools" [ref=e298] [cursor=pointer]:
+                  - /url: https://www.bing.com/webmasters
+                - text: "to help search engines find your pages:"
+              - link "https://apbedford.staging.authorloft.com/sitemap.xml" [ref=e299] [cursor=pointer]:
+                - /url: https://apbedford.staging.authorloft.com/sitemap.xml
+                - text: https://apbedford.staging.authorloft.com/sitemap.xml
+                - img [ref=e300]
+          - generic [ref=e304]:
+            - link "Total Books 13" [ref=e305] [cursor=pointer]:
+              - /url: /admin/books
+              - generic [ref=e306]:
+                - generic [ref=e307]:
+                  - paragraph [ref=e308]: Total Books
+                  - paragraph [ref=e309]: "13"
+                - img [ref=e311]
+            - link "Newsletter Subscribers 1" [ref=e313] [cursor=pointer]:
+              - /url: /admin/newsletter
+              - generic [ref=e314]:
+                - generic [ref=e315]:
+                  - paragraph [ref=e316]: Newsletter Subscribers
+                  - paragraph [ref=e317]: "1"
+                - img [ref=e319]
+            - link "Revenue (All Time) $0.00" [ref=e324] [cursor=pointer]:
+              - /url: /admin/sales
+              - generic [ref=e325]:
+                - generic [ref=e326]:
+                  - paragraph [ref=e327]: Revenue (All Time)
+                  - paragraph [ref=e328]: $0.00
+                - img [ref=e330]
+            - link "Orders This Month 0" [ref=e333] [cursor=pointer]:
+              - /url: /admin/sales
+              - generic [ref=e334]:
+                - generic [ref=e335]:
+                  - paragraph [ref=e336]: Orders This Month
+                  - paragraph [ref=e337]: "0"
+                - img [ref=e339]
+          - generic [ref=e342]:
+            - generic [ref=e343]:
+              - generic [ref=e344]:
+                - heading "Recent Sales" [level=2] [ref=e345]
+                - link "View all" [ref=e346] [cursor=pointer]:
+                  - /url: /admin/sales
+                  - text: View all
+                  - img [ref=e347]
+              - generic [ref=e349]: No sales yet. Once readers purchase books, they'll appear here.
+            - generic [ref=e350]:
+              - generic [ref=e351]:
+                - generic [ref=e352]:
+                  - heading "Your Books" [level=2] [ref=e353]
+                  - link "Manage" [ref=e354] [cursor=pointer]:
+                    - /url: /admin/books
+                    - text: Manage
+                    - img [ref=e355]
+                - generic [ref=e357]:
+                  - generic [ref=e358]:
+                    - img [ref=e359]
+                    - paragraph [ref=e362]: The Surge Below
+                    - img [ref=e363]
+                    - paragraph [ref=e365]: $12.49
+                  - generic [ref=e366]:
+                    - img [ref=e367]
+                    - paragraph [ref=e370]: The Weight of Water
+                    - paragraph [ref=e371]: $0.00
+                  - generic [ref=e372]:
+                    - img [ref=e373]
+                    - paragraph [ref=e376]: Into the Deep
+                    - paragraph [ref=e377]: $9.99
+                  - generic [ref=e378]:
+                    - img [ref=e379]
+                    - paragraph [ref=e382]: Build, Vibe, Scale
+                    - paragraph [ref=e383]: $2.99
+                  - generic [ref=e384]:
+                    - img [ref=e385]
+                    - paragraph [ref=e388]: The Sovereign Founder
+                    - paragraph [ref=e389]: $2.99
+                  - generic [ref=e390]:
+                    - img [ref=e391]
+                    - paragraph [ref=e394]: Build a Solid SaaS App
+                    - paragraph [ref=e395]: $12.99
+                  - generic [ref=e396]:
+                    - img [ref=e397]
+                    - paragraph [ref=e400]: Finley the Friendly Dolphin
+                    - paragraph [ref=e401]: $12.99
+                  - generic [ref=e402]:
+                    - img [ref=e403]
+                    - paragraph [ref=e406]: Crabby's Ocean Friends
+                    - paragraph [ref=e407]: $11.99
+                  - generic [ref=e408]:
+                    - img [ref=e409]
+                    - paragraph [ref=e412]: Benny's Big Bubbling Day
+                    - paragraph [ref=e413]: $5.99
+                  - generic [ref=e414]:
+                    - img [ref=e415]
+                    - paragraph [ref=e418]: Sammy the Seastar
+                    - paragraph [ref=e419]: $11.99
+                  - generic [ref=e420]:
+                    - img [ref=e421]
+                    - paragraph [ref=e424]: Sammy the Starfish
+                    - paragraph [ref=e425]: $0.00
+                  - generic [ref=e426]:
+                    - img [ref=e427]
+                    - paragraph [ref=e430]: Tilly the Turtle’s Ocean Adventures
+                    - paragraph [ref=e431]: $0.00
+                  - generic [ref=e432]:
+                    - img [ref=e433]
+                    - paragraph [ref=e436]: "The Scuba Starter Kit: Everything You Need to Know"
+                    - paragraph [ref=e437]: $0.00
+              - generic [ref=e439]:
+                - generic [ref=e440]:
+                  - paragraph [ref=e441]: "Current Plan: Premium"
+                  - paragraph [ref=e442]: Unlimited books · Custom domain · Sales enabled
+                - link "Manage" [ref=e443] [cursor=pointer]:
+                  - /url: /admin/settings?tab=billing
+                  - button "Manage" [ref=e444]
+  - alert [ref=e445]
