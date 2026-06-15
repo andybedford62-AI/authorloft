@@ -25,9 +25,9 @@ export function BookstoreListCard({
     : null;
 
   return (
-    <div className="group relative flex gap-3 bg-white rounded-xl border border-[#DCDBD3] p-3 hover:border-[#C26A4A] hover:shadow-sm transition-all">
+    <div className="group relative flex gap-3.5 bg-white rounded-xl border border-[#DCDBD3] p-3 hover:border-[#C26A4A] hover:shadow-sm transition-all">
       {/* Cover */}
-      <div className="relative w-[58px] sm:w-16 flex-shrink-0 aspect-[2/3] rounded-md bg-[#E8E2D5] overflow-hidden">
+      <div className="relative w-[88px] sm:w-24 flex-shrink-0 aspect-[2/3] rounded-md bg-[#E8E2D5] overflow-hidden">
         {book.coverImageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -38,7 +38,7 @@ export function BookstoreListCard({
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-[#B6A88F]">
-            <BookOpen className="h-6 w-6" />
+            <BookOpen className="h-8 w-8" />
           </div>
         )}
 
@@ -48,22 +48,10 @@ export function BookstoreListCard({
             {badge.label}
           </span>
         )}
-
-        {/* Quick view — revealed on hover (hover-capable devices), always shown on touch */}
-        {onQuickView && (
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(book); }}
-            className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-1 bg-white/90 backdrop-blur-sm py-1 text-[10px] font-medium text-[#1B2B47] opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
-            aria-label={`Quick view: ${book.title}`}
-          >
-            <Eye className="h-3 w-3" /> Quick view
-          </button>
-        )}
       </div>
 
       {/* Details */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col">
         <h3 className="font-serif text-sm text-[#1B2B47] leading-snug line-clamp-2">
           <a
             href={book.bookUrl}
@@ -108,6 +96,18 @@ export function BookstoreListCard({
               </span>
             ))}
           </div>
+        )}
+
+        {/* Quick view — standalone button, sits above the card's stretched link */}
+        {onQuickView && (
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(book); }}
+            className="relative z-10 mt-auto pt-2 self-start inline-flex items-center gap-1 text-xs font-medium text-[#5C6E89] hover:text-[#C26A4A] transition-colors"
+            aria-label={`Quick view: ${book.title}`}
+          >
+            <Eye className="h-3.5 w-3.5" /> Quick view
+          </button>
         )}
       </div>
     </div>
