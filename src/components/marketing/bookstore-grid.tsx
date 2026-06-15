@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
-import { BookstoreBookCard, type BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { type BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { BookstoreListCard } from "@/components/marketing/bookstore-list-card";
 import { BookstoreQuickView } from "@/components/marketing/bookstore-quick-view";
 
-const PER_PAGE = 24;
+const PER_PAGE_OPTIONS = [24, 48, 96] as const;
 
 const FORMAT_OPTIONS: { id: string; label: string }[] = [
   { id: "EBOOK", label: "eBook" },
@@ -43,6 +44,7 @@ export function BookstoreGrid({
   const [price, setPrice] = useState<PriceFilter>("all");
   const [sort, setSort] = useState<SortKey>("newest");
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState<number>(PER_PAGE_OPTIONS[0]);
   const [quickViewBook, setQuickViewBook] = useState<BookstoreBook | null>(null);
 
   // Only show format chips for formats that actually appear in the catalog
@@ -113,9 +115,9 @@ export function BookstoreGrid({
     return sorted;
   }, [books, search, selectedGenres, format, price, sort]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const currentPage = Math.min(page, totalPages);
-  const pageItems = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const pageItems = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
   const hasActiveFilters =
     !!search || selectedGenres.length > 0 || format !== "all" || price !== "all";
@@ -208,21 +210,35 @@ export function BookstoreGrid({
       </div>
 
       {/* ── Results header ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between gap-3 mb-5">
         <p className="text-sm text-[#5C6E89]">
           {filtered.length === 0
             ? "No books found"
             : `Showing ${pageItems.length} of ${filtered.length} book${filtered.length !== 1 ? "s" : ""}`}
         </p>
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={resetAll}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] hover:text-[#1B2B47] transition-colors"
-          >
-            <X className="h-3.5 w-3.5" /> Clear filters
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={resetAll}
+              className="inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] hover:text-[#1B2B47] transition-colors"
+            >
+              <X className="h-3.5 w-3.5" /> Clear filters
+            </button>
+          )}
+          {filtered.length > PER_PAGE_OPTIONS[0] && (
+            <select
+              value={perPage}
+              onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }}
+              className={selectClass + " py-1.5"}
+              aria-label="Books per page"
+            >
+              {PER_PAGE_OPTIONS.map((n) => (
+                <option key={n} value={n}>Show {n}</option>
+              ))}
+            </select>
+          )}
+        </div>
       </div>
 
       {/* ── Grid / empty state ─────────────────────────────────────────── */}
@@ -245,9 +261,9 @@ export function BookstoreGrid({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {pageItems.map((b) => (
-            <BookstoreBookCard key={b.id} book={b} onQuickView={setQuickViewBook} />
+            <BookstoreListCard key={b.id} book={b} onQuickView={setQuickViewBook} />
           ))}
         </div>
       )}

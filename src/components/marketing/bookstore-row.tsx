@@ -6,8 +6,14 @@ import { BookstoreBookCard, type BookstoreBook } from "@/components/marketing/bo
  * Renders nothing when empty so sparse launches stay clean.
  *
  * - variant "gold": wraps the row in a highlighted gold band so it stands out.
+ * - variant "slate": a soft blue/gray band tied to the brand navy (used for Trending).
  * - compact: simplified cards (cover + title + author + View Book only).
  */
+const BANDS: Record<string, { wrapper: string; subtitle: string }> = {
+  gold:  { wrapper: "border-[#E8C77E] bg-gradient-to-br from-[#FBF3E0] to-[#F2DFB4]", subtitle: "text-[#8a6d33]" },
+  slate: { wrapper: "border-[#CAD6E4] bg-[#EAEFF5]",                                  subtitle: "text-[#5C6E89]" },
+};
+
 export function BookstoreRow({
   title,
   icon,
@@ -19,7 +25,7 @@ export function BookstoreRow({
   title: string;
   icon: ReactNode;
   books: BookstoreBook[];
-  variant?: "default" | "gold";
+  variant?: "default" | "gold" | "slate";
   compact?: boolean;
   subtitle?: string;
 }) {
@@ -35,15 +41,16 @@ export function BookstoreRow({
     </div>
   );
 
-  if (variant === "gold") {
+  const band = BANDS[variant];
+  if (band) {
     return (
       <section className="mb-12">
-        <div className="rounded-3xl border border-[#E8C77E] bg-gradient-to-br from-[#FBF3E0] to-[#F2DFB4] p-6 sm:p-8 shadow-sm">
+        <div className={`rounded-3xl border ${band.wrapper} p-6 sm:p-8 shadow-sm`}>
           <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47]">
             {icon}
             {title}
           </h2>
-          {subtitle && <p className="text-sm text-[#8a6d33] mt-1 mb-5">{subtitle}</p>}
+          {subtitle && <p className={`text-sm ${band.subtitle} mt-1 mb-5`}>{subtitle}</p>}
           <div className={subtitle ? "" : "mt-5"}>{cards}</div>
         </div>
       </section>
