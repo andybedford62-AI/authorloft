@@ -33,3 +33,8 @@ next-env.d.ts
 Thumbs.db
 prisma/cmd prompt.txt
 prisma/URLs.txt
+
+# Local debugging artifacts (Playwright MCP + ad-hoc screenshots)
+.playwright-mcp/
+/*.png
+/*.jpeg
