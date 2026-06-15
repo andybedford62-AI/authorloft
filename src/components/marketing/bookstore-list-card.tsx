@@ -1,6 +1,12 @@
 import { Star, BookOpen, Eye, Sparkles } from "lucide-react";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
+function formatPrice(cents: number | null): string | null {
+  if (cents === null) return null;
+  if (cents === 0) return "Free";
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
 /**
  * Compact horizontal "list" card for the All Books grid: cover on the left,
  * title / author / rating / genres on the right. No price or buy CTA — those
@@ -23,6 +29,8 @@ export function BookstoreListCard({
     : book.isPreOrder
     ? { label: "Soon", icon: false, cls: "text-white bg-[#5C6E89]" }
     : null;
+
+  const price = formatPrice(book.priceCents);
 
   return (
     <div className="group relative flex gap-3.5 bg-white rounded-xl border border-[#DCDBD3] p-3 hover:border-[#C26A4A] hover:shadow-sm transition-all">
@@ -60,15 +68,22 @@ export function BookstoreListCard({
             {book.title}
           </a>
         </h3>
-        <p className="text-xs text-[#9b8e7e] mt-0.5 truncate">
-          by{" "}
-          <a
-            href={book.authorUrl}
-            className="relative z-10 text-[#5C6E89] hover:text-[#C26A4A] hover:underline"
-          >
-            {book.authorName}
-          </a>
-        </p>
+        <div className="flex items-baseline justify-between gap-2 mt-0.5">
+          <p className="text-xs text-[#9b8e7e] truncate">
+            by{" "}
+            <a
+              href={book.authorUrl}
+              className="relative z-10 text-[#5C6E89] hover:text-[#C26A4A] hover:underline"
+            >
+              {book.authorName}
+            </a>
+          </p>
+          {price && (
+            <span className={`text-xs font-semibold flex-shrink-0 ${book.priceCents === 0 ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>
+              {price}
+            </span>
+          )}
+        </div>
 
         {book.ratingCount > 0 && book.averageRating !== null && (
           <div className="flex items-center gap-1 mt-1.5">

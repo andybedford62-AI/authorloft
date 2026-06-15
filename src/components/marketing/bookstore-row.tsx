@@ -21,6 +21,7 @@ export function BookstoreRow({
   variant = "default",
   compact = false,
   subtitle,
+  quickView = false,
 }: {
   title: string;
   icon: ReactNode;
@@ -28,6 +29,7 @@ export function BookstoreRow({
   variant?: "default" | "gold" | "slate";
   compact?: boolean;
   subtitle?: string;
+  quickView?: boolean;
 }) {
   if (books.length === 0) return null;
 
@@ -35,7 +37,7 @@ export function BookstoreRow({
     <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x scroll-smooth">
       {books.map((b) => (
         <div key={b.id} className="w-40 sm:w-44 shrink-0 snap-start">
-          <BookstoreBookCard book={b} compact={compact} />
+          <BookstoreBookCard book={b} compact={compact} quickView={quickView} />
         </div>
       ))}
     </div>

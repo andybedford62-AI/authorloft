@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## June 15, 2026 — Bookstore card cleanup: price in body, modern vertical card
+_(not yet promoted to prod)_
+- **Price moved off the cover into the card body** on every card (vertical New/Trending cards + All Books list cards), shown alongside the title/author/rating data (green for "Free"). No more price chip overlapping the cover art
+- **Modernized the vertical card** (New on the Shelf + Trending): a single priority badge instead of a stack, removed the "Buy on Author's Site" CTA (the whole card already links to the book), and a hairline divider + standalone "Quick view" action. Card is now a client component that self-manages its Quick View modal, so it works inside the server-rendered showcase rows
+- Trending cards now expose Quick View; the All Books list cards are unchanged except for the added price
+
 ## June 15, 2026 — Bookstore "All Books" layout redesign
 _(not yet promoted to prod)_
 - **Compact horizontal list cards** — the All Books catalog moved from a 4-up vertical-cover grid to a denser 3-up grid of horizontal cards (cover left; title, author, rating, genres right). Drops price + the "Buy" CTA from the card — those live in Quick View and on the book page. New `bookstore-list-card.tsx`; the curated New/Trending rows keep their vertical covers so the two zones read differently

@@ -207,6 +207,7 @@ export default async function BookstorePage() {
           icon={<TrendingUp className="h-5 w-5 text-[#C26A4A]" />}
           books={trending}
           variant="slate"
+          quickView
         />
 
         {/* ── Browse by genre ────────────────────────────────────────────── */}
