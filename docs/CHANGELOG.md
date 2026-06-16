@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — QR Code Generator + Reader Magnet + US Privacy
+_(on staging — not yet promoted to prod)_
+- **Book QR Code** — the Organisation tab of every book in admin now includes a **QR Code card** showing a scannable QR code that links directly to the book's public URL. One click downloads the code as an SVG file, ready to drop into bookmarks, event table cards, author swag, newsletters, or printed materials. No plan restriction — available on all tiers. *(zero schema changes; `react-qr-code` SVG component)*
+- **Reader Magnet** — authors can now mark any direct sale file as a free reader magnet (toggle appears on items with a file uploaded). On the public book page, magnet items show a **"[Format] — Free"** gift button instead of a buy button. Readers click it, enter their name and email, and instantly receive a **time-limited download link** by email (7-day expiry, up to 3 downloads). The reader is simultaneously added to the author's newsletter subscriber list. Replaces the need for BookFunnel for list-building. New DB table `BookMagnetLead`; new API routes `POST /api/author/reader-magnet` and `GET /api/reader-magnet/download/[token]`; rate-limited at 5 requests/IP:email/hour. *(STANDARD and PREMIUM plans)*
+- **US State Privacy page** — `/us-privacy` now live; California, Virginia, Colorado, and other state privacy rights (opt-out of sale/sharing, deletion, correction requests). Linked from the Privacy Policy and GDPR pages.
+
 ## June 16, 2026 — Sales Revenue Charts + Book Launch Mode
 _(on staging — not yet promoted to prod)_
 - **Sales Revenue Charts** — three new data panels on the `/admin/sales` dashboard sitting between the stat cards and the orders table. A period selector (30 days / 90 days / 12 months) controls all three simultaneously: an **Area Chart** traces revenue day by day over the selected window, a **Horizontal Bar Chart** ranks your top 10 books by revenue earned, and a **Format Breakdown** shows the percentage split across eBook, Audio, Flip Book, and Print with progress bars. All data comes from your real completed orders — no estimates. Powered by Recharts; live-reloads on period change without a page refresh. (STANDARD and PREMIUM plans)
