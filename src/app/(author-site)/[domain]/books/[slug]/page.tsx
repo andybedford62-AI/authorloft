@@ -46,9 +46,10 @@ export async function generateMetadata({
 
   const base        = getAuthorBaseUrl(author);
   const canonicalUrl = `${base}/books/${slug}`;
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
   const description =
-    book.shortDescription ||
-    (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 160) : null) ||
+    (book.shortDescription ? stripHtml(book.shortDescription).slice(0, 160) : null) ||
+    (book.description ? stripHtml(book.description).slice(0, 160) : null) ||
     `${book.title} by ${authorName}.`;
 
   const ogImages = book.coverImageUrl

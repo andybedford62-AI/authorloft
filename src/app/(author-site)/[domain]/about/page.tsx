@@ -14,7 +14,10 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
-  const description = author.bio || author.shortBio || `Learn more about ${authorName}.`;
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
+  const description = (author.bio ? stripHtml(author.bio).slice(0, 160) : null)
+    || author.shortBio
+    || `Learn more about ${authorName}.`;
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
     : [];
