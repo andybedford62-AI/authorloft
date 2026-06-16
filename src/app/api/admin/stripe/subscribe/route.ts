@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     const { priceId } = validationResult.data;
 
-    // Verify the price ID belongs to a real plan
+    // Verify the price ID belongs to a real plan (also capture monthly ID to detect billing interval)
     const plan = await prisma.plan.findFirst({
       where: {
         OR: [
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
           { stripePriceIdAnnual:  priceId },
         ],
       },
-      select: { id: true, name: true },
+      select: { id: true, name: true, stripePriceIdMonthly: true },
     });
     if (!plan) return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
 
@@ -107,17 +107,7 @@ export async function POST(req: NextRequest) {
     const isOnTrial = !!author.trialEndsAt && author.trialEndsAt > new Date();
     const isEarlyBird = !assignedCouponId && daysSinceSignup <= 30 && !isOnTrial;
 
-    // Determine if the selected price is monthly or annual
-    const selectedPlan = await prisma.plan.findFirst({
-      where: {
-        OR: [
-          { stripePriceIdMonthly: priceId },
-          { stripePriceIdAnnual:  priceId },
-        ],
-      },
-      select: { stripePriceIdMonthly: true },
-    });
-    const isMonthly = selectedPlan?.stripePriceIdMonthly === priceId;
+    const isMonthly = plan.stripePriceIdMonthly === priceId;
 
     const earlyBirdCouponId = isEarlyBird
       ? (isMonthly

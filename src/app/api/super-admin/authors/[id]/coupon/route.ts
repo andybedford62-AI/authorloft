@@ -9,10 +9,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const { couponId } = await req.json();
 
-  const author = await prisma.author.update({
-    where: { id },
-    data:  { assignedCouponId: couponId ?? null },
-    select: { id: true, assignedCouponId: true },
-  });
-  return NextResponse.json(author);
+  try {
+    const author = await prisma.author.update({
+      where:  { id },
+      data:   { assignedCouponId: couponId ?? null },
+      select: { id: true, assignedCouponId: true },
+    });
+    return NextResponse.json(author);
+  } catch (err: any) {
+    if (err?.code === "P2025") return NextResponse.json({ error: "Author not found." }, { status: 404 });
+    return NextResponse.json({ error: "Failed to update coupon assignment." }, { status: 500 });
+  }
 }

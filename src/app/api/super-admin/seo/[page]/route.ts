@@ -13,6 +13,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
   if (!validPageIds.includes(page as any)) return NextResponse.json({ error: "Unknown page." }, { status: 400 });
 
   const { url } = await req.json();
+
+  if (url) {
+    const isValidUrl = typeof url === "string" && url.startsWith("https://");
+    const hasImageExt = /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(url);
+    if (!isValidUrl || !hasImageExt) {
+      return NextResponse.json(
+        { error: "URL must be a valid https:// image URL (png, jpg, webp, gif, or svg)." },
+        { status: 400 }
+      );
+    }
+  }
+
   const pageInfo = SEO_PAGES.find(p => p.id === page)!;
 
   await prisma.seoConfig.upsert({

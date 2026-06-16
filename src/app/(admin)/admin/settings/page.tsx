@@ -92,7 +92,7 @@ function SubscriptionSection() {
     ? new Date(data.trialEndsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : null;
   const trialDaysLeft   = data?.trialEndsAt
-    ? Math.ceil((new Date(data.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    ? Math.max(0, Math.ceil((new Date(data.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
   const renewalDate = data?.subscription?.currentPeriodEnd
@@ -155,6 +155,7 @@ function SubscriptionSection() {
                 <p className="text-xs text-amber-600 mt-0.5 font-medium">
                   Trial — expires {trialExpiryStr}
                   {trialDaysLeft !== null && trialDaysLeft > 0 && ` (${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left)`}
+                  {trialDaysLeft === 0 && " (expires today)"}
                 </p>
               )}
               {isAdminAssigned && !isOnTrial && (

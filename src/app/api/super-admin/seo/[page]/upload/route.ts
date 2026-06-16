@@ -28,6 +28,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pag
     return NextResponse.json({ error: "Only JPG, PNG, or WebP images are allowed." }, { status: 400 });
   }
 
+  const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+  if (file.size > MAX_BYTES) {
+    return NextResponse.json({ error: "Image must be 5 MB or smaller." }, { status: 400 });
+  }
+
   const ext      = file.type.split("/")[1].replace("jpeg", "jpg");
   const fileKey  = `seo/og-${page}-${Date.now()}.${ext}`;
   const buffer   = Buffer.from(await file.arrayBuffer());
