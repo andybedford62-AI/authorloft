@@ -759,7 +759,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 <p className="font-medium">Next steps to go live:</p>
                 <ol className="list-decimal list-inside space-y-0.5 ml-1">
                   <li>Add at least one format in the <strong>Direct Sales</strong> tab and set its price</li>
-                  <li>Connect Stripe in your platform settings</li>
+                  <li>
+                    Connect Stripe in your{" "}
+                    <a
+                      href="/admin/settings#billing"
+                      className="underline font-medium hover:text-blue-900"
+                    >
+                      billing settings
+                    </a>
+                  </li>
                 </ol>
               </div>
             )}
