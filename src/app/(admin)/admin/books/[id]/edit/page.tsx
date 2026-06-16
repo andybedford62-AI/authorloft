@@ -90,8 +90,13 @@ export default async function EditBookPage({
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Book</h1>
-        <p className="text-sm text-gray-500 mt-1">{book.title}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Editing book</p>
+        <h1
+          className="text-3xl font-extrabold leading-tight mt-0.5"
+          style={{ color: "var(--accent)" }}
+        >
+          {book.title}
+        </h1>
       </div>
 
       {/* First-time guidance banner */}

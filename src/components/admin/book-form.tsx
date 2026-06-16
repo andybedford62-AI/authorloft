@@ -206,6 +206,7 @@ function Req() {
 export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true, bookstoreEnabled = false, preOrdersEnabled = false }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError]       = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -362,11 +363,18 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     const saved = await res.json();
 
     if (mode === "new" && saved?.id) {
-      // Go straight to edit so the author can add Direct Sales items and Buy Links
+      // First save of a brand-new book → open the edit screen so the author can
+      // add Direct Sales items and Buy Links.
       router.push(`/admin/books/${saved.id}/edit?new=1`);
-    } else {
-      router.push("/admin/books");
+      router.refresh();
+      return;
     }
+
+    // Edit mode → stay exactly where the author is (same tab) instead of kicking
+    // them back to the book list. Just confirm the save and refresh server data.
+    setSaving(false);
+    setJustSaved(true);
+    setTimeout(() => setJustSaved(false), 2500);
     router.refresh();
   }
 
@@ -918,11 +926,19 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       )}
 
       <div className="flex items-center justify-between pb-8">
-        <Button type="submit" disabled={saving} size="lg">
-          {saving
-            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
-            : mode === "edit" ? "Save Changes" : "Create Book"}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={saving} size="lg">
+            {saving
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
+              : mode === "edit" ? "Save Changes" : "Create Book"}
+          </Button>
+          {justSaved && (
+            <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+              <CheckCircle2 className="h-4 w-4" />
+              Saved
+            </span>
+          )}
+        </div>
 
         <div className="flex gap-3">
           <Button type="button" variant="outline" onClick={() => router.push("/admin/books")}>

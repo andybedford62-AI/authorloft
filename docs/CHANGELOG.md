@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — Book edit UX: stay on tab after save + prominent title
+_(on staging — not yet promoted to prod)_
+- **Saving a book no longer kicks you back to the book list.** On the Details/Organisation tabs, "Save Changes" now keeps you exactly where you are (same tab) and shows a brief "Saved ✓" confirmation, instead of navigating away to `/admin/books`. First save of a brand-new book still opens the edit screen as before.
+- **Book title is now prominent on the edit page** — the book's name is the large, accent-colored heading (with a small "Editing book" eyebrow) so it's always clear which book you're working on.
+
 ## June 16, 2026 — Reader Magnets decoupled from Stripe + available on all plans
 _(on staging — not yet promoted to prod)_
 - **Reader Magnets reworked to be simple and Stripe-independent.** A Reader Magnet is now understood as "give this edition away free in exchange for a reader's email" — it never touches Stripe, since no money changes hands. Changes:
