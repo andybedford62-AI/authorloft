@@ -776,9 +776,10 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
           <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
             <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
             <div className="text-sm text-amber-800">
-              <span className="font-semibold">Direct Sales requires a paid plan.</span>{" "}
-              <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to enable
-              direct sales on your books.
+              <span className="font-semibold">Paid Direct Sales require a paid plan.</span>{" "}
+              <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to sell
+              editions of your books. You can still offer a <strong>free Reader Magnet</strong> — give a book away in
+              exchange for a reader&rsquo;s email — from the <strong>Direct Sales</strong> tab on any plan.
             </div>
           </div>
         )}

@@ -107,7 +107,7 @@ export default async function BookDetailPage({
       },
       directSaleItems: {
         where: { isActive: true },
-        select: { id: true, format: true, label: true, description: true, priceCents: true, isReaderMagnet: true },
+        select: { id: true, format: true, label: true, description: true, priceCents: true, isReaderMagnet: true, fileKey: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
       audioTracks: {
@@ -142,14 +142,18 @@ export default async function BookDetailPage({
 
   const salesEnabled        = author.plan?.salesEnabled ?? false;
   const audioEnabled        = author.plan?.audioEnabled ?? false;
-  const magnetItems         = salesEnabled && book.directSalesEnabled
-    ? book.directSaleItems.filter((i) => i.isReaderMagnet)
-    : [];
-  const paidSaleItems       = salesEnabled && book.directSalesEnabled
+  const stripeReady         = author.stripeConnectOnboarded ?? false;
+  // Reader Magnets are free (file in exchange for an email) → available on every
+  // plan, no Stripe, and independent of the paid "Enable Direct Sales" switch.
+  const magnetItems         = book.directSaleItems.filter((i) => i.isReaderMagnet && i.fileKey);
+  // Paid editions only appear when the author can actually take money:
+  // paid plan + the book's Direct Sales switch + a connected Stripe account.
+  const canSellPaid         = salesEnabled && book.directSalesEnabled && stripeReady;
+  const paidSaleItems       = canSellPaid
     ? book.directSaleItems.filter((i) => !i.isReaderMagnet)
     : [];
   const hasDirectSaleItems  = paidSaleItems.length > 0;
-  const showLegacyDirectBuy = !hasDirectSaleItems && salesEnabled && book.directSalesEnabled && book.priceCents > 0;
+  const showLegacyDirectBuy = !hasDirectSaleItems && canSellPaid && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
   const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks || magnetItems.length > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;

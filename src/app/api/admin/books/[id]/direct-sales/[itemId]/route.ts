@@ -22,8 +22,11 @@ export async function PATCH(
   const body = await req.json();
   const { label, description, priceCents, isActive, isReaderMagnet, clearFile } = body;
 
-  // Stripe Connect gate: block activation if author hasn't completed onboarding
-  if (isActive === true) {
+  // Paid editions can only go live with a paid plan AND a connected Stripe
+  // account. Free Reader Magnets need neither, so they activate freely.
+  const willBeMagnet =
+    isReaderMagnet === true || (isReaderMagnet === undefined && existing.isReaderMagnet);
+  if (isActive === true && !willBeMagnet) {
     const salesCheck = await canUseFeature(authorId, "salesEnabled");
     if (!salesCheck.allowed) {
       return NextResponse.json({ error: salesCheck.reason }, { status: 403 });
@@ -34,7 +37,7 @@ export async function PATCH(
     });
     if (!author?.stripeConnectOnboarded) {
       return NextResponse.json(
-        { error: "You must connect your Stripe account before activating direct sale items." },
+        { error: "Connect your Stripe account before making a paid edition live." },
         { status: 403 }
       );
     }

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle, Lock, Zap,
+  Upload, FileText, X, CheckCircle, Gift, Zap,
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 
@@ -315,7 +315,9 @@ export function DirectSalesItems({
     e.preventDefault();
     setAddError("");
 
-    const priceCents = dollarsTocents(priceInput);
+    // Free-plan authors can only offer free Reader Magnets, so force price 0 and
+    // mark the edition as a magnet up front.
+    const priceCents = salesEnabled ? dollarsTocents(priceInput) : 0;
     const label = customLabel.trim() || FORMATS[selectedFormat].defaultLabel;
 
     setSaving(true);
@@ -327,6 +329,7 @@ export function DirectSalesItems({
         label,
         description: description.trim() || undefined,
         priceCents,
+        isReaderMagnet: salesEnabled ? undefined : true,
       }),
     });
 
@@ -438,59 +441,14 @@ export function DirectSalesItems({
     }
   }
 
+  // ── Capability flags ────────────────────────────────────────────────────────
+  // Reader Magnets are free and work on every plan with or without Stripe.
+  // Paid editions need the paid-sales plan feature AND a connected Stripe
+  // account before they can go live.
+  const canSellPaid = salesEnabled;
+  const stripeReady = stripeConnectOnboarded;
+
   // ── Render ─────────────────────────────────────────────────────────────────
-  if (!salesEnabled) {
-    return (
-      <section className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-1">Direct Sales</h2>
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
-          <Lock className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-amber-800">Direct Sales requires a paid plan</p>
-            <p className="text-amber-700 mt-0.5">
-              Upgrade your plan to offer direct book sales to readers.{" "}
-              <a href="/admin/settings/billing" className="underline font-medium">
-                View plans
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!stripeConnectOnboarded) {
-    return (
-      <section className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-1">Direct Sales</h2>
-        <div className="mt-4 rounded-lg border border-violet-200 bg-violet-50 p-4 flex items-start gap-3">
-          <Zap className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
-          <div className="flex-1 text-sm">
-            <p className="font-medium text-violet-900">Connect your Stripe account to start selling</p>
-            <p className="text-violet-700 mt-1">
-              Readers pay you directly — payments land in your own Stripe account instantly.
-              AuthorLoft retains a <strong>10% platform fee</strong> per sale; you keep the rest.
-              Setup takes about 2 minutes.
-            </p>
-            {connectError && <p className="text-red-600 mt-2 text-xs">{connectError}</p>}
-            <button
-              type="button"
-              onClick={handleConnect}
-              disabled={connectLoading}
-              className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-60"
-            >
-              {connectLoading ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
-              ) : (
-                <><Zap className="h-4 w-4" /> Connect Stripe</>
-              )}
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
       <div className="flex items-center justify-between">
@@ -516,8 +474,51 @@ export function DirectSalesItems({
         )}
       </div>
 
+      {/* ── Capability banners ───────────────────────────────────────────────── */}
+      {!canSellPaid && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 flex items-start gap-3">
+          <Gift className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-indigo-900">Free Reader Magnets are included on your plan</p>
+            <p className="text-indigo-700 mt-0.5">
+              Add a format below and upload a file to give a book away free in exchange for a
+              reader&rsquo;s email — they&rsquo;re added to your subscriber list automatically.
+              To sell <em>paid</em> editions,{" "}
+              <a href="/admin/settings#billing" className="underline font-medium">upgrade to Standard</a>.
+            </p>
+          </div>
+        </div>
+      )}
+      {canSellPaid && !stripeReady && (
+        <div className="rounded-lg border border-violet-200 bg-violet-50 p-4 flex items-start gap-3">
+          <Zap className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-violet-900">Connect Stripe to sell paid editions</p>
+            <p className="text-violet-700 mt-1">
+              Free Reader Magnets work without it. To charge for an edition, connect your Stripe
+              account — payments land in your own account instantly and AuthorLoft retains a{" "}
+              <strong>10% platform fee</strong> per sale. A paid edition stays hidden from readers
+              until Stripe is connected.
+            </p>
+            {connectError && <p className="text-red-600 mt-2 text-xs">{connectError}</p>}
+            <button
+              type="button"
+              onClick={handleConnect}
+              disabled={connectLoading}
+              className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-60"
+            >
+              {connectLoading ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
+              ) : (
+                <><Zap className="h-4 w-4" /> Connect Stripe</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Info panel ──────────────────────────────────────────────────────── */}
-      {items.length === 0 && !loading && !adding && (
+      {canSellPaid && items.length === 0 && !loading && !adding && (
         <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
           <p className="font-medium">How direct sales work</p>
           <p className="text-blue-600">
@@ -543,9 +544,9 @@ export function DirectSalesItems({
         >
           <p className="text-sm font-medium text-gray-700">Add a format for direct sale</p>
 
-          {/* Format picker */}
+          {/* Format picker — free magnets must be a downloadable file, so hide Print */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {FORMAT_KEYS.map((key) => {
+            {FORMAT_KEYS.filter((key) => canSellPaid || FORMATS[key].needsFile).map((key) => {
               const fmt = FORMATS[key];
               const active = selectedFormat === key;
               return (
@@ -575,7 +576,7 @@ export function DirectSalesItems({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Label */}
-            <div className="sm:col-span-2 space-y-1">
+            <div className={canSellPaid ? "sm:col-span-2 space-y-1" : "sm:col-span-3 space-y-1"}>
               <label className="text-xs font-medium text-gray-600">
                 Button label{" "}
                 <span className="text-gray-400 font-normal">
@@ -591,25 +592,34 @@ export function DirectSalesItems({
               />
             </div>
 
-            {/* Price */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-600">
-                Price (USD) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
-                  required
-                  className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                />
+            {/* Price — only when the author can sell paid editions */}
+            {canSellPaid && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600">
+                  Price (USD) <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    required
+                    className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
+
+          {!canSellPaid && (
+            <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2 flex items-center gap-1.5">
+              <Gift className="h-3.5 w-3.5 shrink-0" />
+              This edition will be offered as a free Reader Magnet — readers download it in exchange for their email.
+            </p>
+          )}
 
           {/* Description */}
           <div className="space-y-1">
@@ -684,7 +694,7 @@ export function DirectSalesItems({
                   /* ── Inline edit form ───────────────────────────────────── */
                   <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="sm:col-span-2 space-y-1">
+                      <div className={canSellPaid ? "sm:col-span-2 space-y-1" : "sm:col-span-3 space-y-1"}>
                         <label className="text-xs font-medium text-gray-600">Button label</label>
                         <input
                           type="text"
@@ -694,20 +704,22 @@ export function DirectSalesItems({
                           className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-600">Price (USD)</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={editPrice}
-                            onChange={(e) => setEditPrice(e.target.value)}
-                            className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                          />
+                      {canSellPaid && (
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-600">Price (USD)</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
@@ -761,9 +773,13 @@ export function DirectSalesItems({
                           >
                             {fmt.label}
                           </span>
-                          <span className="text-sm font-semibold text-gray-700">
-                            ${centsToDollars(item.priceCents)}
-                          </span>
+                          {canSellPaid ? (
+                            <span className="text-sm font-semibold text-gray-700">
+                              ${centsToDollars(item.priceCents)}
+                            </span>
+                          ) : (
+                            <span className="text-sm font-semibold text-emerald-700">Free</span>
+                          )}
                         </div>
                         {item.description && (
                           <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
@@ -842,37 +858,50 @@ export function DirectSalesItems({
                       />
                     )}
 
-                    {/* ── Reader Magnet toggle (only when file uploaded) ─── */}
-                    {fmt.needsFile && item.fileKey && (
-                      <div className="pl-12 mt-1">
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => toggleMagnet(item)}
-                          className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors group"
-                        >
-                          <span className={`relative inline-flex h-4 w-7 flex-shrink-0 rounded-full border transition-colors ${
-                            item.isReaderMagnet ? "bg-emerald-500 border-emerald-500" : "bg-gray-200 border-gray-200"
-                          }`}>
-                            <span className={`inline-block h-3 w-3 mt-0.5 rounded-full bg-white shadow transition-transform ${
-                              item.isReaderMagnet ? "translate-x-3.5" : "translate-x-0.5"
-                            }`} />
+                    {/* ── Reader Magnet ───────────────────────────────────── */}
+                    {fmt.needsFile && (
+                      canSellPaid ? (
+                        item.fileKey && (
+                          <div className="pl-12 mt-1">
+                            <button
+                              type="button"
+                              disabled={isBusy}
+                              onClick={() => toggleMagnet(item)}
+                              className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors group"
+                            >
+                              <span className={`relative inline-flex h-4 w-7 flex-shrink-0 rounded-full border transition-colors ${
+                                item.isReaderMagnet ? "bg-emerald-500 border-emerald-500" : "bg-gray-200 border-gray-200"
+                              }`}>
+                                <span className={`inline-block h-3 w-3 mt-0.5 rounded-full bg-white shadow transition-transform ${
+                                  item.isReaderMagnet ? "translate-x-3.5" : "translate-x-0.5"
+                                }`} />
+                              </span>
+                              <span className={item.isReaderMagnet ? "text-emerald-700 font-medium" : ""}>
+                                Give it away free (Reader Magnet)
+                              </span>
+                              {item.isReaderMagnet && (
+                                <span className="text-emerald-600 text-[10px] bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                                  Free in exchange for email
+                                </span>
+                              )}
+                            </button>
+                            <p className="text-[10px] text-gray-400 mt-0.5 ml-9">
+                              {item.isReaderMagnet
+                                ? "Readers download this free for their email. Your price is kept — turn this off to sell it again."
+                                : "Give this edition away free to build your email list. Your price is remembered."}
+                            </p>
+                          </div>
+                        )
+                      ) : (
+                        <div className="pl-12 mt-1 flex items-center gap-2 text-xs">
+                          <span className="inline-flex items-center gap-1 text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <Gift className="h-3 w-3" /> Free Reader Magnet
                           </span>
-                          <span className={item.isReaderMagnet ? "text-emerald-700 font-medium" : ""}>
-                            Reader Magnet
-                          </span>
-                          {item.isReaderMagnet && (
-                            <span className="text-emerald-600 text-[10px] bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
-                              Free in exchange for email
-                            </span>
+                          {!item.fileKey && (
+                            <span className="text-gray-400">Upload a file so readers can download it</span>
                           )}
-                        </button>
-                        {!item.isReaderMagnet && (
-                          <p className="text-[10px] text-gray-400 mt-0.5 ml-9">
-                            Offer this format free to build your email list
-                          </p>
-                        )}
-                      </div>
+                        </div>
+                      )
                     )}
                   </>
                 )}

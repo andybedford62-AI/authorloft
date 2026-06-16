@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { canUseFeature } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const VALID_FORMATS = ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] as const;
@@ -40,26 +39,13 @@ export async function POST(
   const book = await prisma.book.findFirst({ where: { id: bookId, authorId } });
   if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
 
-  // Plan gate: sales feature must be enabled
-  const salesCheck = await canUseFeature(authorId, "salesEnabled");
-  if (!salesCheck.allowed) {
-    return NextResponse.json({ error: salesCheck.reason }, { status: 403 });
-  }
-
-  // Stripe Connect gate: author must have completed onboarding before listing items
-  const author = await prisma.author.findUnique({
-    where: { id: authorId },
-    select: { stripeConnectOnboarded: true },
-  });
-  if (!author?.stripeConnectOnboarded) {
-    return NextResponse.json(
-      { error: "You must connect your Stripe account before listing items for direct sale." },
-      { status: 403 }
-    );
-  }
+  // No plan/Stripe gate on creation: free Reader Magnets are available on every
+  // plan and need no Stripe account. Paid editions are gated where it matters —
+  // they can only go LIVE (be activated / shown publicly) with a paid plan and a
+  // connected Stripe account (enforced in the PATCH route and on the public page).
 
   const body = await req.json();
-  const { format, label, description, priceCents } = body;
+  const { format, label, description, priceCents, isReaderMagnet } = body;
 
   if (!format || !VALID_FORMATS.includes(format as DirectSaleFormat)) {
     return NextResponse.json({ error: "Invalid format. Must be EBOOK, AUDIO, FLIPBOOK, or PRINT." }, { status: 400 });
@@ -80,6 +66,7 @@ export async function POST(
       label: label.trim(),
       description: description?.trim() || null,
       priceCents,
+      isReaderMagnet: isReaderMagnet === true,
       sortOrder: count,
     },
   });

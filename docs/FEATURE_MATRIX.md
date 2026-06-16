@@ -36,6 +36,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Book Reviews** (reader reviews on author site) | ✅ | ✅ | ✅ |
 | **Custom Book Pricing** (set per-book prices) | ✅ | ✅ | ✅ |
 | **Direct Digital Sales** (via Stripe) | ❌ | ✅ | ✅ |
+| **Reader Magnets** (give a book/file away free for a reader's email; auto-adds to subscriber list; no Stripe required) | ✅ | ✅ | ✅ |
 | **Sales Formats** (when Direct Sales enabled) | — | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |

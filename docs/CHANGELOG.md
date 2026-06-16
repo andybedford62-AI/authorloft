@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — Reader Magnets decoupled from Stripe + available on all plans
+_(on staging — not yet promoted to prod)_
+- **Reader Magnets reworked to be simple and Stripe-independent.** A Reader Magnet is now understood as "give this edition away free in exchange for a reader's email" — it never touches Stripe, since no money changes hands. Changes:
+  - **Available on every plan** (FREE/STANDARD/PREMIUM), not just paid plans. Free-plan authors see a "Free Reader Magnets" mode in the Direct Sales tab: add a downloadable format, upload a file, and it's automatically offered free (no price field, no Stripe).
+  - **The full-screen "Connect Stripe" wall is gone.** The Direct Sales tab always shows the editions list + Add Format. Stripe is now a non-blocking banner that only matters for *paid* editions.
+  - **Reader Magnet is a non-destructive override** (paid plans): toggling "Give it away free" on a paid edition gives it away for an email while *preserving the price* — toggle off to sell it again. Great for launch-week giveaways.
+  - **Stripe enforced only where money is involved:** a paid edition can only go live (activate) and appear publicly with a paid plan **and** a connected Stripe account — so a "Buy" button never shows when the author can't receive payment. Magnets are unaffected.
+  - **Public book page**: free gift button shows whenever a magnet edition with a file exists, independent of plan/Stripe/the "Enable Direct Sales" switch.
+  - Files touched: public book page, `direct-sales` create/activate APIs, `DirectSalesItems` admin component, `BookForm` copy. Billing link from the Enable Direct Sales toggle (earlier today) retained.
+
 ## June 16, 2026 — QR Code Generator + Reader Magnet + US Privacy
 _(on staging — not yet promoted to prod)_
 - **Book QR Code** — the Organisation tab of every book in admin now includes a **QR Code card** showing a scannable QR code that links directly to the book's public URL. One click downloads the code as an SVG file, ready to drop into bookmarks, event table cards, author swag, newsletters, or printed materials. No plan restriction — available on all tiers. *(zero schema changes; `react-qr-code` SVG component)*
