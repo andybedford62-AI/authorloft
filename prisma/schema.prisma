@@ -329,6 +329,8 @@ model Book {
   listInBookstore     Boolean              @default(false)  // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
   isPreOrder          Boolean              @default(false)  // shows "Coming Soon" + wishlist instead of buy buttons
   preOrderDate        DateTime?            // expected release/launch date for pre-order books
+  launchDate          DateTime?            // countdown target date for Book Launch Mode
+  showCountdown       Boolean              @default(false)  // show public countdown timer on book page
   affiliateEnabled    Boolean              @default(false)  // author opt-in to the referral/affiliate program for this book
   affiliateCommissionPercent Int           @default(10)     // % of sale price credited to a referrer
   sortOrder           Int                  @default(0)

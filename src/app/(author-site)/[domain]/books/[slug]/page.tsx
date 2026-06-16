@@ -11,6 +11,7 @@ import { BookPreviewGallery } from "@/components/author-site/book-preview-galler
 import { BookBuySection } from "@/components/author-site/book-buy-section";
 import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
 import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-form";
+import { LaunchCountdown } from "@/components/author-site/launch-countdown";
 import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
@@ -146,6 +147,7 @@ export default async function BookDetailPage({
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
+  const showLaunchCountdown = book.showCountdown && !!book.launchDate && book.launchDate > new Date();
   const preOrderLaunchLabel = book.preOrderDate
     ? new Date(book.preOrderDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
     : null;
@@ -329,6 +331,14 @@ export default async function BookDetailPage({
                 className="text-base text-gray-600 leading-relaxed border-l-4 pl-4 rich-content"
                 style={{ borderColor: accentColor }}
                 dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
+              />
+            )}
+
+            {/* Launch countdown */}
+            {showLaunchCountdown && (
+              <LaunchCountdown
+                launchDate={book.launchDate!.toISOString()}
+                accentColor={accentColor}
               />
             )}
 

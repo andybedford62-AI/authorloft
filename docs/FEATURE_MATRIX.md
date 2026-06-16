@@ -1,7 +1,9 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** June 12, 2026  
+**Last Updated:** June 16, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
+
+> **Quick reference for AI/code sessions:** Check this file first before doing a deep code dive — it lists what is built, what tier it lives in, and what is still on the roadmap. Avoids re-discovering existing features.
 
 ---
 
@@ -101,11 +103,13 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
-| **Sales Dashboard** (view revenue, orders) | ❌ | ✅ | ✅ |
-| **Sales Reports** (downloadable CSV/PDF) | ❌ | ✅ | ✅ |
-| **Order History** (track each sale) | ❌ | ✅ | ✅ |
-| **Reader Analytics** (coming soon) | ❌ | ❌ | Roadmap |
-| **Review Monitoring** (aggregate scores) | ❌ | ❌ | Roadmap |
+| **Sales Dashboard** (stat cards: total revenue, this month, total orders, orders this month) | ❌ | ✅ | ✅ |
+| **Sales Revenue Charts** (revenue over time, by book, by format — area + bar charts) | ❌ | ✅ | ✅ |
+| **Sales Reports / Invoices** (year-filtered invoice view, downloadable CSV, discount breakdown) | ❌ | ✅ | ✅ |
+| **Order History** (track each sale with customer info) | ❌ | ✅ | ✅ |
+| **Site Traffic Analytics** (PostHog: page views, referrers, countries — 7/30/90d) | ❌ | ✅ | ✅ |
+| **Reader Analytics** (read engagement, retention) | ❌ | ❌ | Roadmap |
+| **Review Monitoring** (aggregate Amazon/Goodreads scores) | ❌ | ❌ | Roadmap |
 
 ---
 
@@ -146,21 +150,29 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| **Author Management** | Live | Search, view, edit, suspend |
+| **Author Management** | Live | Search, view, edit, suspend, assign coupons |
 | **Mass Email Broadcasts** | Live | Send to FREE/STANDARD/PREMIUM segments |
 | **Email Templates** | Live | Save & reuse broadcast templates |
 | **Welcome Email Editor** | Live | Customize new-author welcome |
 | **Support Email Management** | Live | Add/edit/manage platform contact emails |
 | **Testimonials Manager** | Live | Add/edit/display social proof |
-| **Coupon Manager** | Live | Create & assign discount codes to authors |
-| **Early Bird Coupon** | Live | Auto-applied to new FREE users (30-day window) |
+| **Coupon Manager** | Live | Create Stripe coupons + assign per-author; separate from author-level book discount codes |
+| **Early Bird Coupon** | Live | Auto-applied to new FREE users (30-day window); excluded for trial conversions |
 | **Blog & News CMS** | Live | One editor; "Blog Article / News" toggle routes a post to /blog or /news |
-| **AuthorLoft News** | Live | Public /news archive (announcements, updates, specials, events); separate from /blog |
-| **News Subscribers** | Live | Public subscribe form (news page, footer, home) → platform subscriber list + CSV export. Email *sending* deferred (Phase 2) |
-| **Platform Settings** | Live | Logo, description, contact emails, testimonials |
-| **Analytics Dashboard** | Roadmap | Platform-wide metrics, user growth |
+| **AuthorLoft News** | Live | Public /news archive; one-click email to platform subscribers |
+| **News Subscribers** | Live | Subscribe form → platform subscriber list + CSV export |
+| **Resources CMS** | Live | Downloadable resources with optional email-gate (captures leads) |
+| **FAQ Manager** | Live | Dynamic FAQ page, category-grouped, sortable |
+| **Content Categories** | Live | Platform-wide categories used by blog/news/resources/FAQ |
+| **Social Media Poster** | Live | Platform-level: LinkedIn, Facebook, Instagram, X/Twitter (super-admin only; per-author on roadmap) |
+| **Social Images (OG)** | Live | Per-page OG image override for home/blog/features/pricing/contact/resources |
+| **Platform Settings** | Live | Logo, description, contact emails, testimonials, maintenance mode, AI cap |
+| **Feature Gates** | Live | Toggle feature access per tier from Super Admin UI |
+| **ARC Management** | Live | Advance Review Copy requests, per-book |
+| **Bookstore Management** | Live | Genre management, bookstore opt-in per book, featured placement |
 | **Billing & Subscriptions** | Live | View active subscriptions, manage Stripe integration |
 | **Support Messages** | Live | View & respond to author contact requests |
+| **Analytics Dashboard** | Roadmap | Platform-wide metrics, user growth |
 
 ---
 
@@ -168,12 +180,14 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 
 | Feature | Target Tier | ETA | Notes |
 |---------|------------|-----|-------|
-| **Auto-Formatter** | PREMIUM | Roadmap (3-4 weeks) | Convert to ePub, PDF, Kindle, print formats |
-| **Email List Builder** | PREMIUM | Roadmap (5-6 weeks) | Drag-drop forms, automation sequences |
+| **Book Launch Mode** | STANDARD/PREMIUM | In progress | Countdown timer on book page, launch checklist, social copy toolkit |
+| **Per-Author Social Posting** | PREMIUM | Roadmap | Authors post to their own Instagram/X/Facebook from dashboard (OAuth per author) |
+| **Shareable Promo Graphics** | STANDARD/PREMIUM | Roadmap | Auto-generate book promo image sized for social platforms |
+| **Auto-Formatter** | PREMIUM | Roadmap | Convert to ePub, PDF, Kindle, print formats |
+| **Email List Builder** | PREMIUM | Roadmap | Drag-drop forms, automation sequences |
 | **Reader Analytics** | PREMIUM | Roadmap | Track reads, engagement, retention |
 | **Review Monitoring** | PREMIUM | Roadmap | Aggregate Amazon, Goodreads reviews |
 | **Reader Tiers / Patreon** | All tiers | Roadmap | Membership & exclusive content |
-| **Social Media Uploader** | PREMIUM | Roadmap | Schedule posts to Instagram, TikTok, etc. |
 | **Native PDF Flipbook** | PREMIUM | Deferred | Better mobile experience for flipbook readers |
 | **Two-Factor Auth** | All tiers | Roadmap | Account security |
 | **API Access** | PREMIUM | Roadmap | Programmatic book/author management |

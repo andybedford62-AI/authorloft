@@ -3,6 +3,7 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 import { ShoppingBag, TrendingUp, DollarSign, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/utils";
+import { SalesCharts } from "@/components/admin/sales-charts";
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger"> = {
   COMPLETED: "success",
@@ -96,6 +97,9 @@ export default async function SalesPage() {
           </div>
         ))}
       </div>
+
+      {/* Revenue charts */}
+      <SalesCharts />
 
       {/* Orders table */}
       {orders.length === 0 ? (

@@ -51,7 +51,7 @@ export async function PUT(
     coverImageUrl, seriesId, priceCents,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
     availableFormats, caption, releaseDate, flipBookUrl, sampleContent,
-    isPreOrder, preOrderDate,
+    isPreOrder, preOrderDate, showCountdown, launchDate,
   } = body;
 
   if (!title?.trim() || !slug?.trim()) {
@@ -107,6 +107,8 @@ export async function PUT(
         listInBookstore: listInBookstore ?? false,
         isPreOrder: isPreOrder ?? false,
         preOrderDate: isPreOrder && preOrderDate ? new Date(preOrderDate) : null,
+        showCountdown: showCountdown ?? false,
+        launchDate: showCountdown && launchDate ? new Date(launchDate) : null,
         genres:
           genreIds?.length > 0
             ? { create: genreIds.map((genreId: string) => ({ genreId })) }

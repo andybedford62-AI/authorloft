@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock } from "lucide-react";
+import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -30,6 +30,8 @@ type BookData = {
   listInBookstore: boolean;
   isPreOrder: boolean;
   preOrderDate: string | null; // YYYY-MM-DD string for the date input
+  showCountdown: boolean;
+  launchDate: string | null;   // YYYY-MM-DDTHH:MM string for datetime-local input
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -227,6 +229,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [listInBookstore, setListInBookstore]     = useState(book?.listInBookstore ?? false);
   const [isPreOrder, setIsPreOrder]               = useState(book?.isPreOrder ?? false);
   const [preOrderDate, setPreOrderDate]           = useState(book?.preOrderDate ?? "");
+  const [showCountdown, setShowCountdown]         = useState(book?.showCountdown ?? false);
+  const [launchDate, setLaunchDate]               = useState(book?.launchDate ?? "");
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
   const [availableFormats, setAvailableFormats]   = useState<string[]>(book?.availableFormats ?? []);
   const [caption, setCaption]                     = useState(book?.caption ?? "");
@@ -325,6 +329,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       listInBookstore,
       isPreOrder,
       preOrderDate: preOrderDate || null,
+      showCountdown,
+      launchDate: launchDate || null,
       genreIds: selectedGenres,
       availableFormats,
       caption:     caption || null,
@@ -847,6 +853,39 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                   <span className="font-semibold">Pre-orders / Coming Soon requires a Standard plan or higher.</span>{" "}
                   <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to build anticipation and collect reader signups before launch.
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Book Launch Mode */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-4 cursor-pointer select-none"
+              onClick={() => setShowCountdown((v) => !v)}>
+              <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${showCountdown ? "bg-rose-500" : "bg-gray-300"}`}>
+                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${showCountdown ? "translate-x-5" : "translate-x-1"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                  <Rocket className="h-3.5 w-3.5 text-rose-500" />
+                  Launch Countdown
+                </p>
+                <p className="text-xs text-gray-400">
+                  Show a live countdown timer on your book page leading up to launch day.
+                </p>
+              </div>
+            </div>
+            {showCountdown && (
+              <div className="ml-14 mt-3 space-y-1">
+                <label className="block text-sm font-medium text-gray-700">Launch Date & Time</label>
+                <input
+                  type="datetime-local"
+                  value={launchDate ?? ""}
+                  onChange={(e) => setLaunchDate(e.target.value)}
+                  className="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+                <p className="text-xs text-gray-400">The countdown hides automatically once this date passes.</p>
               </div>
             )}
           </div>

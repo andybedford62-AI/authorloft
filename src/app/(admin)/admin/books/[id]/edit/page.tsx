@@ -74,6 +74,10 @@ export default async function EditBookPage({
     preOrderDate: book.preOrderDate
       ? book.preOrderDate.toISOString().split("T")[0]
       : null,
+    showCountdown: book.showCountdown,
+    launchDate: book.launchDate
+      ? book.launchDate.toISOString().slice(0, 16)
+      : null,
     genreIds: book.genres.map((g) => g.genreId),
     availableFormats: book.availableFormats ?? [],
     caption: book.caption ?? null,

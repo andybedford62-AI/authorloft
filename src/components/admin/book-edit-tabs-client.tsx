@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, CheckCircle2, Circle, Copy, Check, Rocket } from "lucide-react";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
@@ -44,6 +44,8 @@ type BookData = {
   listInBookstore: boolean;
   isPreOrder: boolean;
   preOrderDate: string | null;
+  showCountdown: boolean;
+  launchDate: string | null;
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -137,6 +139,11 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         </div>
       )}
 
+      {/* ── Launch Toolkit — shown on Organisation tab ── */}
+      {activeTab === "organisation" && (
+        <LaunchToolkit book={book} publicBaseUrl={publicBaseUrl} />
+      )}
+
       {/* ── Standalone tab panels — mounted only when active ── */}
       {activeTab === "buy-links" && (
         <div className="max-w-3xl space-y-4">
@@ -203,6 +210,75 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function LaunchToolkit({ book, publicBaseUrl }: { book: BookData; publicBaseUrl: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const bookUrl  = `${publicBaseUrl}/books/${book.slug}`;
+  const copyText = `🚀 My new book "${book.title}" is live — check it out! ${bookUrl}`;
+
+  const checklist = [
+    { label: "Cover image uploaded",         done: !!book.coverImageUrl },
+    { label: "Description added",            done: !!book.description },
+    { label: "Genre assigned",               done: book.genreIds.length > 0 },
+    { label: "Direct sales or buy links set",done: book.directSalesEnabled },
+    { label: "Published or pre-order active",done: book.isPublished || book.isPreOrder },
+  ];
+
+  const allDone    = checklist.every((c) => c.done);
+  const doneCnt    = checklist.filter((c) => c.done).length;
+
+  function handleCopy() {
+    navigator.clipboard.writeText(copyText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <div className="max-w-3xl mt-6 bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div className="flex items-center gap-2">
+        <Rocket className="h-4 w-4 text-rose-500" />
+        <h3 className="font-semibold text-gray-900 text-sm">Launch Toolkit</h3>
+        <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
+          allDone ? "bg-green-100 text-green-700" : "bg-amber-50 text-amber-700"
+        }`}>
+          {doneCnt}/{checklist.length} ready
+        </span>
+      </div>
+
+      {/* Checklist */}
+      <div className="space-y-2">
+        {checklist.map(({ label, done }) => (
+          <div key={label} className="flex items-center gap-2.5 text-sm">
+            {done
+              ? <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+              : <Circle className="h-4 w-4 text-gray-300 flex-shrink-0" />
+            }
+            <span className={done ? "text-gray-700" : "text-gray-400"}>{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Social copy */}
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Social Announcement</p>
+        <div className="relative rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 leading-relaxed pr-10">
+          {copyText}
+          <button
+            type="button"
+            onClick={handleCopy}
+            title="Copy to clipboard"
+            className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+        <p className="text-xs text-gray-400">Click the copy button to grab this for Instagram, X, Facebook, or LinkedIn.</p>
+      </div>
     </div>
   );
 }
