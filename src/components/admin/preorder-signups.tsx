@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Mail, Send, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Signup = {
   id: string;
@@ -75,16 +76,16 @@ export function PreOrderSignups({ bookId }: { bookId: string }) {
             <strong>{total}</strong> signup{total === 1 ? "" : "s"}
             {notified > 0 && <span className="text-gray-400"> · {notified} notified</span>}
           </span>
-          <button
+          <Button
             type="button"
+            size="sm"
             onClick={handleNotify}
             disabled={sending || pending === 0}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {sending
-              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Sending…</>
-              : <><Send className="h-3.5 w-3.5" />Send Launch Email{pending > 0 ? ` (${pending})` : ""}</>}
-          </button>
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Sending…</>
+              : <><Send className="h-3.5 w-3.5 mr-1.5" />Send Launch Email{pending > 0 ? ` (${pending})` : ""}</>}
+          </Button>
         </div>
       </div>
 

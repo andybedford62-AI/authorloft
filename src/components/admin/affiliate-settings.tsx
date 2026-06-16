@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Link2, Copy, Check, Trash2, Percent, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 
 type Referral = {
   id: string;
@@ -178,14 +180,10 @@ export function AffiliateSettings({ bookId, bookSlug, publicBaseUrl, salesEnable
               placeholder="e.g. Jane's Book Club, Newsletter, Instagram"
               className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <button
-              type="submit"
-              disabled={creating || !newLabel.trim()}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-colors"
-            >
-              {creating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2 className="h-3.5 w-3.5" />}
+            <Button type="submit" size="sm" disabled={creating || !newLabel.trim()}>
+              {creating ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Link2 className="h-3.5 w-3.5 mr-1.5" />}
               Generate Link
-            </button>
+            </Button>
           </form>
 
           {referrals.length === 0 ? (
@@ -221,9 +219,12 @@ export function AffiliateSettings({ bookId, bookSlug, publicBaseUrl, salesEnable
                       <td className="px-2 py-2 text-right text-gray-500">{r.saleCount}</td>
                       <td className="px-2 py-2 text-right font-medium text-emerald-700">${(r.earningsCents / 100).toFixed(2)}</td>
                       <td className="px-2 py-2 text-right">
-                        <button type="button" onClick={() => deleteReferral(r.id)} className="text-gray-300 hover:text-red-500 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        <IconButton
+                          icon={<Trash2 className="h-4 w-4" />}
+                          title="Delete link"
+                          variant="delete"
+                          onClick={() => deleteReferral(r.id)}
+                        />
                       </td>
                     </tr>
                   ))}
