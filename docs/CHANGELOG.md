@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — Sales Revenue Charts + Book Launch Mode
+_(on staging — not yet promoted to prod)_
+- **Sales Revenue Charts** — three new data panels on the `/admin/sales` dashboard sitting between the stat cards and the orders table. A period selector (30 days / 90 days / 12 months) controls all three simultaneously: an **Area Chart** traces revenue day by day over the selected window, a **Horizontal Bar Chart** ranks your top 10 books by revenue earned, and a **Format Breakdown** shows the percentage split across eBook, Audio, Flip Book, and Print with progress bars. All data comes from your real completed orders — no estimates. Powered by Recharts; live-reloads on period change without a page refresh. (STANDARD and PREMIUM plans)
+- **Book Launch Mode — Countdown Timer** — a new "Launch Countdown" toggle in each book's Organisation tab (Visibility & Publishing section). Enable it, set a launch date and time, save — and a live days/hours/minutes/seconds countdown appears on your public book page in your site's accent color. It counts down to the second and disappears the moment the date passes, automatically, with no further action needed. Use it alongside the existing Pre-order Coming Soon feature, or standalone for a relaunch, paperback drop, or limited-time event. (All plans)
+- **Launch Toolkit panel** — a new card appears on the Organisation tab every time you edit a book. It shows a 5-point **readiness checklist** (cover uploaded, description added, genre assigned, sales or buy links configured, published or pre-order active) with a live done count so you can spot what's still missing before launch day. Below that, a pre-written **social announcement** ("🚀 My new book [Title] is live — [URL]") is ready to copy with one click for Instagram, X/Twitter, Facebook, or LinkedIn. No formatting needed.
+
+## June 16, 2026 — Admin Books: rich Status column
+_(on staging — not yet promoted to prod)_
+- **Books list Status column** — the single Published / Draft badge on the `/admin/books` list is replaced by a richer set of badges showing all five Visibility & Publishing flags at once. The primary badge reflects the real state — **Pre-order** (blue clock), **Published** (green), or **Draft** (amber). Up to three secondary badges then appear inline: **Featured** (amber star, appears when the book is the homepage hero), **Direct Sales** (blue cart, appears when direct selling is enabled), and **Bookstore** (purple store, appears when listed in the AuthorLoft Bookstore). At a glance you can see exactly how each book is configured without clicking into it.
+
+## June 16, 2026 — Feature Matrix updated + code quality pass
+_(on staging — not yet promoted to prod)_
+- **Feature Matrix** (`docs/FEATURE_MATRIX.md`) overhauled as the canonical "what's built" reference — expanded Super Admin section with 15+ previously undocumented features (Resources CMS, FAQ Manager, Content Categories, Social Poster, ARC Management, Bookstore Management, etc.); Analytics section split into stat cards vs. revenue charts; Book Launch Mode, Per-Author Social Posting, and Shareable Promo Graphics added to Upcoming; quick-reference note added at top so future sessions check the matrix first and skip the code dive
+- **Code quality / security review** — all findings from a full codebase review addressed: coupon validation (allowlist for currency/duration/discount-type; percent cap at 100; name non-empty check); OG image URL validation (must be `https://` + image extension); OG upload 5 MB file-size cap before reading to memory; Stripe subscribe route merged a duplicate Prisma query; trial days display guarded against negative values; author coupon assignment API wrapped in try/catch with correct 404 vs 500 responses
+
 ## June 15, 2026 — Bookstore card cleanup: price in body, modern vertical card
 _(not yet promoted to prod)_
 - **Price moved off the cover into the card body** on every card (vertical New/Trending cards + All Books list cards), shown alongside the title/author/rating data (green for "Free"). No more price chip overlapping the cover art
