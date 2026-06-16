@@ -151,7 +151,7 @@ export function ArchiveAction({ onClick, disabled, loading }: ActionIconProps) {
       onClick={onClick}
       disabled={disabled}
       loading={loading}
-      variant="edit"
+      variant="warning"
     />
   );
 }

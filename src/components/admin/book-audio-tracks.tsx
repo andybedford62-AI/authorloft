@@ -7,6 +7,7 @@ import {
   Play, Pause, Volume2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 import { Input } from "@/components/ui/input";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -266,7 +267,6 @@ function AddTrackForm({ bookId, onSaved, onCancel }: AddTrackFormProps) {
         <Button
           type="submit"
           disabled={saving}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
           size="sm"
         >
           {saving ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Saving…</> : "Save Track"}
@@ -331,7 +331,7 @@ function EditInlineForm({ track, bookId, onSaved, onCancel }: EditInlineProps) {
       />
       {error && <p className="text-xs text-red-600">{error}</p>}
       <div className="flex gap-2">
-        <Button type="submit" size="sm" disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button type="submit" size="sm" disabled={saving}>
           {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={onCancel}>
@@ -420,7 +420,7 @@ export function BookAudioTracks({ bookId, audioEnabled }: Props) {
             type="button"
             size="sm"
             onClick={() => setAdding(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white flex-shrink-0"
+            className="flex-shrink-0"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
             Add Track
@@ -468,7 +468,7 @@ export function BookAudioTracks({ bookId, audioEnabled }: Props) {
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="mt-4 text-sm text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
+            className="mt-4 text-sm text-[var(--accent)] hover:opacity-80 font-medium underline underline-offset-2"
           >
             Add your first track
           </button>
@@ -499,22 +499,20 @@ export function BookAudioTracks({ bookId, audioEnabled }: Props) {
                 <div className="flex items-start gap-3">
                   {/* Reorder */}
                   <div className="flex flex-col gap-0.5 pt-0.5 flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleReorder(track.id, "up")}
+                    <IconButton
+                      icon={<ChevronUp className="h-4 w-4" />}
+                      title="Move up"
+                      variant="ghost"
                       disabled={idx === 0}
-                      className="text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors"
-                    >
-                      <ChevronUp className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReorder(track.id, "down")}
+                      onClick={() => handleReorder(track.id, "up")}
+                    />
+                    <IconButton
+                      icon={<ChevronDown className="h-4 w-4" />}
+                      title="Move down"
+                      variant="ghost"
                       disabled={idx === tracks.length - 1}
-                      className="text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors"
-                    >
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    </button>
+                      onClick={() => handleReorder(track.id, "down")}
+                    />
                   </div>
 
                   {/* Track icon */}
@@ -545,33 +543,25 @@ export function BookAudioTracks({ bookId, audioEnabled }: Props) {
 
                   {/* Actions */}
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(track)}
+                    <IconButton
+                      icon={<Volume2 className={`h-4 w-4 ${track.isActive ? "" : "opacity-40"}`} />}
                       title={track.isActive ? "Hide from public" : "Show on public page"}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      {track.isActive
-                        ? <Volume2 className="h-3.5 w-3.5" />
-                        : <Volume2 className="h-3.5 w-3.5 opacity-40" />}
-                    </button>
-                    <button
-                      type="button"
+                      variant="ghost"
+                      onClick={() => handleToggleActive(track)}
+                    />
+                    <IconButton
+                      icon={<Pencil className="h-4 w-4" />}
+                      title="Edit"
+                      variant="edit"
                       onClick={() => setEditId(track.id)}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      type="button"
+                    />
+                    <IconButton
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title="Delete"
+                      variant="delete"
+                      loading={deletingId === track.id}
                       onClick={() => handleDelete(track.id)}
-                      disabled={deletingId === track.id}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                    >
-                      {deletingId === track.id
-                        ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        : <Trash2 className="h-3.5 w-3.5" />}
-                    </button>
+                    />
                   </div>
                 </div>
               )}

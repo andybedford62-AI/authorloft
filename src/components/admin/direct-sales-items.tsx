@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
+  Plus, Loader2, Trash2, Edit2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
   Upload, FileText, X, CheckCircle, Gift, Zap, Users,
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
+import { IconButton } from "@/components/admin/icon-button";
 import { showToast } from "@/lib/use-toast";
 
 // ── Format config ─────────────────────────────────────────────────────────────
@@ -807,51 +808,27 @@ export function DirectSalesItems({
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        {/* Edit */}
-                        <button
-                          type="button"
+                        <IconButton
+                          icon={<Edit2 className="h-4 w-4" />}
+                          title="Edit"
+                          variant="edit"
                           disabled={isBusy}
                           onClick={() => startEdit(item)}
-                          className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        >
-                          Edit
-                        </button>
-
-                        {/* Activate / Deactivate */}
-                        <button
-                          type="button"
-                          disabled={isBusy}
+                        />
+                        <IconButton
+                          icon={item.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                          title={item.isActive ? "Deactivate (hide from your site)" : "Activate"}
+                          variant={item.isActive ? "warning" : "add"}
+                          loading={isBusy}
                           onClick={() => toggleActive(item)}
-                          title={item.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                          className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
-                            item.isActive
-                              ? "border-amber-200 text-amber-600 hover:bg-amber-50"
-                              : "border-green-200 text-green-600 hover:bg-green-50"
-                          }`}
-                        >
-                          {isBusy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : item.isActive ? (
-                            <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
-                          ) : (
-                            <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
-                          )}
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => deleteItem(item.id, item.label)}
+                        />
+                        <IconButton
+                          icon={<Trash2 className="h-4 w-4" />}
                           title="Delete"
-                          className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-                        >
-                          {isBusy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
-                          )}
-                        </button>
+                          variant="delete"
+                          loading={isBusy}
+                          onClick={() => deleteItem(item.id, item.label)}
+                        />
                       </div>
                     </div>
 

@@ -3,14 +3,17 @@
 import { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 
-type Variant = "edit" | "add" | "delete" | "view" | "ghost";
+// Canonical semantic variants for admin/super-admin icon actions.
+// Keep this list small so the whole admin reads as one cohesive palette.
+type Variant = "edit" | "add" | "delete" | "warning" | "view" | "ghost";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  edit:   "text-blue-600 hover:text-blue-700 hover:bg-blue-50",
-  add:    "text-green-600 hover:text-green-700 hover:bg-green-50",
-  delete: "text-red-600  hover:text-red-700  hover:bg-red-50",
-  view:   "text-gray-900 hover:text-gray-800 hover:bg-gray-100",
-  ghost:  "text-gray-500 hover:text-gray-700 hover:bg-gray-100",
+  edit:    "text-blue-600  hover:text-blue-700  hover:bg-blue-50",   // edit / configure
+  add:     "text-green-600 hover:text-green-700 hover:bg-green-50",  // add / create / activate / save
+  delete:  "text-red-600   hover:text-red-700   hover:bg-red-50",    // destructive
+  warning: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",  // deactivate / caution / archive
+  view:    "text-gray-900  hover:text-gray-800  hover:bg-gray-100",  // view / preview
+  ghost:   "text-gray-500  hover:text-gray-700  hover:bg-gray-100",  // secondary / more / reorder / cancel
 };
 
 interface IconButtonProps {

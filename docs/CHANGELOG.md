@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — Admin CRUD UI standardization (rolling)
+_(on staging — not yet promoted to prod)_
+Adopting the existing `IconButton` / `action-icons` / `Button` design system across all
+admin & super-admin CRUD for one cohesive look & feel. Rolling out in batches.
+- **Foundation:** reconciled the `IconButton` primitive — canonical color-coded variants are now `edit` (blue), `add` (green), `delete` (red), `warning` (amber), `view` (dark), `ghost` (gray), each with a built-in hover tooltip. Updated `ICON_BUTTON_GUIDE.md` to match (it referenced variants that never existed) and documented the text-`Button` CTA conventions.
+- **Converted:** Direct Sales editor and Audio Previews now use the shared `IconButton` for row actions (edit/activate/deactivate/delete/reorder) and the shared accent `Button` for CTAs — replacing one-off purple/blue/gray button colors and hand-rolled icon buttons.
+- More admin and super-admin pages to follow in subsequent batches.
+
 ## June 16, 2026 — Book edit UX polish batch
 _(on staging — not yet promoted to prod)_
 - **Sticky book title** — the accent-colored book title now stays pinned to the top of the edit screen while you scroll, so it's always clear which book you're working on.

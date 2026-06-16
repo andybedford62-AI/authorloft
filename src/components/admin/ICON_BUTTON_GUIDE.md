@@ -7,13 +7,17 @@
 
 ## Icon Button Variants & Colors
 
+These are the **only** variants. Keep the palette small so the whole admin reads
+as one cohesive system. (`<IconButton>` lives in `icon-button.tsx`.)
+
 | Variant | Use Case | Color |
 |---------|----------|-------|
-| `edit` (blue) | Edit, Pencil actions | Blue → Darker blue on hover |
-| `add` (green) | Plus, Add, Create new | Green → Darker green on hover |
-| `delete` (red) | Trash, Delete, Remove | Red → Darker red on hover |
-| `view` (black) | Eye, View, Preview | Black → Darker gray on hover |
-| `ghost` (gray) | Secondary, More, Cancel | Gray → Darker gray on hover |
+| `edit` (blue) | Edit, Pencil, Configure | Blue → darker blue on hover |
+| `add` (green) | Plus, Add, Create, Activate, Save/Confirm | Green → darker green on hover |
+| `delete` (red) | Trash, Delete, Remove | Red → darker red on hover |
+| `warning` (amber) | Deactivate, Archive, caution actions | Amber → darker amber on hover |
+| `view` (dark) | Eye, View, Preview | Dark gray → darker on hover |
+| `ghost` (gray) | Secondary, More, Reorder, Cancel/Close | Gray → darker gray on hover |
 
 ## Usage Examples
 
@@ -52,7 +56,7 @@ import { Edit2, Trash2, Eye } from "lucide-react";
       icon={<Check className="h-4 w-4" />}
       title="Save"
       onClick={handleSave}
-      variant="success"
+      variant="add"
       loading={saving}
     />
     <IconButton 
@@ -67,7 +71,7 @@ import { Edit2, Trash2, Eye } from "lucide-react";
     icon={<Edit2 className="h-4 w-4" />}
     title="Edit"
     onClick={() => setEditing(true)}
-    variant="primary"
+    variant="edit"
   />
 )}
 ```
@@ -78,10 +82,23 @@ import { Edit2, Trash2, Eye } from "lucide-react";
   icon={<Trash2 className="h-4 w-4" />}
   title="Delete"
   onClick={handleDelete}
-  variant="danger"
+  variant="delete"
   loading={isDeleting}
 />
 ```
+
+## Text Buttons (CTAs & form submits)
+
+For prominent/labelled actions use the shared `<Button>` (`components/ui/button.tsx`),
+never a hand-rolled `<button className="bg-...">`:
+
+| Intent | Variant |
+|--------|---------|
+| Primary action — Save, Create, Submit | `variant="primary"` (accent) |
+| Secondary — Cancel, Back | `variant="outline"` or `"secondary"` |
+| Destructive — Delete book, Remove | `variant="danger"` |
+
+Pair with a leading lucide icon (`h-4 w-4 mr-1.5/mr-2`) where it aids scanning.
 
 ## Icon Conventions
 
