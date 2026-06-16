@@ -16,6 +16,9 @@ type BookRow = {
   coverImageUrl: string | null;
   isFeatured: boolean;
   isPublished: boolean;
+  directSalesEnabled: boolean;
+  listInBookstore: boolean;
+  isPreOrder: boolean;
   caption: string | null;
   series: { name: string } | null;
   _count: { directSaleItems: number; retailerLinks: number };

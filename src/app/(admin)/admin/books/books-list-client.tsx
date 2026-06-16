@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical } from "lucide-react";
+import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical, Store, Clock } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
 
 type BookRow = {
@@ -12,6 +12,9 @@ type BookRow = {
   coverImageUrl: string | null;
   isFeatured: boolean;
   isPublished: boolean;
+  directSalesEnabled: boolean;
+  listInBookstore: boolean;
+  isPreOrder: boolean;
   caption: string | null;
   series: { name: string } | null;
   _count: { directSaleItems: number; retailerLinks: number };
@@ -187,13 +190,41 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
 
               {/* Status */}
               <td className="px-4 py-4 hidden lg:table-cell">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                  book.isPublished
-                    ? "bg-green-100 text-green-700"
-                    : "bg-amber-100 text-amber-700"
-                }`}>
-                  {book.isPublished ? "Published" : "Draft"}
-                </span>
+                <div className="flex flex-col gap-1">
+                  {/* Published / Draft — primary state */}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium w-fit ${
+                    book.isPreOrder
+                      ? "bg-blue-100 text-blue-700"
+                      : book.isPublished
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700"
+                  }`}>
+                    {book.isPreOrder
+                      ? <><Clock className="h-2.5 w-2.5" /> Pre-order</>
+                      : book.isPublished
+                        ? "Published"
+                        : "Draft"}
+                  </span>
+
+                  {/* Secondary badges */}
+                  <div className="flex flex-wrap gap-1">
+                    {book.isFeatured && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-600">
+                        <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" /> Featured
+                      </span>
+                    )}
+                    {book.directSalesEnabled && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-600">
+                        <ShoppingCart className="h-2.5 w-2.5" /> Direct sales
+                      </span>
+                    )}
+                    {book.listInBookstore && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-600">
+                        <Store className="h-2.5 w-2.5" /> Bookstore
+                      </span>
+                    )}
+                  </div>
+                </div>
               </td>
 
               {/* Edit */}
