@@ -20,6 +20,7 @@ import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { AddToCartButtons } from "@/components/author-site/add-to-cart-buttons";
+import { ReaderMagnetButton } from "@/components/author-site/reader-magnet-button";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -106,7 +107,7 @@ export default async function BookDetailPage({
       },
       directSaleItems: {
         where: { isActive: true },
-        select: { id: true, format: true, label: true, description: true, priceCents: true },
+        select: { id: true, format: true, label: true, description: true, priceCents: true, isReaderMagnet: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
       audioTracks: {
@@ -141,10 +142,16 @@ export default async function BookDetailPage({
 
   const salesEnabled        = author.plan?.salesEnabled ?? false;
   const audioEnabled        = author.plan?.audioEnabled ?? false;
-  const hasDirectSaleItems  = salesEnabled && book.directSalesEnabled && book.directSaleItems.length > 0;
+  const magnetItems         = salesEnabled && book.directSalesEnabled
+    ? book.directSaleItems.filter((i) => i.isReaderMagnet)
+    : [];
+  const paidSaleItems       = salesEnabled && book.directSalesEnabled
+    ? book.directSaleItems.filter((i) => !i.isReaderMagnet)
+    : [];
+  const hasDirectSaleItems  = paidSaleItems.length > 0;
   const showLegacyDirectBuy = !hasDirectSaleItems && salesEnabled && book.directSalesEnabled && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
-  const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks;
+  const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks || magnetItems.length > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
@@ -385,7 +392,7 @@ export default async function BookDetailPage({
                     {/* Per-format direct sale items — Add to Cart */}
                     {hasDirectSaleItems && (
                       <AddToCartButtons
-                        items={book.directSaleItems}
+                        items={paidSaleItems}
                         bookId={book.id}
                         bookSlug={book.slug}
                         bookTitle={book.title}
@@ -394,6 +401,26 @@ export default async function BookDetailPage({
                         formatColors={FORMAT_COLORS}
                       />
                     )}
+
+                    {/* Reader magnet items — free in exchange for email */}
+                    {magnetItems.map((item) => {
+                      const colors = FORMAT_COLORS[item.format] ?? FORMAT_COLORS.EBOOK;
+                      return (
+                        <ReaderMagnetButton
+                          key={item.id}
+                          bookId={book.id}
+                          saleItemId={item.id}
+                          authorId={author.id}
+                          bookTitle={book.title}
+                          format={item.format}
+                          label={item.label}
+                          coverImageUrl={book.coverImageUrl}
+                          accentColor={accentColor}
+                          formatColor={colors.color}
+                          formatBg={colors.bg}
+                        />
+                      );
+                    })}
 
                     {/* Legacy single direct-buy button */}
                     {showLegacyDirectBuy && (

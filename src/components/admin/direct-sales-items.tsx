@@ -79,6 +79,7 @@ type DirectSaleItem = {
   description: string | null;
   priceCents: number;
   isActive: boolean;
+  isReaderMagnet: boolean;
   sortOrder: number;
   fileUrl: string | null;
   fileKey: string | null;
@@ -341,6 +342,25 @@ export function DirectSalesItems({
       setAdding(false);
     }
     setSaving(false);
+  }
+
+  // ── Toggle reader magnet ───────────────────────────────────────────────────
+  async function toggleMagnet(item: DirectSaleItem) {
+    setToggleError("");
+    setPending((p) => ({ ...p, [item.id]: true }));
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isReaderMagnet: !item.isReaderMagnet }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setToggleError(data.error || "Could not update item. Please try again.");
+    }
+    setPending((p) => ({ ...p, [item.id]: false }));
   }
 
   // ── Toggle active ──────────────────────────────────────────────────────────
@@ -820,6 +840,39 @@ export function DirectSalesItems({
                           setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
                         }
                       />
+                    )}
+
+                    {/* ── Reader Magnet toggle (only when file uploaded) ─── */}
+                    {fmt.needsFile && item.fileKey && (
+                      <div className="pl-12 mt-1">
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => toggleMagnet(item)}
+                          className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors group"
+                        >
+                          <span className={`relative inline-flex h-4 w-7 flex-shrink-0 rounded-full border transition-colors ${
+                            item.isReaderMagnet ? "bg-emerald-500 border-emerald-500" : "bg-gray-200 border-gray-200"
+                          }`}>
+                            <span className={`inline-block h-3 w-3 mt-0.5 rounded-full bg-white shadow transition-transform ${
+                              item.isReaderMagnet ? "translate-x-3.5" : "translate-x-0.5"
+                            }`} />
+                          </span>
+                          <span className={item.isReaderMagnet ? "text-emerald-700 font-medium" : ""}>
+                            Reader Magnet
+                          </span>
+                          {item.isReaderMagnet && (
+                            <span className="text-emerald-600 text-[10px] bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                              Free in exchange for email
+                            </span>
+                          )}
+                        </button>
+                        {!item.isReaderMagnet && (
+                          <p className="text-[10px] text-gray-400 mt-0.5 ml-9">
+                            Offer this format free to build your email list
+                          </p>
+                        )}
+                      </div>
                     )}
                   </>
                 )}

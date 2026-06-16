@@ -1276,6 +1276,69 @@ export async function sendResourceDownloadEmail({
   });
 }
 
+// ── Reader Magnet download delivery ──────────────────────────────────────────
+
+export async function sendReaderMagnetEmail({
+  to,
+  authorName,
+  bookTitle,
+  coverImageUrl,
+  downloadUrl,
+  downloadExpiry,
+}: {
+  to: string;
+  authorName: string;
+  bookTitle: string;
+  coverImageUrl?: string | null;
+  downloadUrl: string;
+  downloadExpiry: Date;
+}) {
+  const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+
+  return sendMail({
+    to,
+    from: BROADCAST_FROM_ADDRESS,
+    subject: `Your free copy of "${bookTitle}" is ready`,
+    text: [
+      `Hi there,`,
+      `Thanks for signing up! Here's your free copy of "${bookTitle}" by ${authorName}.`,
+      `Download link: ${downloadUrl}`,
+      `This link expires on ${expiryStr} and can be used up to 3 times.`,
+      `— ${authorName}`,
+    ].join("\n\n"),
+    html: wrapHtml(`Your free copy of "${bookTitle}"`, `
+      <p style="margin:0 0 16px;">Hi there,</p>
+      <p style="margin:0 0 20px;">
+        Thanks for signing up! Here&rsquo;s your free copy of
+        <strong>${esc(bookTitle)}</strong> by ${esc(authorName)}.
+      </p>
+      ${coverImageUrl ? `
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding-bottom:20px;">
+          <img src="${coverImageUrl}" alt="${esc(bookTitle)}" style="max-width:160px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" />
+        </td></tr>
+      </table>` : ""}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${downloadUrl}"
+               style="display:inline-block;background:#059669;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              Download Your Free Copy
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">If the button doesn&rsquo;t work, paste this link into your browser:</p>
+      <p style="margin:0 0 20px;font-size:13px;word-break:break-all;"><a href="${downloadUrl}" style="color:#2563eb;">${downloadUrl}</a></p>
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
+        Link expires ${esc(expiryStr)} &middot; up to 3 downloads
+      </p>
+    `),
+  });
+}
+
 // ── News issue email (to a platform News subscriber) ─────────────────────────
 
 export function buildPlatformUnsubscribeLink(token: string): string {

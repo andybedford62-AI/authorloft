@@ -13,6 +13,7 @@ import { BookExcerptEditor } from "@/components/admin/book-excerpt-editor";
 import { ArcTab } from "@/components/admin/books/arc-tab";
 import { PreOrderSignups } from "@/components/admin/preorder-signups";
 import { AffiliateSettings } from "@/components/admin/affiliate-settings";
+import { BookQRCode } from "@/components/admin/book-qr-code";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -142,6 +143,16 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
       {/* ── Launch Toolkit — shown on Organisation tab ── */}
       {activeTab === "organisation" && (
         <LaunchToolkit book={book} publicBaseUrl={publicBaseUrl} />
+      )}
+
+      {/* ── QR Code — shown on Organisation tab ── */}
+      {activeTab === "organisation" && (
+        <div className="max-w-3xl mt-4">
+          <BookQRCode
+            bookUrl={`${publicBaseUrl}/books/${book.slug}`}
+            bookTitle={book.title}
+          />
+        </div>
       )}
 
       {/* ── Standalone tab panels — mounted only when active ── */}

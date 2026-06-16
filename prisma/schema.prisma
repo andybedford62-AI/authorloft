@@ -192,6 +192,7 @@ model Author {
   impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
   impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
   preOrderSignups      PreOrderSignup[]
+  magnetLeads          BookMagnetLead[]
 
   @@index([slug])
   @@index([customDomain])
@@ -352,6 +353,7 @@ model Book {
   arcCopies           ArcCopy[]
   preOrderSignups     PreOrderSignup[]
   affiliateReferrals  AffiliateReferral[]
+  magnetLeads         BookMagnetLead[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -368,21 +370,23 @@ enum DirectSaleFormat {
 }
 
 model BookDirectSaleItem {
-  id          String           @id @default(cuid())
-  bookId      String
-  book        Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  format      DirectSaleFormat
-  label       String
-  description String?
-  priceCents  Int              @default(0)
-  isActive    Boolean          @default(true)
-  sortOrder   Int              @default(0)
-  fileUrl     String?          // Supabase storage URL (for display / reference)
-  fileKey     String?          // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
-  fileName    String?          // Original filename shown in admin UI
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  orderItems  OrderItem[]
+  id             String           @id @default(cuid())
+  bookId         String
+  book           Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  format         DirectSaleFormat
+  label          String
+  description    String?
+  priceCents     Int              @default(0)
+  isActive       Boolean          @default(true)
+  isReaderMagnet Boolean          @default(false)
+  sortOrder      Int              @default(0)
+  fileUrl        String?          // Supabase storage URL (for display / reference)
+  fileKey        String?          // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
+  fileName       String?          // Original filename shown in admin UI
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  orderItems     OrderItem[]
+  magnetLeads    BookMagnetLead[]
 
   @@index([bookId])
 }
@@ -1203,4 +1207,28 @@ model PlatformResource {
   updatedAt      DateTime @updatedAt
 
   @@index([isActive, displayOrder])
+}
+
+// ─── Reader Magnet Leads ──────────────────────────────────────────────────────
+
+model BookMagnetLead {
+  id             String             @id @default(cuid())
+  bookId         String
+  saleItemId     String
+  authorId       String
+  email          String
+  name           String?
+  downloadToken  String             @unique @default(cuid())
+  downloadCount  Int                @default(0)
+  maxDownloads   Int                @default(3)
+  downloadExpiry DateTime?
+  createdAt      DateTime           @default(now())
+
+  book     Book               @relation(fields: [bookId],     references: [id], onDelete: Cascade)
+  saleItem BookDirectSaleItem @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  author   Author             @relation(fields: [authorId],   references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([bookId])
+  @@index([downloadToken])
 }

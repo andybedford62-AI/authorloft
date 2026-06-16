@@ -20,7 +20,7 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { label, description, priceCents, isActive, clearFile } = body;
+  const { label, description, priceCents, isActive, isReaderMagnet, clearFile } = body;
 
   // Stripe Connect gate: block activation if author hasn't completed onboarding
   if (isActive === true) {
@@ -57,6 +57,7 @@ export async function PATCH(
       ...(description !== undefined && { description: description?.trim() || null }),
       ...(priceCents !== undefined && { priceCents }),
       ...(isActive !== undefined && { isActive }),
+      ...(isReaderMagnet !== undefined && { isReaderMagnet }),
       ...(clearFile && { fileUrl: null, fileKey: null, fileName: null }),
     },
   });
