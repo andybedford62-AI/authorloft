@@ -81,9 +81,10 @@ export default async function PrivacyPage() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-[#DCDBD3] flex flex-wrap justify-between items-center gap-3 text-sm text-gray-400">
-          <Link href="/terms" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Terms of Service →</Link>
-          <Link href="/gdpr"  className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">GDPR &amp; Data Rights →</Link>
-          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Contact us</Link>
+          <Link href="/terms"       className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Terms of Service →</Link>
+          <Link href="/gdpr"        className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">GDPR &amp; Data Rights →</Link>
+          <Link href="/us-privacy"  className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">U.S. State Privacy Rights →</Link>
+          <Link href="/contact"     className="text-[#C26A4A] hover:text-[#1B2B47] transition-colors">Contact us</Link>
         </div>
 
         {/* Register CTA */}
