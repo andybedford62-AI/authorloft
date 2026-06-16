@@ -89,10 +89,10 @@ export default async function EditBookPage({
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Editing book</p>
+      <div className="sticky top-0 z-20 bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Editing book</p>
         <h1
-          className="text-3xl font-extrabold leading-tight mt-0.5"
+          className="text-2xl font-extrabold leading-tight"
           style={{ color: "var(--accent)" }}
         >
           {book.title}
@@ -108,10 +108,10 @@ export default async function EditBookPage({
               <p className="font-semibold text-green-900 text-sm">Book created — here's what to do next</p>
               <ul className="mt-2 space-y-1 text-sm text-green-800">
                 <li>1. <strong>Details tab</strong> — add a cover image and description so readers know what your book is about</li>
-                <li>2. <strong>Sales tab</strong> — upload your eBook or PDF and set a price to start selling directly</li>
-                <li>3. <strong>Distribution tab</strong> — add buy links for Amazon, Apple Books, or other retailers</li>
+                <li>2. <strong>Direct Sales tab</strong> — upload your eBook or PDF, then set a price to sell it or give it away free as a Reader Magnet</li>
+                <li>3. <strong>Buy Links tab</strong> — add links to Amazon, Apple Books, or other retailers</li>
               </ul>
-              <p className="mt-2 text-xs text-green-700">Everything auto-saves. Skip any step and come back later.</p>
+              <p className="mt-2 text-xs text-green-700">Use <strong>Save Changes</strong> on the Details and Organisation tabs; the other tabs save as you go. Skip any step and come back later.</p>
             </div>
           </div>
         </div>

@@ -207,6 +207,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [dirty, setDirty]       = useState(false);
+  const formRef                 = useRef<HTMLFormElement>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError]       = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -373,10 +375,34 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     // Edit mode → stay exactly where the author is (same tab) instead of kicking
     // them back to the book list. Just confirm the save and refresh server data.
     setSaving(false);
+    setDirty(false);
     setJustSaved(true);
     setTimeout(() => setJustSaved(false), 2500);
     router.refresh();
   }
+
+  // Save with Ctrl/Cmd+S from anywhere in the form.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        formRef.current?.requestSubmit();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Warn before a hard navigation / tab close when there are unsaved edits.
+  useEffect(() => {
+    if (!dirty) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 
   async function handleDelete() {
     if (!confirm(`Delete "${book?.title}"? This cannot be undone.`)) return;
@@ -405,7 +431,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6${formHidden ? " hidden" : ""}`}>
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setDirty(true)} className={`space-y-6${formHidden ? " hidden" : ""}`}>
 
       {/* ── ISBN Lookup ──────────────────────────────────────────────────────── */}
       {showDetails && <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
@@ -941,7 +967,14 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         </div>
 
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.push("/admin/books")}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (dirty && !confirm("You have unsaved changes. Leave without saving?")) return;
+              router.push("/admin/books");
+            }}
+          >
             Cancel
           </Button>
           {mode === "edit" && (

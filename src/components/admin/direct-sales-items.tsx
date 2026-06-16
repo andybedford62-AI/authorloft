@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle, Gift, Zap,
+  Upload, FileText, X, CheckCircle, Gift, Zap, Users,
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
+import { showToast } from "@/lib/use-toast";
 
 // ── Format config ─────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ type DirectSaleItem = {
   fileUrl: string | null;
   fileKey: string | null;
   fileName: string | null;
+  magnetLeadCount?: number;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -170,6 +172,7 @@ function FileUploadWidget({
         setUploadError(data.error || "File uploaded but could not save. Please try again.");
       } else {
         onUpdated({ ...item, fileUrl: fileKey, fileKey, fileName: file.name });
+        showToast("success", "File uploaded");
       }
     } catch (err: any) {
       setUploadError(err?.message ?? "Unexpected error. Please try again.");
@@ -338,7 +341,8 @@ export function DirectSalesItems({
       setAddError(data.error || "Could not add item.");
     } else {
       const created = await res.json();
-      setItems((prev) => [...prev, created]);
+      setItems((prev) => [...prev, { ...created, magnetLeadCount: 0 }]);
+      showToast("success", "Format added");
       setCustomLabel("");
       setDescription("");
       setPriceInput("0.00");
@@ -358,7 +362,8 @@ export function DirectSalesItems({
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
     } else {
       const data = await res.json().catch(() => ({}));
       setToggleError(data.error || "Could not update item. Please try again.");
@@ -377,7 +382,8 @@ export function DirectSalesItems({
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
     } else {
       const data = await res.json().catch(() => ({}));
       setToggleError(data.error || "Could not update item. Please try again.");
@@ -390,7 +396,10 @@ export function DirectSalesItems({
     if (!confirm(`Remove "${label}"? This cannot be undone.`)) return;
     setPending((p) => ({ ...p, [id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${id}`, { method: "DELETE" });
-    if (res.ok) setItems((prev) => prev.filter((i) => i.id !== id));
+    if (res.ok) {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+      showToast("success", "Removed");
+    }
     setPending((p) => ({ ...p, [id]: false }));
   }
 
@@ -416,7 +425,8 @@ export function DirectSalesItems({
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
       setEditingId(null);
     }
     setEditSaving(false);
@@ -890,6 +900,11 @@ export function DirectSalesItems({
                                 ? "Readers download this free for their email. Your price is kept — turn this off to sell it again."
                                 : "Give this edition away free to build your email list. Your price is remembered."}
                             </p>
+                            {item.isReaderMagnet && (item.magnetLeadCount ?? 0) > 0 && (
+                              <p className="text-[10px] text-emerald-600 mt-0.5 ml-9 flex items-center gap-1">
+                                <Users className="h-3 w-3" /> {item.magnetLeadCount} reader{item.magnetLeadCount === 1 ? "" : "s"} captured
+                              </p>
+                            )}
                           </div>
                         )
                       ) : (
@@ -899,6 +914,11 @@ export function DirectSalesItems({
                           </span>
                           {!item.fileKey && (
                             <span className="text-gray-400">Upload a file so readers can download it</span>
+                          )}
+                          {(item.magnetLeadCount ?? 0) > 0 && (
+                            <span className="inline-flex items-center gap-1 text-emerald-600">
+                              <Users className="h-3 w-3" /> {item.magnetLeadCount} captured
+                            </span>
                           )}
                         </div>
                       )

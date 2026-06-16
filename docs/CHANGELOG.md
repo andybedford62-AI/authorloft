@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## June 16, 2026 — Book edit UX polish batch
+_(on staging — not yet promoted to prod)_
+- **Sticky book title** — the accent-colored book title now stays pinned to the top of the edit screen while you scroll, so it's always clear which book you're working on.
+- **Accurate first-book guidance** — the green "what to do next" banner now references the real tab names (**Direct Sales**, **Buy Links**) and correctly explains that Details/Organisation use Save Changes while other tabs save as you go (removed the inaccurate "everything auto-saves" line).
+- **Unsaved-changes guard** — editing fields on Details/Organisation and then closing the tab or hitting Cancel now prompts "You have unsaved changes" instead of silently discarding them.
+- **Ctrl/Cmd+S to save** the book form from anywhere on the page.
+- **"Readers captured" count** — each Reader Magnet edition now shows how many readers have claimed it, right in the Direct Sales editor (powered by a `magnetLeads` count on the list API).
+- **Consistent "Saved" feedback** — Direct Sales actions (add format, file upload, toggle magnet/active, edit, remove) now show a success toast, matching the "Saved ✓" confirmation on the main form.
+
 ## June 16, 2026 — Book edit UX: stay on tab after save + prominent title
 _(on staging — not yet promoted to prod)_
 - **Saving a book no longer kicks you back to the book list.** On the Details/Organisation tabs, "Save Changes" now keeps you exactly where you are (same tab) and shows a brief "Saved ✓" confirmation, instead of navigating away to `/admin/books`. First save of a brand-new book still opens the edit screen as before.

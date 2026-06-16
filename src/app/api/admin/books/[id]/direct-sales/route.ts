@@ -21,9 +21,13 @@ export async function GET(
   const items = await prisma.bookDirectSaleItem.findMany({
     where: { bookId },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { magnetLeads: true } } },
   });
 
-  return NextResponse.json(items);
+  // Surface how many readers each magnet has captured so the editor can show it.
+  return NextResponse.json(
+    items.map(({ _count, ...item }) => ({ ...item, magnetLeadCount: _count.magnetLeads }))
+  );
 }
 
 // ── POST — create a new direct sale item ──────────────────────────────────────
