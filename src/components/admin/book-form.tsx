@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
+import { Loader2, Trash2, Check, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -947,7 +947,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
           <Button type="submit" disabled={saving} size="md">
             {saving
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
-              : mode === "edit" ? "Save Changes" : "Create Book"}
+              : <><Check className="h-4 w-4 mr-2" />{mode === "edit" ? "Save Changes" : "Create Book"}</>}
           </Button>
           {justSaved && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
@@ -970,7 +970,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
           </Button>
           {mode === "edit" && (
             <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Book"}
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Book</>}
             </Button>
           )}
         </div>

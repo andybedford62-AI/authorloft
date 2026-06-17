@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Plus, Loader2, Trash2, Edit2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle, Gift, Zap, Users,
+  Upload, FileText, X, CheckCircle, Check, Gift, Zap, Users,
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { IconButton } from "@/components/admin/icon-button";
@@ -658,8 +658,8 @@ export function DirectSalesItems({
           <div className="flex gap-2">
             <Button type="submit" size="sm" disabled={saving}>
               {saving
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Adding…</>
-                : <><Plus className="h-3.5 w-3.5 mr-1.5" />Add Format</>}
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
+                : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Format</>}
             </Button>
             <Button
               type="button"
@@ -740,7 +740,7 @@ export function DirectSalesItems({
                     </div>
                     <div className="flex gap-2">
                       <Button type="button" size="sm" disabled={editSaving} onClick={() => saveEdit(item)}>
-                        {editSaving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save"}
+                        {editSaving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
                       </Button>
                       <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                         Cancel

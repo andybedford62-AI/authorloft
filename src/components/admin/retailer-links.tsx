@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit } from "lucide-react";
+import { Plus, Loader2, Check, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
 import { Button } from "@/components/ui/button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
@@ -275,8 +275,8 @@ export function RetailerLinks({ bookId }: Props) {
           <div className="flex gap-2">
             <Button type="submit" size="sm" disabled={saving}>
               {saving
-                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Adding…</>
-                : <><Plus className="h-3.5 w-3.5 mr-1.5" />Add Link</>}
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
+                : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Link</>}
             </Button>
             <Button
               type="button"
@@ -426,7 +426,7 @@ export function RetailerLinks({ bookId }: Props) {
 
                     <div className="flex gap-2">
                       <Button type="button" size="sm" disabled={isBusy} onClick={() => saveEdit(link)}>
-                        {isBusy ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save"}
+                        {isBusy ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
                       </Button>
                       <Button type="button" variant="ghost" size="sm" disabled={isBusy} onClick={() => cancelEdit(link.id)}>
                         Cancel
