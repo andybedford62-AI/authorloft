@@ -23,6 +23,10 @@ Locked and applied a consistent button/icon standard across the entire admin sec
 - **Special, Flip Book, Blog/News Post, Custom Pages, Media Kit, Legal Notice, Legal Editor** — all Save/Create/Delete/Cancel buttons updated to match locked standard.
 - **ARC tab** — "Create ARC" gets Plus icon. **Book Excerpt** — "Save Excerpt" gets Check icon.
 - **Discount Codes, Newsletter** — Cancel buttons in edit modal and send confirmation corrected from outline to ghost.
+- **Settings page** — "Remove Key" buttons use `danger` variant (was outline+manual red className); "Delete Account" gets Trash2 icon; Save Key/Save New Key buttons get Check icon.
+- **Super-admin Categories** — all 3 hand-rolled purple buttons converted to `Button` component: Add (Plus), Save (Check), Cancel (ghost).
+- **Super-admin Coupons** — all 3 hand-rolled purple buttons converted to `Button` component: New Coupon (Plus), Create Coupon (Plus), Cancel (ghost).
+- **Super-admin Author edit form** — 5 hand-rolled blue/indigo/purple buttons converted to `Button` component: Grant/Update Trial (Check), Assign Coupon (Tag), Save AI Cap (Check), Reset AI Counter (outline), Save Changes (Check).
 
 ## June 16, 2026 — Book edit UX polish batch
 _(on staging — not yet promoted to prod)_
