@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Upload, X, Loader2, Tag, ExternalLink, Calendar, Clock, Percent } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { formatCents } from "@/lib/utils";
 
@@ -443,33 +444,20 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
       {/* ── Actions ────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          <Button type="submit" disabled={saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {mode === "create" ? "Create Special" : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/specials")}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-lg border border-gray-300 hover:border-gray-400"
-          >
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.push("/admin/specials")}>
             Cancel
-          </button>
+          </Button>
         </div>
 
         {mode === "edit" && initial?.id && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="px-4 py-2 text-sm text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 rounded-lg disabled:opacity-50 flex items-center gap-2"
-          >
-            {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
+          <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
+            {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Delete Special
-          </button>
+          </Button>
         )}
       </div>
     </form>

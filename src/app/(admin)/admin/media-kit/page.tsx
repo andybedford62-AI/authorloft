@@ -69,7 +69,7 @@ export default async function AdminMediaKitPage() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <a
             href="/api/admin/media-kit/pdf"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-[var(--accent)] hover:opacity-90 rounded-lg transition-colors"
           >
             Download PDF <Download className="h-3.5 w-3.5" />
           </a>

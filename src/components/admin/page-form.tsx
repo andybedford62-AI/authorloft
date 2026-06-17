@@ -6,6 +6,7 @@ import {
   Eye, EyeOff, Navigation, Info, AlertCircle, Loader2, Save,
   Link as LinkIcon, Type, AlignLeft
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
@@ -319,25 +320,17 @@ export function PageForm({ initial }: PageFormProps) {
 
       {/* ── Save button ─── */}
       <div className="flex items-center justify-between pt-2">
-        <button
-          type="button"
-          onClick={() => router.push("/admin/pages")}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-        >
+        <Button type="button" variant="ghost" onClick={() => router.push("/admin/pages")}>
           Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 transition-colors"
-        >
+        </Button>
+        <Button onClick={handleSave} disabled={saving}>
           {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
           ) : (
-            <Save className="h-4 w-4" />
+            <Save className="h-4 w-4 mr-2" />
           )}
           {isEdit ? "Save Changes" : "Create Page"}
-        </button>
+        </Button>
       </div>
     </div>
   );

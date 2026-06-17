@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, BookMarked, ExternalLink, Pencil, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { canAddFlipBook } from "@/lib/plan-limits";
 import { FlipBookToggle } from "@/components/admin/flip-book-toggle";
@@ -54,12 +55,11 @@ export default async function AdminFlipBooksPage() {
             Limit reached — upgrade for unlimited
           </div>
         ) : (
-          <Link
-            href="/admin/flip-books/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            Add Flip Book
+          <Link href="/admin/flip-books/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Flip Book
+            </Button>
           </Link>
         )}
       </div>
@@ -94,12 +94,11 @@ export default async function AdminFlipBooksPage() {
           <p className="text-sm text-gray-400 mt-1 mb-6">
             Add your first flip book to embed interactive reading experiences on your site.
           </p>
-          <Link
-            href="/admin/flip-books/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            Add Your First Flip Book
+          <Link href="/admin/flip-books/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Flip Book
+            </Button>
           </Link>
         </div>
       )}

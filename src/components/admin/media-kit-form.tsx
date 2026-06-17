@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Save, Image as ImageIcon, BookOpen, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 interface MediaKitFormProps {
@@ -128,14 +129,10 @@ export function MediaKitForm({ initialData }: MediaKitFormProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           Save Changes
-        </button>
+        </Button>
         {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
         {error && <span className="text-sm text-red-600">{error}</span>}
       </div>

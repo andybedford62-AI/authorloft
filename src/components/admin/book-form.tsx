@@ -456,16 +456,11 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             placeholder="e.g. 978-0-7432-7356-5"
             className="flex-1 rounded-md border border-blue-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <button
-            type="button"
-            onClick={lookupByISBN}
-            disabled={isbnLooking || !isbnQuery.trim()}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+          <Button type="button" onClick={lookupByISBN} disabled={isbnLooking || !isbnQuery.trim()}>
             {isbnLooking
-              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Looking up…</>
-              : <><Search className="h-3.5 w-3.5" />Look up</>}
-          </button>
+              ? <><Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />Looking up…</>
+              : <><Search className="h-3.5 w-3.5 mr-1.5" />Look up</>}
+          </Button>
         </div>
 
         {/* Error state */}
@@ -507,13 +502,9 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 <p className="text-xs text-gray-500 line-clamp-2 mt-1">{isbnResult.description.replace(/<[^>]+>/g, "")}</p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={applyIsbnData}
-              className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
+            <Button type="button" size="sm" onClick={applyIsbnData} className="flex-shrink-0">
               Use this data
-            </button>
+            </Button>
           </div>
         )}
 

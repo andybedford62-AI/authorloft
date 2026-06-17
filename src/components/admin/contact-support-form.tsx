@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, Check, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type SupportEmailOption = { id: string; label: string; email: string; description: string | null };
 
@@ -150,13 +151,9 @@ export function ContactSupportForm({ authorName, authorEmail, supportEmails }: P
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={sending}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors disabled:opacity-60"
-      >
-        {sending ? "Sending…" : <><Send className="h-4 w-4" /> Send Message</>}
-      </button>
+      <Button type="submit" disabled={sending}>
+        {sending ? "Sending…" : <><Send className="h-4 w-4 mr-2" /> Send Message</>}
+      </Button>
     </form>
   );
 }

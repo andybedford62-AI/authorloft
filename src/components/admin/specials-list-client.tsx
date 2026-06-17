@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Tag, Pencil, Clock, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
 
 interface Special {
@@ -72,11 +73,8 @@ export function SpecialsListClient({ specials: initial }: SpecialsListClientProp
           Create promotions, limited-time deals, signed copies, bundles, and exclusive offers
           that appear on your public Specials page.
         </p>
-        <Link
-          href="/admin/specials/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Create Your First Special
+        <Link href="/admin/specials/new">
+          <Button>Create Your First Special</Button>
         </Link>
       </div>
     );

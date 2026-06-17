@@ -6,6 +6,7 @@ import {
   Loader2, Copy, Check, Pencil, X,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
 import { HelpTip } from "@/components/admin/help-tip";
 
@@ -403,14 +404,10 @@ export default function DiscountCodesPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex justify-end pt-1">
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            <Button type="submit" disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
               Create Code
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -681,21 +678,13 @@ export default function DiscountCodesPage() {
               {editError && <p className="text-sm text-red-600">{editError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setEditingCode(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
+                <Button type="button" variant="outline" onClick={() => setEditingCode(null)}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={editSaving}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                >
-                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                </Button>
+                <Button type="submit" disabled={editSaving}>
+                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
                   Save Changes
-                </button>
+                </Button>
               </div>
             </form>
           </div>

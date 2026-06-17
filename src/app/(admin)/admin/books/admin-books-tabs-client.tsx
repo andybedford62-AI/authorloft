@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { BookOpen, BookMarked, Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
 import { ArcsOverview } from "./arcs-overview";
@@ -67,11 +69,9 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
             <BookOpen className="h-10 w-10 text-gray-300 mx-auto mb-3" />
             <p className="font-medium text-gray-500">No books yet</p>
             <p className="text-sm text-gray-400 mt-1 mb-6">Add your first book to get started.</p>
-            <a href="/admin/books/new">
-              <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                Add Your First Book
-              </button>
-            </a>
+            <Link href="/admin/books/new">
+              <Button>Add Your First Book</Button>
+            </Link>
           </div>
         ) : (
           <BooksListClient initialBooks={books} />

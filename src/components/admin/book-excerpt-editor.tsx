@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Loader2, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 interface Props {
@@ -83,15 +84,10 @@ export function BookExcerptEditor({ bookId, initial }: Props) {
       )}
 
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+        <Button type="button" onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
           {saving ? "Saving…" : "Save Excerpt"}
-        </button>
+        </Button>
         {saved && (
           <span className="flex items-center gap-1.5 text-sm text-green-600 font-medium">
             <Check className="h-4 w-4" /> Saved

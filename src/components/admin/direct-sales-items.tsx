@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/use-toast";
 
 // ── Format config ─────────────────────────────────────────────────────────────
@@ -474,14 +475,10 @@ export function DirectSalesItems({
           </p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
+          <Button type="button" size="sm" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
             Add Format
-          </button>
+          </Button>
         )}
       </div>
 

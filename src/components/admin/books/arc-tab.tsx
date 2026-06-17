@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText, UserPlus, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -341,14 +342,10 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <button
-            onClick={createArc}
-            disabled={creating}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
-            {creating && <Loader2 className="h-4 w-4 animate-spin" />}
+          <Button onClick={createArc} disabled={creating}>
+            {creating && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Create ARC
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -502,14 +499,10 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
               <p className="text-xs text-gray-400 mt-1">Defaults to 7 days from today</p>
             </div>
             <div className="flex items-end pb-0.5">
-              <button
-                onClick={inviteReader}
-                disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+              <Button onClick={inviteReader} disabled={inviting || !inviteName.trim() || !inviteEmail.trim()}>
+                {inviting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Mail className="h-4 w-4 mr-2" />}
                 Send Invite
-              </button>
+              </Button>
             </div>
           </div>
         </div>

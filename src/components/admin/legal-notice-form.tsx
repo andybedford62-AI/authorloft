@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Save, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LegalNoticeFormProps {
   initialContent: string;
@@ -107,15 +108,10 @@ export function LegalNoticeForm({ initialContent, updatedAt }: LegalNoticeFormPr
               Discard changes
             </button>
           )}
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || !content.trim()}
-            className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Save className="h-4 w-4" />
+          <Button type="button" onClick={handleSave} disabled={saving || !content.trim()}>
+            <Save className="h-4 w-4 mr-2" />
             {saving ? "Saving…" : "Save Legal Notice"}
-          </button>
+          </Button>
         </div>
       </div>
 

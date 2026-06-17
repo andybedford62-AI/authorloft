@@ -238,7 +238,7 @@ export function MessagesClient({ initialMessages }: Props) {
                     <div className="ml-5 mt-4 flex items-center gap-2 flex-wrap">
                       <a
                         href={`mailto:${msg.senderEmail}${msg.subject ? `?subject=Re: ${encodeURIComponent(msg.subject)}` : ""}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:opacity-90 text-white text-sm font-medium rounded-lg transition-colors"
                       >
                         <Mail className="h-4 w-4" />
                         Reply by email

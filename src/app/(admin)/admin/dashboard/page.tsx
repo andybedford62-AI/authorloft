@@ -297,7 +297,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link href="/admin/books/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button>
             <Plus className="h-4 w-4 mr-2" /> Add Book
           </Button>
         </Link>
@@ -398,7 +398,7 @@ export default async function DashboardPage() {
               <div className="px-5 py-8 text-center">
                 <p className="text-gray-400 text-sm mb-3">No books yet.</p>
                 <Link href="/admin/books/new">
-                  <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+                  <Button size="sm">
                     <Plus className="h-3.5 w-3.5 mr-1.5" /> Add your first book
                   </Button>
                 </Link>
