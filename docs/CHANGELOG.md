@@ -15,11 +15,14 @@ line rather than listing every commit.
 
 ## June 16, 2026 — Admin CRUD UI standardization (rolling)
 _(on staging — not yet promoted to prod)_
-Adopting the existing `IconButton` / `action-icons` / `Button` design system across all
-admin & super-admin CRUD for one cohesive look & feel. Rolling out in batches.
-- **Foundation:** reconciled the `IconButton` primitive — canonical color-coded variants are now `edit` (blue), `add` (green), `delete` (red), `warning` (amber), `view` (dark), `ghost` (gray), each with a built-in hover tooltip. Updated `ICON_BUTTON_GUIDE.md` to match (it referenced variants that never existed) and documented the text-`Button` CTA conventions.
-- **Converted:** Direct Sales editor and Audio Previews now use the shared `IconButton` for row actions (edit/activate/deactivate/delete/reorder) and the shared accent `Button` for CTAs — replacing one-off purple/blue/gray button colors and hand-rolled icon buttons.
-- More admin and super-admin pages to follow in subsequent batches.
+Locked and applied a consistent button/icon standard across the entire admin section. Standard: **Check icon = Save/Update**, **Plus icon = Create/Add**, **Trash2 icon = Delete**, **ghost variant = Cancel** (no fill), **danger variant = muted-to-red delete** (not solid red). Rolling out in 7 commits:
+- **Foundation:** reconciled `IconButton` variants; updated `ICON_BUTTON_GUIDE.md`; converted Direct Sales and Audio Previews row actions.
+- **Page-level Add buttons** swept across all admin list pages (affiliate, pre-orders, resources, specials, ARC, etc.) — now consistently use accent `Button` with Plus icon.
+- **Book edit tabs** fully standardized: Buy Links (retailer-links), Audio Tracks, Reviews, Direct Sales inline forms — Check on Save, ghost Cancel, Trash2+danger on Delete.
+- **`button.tsx` danger variant** updated from solid red fill to muted-to-red (`text-slate-500 hover:text-red-600 hover:bg-red-50`) per CRUD style guide.
+- **Special, Flip Book, Blog/News Post, Custom Pages, Media Kit, Legal Notice, Legal Editor** — all Save/Create/Delete/Cancel buttons updated to match locked standard.
+- **ARC tab** — "Create ARC" gets Plus icon. **Book Excerpt** — "Save Excerpt" gets Check icon.
+- **Discount Codes, Newsletter** — Cancel buttons in edit modal and send confirmation corrected from outline to ghost.
 
 ## June 16, 2026 — Book edit UX polish batch
 _(on staging — not yet promoted to prod)_
