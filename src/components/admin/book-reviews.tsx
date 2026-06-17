@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Quote, Star, Plus, Trash2, Pencil, Loader2, GripVertical, X, Check } from "lucide-react";
+import { Quote, Star, Plus, Trash2, Pencil, Loader2, GripVertical } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
 import { Button } from "@/components/ui/button";
 
@@ -285,11 +285,9 @@ function ReviewForm({
 
       <div className="flex gap-2 pt-1">
         <Button type="button" size="sm" onClick={onSave} disabled={saving}>
-          {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Check className="h-3.5 w-3.5 mr-1.5" />}
-          Save Review
+          {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save Review"}
         </Button>
-        <Button type="button" size="sm" variant="outline" onClick={onCancel}>
-          <X className="h-3.5 w-3.5 mr-1.5" />
+        <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
       </div>

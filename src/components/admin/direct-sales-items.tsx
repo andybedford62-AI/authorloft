@@ -475,7 +475,7 @@ export function DirectSalesItems({
           </p>
         </div>
         {!adding && (
-          <Button type="button" size="sm" onClick={() => setAdding(true)}>
+          <Button type="button" size="sm" className="whitespace-nowrap" onClick={() => setAdding(true)}>
             <Plus className="h-3.5 w-3.5 mr-1" />
             Add Format
           </Button>
@@ -656,21 +656,19 @@ export function DirectSalesItems({
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-              {saving ? "Adding…" : "Add Format"}
-            </button>
-            <button
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Adding…</>
+                : <><Plus className="h-3.5 w-3.5 mr-1.5" />Add Format</>}
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => { setAdding(false); setAddError(""); setCustomLabel(""); setDescription(""); setPriceInput("0.00"); }}
-              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -741,22 +739,12 @@ export function DirectSalesItems({
                       />
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => saveEdit(item)}
-                        disabled={editSaving}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-60"
-                      >
-                        {editSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                        {editSaving ? "Saving…" : "Save"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingId(null)}
-                        className="px-3 py-1.5 text-xs rounded-md border border-gray-300 bg-white hover:bg-gray-50"
-                      >
+                      <Button type="button" size="sm" disabled={editSaving} onClick={() => saveEdit(item)}>
+                        {editSaving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save"}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (

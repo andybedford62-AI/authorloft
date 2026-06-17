@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
+import { Loader2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -944,7 +944,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
 
       <div className="flex items-center justify-between pb-8">
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={saving} size="lg">
+          <Button type="submit" disabled={saving} size="md">
             {saving
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
               : mode === "edit" ? "Save Changes" : "Create Book"}
@@ -960,7 +960,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         <div className="flex gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={() => {
               if (dirty && !confirm("You have unsaved changes. Leave without saving?")) return;
               router.push("/admin/books");
@@ -969,11 +969,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             Cancel
           </Button>
           {mode === "edit" && (
-            <Button type="button" variant="outline" onClick={handleDelete} disabled={deleting}
-              className="text-red-600 hover:bg-red-50 border-red-200">
-              {deleting
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Book</>}
+            <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete Book"}
             </Button>
           )}
         </div>

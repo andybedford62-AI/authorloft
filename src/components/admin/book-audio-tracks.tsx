@@ -271,7 +271,7 @@ function AddTrackForm({ bookId, onSaved, onCancel }: AddTrackFormProps) {
         >
           {saving ? <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Saving…</> : "Save Track"}
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={onCancel}>
+        <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
           Cancel
         </Button>
       </div>
@@ -332,10 +332,10 @@ function EditInlineForm({ track, bookId, onSaved, onCancel }: EditInlineProps) {
       {error && <p className="text-xs text-red-600">{error}</p>}
       <div className="flex gap-2">
         <Button type="submit" size="sm" disabled={saving}>
-          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+          {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save"}
         </Button>
-        <Button type="button" size="sm" variant="outline" onClick={onCancel}>
-          <X className="h-3.5 w-3.5" />
+        <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
+          Cancel
         </Button>
       </div>
     </form>

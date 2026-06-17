@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit, Check, X } from "lucide-react";
+import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -200,14 +201,9 @@ export function RetailerLinks({ bookId }: Props) {
           </p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Add Link
-          </button>
+          <Button type="button" size="sm" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />Add Link
+          </Button>
         )}
       </div>
 
@@ -277,21 +273,19 @@ export function RetailerLinks({ bookId }: Props) {
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-              {saving ? "Adding…" : "Add Link"}
-            </button>
-            <button
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Adding…</>
+                : <><Plus className="h-3.5 w-3.5 mr-1.5" />Add Link</>}
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => { setAdding(false); setAddError(""); setUrl(""); setCustomLabel(""); }}
-              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -431,28 +425,12 @@ export function RetailerLinks({ bookId }: Props) {
                     {error && <p className="text-xs text-red-600">{error}</p>}
 
                     <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => saveEdit(link)}
-                        disabled={isBusy}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-                      >
-                        {isBusy ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Check className="h-3.5 w-3.5" />
-                        )}
-                        {isBusy ? "Saving…" : "Save"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => cancelEdit(link.id)}
-                        disabled={isBusy}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors disabled:opacity-60"
-                      >
-                        <X className="h-3.5 w-3.5" />
+                      <Button type="button" size="sm" disabled={isBusy} onClick={() => saveEdit(link)}>
+                        {isBusy ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : "Save"}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" disabled={isBusy} onClick={() => cancelEdit(link.id)}>
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
