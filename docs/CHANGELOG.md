@@ -27,6 +27,11 @@ Locked and applied a consistent button/icon standard across the entire admin sec
 - **Super-admin Categories** — all 3 hand-rolled purple buttons converted to `Button` component: Add (Plus), Save (Check), Cancel (ghost).
 - **Super-admin Coupons** — all 3 hand-rolled purple buttons converted to `Button` component: New Coupon (Plus), Create Coupon (Plus), Cancel (ghost).
 - **Super-admin Author edit form** — 5 hand-rolled blue/indigo/purple buttons converted to `Button` component: Grant/Update Trial (Check), Assign Coupon (Tag), Save AI Cap (Check), Reset AI Counter (outline), Save Changes (Check).
+- **Appearance page** — 2 "Apply Colour" buttons + 2 revert/reset buttons converted from hand-rolled purple to `Button` component.
+- **Super-admin Resources + Resource Downloads** — Add/Save/Cancel buttons in both clients converted from hand-rolled purple to `Button` component.
+- **Super-admin Blog + Plans list pages** — header "New Post" / "New Plan" nav links converted from purple to `bg-[var(--accent)]` primary button styling with Plus icon.
+- **Super-admin Authors table** — confirm-delete dialog: Cancel → ghost, "Yes, delete" → danger + Trash2 + loading state.
+- **`/admin-buttons` skill** added at `.claude/commands/admin-buttons.md` — run `/admin-buttons` to audit any file/directory for non-standard buttons, `/admin-buttons --fix` to auto-apply the locked standard.
 
 ## June 16, 2026 — Book edit UX polish batch
 _(on staging — not yet promoted to prod)_
