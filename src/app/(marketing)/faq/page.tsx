@@ -83,7 +83,7 @@ export default async function FaqPage() {
         backgroundImage="/faq-header.png"
       />
 
-      <section style={{ maxWidth: 860, margin: "0 auto", padding: "72px 24px 96px" }}>
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 20px 96px" }}>
         <FaqPageList groups={groups} />
 
         {/* Still need help */}
