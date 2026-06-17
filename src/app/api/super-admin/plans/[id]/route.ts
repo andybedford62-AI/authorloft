@@ -26,6 +26,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.customDomain !== undefined && { customDomain: body.customDomain }),
         ...(body.salesEnabled !== undefined && { salesEnabled: body.salesEnabled }),
         ...(body.flipBooksLimit !== undefined && { flipBooksLimit: body.flipBooksLimit }),
+        ...(body.bookstoreListingLimit !== undefined && { bookstoreListingLimit: body.bookstoreListingLimit }),
         ...(body.audioEnabled !== undefined && { audioEnabled: body.audioEnabled }),
         ...(body.newsletter !== undefined && { newsletter: body.newsletter }),
         ...(body.analyticsEnabled !== undefined && { analyticsEnabled: body.analyticsEnabled }),

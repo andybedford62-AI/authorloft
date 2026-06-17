@@ -30,6 +30,7 @@ type BookData = {
   listInBookstore: boolean;
   isPreOrder: boolean;
   preOrderDate: string | null; // YYYY-MM-DD string for the date input
+  autoSendLaunchEmail: boolean;
   showCountdown: boolean;
   launchDate: string | null;   // YYYY-MM-DDTHH:MM string for datetime-local input
   genreIds: string[];
@@ -232,6 +233,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [listInBookstore, setListInBookstore]     = useState(book?.listInBookstore ?? false);
   const [isPreOrder, setIsPreOrder]               = useState(book?.isPreOrder ?? false);
   const [preOrderDate, setPreOrderDate]           = useState(book?.preOrderDate ?? "");
+  const [autoSendLaunchEmail, setAutoSendLaunchEmail] = useState(book?.autoSendLaunchEmail ?? false);
   const [showCountdown, setShowCountdown]         = useState(book?.showCountdown ?? false);
   const [launchDate, setLaunchDate]               = useState(book?.launchDate ?? "");
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
@@ -332,6 +334,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       listInBookstore,
       isPreOrder,
       preOrderDate: preOrderDate || null,
+      autoSendLaunchEmail: isPreOrder ? autoSendLaunchEmail : false,
       showCountdown,
       launchDate: launchDate || null,
       genreIds: selectedGenres,
@@ -877,6 +880,26 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                       className="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                     <p className="text-xs text-gray-400">Shown to readers as "Coming {`{date}`}". Leave blank to show "Coming Soon" without a date.</p>
+
+                    <div className="pt-3 border-t border-gray-100 mt-3">
+                      <div
+                        className="flex items-start gap-3 cursor-pointer select-none"
+                        onClick={() => setAutoSendLaunchEmail((v) => !v)}
+                      >
+                        <div className={`relative flex-shrink-0 mt-0.5 w-9 h-5 rounded-full transition-colors ${autoSendLaunchEmail ? "bg-green-600" : "bg-gray-300"}`}>
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${autoSendLaunchEmail ? "translate-x-4" : "translate-x-0.5"}`} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                            <Rocket className="h-3.5 w-3.5 text-green-600" />
+                            Auto-send launch email
+                          </p>
+                          <p className="text-xs text-gray-400 leading-relaxed">
+                            When the pre-order date passes and the book is published with a cover and price, we&apos;ll automatically notify your signups and mark the book as live. You can still use the manual &ldquo;Send Launch Email&rdquo; button at any time.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </>

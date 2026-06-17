@@ -45,6 +45,7 @@ type BookData = {
   listInBookstore: boolean;
   isPreOrder: boolean;
   preOrderDate: string | null;
+  autoSendLaunchEmail: boolean;
   showCountdown: boolean;
   launchDate: string | null;
   genreIds: string[];

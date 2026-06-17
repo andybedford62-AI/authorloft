@@ -133,26 +133,30 @@ export default async function ResourcesPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 16 }}>
                   {group.items.map((d) => (
                     <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 18, overflow: 'hidden' }}>
-                      {d.coverImageUrl ? (
-                        <div style={{ width: '100%', height: 160, background: '#E8E2D5' }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={d.coverImageUrl} alt={d.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        </div>
-                      ) : (
-                        <div style={{ width: '100%', height: 84, background: `${ML.copper}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <FileDown style={{ width: 26, height: 26, color: ML.copper }} />
-                        </div>
-                      )}
-                      <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                        <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
-                        {d.description && (
-                          <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: '0 0 16px', flex: 1 }}>{d.description}</p>
+                      <Link href={`/resources/${d.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                        {d.coverImageUrl ? (
+                          <div style={{ width: '100%', height: 160, background: '#E8E2D5' }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={d.coverImageUrl} alt={d.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          </div>
+                        ) : (
+                          <div style={{ width: '100%', height: 84, background: `${ML.copper}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <FileDown style={{ width: 26, height: 26, color: ML.copper }} />
+                          </div>
                         )}
+                        <div style={{ padding: '18px 20px 12px' }}>
+                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
+                          {d.description && (
+                            <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{d.description}</p>
+                          )}
+                        </div>
+                      </Link>
+                      <div style={{ padding: '0 20px 18px', marginTop: 'auto' }}>
                         <DownloadButton
                           id={d.id}
                           title={d.title}
                           requiresEmail={d.requiresEmail}
-                          className="mt-auto w-full inline-flex items-center justify-center gap-2 bg-[#1B2B47] text-[#E8E5DD] text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#27406B] transition-colors"
+                          className="w-full inline-flex items-center justify-center gap-2 bg-[#1B2B47] text-[#E8E5DD] text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#27406B] transition-colors"
                         />
                       </div>
                     </div>

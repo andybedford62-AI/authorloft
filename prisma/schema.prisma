@@ -63,7 +63,8 @@ model Plan {
   maxStorageMb         Int?
   customDomain         Boolean   @default(false)
   salesEnabled         Boolean   @default(false)
-  flipBooksLimit       Int       @default(0)    // 0 = none, -1 = unlimited, n = max count
+  flipBooksLimit            Int       @default(0)    // 0 = none, -1 = unlimited, n = max count
+  bookstoreListingLimit     Int       @default(-1)   // -1 = unlimited, 0 = none, n = max bookstore listings
   audioEnabled         Boolean   @default(false)
   analyticsEnabled     Boolean   @default(false)
   newsletter           Boolean   @default(false)
@@ -330,6 +331,7 @@ model Book {
   listInBookstore     Boolean              @default(false)  // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
   isPreOrder          Boolean              @default(false)  // shows "Coming Soon" + wishlist instead of buy buttons
   preOrderDate        DateTime?            // expected release/launch date for pre-order books
+  autoSendLaunchEmail Boolean              @default(false)  // cron auto-sends launch email when preOrderDate passes + readiness check passes
   launchDate          DateTime?            // countdown target date for Book Launch Mode
   showCountdown       Boolean              @default(false)  // show public countdown timer on book page
   affiliateEnabled    Boolean              @default(false)  // author opt-in to the referral/affiliate program for this book

@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## June 17, 2026
+
+- **FAQ category filter** — pill-chip row ("All" + each category) above the accordion on `/faq`; clicking a chip shows only that category's questions. Client-side only, no page reload.
+- **Bookstore listing limit by plan tier** — new `bookstoreListingLimit` field on `Plan` (-1 = unlimited, 0 = none, n = max). Enforced server-side in the book save API; configurable per-plan via Super Admin Plan form with presets + custom input.
+- **Resource download detail pages** — `/resources/[slug]` SEO landing pages for each published `ResourceDownload`, rendering the RTE `body` field with cover, description, and download button. Cards on `/resources` now link to each detail page. Added to sitemap.
+- **Auto pre-order launch email** — new `autoSendLaunchEmail` opt-in toggle on the book pre-order section. A new daily cron (`/api/cron/launch-preorders`, 08:00 UTC) fires when `preOrderDate` has passed; passes a readiness gate (published + cover + buy option) before sending; flips `isPreOrder` off automatically. Manual override button unchanged.
+
 ## June 16, 2026 — Admin CRUD UI standardization (rolling)
 _(on staging — not yet promoted to prod)_
 Locked and applied a consistent button/icon standard across the entire admin section. Standard: **Check icon = Save/Update**, **Plus icon = Create/Add**, **Trash2 icon = Delete**, **ghost variant = Cancel** (no fill), **danger variant = muted-to-red delete** (not solid red). Rolling out in 7 commits:

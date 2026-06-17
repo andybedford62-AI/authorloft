@@ -51,7 +51,7 @@ export async function PUT(
     coverImageUrl, seriesId, priceCents,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
     availableFormats, caption, releaseDate, flipBookUrl, sampleContent,
-    isPreOrder, preOrderDate, showCountdown, launchDate,
+    isPreOrder, preOrderDate, autoSendLaunchEmail, showCountdown, launchDate,
   } = body;
 
   if (!title?.trim() || !slug?.trim()) {
@@ -68,6 +68,24 @@ export async function PUT(
         { error: "A book with that slug already exists. Please choose a different slug." },
         { status: 409 }
       );
+    }
+  }
+
+  // Enforce bookstore listing limit when the author is turning this on
+  if (listInBookstore && !existing.listInBookstore) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { plan: { select: { bookstoreListingLimit: true } } },
+    });
+    const limit = author?.plan?.bookstoreListingLimit ?? -1;
+    if (limit !== -1) {
+      const currentCount = await prisma.book.count({ where: { authorId, listInBookstore: true, id: { not: id } } });
+      if (currentCount >= limit) {
+        return NextResponse.json(
+          { error: `Your plan allows up to ${limit} bookstore listing${limit === 1 ? "" : "s"}. Upgrade to list more books.` },
+          { status: 403 }
+        );
+      }
     }
   }
 
@@ -107,6 +125,7 @@ export async function PUT(
         listInBookstore: listInBookstore ?? false,
         isPreOrder: isPreOrder ?? false,
         preOrderDate: isPreOrder && preOrderDate ? new Date(preOrderDate) : null,
+        autoSendLaunchEmail: isPreOrder ? (autoSendLaunchEmail ?? false) : false,
         showCountdown: showCountdown ?? false,
         launchDate: showCountdown && launchDate ? new Date(launchDate) : null,
         genres:

@@ -36,6 +36,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        0.7,
   }));
 
+  // Resource download detail pages
+  const resourceDownloads = await prisma.resourceDownload.findMany({
+    where:   { isPublished: true },
+    select:  { slug: true, updatedAt: true },
+  }).catch(() => []);
+
+  const resourceDownloadEntries: MetadataRoute.Sitemap = resourceDownloads.map((d) => ({
+    url:             `${BASE}/resources/${d.slug}`,
+    lastModified:    d.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority:        0.65,
+  }));
+
   // Bookstore genre landing pages (only genres that actually have books)
   const { genres } = await getBookstoreData().catch(() => ({ genres: [] as { slug: string }[] }));
   const genreEntries: MetadataRoute.Sitemap = genres.map((g) => ({
@@ -73,6 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Resources - medium priority
     { url: `${BASE}/resources`, lastModified: new Date(), changeFrequency: "monthly",  priority: 0.7 },
+    ...resourceDownloadEntries,
 
     // FAQ - medium priority (carries FAQ structured data)
     { url: `${BASE}/faq`,       lastModified: new Date(), changeFrequency: "monthly",  priority: 0.7 },

@@ -17,7 +17,7 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [ ] **Reader accounts + favorites/wishlists** — let readers save books. Powerful but heavy (no reader auth today). *(large)*
 - [ ] **Curated "Staff Picks" / collections** — super-admin curation UI for themed shelves. *(medium)*
 - [x] **Quick-view modal** — shipped June 15, 2026; a "Quick view" button on each catalog card opens a modal (cover, blurb, rating, formats, price, genres, author link, buy CTA) without leaving the bookstore. *(done)*
-- [ ] **Bookstore listing limits by tier** — e.g., STANDARD limited number of listings, PREMIUM unlimited + featured (pricing lever). *(small)*
+- [x] **Bookstore listing limits by tier** — `bookstoreListingLimit` on Plan; enforced server-side; configurable in Super Admin. *(done June 17, 2026)*
 - [x] **Clickable author name on book cards** — shipped June 15, 2026; restructured the card with a stretched-link pattern so the whole card still opens the book while the author name links separately to their site. *(done)*
 - [x] **Unify genre-page headers** — shipped June 15, 2026; `/bookstore/genre/[slug]` now uses the shared `MarketingPageHeader` brand band (same banner as the main Bookstore page) with an "All books" breadcrumb. *(done)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
@@ -40,7 +40,7 @@ Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscri
 
 Sprint 1 shipped June 12, 2026 (see Shipped section). Open follow-ons:
 
-- [ ] **Auto-send pre-order launch email** — currently a manual "Send Launch Email" button on the book's Organisation tab; add a daily cron (`/api/cron/...`) that auto-sends when `preOrderDate` has passed and `isPreOrder` is still true (then flips `isPreOrder` off). *(small)*
+- [x] **Auto-send pre-order launch email** — opt-in toggle per book + daily cron with two-layer safety (toggle + readiness gate). *(done June 17, 2026)*
 - [ ] **Reader-facing affiliate dashboard** — referral links/stats are currently author-only (no reader accounts exist). A magic-link or email-based portal for promoters to see their own clicks/earnings is a larger lift requiring reader auth. *(large)*
 - [ ] **Affiliate payouts** — earnings accrue in `AffiliateReferral.earningsCents` but there's no payout mechanism yet (Stripe Connect transfer or manual "mark as paid"). *(medium)*
 - [ ] **Media Kit PDF — sales trend chart** — current PDF shows point-in-time stats; a 6-month sales trend sparkline would need chart-to-image rendering compatible with `@react-pdf/renderer`. *(medium)*
@@ -73,7 +73,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliate directory). Open ideas:
 
-- [ ] **Individual download detail pages** (`/resources/[slug]`) — render each download's RTE `body` as its own SEO landing page (currently downloads are cards only; the `body` field is captured but not surfaced publicly). Would also add per-download sitemap entries. *(small–medium)*
+- [x] **Individual download detail pages** (`/resources/[slug]`) — SEO landing pages with cover, body RTE, and download button; cards link to detail pages; sitemap updated. *(done June 17, 2026)*
 - [x] **Email the download file** — shipped June 15, 2026; unlocking a gated resource now also emails the lead a copy of the download link (best-effort, never blocks the unlock). *(done)*
 - [ ] **Move gated files to Supabase signed URLs** (like orders/ARC downloads) if stronger control than hidden Drive links is needed later. *(medium)*
 - [x] **Resources dropdown child label** — confirmed "Tools & Communities" matches the page content (tools, communities, organisations); keeping as-is. *(June 12, 2026)*

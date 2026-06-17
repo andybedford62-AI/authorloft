@@ -12,7 +12,8 @@ type PlanFormData = {
   stripePriceIdMonthly: string; stripePriceIdAnnual: string;
   maxBooks: string; maxPosts: string; maxStorageMb: string;
   customDomain: boolean; salesEnabled: boolean;
-  flipBooksLimit: string;  // "0" | "3" | "-1" | any number as string
+  flipBooksLimit: string;          // "0" | "3" | "-1" | any number as string
+  bookstoreListingLimit: string;   // "-1" = unlimited, "0" = none, n = max listings
   audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
   badgeColor: string; featuredLabel: string; sortOrder: number;
   isActive: boolean; isDefault: boolean;
@@ -25,7 +26,7 @@ type Plan = {
   stripePriceIdMonthly: string | null; stripePriceIdAnnual: string | null;
   maxBooks: number | null; maxPosts: number | null; maxStorageMb: number | null;
   customDomain: boolean; salesEnabled: boolean;
-  flipBooksLimit: number;
+  flipBooksLimit: number; bookstoreListingLimit: number;
   audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
   badgeColor: string; featuredLabel: string | null; sortOrder: number;
   isActive: boolean; isDefault: boolean;
@@ -86,6 +87,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
     customDomain: plan?.customDomain ?? false,
     salesEnabled: plan?.salesEnabled ?? false,
     flipBooksLimit: plan?.flipBooksLimit?.toString() ?? "0",
+    bookstoreListingLimit: plan?.bookstoreListingLimit?.toString() ?? "-1",
     audioEnabled: plan?.audioEnabled ?? false,
     newsletter: plan?.newsletter ?? false,
     analyticsEnabled: plan?.analyticsEnabled ?? false,
@@ -125,6 +127,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       maxPosts: form.maxPosts === "" ? null : parseInt(form.maxPosts, 10),
       maxStorageMb: form.maxStorageMb === "" ? null : parseInt(form.maxStorageMb, 10),
       flipBooksLimit: parseInt(form.flipBooksLimit, 10),
+      bookstoreListingLimit: parseInt(form.bookstoreListingLimit, 10),
       stripePriceIdMonthly: form.stripePriceIdMonthly || null,
       stripePriceIdAnnual: form.stripePriceIdAnnual || null,
       featuredLabel: form.featuredLabel || null,
@@ -284,6 +287,47 @@ export function PlanForm({ plan }: { plan?: Plan }) {
             min={-1}
             value={form.flipBooksLimit}
             onChange={(e) => set("flipBooksLimit", e.target.value)}
+            className={input}
+          />
+        </div>
+      </section>
+
+      {/* Bookstore Listing Limit */}
+      <section className="rounded-xl bg-white border border-gray-200 p-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Bookstore Listing Limit</h2>
+        <p className="text-xs text-gray-500 mb-5">
+          How many books can authors on this plan list in the public AuthorLoft Bookstore?
+          Use <code className="text-purple-600">-1</code> for unlimited, <code className="text-purple-600">0</code> to disallow.
+        </p>
+        <div className="flex flex-wrap gap-3 mb-4">
+          {[
+            { value: "0",  label: "None",      desc: "Not allowed" },
+            { value: "3",  label: "Up to 3",   desc: "Standard" },
+            { value: "10", label: "Up to 10",  desc: "Higher tier" },
+            { value: "-1", label: "Unlimited", desc: "Premium" },
+          ].map((preset) => (
+            <button
+              key={preset.value}
+              type="button"
+              onClick={() => set("bookstoreListingLimit", preset.value)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                form.bookstoreListingLimit === preset.value
+                  ? "border-purple-500 bg-purple-50 text-purple-700"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-purple-300"
+              }`}
+            >
+              <span className="font-bold">{preset.label}</span>
+              <span className="text-xs ml-1.5 opacity-60">{preset.desc}</span>
+            </button>
+          ))}
+        </div>
+        <div className="max-w-xs">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">Custom value (0 = none, -1 = unlimited, n = exact limit)</label>
+          <input
+            type="number"
+            min={-1}
+            value={form.bookstoreListingLimit}
+            onChange={(e) => set("bookstoreListingLimit", e.target.value)}
             className={input}
           />
         </div>

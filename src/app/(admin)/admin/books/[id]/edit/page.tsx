@@ -74,6 +74,7 @@ export default async function EditBookPage({
     preOrderDate: book.preOrderDate
       ? book.preOrderDate.toISOString().split("T")[0]
       : null,
+    autoSendLaunchEmail: book.autoSendLaunchEmail,
     showCountdown: book.showCountdown,
     launchDate: book.launchDate
       ? book.launchDate.toISOString().slice(0, 16)

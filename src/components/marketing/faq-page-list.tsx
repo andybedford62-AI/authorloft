@@ -9,8 +9,8 @@ export type FaqGroup = {
 };
 
 export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
-  // Open the first question of the first group by default.
   const [openId, setOpenId] = useState<string | null>(groups[0]?.items[0]?.id ?? null);
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
   if (groups.length === 0) {
     return (
@@ -20,9 +20,45 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
     );
   }
 
+  const visibleGroups = activeSlug ? groups.filter((g) => g.slug === activeSlug) : groups;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
-      {groups.map((group) => (
+    <div>
+      {/* Category filter chips */}
+      {groups.length > 1 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 48 }}>
+          {[{ slug: null, name: "All" }, ...groups.map((g) => ({ slug: g.slug, name: g.name }))].map(({ slug, name }) => {
+            const active = slug === activeSlug;
+            return (
+              <button
+                key={slug ?? "__all__"}
+                type="button"
+                onClick={() => {
+                  setActiveSlug(slug);
+                  setOpenId(null);
+                }}
+                style={{
+                  padding: "7px 18px",
+                  borderRadius: 999,
+                  border: `1px solid ${active ? "#1B2B47" : "#DCDBD3"}`,
+                  background: active ? "#1B2B47" : "#fff",
+                  color: active ? "#E8E5DD" : "#5C6E89",
+                  fontFamily: "var(--font-geist-mono, monospace)",
+                  fontSize: 12,
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
+      {visibleGroups.map((group) => (
         <div key={group.slug} id={group.slug}>
           {/* Category heading */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
@@ -67,6 +103,7 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }
