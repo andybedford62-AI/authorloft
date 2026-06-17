@@ -24,9 +24,9 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
 
   return (
     <div>
-      {/* Category filter chips */}
+      {/* Category filter tabs — underline style matching the blog */}
       {groups.length > 1 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 48 }}>
+        <div className="flex flex-wrap gap-x-7 gap-y-1 border-b border-[#DCDBD3] mb-10">
           {[{ slug: null, name: "All" }, ...groups.map((g) => ({ slug: g.slug, name: g.name }))].map(({ slug, name }) => {
             const active = slug === activeSlug;
             return (
@@ -37,21 +37,16 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
                   setActiveSlug(slug);
                   setOpenId(null);
                 }}
-                className="faq-chip"
-                style={{
-                  padding: "7px 18px",
-                  borderRadius: 999,
-                  border: `1px solid ${active ? "#C26A4A" : "#C9C5BB"}`,
-                  background: active ? "#C26A4A" : "#F0EDE4",
-                  color: active ? "#fff" : "#5C6E89",
-                  fontFamily: "var(--font-geist-mono, monospace)",
-                  fontSize: 12,
-                  letterSpacing: "0.06em",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
+                className={`relative pb-3.5 text-sm font-semibold transition-colors ${
+                  active ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
+                }`}
               >
                 {name}
+                <span
+                  className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
+                    active ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
               </button>
             );
           })}
@@ -105,7 +100,6 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
         </div>
       ))}
       </div>
-      <style>{`.faq-chip:hover { border-color: #C26A4A !important; }`}</style>
     </div>
   );
 }
