@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Trash2, Copy, Check, Loader2, Tag, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type StripeCoupon = {
   id: string;
@@ -104,12 +105,9 @@ export function CouponsClient() {
           <button onClick={load} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500">
             <RefreshCw className="h-4 w-4" />
           </button>
-          <button
-            onClick={() => setShowForm(v => !v)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium"
-          >
-            <Plus className="h-4 w-4" /> New Coupon
-          </button>
+          <Button onClick={() => setShowForm(v => !v)}>
+            <Plus className="h-4 w-4 mr-2" /> New Coupon
+          </Button>
         </div>
       </div>
 
@@ -157,10 +155,10 @@ export function CouponsClient() {
             </div>
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 hover:text-gray-900">Cancel</button>
-            <button type="submit" disabled={saving} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium disabled:opacity-50">
-              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating…</> : "Create Coupon"}
-            </button>
+            <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating…</> : <><Plus className="h-4 w-4 mr-2" />Create Coupon</>}
+            </Button>
           </div>
         </form>
       )}

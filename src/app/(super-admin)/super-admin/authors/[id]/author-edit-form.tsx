@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Save, Loader2, CheckCircle, AlertTriangle,
+  Check, Loader2, CheckCircle, AlertTriangle,
   Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X, Tag,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Plan = {
@@ -454,15 +455,15 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
             </Field>
           </div>
 
-          <button
+          <Button
             type="button"
             disabled={trialSaving || !trialSelectedPlanId}
             onClick={handleSetTrial}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {trialSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gift className="h-4 w-4" />}
-            {currentTrialPlanId ? "Update Trial" : "Grant Trial"}
-          </button>
+            {trialSaving
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{currentTrialPlanId ? "Updating…" : "Granting…"}</>
+              : <><Check className="h-4 w-4 mr-2" />{currentTrialPlanId ? "Update Trial" : "Grant Trial"}</>}
+          </Button>
 
           <p className="text-xs text-gray-400">
             A trial sets the author's plan immediately. They'll receive a 7-day warning email before it expires, then auto-revert to Free.
@@ -522,7 +523,7 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
                 placeholder="Paste coupon ID (e.g. 0gNAZ9ms)"
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
-              <button
+              <Button
                 onClick={async () => {
                   if (!couponInput.trim()) return;
                   setCouponSaving(true); setCouponStatus("idle");
@@ -536,11 +537,9 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
                   else { setCouponStatus("error"); setCouponErrMsg("Failed to assign coupon."); }
                 }}
                 disabled={couponSaving || !couponInput.trim()}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium disabled:opacity-50"
               >
-                {couponSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Tag className="h-4 w-4" />}
-                Assign
-              </button>
+                {couponSaving ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Assigning…</> : <><Tag className="h-4 w-4 mr-1.5" />Assign</>}
+              </Button>
             </div>
           )}
 
@@ -685,28 +684,25 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
                 className={`${inputClass} w-28`}
               />
             </div>
-            <button
+            <Button
               type="button"
               disabled={aiSaving}
               onClick={() => handleAiSave({ cap: aiCap })}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {aiSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save Cap
-            </button>
+              {aiSaving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Cap</>}
+            </Button>
           </div>
 
           {/* Reset counter */}
           <div className="pt-1 border-t border-gray-100">
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={aiSaving}
               onClick={() => handleAiSave({ resetCount: true })}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset Counter to 0
-            </button>
+              <RotateCcw className="h-4 w-4 mr-2" />Reset Counter to 0
+            </Button>
             <p className="text-xs text-gray-400 mt-1.5">Resets the monthly count immediately.</p>
           </div>
 
@@ -737,17 +733,16 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
             </span>
           )}
         </div>
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {saving
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
-            : <><Save className="h-4 w-4" /> Save Changes</>
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+            : <><Check className="h-4 w-4 mr-2" />Save Changes</>
           }
-        </button>
+        </Button>
       </div>
 
     </div>

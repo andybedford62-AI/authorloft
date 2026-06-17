@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe } from "lucide-react";
+import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
@@ -518,13 +518,13 @@ function AiKeySection() {
                 onClick={() => handleAction("save")}
                 className="text-sm"
               >
-                Save New Key
+                <Check className="h-4 w-4 mr-1.5" /> Save New Key
               </Button>
               <Button
-                variant="outline"
+                variant="danger"
                 disabled={busy}
                 onClick={() => handleAction("remove")}
-                className="text-sm text-red-600 hover:bg-red-50 border-red-200 ml-auto"
+                className="text-sm ml-auto"
               >
                 <Trash2 className="h-4 w-4 mr-1.5" /> Remove Key
               </Button>
@@ -566,7 +566,7 @@ function AiKeySection() {
               onClick={() => handleAction("save")}
               className="text-sm"
             >
-              Save Key
+              <Check className="h-4 w-4 mr-1.5" />Save Key
             </Button>
           </div>
         </div>
@@ -1118,11 +1118,10 @@ export default function SettingsPage() {
             Permanently delete your AuthorLoft account and all associated data. This action cannot be undone.
           </p>
           <Button
-            variant="outline"
-            className="text-red-600 hover:bg-red-50 border-red-200"
+            variant="danger"
             onClick={() => alert("To delete your account, please contact support@authorloft.com")}
           >
-            Delete Account
+            <Trash2 className="h-4 w-4 mr-1.5" />Delete Account
           </Button>
         </section>
       )}
