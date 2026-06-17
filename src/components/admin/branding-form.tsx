@@ -679,12 +679,12 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">{error}</p>
         )}
         <div className="flex items-center gap-3 pb-8">
-          <Button onClick={handleSave} size="lg" disabled={saving}>
+          <Button onClick={handleSave} size="md" disabled={saving}>
             {saving
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
               : saved
               ? <><Check className="h-4 w-4 mr-2" />Saved!</>
-              : "Save Changes"}
+              : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
           </Button>
           <p className="text-xs text-gray-400">Changes are reflected on your live site immediately.</p>
         </div>

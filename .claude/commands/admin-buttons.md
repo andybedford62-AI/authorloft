@@ -149,11 +149,13 @@ If `--fix` was NOT passed, end with: "Run `/admin-buttons --fix` to apply all ch
 
 Do not convert these — they look like buttons but aren't CRUD actions:
 - Toggle switches: `inline-flex h-5 w-9 items-center rounded-full` — these are on/off toggles
-- Tab bar buttons: `border-b-2` active indicator — these are navigation tabs
+- Tab bar / mode toggles: `border-b-2` active indicator or pill-style segment controls (`rounded-full px-4 py-1.5`) — these are navigation/filter controls, even if they use `bg-blue-600` for the active state
 - Sidebar nav items
 - Progress step indicators
 - Badge/pill colour classes (`bg-purple-600 text-white px-1.5 py-0.5 rounded`)
 - Status/alert divs (`<p className="...bg-red-50...">`, `<div className="...bg-red-50...">`)
 - Small inline text-link remove actions for image fields (`text-xs text-red-500 hover:text-red-600`) — these are field-clear helpers, not form-level deletes
+- **AI generation buttons** (`bg-amber-400 text-gray-900` + `<Sparkles>` icon) — these are a distinct "AI action" visual category used in SEO Audit and AI Assistant tabs. Leave them amber. Do NOT convert to `<Button>` with Check/Plus.
+- **"Copy" utility buttons** in result boxes (`text-xs text-gray-400`) — utility icon, not CRUD
 - Onboarding modal buttons (`onboarding-modal.tsx`, `onboarding-guided-modal.tsx`) — these have their own visual language
 - Rich text editor toolbar buttons — inline formatting tools, not CRUD
