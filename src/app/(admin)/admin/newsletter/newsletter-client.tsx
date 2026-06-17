@@ -434,7 +434,7 @@ export function NewsletterClient({
                       <Send className="h-4 w-4 mr-2" />
                       Yes, send now
                     </Button>
-                    <Button variant="outline" onClick={() => setSendState("idle")}>Cancel</Button>
+                    <Button variant="ghost" onClick={() => setSendState("idle")}>Cancel</Button>
                   </div>
                 </div>
               ) : sendState === "sending" ? (

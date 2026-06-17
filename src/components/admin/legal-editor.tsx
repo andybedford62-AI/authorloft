@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Save, Loader2, Check, AlertTriangle, ExternalLink } from "lucide-react";
+import { Loader2, Check, AlertTriangle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -162,7 +162,7 @@ export function LegalEditor({
               ) : saved === "privacy" ? (
                 <><Check className="h-4 w-4 mr-2" />Published!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Publish Privacy Policy</>
+                <><Check className="h-4 w-4 mr-2" />Publish Privacy Policy</>
               )}
             </Button>
           </div>
@@ -210,7 +210,7 @@ export function LegalEditor({
               ) : saved === "terms" ? (
                 <><Check className="h-4 w-4 mr-2" />Published!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Publish Terms of Service</>
+                <><Check className="h-4 w-4 mr-2" />Publish Terms of Service</>
               )}
             </Button>
           </div>
@@ -244,7 +244,7 @@ export function LegalEditor({
               ) : saved === "contact" ? (
                 <><Check className="h-4 w-4 mr-2" />Saved!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Save Settings</>
+                <><Check className="h-4 w-4 mr-2" />Save Settings</>
               )}
             </Button>
           </div>

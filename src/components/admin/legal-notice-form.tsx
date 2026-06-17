@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Save, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { Check, Loader2, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LegalNoticeFormProps {
@@ -109,8 +109,9 @@ export function LegalNoticeForm({ initialContent, updatedAt }: LegalNoticeFormPr
             </button>
           )}
           <Button type="button" onClick={handleSave} disabled={saving || !content.trim()}>
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? "Saving…" : "Save Legal Notice"}
+            {saving
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+              : <><Check className="h-4 w-4 mr-2" />Save Legal Notice</>}
           </Button>
         </div>
       </div>

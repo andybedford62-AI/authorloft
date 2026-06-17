@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Save, Upload, X, Link as LinkIcon, FileDown } from "lucide-react";
+import { Loader2, Check, Plus, Upload, X, Link as LinkIcon, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const RichTextEditor = dynamic(
@@ -127,13 +127,15 @@ export function PostForm({ post }: PostFormProps) {
         <Button type="submit" disabled={saving}>
           {saving ? (
             <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+          ) : isEdit ? (
+            <><Check className="h-4 w-4 mr-2" />Save Changes</>
           ) : (
-            <><Save className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>
+            <><Plus className="h-4 w-4 mr-2" />Create Post</>
           )}
         </Button>
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           onClick={() => router.push("/admin/blog")}
           disabled={saving}
         >

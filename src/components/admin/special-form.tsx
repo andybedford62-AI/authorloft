@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Loader2, Tag, ExternalLink, Calendar, Clock, Percent } from "lucide-react";
+import { Upload, X, Loader2, Tag, ExternalLink, Calendar, Clock, Percent, Check, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { formatCents } from "@/lib/utils";
@@ -445,18 +445,22 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving}>
-            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            {mode === "create" ? "Create Special" : "Save Changes"}
+            {saving
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+              : mode === "create"
+                ? <><Plus className="h-4 w-4 mr-2" />Create Special</>
+                : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.push("/admin/specials")}>
+          <Button type="button" variant="ghost" onClick={() => router.push("/admin/specials")}>
             Cancel
           </Button>
         </div>
 
         {mode === "edit" && initial?.id && (
           <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
-            {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Delete Special
+            {deleting
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Special</>}
           </Button>
         )}
       </div>

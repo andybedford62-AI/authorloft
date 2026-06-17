@@ -678,7 +678,7 @@ export default function DiscountCodesPage() {
               {editError && <p className="text-sm text-red-600">{editError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <Button type="button" variant="outline" onClick={() => setEditingCode(null)}>
+                <Button type="button" variant="ghost" onClick={() => setEditingCode(null)}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={editSaving}>

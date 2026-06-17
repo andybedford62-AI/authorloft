@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Eye, EyeOff, ExternalLink, Loader2, BookOpen } from "lucide-react";
+import { Upload, X, Eye, EyeOff, ExternalLink, Loader2, BookOpen, Check, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface FlipBookData {
@@ -385,18 +385,22 @@ export function FlipBookForm({ initial, mode }: FlipBookFormProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving}>
-            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            {mode === "create" ? "Create Flip Book" : "Save Changes"}
+            {saving
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+              : mode === "create"
+                ? <><Plus className="h-4 w-4 mr-2" />Create Flip Book</>
+                : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.push("/admin/flip-books")}>
+          <Button type="button" variant="ghost" onClick={() => router.push("/admin/flip-books")}>
             Cancel
           </Button>
         </div>
 
         {mode === "edit" && initial?.id && (
           <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
-            {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Delete Flip Book
+            {deleting
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Flip Book</>}
           </Button>
         )}
       </div>

@@ -46,9 +46,11 @@ export function BlogDeleteButton({ postId, postTitle, redirectTo }: Props) {
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-gray-500 hidden sm:inline">Delete &quot;{postTitle}&quot;?</span>
         <Button variant="danger" size="sm" onClick={handleDelete} disabled={deleting}>
-          {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Confirm"}
+          {deleting
+            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : <><Trash2 className="h-3.5 w-3.5 mr-1.5" />Confirm Delete</>}
         </Button>
-        <Button variant="outline" size="sm" onClick={() => setConfirming(false)} disabled={deleting}>
+        <Button variant="ghost" size="sm" onClick={() => setConfirming(false)} disabled={deleting}>
           Cancel
         </Button>
         {deleteError && <span className="text-xs text-red-600 w-full">{deleteError}</span>}

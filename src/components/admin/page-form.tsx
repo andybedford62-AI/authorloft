@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Eye, EyeOff, Navigation, Info, AlertCircle, Loader2, Save,
+  Eye, EyeOff, Navigation, Info, AlertCircle, Loader2, Check, Plus,
   Link as LinkIcon, Type, AlignLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -325,11 +325,12 @@ export function PageForm({ initial }: PageFormProps) {
         </Button>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <><Loader2 className="h-4 w-4 animate-spin mr-2" />{isEdit ? "Save Changes" : "Create Page"}</>
+          ) : isEdit ? (
+            <><Check className="h-4 w-4 mr-2" />Save Changes</>
           ) : (
-            <Save className="h-4 w-4 mr-2" />
+            <><Plus className="h-4 w-4 mr-2" />Create Page</>
           )}
-          {isEdit ? "Save Changes" : "Create Page"}
         </Button>
       </div>
     </div>

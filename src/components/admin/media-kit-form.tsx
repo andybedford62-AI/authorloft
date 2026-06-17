@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Save, Image as ImageIcon, BookOpen, Info } from "lucide-react";
+import { Loader2, Check, Image as ImageIcon, BookOpen, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -130,8 +130,9 @@ export function MediaKitForm({ initialData }: MediaKitFormProps) {
       {/* Actions */}
       <div className="flex items-center gap-4">
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-          Save Changes
+          {saving
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+            : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
         </Button>
         {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
         {error && <span className="text-sm text-red-600">{error}</span>}
