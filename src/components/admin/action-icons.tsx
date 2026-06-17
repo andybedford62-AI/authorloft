@@ -9,7 +9,7 @@ import {
   Copy,
   Share2,
   Archive,
-  Save,
+  Check,
   X,
   MoreVertical,
   ChevronDown,
@@ -82,7 +82,7 @@ export function SaveAction({
 }: ActionIconProps) {
   return (
     <IconButton
-      icon={<Save className="h-4 w-4" />}
+      icon={<Check className="h-4 w-4" />}
       title="Save"
       onClick={onClick}
       disabled={disabled}

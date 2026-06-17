@@ -5,7 +5,7 @@ import Link from "next/link";
 import Papa from "papaparse";
 import {
   UploadCloud, FileText, ArrowRight, ArrowLeft, Loader2, CheckCircle2,
-  AlertTriangle, Sparkles, Download, RotateCcw, Save, BookmarkPlus, Trash2,
+  AlertTriangle, Sparkles, Download, RotateCcw, Check, BookmarkPlus, Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -380,7 +380,7 @@ export function BookImportWizard({ existingGenres, existingSeries, remainingSlot
                   className={selectClass + " flex-1"}
                 />
                 <Button type="button" size="sm" variant="outline" onClick={handleSavePreset}>
-                  <Save className="h-3.5 w-3.5 mr-1.5" /> Save
+                  <Check className="h-3.5 w-3.5 mr-1.5" /> Save
                 </Button>
               </div>
             </div>

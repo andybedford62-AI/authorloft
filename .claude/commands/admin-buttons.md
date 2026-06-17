@@ -156,6 +156,7 @@ Do not convert these — they look like buttons but aren't CRUD actions:
 - Status/alert divs (`<p className="...bg-red-50...">`, `<div className="...bg-red-50...">`)
 - Small inline text-link remove actions for image fields (`text-xs text-red-500 hover:text-red-600`) — these are field-clear helpers, not form-level deletes
 - **AI generation buttons** (`bg-amber-400 text-gray-900` + `<Sparkles>` icon) — these are a distinct "AI action" visual category used in SEO Audit and AI Assistant tabs. Leave them amber. Do NOT convert to `<Button>` with Check/Plus.
+- **Upgrade Plan CTAs** (`bg-blue-600` with `<Zap>` icon) — intentional blue to signal a payment/subscription action, distinct from CRUD. Appears in `admin-shell.tsx`, `settings/page.tsx` billing section, and `book-edit-tabs-client.tsx`. Leave them blue.
 - **"Copy" utility buttons** in result boxes (`text-xs text-gray-400`) — utility icon, not CRUD
 - Onboarding modal buttons (`onboarding-modal.tsx`, `onboarding-guided-modal.tsx`) — these have their own visual language
 - Rich text editor toolbar buttons — inline formatting tools, not CRUD
