@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Resource = {
   id: string; name: string; category: string; description: string;
@@ -120,9 +121,9 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
 
       {/* ── Add button ─────────────────────────────────────────────────── */}
       <div className="flex justify-end">
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition-colors">
-          <Plus className="h-4 w-4" /> Add Resource
-        </button>
+        <Button onClick={openNew}>
+          <Plus className="h-4 w-4 mr-2" />Add Resource
+        </Button>
       </div>
 
       {/* ── Add/Edit form ──────────────────────────────────────────────── */}
@@ -216,11 +217,10 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
           </div>
 
           <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50">
-              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : "Save"}
-            </button>
-            <button onClick={closeForm} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">Cancel</button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save</>}
+            </Button>
+            <Button variant="ghost" onClick={closeForm}>Cancel</Button>
           </div>
         </div>
       )}

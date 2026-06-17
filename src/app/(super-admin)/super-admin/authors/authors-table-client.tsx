@@ -8,6 +8,7 @@ import {
   Mail, Pencil, Trash2, Loader2, UserCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
 
 type Author = {
@@ -291,19 +292,19 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 </div>
               </div>
               <div className="flex gap-3 pt-1">
-                <button
-                  onClick={() => setConfirmId(null)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
+                <Button variant="ghost" className="flex-1" onClick={() => setConfirmId(null)}>
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
                   onClick={() => handleDelete(target)}
                   disabled={!!deleting}
-                  className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
                 >
-                  {deleting ? "Deleting…" : "Yes, delete"}
-                </button>
+                  {deleting
+                    ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Deleting…</>
+                    : <><Trash2 className="h-4 w-4 mr-1.5" />Yes, delete</>}
+                </Button>
               </div>
             </div>
           </div>

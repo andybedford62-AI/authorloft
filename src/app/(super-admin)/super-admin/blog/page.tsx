@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { BlogPostsClient } from "@/components/super-admin/blog-posts-client";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default async function SuperAdminBlogPage() {
   const session = await getServerSession(authOptions);
@@ -26,12 +28,12 @@ export default async function SuperAdminBlogPage() {
             choose where each post appears. Search and sort columns to find what you need.
           </p>
         </div>
-        <a
+        <Link
           href="/super-admin/blog/new"
-          className="bg-purple-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+          className="inline-flex items-center gap-2 rounded font-medium h-10 px-5 text-sm bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
         >
-          + New Post
-        </a>
+          <Plus className="h-4 w-4" />New Post
+        </Link>
       </div>
       <BlogPostsClient initialPosts={posts as any} />
     </div>

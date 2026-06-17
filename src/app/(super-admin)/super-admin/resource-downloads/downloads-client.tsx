@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Loader2, Plus, Pencil, Trash2, Upload, Link2, X, FileDown, Download, Eye, EyeOff } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Upload, Link2, X, FileDown, Download, Eye, EyeOff, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Download = {
@@ -123,10 +124,9 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
       )}
 
       <div className="flex justify-end">
-        <button onClick={openNew} disabled={noCategories}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50">
-          <Plus className="h-4 w-4" /> Add Download
-        </button>
+        <Button onClick={openNew} disabled={noCategories}>
+          <Plus className="h-4 w-4 mr-2" />Add Download
+        </Button>
       </div>
 
       {showForm && (
@@ -202,11 +202,10 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
           </div>
 
           <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50">
-              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : "Save"}
-            </button>
-            <button onClick={closeForm} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">Cancel</button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save</>}
+            </Button>
+            <Button variant="ghost" onClick={closeForm}>Cancel</Button>
           </div>
         </div>
       )}

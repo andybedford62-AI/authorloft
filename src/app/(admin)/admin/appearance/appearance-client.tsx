@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Loader2, Lock, Sparkles, CheckCircle2, Palette, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BASE_THEMES, STYLE_PALETTES } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 
@@ -556,25 +557,25 @@ export function AppearanceClient({
 
               {/* Save / clear */}
               <div className="flex items-center gap-2 pt-5">
-                <button
+                <Button
                   type="button"
                   disabled={savingAccent || !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(customAccent)}
                   onClick={() => { setAccentEnabled(true); saveCustomAccent(customAccent); }}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {savingAccent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Apply Colour
-                </button>
+                  {savingAccent
+                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
+                    : <><Check className="w-4 h-4 mr-2" />Apply Colour</>}
+                </Button>
                 {accentEnabled && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     disabled={savingAccent}
                     onClick={handleClearAccent}
-                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
                     title="Revert to theme accent"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Use theme accent
-                  </button>
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />Use theme accent
+                  </Button>
                 )}
               </div>
             </div>
@@ -661,25 +662,25 @@ export function AppearanceClient({
 
               {/* Save / clear */}
               <div className="flex items-center gap-2 pt-5">
-                <button
+                <Button
                   type="button"
                   disabled={savingSecondary || !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(customSecondary)}
                   onClick={() => { setSecondaryEnabled(true); saveCustomSecondary(customSecondary); }}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {savingSecondary ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Apply Colour
-                </button>
+                  {savingSecondary
+                    ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
+                    : <><Check className="w-4 h-4 mr-2" />Apply Colour</>}
+                </Button>
                 {secondaryEnabled && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     disabled={savingSecondary}
                     onClick={handleClearSecondary}
-                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
                     title="Remove secondary colour"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> Remove
-                  </button>
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />Remove
+                  </Button>
                 )}
               </div>
             </div>
