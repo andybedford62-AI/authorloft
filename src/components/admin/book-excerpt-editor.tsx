@@ -85,8 +85,9 @@ export function BookExcerptEditor({ bookId, initial }: Props) {
 
       <div className="flex items-center gap-3">
         <Button type="button" onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-          {saving ? "Saving…" : "Save Excerpt"}
+          {saving
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+            : <><Check className="h-4 w-4 mr-2" />Save Excerpt</>}
         </Button>
         {saved && (
           <span className="flex items-center gap-1.5 text-sm text-green-600 font-medium">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
-import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText, UserPlus, Mail } from "lucide-react";
+import { Upload, CheckCircle, XCircle, Loader2, Trash2, FileText, UserPlus, Mail, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HelpTip } from "@/components/admin/help-tip";
 
@@ -343,8 +343,9 @@ export function ArcTab({ bookId, bookTitle }: ArcTabProps) {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button onClick={createArc} disabled={creating}>
-            {creating && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Create ARC
+            {creating
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Creating…</>
+              : <><Plus className="h-4 w-4 mr-2" />Create ARC</>}
           </Button>
         </div>
       </div>
