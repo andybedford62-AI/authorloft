@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { ArrowLeft, Save, Loader2, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Subtopic { id: string; title: string; }
 interface Topic    { id: string; title: string; subtopics: Subtopic[]; }
@@ -159,9 +160,9 @@ export function HelpArticleForm({ topics, article }: Props) {
               <div className="flex gap-2 pt-1">
                 <input value={newTopicTitle} onChange={(e) => setNewTopicTitle(e.target.value)} placeholder="Topic title" className="flex-1 px-2.5 py-1.5 border border-blue-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 <input value={newTopicSlug} onChange={(e) => setNewTopicSlug(e.target.value)} placeholder="slug" className="w-28 px-2.5 py-1.5 border border-blue-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                <button onClick={createTopic} disabled={savingTopic || !newTopicTitle.trim() || !newTopicSlug.trim()} className="px-2.5 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap">
-                  {savingTopic ? <Loader2 className="h-3 w-3 animate-spin" /> : "Create"}
-                </button>
+                <Button size="sm" onClick={createTopic} disabled={savingTopic || !newTopicTitle.trim() || !newTopicSlug.trim()} className="whitespace-nowrap">
+                  {savingTopic ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Create</>}
+                </Button>
               </div>
             )}
           </div>
@@ -193,9 +194,9 @@ export function HelpArticleForm({ topics, article }: Props) {
               <div className="flex gap-2 pt-1">
                 <input value={newSubtopicTitle} onChange={(e) => setNewSubtopicTitle(e.target.value)} placeholder="Subtopic title" className="flex-1 px-2.5 py-1.5 border border-blue-300 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 <input value={newSubtopicSlug} onChange={(e) => setNewSubtopicSlug(e.target.value)} placeholder="slug" className="w-28 px-2.5 py-1.5 border border-blue-300 rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                <button onClick={createSubtopic} disabled={savingSubtopic || !newSubtopicTitle.trim() || !newSubtopicSlug.trim()} className="px-2.5 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap">
-                  {savingSubtopic ? <Loader2 className="h-3 w-3 animate-spin" /> : "Create"}
-                </button>
+                <Button size="sm" onClick={createSubtopic} disabled={savingSubtopic || !newSubtopicTitle.trim() || !newSubtopicSlug.trim()} className="whitespace-nowrap">
+                  {savingSubtopic ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Create</>}
+                </Button>
               </div>
             )}
           </div>
@@ -257,24 +258,14 @@ export function HelpArticleForm({ topics, article }: Props) {
       <div className="flex items-center justify-between">
         <div>
           {isEdit && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
-            >
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              Delete Article
-            </button>
+            <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Deleting…</> : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Article</>}
+            </Button>
           )}
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {isEdit ? "Save Changes" : "Create Article"}
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Article"}</>}
+        </Button>
       </div>
     </div>
   );

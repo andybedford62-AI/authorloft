@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, Link, Check, Loader2, X, ImageIcon, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type SeoPage = {
   id: string;
@@ -140,13 +141,10 @@ function PageImageEditor({ page, onSaved }: { page: SeoPage; onSaved: (id: strin
             placeholder="https://example.com/image.jpg"
             className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
-          <button
-            onClick={handleSaveUrl}
-            disabled={saving || !url}
-            className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium disabled:opacity-50 flex items-center gap-1.5"
-          >
-            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
-          </button>
+          <Button size="sm" onClick={handleSaveUrl} disabled={saving || !url}>
+            {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Check className="h-3.5 w-3.5 mr-1.5" />}
+            Save
+          </Button>
         </div>
       )}
 

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type PlanFormData = {
   name: string; slug: string; description: string;
@@ -368,10 +370,10 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       </section>
 
       <div className="flex items-center justify-between">
-        <button type="button" onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-900">← Cancel</button>
-        <button type="submit" disabled={saving} className="rounded-lg bg-purple-600 hover:bg-purple-500 px-6 py-2.5 text-sm font-medium text-white disabled:opacity-50">
-          {saving ? "Saving…" : isEditing ? "Save Changes" : "Create Plan"}
-        </button>
+        <Button type="button" variant="ghost" onClick={() => router.back()}>Cancel</Button>
+        <Button type="submit" disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />{isEditing ? "Save Changes" : "Create Plan"}</>}
+        </Button>
       </div>
     </form>
   );

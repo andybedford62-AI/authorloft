@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Loader2, Check, Power } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   initialMode: boolean;
@@ -102,12 +103,7 @@ export function MaintenanceToggle({ initialMode, initialMessage }: Props) {
               {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Power className="h-3.5 w-3.5" />}
               Yes, enable maintenance
             </button>
-            <button
-              onClick={() => setConfirmPending(false)}
-              className="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium"
-            >
-              Cancel
-            </button>
+            <Button variant="ghost" onClick={() => setConfirmPending(false)}>Cancel</Button>
           </div>
         </div>
       )}
@@ -129,18 +125,13 @@ export function MaintenanceToggle({ initialMode, initialMessage }: Props) {
 
       {/* Save message button */}
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => save(maintenanceMode, message)}
-          disabled={saving}
-          className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-        >
+        <Button type="button" onClick={() => save(maintenanceMode, message)} disabled={saving}>
           {saving
-            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
             : saved
-            ? <><Check className="h-3.5 w-3.5" /> Saved</>
-            : "Save Message"}
-        </button>
+            ? <><Check className="h-4 w-4 mr-2" />Saved</>
+            : <><Check className="h-4 w-4 mr-2" />Save Message</>}
+        </Button>
         {error && <p className="text-xs text-red-400">{error}</p>}
       </div>
     </div>

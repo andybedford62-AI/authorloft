@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Loader2, History, Users, BookmarkPlus, FolderOpen, Trash2 } from "lucide-react";
+import { Send, Loader2, History, Users, BookmarkPlus, FolderOpen, Trash2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 
 type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM";
 
@@ -170,9 +172,7 @@ export function MassEmailPanel() {
                       <p className="text-sm font-medium text-gray-900">{t.name}</p>
                       <p className="text-xs text-gray-400 truncate">{t.subject}</p>
                     </button>
-                    <button onClick={() => deleteTemplate(t.id)} className="ml-3 text-red-400 hover:text-red-600 transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete template" variant="delete" onClick={() => deleteTemplate(t.id)} />
                   </li>
                 ))}
               </ul>
@@ -193,15 +193,10 @@ export function MassEmailPanel() {
               autoFocus
             />
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleSaveTemplate}
-                disabled={savingTemplate || !templateName.trim()}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50"
-              >
-                {savingTemplate ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BookmarkPlus className="h-3.5 w-3.5" />}
-                Save
-              </button>
-              <button onClick={() => setShowSaveModal(false)} className="text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+              <Button size="sm" onClick={handleSaveTemplate} disabled={savingTemplate || !templateName.trim()}>
+                {savingTemplate ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowSaveModal(false)}>Cancel</Button>
             </div>
           </div>
         )}
@@ -264,14 +259,9 @@ export function MassEmailPanel() {
           </p>
         )}
 
-        <button
-          onClick={handleSend}
-          disabled={sending || count === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
-        >
-          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          {sending ? "Sending…" : `Send to ${count ?? "?"} authors`}
-        </button>
+        <Button onClick={handleSend} disabled={sending || count === 0}>
+          {sending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Sending…</> : <><Send className="h-4 w-4 mr-2" />{`Send to ${count ?? "?"} authors`}</>}
+        </Button>
       </div>
 
       {/* History */}

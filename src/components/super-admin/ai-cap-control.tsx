@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Loader2, Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   initialCap: number;
@@ -76,19 +77,13 @@ export function AiCapControl({ initialCap }: Props) {
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving || !isDirty}
-          className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-        >
+        <Button type="button" onClick={save} disabled={saving || !isDirty}>
           {saving
-            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
             : saved
-            ? <><Check className="h-3.5 w-3.5" /> Saved</>
-            : "Save & Apply"
-          }
-        </button>
+            ? <><Check className="h-4 w-4 mr-2" />Saved</>
+            : <><Check className="h-4 w-4 mr-2" />Save & Apply</>}
+        </Button>
 
         {saved && result && (
           <p className="text-xs text-green-600 font-medium">

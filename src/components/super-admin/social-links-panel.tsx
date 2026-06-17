@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Edit2, Save, X, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 import type { SocialLink } from "@/app/api/super-admin/settings/social-links/route";
 
 const ICON_OPTIONS = [
@@ -146,13 +148,9 @@ export function SocialLinksPanel() {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900">Company Social Links</h3>
         {editingId === null && (
-          <button
-            onClick={startAdd}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Add Link
-          </button>
+          <Button onClick={startAdd}>
+            <Plus className="h-4 w-4 mr-2" />Add Link
+          </Button>
         )}
       </div>
 
@@ -239,43 +237,35 @@ export function SocialLinksPanel() {
             <div className="flex items-center gap-2 flex-shrink-0">
               {editingId === link.id ? (
                 <>
-                  <button
+                  <IconButton
+                    icon={saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    title="Save"
+                    variant="edit"
                     onClick={saveEdit}
                     disabled={saving}
-                    className="p-2 text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
-                    title="Save"
-                  >
-                    {saving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4" />
-                    )}
-                  </button>
-                  <button
+                  />
+                  <IconButton
+                    icon={<X className="h-4 w-4" />}
+                    title="Cancel"
+                    variant="ghost"
                     onClick={cancelEdit}
                     disabled={saving}
-                    className="p-2 text-gray-600 hover:bg-gray-200 rounded transition-colors disabled:opacity-50"
-                    title="Cancel"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  />
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={() => startEdit(link)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  <IconButton
+                    icon={<Edit2 className="h-4 w-4" />}
                     title="Edit"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteLink(link.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    variant="edit"
+                    onClick={() => startEdit(link)}
+                  />
+                  <IconButton
+                    icon={<Trash2 className="h-4 w-4" />}
                     title="Delete"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                    variant="delete"
+                    onClick={() => deleteLink(link.id)}
+                  />
                 </>
               )}
             </div>
@@ -335,21 +325,10 @@ export function SocialLinksPanel() {
               />
             </div>
             <div className="flex items-center gap-2 justify-end">
-              <button
-                onClick={cancelEdit}
-                disabled={saving}
-                className="px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-100 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveEdit}
-                disabled={saving}
-                className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Save Link
-              </button>
+              <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>Cancel</Button>
+              <Button size="sm" onClick={saveEdit} disabled={saving}>
+                {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Link</>}
+              </Button>
             </div>
           </div>
         )}

@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { ArrowLeft, Save, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Post = {
   id:              string;
@@ -171,14 +172,9 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
       {/* ── Top save bar ─────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4">
         <div />
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {isEdit ? "Save Changes" : "Create Post"}
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>}
+        </Button>
       </div>
 
       {error && (
@@ -604,24 +600,15 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
       <div className="flex items-center justify-between pb-6">
         <div>
           {isEdit && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-50 transition-colors"
-            >
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1.5" />}
               Delete Post
-            </button>
+            </Button>
           )}
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {isEdit ? "Save Changes" : "Create Post"}
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>}
+        </Button>
       </div>
     </div>
   );

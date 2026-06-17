@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, AlertCircle, Loader2, Trash2, Plus, ExternalLink } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2, Trash2, Plus, ExternalLink, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Token = {
   id:             string;
@@ -188,13 +189,9 @@ function ConnectPanel({
         </>
       )}
 
-      <button
-        onClick={handleConnect}
-        disabled={saving}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors"
-      >
-        {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Testing & Connecting…</> : "Connect"}
-      </button>
+      <Button onClick={handleConnect} disabled={saving} className="w-full justify-center">
+        {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Testing & Connecting…</> : <><Check className="h-4 w-4 mr-2" />Connect</>}
+      </Button>
       {autoId && (
         <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1.5">
           Posts to your personal LinkedIn profile. Company Page API requires a LinkedIn partnership.
@@ -279,12 +276,9 @@ export function SocialPlatformConnect({ initialTokens }: { initialTokens: Token[
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={() => setOpenPanel(isOpen ? null : plat.id)}
-                      className="flex items-center gap-1.5 text-xs font-medium text-purple-600 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      <Plus className="h-3.5 w-3.5" /> Connect
-                    </button>
+                    <Button size="sm" onClick={() => setOpenPanel(isOpen ? null : plat.id)}>
+                      <Plus className="h-3.5 w-3.5 mr-1.5" />Connect
+                    </Button>
                   )}
                 </div>
               </div>

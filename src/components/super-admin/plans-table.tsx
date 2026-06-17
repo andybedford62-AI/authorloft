@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Loader2 } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 
 type Plan = {
   id: string;
@@ -83,10 +84,12 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
             <h3 className="font-semibold text-gray-900 mb-2">Delete this plan?</h3>
             <p className="text-sm text-gray-500 mb-6">This cannot be undone. Authors on this plan must be reassigned manually.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">Cancel</button>
-              <button onClick={() => deletePlan(confirmDelete)} disabled={deletingId === confirmDelete} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50">
-                {deletingId === confirmDelete ? "Deleting…" : "Delete Plan"}
-              </button>
+              <Button variant="ghost" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+              <Button variant="danger" onClick={() => deletePlan(confirmDelete)} disabled={deletingId === confirmDelete}>
+                {deletingId === confirmDelete
+                  ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Deleting…</>
+                  : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Plan</>}
+              </Button>
             </div>
           </div>
         </div>

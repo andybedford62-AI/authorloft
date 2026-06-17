@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { ImageIcon, Upload, Link, Check, Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }) {
   const [url, setUrl]           = useState(initialUrl ?? "");
@@ -139,13 +140,9 @@ export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }
             placeholder="https://example.com/image.jpg"
             className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
-          <button
-            onClick={handleSaveUrl}
-            disabled={saving || !url}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors flex items-center gap-1.5"
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
-          </button>
+          <Button size="sm" onClick={handleSaveUrl} disabled={saving || !url}>
+            {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
+          </Button>
         </div>
       )}
 

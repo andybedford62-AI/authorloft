@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Edit2, Trash2, Loader2, ChevronDown, ChevronRight, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Loader2, ChevronDown, ChevronRight, Search, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 import { sanitize } from "@/lib/sanitize";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -85,7 +87,7 @@ function ArticlesTab({ articles, topics }: { articles: Article[]; topics: Topic[
         </select>
         <Link
           href="/super-admin/help/articles/new"
-          className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap"
+          className="inline-flex items-center gap-2 rounded-lg font-medium h-10 px-5 text-sm bg-[var(--accent)] text-white hover:opacity-90 transition-opacity whitespace-nowrap"
         >
           <Plus className="h-4 w-4" /> New Article
         </Link>
@@ -124,21 +126,19 @@ function ArticlesTab({ articles, topics }: { articles: Article[]; topics: Topic[
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <Link
-                  href={`/super-admin/help/articles/${article.id}/edit`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                >
-                  <Edit2 className="h-4 w-4" />
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Link href={`/super-admin/help/articles/${article.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                  <IconButton icon={<Edit2 className="h-4 w-4" />} title="Edit article" variant="edit" />
                 </Link>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(article.id); }}
-                  disabled={deleting === article.id}
-                  className="p-1.5 rounded text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                >
-                  {deleting === article.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                </button>
+                <span onClick={(e) => e.stopPropagation()}>
+                  <IconButton
+                    icon={deleting === article.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                    title="Delete article"
+                    variant="delete"
+                    onClick={() => handleDelete(article.id)}
+                    disabled={deleting === article.id}
+                  />
+                </span>
               </div>
             </div>
 
@@ -248,8 +248,10 @@ function TopicsTab({ topics: initialTopics }: { topics: Topic[] }) {
                     onChange={(e) => setEditTitle(e.target.value)}
                     className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button onClick={() => updateTopic(topic.id)} className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">Save</button>
-                  <button onClick={() => setEditingId(null)} className="px-3 py-1.5 border border-gray-200 text-gray-600 text-xs rounded hover:bg-gray-50">Cancel</button>
+                  <Button size="sm" onClick={() => updateTopic(topic.id)}>
+                    <Check className="h-3.5 w-3.5 mr-1.5" />Save
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
                 </>
               ) : (
                 <>
@@ -259,12 +261,8 @@ function TopicsTab({ topics: initialTopics }: { topics: Topic[] }) {
                       {topic._count.articles} article{topic._count.articles !== 1 ? "s" : ""} · {topic.subtopics.length} subtopic{topic.subtopics.length !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <button onClick={() => { setEditingId(topic.id); setEditTitle(topic.title); }} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => deleteTopic(topic.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <IconButton icon={<Edit2 className="h-4 w-4" />} title="Edit topic" variant="edit" onClick={() => { setEditingId(topic.id); setEditTitle(topic.title); }} />
+                  <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete topic" variant="delete" onClick={() => deleteTopic(topic.id)} />
                 </>
               )}
             </div>
@@ -274,9 +272,7 @@ function TopicsTab({ topics: initialTopics }: { topics: Topic[] }) {
                 {topic.subtopics.map((sub) => (
                   <div key={sub.id} className="flex items-center gap-3 px-8 py-2.5">
                     <span className="flex-1 text-sm text-gray-600">{sub.title}</span>
-                    <button onClick={() => deleteSubtopic(topic.id, sub.id)} className="p-1 text-gray-300 hover:text-red-500 transition-colors">
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <IconButton icon={<Trash2 className="h-3.5 w-3.5" />} title="Delete subtopic" variant="delete" onClick={() => deleteSubtopic(topic.id, sub.id)} />
                   </div>
                 ))}
               </div>
@@ -292,9 +288,9 @@ function TopicsTab({ topics: initialTopics }: { topics: Topic[] }) {
           <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Title" className="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="slug" className="w-36 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input value={newIcon} onChange={(e) => setNewIcon(e.target.value)} placeholder="Icon (e.g. BookOpen)" className="w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <button onClick={addTopic} disabled={saving || !newTitle.trim() || !newSlug.trim()} className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add
-          </button>
+          <Button onClick={addTopic} disabled={saving || !newTitle.trim() || !newSlug.trim()}>
+            {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Plus className="h-4 w-4 mr-2" />Add</>}
+          </Button>
         </div>
       </div>
 
@@ -308,9 +304,9 @@ function TopicsTab({ topics: initialTopics }: { topics: Topic[] }) {
           </select>
           <input value={subtopicTitle} onChange={(e) => setSubtopicTitle(e.target.value)} placeholder="Subtopic title" className="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input value={subtopicSlug} onChange={(e) => setSubtopicSlug(e.target.value)} placeholder="slug" className="w-36 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <button onClick={addSubtopic} disabled={subtopicSaving || !subtopicTopicId || !subtopicTitle.trim() || !subtopicSlug.trim()} className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors">
-            {subtopicSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add
-          </button>
+          <Button onClick={addSubtopic} disabled={subtopicSaving || !subtopicTopicId || !subtopicTitle.trim() || !subtopicSlug.trim()}>
+            {subtopicSaving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Plus className="h-4 w-4 mr-2" />Add</>}
+          </Button>
         </div>
       </div>
     </div>
@@ -391,8 +387,10 @@ function TooltipsTab({ tooltips: initialTooltips }: { tooltips: Tooltip[] }) {
                     </td>
                     <td className="px-5 py-2">
                       <div className="flex gap-2">
-                        <button onClick={() => saveEdit(tooltip.id)} className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">Save</button>
-                        <button onClick={() => setEditingId(null)} className="px-2 py-1 border border-gray-200 text-gray-600 text-xs rounded hover:bg-gray-50">Cancel</button>
+                        <Button size="sm" onClick={() => saveEdit(tooltip.id)}>
+                          <Check className="h-3.5 w-3.5 mr-1.5" />Save
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
                       </div>
                     </td>
                   </>
@@ -402,9 +400,9 @@ function TooltipsTab({ tooltips: initialTooltips }: { tooltips: Tooltip[] }) {
                     <td className="px-5 py-3 font-medium text-gray-900">{tooltip.title}</td>
                     <td className="px-5 py-3 text-gray-500 hidden md:table-cell max-w-xs truncate">{tooltip.content}</td>
                     <td className="px-5 py-3">
-                      <div className="flex gap-2">
-                        <button onClick={() => { setEditingId(tooltip.id); setEditData({}); }} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
-                        <button onClick={() => deleteTooltip(tooltip.id)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+                      <div className="flex gap-1">
+                        <IconButton icon={<Edit2 className="h-3.5 w-3.5" />} title="Edit tooltip" variant="edit" onClick={() => { setEditingId(tooltip.id); setEditData({}); }} />
+                        <IconButton icon={<Trash2 className="h-3.5 w-3.5" />} title="Delete tooltip" variant="delete" onClick={() => deleteTooltip(tooltip.id)} />
                       </div>
                     </td>
                   </>
@@ -423,9 +421,9 @@ function TooltipsTab({ tooltips: initialTooltips }: { tooltips: Tooltip[] }) {
           <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Title" className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="Short description (1-2 sentences)" className="sm:col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="Learn more URL (optional)" className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <button onClick={addTooltip} disabled={saving || !newKey.trim() || !newTitle.trim() || !newContent.trim()} className="flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Add Tooltip
-          </button>
+          <Button onClick={addTooltip} disabled={saving || !newKey.trim() || !newTitle.trim() || !newContent.trim()}>
+            {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Plus className="h-4 w-4 mr-2" />Add Tooltip</>}
+          </Button>
         </div>
       </div>
     </div>

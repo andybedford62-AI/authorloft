@@ -4,8 +4,9 @@ import { useState } from "react";
 import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag, ShoppingCart,
-  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe, Megaphone, Store, CalendarClock,
+  Paintbrush, Palette, Shield, Bot, Search, Settings, Check, Loader2, Globe, Megaphone, Store, CalendarClock,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 
 // ── Feature list with icons ───────────────────────────────────────────────────
@@ -107,14 +108,9 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
             Changes apply to all authors on next page load.
           </p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors flex-shrink-0"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save Changes
-        </button>
+        <Button onClick={handleSave} disabled={saving} className="flex-shrink-0">
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
+        </Button>
       </div>
 
       {/* Feedback */}
@@ -202,14 +198,9 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
 
       {/* Save (bottom) */}
       <div className="flex justify-end pt-2">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save Changes
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
+        </Button>
       </div>
     </div>
   );

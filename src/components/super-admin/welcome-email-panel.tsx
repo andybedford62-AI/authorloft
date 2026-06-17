@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mail, Save, Loader2, RotateCcw, Send, Search, X } from "lucide-react";
+import { Mail, Check, Loader2, RotateCcw, Send, Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AuthorResult {
   id:          string;
@@ -191,14 +192,9 @@ export function WelcomeEmailPanel({ initialSubject, initialBody }: Props) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex items-center gap-3">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {saving ? "Saving…" : "Save"}
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save</>}
+        </Button>
         {saved && <span className="text-sm text-green-600 font-medium">Saved!</span>}
       </div>
 

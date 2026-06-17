@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { useRouter }         from "next/navigation";
-import { ImageIcon, Upload, X, Loader2, Save, Send, Calendar, ArrowLeft } from "lucide-react";
+import { ImageIcon, Upload, X, Loader2, Check, Send, Calendar, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Token    = { platform: string; accountName: string; isActive: boolean };
 type PostData = {
@@ -279,21 +280,15 @@ export function SocialPostForm({ tokens, post }: Props) {
           {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           Publish Now
         </button>
-        <button
+        <Button
           onClick={() => handleSave(false)}
           disabled={publishing || saving}
-          className="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
         >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : scheduledAt ? <Calendar className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-          {scheduledAt ? "Schedule" : "Save Draft"}
-        </button>
-        <button
-          onClick={() => router.push("/super-admin/social")}
-          disabled={publishing || saving}
-          className="px-5 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
-        >
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : scheduledAt ? <><Calendar className="h-4 w-4 mr-2" />Schedule</> : <><Check className="h-4 w-4 mr-2" />Save Draft</>}
+        </Button>
+        <Button variant="ghost" onClick={() => router.push("/super-admin/social")} disabled={publishing || saving}>
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

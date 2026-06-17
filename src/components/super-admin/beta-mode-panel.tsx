@@ -5,6 +5,7 @@ import {
   AlertTriangle, Loader2, Check, Power, KeyRound, Plus, Trash2,
   Copy, RefreshCw, ChevronDown, ChevronUp,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type InviteCode = {
@@ -190,12 +191,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
               {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Power className="h-3.5 w-3.5" />}
               Yes, enable beta mode
             </button>
-            <button
-              onClick={() => setConfirmOn(false)}
-              className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium"
-            >
-              Cancel
-            </button>
+            <Button variant="ghost" onClick={() => setConfirmOn(false)}>Cancel</Button>
           </div>
         </div>
       )}
@@ -222,12 +218,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
               {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               Yes, go live
             </button>
-            <button
-              onClick={() => setConfirmOff(false)}
-              className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-medium"
-            >
-              Cancel
-            </button>
+            <Button variant="ghost" onClick={() => setConfirmOff(false)}>Cancel</Button>
           </div>
         </div>
       )}
@@ -244,18 +235,13 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
           className="border-gray-300"
         />
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => saveBeta(betaMode, message)}
-            disabled={saving}
-            className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-          >
+          <Button type="button" onClick={() => saveBeta(betaMode, message)} disabled={saving}>
             {saving
-              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
               : saved
-              ? <><Check className="h-3.5 w-3.5" /> Saved</>
-              : "Save Message"}
-          </button>
+              ? <><Check className="h-4 w-4 mr-2" />Saved</>
+              : <><Check className="h-4 w-4 mr-2" />Save Message</>}
+          </Button>
           {error && <p className="text-xs text-red-600">{error}</p>}
         </div>
       </div>
@@ -330,15 +316,11 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                 />
               </div>
               {genError && <p className="text-xs text-red-600">{genError}</p>}
-              <button
-                type="submit"
-                disabled={generating}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium disabled:opacity-50"
-              >
+              <Button type="submit" disabled={generating}>
                 {generating
-                  ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating…</>
-                  : <><Plus className="h-3.5 w-3.5" /> Generate {genCount > 1 ? `${genCount} codes` : "code"}</>}
-              </button>
+                  ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Generating…</>
+                  : <><Plus className="h-4 w-4 mr-2" />Generate {genCount > 1 ? `${genCount} codes` : "code"}</>}
+              </Button>
             </form>
 
             {/* Code list */}

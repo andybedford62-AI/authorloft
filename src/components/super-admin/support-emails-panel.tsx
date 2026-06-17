@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, Check, X, Mail } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 
 type SupportEmail = {
   id: string;
@@ -120,19 +121,10 @@ export function SupportEmailsPanel({ initialEmails }: { initialEmails: SupportEm
               It will no longer appear in contact form dropdowns.
             </p>
             <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setConfirmDelete(null)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(confirmDelete)}
-                disabled={deletingId === confirmDelete}
-                className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50"
-              >
-                {deletingId === confirmDelete ? "Deleting…" : "Delete"}
-              </button>
+              <Button variant="ghost" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+              <Button variant="danger" onClick={() => handleDelete(confirmDelete)} disabled={deletingId === confirmDelete}>
+                <Trash2 className="h-4 w-4 mr-1.5" />{deletingId === confirmDelete ? "Deleting…" : "Delete"}
+              </Button>
             </div>
           </div>
         </div>
@@ -145,13 +137,9 @@ export function SupportEmailsPanel({ initialEmails }: { initialEmails: SupportEm
             Active emails appear in contact form dropdowns.
           </p>
           {!adding && (
-            <button
-              onClick={() => { setAdding(true); setAddForm(emptyForm); }}
-              className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0 ml-4"
-            >
-              <Plus className="h-4 w-4" />
-              Add Email
-            </button>
+            <Button onClick={() => { setAdding(true); setAddForm(emptyForm); }} className="flex-shrink-0 ml-4">
+              <Plus className="h-4 w-4 mr-2" />Add Email
+            </Button>
           )}
         </div>
 

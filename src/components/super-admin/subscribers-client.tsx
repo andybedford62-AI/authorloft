@@ -1,6 +1,7 @@
 "use client";
 
 import { Download, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Subscriber = {
   id: string;
@@ -45,13 +46,9 @@ export function SubscribersClient({ subscribers }: { subscribers: Subscriber[] }
           <Mail className="h-4 w-4 text-gray-400" />
           <span className="font-semibold text-gray-900">{subscribers.length.toLocaleString()}</span> subscriber{subscribers.length !== 1 ? "s" : ""}
         </div>
-        <button
-          onClick={exportCsv}
-          disabled={subscribers.length === 0}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
-        >
-          <Download className="h-4 w-4" /> Export CSV
-        </button>
+        <Button onClick={exportCsv} disabled={subscribers.length === 0}>
+          <Download className="h-4 w-4 mr-2" /> Export CSV
+        </Button>
       </div>
 
       {subscribers.length === 0 ? (

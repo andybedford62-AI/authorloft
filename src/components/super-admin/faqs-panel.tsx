@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Plus, HelpCircle, X } from "lucide-react";
+import { Pencil, Trash2, Plus, HelpCircle, X, Check, Loader2 } from "lucide-react";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { Button } from "@/components/ui/button";
 
 type Faq = {
   id: string;
@@ -106,16 +107,13 @@ function FaqModal({
         </div>
 
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
-            Cancel
-          </button>
-          <button
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button
             onClick={onSave}
             disabled={saving || !form.question.trim() || !form.answer.replace(/<[^>]+>/g, "").trim()}
-            className="px-5 py-2 text-sm font-medium bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-lg transition-colors"
           >
-            {saving ? "Saving…" : "Save FAQ"}
-          </button>
+            {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save FAQ</>}
+          </Button>
         </div>
       </div>
     </div>
@@ -236,14 +234,10 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
             <h3 className="font-semibold text-gray-900 mb-2">Delete this FAQ?</h3>
             <p className="text-sm text-gray-500 mb-6">It will be removed from the homepage.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">Cancel</button>
-              <button
-                onClick={() => handleDelete(confirmDelete)}
-                disabled={!!deletingId}
-                className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50"
-              >
-                {deletingId ? "Deleting…" : "Delete"}
-              </button>
+              <Button variant="ghost" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+              <Button variant="danger" onClick={() => handleDelete(confirmDelete)} disabled={!!deletingId}>
+                <Trash2 className="h-4 w-4 mr-1.5" />{deletingId ? "Deleting…" : "Delete"}
+              </Button>
             </div>
           </div>
         </div>
@@ -254,13 +248,9 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
           <p className="text-sm text-gray-500">
             Active FAQs appear in the FAQ accordion on the homepage and in search engine structured data.
           </p>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0 ml-4"
-          >
-            <Plus className="h-4 w-4" />
-            Add FAQ
-          </button>
+          <Button onClick={openAdd} className="flex-shrink-0 ml-4">
+            <Plus className="h-4 w-4 mr-2" />Add FAQ
+          </Button>
         </div>
 
         {faqs.length === 0 ? (

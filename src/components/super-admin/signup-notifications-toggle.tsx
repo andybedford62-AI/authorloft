@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Bell, BellOff, Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   initialEnabled: boolean;
@@ -86,19 +87,13 @@ export function SignupNotificationsToggle({ initialEnabled, initialEmail }: Prop
 
       {/* Save button */}
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => save(enabled, email)}
-          disabled={saving || !email.trim()}
-          className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-        >
+        <Button type="button" onClick={() => save(enabled, email)} disabled={saving || !email.trim()}>
           {saving
-            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
             : saved
-            ? <><Check className="h-3.5 w-3.5" /> Saved</>
-            : "Save"
-          }
-        </button>
+            ? <><Check className="h-4 w-4 mr-2" />Saved</>
+            : <><Check className="h-4 w-4 mr-2" />Save</>}
+        </Button>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     </div>
