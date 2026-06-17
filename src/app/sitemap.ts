@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getBookstoreData } from "@/lib/bookstore";
 import { COMPARISON_SLUGS } from "@/lib/comparison-data";
 
+export const dynamic = "force-dynamic";
+
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
