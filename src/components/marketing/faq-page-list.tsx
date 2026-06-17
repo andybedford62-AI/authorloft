@@ -37,12 +37,13 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
                   setActiveSlug(slug);
                   setOpenId(null);
                 }}
+                className="faq-chip"
                 style={{
                   padding: "7px 18px",
                   borderRadius: 999,
-                  border: `1px solid ${active ? "#1B2B47" : "#DCDBD3"}`,
-                  background: active ? "#1B2B47" : "#fff",
-                  color: active ? "#E8E5DD" : "#5C6E89",
+                  border: `1px solid ${active ? "#C26A4A" : "#C9C5BB"}`,
+                  background: active ? "#C26A4A" : "#F0EDE4",
+                  color: active ? "#fff" : "#5C6E89",
                   fontFamily: "var(--font-geist-mono, monospace)",
                   fontSize: 12,
                   letterSpacing: "0.06em",
@@ -104,6 +105,7 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
         </div>
       ))}
       </div>
+      <style>{`.faq-chip:hover { border-color: #C26A4A !important; }`}</style>
     </div>
   );
 }
