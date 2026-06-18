@@ -17,6 +17,7 @@ line rather than listing every commit.
 
 - **Super Admin FAQ moved to Marketing** — FAQs has its own dedicated page at `/super-admin/faqs` under the Marketing sidebar group (was buried in Platform Settings → Content tab). Settings page no longer fetches or renders FAQs.
 - **FAQ reorder UX** — up/down arrow buttons on each FAQ row in `FaqsPanel`; clicking swaps `sortOrder` with the adjacent item and updates the list in-place. No more opening the edit modal to change a sort number.
+- **Homepage rebrand live** — Promoted `/homepage-rebrand` to the live homepage at `/`. New positioning: "author growth platform" instead of "website builder." Features: 4-step journey (Go Live → Sell → Grow → Track), integrated tools section (Stripe, Mailchimp, PostHog, Gemini), elevated AI features (6-card Premium suite). Updated metadata: OG image, Twitter card, canonical, structured data. Old homepage archived as `page-original-jun18.tsx`. Rebrand components moved to `src/components/marketing/` for reuse.
 
 ## June 17, 2026
 
