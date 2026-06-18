@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## June 18, 2026
+
+- **Super Admin FAQ moved to Marketing** — FAQs has its own dedicated page at `/super-admin/faqs` under the Marketing sidebar group (was buried in Platform Settings → Content tab). Settings page no longer fetches or renders FAQs.
+- **FAQ reorder UX** — up/down arrow buttons on each FAQ row in `FaqsPanel`; clicking swaps `sortOrder` with the adjacent item and updates the list in-place. No more opening the edit modal to change a sort number.
+
 ## June 17, 2026
 
 - **FAQ category filter** — pill-chip row ("All" + each category) above the accordion on `/faq`; clicking a chip shows only that category's questions. Client-side only, no page reload.

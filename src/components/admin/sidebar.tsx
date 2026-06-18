@@ -152,6 +152,7 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
       { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download   },
       { href: "/super-admin/categories",         label: "Content Categories", icon: FolderTree },
       { href: "/super-admin/social",             label: "Social Media",       icon: Share2     },
+      { href: "/super-admin/faqs",               label: "FAQs",               icon: HelpCircle },
     ],
   },
   {

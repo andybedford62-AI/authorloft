@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Plus, HelpCircle, X, Check, Loader2 } from "lucide-react";
+import { Pencil, Trash2, Plus, HelpCircle, X, Check, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { Button } from "@/components/ui/button";
 
@@ -131,6 +131,7 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [reorderingId, setReorderingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/super-admin/categories?type=faq")
@@ -210,6 +211,39 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
     setTogglingId(null);
   }
 
+  async function handleReorder(id: string, direction: "up" | "down") {
+    const sorted = [...faqs].sort((a, b) => a.sortOrder - b.sortOrder);
+    const idx = sorted.findIndex((f) => f.id === id);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+
+    const current = sorted[idx];
+    const swap = sorted[swapIdx];
+    setReorderingId(id);
+
+    await Promise.all([
+      fetch(`/api/super-admin/faqs/${current.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sortOrder: swap.sortOrder }),
+      }),
+      fetch(`/api/super-admin/faqs/${swap.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sortOrder: current.sortOrder }),
+      }),
+    ]);
+
+    setFaqs((prev) =>
+      prev.map((f) => {
+        if (f.id === current.id) return { ...f, sortOrder: swap.sortOrder };
+        if (f.id === swap.id) return { ...f, sortOrder: current.sortOrder };
+        return f;
+      })
+    );
+    setReorderingId(null);
+  }
+
   async function handleDelete(id: string) {
     setDeletingId(id);
     await fetch(`/api/super-admin/faqs/${id}`, { method: "DELETE" });
@@ -263,7 +297,7 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
           </div>
         ) : (
           <div className="space-y-3">
-            {faqs.map((faq) => (
+            {[...faqs].sort((a, b) => a.sortOrder - b.sortOrder).map((faq, idx, sorted) => (
               <div
                 key={faq.id}
                 className={`bg-white rounded-xl border p-4 transition-colors ${faq.isActive ? "border-purple-200" : "border-gray-200"}`}
@@ -293,7 +327,23 @@ export function FaqsPanel({ initialFaqs }: { initialFaqs: Faq[] }) {
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{faq.answer.replace(/<[^>]+>/g, " ").trim()}</p>
                   </div>
 
-                  <div className="flex items-center gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <button
+                      onClick={() => handleReorder(faq.id, "up")}
+                      disabled={reorderingId === faq.id || idx === 0}
+                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move up"
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleReorder(faq.id, "down")}
+                      disabled={reorderingId === faq.id || idx === sorted.length - 1}
+                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Move down"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
                     <button
                       onClick={() => openEdit(faq)}
                       className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
