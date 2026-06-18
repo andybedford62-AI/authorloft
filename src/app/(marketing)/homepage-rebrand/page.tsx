@@ -148,12 +148,10 @@ export default async function HomepageRebrandPage() {
               A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of story.</span>
             </h2>
           </div>
+          <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 12 }}>
             {GENRES.map((g, i) => (
-              <div key={i} style={{ background: g.bg, borderRadius: 16, padding: '32px 28px', color: ML.bone, border: '1px solid rgba(232,229,221,0.08)', transition: 'transform 0.2s, box-shadow 0.2s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 32px rgba(0,0,0,0.3)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = ''; }}
-              >
+              <div key={i} className="rb-genre-card" style={{ background: g.bg, borderRadius: 16, padding: '32px 28px', color: ML.bone, border: '1px solid rgba(232,229,221,0.08)' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
                 <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: `${ML.bone}bb`, margin: 0 }}>{g.description}</p>
