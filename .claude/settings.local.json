@@ -100,7 +100,32 @@
       "Bash(grep -rn \"viewport\" src/app/**/layout.tsx)",
       "PowerShell(npx next build 2>&1)",
       "mcp__plugin_playwright_playwright__browser_snapshot",
-      "mcp__plugin_playwright_playwright__browser_click"
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(git restore *)",
+      "Bash(git -c http.version=HTTP/1.1 push origin dev)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(node -e \"console.log\\(require\\('docx'\\).Document ? 'docx ok' : 'missing'\\)\")",
+      "Bash(npm root *)",
+      "Bash(node scripts/creatorloft-plan.js)",
+      "Bash(python \"C:\\\\Users\\\\andyb\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\88664d14-b069-44c9-b5d7-becb076f0e7a\\\\c273da38-e902-486c-9fd1-edd53d0bf5c7\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py\" \"C:\\\\Users\\\\andyb\\\\Downloads\\\\CreatorLoft_Expansion_Plan.docx\")",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python \"C:\\\\Users\\\\andyb\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\88664d14-b069-44c9-b5d7-becb076f0e7a\\\\c273da38-e902-486c-9fd1-edd53d0bf5c7\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py\" \"C:\\\\Users\\\\andyb\\\\Downloads\\\\CreatorLoft_Expansion_Plan.docx\")",
+      "Bash(grep -v \"replace\\\\|stripHtml\\\\|strip\\\\|slice\\\\|sanitize\\\\|//\\\\|import\\\\|type\\\\|interface\\\\|Props\\\\|<\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\andyb\\\\Downloads\\\\bookstage\" -Force)",
+      "Bash(Select-Object -First 20)",
+      "Bash(python \"C:\\\\Users\\\\andyb\\\\Downloads\\\\fix_quotes.py\")",
+      "Bash(node \"C:\\\\Users\\\\andyb\\\\Downloads\\\\build_authorloft_ref.js\")",
+      "Bash(node --check \"C:\\\\Users\\\\andyb\\\\Downloads\\\\build_authorloft_ref.js\")",
+      "Bash(set PYTHONUTF8=1)",
+      "Bash(set PYTHONIOENCODING=utf-8)",
+      "Bash(python \"C:\\\\Users\\\\andyb\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\88664d14-b069-44c9-b5d7-becb076f0e7a\\\\c273da38-e902-486c-9fd1-edd53d0bf5c7\\\\skills\\\\docx\\\\scripts\\\\office\\\\validate.py\" \"AuthorLoft_Feature_Reference_June2026.docx\")",
+      "Bash(ls /mnt/c/Users/andyb/Downloads/bookstage/)",
+      "Bash(node scripts/build-feature-reference.js)",
+      "PowerShell(cd \"C:\\\\Users\\\\andyb\\\\Downloads\\\\bookstage\"; git add src/app/\\(super-admin\\)/super-admin/faqs/page.tsx src/components/admin/sidebar.tsx src/components/super-admin/faqs-panel.tsx src/components/super-admin/settings-tabs.tsx src/app/\\(super-admin\\)/super-admin/settings/page.tsx docs/CHANGELOG.md; git status)",
+      "Bash(mv \"src/app/\\(marketing\\)/page.tsx\" \"src/app/\\(marketing\\)/page-original-jun18.tsx\")",
+      "Bash(mv \"src/app/\\(marketing\\)/homepage-rebrand/page.tsx\" \"src/app/\\(marketing\\)/page.tsx\")",
+      "Bash(rm -rf \"src/app/\\(marketing\\)/homepage-rebrand\")"
     ]
   }
 }
