@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Sparkles, Zap, BarChart3, Search } from 'lucide-react';
+import { Sparkles, Zap, BarChart3, Search, MessageSquare, Share2 } from 'lucide-react';
 
 const ML = {
   midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
@@ -217,10 +217,12 @@ export function AISpotlight() {
   }, []);
 
   const aiFeatures = [
-    { icon: Sparkles, title: 'AI Book Descriptions', body: 'Generate compelling blurbs that sell — in seconds.' },
-    { icon: Zap,      title: 'Blog & Content Ideas', body: 'Never stare at a blank page. AI drafts, you refine.' },
-    { icon: Search,   title: 'SEO Audit Tool',       body: 'Keywords, meta tags, internal links — all analysed.' },
-    { icon: BarChart3, title: 'Marketing Copy',      body: 'Social posts, email subject lines, ad copy — done.' },
+    { icon: Sparkles,     title: 'AI Book Descriptions',    body: 'Generate compelling blurbs that sell — in seconds.' },
+    { icon: Zap,          title: 'Blog & Content Ideas',    body: 'Never stare at a blank page. AI drafts, you refine.' },
+    { icon: Search,       title: 'SEO Audit Tool',          body: 'Keywords, meta tags, internal links — all analysed.' },
+    { icon: BarChart3,    title: 'Marketing Copy',          body: 'Social posts, email subject lines, ad copy — done.' },
+    { icon: MessageSquare, title: 'Feedback Analysis',      body: 'AI surfaces what readers love — and what to improve.' },
+    { icon: Share2,       title: 'Dynamic OG Images',       body: 'Auto-generated social sharing cards for every book page.' },
   ];
 
   return (
@@ -260,7 +262,7 @@ export function AISpotlight() {
             {/* Right: feature grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
               {aiFeatures.map(({ icon: Icon, title, body }) => (
-                <div key={title} style={{ background: 'rgba(232,229,221,0.05)', border: '1px solid rgba(232,229,221,0.1)', borderRadius: 16, padding: '24px 20px' }}>
+                <div key={title} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(232,229,221,0.15)', borderRadius: 16, padding: '24px 20px' }}>
                   <div style={{ width: 38, height: 38, borderRadius: 10, background: `${ML.brass}22`, border: `1px solid ${ML.brass}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                     <Icon style={{ width: 18, height: 18, color: ML.brass2 }} />
                   </div>
