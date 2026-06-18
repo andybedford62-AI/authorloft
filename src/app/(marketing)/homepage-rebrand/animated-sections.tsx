@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Rocket, CreditCard, Users, TrendingUp, Sparkles, Zap, BarChart3, Search } from 'lucide-react';
+import { Sparkles, Zap, BarChart3, Search } from 'lucide-react';
 
 const ML = {
   midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
@@ -39,14 +39,12 @@ export function AnimatedStatsBar() {
     return () => obs.disconnect();
   }, []);
 
-  const authors = useCountUp(3200, 1600, started);
   const minutes = useCountUp(5, 900, started);
 
   const stats = [
-    { value: `${authors.toLocaleString()}+`, label: 'authors building on AuthorLoft' },
-    { value: '0%',   label: 'platform fees on any plan' },
+    { value: '0%',            label: 'platform fees on any plan' },
     { value: `${minutes} min`, label: 'from sign-up to live site' },
-    { value: '100%', label: 'reader data — always yours' },
+    { value: '100%',          label: 'reader data — always yours' },
   ];
 
   return (
@@ -66,39 +64,34 @@ export function AnimatedStatsBar() {
 // ── Journey section ───────────────────────────────────────────────────────────
 const STEPS = [
   {
-    num: '01', icon: Rocket, label: 'Go Live',
+    num: '01', label: 'Go Live',
     headline: 'Your pro site, minutes from now.',
     tools: ['Instant author subdomain', 'Genre-optimized templates', 'Custom domain (Standard+)', 'Logo & hero banner'],
-    benefit: 'Live in minutes, not weeks',
     bg: ML.ink,
   },
   {
-    num: '02', icon: CreditCard, label: 'Sell Direct',
+    num: '02', label: 'Sell Direct',
     headline: 'Keep every dollar. Own every reader.',
     tools: ['Book catalog with Stripe checkout', 'eBook, audio & flipbook formats', 'Pre-orders + countdown pages', 'Discount codes & affiliate links'],
-    benefit: '0% platform fees, always',
     bg: '#1e3355',
   },
   {
-    num: '03', icon: Users, label: 'Grow Your Audience',
+    num: '03', label: 'Grow Your Audience',
     headline: 'Readers today. Fans for life.',
     tools: ['Newsletter capture & campaigns', 'Reader magnets (free email capture)', 'Media kit PDF generator', 'AuthorLoft Bookstore discovery'],
-    benefit: 'Your list. Your rules. Forever.',
     bg: '#27406B',
   },
   {
-    num: '04', icon: TrendingUp, label: 'Track & Optimize',
+    num: '04', label: 'Track & Optimize',
     headline: 'Know what works. Scale it fast.',
     tools: ['Sales dashboard & revenue charts', 'Traffic analytics (PostHog)', 'AI-powered content assistant', 'SEO audit tool (Premium)'],
-    benefit: 'Data-driven growth',
-    bg: ML.midnight,
+    bg: '#162338',
   },
 ];
 
 function JourneyCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const Icon = step.icon;
 
   useEffect(() => {
     const el = ref.current;
@@ -120,27 +113,19 @@ function JourneyCard({ step, index }: { step: typeof STEPS[0]; index: number }) 
       borderRadius: 20,
       padding: '40px 36px',
       color: ML.bone,
-      border: '1px solid rgba(232,229,221,0.08)',
+      border: '1px solid rgba(232,229,221,0.12)',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Subtle glow accent */}
       <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: `radial-gradient(circle, ${ML.brass2}18, transparent 70%)`, pointerEvents: 'none' }} />
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20, marginBottom: 24, position: 'relative' }}>
-        <div style={{ flexShrink: 0 }}>
-          <div style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 56, lineHeight: 1, color: `${ML.brass2}30`, marginBottom: -10, userSelect: 'none' }}>{step.num}</div>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: `${ML.brass}22`, border: `1px solid ${ML.brass}44`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon style={{ width: 22, height: 22, color: ML.brass2 }} />
-          </div>
-        </div>
-        <div>
-          <div style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 6 }}>{step.label}</div>
-          <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 400, lineHeight: 1.15, color: ML.bone, margin: 0 }}>{step.headline}</h3>
-        </div>
+      <div style={{ position: 'relative', marginBottom: 24 }}>
+        <div style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 64, lineHeight: 1, color: `${ML.brass2}25`, marginBottom: 8, userSelect: 'none' }}>{step.num}</div>
+        <div style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 8 }}>{step.label}</div>
+        <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(20px, 2vw, 26px)', fontWeight: 400, lineHeight: 1.15, color: ML.bone, margin: 0 }}>{step.headline}</h3>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {step.tools.map((tool) => (
           <li key={tool} style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'Georgia, serif', fontSize: 14, color: `${ML.bone}cc`, lineHeight: 1.4 }}>
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: ML.brass2, flexShrink: 0 }} />
@@ -148,10 +133,6 @@ function JourneyCard({ step, index }: { step: typeof STEPS[0]; index: number }) 
           </li>
         ))}
       </ul>
-
-      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999 }}>
-        <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ML.brass2 }}>{step.benefit}</span>
-      </div>
     </div>
   );
 }

@@ -26,12 +26,12 @@ const ML = {
 
 const GENRES = [
   { name: "Romance & Contemporary", accent: "for the heart",  description: "Sell your series direct, capture devoted reader emails, and build the fan base that comes back every launch.", bg: "#1B2B47" },
-  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark templates built for tension — from the moment a reader lands, they're already hooked.", bg: "#0F1A2D" },
+  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark templates built for tension — from the moment a reader lands, they're already hooked.", bg: "#1B2B47" },
   { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase your world with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
   { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they buy.", bg: "#3A5577" },
   { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and space to share the ideas behind your work.", bg: "#2A3A55" },
   { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with credentials, build authority, and let your back catalog speak for your expertise.", bg: "#3A5577" },
-  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark futures — showcase the series, lore, and stakes that pull readers in.", bg: "#0F1A2D" },
+  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark futures — showcase the series, lore, and stakes that pull readers in.", bg: "#2A3A55" },
   { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries and complex ideas to general readers. Build authority with a catalog that grows.", bg: "#27406B" },
 ];
 

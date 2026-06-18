@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useId } from 'react';
+import { HeroMobileMenu } from '@/components/marketing/hero-mobile-menu';
 
 const ML = {
   midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
@@ -156,6 +157,28 @@ function BookStack() {
   );
 }
 
+// ── Nav dropdown ─────────────────────────────────────────────────────────────
+function HeroNavDropdown({ label, items }: { label: string; items: [string, string][] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: 999, background: 'none', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        {label} <span style={{ fontSize: 9, opacity: 0.7, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, paddingTop: 8, zIndex: 50 }}>
+          <div style={{ minWidth: 210, background: ML.midnight, border: '1px solid rgba(232,229,221,0.18)', borderRadius: 14, padding: 8, boxShadow: '0 20px 44px -12px rgba(0,0,0,0.6)' }}>
+            {items.map(([href, l]) => (
+              <Link key={href} href={href} style={{ display: 'block', padding: '9px 12px', fontSize: 13, color: ML.bone, textDecoration: 'none', borderRadius: 8 }}>{l}</Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RebelHero() {
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '92vh' }}>
@@ -184,17 +207,25 @@ export function RebelHero() {
           <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
         </Link>
         <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
-          <Link href="/bookstore" className="rb-nav-link" style={{ padding: '8px 14px', fontSize: 13, color: '#E8B04B', fontWeight: 600, borderRadius: 999, textDecoration: 'none', transition: 'background 0.15s' }}>Bookstore</Link>
-          <Link href="/features" className="rb-nav-link" style={{ padding: '8px 14px', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none', transition: 'background 0.15s' }}>Features</Link>
-          <Link href="/blog" className="rb-nav-link" style={{ padding: '8px 14px', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none', transition: 'background 0.15s' }}>Blog</Link>
-          <Link href="/pricing" className="rb-nav-link" style={{ padding: '8px 14px', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none', transition: 'background 0.15s' }}>Pricing</Link>
+          <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
+          <Link href="/features" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>Features</Link>
+          <HeroNavDropdown label="Resources" items={[
+            ['/blog',      'Blog'],
+            ['/news',      'News'],
+            ['/faq',       'FAQ'],
+            ['/resources', 'Tools & Communities'],
+          ]} />
+          <Link href="#how-it-works" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>How it works</Link>
+          <Link href="/pricing" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>Pricing</Link>
+          <Link href="#genres" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>For authors</Link>
         </div>
         <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
-          <Link href="/login" style={{ fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
-          <Link href="/register" className="rb-cta-primary" style={{ padding: '10px 20px', fontSize: 14, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: `0 4px 14px -4px ${ML.brass}88`, transition: 'transform 0.2s, box-shadow 0.2s', display: 'inline-block' }}>
+          <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
+          <Link href="/register" style={{ padding: '10px 20px', fontFamily: 'inherit', fontSize: 14, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 14px -4px rgba(184,137,61,0.55)' }}>
             Start free →
           </Link>
         </div>
+        <HeroMobileMenu />
       </nav>
 
       {/* Content grid */}
