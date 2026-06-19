@@ -153,12 +153,18 @@ export default async function PricingPage() {
       </section>
 
       {/* Feature comparison table */}
-      <section className="py-16 bg-[#F0EDE4] px-4">
+      <section className="py-20 bg-[#1B2B47] px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-[#1B2B47] text-center mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#D4AE6A] text-center mb-2">
+            Plan details
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-3">
             Quick feature comparison
           </h2>
-          <div className="bg-[#E8E5DD] rounded-2xl border border-[#DCDBD3] overflow-hidden">
+          <p className="text-[#8993A4] text-sm text-center max-w-xl mx-auto mb-10">
+            See what&apos;s included at every level — from free to premium.
+          </p>
+          <div className="bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden shadow-lg">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#DCDBD3]">
@@ -200,7 +206,7 @@ export default async function PricingPage() {
               </tfoot>
             </table>
           </div>
-          <p className="text-center text-sm text-[#5C6E89] mt-6">
+          <p className="text-center text-sm text-[#8993A4] mt-6">
             All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.
           </p>
         </div>
@@ -283,13 +289,21 @@ export default async function PricingPage() {
       </section>
 
       {/* Have questions CTA */}
-      <section className="py-8 px-4 text-center bg-[#E8E5DD]">
-        <p className="text-sm text-[#8993A4]">
-          Not sure which plan is right for you?{" "}
-          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">
-            Contact us and we'll help →
-          </Link>
-        </p>
+      <section className="bg-[#1B2B47] py-16 px-4">
+        <div className="max-w-2xl mx-auto text-center space-y-4">
+          <h2 className="text-2xl font-bold text-[#E8E5DD]">Not sure which plan is right for you?</h2>
+          <p className="text-[#8993A4]">
+            We&apos;re happy to help you find the perfect fit for your author platform.
+          </p>
+          <div className="mt-6">
+            <Link
+              href="/contact"
+              className="inline-block bg-[#B8893D] text-[#0F1A2D] font-semibold px-6 py-3 rounded-lg hover:bg-[#D4AE6A] transition-colors"
+            >
+              Contact Us →
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
