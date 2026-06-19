@@ -112,9 +112,9 @@ export default async function HomepagePreviewPage() {
       <section style={{ background: ML.midnight, padding: '120px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Built for every creator ·</p>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Built for every digital product ·</p>
             <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: 0 }}>
-              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of creator.</span>
+              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>digital product.</span>
             </h2>
           </div>
           <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>
@@ -143,7 +143,7 @@ export default async function HomepagePreviewPage() {
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
               <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 60px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 16px' }}>
-                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious creator.</span>
+                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious digital entrepreneur.</span>
               </h2>
               <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
                 Browse all posts →
@@ -198,7 +198,7 @@ export default async function HomepagePreviewPage() {
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; communities we recommend ·</p>
               <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.02em', color: ML.bone, margin: '0 0 8px' }}>
-                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>creator community</span>
+                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>digital product community</span>
               </h2>
               <Link href="/resources" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
                 See all resources →

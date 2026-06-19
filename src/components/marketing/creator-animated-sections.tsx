@@ -139,7 +139,7 @@ export function CreatorJourneySection() {
         <div style={{ textAlign: 'center', marginBottom: 72 }}>
           <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Your business, one platform ·</p>
           <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4.5vw, 72px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 16px' }}>
-            From first upload to<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>full-time creator.</span>
+            From first upload to<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>full-time digital business.</span>
           </h2>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: `${ML.bone}80`, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
             Every tool you need, working together. No app-switching, no integrations to wrestle with.
@@ -170,7 +170,7 @@ export function CreatorIntegrationStrip() {
   return (
     <section style={{ background: ML.bone, padding: '80px 60px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Your entire creator stack ·</p>
+        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Your entire digital toolkit ·</p>
         <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(30px, 3.5vw, 52px)', fontWeight: 400, color: ML.ink, margin: '0 0 12px', letterSpacing: '-0.02em' }}>
           One platform. <span style={{ fontStyle: 'italic', color: ML.copper }}>No tab-switching.</span>
         </h2>
@@ -274,10 +274,10 @@ export function CreatorCTA() {
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
         <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready to build? ·</p>
         <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(44px, 6vw, 84px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.03em', color: ML.bone, margin: '0 0 20px' }}>
-          Your creator business<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>starts today.</span>
+          Your digital stage<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>starts today.</span>
         </h2>
         <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.6, color: `${ML.bone}cc`, margin: '0 0 36px', maxWidth: 460, marginLeft: 'auto', marginRight: 'auto' }}>
-          Join creators who chose to own their business — not rent space on someone else&apos;s platform.
+          Join thousands who chose to own their digital business — not rent space on someone else&apos;s platform.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/register" style={{ padding: '16px 36px', fontSize: 16, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: `0 16px 32px -10px ${ML.brass}60`, display: 'inline-block' }}>

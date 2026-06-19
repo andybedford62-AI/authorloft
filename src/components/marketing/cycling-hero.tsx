@@ -185,13 +185,13 @@ export function CyclingHero() {
         {/* Left: copy */}
         <div style={{ color: ML.bone }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'rgba(15,26,45,0.6)', border: '1px solid rgba(232,229,221,0.18)', borderRadius: 999, marginBottom: 28, backdropFilter: 'blur(8px)', animation: 'rbFadeUp 0.6s ease both' }}>
-            <span style={{ padding: '3px 10px', background: ML.brass, color: ML.midnight, borderRadius: 999, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>Creator Platform</span>
+            <span style={{ padding: '3px 10px', background: ML.brass, color: ML.midnight, borderRadius: 999, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>Digital Creator Platform</span>
             <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.bone, opacity: 0.85 }}>Free forever · no card needed</span>
           </div>
 
           <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(48px, 6.5vw, 104px)', lineHeight: 0.92, letterSpacing: '-0.03em', margin: '0 0 28px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
             <span style={{ display: 'block' }}>Build your</span>
-            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>creator business.</span>
+            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>digital stage.</span>
           </h1>
 
           <div style={{ display: 'flex', gap: 0, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
