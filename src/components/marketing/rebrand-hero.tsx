@@ -255,7 +255,7 @@ export function RebelHero() {
           </div>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.6, color: ML.bone, opacity: 0.85, margin: '0 0 32px', maxWidth: 460, animation: 'rbFadeUp 0.7s 0.25s ease both' }}>
-            One platform for indie authors who mean business — sell direct, grow your list, and own every reader relationship.
+            A full service platform for all authors who mean business — host, promote and sell direct, grow your list, and own every reader relationship.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>
