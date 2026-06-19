@@ -134,7 +134,11 @@ export default async function HomepagePreviewPage() {
       <CreatorAISpotlight />
 
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
-      <MidnightTestimonialsSection testimonials={testimonials} />
+      <MidnightTestimonialsSection
+        testimonials={testimonials}
+        eyebrow="· Real people, real results ·"
+        heading={<>People who{' '}<span style={{ fontStyle: 'italic', color: '#D4AE6A' }}>finally own</span>{' '}their digital stage.</>}
+      />
 
       {/* ── Blog preview ──────────────────────────────────────────────────── */}
       {blogPosts.length > 0 && (

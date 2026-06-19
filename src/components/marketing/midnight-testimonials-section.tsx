@@ -14,7 +14,11 @@ function StarRow({ rating }: { rating: number | null }) {
   );
 }
 
-export function MidnightTestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
+export function MidnightTestimonialsSection({ testimonials, eyebrow, heading }: {
+  testimonials: Testimonial[];
+  eyebrow?: React.ReactNode;
+  heading?: React.ReactNode;
+}) {
   if (testimonials.length === 0) return null;
 
   const [lead, ...rest] = testimonials;
@@ -32,12 +36,10 @@ export function MidnightTestimonialsSection({ testimonials }: { testimonials: Te
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: 64 }}>
           <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D4AE6A', marginBottom: 16 }}>
-            · Real authors ·
+            {eyebrow ?? '· Real authors ·'}
           </p>
           <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(40px, 5vw, 72px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.02em', color: '#E8E5DD', margin: 0 }}>
-            Authors who{' '}
-            <span style={{ fontStyle: 'italic', color: '#D4AE6A' }}>finally own</span>{' '}
-            their shelf.
+            {heading ?? <>Authors who{' '}<span style={{ fontStyle: 'italic', color: '#D4AE6A' }}>finally own</span>{' '}their shelf.</>}
           </h2>
         </div>
 
