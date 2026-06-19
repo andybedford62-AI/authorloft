@@ -105,10 +105,20 @@ export default async function FeaturesPage() {
         )}
       </section>
 
+      {/* Compare link */}
+      <section className="px-4 pb-12 max-w-5xl mx-auto text-center">
+        <Link
+          href="/pricing#comparison"
+          className="inline-flex items-center gap-2 text-sm text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors"
+        >
+          See how AuthorLoft compares to the competition →
+        </Link>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-[#1B2B47] py-16 px-4">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h2 className="text-2xl font-bold text-[#1B2B47]">Ready to get started?</h2>
+          <h2 className="text-2xl font-bold text-[#E8E5DD]">Ready to get started?</h2>
           <p className="text-[#5C6E89]">
             All plans start with a free account. Upgrade anytime from your dashboard.
           </p>

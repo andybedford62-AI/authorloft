@@ -207,7 +207,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Competitor comparison table */}
-      <section className="py-20 bg-[#E8E5DD] px-4">
+      <section id="comparison" className="py-20 bg-[#E8E5DD] px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#C26A4A] mb-2">How we compare</p>

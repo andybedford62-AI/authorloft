@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Linkedin, Facebook, Twitter, Instagram, Youtube, Globe, type LucideIcon } from "lucide-react";
 import { getSocialLinks } from "@/lib/social-links";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
@@ -46,13 +45,13 @@ export async function MarketingFooter() {
 
         {/* Top row: logo + inline links */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <Image
-            src="/AL_site_Logo-Dark_footer.png"
-            alt="AuthorLoft"
-            width={140}
-            height={40}
-            className="h-7 w-auto"
-          />
+          <Link
+            href="/"
+            className="text-lg font-bold text-[#1B2B47] hover:text-[#C26A4A] transition-colors"
+            style={{ fontFamily: "Georgia, serif" }}
+          >
+            AuthorLoft
+          </Link>
           <div className="flex flex-wrap items-center gap-y-1.5">
             {NAV_LINKS.map(([label, href], i) => (
               <span key={label} className="inline-flex items-center">
