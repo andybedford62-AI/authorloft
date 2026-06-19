@@ -155,7 +155,11 @@ export function CyclingHero() {
       {/* Nav */}
       <nav className="rb-nav" style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 60px' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
+          <svg viewBox="0 0 220 32" width={180} height={26} aria-label="AuthorLoft" role="img">
+            <text x="0" y="24" style={{ fontFamily: 'Georgia, serif', fontSize: 26, fontWeight: 400, letterSpacing: '-0.02em' }}>
+              <tspan fill="#D4AE6A">Author</tspan><tspan fill="#E8E5DD">Loft</tspan>
+            </text>
+          </svg>
         </Link>
         <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
