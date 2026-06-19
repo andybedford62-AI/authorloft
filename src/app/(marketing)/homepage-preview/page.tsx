@@ -1,0 +1,270 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
+import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
+import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
+import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
+import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
+import { CyclingHero } from "@/components/marketing/cycling-hero";
+import { AnimatedStatsBar, JourneySection, IntegrationStrip, AISpotlight, RebelCTA } from "@/components/marketing/animated-sections";
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Homepage Preview — AuthorLoft",
+  robots: { index: false, follow: false },
+};
+
+const ML = {
+  midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
+  pearl: '#F0EDE4', brass: '#B8893D', brass2: '#D4AE6A',
+  copper: '#C26A4A', slate: '#5C6E89', mist: '#D4DDEB',
+};
+
+const GENRES = [
+  { name: "Romance & Contemporary", accent: "for the heart",  description: "Sell your series direct, capture devoted reader emails, and build the fan base that comes back every launch.", bg: "#1B2B47" },
+  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark templates built for tension — from the moment a reader lands, they're already hooked.", bg: "#1B2B47" },
+  { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase your world with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
+  { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they buy.", bg: "#3A5577" },
+  { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and space to share the ideas behind your work.", bg: "#2A3A55" },
+  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with credentials, build authority, and let your back catalog speak for your expertise.", bg: "#3A5577" },
+  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark futures — showcase the series, lore, and stakes that pull readers in.", bg: "#2A3A55" },
+  { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries and complex ideas to general readers. Build authority with a catalog that grows.", bg: "#27406B" },
+];
+
+async function getActivePlans() {
+  return prisma.plan.findMany({
+    where: { isActive: true },
+    select: {
+      id: true, name: true, tier: true, description: true, featuresJson: true,
+      monthlyPriceCents: true, annualPriceCents: true,
+      featuredLabel: true, badgeColor: true,
+      maxBooks: true, maxPosts: true, maxStorageMb: true,
+      customDomain: true, salesEnabled: true, newsletter: true,
+      analyticsEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, isDefault: true,
+    },
+    orderBy: { sortOrder: "asc" },
+  }).catch(() => []);
+}
+
+async function getTestimonials() {
+  return prisma.testimonial.findMany({
+    where: { isActive: true },
+    orderBy: { displayOrder: "asc" },
+    take: 3,
+    select: { id: true, authorName: true, authorRole: true, quote: true, rating: true, image: true },
+  }).catch(() => []);
+}
+
+async function getFaqs() {
+  const [items, total] = await Promise.all([
+    prisma.homepageFaq.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: 10,
+      select: { id: true, question: true, answer: true },
+    }).catch(() => []),
+    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
+  ]);
+  return { items, total };
+}
+
+async function getLatestBlogPosts() {
+  return prisma.platformPost.findMany({
+    where: { isPublished: true },
+    orderBy: { publishedAt: "desc" },
+    take: 3,
+    select: { id: true, title: true, slug: true, excerpt: true, category: true, readTimeMinutes: true, publishedAt: true },
+  }).catch(() => []);
+}
+
+async function getShowcaseAuthors() {
+  return prisma.author.findMany({
+    where: { showInShowcase: true, isActive: true, books: { some: { isPublished: true } } },
+    select: {
+      id: true, slug: true, displayName: true, name: true, tagline: true,
+      profileImageUrl: true, customDomain: true, showcaseStyle: true,
+      books: {
+        where: { isPublished: true, coverImageUrl: { not: null } },
+        orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
+        take: 1,
+        select: { coverImageUrl: true, title: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 8,
+  }).catch(() => []);
+}
+
+async function getHomepageResources() {
+  return prisma.platformResource.findMany({
+    where: { isActive: true, showOnHomepage: true },
+    orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    select: { id: true, name: true, category: true, websiteUrl: true, logoUrl: true, initials: true, avatarColor: true, isPartner: true },
+  }).catch(() => []);
+}
+
+export default async function HomepagePreviewPage() {
+  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([
+    getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(),
+  ]);
+  const faqs      = faqData.items;
+  const faqTotal  = faqData.total;
+
+  return (
+    <div style={{ minHeight: '100vh', background: ML.bone, fontFamily: 'inherit' }}>
+
+      {/* ── Cycling Hero ─────────────────────────────────────────────────── */}
+      <CyclingHero />
+
+      {/* ── Animated stats bar ────────────────────────────────────────────── */}
+      <AnimatedStatsBar />
+
+      {/* ── Author showcase ───────────────────────────────────────────────── */}
+      <AuthorShowcaseSection
+        authors={showcaseAuthors}
+        platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
+      />
+
+      {/* ── 4-step Journey ────────────────────────────────────────────────── */}
+      <JourneySection />
+
+      {/* ── Integration strip ─────────────────────────────────────────────── */}
+      <IntegrationStrip />
+
+      {/* ── Genre section ─────────────────────────────────────────────────── */}
+      <section id="genres" style={{ background: ML.midnight, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Genre-optimised designs ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: 0 }}>
+              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of story.</span>
+            </h2>
+          </div>
+          <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 12 }}>
+            {GENRES.map((g, i) => (
+              <div key={i} className="rb-genre-card" style={{ background: g.bg, borderRadius: 16, padding: '32px 28px', color: ML.bone, border: '1px solid rgba(232,229,221,0.08)' }}>
+                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
+                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: `${ML.bone}bb`, margin: 0 }}>{g.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── AI Spotlight ──────────────────────────────────────────────────── */}
+      <AISpotlight />
+
+      {/* ── Testimonials ──────────────────────────────────────────────────── */}
+      <MidnightTestimonialsSection testimonials={testimonials} />
+
+      {/* ── Blog preview ──────────────────────────────────────────────────── */}
+      {blogPosts.length > 0 && (
+        <section style={{ background: ML.bone, padding: '120px 60px' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 60px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 16px' }}>
+                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious author.</span>
+              </h2>
+              <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+                Browse all posts →
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 16 }}>
+              {blogPosts.map((post) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="rb-blog-card" style={{ background: ML.pearl, borderRadius: 16, padding: '28px 24px', border: '1px solid #DCDBD3', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}>
+                  <div>
+                    {post.category && (
+                      <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 12px' }}>{post.category}</p>
+                    )}
+                    <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.ink, margin: '0 0 12px', lineHeight: 1.3 }}>{post.title}</h3>
+                    {post.excerpt && (
+                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: ML.slate, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{post.excerpt}</p>
+                    )}
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass, margin: 0, letterSpacing: '0.06em' }}>Read more →</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <style>{`.rb-blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(27,43,71,0.12); border-color: ${ML.copper}55 !important; }`}</style>
+        </section>
+      )}
+
+      {/* ── Pricing ───────────────────────────────────────────────────────── */}
+      <section id="pricing" style={{ background: ML.mist, padding: '120px 60px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Pricing ·</p>
+            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
+              Start free. <span style={{ fontStyle: 'italic', color: ML.copper }}>Scale when you&apos;re ready.</span>
+            </h2>
+          </div>
+          <MidnightPricingSection plans={plans} />
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Link href="/pricing" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+              View full pricing comparison →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
+      <MidnightFaqSection faqs={faqs} hasMore={faqTotal > faqs.length} />
+
+      {/* ── Resources strip ───────────────────────────────────────────────── */}
+      {homepageResources.length > 0 && (
+        <section style={{ background: ML.ink, padding: '72px 60px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; communities we recommend ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.02em', color: ML.bone, margin: '0 0 8px' }}>
+                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>indie author community</span>
+              </h2>
+              <Link href="/resources" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
+                See all resources →
+              </Link>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
+              {homepageResources.map((r) => (
+                <a key={r.id} href={r.websiteUrl} target="_blank" rel="noopener noreferrer"
+                  className="resource-chip"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '12px 22px 12px 14px', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 999, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: r.logoUrl ? ML.bone : r.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: r.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
+                    {r.logoUrl
+                      ? <img src={r.logoUrl} alt={r.name} style={{ width: 36, height: 36, objectFit: 'contain', padding: 4 }} />
+                      : <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (r.initials?.length ?? 0) > 2 ? 10 : 13, fontWeight: 700, color: ML.bone }}>{r.initials || r.name[0]}</span>
+                    }
+                  </div>
+                  <div>
+                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: ML.ink, whiteSpace: 'nowrap', display: 'block', lineHeight: 1.2 }}>{r.name}</span>
+                    {r.category && <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.slate }}>{r.category}</span>}
+                  </div>
+                  {r.isPartner && (
+                    <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.brass, background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999, padding: '3px 8px' }}>Partner</span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+          <style>{`.resource-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }`}</style>
+        </section>
+      )}
+
+      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
+      <RebelCTA />
+
+      {/* ── News subscribe ────────────────────────────────────────────────── */}
+      <section style={{ background: ML.bone, padding: '64px 24px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <NewsSubscribeForm source="home" variant="box" />
+        </div>
+      </section>
+
+    </div>
+  );
+}
