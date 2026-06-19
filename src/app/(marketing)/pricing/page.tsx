@@ -105,6 +105,7 @@ const COMPARISON_ROWS = [
   { label: "Direct digital sales",free: "—",        standard: "✓",          premium: "✓"          },
   { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
+  { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
   { label: "Contact form",       free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Support",            free: "Community", standard: "Priority",   premium: "Priority"   },
 ];

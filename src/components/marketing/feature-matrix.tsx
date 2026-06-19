@@ -170,6 +170,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
+          name: "Support Link (Patreon, Ko-fi, etc.)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Legal / Disclaimer Page",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
