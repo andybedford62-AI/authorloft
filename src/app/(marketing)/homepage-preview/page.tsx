@@ -4,10 +4,9 @@ import { prisma } from "@/lib/db";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
-import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { CyclingHero } from "@/components/marketing/cycling-hero";
-import { AnimatedStatsBar, JourneySection, IntegrationStrip, AISpotlight, RebelCTA } from "@/components/marketing/animated-sections";
+import { CreatorStatsBar, CreatorJourneySection, CreatorIntegrationStrip, CreatorAISpotlight, CreatorCTA } from "@/components/marketing/creator-animated-sections";
 
 export const revalidate = 60;
 
@@ -22,15 +21,15 @@ const ML = {
   copper: '#C26A4A', slate: '#5C6E89', mist: '#D4DDEB',
 };
 
-const GENRES = [
-  { name: "Romance & Contemporary", accent: "for the heart",  description: "Sell your series direct, capture devoted reader emails, and build the fan base that comes back every launch.", bg: "#1B2B47" },
-  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark templates built for tension — from the moment a reader lands, they're already hooked.", bg: "#1B2B47" },
-  { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase your world with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
-  { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they buy.", bg: "#3A5577" },
-  { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and space to share the ideas behind your work.", bg: "#2A3A55" },
-  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with credentials, build authority, and let your back catalog speak for your expertise.", bg: "#3A5577" },
-  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark futures — showcase the series, lore, and stakes that pull readers in.", bg: "#2A3A55" },
-  { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries and complex ideas to general readers. Build authority with a catalog that grows.", bg: "#27406B" },
+const CREATOR_CATEGORIES = [
+  { name: "Authors & Writers",      accent: "for the storyteller",  description: "Sell your books direct, capture devoted reader emails, and build the fan base that comes back every launch.", bg: "#1B2B47" },
+  { name: "Musicians & Producers",  accent: "for the sound",        description: "Showcase your albums, sell tracks direct, and grow a listener base you actually own — no middleman.", bg: "#27406B" },
+  { name: "Visual Artists",         accent: "for the eye",          description: "Display your portfolio, sell prints and originals, and connect with collectors who value your work.", bg: "#3A5577" },
+  { name: "Course Creators",        accent: "for the teacher",      description: "Package your expertise into downloadable courses, guides, and workshops — sell on your own terms.", bg: "#2A3A55" },
+  { name: "Photographers",          accent: "for the lens",         description: "Build a stunning portfolio, sell prints and digital packs, and let your work speak for itself.", bg: "#1B2B47" },
+  { name: "Podcasters",             accent: "for the voice",        description: "Host your show, grow your subscriber list, and monetize with premium content and downloads.", bg: "#27406B" },
+  { name: "Designers & Illustrators", accent: "for the craft",      description: "Sell templates, assets, and custom work. Showcase your style with a site that matches your aesthetic.", bg: "#3A5577" },
+  { name: "Content Creators",       accent: "for the hustle",       description: "Consolidate your digital empire — sell guides, merch, and downloads from one beautiful home base.", bg: "#2A3A55" },
 ];
 
 async function getActivePlans() {
@@ -79,24 +78,6 @@ async function getLatestBlogPosts() {
   }).catch(() => []);
 }
 
-async function getShowcaseAuthors() {
-  return prisma.author.findMany({
-    where: { showInShowcase: true, isActive: true, books: { some: { isPublished: true } } },
-    select: {
-      id: true, slug: true, displayName: true, name: true, tagline: true,
-      profileImageUrl: true, customDomain: true, showcaseStyle: true,
-      books: {
-        where: { isPublished: true, coverImageUrl: { not: null } },
-        orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
-        take: 1,
-        select: { coverImageUrl: true, title: true },
-      },
-    },
-    orderBy: { createdAt: "asc" },
-    take: 8,
-  }).catch(() => []);
-}
-
 async function getHomepageResources() {
   return prisma.platformResource.findMany({
     where: { isActive: true, showOnHomepage: true },
@@ -106,8 +87,8 @@ async function getHomepageResources() {
 }
 
 export default async function HomepagePreviewPage() {
-  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([
-    getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(),
+  const [plans, testimonials, faqData, blogPosts, homepageResources] = await Promise.all([
+    getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getHomepageResources(),
   ]);
   const faqs      = faqData.items;
   const faqTotal  = faqData.total;
@@ -118,33 +99,27 @@ export default async function HomepagePreviewPage() {
       {/* ── Cycling Hero ─────────────────────────────────────────────────── */}
       <CyclingHero />
 
-      {/* ── Animated stats bar ────────────────────────────────────────────── */}
-      <AnimatedStatsBar />
-
-      {/* ── Author showcase ───────────────────────────────────────────────── */}
-      <AuthorShowcaseSection
-        authors={showcaseAuthors}
-        platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
-      />
+      {/* ── Stats bar ────────────────────────────────────────────────────── */}
+      <CreatorStatsBar />
 
       {/* ── 4-step Journey ────────────────────────────────────────────────── */}
-      <JourneySection />
+      <CreatorJourneySection />
 
       {/* ── Integration strip ─────────────────────────────────────────────── */}
-      <IntegrationStrip />
+      <CreatorIntegrationStrip />
 
-      {/* ── Genre section ─────────────────────────────────────────────────── */}
-      <section id="genres" style={{ background: ML.midnight, padding: '120px 60px' }}>
+      {/* ── Creator categories ────────────────────────────────────────────── */}
+      <section style={{ background: ML.midnight, padding: '120px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Genre-optimised designs ·</p>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Built for every creator ·</p>
             <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: 0 }}>
-              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of story.</span>
+              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of creator.</span>
             </h2>
           </div>
           <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 12 }}>
-            {GENRES.map((g, i) => (
+            {CREATOR_CATEGORIES.map((g, i) => (
               <div key={i} className="rb-genre-card" style={{ background: g.bg, borderRadius: 16, padding: '32px 28px', color: ML.bone, border: '1px solid rgba(232,229,221,0.08)' }}>
                 <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
                 <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
@@ -156,7 +131,7 @@ export default async function HomepagePreviewPage() {
       </section>
 
       {/* ── AI Spotlight ──────────────────────────────────────────────────── */}
-      <AISpotlight />
+      <CreatorAISpotlight />
 
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
       <MidnightTestimonialsSection testimonials={testimonials} />
@@ -168,7 +143,7 @@ export default async function HomepagePreviewPage() {
             <div style={{ textAlign: 'center', marginBottom: 56 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
               <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 60px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 16px' }}>
-                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious author.</span>
+                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious creator.</span>
               </h2>
               <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
                 Browse all posts →
@@ -223,7 +198,7 @@ export default async function HomepagePreviewPage() {
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; communities we recommend ·</p>
               <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.02em', color: ML.bone, margin: '0 0 8px' }}>
-                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>indie author community</span>
+                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>creator community</span>
               </h2>
               <Link href="/resources" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
                 See all resources →
@@ -256,7 +231,7 @@ export default async function HomepagePreviewPage() {
       )}
 
       {/* ── Final CTA ─────────────────────────────────────────────────────── */}
-      <RebelCTA />
+      <CreatorCTA />
 
       {/* ── News subscribe ────────────────────────────────────────────────── */}
       <section style={{ background: ML.bone, padding: '64px 24px' }}>
