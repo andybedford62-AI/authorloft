@@ -39,6 +39,7 @@ async function resolveAuthor(domain: string) {
       facebookUrl: true,
       twitterUrl: true,
       instagramUrl: true,
+      supportUrl: true,
       contactEmail: true,
       // Nav visibility toggles
       navShowAbout: true,

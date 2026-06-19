@@ -112,6 +112,7 @@ model Author {
   facebookUrl          String?
   twitterUrl           String?
   instagramUrl         String?
+  supportUrl           String?
   contactEmail         String?
   contactResponseTime  String?
   contactOpenTo        String?

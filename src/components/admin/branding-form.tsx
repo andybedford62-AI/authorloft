@@ -24,6 +24,7 @@ type BrandingFormProps = {
     facebookUrl: string;
     twitterUrl: string;
     instagramUrl: string;
+    supportUrl: string;
     contactEmail: string;
     contactResponseTime: string;
     contactOpenTo: string;
@@ -70,6 +71,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
   const [facebookUrl, setFacebookUrl] = useState(initial.facebookUrl);
   const [twitterUrl, setTwitterUrl] = useState(initial.twitterUrl);
   const [instagramUrl, setInstagramUrl] = useState(initial.instagramUrl);
+  const [supportUrl, setSupportUrl] = useState(initial.supportUrl);
   const [contactEmail, setContactEmail] = useState(initial.contactEmail);
   const [contactResponseTime, setContactResponseTime] = useState(initial.contactResponseTime);
   const [contactOpenTo, setContactOpenTo] = useState(initial.contactOpenTo);
@@ -213,7 +215,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
         profileImageUrl, logoUrl, heroImageUrl, heroLayout,
-        linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
+        linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
         aboutStats, credentials,
@@ -653,6 +655,13 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
             <Input label="Facebook URL" value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} placeholder="https://facebook.com/..." />
             <Input label="X / Twitter URL" value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." />
             <Input label="Instagram URL" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." />
+
+            <div className="pt-4 border-t border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Monetization</h3>
+              <p className="text-xs text-gray-400 mb-3">Add a support link so readers can donate or become a patron. Shown on your site header and footer.</p>
+              <Input label="Support Link (Patreon, Ko-fi, Buy Me a Coffee)" value={supportUrl} onChange={(e) => setSupportUrl(e.target.value)} placeholder="https://patreon.com/..." />
+            </div>
+
             <Input label="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" placeholder="you@example.com" />
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Response Time</label>

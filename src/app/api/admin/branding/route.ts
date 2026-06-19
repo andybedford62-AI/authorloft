@@ -20,6 +20,7 @@ const URL_RULES: { field: string; label: string; domains: string[] }[] = [
   { field: "facebookUrl",  label: "Facebook",  domains: ["facebook.com", "fb.com"] },
   { field: "twitterUrl",   label: "X / Twitter", domains: ["twitter.com", "x.com"] },
   { field: "instagramUrl", label: "Instagram", domains: ["instagram.com"] },
+  { field: "supportUrl",  label: "Support Link", domains: ["patreon.com", "ko-fi.com", "buymeacoffee.com", "gofundme.com", "paypal.com", "paypal.me"] },
 ];
 
 export async function PATCH(req: NextRequest) {
@@ -30,7 +31,7 @@ export async function PATCH(req: NextRequest) {
   const {
     displayName, tagline, shortBio, bio,
     profileImageUrl, logoUrl, heroImageUrl, heroLayout,
-    linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
+    linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
     contactEmail, contactResponseTime, contactOpenTo,
     heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
     aboutStats, credentials, pressOutlets,
@@ -83,6 +84,7 @@ export async function PATCH(req: NextRequest) {
       facebookUrl:    facebookUrl    || null,
       twitterUrl:     twitterUrl     || null,
       instagramUrl:   instagramUrl   || null,
+      supportUrl:     supportUrl     || null,
       contactEmail:         contactEmail         || null,
       contactResponseTime:  contactResponseTime  || null,
       contactOpenTo:        contactOpenTo        || null,

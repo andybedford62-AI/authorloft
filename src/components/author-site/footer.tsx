@@ -31,6 +31,7 @@ interface FooterProps {
     facebookUrl?:   string | null;
     twitterUrl?:    string | null;
     instagramUrl?:  string | null;
+    supportUrl?:    string | null;
     accentColor:    string;
     plan?:          { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
   };
@@ -81,6 +82,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
     { href: author.facebookUrl,  label: "Facebook" },
     { href: author.twitterUrl,   label: "X / Twitter" },
     { href: author.instagramUrl, label: "Instagram" },
+    { href: author.supportUrl,  label: "Support" },
   ].filter((s) => !!s.href);
 
   return (

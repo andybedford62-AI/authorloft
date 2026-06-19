@@ -53,6 +53,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     { href: author.instagramUrl, icon: "instagram", label: "Instagram"   },
     { href: author.facebookUrl,  icon: "facebook",  label: "Facebook"    },
     { href: author.youtubeUrl,   icon: "youtube",   label: "YouTube"     },
+    { href: (author as any).supportUrl, icon: "heart", label: "Support" },
     ...(author.contactEmail ? [{ href: "/contact", icon: "mail", label: "Contact" }] : []),
   ].filter((s): s is { href: string; icon: string; label: string } => !!s.href);
 
