@@ -36,7 +36,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
           {/* Banner image — subject weighted right, calm space left. object-contain
               shows the full image (no cropping); navy bg fills the remaining space. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain object-right" />
+          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-right" />
           {/* Navy scrim so the left-aligned text stays readable over the art —
               stays dark across the text column even on bright/light photos,
               then fades out toward the right where the image is the focus. */}
@@ -45,7 +45,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.97) 30%, rgba(15,26,45,0.85) 42%, rgba(15,26,45,0.45) 55%, rgba(15,26,45,0.1) 68%, rgba(15,26,45,0) 78%)",
+                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.96) 35%, rgba(15,26,45,0.82) 55%, rgba(15,26,45,0.45) 75%, rgba(15,26,45,0.08) 100%)",
             }}
           />
         </>
