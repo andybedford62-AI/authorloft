@@ -44,6 +44,7 @@ import {
   SlidersHorizontal,
   Send,
   Layers,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -160,8 +161,10 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
   {
     key: "sa-social-promote", label: "Social Promote", defaultOpen: false,
     items: [
-      { href: "/super-admin/social-promote/platforms",   label: "Platforms",   icon: Share2 },
-      { href: "/super-admin/social-promote/promo-types", label: "Promo Types", icon: Layers },
+      { href: "/super-admin/social-promote/platforms",   label: "Platforms",       icon: Share2     },
+      { href: "/super-admin/social-promote/promo-types", label: "Promo Types",     icon: Layers     },
+      { href: "/super-admin/social-promote/log",         label: "Generation Log",  icon: ListChecks },
+      { href: "/super-admin/social-promote/settings",    label: "Settings",        icon: Settings   },
     ],
   },
   {
