@@ -45,7 +45,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.96) 35%, rgba(15,26,45,0.82) 55%, rgba(15,26,45,0.45) 75%, rgba(15,26,45,0.08) 100%)",
+                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.95) 25%, rgba(15,26,45,0.7) 45%, rgba(15,26,45,0.4) 60%, rgba(15,26,45,0.15) 80%, rgba(15,26,45,0) 100%)",
             }}
           />
         </>
