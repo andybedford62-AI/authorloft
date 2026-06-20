@@ -39,7 +39,7 @@ export function AnimatedStatsBar() {
     return () => obs.disconnect();
   }, []);
 
-  const minutes = useCountUp(5, 900, started);
+  const minutes = useCountUp(15, 900, started);
 
   const stats = [
     { value: '0%',            label: 'platform fees — keep every dollar' },

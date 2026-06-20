@@ -82,11 +82,11 @@ function StarField() {
 }
 
 const PAIN_CARDS = [
-  { pain: "Retail publishers take most of your profit", solution: "You keep 100%" },
-  { pain: "Their email list, their rules",        solution: "Your list, nobody can take it" },
-  { pain: "No idea who your readers are",         solution: "Full reader analytics, always" },
-  { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in" },
-  { pain: "Their storefront, their brand",        solution: "Your domain, your design" },
+  { pain: "Retail publishers take most of your profit", solution: "You keep 100%", image: "/hero-card-1.png", title: "Your Profit" },
+  { pain: "Their email list, their rules",        solution: "Your list, nobody can take it", image: "/hero-card-2.png", title: "Your Readers" },
+  { pain: "No idea who your readers are",         solution: "Full reader analytics, always", image: "/hero-card-3.png", title: "Your Analytics" },
+  { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.png", title: "Your Platform" },
+  { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.png", title: "Your Brand" },
 ];
 
 function PainSolutionCards() {
@@ -101,38 +101,61 @@ function PainSolutionCards() {
     <div className="hidden lg:block relative" style={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ position: 'absolute', inset: '10% -10%', background: `radial-gradient(50% 50% at 50% 50%, ${ML.brass2}22, transparent 70%)`, filter: 'blur(40px)' }} />
 
-      <div style={{ position: 'relative', width: '100%', maxWidth: 420 }}>
+      <div style={{ position: 'relative', width: '100%', maxWidth: 460 }}>
         {PAIN_CARDS.map((card, i) => (
           <div key={i} style={{
             position: i === idx ? 'relative' : 'absolute',
             top: 0, left: 0, right: 0,
             opacity: i === idx ? 1 : 0,
-            transform: i === idx ? 'translateY(0)' : 'translateY(12px)',
-            transition: 'opacity 0.6s ease, transform 0.6s ease',
+            transform: i === idx ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.98)',
+            transition: 'opacity 0.8s ease, transform 0.8s ease',
             pointerEvents: i === idx ? 'auto' : 'none',
           }}>
             <div style={{
-              background: 'rgba(15,26,45,0.7)',
-              border: '1px solid rgba(232,229,221,0.12)',
               borderRadius: 20,
-              padding: '48px 40px',
-              backdropFilter: 'blur(12px)',
+              overflow: 'hidden',
+              position: 'relative',
+              border: '1px solid rgba(232,229,221,0.12)',
+              boxShadow: '0 24px 60px -16px rgba(0,0,0,0.5)',
             }}>
-              <div style={{ marginBottom: 32 }}>
-                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.copper, marginBottom: 12 }}>The old way</p>
-                <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(22px, 2.5vw, 30px)', fontWeight: 400, lineHeight: 1.2, color: `${ML.bone}66`, margin: 0, fontStyle: 'italic' }}>{card.pain}</p>
-              </div>
-              <div style={{ width: 48, height: 1, background: `linear-gradient(90deg, ${ML.brass}00, ${ML.brass}, ${ML.brass}00)`, marginBottom: 32 }} />
-              <div>
-                <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>With AuthorLoft</p>
-                <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(26px, 3vw, 36px)', fontWeight: 400, lineHeight: 1.2, color: ML.bone, margin: 0 }}>{card.solution}</p>
+              {/* Background image */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: `url(${card.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }} />
+              {/* Dark scrim for text readability */}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(15,26,45,0.55) 0%, rgba(15,26,45,0.85) 100%)' }} />
+
+              {/* Content */}
+              <div style={{ position: 'relative', padding: '44px 36px' }}>
+                {/* Title label */}
+                <div style={{ marginBottom: 24 }}>
+                  <span style={{
+                    fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.16em',
+                    textTransform: 'uppercase', color: ML.brass2, fontWeight: 600,
+                    padding: '4px 12px', background: 'rgba(15,26,45,0.5)', border: `1px solid ${ML.brass}44`,
+                    borderRadius: 999, backdropFilter: 'blur(6px)',
+                  }}>{card.title}</span>
+                </div>
+
+                <div style={{ marginBottom: 28 }}>
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.copper, marginBottom: 10 }}>The old way</p>
+                  <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(20px, 2.2vw, 26px)', fontWeight: 400, lineHeight: 1.25, color: `${ML.bone}77`, margin: 0, fontStyle: 'italic' }}>{card.pain}</p>
+                </div>
+                <div style={{ width: 48, height: 1, background: `linear-gradient(90deg, ${ML.brass}00, ${ML.brass}, ${ML.brass}00)`, marginBottom: 28 }} />
+                <div>
+                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 10 }}>With AuthorLoft</p>
+                  <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(24px, 2.8vw, 32px)', fontWeight: 400, lineHeight: 1.2, color: ML.bone, margin: 0 }}>{card.solution}</p>
+                </div>
               </div>
             </div>
           </div>
         ))}
 
-        {/* Dots */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24 }}>
+        {/* Dots + title */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 20 }}>
           {PAIN_CARDS.map((_, i) => (
             <button key={i} onClick={() => setIdx(i)} style={{
               width: 10, height: 10, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0,
@@ -140,13 +163,8 @@ function PainSolutionCards() {
               transition: 'background 0.3s',
             }} aria-label={`Card ${i + 1}`} />
           ))}
+          <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: ML.brass2, opacity: 0.7, letterSpacing: '0.1em', textTransform: 'uppercase', marginLeft: 6 }}>{PAIN_CARDS[idx].title}</span>
         </div>
-      </div>
-
-      {/* Badge */}
-      <div style={{ position: 'absolute', top: 16, right: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 7, padding: '6px 14px 6px 8px', background: 'rgba(15,26,45,0.75)', border: '1px solid rgba(232,229,221,0.2)', borderRadius: 999, backdropFilter: 'blur(10px)', whiteSpace: 'nowrap' }}>
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: ML.copper, animation: 'rbPulse 1.6s ease-in-out infinite', flexShrink: 0 }} />
-        <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: ML.bone, letterSpacing: '0.08em' }}>Author Independence Platform</span>
       </div>
     </div>
   );
@@ -263,7 +281,7 @@ export function RebelHero() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.bone, opacity: 0.55, letterSpacing: '0.06em', textTransform: 'uppercase', animation: 'rbFadeUp 0.7s 0.45s ease both' }}>
             <span>↳ your readers, always yours</span>
             <span>↳ zero platform fees</span>
-            <span>↳ live in 5 minutes</span>
+            <span>↳ live in 15 minutes</span>
           </div>
         </div>
 
