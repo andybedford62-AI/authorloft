@@ -48,153 +48,157 @@ enum PlanTier {
 }
 
 model Plan {
-  id                   String    @id @default(cuid())
-  name                 String
-  slug                 String    @unique
-  tier                 PlanTier  @unique
-  description          String?
-  monthlyPriceCents    Int       @default(0)
-  annualPriceCents     Int       @default(0)
-  stripePriceId        String?
-  stripePriceIdMonthly String?
-  stripePriceIdAnnual  String?
-  maxBooks             Int?
-  maxPosts             Int?
-  maxStorageMb         Int?
-  customDomain         Boolean   @default(false)
-  salesEnabled         Boolean   @default(false)
-  flipBooksLimit            Int       @default(0)    // 0 = none, -1 = unlimited, n = max count
-  bookstoreListingLimit     Int       @default(-1)   // -1 = unlimited, 0 = none, n = max bookstore listings
-  audioEnabled         Boolean   @default(false)
-  analyticsEnabled     Boolean   @default(false)
-  newsletter           Boolean   @default(false)
-  mediaKitEnabled      Boolean   @default(false)
-  bookstoreListingEnabled Boolean @default(true)
-  preOrdersEnabled     Boolean   @default(true)
-  featuresJson         String?
-  badgeColor           String    @default("gray")
-  featuredLabel        String?
-  sortOrder            Int       @default(0)
-  isActive             Boolean   @default(true)
-  isDefault            Boolean   @default(false)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  authors              Author[]
-  trialAuthors         Author[]           @relation("AuthorTrialPlan")
-  subscriptions        AuthorSubscription[]
+  id                      String               @id @default(cuid())
+  name                    String
+  slug                    String               @unique
+  tier                    PlanTier             @unique
+  description             String?
+  monthlyPriceCents       Int                  @default(0)
+  annualPriceCents        Int                  @default(0)
+  stripePriceId           String?
+  stripePriceIdMonthly    String?
+  stripePriceIdAnnual     String?
+  maxBooks                Int?
+  maxPosts                Int?
+  maxStorageMb            Int?
+  customDomain            Boolean              @default(false)
+  salesEnabled            Boolean              @default(false)
+  flipBooksLimit          Int                  @default(0) // 0 = none, -1 = unlimited, n = max count
+  bookstoreListingLimit   Int                  @default(-1) // -1 = unlimited, 0 = none, n = max bookstore listings
+  audioEnabled            Boolean              @default(false)
+  analyticsEnabled        Boolean              @default(false)
+  newsletter              Boolean              @default(false)
+  mediaKitEnabled         Boolean              @default(false)
+  bookstoreListingEnabled Boolean              @default(true)
+  preOrdersEnabled        Boolean              @default(true)
+  socialDailyLimit        Int                  @default(0) // Social Promote: 0 = feature disabled for this plan
+  socialMonthlyLimit      Int                  @default(0)
+  featuresJson            String?
+  badgeColor              String               @default("gray")
+  featuredLabel           String?
+  sortOrder               Int                  @default(0)
+  isActive                Boolean              @default(true)
+  isDefault               Boolean              @default(false)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  authors                 Author[]
+  trialAuthors            Author[]             @relation("AuthorTrialPlan")
+  subscriptions           AuthorSubscription[]
 }
 
 // ─── Authors (Tenants) ────────────────────────────────────────────────────────
 
 model Author {
-  id                   String         @id @default(cuid())
-  email                String         @unique
-  passwordHash         String?
-  name                 String
-  displayName          String?
-  slug                 String         @unique
-  customDomain         String?        @unique
-  bio                  String?        @db.Text
-  shortBio             String?
-  profileImageUrl      String?
-  logoUrl              String?
-  heroImageUrl         String?
-  heroLayout           String         @default("author-right")
-  heroTitle            String?
-  heroSubtitle         String?
-  accentColor          String         @default("#7B2D2D")  // legacy — no longer drives UI; kept for data safety
-  customAccentColor    String?        // PREMIUM custom accent override; null = use theme accent. Takes precedence over theme when Premium.
-  customSecondaryColor String?        // PREMIUM custom secondary/highlight colour; null = no override (hero falls back to accent-only styling).
-  baseTheme            String         @default("classic-literary") // last base theme before a genre palette was applied; used on plan downgrade
-  tagline              String?
-  linkedinUrl          String?
-  youtubeUrl           String?
-  facebookUrl          String?
-  twitterUrl           String?
-  instagramUrl         String?
-  supportUrl           String?
-  contactEmail         String?
-  contactResponseTime  String?
-  contactOpenTo        String?
-  adminTheme           String         @default("light")  // admin UI preference: "light" | "dark"
-  aiApiKey             String?
-  aiUsageCount         Int       @default(0)
-  aiUsageCap           Int       @default(20)
-  aiUsageResetAt       DateTime?
-  aboutStats           Json?
-  credentials          Json?
-  legalNotice          String?        @db.Text  // author's own legal/disclaimer notice
-  legalNoticeUpdatedAt DateTime?               // stamped when author saves a new version
-  showHeroBanner       Boolean        @default(true)
-  heroFeaturedBookId   String?
-  heroFeaturedBook     Book?          @relation("HeroFeaturedBook", fields: [heroFeaturedBookId], references: [id])
-  homeTemplate         String         @default("classic")
-  booksLayout          String         @default("list")
-  siteTheme            String         @default("classic-literary")
-  navShowAbout         Boolean        @default(true)
-  navShowBooks         Boolean        @default(true)
-  navShowSpecials      Boolean        @default(true)
-  navShowFlipBooks     Boolean        @default(true)
-  navShowBlog          Boolean        @default(false)
-  navShowContact       Boolean        @default(true)
-  navShowMediaKit      Boolean        @default(false)
-  pressTitle           String?
-  pressBio             String?        @db.Text
-  pressContact         String?
-  pressOutlets         String[]
-  stripeCustomerId          String?
-  stripeSubscriptionId      String?
-  assignedCouponId          String?   // Stripe coupon ID assigned by super-admin, auto-applied at next checkout
-  stripeConnectAccountId    String?   // Stripe Express connected account ID (acct_xxx)
-  stripeConnectOnboarded    Boolean   @default(false) // true once onboarding is complete
-  planId               String?
-  plan                 Plan?          @relation(fields: [planId], references: [id])
-  isActive             Boolean        @default(true)
-  isSuperAdmin         Boolean        @default(false)
-  emailVerified        DateTime?
-  emailVerifyToken     String?        @unique
-  emailVerifyExpiry    DateTime?
-  passwordResetToken   String?        @unique
-  passwordResetExpiry  DateTime?
-  emailProvider        String?        // "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN"
-  emailProviderKey     String?        // API key for the connected email service
-  emailProviderExtra   String?        // Provider-specific extra: Mailchimp audience ID or ActiveCampaign account URL
-  platformEmailOptOut  Boolean   @default(false)
-  platformEmailsToken  String    @unique @default(cuid())
-  termsAcceptedAt         DateTime?      // null = never accepted; non-null = timestamp of acceptance
-  onboardingCompletedAt        DateTime?  // set when first book is created; null = never completed onboarding
+  id                            String                @id @default(cuid())
+  email                         String                @unique
+  passwordHash                  String?
+  name                          String
+  displayName                   String?
+  slug                          String                @unique
+  customDomain                  String?               @unique
+  bio                           String?               @db.Text
+  shortBio                      String?
+  profileImageUrl               String?
+  logoUrl                       String?
+  heroImageUrl                  String?
+  heroLayout                    String                @default("author-right")
+  heroTitle                     String?
+  heroSubtitle                  String?
+  accentColor                   String                @default("#7B2D2D") // legacy — no longer drives UI; kept for data safety
+  customAccentColor             String? // PREMIUM custom accent override; null = use theme accent. Takes precedence over theme when Premium.
+  customSecondaryColor          String? // PREMIUM custom secondary/highlight colour; null = no override (hero falls back to accent-only styling).
+  baseTheme                     String                @default("classic-literary") // last base theme before a genre palette was applied; used on plan downgrade
+  tagline                       String?
+  linkedinUrl                   String?
+  youtubeUrl                    String?
+  facebookUrl                   String?
+  twitterUrl                    String?
+  instagramUrl                  String?
+  supportUrl                    String?
+  contactEmail                  String?
+  contactResponseTime           String?
+  contactOpenTo                 String?
+  adminTheme                    String                @default("light") // admin UI preference: "light" | "dark"
+  aiApiKey                      String?
+  aiUsageCount                  Int                   @default(0)
+  aiUsageCap                    Int                   @default(20)
+  aiUsageResetAt                DateTime?
+  aboutStats                    Json?
+  credentials                   Json?
+  legalNotice                   String?               @db.Text // author's own legal/disclaimer notice
+  legalNoticeUpdatedAt          DateTime? // stamped when author saves a new version
+  showHeroBanner                Boolean               @default(true)
+  heroFeaturedBookId            String?
+  heroFeaturedBook              Book?                 @relation("HeroFeaturedBook", fields: [heroFeaturedBookId], references: [id])
+  homeTemplate                  String                @default("classic")
+  booksLayout                   String                @default("list")
+  siteTheme                     String                @default("classic-literary")
+  navShowAbout                  Boolean               @default(true)
+  navShowBooks                  Boolean               @default(true)
+  navShowSpecials               Boolean               @default(true)
+  navShowFlipBooks              Boolean               @default(true)
+  navShowBlog                   Boolean               @default(false)
+  navShowContact                Boolean               @default(true)
+  navShowMediaKit               Boolean               @default(false)
+  pressTitle                    String?
+  pressBio                      String?               @db.Text
+  pressContact                  String?
+  pressOutlets                  String[]
+  stripeCustomerId              String?
+  stripeSubscriptionId          String?
+  assignedCouponId              String? // Stripe coupon ID assigned by super-admin, auto-applied at next checkout
+  stripeConnectAccountId        String? // Stripe Express connected account ID (acct_xxx)
+  stripeConnectOnboarded        Boolean               @default(false) // true once onboarding is complete
+  planId                        String?
+  plan                          Plan?                 @relation(fields: [planId], references: [id])
+  isActive                      Boolean               @default(true)
+  isSuperAdmin                  Boolean               @default(false)
+  emailVerified                 DateTime?
+  emailVerifyToken              String?               @unique
+  emailVerifyExpiry             DateTime?
+  passwordResetToken            String?               @unique
+  passwordResetExpiry           DateTime?
+  emailProvider                 String? // "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN"
+  emailProviderKey              String? // API key for the connected email service
+  emailProviderExtra            String? // Provider-specific extra: Mailchimp audience ID or ActiveCampaign account URL
+  platformEmailOptOut           Boolean               @default(false)
+  platformEmailsToken           String                @unique @default(cuid())
+  termsAcceptedAt               DateTime? // null = never accepted; non-null = timestamp of acceptance
+  onboardingCompletedAt         DateTime? // set when first book is created; null = never completed onboarding
   onboardingEarlyReminderSentAt DateTime? // set when the day-3 nudge email is sent
-  onboardingReminderSentAt     DateTime?  // set when the day-7 nudge email is sent
-  hideNextStepsChecklist       Boolean   @default(false) // paid-plan authors can dismiss the Next Steps card
-  showInShowcase               Boolean   @default(false) // author has opted in to being shown on the marketing page showcase
-  showcaseStyle                String    @default("photo") // "photo" | "book" | "text" — controls what the showcase card displays
-  trialPlanId          String?        // plan ID for admin-assigned free trial
-  trialPlan            Plan?          @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
-  trialStartsAt        DateTime?      // when the trial began
-  trialEndsAt          DateTime?      // when the trial expires; null = not on a trial
-  trialExpiryReminderSentAt DateTime? // set when the 7-day warning email is sent
-  lastLoginAt          DateTime?      // null = never logged in; non-null = timestamp of last successful login
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  books                Book[]
-  flipBooks            FlipBook[]
-  genres               Genre[]
-  series               Series[]
-  subscribers          Subscriber[]
-  campaigns            Campaign[]
-  orders               Order[]
-  sessions             Session[]
-  accounts             Account[]
-  specials             Special[]
-  pages                AuthorPage[]
-  posts                Post[]
-  contactMessages      ContactMessage[]
-  subscription         AuthorSubscription?
-  discountCodes        DiscountCode[]
-  impersonationsAsSuperAdmin ImpersonationLog[] @relation("ImpersonationAsSuperAdmin")
-  impersonationsAsTarget     ImpersonationLog[] @relation("ImpersonationAsTarget")
-  preOrderSignups      PreOrderSignup[]
-  magnetLeads          BookMagnetLead[]
+  onboardingReminderSentAt      DateTime? // set when the day-7 nudge email is sent
+  hideNextStepsChecklist        Boolean               @default(false) // paid-plan authors can dismiss the Next Steps card
+  showInShowcase                Boolean               @default(false) // author has opted in to being shown on the marketing page showcase
+  showcaseStyle                 String                @default("photo") // "photo" | "book" | "text" — controls what the showcase card displays
+  trialPlanId                   String? // plan ID for admin-assigned free trial
+  trialPlan                     Plan?                 @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
+  trialStartsAt                 DateTime? // when the trial began
+  trialEndsAt                   DateTime? // when the trial expires; null = not on a trial
+  trialExpiryReminderSentAt     DateTime? // set when the 7-day warning email is sent
+  lastLoginAt                   DateTime? // null = never logged in; non-null = timestamp of last successful login
+  createdAt                     DateTime              @default(now())
+  updatedAt                     DateTime              @updatedAt
+  books                         Book[]
+  flipBooks                     FlipBook[]
+  genres                        Genre[]
+  series                        Series[]
+  subscribers                   Subscriber[]
+  campaigns                     Campaign[]
+  orders                        Order[]
+  sessions                      Session[]
+  accounts                      Account[]
+  specials                      Special[]
+  pages                         AuthorPage[]
+  posts                         Post[]
+  contactMessages               ContactMessage[]
+  subscription                  AuthorSubscription?
+  discountCodes                 DiscountCode[]
+  impersonationsAsSuperAdmin    ImpersonationLog[]    @relation("ImpersonationAsSuperAdmin")
+  impersonationsAsTarget        ImpersonationLog[]    @relation("ImpersonationAsTarget")
+  preOrderSignups               PreOrderSignup[]
+  magnetLeads                   BookMagnetLead[]
+  socialVoiceDescription        String?               @db.VarChar(500) // Social Promote: author's voice description for AI prompts
+  generatedSocialPosts          GeneratedSocialPost[]
 
   @@index([slug])
   @@index([customDomain])
@@ -211,18 +215,18 @@ model SeoConfig {
 // ─── Author Subscription ──────────────────────────────────────────────────────
 
 model AuthorSubscription {
-  id                 String   @id @default(cuid())
-  authorId           String   @unique
-  author             Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  planId             String
-  plan               Plan     @relation(fields: [planId], references: [id])
-  status             String   @default("active")
-  billingInterval    String   @default("monthly")
+  id                    String    @id @default(cuid())
+  authorId              String    @unique
+  author                Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  planId                String
+  plan                  Plan      @relation(fields: [planId], references: [id])
+  status                String    @default("active")
+  billingInterval       String    @default("monthly")
   currentPeriodStart    DateTime?
   currentPeriodEnd      DateTime?
   renewalReminderSentAt DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 // ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
@@ -304,59 +308,59 @@ model Series {
 // ─── Books ────────────────────────────────────────────────────────────────────
 
 model Book {
-  id                  String               @id @default(cuid())
-  authorId            String
-  seriesId            String?
-  title               String
-  slug                String
-  subtitle            String?
-  description         String?              @db.Text
-  shortDescription    String?
-  sampleContent       String?              @db.Text
-  coverImageUrl       String?
-  publishedAt         DateTime?
-  isbn                String?
-  pageCount           Int?
-  language            String               @default("en")
-  priceCents          Int                  @default(0)
-  stripePriceId       String?
-  fileUrl             String?
-  flipBookUrl         String?
-  externalBuyUrl      String?
-  availableFormats    String[]
-  caption             String?
-  releaseDate         DateTime?
-  isFeatured          Boolean              @default(false)
-  isPublished         Boolean              @default(true)
-  directSalesEnabled  Boolean              @default(false)
-  listInBookstore     Boolean              @default(false)  // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
-  isPreOrder          Boolean              @default(false)  // shows "Coming Soon" + wishlist instead of buy buttons
-  preOrderDate        DateTime?            // expected release/launch date for pre-order books
-  autoSendLaunchEmail Boolean              @default(false)  // cron auto-sends launch email when preOrderDate passes + readiness check passes
-  launchDate          DateTime?            // countdown target date for Book Launch Mode
-  showCountdown       Boolean              @default(false)  // show public countdown timer on book page
-  affiliateEnabled    Boolean              @default(false)  // author opt-in to the referral/affiliate program for this book
-  affiliateCommissionPercent Int           @default(10)     // % of sale price credited to a referrer
-  sortOrder           Int                  @default(0)
-  views               Int                  @default(0)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  author              Author               @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  series              Series?              @relation(fields: [seriesId], references: [id])
-  genres              BookGenre[]
-  orderItems          OrderItem[]
-  retailerLinks       BookRetailerLink[]
-  directSaleItems     BookDirectSaleItem[]
-  audioTracks         BookAudioTrack[]
-  previewMedia        BookPreviewMedia[]
-  reviews             BookReview[]
-  bookFeedback        BookFeedback[]
-  discountCodeBooks   DiscountCodeBook[]
-  heroFeaturedAuthors Author[]     @relation("HeroFeaturedBook")
-  arcCopies           ArcCopy[]
-  preOrderSignups     PreOrderSignup[]
-  affiliateReferrals  AffiliateReferral[]
-  magnetLeads         BookMagnetLead[]
+  id                         String               @id @default(cuid())
+  authorId                   String
+  seriesId                   String?
+  title                      String
+  slug                       String
+  subtitle                   String?
+  description                String?              @db.Text
+  shortDescription           String?
+  sampleContent              String?              @db.Text
+  coverImageUrl              String?
+  publishedAt                DateTime?
+  isbn                       String?
+  pageCount                  Int?
+  language                   String               @default("en")
+  priceCents                 Int                  @default(0)
+  stripePriceId              String?
+  fileUrl                    String?
+  flipBookUrl                String?
+  externalBuyUrl             String?
+  availableFormats           String[]
+  caption                    String?
+  releaseDate                DateTime?
+  isFeatured                 Boolean              @default(false)
+  isPublished                Boolean              @default(true)
+  directSalesEnabled         Boolean              @default(false)
+  listInBookstore            Boolean              @default(false) // author opt-in to the public AuthorLoft Bookstore (STANDARD+)
+  isPreOrder                 Boolean              @default(false) // shows "Coming Soon" + wishlist instead of buy buttons
+  preOrderDate               DateTime? // expected release/launch date for pre-order books
+  autoSendLaunchEmail        Boolean              @default(false) // cron auto-sends launch email when preOrderDate passes + readiness check passes
+  launchDate                 DateTime? // countdown target date for Book Launch Mode
+  showCountdown              Boolean              @default(false) // show public countdown timer on book page
+  affiliateEnabled           Boolean              @default(false) // author opt-in to the referral/affiliate program for this book
+  affiliateCommissionPercent Int                  @default(10) // % of sale price credited to a referrer
+  sortOrder                  Int                  @default(0)
+  views                      Int                  @default(0)
+  createdAt                  DateTime             @default(now())
+  updatedAt                  DateTime             @updatedAt
+  author                     Author               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  series                     Series?              @relation(fields: [seriesId], references: [id])
+  genres                     BookGenre[]
+  orderItems                 OrderItem[]
+  retailerLinks              BookRetailerLink[]
+  directSaleItems            BookDirectSaleItem[]
+  audioTracks                BookAudioTrack[]
+  previewMedia               BookPreviewMedia[]
+  reviews                    BookReview[]
+  bookFeedback               BookFeedback[]
+  discountCodeBooks          DiscountCodeBook[]
+  heroFeaturedAuthors        Author[]             @relation("HeroFeaturedBook")
+  arcCopies                  ArcCopy[]
+  preOrderSignups            PreOrderSignup[]
+  affiliateReferrals         AffiliateReferral[]
+  magnetLeads                BookMagnetLead[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -383,9 +387,9 @@ model BookDirectSaleItem {
   isActive       Boolean          @default(true)
   isReaderMagnet Boolean          @default(false)
   sortOrder      Int              @default(0)
-  fileUrl        String?          // Supabase storage URL (for display / reference)
-  fileKey        String?          // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
-  fileName       String?          // Original filename shown in admin UI
+  fileUrl        String? // Supabase storage URL (for display / reference)
+  fileKey        String? // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
+  fileName       String? // Original filename shown in admin UI
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   orderItems     OrderItem[]
@@ -400,12 +404,12 @@ model BookAudioTrack {
   id              String   @id @default(cuid())
   bookId          String
   book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  title           String                        // e.g. "Chapter 1 Excerpt", "Author Narration"
+  title           String // e.g. "Chapter 1 Excerpt", "Author Narration"
   description     String?
-  url             String                        // Supabase public URL or external URL
-  fileKey         String?                       // Supabase storage path — for deletion
-  mimeType        String?                       // e.g. "audio/mpeg"
-  durationSeconds Int?                          // optional, filled manually or from metadata
+  url             String // Supabase public URL or external URL
+  fileKey         String? // Supabase storage path — for deletion
+  mimeType        String? // e.g. "audio/mpeg"
+  durationSeconds Int? // optional, filled manually or from metadata
   sortOrder       Int      @default(0)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -426,12 +430,12 @@ model BookPreviewMedia {
   id               String           @id @default(cuid())
   bookId           String
   book             Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  position         Int              // 1, 2, or 3
+  position         Int // 1, 2, or 3
   mediaType        PreviewMediaType @default(IMAGE)
-  fileUrl          String           // main media file (image/MP4/MP3)
-  fileKey          String?          // Supabase storage path for deletion
-  thumbnailUrl     String?          // poster image for VIDEO/AUDIO slots
-  thumbnailFileKey String?          // Supabase path for poster deletion
+  fileUrl          String // main media file (image/MP4/MP3)
+  fileKey          String? // Supabase storage path for deletion
+  thumbnailUrl     String? // poster image for VIDEO/AUDIO slots
+  thumbnailFileKey String? // Supabase path for poster deletion
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -448,7 +452,7 @@ model BookReview {
   quote        String   @db.Text
   reviewerName String
   source       String?
-  rating       Int?                              // 1–5 stars, optional
+  rating       Int? // 1–5 stars, optional
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -470,7 +474,7 @@ model BookFeedback {
   book          Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
   reviewerName  String
   reviewerEmail String
-  rating        Int                // 1–5 required
+  rating        Int // 1–5 required
   comment       String?            @db.Text
   status        BookFeedbackStatus @default(PENDING)
   createdAt     DateTime           @default(now())
@@ -483,20 +487,20 @@ model BookFeedback {
 // ─── Flip Books ───────────────────────────────────────────────────────────────
 
 model FlipBook {
-  id              String   @id @default(cuid())
-  authorId        String
-  author          Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  title           String
-  subtitle        String?
-  description     String?  @db.Text
-  slug            String
-  flipBookUrl     String?
-  coverImageUrl   String?
-  coverImageKey   String?                       // Supabase storage path — for deletion
-  isActive        Boolean  @default(true)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  authorId      String
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title         String
+  subtitle      String?
+  description   String?  @db.Text
+  slug          String
+  flipBookUrl   String?
+  coverImageUrl String?
+  coverImageKey String? // Supabase storage path — for deletion
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -584,12 +588,12 @@ model Post {
   isPublished     Boolean   @default(false)
   views           Int       @default(0)
   // SEO fields
-  seoTitle        String?                    // overrides title in <title> tag if set
-  metaDescription String?   @db.Text        // overrides excerpt in meta description if set
-  focusKeyword    String?                    // author's target keyword — guidance only
+  seoTitle        String? // overrides title in <title> tag if set
+  metaDescription String?   @db.Text // overrides excerpt in meta description if set
+  focusKeyword    String? // author's target keyword — guidance only
   // Downloadable resource
-  attachmentUrl   String?                    // external link or uploaded file URL
-  attachmentLabel String?                    // e.g. "Download Free Chapter"
+  attachmentUrl   String? // external link or uploaded file URL
+  attachmentLabel String? // e.g. "Download Free Chapter"
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -619,14 +623,14 @@ model Subscriber {
 // ─── Newsletter Campaigns ─────────────────────────────────────────────────────
 
 model Campaign {
-  id           String   @id @default(cuid())
-  authorId     String
-  subject      String
-  sentAt       DateTime @default(now())
-  totalSent    Int
-  totalFailed  Int
+  id            String   @id @default(cuid())
+  authorId      String
+  subject       String
+  sentAt        DateTime @default(now())
+  totalSent     Int
+  totalFailed   Int
   totalTargeted Int
-  author       Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
 }
@@ -697,13 +701,13 @@ model DiscountCode {
   id              String             @id @default(cuid())
   authorId        String
   author          Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  code            String             // stored uppercase, e.g. "LAUNCH20"
-  description     String?            // internal note for the author
-  type            String             // "PERCENT" | "FIXED"
-  value           Int                // percent 1-100, or fixed cents (e.g. 500 = $5.00)
-  maxUses         Int?               // null = unlimited
+  code            String // stored uppercase, e.g. "LAUNCH20"
+  description     String? // internal note for the author
+  type            String // "PERCENT" | "FIXED"
+  value           Int // percent 1-100, or fixed cents (e.g. 500 = $5.00)
+  maxUses         Int? // null = unlimited
   usesCount       Int                @default(0)
-  expiresAt       DateTime?          // null = no expiry
+  expiresAt       DateTime? // null = no expiry
   isActive        Boolean            @default(true)
   showAsSalePrice Boolean            @default(false) // when true, show discounted price publicly on book pages
   books           DiscountCodeBook[]
@@ -720,9 +724,9 @@ model OrderItem {
   id             String              @id @default(cuid())
   orderId        String
   bookId         String
-  saleItemId     String?             // links to BookDirectSaleItem — which format was purchased
+  saleItemId     String? // links to BookDirectSaleItem — which format was purchased
   priceCents     Int
-  fileKey        String?             // Supabase storage path — copied at purchase time for secure delivery
+  fileKey        String? // Supabase storage path — copied at purchase time for secure delivery
   downloadToken  String              @unique @default(cuid())
   downloadCount  Int                 @default(0)
   maxDownloads   Int                 @default(5)
@@ -787,7 +791,7 @@ model HomepageFaq {
   id        String   @id @default(cuid())
   question  String
   answer    String   @db.Text
-  category  String?  // Category slug (type = "faq"); null/empty → "General"
+  category  String? // Category slug (type = "faq"); null/empty → "General"
   sortOrder Int      @default(0)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -798,7 +802,7 @@ model HomepageFaq {
 
 model Category {
   id          String   @id @default(cuid())
-  type        String   // "blog" | "resource" | "faq"
+  type        String // "blog" | "resource" | "faq"
   name        String
   slug        String
   description String?
@@ -819,8 +823,8 @@ model ResourceDownload {
   slug          String    @unique
   description   String?
   body          String?   @db.Text // optional RTE detail content
-  category      String    // Category slug, type = "resource"
-  fileUrl       String    // Drive/Supabase/direct — never exposed raw to the client
+  category      String // Category slug, type = "resource"
+  fileUrl       String // Drive/Supabase/direct — never exposed raw to the client
   coverImageUrl String?
   requiresEmail Boolean   @default(true)
   downloadCount Int       @default(0)
@@ -837,7 +841,7 @@ model DownloadLead {
   id         String   @id @default(cuid())
   email      String
   resourceId String?
-  source     String?  // "resource" | "blog"
+  source     String? // "resource" | "blog"
   ipAddress  String?
   createdAt  DateTime @default(now())
 
@@ -886,7 +890,7 @@ model PlanFeatureConfig {
 }
 
 model StripeEvent {
-  id          String   @id  // Stripe event ID (evt_xxx) — unique by design
+  id          String   @id // Stripe event ID (evt_xxx) — unique by design
   processedAt DateTime @default(now())
 }
 
@@ -897,7 +901,7 @@ model HelpTopic {
   title       String
   slug        String         @unique
   description String?
-  icon        String?        // lucide icon name e.g. "BookOpen"
+  icon        String? // lucide icon name e.g. "BookOpen"
   sortOrder   Int            @default(0)
   isPublished Boolean        @default(true)
   createdAt   DateTime       @default(now())
@@ -925,8 +929,8 @@ model HelpArticle {
   id          String        @id @default(cuid())
   topicId     String
   subtopicId  String?
-  question    String        @db.Text  // rich HTML
-  answer      String        @db.Text  // rich HTML
+  question    String        @db.Text // rich HTML
+  answer      String        @db.Text // rich HTML
   sortOrder   Int           @default(0)
   isPublished Boolean       @default(true)
   createdAt   DateTime      @default(now())
@@ -949,14 +953,14 @@ model HelpTooltip {
 }
 
 model ImpersonationLog {
-  id            String   @id @default(cuid())
-  superAdminId  String
+  id             String   @id @default(cuid())
+  superAdminId   String
   targetAuthorId String
-  action        String   // "start" | "end"
-  createdAt     DateTime @default(now())
+  action         String // "start" | "end"
+  createdAt      DateTime @default(now())
 
-  superAdmin    Author   @relation("ImpersonationAsSuperAdmin", fields: [superAdminId],   references: [id])
-  targetAuthor  Author   @relation("ImpersonationAsTarget",     fields: [targetAuthorId], references: [id])
+  superAdmin   Author @relation("ImpersonationAsSuperAdmin", fields: [superAdminId], references: [id])
+  targetAuthor Author @relation("ImpersonationAsTarget", fields: [targetAuthorId], references: [id])
 }
 
 // ─── ARC (Advance Reader Copies) ─────────────────────────────────────────────
@@ -983,57 +987,57 @@ enum ArcReviewPlatform {
 }
 
 model ArcCopy {
-  id          String      @id @default(cuid())
-  bookId      String
-  book        Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  disclaimer  String?     @db.Text
-  isActive    Boolean     @default(true)
-  expiresAt   DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  files       ArcFile[]
-  readers     ArcReader[]
+  id         String      @id @default(cuid())
+  bookId     String
+  book       Book        @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  disclaimer String?     @db.Text
+  isActive   Boolean     @default(true)
+  expiresAt  DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  files      ArcFile[]
+  readers    ArcReader[]
 
   @@index([bookId])
 }
 
 model ArcFile {
-  id            String      @id @default(cuid())
+  id            String              @id @default(cuid())
   arcCopyId     String
-  arcCopy       ArcCopy     @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
-  format        String      // "PDF", "EPUB", "MOBI", etc.
+  arcCopy       ArcCopy             @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
+  format        String // "PDF", "EPUB", "MOBI", etc.
   fileUrl       String
   fileKey       String
   fileName      String
   fileSizeBytes Int?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
   downloads     ArcReaderDownload[]
 
-  @@index([arcCopyId])
   @@unique([arcCopyId, format])
+  @@index([arcCopyId])
 }
 
 model ArcReader {
-  id                       String             @id @default(cuid())
+  id                       String              @id @default(cuid())
   arcCopyId                String
-  arcCopy                  ArcCopy            @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
+  arcCopy                  ArcCopy             @relation(fields: [arcCopyId], references: [id], onDelete: Cascade)
   email                    String
   name                     String
-  source                   ArcReaderSource    @default(INVITED)
-  status                   ArcReaderStatus    @default(INVITED)
-  token                    String             @unique
+  source                   ArcReaderSource     @default(INVITED)
+  status                   ArcReaderStatus     @default(INVITED)
+  token                    String              @unique
   tokenExpiresAt           DateTime?
   reviewPlatform           ArcReviewPlatform?
   reviewUrl                String?
-  notes                    String?            @db.Text
+  notes                    String?             @db.Text
   disclaimerAcknowledgedAt DateTime?
   invitedAt                DateTime?
   downloadedAt             DateTime?
   reviewedAt               DateTime?
   reminderSentAt           DateTime?
-  createdAt                DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
   downloads                ArcReaderDownload[]
 
   @@index([arcCopyId])
@@ -1042,26 +1046,26 @@ model ArcReader {
 }
 
 model ArcReaderDownload {
-  id            String      @id @default(cuid())
-  readerId      String
-  reader        ArcReader   @relation(fields: [readerId], references: [id], onDelete: Cascade)
-  fileId        String
-  file          ArcFile     @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  downloadedAt  DateTime    @default(now())
+  id           String    @id @default(cuid())
+  readerId     String
+  reader       ArcReader @relation(fields: [readerId], references: [id], onDelete: Cascade)
+  fileId       String
+  file         ArcFile   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  downloadedAt DateTime  @default(now())
 
+  @@unique([readerId, fileId])
   @@index([readerId])
   @@index([fileId])
-  @@unique([readerId, fileId])
 }
 
 // ─── Social Media ─────────────────────────────────────────────────────────────
 
 model SocialPlatformToken {
   id             String    @id @default(cuid())
-  platform       String    // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
-  accessToken    String    @db.Text   // AES-256-GCM encrypted
-  accountId      String               // page ID / org ID / IG account ID
-  accountName    String               // human-readable name for UI
+  platform       String // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
+  accessToken    String    @db.Text // AES-256-GCM encrypted
+  accountId      String // page ID / org ID / IG account ID
+  accountName    String // human-readable name for UI
   tokenExpiresAt DateTime?
   isActive       Boolean   @default(true)
   createdAt      DateTime  @default(now())
@@ -1071,16 +1075,16 @@ model SocialPlatformToken {
 }
 
 model SocialPost {
-  id          String            @id @default(cuid())
-  caption     String            @db.Text
-  mediaUrl    String?                      // Supabase public URL
-  mediaType   String?                      // "IMAGE" | null
-  platforms   String[]                     // ["LINKEDIN","FACEBOOK","INSTAGRAM"]
-  status      String            @default("DRAFT") // DRAFT|SCHEDULED|PUBLISHING|PUBLISHED|PARTIAL|FAILED
+  id          String             @id @default(cuid())
+  caption     String             @db.Text
+  mediaUrl    String? // Supabase public URL
+  mediaType   String? // "IMAGE" | null
+  platforms   String[] // ["LINKEDIN","FACEBOOK","INSTAGRAM"]
+  status      String             @default("DRAFT") // DRAFT|SCHEDULED|PUBLISHING|PUBLISHED|PARTIAL|FAILED
   scheduledAt DateTime?
   publishedAt DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   results     SocialPostResult[]
 
   @@index([status, scheduledAt])
@@ -1090,9 +1094,9 @@ model SocialPostResult {
   id             String     @id @default(cuid())
   postId         String
   post           SocialPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  platform       String     // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
-  status         String     // "PENDING" | "PUBLISHED" | "FAILED"
-  platformPostId String?    // ID returned by the platform on success
+  platform       String // "LINKEDIN" | "FACEBOOK" | "INSTAGRAM"
+  status         String // "PENDING" | "PUBLISHED" | "FAILED"
+  platformPostId String? // ID returned by the platform on success
   error          String?    @db.Text
   publishedAt    DateTime?
   createdAt      DateTime   @default(now())
@@ -1113,16 +1117,16 @@ model PlatformPost {
   authorName      String    @default("AuthorLoft Team")
   readTimeMinutes Int       @default(5)
   displayOrder    Int       @default(0)
-  isNews          Boolean   @default(false)   // true = AuthorLoft News (/news); false = blog article (/blog)
+  isNews          Boolean   @default(false) // true = AuthorLoft News (/news); false = blog article (/blog)
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
   // SEO fields
-  focusKeyword    String?                    // target keyword — editorial guidance
-  seoTitle        String?                    // overrides title in <title> tag if set
-  metaDescription String?   @db.Text        // overrides excerpt in meta description if set
+  focusKeyword    String? // target keyword — editorial guidance
+  seoTitle        String? // overrides title in <title> tag if set
+  metaDescription String?   @db.Text // overrides excerpt in meta description if set
   // Downloadable resource
-  attachmentUrl   String?                    // external link or uploaded file URL
-  attachmentLabel String?                    // e.g. "Download Free Chapter"
+  attachmentUrl   String? // external link or uploaded file URL
+  attachmentLabel String? // e.g. "Download Free Chapter"
   // News email — set when this News post is emailed to platform subscribers (guards against double-send)
   newsEmailedAt   DateTime?
   createdAt       DateTime  @default(now())
@@ -1145,7 +1149,7 @@ model PlatformSubscriber {
   isConfirmed      Boolean  @default(false)
   confirmToken     String?  @unique
   unsubscribeToken String   @default(cuid())
-  source           String?  // where they signed up: "news" | "footer" | "home"
+  source           String? // where they signed up: "news" | "footer" | "home"
   createdAt        DateTime @default(now())
 
   @@index([createdAt])
@@ -1199,12 +1203,12 @@ model PlatformResource {
   category       String   @default("")
   description    String   @default("") @db.Text
   websiteUrl     String
-  logoUrl        String?                    // public image URL for logo
-  initials       String   @default("")      // 2-4 char fallback when no logo
+  logoUrl        String? // public image URL for logo
+  initials       String   @default("") // 2-4 char fallback when no logo
   avatarColor    String   @default("#1B2B47") // hex bg for initials avatar
-  isPartner      Boolean  @default(false)   // confirmed cross-promotion partner
-  isActive       Boolean  @default(true)    // hide without deleting
-  showOnHomepage Boolean  @default(false)   // show in homepage trusted resources strip
+  isPartner      Boolean  @default(false) // confirmed cross-promotion partner
+  isActive       Boolean  @default(true) // hide without deleting
+  showOnHomepage Boolean  @default(false) // show in homepage trusted resources strip
   displayOrder   Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -1215,23 +1219,104 @@ model PlatformResource {
 // ─── Reader Magnet Leads ──────────────────────────────────────────────────────
 
 model BookMagnetLead {
-  id             String             @id @default(cuid())
+  id             String    @id @default(cuid())
   bookId         String
   saleItemId     String
   authorId       String
   email          String
   name           String?
-  downloadToken  String             @unique @default(cuid())
-  downloadCount  Int                @default(0)
-  maxDownloads   Int                @default(3)
+  downloadToken  String    @unique @default(cuid())
+  downloadCount  Int       @default(0)
+  maxDownloads   Int       @default(3)
   downloadExpiry DateTime?
-  createdAt      DateTime           @default(now())
+  createdAt      DateTime  @default(now())
 
-  book     Book               @relation(fields: [bookId],     references: [id], onDelete: Cascade)
+  book     Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
   saleItem BookDirectSaleItem @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
-  author   Author             @relation(fields: [authorId],   references: [id], onDelete: Cascade)
+  author   Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
   @@index([bookId])
   @@index([downloadToken])
+}
+
+// ─── Social Promote (AI post generator) ───────────────────────────────────────
+// Phase 1: authors generate posts and copy to clipboard. No OAuth, no auto-post.
+
+model SocialPromotePlatform {
+  id             String   @id @default(cuid())
+  slug           String   @unique // "facebook" | "instagram" | "x" | "linkedin" | "tiktok"
+  name           String // display name
+  maxChars       Int // character limit for the platform
+  hashtagStyle   String   @default("inline") // "inline" | "trailing" | "none"
+  promptAddendum String?  @db.Text // extra instructions appended to the prompt for this platform
+  isPremiumOnly  Boolean  @default(false) // LinkedIn + TikTok start as Premium-only
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  generatedPosts GeneratedSocialPost[]
+
+  @@index([isActive, sortOrder])
+}
+
+model SocialPromoType {
+  id                  String   @id @default(cuid())
+  slug                String   @unique // "new-release" | "sale" | etc.
+  name                String // display name shown to authors
+  description         String   @default("") // short helper text in UI
+  promptTemplate      String   @db.Text // template with {{book.title}}, {{voice}}, etc.
+  applicableContexts  String[] @default([]) // ["book","news","topic"] — empty = all
+  applicablePlatforms String[] @default([]) // platform slugs — empty = all
+  isActive            Boolean  @default(true)
+  sortOrder           Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  generatedPosts GeneratedSocialPost[]
+
+  @@index([isActive, sortOrder])
+}
+
+model GeneratedSocialPost {
+  id             String                @id @default(cuid())
+  authorId       String
+  author         Author                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  platformId     String
+  platform       SocialPromotePlatform @relation(fields: [platformId], references: [id])
+  promoTypeId    String
+  promoType      SocialPromoType       @relation(fields: [promoTypeId], references: [id])
+  contextType    String // "book" | "news" | "topic"
+  contextRefId   String? // bookId, platformPostId, or null for free-text topic
+  contextSummary String?               @db.Text // snapshot of what was sent in (book title, topic text)
+  promptUsed     String                @db.Text // final assembled prompt for audit / debugging
+  outputText     String                @db.Text // generated post content
+  modelUsed      String // e.g. "gemini-2.5-flash"
+  inputTokens    Int                   @default(0)
+  outputTokens   Int                   @default(0)
+  costMicroCents Int                   @default(0) // store as micro-cents to keep small AI costs as integers
+  status         String                @default("SUCCESS") // "SUCCESS" | "FAILED" | "BLOCKED"
+  errorMessage   String?               @db.Text
+  wasCopied      Boolean               @default(false)
+  copiedAt       DateTime?
+  ipAddress      String? // for abuse detection
+  createdAt      DateTime              @default(now())
+
+  @@index([authorId, createdAt])
+  @@index([status, createdAt])
+  @@index([promoTypeId])
+  @@index([platformId])
+}
+
+model SocialPromoteSettings {
+  id                     String   @id @default("main") // singleton
+  enabled                Boolean  @default(false) // DB-level kill switch (env kill switch overrides)
+  model                  String   @default("gemini-2.5-flash")
+  timeoutMs              Int      @default(30000)
+  maxOutputTokens        Int      @default(800)
+  costWarnCentsPerDay    Int      @default(5000) // $50 warning email
+  costDisableCentsPerDay Int      @default(20000) // $200 auto-disable
+  adminAlertEmails       String   @default("") // comma-separated; falls back to SOCIAL_PROMOTE_ADMIN_EMAILS env
+  updatedAt              DateTime @updatedAt
 }

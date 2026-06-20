@@ -42,6 +42,8 @@ import {
   FolderTree,
   Download,
   SlidersHorizontal,
+  Send,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -153,6 +155,13 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
       { href: "/super-admin/categories",         label: "Content Categories", icon: FolderTree },
       { href: "/super-admin/social",             label: "Social Media",       icon: Share2     },
       { href: "/super-admin/faqs",               label: "FAQs",               icon: HelpCircle },
+    ],
+  },
+  {
+    key: "sa-social-promote", label: "Social Promote", defaultOpen: false,
+    items: [
+      { href: "/super-admin/social-promote/platforms",   label: "Platforms",   icon: Share2 },
+      { href: "/super-admin/social-promote/promo-types", label: "Promo Types", icon: Layers },
     ],
   },
   {
