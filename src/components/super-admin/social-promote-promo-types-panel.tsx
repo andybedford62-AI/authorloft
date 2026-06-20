@@ -367,7 +367,8 @@ export function SocialPromotePromoTypesPanel({
             {promoTypes.map((t) => (
               <div
                 key={t.id}
-                className={`bg-white rounded-xl border p-4 transition-colors ${t.isActive ? "border-purple-200" : "border-gray-200"}`}
+                id={`promo-${t.slug}`}
+                className={`bg-white rounded-xl border p-4 transition-colors scroll-mt-24 target:ring-2 target:ring-purple-400 ${t.isActive ? "border-purple-200" : "border-gray-200"}`}
               >
                 <div className="flex items-start gap-4">
                   <button

@@ -116,6 +116,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "tools", label: "Tools", defaultOpen: false,
     items: [
+      { href: "/admin/promote",      label: "Promote",      icon: Send   },
       { href: "/admin/ai-assistant", label: "AI Assistant", icon: Bot    },
       { href: "/admin/seo-audit",    label: "SEO Audit",    icon: Search },
     ],

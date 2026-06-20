@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Play, Save, RotateCcw, FileText, AlertTriangle, Sparkles } from "lucide-react";
+import { Check, Loader2, Play, Save, RotateCcw, FileText, AlertTriangle, Sparkles, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 type PromoType = {
@@ -169,7 +170,17 @@ export function SocialPromotePromptsPanel({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="font-semibold text-gray-900">{selected.name}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">/{selected.slug}</p>
+                <div className="flex items-center gap-3 mt-0.5">
+                  <p className="text-xs text-gray-500">/{selected.slug}</p>
+                  <Link
+                    href={`/super-admin/social-promote/promo-types#promo-${selected.slug}`}
+                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 hover:underline"
+                    title="Edit full promo type (active state, contexts, platforms, sort order)"
+                  >
+                    Manage in Promo Types
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {dirty && (

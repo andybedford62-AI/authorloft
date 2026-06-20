@@ -30,6 +30,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/legal":        "FREE",
   "/admin/ai-assistant": "PREMIUM",
   "/admin/seo-audit":    "PREMIUM",
+  "/admin/promote":      "STANDARD",
   "/admin/settings":     "FREE",
   "/admin/media-kit":    "STANDARD",
 };
@@ -64,6 +65,7 @@ export const FEATURE_PLAN_MAP: Record<
   "/admin/legal":        null,
   "/admin/ai-assistant": null,
   "/admin/seo-audit":    null,
+  "/admin/promote":      null,
   "/admin/settings":     null,
 };
 
