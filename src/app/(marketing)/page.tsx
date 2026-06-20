@@ -16,20 +16,20 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Build Your Author Business | AuthorLoft",
+    title: "Own Your Author Business | AuthorLoft",
     description:
-      "The author growth platform for indie writers — publish, sell direct, grow your audience, and scale your career. One platform. Zero fees. Free forever.",
+      "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Build Your Author Business | AuthorLoft",
-      description: "The author growth platform for indie writers — publish, sell direct, grow your audience, and scale your career. One platform. Zero fees. Free forever.",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — author growth platform for independent authors" }],
+      title:       "Own Your Author Business | AuthorLoft",
+      description: "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — own your readers, keep every sale" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Build Your Author Business | AuthorLoft",
-      description: "The author growth platform for indie writers — publish, sell direct, grow your audience, and scale your career. One platform. Zero fees. Free forever.",
+      title:       "Own Your Author Business | AuthorLoft",
+      description: "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
       images:      [ogImage],
     },
   };
@@ -160,9 +160,9 @@ export default async function HomepageRebrandPage() {
       <section id="genres" style={{ background: ML.midnight, padding: '120px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Genre-optimised designs ·</p>
+            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Built for your genre, not a generic template ·</p>
             <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: 0 }}>
-              A home for every <span style={{ fontStyle: 'italic', color: ML.brass2 }}>kind of story.</span>
+              Your genre. <span style={{ fontStyle: 'italic', color: ML.brass2 }}>Your way.</span>
             </h2>
           </div>
           <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>

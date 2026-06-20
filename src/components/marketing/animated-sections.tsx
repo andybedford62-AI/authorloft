@@ -42,9 +42,9 @@ export function AnimatedStatsBar() {
   const minutes = useCountUp(5, 900, started);
 
   const stats = [
-    { value: '0%',            label: 'platform fees on any plan' },
-    { value: `${minutes} min`, label: 'from sign-up to live site' },
-    { value: '100%',          label: 'reader data — always yours' },
+    { value: '0%',            label: 'platform fees — keep every dollar' },
+    { value: `${minutes} min`, label: 'to your own storefront' },
+    { value: '100%',          label: 'of your readers — not Amazon’s' },
   ];
 
   return (
@@ -65,25 +65,25 @@ export function AnimatedStatsBar() {
 const STEPS = [
   {
     num: '01', label: 'Go Live',
-    headline: 'Your pro site, minutes from now.',
+    headline: 'Your name on the door, not theirs.',
     tools: ['Instant author subdomain', 'Genre-optimized templates', 'Custom domain (Standard+)', 'Logo & hero banner'],
     bg: ML.ink,
   },
   {
     num: '02', label: 'Sell Direct',
-    headline: 'Keep every dollar. Own every reader.',
+    headline: 'Keep 100% of every sale.',
     tools: ['Book catalog with Stripe checkout', 'eBook, audio & flipbook formats', 'Pre-orders + countdown pages', 'Discount codes & affiliate links'],
     bg: '#1e3355',
   },
   {
     num: '03', label: 'Grow Your Audience',
-    headline: 'Readers today. Fans for life.',
+    headline: 'Build a list nobody can take away.',
     tools: ['Newsletter capture & campaigns', 'Reader magnets (free email capture)', 'Media kit PDF generator', 'AuthorLoft Bookstore discovery'],
     bg: '#27406B',
   },
   {
     num: '04', label: 'Track & Optimize',
-    headline: 'Know what works. Scale it fast.',
+    headline: 'Know exactly what’s working.',
     tools: ['Sales dashboard & revenue charts', 'Traffic analytics (PostHog)', 'AI-powered content assistant', 'SEO audit tool (Premium)'],
     bg: '#162338',
   },
@@ -145,12 +145,12 @@ export function JourneySection() {
       `}</style>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 72 }}>
-          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Your career, one platform ·</p>
+          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Stop paying for five tools that don&apos;t talk to each other ·</p>
           <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4.5vw, 72px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 16px' }}>
-            From first page to<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>full-time author.</span>
+            Everything you need.<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Nothing you don&apos;t own.</span>
           </h2>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: `${ML.bone}80`, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
-            Every tool you need, working together. No app-switching, no integrations to wrestle with.
+            One platform replaces your website builder, email service, payment processor, and analytics — and you keep 100% of every sale.
           </p>
         </div>
 
@@ -291,23 +291,23 @@ export function RebelCTA() {
       <div style={{ position: 'absolute', top: -100, right: -100, width: 500, height: 500, background: `radial-gradient(circle, ${ML.brass2}20, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 400, height: 400, background: `radial-gradient(circle, ${ML.copper}12, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
-        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready to build? ·</p>
+        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready to take back control? ·</p>
         <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(44px, 6vw, 84px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.03em', color: ML.bone, margin: '0 0 20px' }}>
-          Your author career<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>starts today.</span>
+          Your readers are waiting.<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Stop giving them away.</span>
         </h2>
         <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.6, color: `${ML.bone}cc`, margin: '0 0 36px', maxWidth: 460, marginLeft: 'auto', marginRight: 'auto' }}>
-          Join thousands of indie authors who chose to own their business — not rent space on someone else&apos;s platform.
+          Every sale through Amazon is money and reader data you&apos;ll never get back. Start free, go live today, and own everything you build.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/register" style={{ padding: '16px 36px', fontSize: 16, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: `0 16px 32px -10px ${ML.brass}60`, display: 'inline-block' }}>
-            Start building free →
+            Take back control →
           </a>
           <a href="/bookstore" style={{ padding: '16px 28px', fontSize: 16, fontWeight: 500, background: 'transparent', color: ML.bone, border: '1px solid rgba(232,229,221,0.3)', borderRadius: 999, textDecoration: 'none' }}>
             Browse the bookstore
           </a>
         </div>
         <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 14, color: `${ML.bone}33`, marginTop: 36 }}>
-          — No credit card. No lock-in. Just your name on the door. —
+          — No credit card. No lock-in. No middleman. —
         </p>
       </div>
     </section>
