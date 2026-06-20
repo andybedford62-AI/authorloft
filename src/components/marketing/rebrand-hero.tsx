@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect, useId } from 'react';
 import { HeroMobileMenu } from '@/components/marketing/hero-mobile-menu';
 
@@ -83,7 +82,7 @@ function StarField() {
 }
 
 const PAIN_CARDS = [
-  { pain: "Amazon keeps 65% of every sale",      solution: "You keep 100%" },
+  { pain: "Retail publishers take most of your profit", solution: "You keep 100%" },
   { pain: "Their email list, their rules",        solution: "Your list, nobody can take it" },
   { pain: "No idea who your readers are",         solution: "Full reader analytics, always" },
   { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in" },
@@ -177,7 +176,7 @@ function HeroNavDropdown({ label, items }: { label: string; items: [string, stri
 
 export function RebelHero() {
   return (
-    <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '92vh' }}>
+    <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
       <style>{`
         @keyframes rbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes rbFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(20px,-10px)} 66%{transform:translate(-10px,8px)} }
@@ -200,7 +199,11 @@ export function RebelHero() {
       {/* Nav */}
       <nav className="rb-nav" style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 60px' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={160} height={46} style={{ height: 44, width: 'auto' }} priority />
+          <svg viewBox="0 0 260 38" width={220} height={36} aria-label="AuthorLoft" role="img">
+            <text x="0" y="30" style={{ fontFamily: 'Georgia, serif', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
+              <tspan fill={ML.brass2}>Author</tspan><tspan fill={ML.bone}>Loft</tspan>
+            </text>
+          </svg>
         </Link>
         <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
@@ -225,16 +228,10 @@ export function RebelHero() {
       </nav>
 
       {/* Content grid */}
-      <div className="rb-grid" style={{ position: 'relative', zIndex: 2, padding: '60px 60px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
+      <div className="rb-grid" style={{ position: 'relative', zIndex: 2, padding: '40px 60px 64px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
 
         {/* Left: copy */}
         <div style={{ color: ML.bone }}>
-          {/* Platform badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 14px 6px 6px', background: 'rgba(15,26,45,0.6)', border: '1px solid rgba(232,229,221,0.18)', borderRadius: 999, marginBottom: 28, backdropFilter: 'blur(8px)', animation: 'rbFadeUp 0.6s ease both' }}>
-            <span style={{ padding: '3px 10px', background: ML.brass, color: ML.midnight, borderRadius: 999, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>Author Independence Platform</span>
-            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.bone, opacity: 0.85 }}>Free forever · no card needed</span>
-          </div>
-
           {/* Headline */}
           <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(48px, 6.5vw, 104px)', lineHeight: 0.92, letterSpacing: '-0.03em', margin: '0 0 28px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
             <span style={{ display: 'block' }}>You wrote the book.</span>
@@ -251,7 +248,7 @@ export function RebelHero() {
           </div>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.6, color: ML.bone, opacity: 0.85, margin: '0 0 32px', maxWidth: 460, animation: 'rbFadeUp 0.7s 0.25s ease both' }}>
-            Stop giving Amazon 65% of every sale and building someone else&apos;s audience. AuthorLoft gives you a direct-sales storefront, a reader list nobody can take away, and every tool to grow — all free to start.
+            Stop giving retail publishers your deserved profit of every sale and building someone else&apos;s audience. AuthorLoft gives you a direct-sales storefront, a reader list nobody can take away, and every tool to grow — all free to start.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>
@@ -264,7 +261,7 @@ export function RebelHero() {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.bone, opacity: 0.55, letterSpacing: '0.06em', textTransform: 'uppercase', animation: 'rbFadeUp 0.7s 0.45s ease both' }}>
-            <span>↳ your readers, not Amazon&apos;s</span>
+            <span>↳ your readers, always yours</span>
             <span>↳ zero platform fees</span>
             <span>↳ live in 5 minutes</span>
           </div>

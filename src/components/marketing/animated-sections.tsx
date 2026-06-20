@@ -44,16 +44,16 @@ export function AnimatedStatsBar() {
   const stats = [
     { value: '0%',            label: 'platform fees — keep every dollar' },
     { value: `${minutes} min`, label: 'to your own storefront' },
-    { value: '100%',          label: 'of your readers — not Amazon’s' },
+    { value: '100%',          label: 'of your readers — always yours' },
   ];
 
   return (
     <div ref={ref} style={{ background: ML.ink, borderTop: `1px solid rgba(232,229,221,0.07)`, borderBottom: `1px solid rgba(232,229,221,0.07)` }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
         {stats.map((s, i) => (
-          <div key={i} style={{ padding: '28px 24px', textAlign: 'center', borderRight: i < stats.length - 1 ? '1px solid rgba(232,229,221,0.07)' : 'none' }}>
-            <div style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(28px, 3.5vw, 42px)', color: ML.brass2, lineHeight: 1, marginBottom: 6 }}>{s.value}</div>
-            <div style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: `${ML.bone}70` }}>{s.label}</div>
+          <div key={i} style={{ padding: '36px 24px', textAlign: 'center', borderRight: i < stats.length - 1 ? '1px solid rgba(232,229,221,0.07)' : 'none' }}>
+            <div style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(34px, 4vw, 52px)', color: ML.brass2, lineHeight: 1, marginBottom: 8 }}>{s.value}</div>
+            <div style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: `${ML.bone}88` }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -83,7 +83,7 @@ const STEPS = [
   },
   {
     num: '04', label: 'Track & Optimize',
-    headline: 'Know exactly what’s working.',
+    headline: "Know exactly what's working.",
     tools: ['Sales dashboard & revenue charts', 'Traffic analytics (PostHog)', 'AI-powered content assistant', 'SEO audit tool (Premium)'],
     bg: '#162338',
   },
@@ -296,7 +296,7 @@ export function RebelCTA() {
           Your readers are waiting.<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Stop giving them away.</span>
         </h2>
         <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, lineHeight: 1.6, color: `${ML.bone}cc`, margin: '0 0 36px', maxWidth: 460, marginLeft: 'auto', marginRight: 'auto' }}>
-          Every sale through Amazon is money and reader data you&apos;ll never get back. Start free, go live today, and own everything you build.
+          Every sale through a middleman is profit and reader data you&apos;ll never get back. Start free, go live today, and own everything you build.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/register" style={{ padding: '16px 36px', fontSize: 16, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: `0 16px 32px -10px ${ML.brass}60`, display: 'inline-block' }}>

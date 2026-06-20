@@ -18,18 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Own Your Author Business | AuthorLoft",
     description:
-      "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       title:       "Own Your Author Business | AuthorLoft",
-      description: "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      description: "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — own your readers, keep every sale" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Own Your Author Business | AuthorLoft",
-      description: "Stop building someone else's audience. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      description: "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
       images:      [ogImage],
     },
   };
