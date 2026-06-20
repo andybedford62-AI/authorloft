@@ -28,7 +28,7 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
             What authors say
           </h2>
           <p className="text-gray-500 text-lg max-w-xl mx-auto">
-            Hear from authors who are using AuthorLoft to build their author platform.
+            Hear from authors who took back control of their career with AuthorLoft.
           </p>
         </ScrollReveal>
 

@@ -13,20 +13,20 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("features");
   return {
-    title: "Author Website Features — Books, Sales & Newsletter",
+    title: "Author Platform Features — Sales, Readers & Growth",
     description:
-      "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+      "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
     alternates: { canonical: "/features" },
     openGraph: {
       type:   "website",
-      title:  "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
-      description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+      title:  "Author Platform Features — Sales, Readers & Growth | AuthorLoft",
+      description: "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft features" }],
     },
     twitter: {
       card:  "summary_large_image",
-      title: "Author Website Features — Books, Sales & Newsletter | AuthorLoft",
-      description: "Everything indie authors need: book catalog, direct sales, newsletter capture, custom domain, flip books, and AI writing tools. Compare FREE, STANDARD, and PREMIUM.",
+      title: "Author Platform Features — Sales, Readers & Growth | AuthorLoft",
+      description: "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
       images: [ogImage],
     },
   };

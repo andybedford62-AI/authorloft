@@ -63,7 +63,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       "You distribute ARCs to reviewers at scale",
     ],
     rows: [
-      { label: "Full author website builder",     us: "yes", them: "no",      note: "BookFunnel centres on delivery & reader magnets, not a website." },
+      { label: "Full author platform & site",     us: "yes", them: "no",      note: "BookFunnel centres on delivery & reader magnets, not a website." },
       { label: "Custom domain",                   us: "yes", them: "no" },
       { label: "Unlimited books & series",        us: "yes", them: "limited" },
       { label: "Custom pages, events & news",     us: "yes", them: "no" },
@@ -87,7 +87,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       </>
     ),
     faqs: [
-      { q: "Is AuthorLoft a good BookFunnel alternative?", a: "Yes — if you want more than ebook delivery. BookFunnel excels at distributing files and reader magnets, but it isn't a website builder. AuthorLoft gives independent authors a full branded author website with a custom domain, plus direct sales of ebooks, audiobooks and print, newsletters, and a discovery bookstore — so readers can find you and buy from your own site." },
+      { q: "Is AuthorLoft a good BookFunnel alternative?", a: "Yes — if you want more than ebook delivery. BookFunnel excels at distributing files and reader magnets, but it isn't an author platform. AuthorLoft gives independent authors a full branded author website with a custom domain, plus direct sales of ebooks, audiobooks and print, newsletters, and a discovery bookstore — so readers can find you and buy from your own site." },
       { q: "Can I sell ebooks, audiobooks and print books directly with AuthorLoft?", a: "Yes. AuthorLoft supports direct sales of all three formats — ebook, audiobook and print — from your own author site, with payouts via Stripe. BookFunnel focuses on ebook delivery, with more limited audiobook and print options." },
       { q: "Does BookFunnel build an author website?", a: "No. BookFunnel is built around delivering ebooks and audiobooks to readers and running reader-magnet giveaways and newsletter swaps. It does not provide a full author website with custom pages, a custom domain, blog/news, or a storefront — which is the core of what AuthorLoft does." },
       { q: "Can I use AuthorLoft alongside BookFunnel?", a: "Many authors do. You can keep using BookFunnel for advance reader copies and giveaways while using AuthorLoft as your home base — your website, newsletter, storefront, and bookstore listing. AuthorLoft also has its own ARC and reader-magnet tools if you'd rather consolidate." },
@@ -126,7 +126,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       "You mainly need reader magnets wired to your existing ESP",
     ],
     rows: [
-      { label: "Full author website builder",         us: "yes", them: "yes" },
+      { label: "Full author platform & site",         us: "yes", them: "yes" },
       { label: "Custom domain",                       us: "yes", them: "yes" },
       { label: "Direct eBook sales",                  us: "yes", them: "yes" },
       { label: "Direct audiobook sales",              us: "yes", them: "no",  note: "StoryOrigin distributes audiobook promo/review codes, not direct sales." },
@@ -167,7 +167,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
     tldr: (
       <>
         <strong>The short version:</strong> <strong>Tertulia</strong> is a reader-facing <em>book discovery app</em>
-        {" "}that recently added an author website builder which links out to retailers. <strong>AuthorLoft</strong> is
+        {" "}that recently added an author site builder which links out to retailers. <strong>AuthorLoft</strong> is
         built for authors to <strong>own their site and sell direct</strong> — ebooks, audiobooks and print on your own
         domain, with newsletters and a storefront, not just links to Amazon.
       </>
@@ -185,7 +185,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       "You don't need to sell or run a newsletter directly",
     ],
     rows: [
-      { label: "Full author website builder",            us: "yes", them: "yes" },
+      { label: "Full author platform & site",            us: "yes", them: "yes" },
       { label: "Custom domain",                          us: "yes", them: "yes" },
       { label: "Sell ebooks, audiobooks & print direct", us: "yes", them: "no",  note: "Tertulia links readers out to retailers; AuthorLoft sells direct on your site." },
       { label: "Newsletter capture",                     us: "yes", them: "yes" },

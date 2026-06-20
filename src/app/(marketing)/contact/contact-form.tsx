@@ -56,7 +56,7 @@ export function ContactForm() {
   }
 
   const inputClass =
-    "w-full border border-[#DCDBD3] rounded-lg px-3 py-2.5 text-sm text-[#1B2B47] placeholder-[#8993A4] bg-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#B8893D] focus:border-transparent";
+    "w-full border border-[#DCDBD3] rounded-lg px-3 py-2.5 text-sm text-[#1B2B47] placeholder-[#8993A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8893D] focus:border-transparent";
 
   return (
     <div className="min-h-screen bg-[#E8E5DD]">

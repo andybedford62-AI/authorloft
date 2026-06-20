@@ -255,7 +255,7 @@ function RegisterPageInner() {
             <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
           </Link>
           <p className="text-gray-500 mt-2 text-sm">
-            Create your free author website
+            Start your author career — free
           </p>
         </div>
 

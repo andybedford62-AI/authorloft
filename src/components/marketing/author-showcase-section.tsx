@@ -259,7 +259,7 @@ export function AuthorShowcaseSection({
                 boxShadow:      '0 8px 24px -8px rgba(184,137,61,0.6)',
               }}
             >
-              Build your site free
+              Take back control — free
               <span style={{ fontSize: 16 }}>→</span>
             </Link>
           </div>

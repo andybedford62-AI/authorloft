@@ -45,9 +45,9 @@ export async function GET() {
   const lines: string[] = [
     "# AuthorLoft",
     "",
-    "> The author website builder for independent authors. Create a professional author site with your book catalog, sell direct to readers, and capture newsletter signups — free forever.",
+    "> The author career platform for independent authors. Own your readers, sell direct, and grow your business — all on one platform, free forever.",
     "",
-    "AuthorLoft is a multi-tenant SaaS platform that gives independent authors everything they need to build a professional web presence, sell books directly to readers, and grow their newsletter audience — without technical knowledge. Each author gets their own subdomain (e.g. authorname.authorloft.com) or can connect a custom domain.",
+    "AuthorLoft is a multi-tenant SaaS platform that gives independent authors everything they need to own their career — sell books directly to readers, build a reader list nobody can take away, and grow their audience — without technical knowledge. Each author gets their own subdomain (e.g. authorname.authorloft.com) or can connect a custom domain.",
     "",
     "## Features & Pricing",
     "",
