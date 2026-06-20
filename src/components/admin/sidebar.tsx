@@ -163,6 +163,7 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
     items: [
       { href: "/super-admin/social-promote/platforms",   label: "Platforms",       icon: Share2     },
       { href: "/super-admin/social-promote/promo-types", label: "Promo Types",     icon: Layers     },
+      { href: "/super-admin/social-promote/prompts",     label: "Prompts & Test",  icon: Sparkles   },
       { href: "/super-admin/social-promote/log",         label: "Generation Log",  icon: ListChecks },
       { href: "/super-admin/social-promote/settings",    label: "Settings",        icon: Settings   },
     ],

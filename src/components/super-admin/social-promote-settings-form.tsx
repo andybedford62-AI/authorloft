@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Check, Loader2, AlertTriangle, ShieldAlert, HelpCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Settings = {
@@ -45,6 +45,7 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [showCostHelp, setShowCostHelp] = useState(false);
 
   const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent";
   const labelCls = "block text-sm font-medium text-gray-700 mb-1.5";
@@ -77,6 +78,8 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
 
   return (
     <div className="space-y-6">
+      {showCostHelp && <CostHelpModal onClose={() => setShowCostHelp(false)} />}
+
       {/* Kill switch — prominent at top */}
       <div className={`p-4 rounded-xl border ${enabled ? "border-green-200 bg-green-50/50" : "border-amber-200 bg-amber-50/50"}`}>
         <div className="flex items-start justify-between gap-4">
@@ -162,7 +165,17 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
 
       {/* Cost ceilings */}
       <div className="space-y-4">
-        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Cost ceilings</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Cost ceilings</h3>
+          <button
+            type="button"
+            onClick={() => setShowCostHelp(true)}
+            className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 hover:underline"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+            How are costs calculated?
+          </button>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -216,6 +229,97 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save settings</>}
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function CostHelpModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-2xl mx-auto max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+          <h3 className="font-semibold text-gray-900">How Social Promote costs are calculated</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 text-sm">
+          <section>
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Per-generation cost (Gemini 2.5 Flash)</h4>
+            <div className="bg-gray-50 border border-gray-100 rounded-lg p-3 font-mono text-xs leading-relaxed">
+              Input  ≈ 600 tokens × $0.30 / 1M = <span className="text-gray-900 font-semibold">$0.00018</span><br />
+              Output ≈ 250 tokens × $2.50 / 1M = <span className="text-gray-900 font-semibold">$0.000625</span><br />
+              <span className="text-purple-700 font-semibold">Total ≈ $0.0008 per generation</span> (less than a tenth of a cent)
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Typical input includes the system prompt, promo type template, book or news context, author voice description,
+              and platform addendum. Output is capped by the "Max output tokens" setting above.
+            </p>
+          </section>
+
+          <section>
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Realistic daily spend at scale</h4>
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stage</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Gens / day</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cost / day</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white">
+                  <tr><td className="px-3 py-2">10 authors (beta)</td>          <td className="px-3 py-2 font-mono">100</td>    <td className="px-3 py-2 font-mono font-semibold">$0.08</td></tr>
+                  <tr><td className="px-3 py-2">100 authors (early launch)</td> <td className="px-3 py-2 font-mono">1,000</td>  <td className="px-3 py-2 font-mono font-semibold">$0.80</td></tr>
+                  <tr><td className="px-3 py-2">500 authors (steady-state)</td> <td className="px-3 py-2 font-mono">5,000</td>  <td className="px-3 py-2 font-mono font-semibold">$4.00</td></tr>
+                  <tr><td className="px-3 py-2">1,000 authors (Premium-heavy)</td><td className="px-3 py-2 font-mono">10,000</td><td className="px-3 py-2 font-mono font-semibold">$8.00</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Suggested ceilings by stage</h4>
+            <p className="text-xs text-gray-500 mb-2">
+              These are <em>abuse-protection</em> ceilings, not "expected spend" caps. Set them so a runaway loop or
+              prompt-injection abuse trips the alert well before becoming expensive.
+            </p>
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stage</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Warn at</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Auto-disable at</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white">
+                  <tr className="bg-purple-50/40">
+                    <td className="px-3 py-2">Beta launch (recommended)</td>
+                    <td className="px-3 py-2 font-mono font-semibold text-purple-700">$10 / day</td>
+                    <td className="px-3 py-2 font-mono font-semibold text-purple-700">$50 / day</td>
+                  </tr>
+                  <tr><td className="px-3 py-2">100+ paid authors</td><td className="px-3 py-2 font-mono">$25 / day</td><td className="px-3 py-2 font-mono">$100 / day</td></tr>
+                  <tr><td className="px-3 py-2">500+ paid authors</td><td className="px-3 py-2 font-mono">$50 / day</td><td className="px-3 py-2 font-mono">$200 / day</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="bg-amber-50/50 border border-amber-100 rounded-lg p-3">
+            <p className="text-xs text-amber-900">
+              <strong>Note on the warn ceiling:</strong> reaching it triggers an alert email to the "Admin alert emails"
+              list above. Reaching the auto-disable ceiling flips the kill switch off automatically — authors will see a
+              friendly maintenance message until you investigate and re-enable.
+            </p>
+          </section>
+        </div>
+
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0">
+          <Button variant="ghost" onClick={onClose}>Close</Button>
+        </div>
       </div>
     </div>
   );
