@@ -21,7 +21,7 @@ export function DemoBanner() {
           70% Demo
         </div>
         <p className="text-sm text-gray-700">
-          You're viewing a demonstration. Ready to build your author site?{" "}
+          You're viewing a demonstration. Ready to own your author business?{" "}
           <a
             href="https://www.authorloft.com/pricing"
             target="_blank"

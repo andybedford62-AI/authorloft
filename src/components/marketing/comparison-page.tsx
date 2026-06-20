@@ -119,10 +119,10 @@ export function ComparisonPage({ data }: { data: ComparisonData }) {
         <section className="bg-[#1B2B47] rounded-2xl px-6 py-10 text-center">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AE6A] mb-3">· Start free ·</p>
           <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
-            Build your author home base on AuthorLoft
+            Own your author business on AuthorLoft
           </h2>
           <p className="text-sm text-[#D4DDEB] max-w-md mx-auto mb-6">
-            A free hosted author site and newsletter capture to start — upgrade for a custom domain and direct sales
+            Keep 100% of every sale, own your reader list, and grow on one platform — free to start, upgrade
             when you&apos;re ready.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">

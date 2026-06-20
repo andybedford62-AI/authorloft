@@ -20,23 +20,23 @@ const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "
 export const metadata: Metadata = {
   metadataBase: new URL(PLATFORM_URL),
   title: {
-    default: "AuthorLoft — The Author Website Platform",
+    default: "AuthorLoft — Own Your Author Business",
     template: "%s | AuthorLoft",
   },
   description:
-    "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
   icons: { icon: "/authorloft-logo.png" },
   openGraph: {
     type:        "website",
     siteName:    "AuthorLoft",
-    title:       "AuthorLoft — The Author Website Platform",
-    description: "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+    title:       "AuthorLoft — Own Your Author Business",
+    description: "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
     url:         PLATFORM_URL,
   },
   twitter: {
     card:        "summary_large_image",
-    title:       "AuthorLoft — The Author Website Platform",
-    description: "Build your author website with AuthorLoft. Catalog management, digital book sales, newsletter capture, flip books, and more — no coding required.",
+    title:       "AuthorLoft — Own Your Author Business",
+    description: "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
   },
   robots: {
     index:  true,

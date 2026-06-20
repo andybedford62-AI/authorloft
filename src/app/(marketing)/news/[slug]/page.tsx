@@ -154,12 +154,12 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
 
         {/* CTA */}
         <div className="mt-12 bg-[#1B2B47] rounded-2xl p-8 text-center">
-          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to start? ·</p>
+          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to take back control? ·</p>
           <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
-            Build your author site <span className="italic text-[#D4AE6A]">in minutes</span>
+            Own your author business <span className="italic text-[#D4AE6A]">starting today</span>
           </h2>
           <p className="text-sm text-[#D4DDEB] mb-6 max-w-sm mx-auto">
-            Join thousands of independent authors selling direct to readers on AuthorLoft.
+            Keep 100% of every sale and own every reader relationship — no middleman.
           </p>
           <Link
             href="/register"

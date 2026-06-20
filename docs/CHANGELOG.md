@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## June 20, 2026
+
+- **Homepage messaging rewrite — pain-first framing** — Rewrote all homepage copy from feature-first ("Build your author business") to pain-first ("You wrote the book. Own the business."). Hero book stack replaced with cycling pain→solution image cards (5 cards, background photos, 6s rotation). Genre section, journey, stats bar, and final CTA all rewritten. Removed "rent/renting" language in favor of "someone else's" / "middleman" framing.
+- **SVG logo sitewide** — Replaced PNG logo with SVG text logo (gold "Author" + ink/bone "Loft") across homepage hero, marketing nav, midnight hero, and all legal pages (terms, privacy, GDPR, US privacy). Consistent on both light and dark backgrounds.
+- **Subpage copy alignment** — Updated CTAs on blog, news, comparison pages, demo banner, and all legal pages from "Build your author site" to "Own your author business." Global layout meta description updated to pain-first framing.
+- **Hero layout refinements** — Removed eyebrow pill badge, reduced hero height (92vh → 72vh), increased stats bar sizing, updated "5 minutes" to "15 minutes" throughout.
+
 ## June 18, 2026
 
 - **Super Admin FAQ moved to Marketing** — FAQs has its own dedicated page at `/super-admin/faqs` under the Marketing sidebar group (was buried in Platform Settings → Content tab). Settings page no longer fetches or renders FAQs.

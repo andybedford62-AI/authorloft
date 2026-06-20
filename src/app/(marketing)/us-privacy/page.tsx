@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-static";
@@ -179,7 +179,11 @@ export default function UsPrivacyPage() {
       <header className="border-b border-[#DCDBD3] bg-[#E8E5DD] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/authorloft-logo-new.png" alt="AuthorLoft" width={200} height={57} className="h-14 w-auto" />
+            <svg viewBox="0 0 260 38" width={200} height={34} aria-label="AuthorLoft" role="img">
+              <text x="0" y="30" style={{ fontFamily: 'Georgia, serif', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
+                <tspan fill="#B8893D">Author</tspan><tspan fill="#1B2B47">Loft</tspan>
+              </text>
+            </svg>
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
             <ArrowLeft className="h-4 w-4" /> AuthorLoft home
@@ -219,7 +223,7 @@ export default function UsPrivacyPage() {
 
         {/* Register CTA */}
         <div className="mt-8 rounded-xl bg-[#F0EDE4] border border-[#DCDBD3] px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-[#5C6E89]">Ready to build your author site?</p>
+          <p className="text-sm text-[#5C6E89]">Ready to own your author business?</p>
           <Link href="/register" className="flex-shrink-0 bg-[#B8893D] text-[#0F1A2D] text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#D4AE6A] transition-colors">
             Create your free account →
           </Link>
