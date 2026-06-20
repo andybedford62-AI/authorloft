@@ -93,15 +93,15 @@ function PainSolutionCards() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 4000);
+    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 6000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="hidden lg:block relative" style={{ height: 460, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="hidden lg:block relative" style={{ height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ position: 'absolute', inset: '10% -10%', background: `radial-gradient(50% 50% at 50% 50%, ${ML.brass2}22, transparent 70%)`, filter: 'blur(40px)' }} />
 
-      <div style={{ position: 'relative', width: '100%', maxWidth: 460 }}>
+      <div style={{ position: 'relative', width: '100%', maxWidth: 540 }}>
         {PAIN_CARDS.map((card, i) => (
           <div key={i} style={{
             position: i === idx ? 'relative' : 'absolute',

@@ -36,8 +36,11 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/authorloft-logo-new.png" alt="AuthorLoft" className="h-14 w-auto" />
+            <svg viewBox="0 0 260 38" width={200} height={34} aria-label="AuthorLoft" role="img">
+              <text x="0" y="30" style={{ fontFamily: 'Georgia, serif', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
+                <tspan fill="#B8893D">Author</tspan><tspan fill="#1B2B47">Loft</tspan>
+              </text>
+            </svg>
           </Link>
 
           {author && (
