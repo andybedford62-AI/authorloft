@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil, Trash2, Plus, Layers, X, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -201,6 +201,7 @@ export function SocialPromotePromoTypesPanel({
   platforms: PlatformOption[];
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [promoTypes, setPromoTypes] = useState<PromoType[]>(initialPromoTypes);
   const [modal, setModal] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -212,6 +213,15 @@ export function SocialPromotePromoTypesPanel({
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const platformNameBySlug = (slug: string) => platforms.find((p) => p.slug === slug)?.name ?? slug;
+
+  // Deep-link: ?edit=<slug> auto-opens the edit modal for that promo type (used by the Prompts page jump)
+  useEffect(() => {
+    const editSlug = searchParams.get("edit");
+    if (!editSlug || modal) return;
+    const target = promoTypes.find((t) => t.slug === editSlug);
+    if (target) openEdit(target);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   function openAdd() {
     setForm({ ...emptyForm, sortOrder: promoTypes.length.toString() });

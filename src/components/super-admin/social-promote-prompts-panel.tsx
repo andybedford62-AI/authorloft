@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Play, Save, RotateCcw, FileText, AlertTriangle, Sparkles, ExternalLink } from "lucide-react";
+import { Check, Loader2, Play, Save, RotateCcw, FileText, AlertTriangle, Sparkles, ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -210,7 +210,17 @@ export function SocialPromotePromptsPanel({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Prompt template</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-gray-700">Prompt template</label>
+                <Link
+                  href={`/super-admin/social-promote/promo-types?edit=${selected.slug}#promo-${selected.slug}`}
+                  className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 hover:underline"
+                  title="Open the full edit dialog (active state, contexts, platforms, sort order)"
+                >
+                  <Pencil className="h-3 w-3" />
+                  Edit full promo type
+                </Link>
+              </div>
               <textarea
                 value={draftTemplate}
                 onChange={(e) => { setDraftTemplate(e.target.value); setDirty(true); }}
