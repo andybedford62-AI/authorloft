@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/db";
 import { calcCostMicroCents } from "./pricing";
 import { assemblePrompt, type AssemblyInputs } from "./prompt-assembly";
+import { checkCostCeilingsAfterGen } from "./cost-alerts";
 
 export type GenerateRequest = {
   authorId:      string;
@@ -195,6 +196,10 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
       ipAddress:      req.ipAddress,
     },
   });
+
+  // Best-effort cost-ceiling check (fires warn or auto-disable email if a threshold was just crossed).
+  // Never blocks the response — the gen itself already succeeded.
+  await checkCostCeilingsAfterGen({ thisGenCostMicroCents: costMicroCents });
 
   return {
     ok: true,

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Sparkles, Lock, Check, Loader2, Copy, RefreshCw, AlertTriangle,
-  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil,
+  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AuthorPromoteContext } from "@/lib/social-promote/author-context";
@@ -47,6 +47,7 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
   const [result, setResult] = useState<GenResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [removedHashtags, setRemovedHashtags] = useState<Set<string>>(new Set());
 
   const atDailyLimit   = ctx.todayCount >= ctx.dailyLimit;
   const atMonthlyLimit = ctx.monthCount >= ctx.monthlyLimit;
@@ -128,6 +129,7 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
     if (res.ok) {
       const body = await res.json();
       setResult(body);
+      setRemovedHashtags(new Set());
       router.refresh();   // re-pull usage counts
     } else {
       const body = await res.json().catch(() => ({}));
@@ -136,10 +138,50 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
     setGenerating(false);
   }
 
+  // ── Hashtag handling ───────────────────────────────────────────────────
+  // Extract every #tag from the raw output. Order-preserved, de-duplicated.
+  const allHashtags = useMemo(() => {
+    if (!result) return [] as string[];
+    const seen = new Set<string>();
+    const list: string[] = [];
+    const re = /#[A-Za-z0-9_]+/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(result.outputText)) !== null) {
+      const tag = m[0];
+      if (!seen.has(tag.toLowerCase())) { seen.add(tag.toLowerCase()); list.push(tag); }
+    }
+    return list;
+  }, [result]);
+
+  // Final text after applying removals — collapse extra spaces and trim trailing whitespace lines.
+  const displayedText = useMemo(() => {
+    if (!result) return "";
+    if (removedHashtags.size === 0) return result.outputText;
+    let txt = result.outputText;
+    for (const tag of removedHashtags) {
+      // Remove leading whitespace + the tag (case-insensitive, word-boundary safe).
+      const re = new RegExp(`\\s*${tag.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}\\b`, "gi");
+      txt = txt.replace(re, "");
+    }
+    // Tidy: collapse 3+ blank lines to 2, trim trailing whitespace per line, trim ends.
+    return txt.split("\n").map((l) => l.replace(/\s+$/, "")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }, [result, removedHashtags]);
+
+  function toggleHashtag(tag: string) {
+    setRemovedHashtags((prev) => {
+      const next = new Set(prev);
+      const key = tag.toLowerCase();
+      // Store the original-case version when adding; check lowercase for membership.
+      const existing = Array.from(next).find((t) => t.toLowerCase() === key);
+      if (existing) next.delete(existing); else next.add(tag);
+      return next;
+    });
+  }
+
   async function handleCopy() {
     if (!result) return;
     try {
-      await navigator.clipboard.writeText(result.outputText);
+      await navigator.clipboard.writeText(displayedText);
       setCopied(true);
       // Mark on server (drives copy-rate success metric)
       await fetch(`/api/social-promote/copied/${result.postId}`, { method: "POST" });
@@ -149,8 +191,9 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
     }
   }
 
-  const charsUsed = result?.outputText.length ?? 0;
+  const charsUsed = displayedText.length;
   const overLimit = result && result.maxChars > 0 && charsUsed > result.maxChars;
+  const isRemoved = (tag: string) => Array.from(removedHashtags).some((t) => t.toLowerCase() === tag.toLowerCase());
 
   const canGenerate =
     !!platformSlug &&
@@ -320,7 +363,9 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
             >
               <option value="">— Pick a promo type ({eligiblePromoTypes.length} available) —</option>
               {eligiblePromoTypes.map((t) => (
-                <option key={t.slug} value={t.slug}>{t.name}</option>
+                <option key={t.slug} value={t.slug}>
+                  {t.name}{t.description ? ` — ${t.description}` : ""}
+                </option>
               ))}
             </select>
             {selectedPromo?.description && (
@@ -362,12 +407,12 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
 
       {/* Result */}
       {result && (
-        <div className="bg-white rounded-xl border border-purple-200 p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-purple-200 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-gray-900">Your post</h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {result.promoType.name} for {result.platform.name}
+              <h3 className="font-semibold text-gray-900 text-sm">Your post</h3>
+              <p className="text-[11px] text-gray-500 mt-0.5">
+                {result.promoType.name} · {result.platform.name}
               </p>
             </div>
             <div className={`text-xs font-medium ${overLimit ? "text-red-600" : "text-gray-500"}`}>
@@ -375,18 +420,45 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
             </div>
           </div>
 
-          <pre className="whitespace-pre-wrap bg-gray-50 border border-gray-100 rounded-lg p-4 text-sm text-gray-900 font-sans">
-            {result.outputText}
+          <pre className="whitespace-pre-wrap bg-gray-50 border border-gray-100 rounded-md p-3 text-sm text-gray-900 font-sans">
+            {displayedText}
           </pre>
 
-          {overLimit && (
-            <div className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-              This post is over the {result.platform.name} character limit. Edit it down before posting, or generate another angle.
+          {allHashtags.length > 0 && (
+            <div>
+              <p className="text-[11px] text-gray-500 mb-1.5">Hashtags — click to remove or restore:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allHashtags.map((tag) => {
+                  const removed = isRemoved(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleHashtag(tag)}
+                      className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
+                        removed
+                          ? "bg-gray-50 text-gray-400 border-gray-200 line-through hover:bg-gray-100"
+                          : "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
+                      }`}
+                      title={removed ? "Click to restore" : "Click to remove from post"}
+                    >
+                      {tag}
+                      <X className="h-2.5 w-2.5 opacity-60" />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+          {overLimit && (
+            <div className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-md px-3 py-2 flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              Over the {result.platform.name} character limit. Remove some hashtags or generate another angle.
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
             <Button variant="ghost" onClick={handleGenerate} disabled={generating || atLimit}>
               <RefreshCw className="h-4 w-4 mr-2" />Try another angle
             </Button>
