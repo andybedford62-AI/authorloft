@@ -9,6 +9,26 @@ Mermaid-format architecture documentation for AuthorLoft. Each file renders inli
 | [user-flow.md](./user-flow.md) | Flowchart | Author journey from visitor → publish → sell |
 | [social-promote-sequence.md](./social-promote-sequence.md) | Sequence | End-to-end Social Promote generation + abuse-check cron |
 
+## PlantUML variants
+
+Same diagrams in PlantUML format (`.puml`) for tools that prefer it (IntelliJ PlantUML plugin, VS Code PlantUML, Confluence, draw.io import, etc.):
+
+- [architecture.puml](./architecture.puml) — deployment / component diagram
+- [erd.puml](./erd.puml) — entity-relationship diagram
+- [user-flow.puml](./user-flow.puml) — activity diagram
+- [social-promote-sequence.puml](./social-promote-sequence.puml) — sequence diagram
+- [social-promote-abuse-check.puml](./social-promote-abuse-check.puml) — abuse-check cron sequence
+
+### Rendering .puml on GitHub
+
+GitHub does **not** auto-render .puml — you have a few options:
+
+1. **PlantUML proxy URL** — paste this into a browser (replace branch as needed):
+   `https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/andybedford62-AI/authorloft/dev/docs/uml/architecture.puml`
+2. **VS Code PlantUML extension** — install jebbs.plantuml, open the .puml file, `Alt+D` previews.
+3. **IntelliJ / WebStorm** — built-in PlantUML support after installing the plugin.
+4. **PlantUML web editor** — paste contents into https://www.plantuml.com/plantuml/uml/
+
 ## Exporting to images
 
 For a static PNG/SVG (e.g. for slide decks):

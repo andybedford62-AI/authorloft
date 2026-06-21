@@ -1,0 +1,80 @@
+@startuml AuthorLoft User Flow
+!theme plain
+title AuthorLoft — Author + Reader Flow
+
+skinparam ActivityBackgroundColor #FDFDFD
+skinparam ActivityBorderColor #555555
+
+start
+
+:Visit marketing site\n(/, /features, /pricing);
+
+if (Has account?) then (no)
+  :Register at /register;
+  :Verify email\n(via Resend);
+  :Onboard\n(name, slug, plan pick);
+  if (Paid plan?) then (yes)
+    :Stripe Checkout;
+    :Webhook activates subscription;
+  endif
+else (yes)
+  :Login at /login;
+endif
+
+:Author Dashboard\n(/admin);
+
+split
+  partition "Publishing" {
+    :Create book at /admin/books/new\n(title, cover, description);
+    if (Publish?) then (yes)
+      :Book live on public site\n(authorname.com OR\nauthorloft.com/a/slug/books/title);
+    else (no, draft)
+      :Save as draft;
+      detach
+    endif
+    :Reader visits book page;
+    :Reader clicks Buy → Cart drawer;
+    :Stripe Checkout;
+    :Webhook creates Order\n+ sends receipt;
+  }
+split again
+  partition "Promote" {
+    :Open /admin/promote\n(Social Promote);
+    :Pick context\n(book / news / topic);
+    :Pick platform;
+    :Pick promo type;
+    :Click Generate;
+    :Gemini generates post\n(prompt assembled\nwith author voice);
+    if (Hashtags to remove?) then (yes)
+      :Click chips to strike through;
+    endif
+    :Copy to clipboard;
+    :Paste to external platform\n(IG, X, LinkedIn, etc.);
+  }
+split again
+  partition "Newsletter" {
+    :Open /admin/subscribers;
+    :Compose broadcast;
+    :Send via Resend;
+  }
+split again
+  partition "Settings" {
+    :Open /admin/settings;
+    if (Upgrade plan?) then (yes)
+      :Stripe portal;
+    endif
+    if (Custom domain?) then (yes)
+      :Configure DNS CNAME;
+      :Vercel auto-issues SSL;
+      note right
+        Edge middleware (proxy.ts)
+        transparently rewrites
+        custom domain → apex
+      end note
+    endif
+  }
+end split
+
+stop
+
+@enduml

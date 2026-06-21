@@ -1,0 +1,96 @@
+@startuml Social Promote Sequence
+!theme plain
+title Social Promote — Generation Sequence
+
+actor Author
+participant "PromotePanel\n(/admin/promote)" as UI
+participant "POST /api/social-promote/generate" as API
+participant "Limits\n(platform + entitlement)" as Limits
+participant "generate.ts" as Gen
+participant "prompt-assembly.ts" as Prompt
+participant "Google Gemini API" as Gemini
+database "Supabase\n(GeneratedSocialPost)" as DB
+participant "cost-alerts.ts" as Alerts
+participant "Resend" as Email
+participant Sentry
+
+== Setup ==
+Author -> UI : Pick context (book/news/topic) + platform + promo type
+Author -> UI : Click "Generate post"
+UI -> API : POST {platformSlug, promoTypeSlug,\ncontextType, contextRefId, topicText}
+
+== Gates ==
+API -> Limits : enforceRateLimit("ai", 20/60s)
+API -> Limits : checkPlatformAvailable()
+note right of Limits
+  env kill switch?
+  DB kill switch?
+  cost ceiling hit?
+end note
+Limits --> API : allowed | blocked
+
+API -> Limits : checkAuthorEntitlement(authorId)
+note right of Limits
+  plan allows feature?
+  daily limit?
+  monthly limit?
+end note
+Limits --> API : allowed | blocked
+
+== Generation ==
+API -> Gen : generateSocialPost(req)
+Gen -> DB : load Settings, Platform,\nPromoType, Author (parallel)
+DB --> Gen : rows
+
+Gen -> DB : load context\n(Book by authorId-check / PlatformPost / topic)
+DB --> Gen : context
+
+Gen -> Prompt : assemblePrompt(inputs)
+note over Prompt
+  1) SYSTEM_PROMPT
+  2) <author_data> block (clipped, untrusted)
+  3) substituted promo template
+  4) platform constraints
+  5) platform addendum
+end note
+Prompt --> Gen : assembledPrompt
+
+Gen -> Gemini : generateContent(prompt) with timeout
+
+alt success
+  Gemini --> Gen : outputText + usage tokens
+  Gen -> DB : INSERT GeneratedSocialPost (status=SUCCESS)
+  Gen -> Alerts : checkCostCeilingsAfterGen(thisGenCost)
+  alt just crossed warn ceiling
+    Alerts -> Email : sendMail (warn)
+  else just crossed disable ceiling
+    Alerts -> DB : UPDATE SocialPromoteSettings.enabled=false
+    Alerts -> Email : sendMail (auto-disabled)
+  else neither
+    note right of Alerts : no-op
+  end
+  Gen --> API : {ok:true, postId, outputText, ...}
+  API --> UI : 200 {postId, outputText, maxChars,\nplatform, promoType}
+  UI --> Author : Render post + hashtag chips
+else failure or timeout
+  Gemini -->x Gen : error
+  Gen -> Sentry : captureException(err,\ntags={feature:social-promote,\nphase:ai-generate})
+  Gen -> DB : INSERT GeneratedSocialPost (status=FAILED)
+  Gen --> API : {ok:false, userMessage}
+  API --> UI : 5xx {error}
+  UI --> Author : Show retry-able error
+end
+
+== Copy ==
+Author -> UI : Click hashtag chips to remove/restore
+Author -> UI : Click "Copy"
+UI -> UI : navigator.clipboard.writeText(displayedText)
+UI -> API : POST /api/social-promote/copied/[id]
+API -> DB : UPDATE wasCopied=true, copiedAt=now
+
+note right of Author
+  Paste to Instagram / X /
+  LinkedIn / Facebook / etc.
+end note
+
+@enduml
