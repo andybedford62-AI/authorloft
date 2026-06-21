@@ -35,9 +35,8 @@ export async function checkPlatformAvailable(): Promise<LimitCheckResult> {
     where: { createdAt: { gte: startOfDay } },
     _sum:  { costMicroCents: true },
   });
-  // costMicroCents → cents: divide by 10,000
-  const todayCents = (todaySpend._sum.costMicroCents ?? 0) / 10_000;
-  if (todayCents >= settings.costDisableCentsPerDay) {
+  const todayMicroCents = todaySpend._sum.costMicroCents ?? 0;
+  if (todayMicroCents >= settings.costDisableMicroCentsPerDay) {
     return {
       allowed: false,
       reason: "Social Promote has hit today's cost ceiling and is temporarily paused. It will resume tomorrow.",

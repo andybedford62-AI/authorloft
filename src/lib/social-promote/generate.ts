@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import * as Sentry from "@sentry/nextjs";
 import { prisma } from "@/lib/db";
 import { calcCostMicroCents } from "./pricing";
 import { assemblePrompt, type AssemblyInputs } from "./prompt-assembly";
@@ -150,6 +151,18 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
       throw new Error("Model returned empty output");
     }
   } catch (err: any) {
+    Sentry.captureException(err, {
+      tags: { feature: "social-promote", phase: "ai-generate" },
+      extra: {
+        authorId: req.authorId,
+        platformId: req.platformId,
+        promoTypeId: req.promoTypeId,
+        contextType: req.contextType,
+        model,
+        inputTokens,
+        outputTokens,
+      },
+    });
     const costMicroCents = calcCostMicroCents(model, inputTokens, outputTokens);
     const logged = await prisma.generatedSocialPost.create({
       data: {

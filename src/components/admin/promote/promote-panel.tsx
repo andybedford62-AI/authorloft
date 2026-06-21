@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Sparkles, Lock, Check, Loader2, Copy, RefreshCw, AlertTriangle,
-  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil, X,
+  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil, X, Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AuthorPromoteContext } from "@/lib/social-promote/author-context";
 
-type ContextType = "book" | "topic" | "";  // "news" deferred to a later session
+type ContextType = "book" | "news" | "topic" | "";
 
 type GenResult = {
   postId: string;
@@ -39,6 +39,7 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
   // No defaults — every selection is deliberate to prevent accidental token burn.
   const [contextType, setContextType] = useState<ContextType>("");
   const [bookId, setBookId] = useState<string>("");
+  const [newsId, setNewsId] = useState<string>("");
   const [topicText, setTopicText] = useState<string>("");
   const [platformSlug, setPlatformSlug] = useState<string>("");
   const [promoTypeSlug, setPromoTypeSlug] = useState<string>("");
@@ -64,17 +65,22 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
   }, [ctx.promoTypes, contextType, platformSlug]);
 
   // Step completion state
-  const step1Done = contextType === "book" ? !!bookId : contextType === "topic" ? topicText.trim().length > 0 : false;
+  const step1Done =
+    contextType === "book"  ? !!bookId
+  : contextType === "news"  ? !!newsId
+  : contextType === "topic" ? topicText.trim().length > 0
+  : false;
   const step2Done = step1Done && !!platformSlug;
   const step3Done = step2Done && !!promoTypeSlug;
 
   // Selection summaries for collapsed/completed steps
   const selectedBook     = ctx.books.find((b) => b.id === bookId);
+  const selectedNews     = ctx.newsPosts.find((n) => n.id === newsId);
   const selectedPlatform = ctx.platforms.find((p) => p.slug === platformSlug);
   const selectedPromo    = ctx.promoTypes.find((t) => t.slug === promoTypeSlug);
 
   function reset() {
-    setContextType(""); setBookId(""); setTopicText("");
+    setContextType(""); setBookId(""); setNewsId(""); setTopicText("");
     setPlatformSlug(""); setPromoTypeSlug("");
     setResult(null); setError(null);
   }
@@ -122,7 +128,10 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
         platformSlug,
         promoTypeSlug,
         contextType,
-        contextRefId: contextType === "book"  ? bookId    : null,
+        contextRefId:
+            contextType === "book" ? bookId
+          : contextType === "news" ? newsId
+          : null,
         topicText:    contextType === "topic" ? topicText : null,
       }),
     });
@@ -199,7 +208,9 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
     !!platformSlug &&
     !!promoTypeSlug &&
     !atLimit &&
-    (contextType === "book" ? !!bookId : topicText.trim().length > 0);
+    (contextType === "book"  ? !!bookId
+   : contextType === "news"  ? !!newsId
+   : topicText.trim().length > 0);
 
   return (
     <div className="space-y-3">
@@ -263,26 +274,36 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
         summary={
           step1Done && contextType === "book" && selectedBook
             ? `📖 ${selectedBook.title}`
+            : step1Done && contextType === "news" && selectedNews
+            ? `📰 ${selectedNews.title}`
             : step1Done && contextType === "topic"
             ? `✏️ Topic: ${topicText.trim().slice(0, 80)}${topicText.length > 80 ? "…" : ""}`
             : null
         }
       >
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <ContextChoice
             icon={BookOpen}
             label="One of your books"
             hint={ctx.books.length === 0 ? "Add a published book first" : `${ctx.books.length} available`}
             selected={contextType === "book"}
             disabled={ctx.books.length === 0}
-            onClick={() => { setContextType("book"); setBookId(""); setTopicText(""); setPromoTypeSlug(""); }}
+            onClick={() => { setContextType("book"); setBookId(""); setNewsId(""); setTopicText(""); setPromoTypeSlug(""); }}
+          />
+          <ContextChoice
+            icon={Newspaper}
+            label="AuthorLoft News"
+            hint={ctx.newsPosts.length === 0 ? "No news posts yet" : `${ctx.newsPosts.length} recent`}
+            selected={contextType === "news"}
+            disabled={ctx.newsPosts.length === 0}
+            onClick={() => { setContextType("news"); setBookId(""); setNewsId(""); setTopicText(""); setPromoTypeSlug(""); }}
           />
           <ContextChoice
             icon={Pencil}
             label="Something else"
             hint="Free-text topic"
             selected={contextType === "topic"}
-            onClick={() => { setContextType("topic"); setBookId(""); setPromoTypeSlug(""); }}
+            onClick={() => { setContextType("topic"); setBookId(""); setNewsId(""); setPromoTypeSlug(""); }}
           />
         </div>
 
@@ -301,6 +322,25 @@ function Flow({ context: ctx }: { context: AuthorPromoteContext }) {
                 <option key={b.id} value={b.id}>{b.title}{b.subtitle ? ` — ${b.subtitle}` : ""}</option>
               ))}
             </select>
+          </div>
+        )}
+
+        {contextType === "news" && ctx.newsPosts.length > 0 && (
+          <div className="mt-3 p-3 rounded-md bg-purple-50/40 border border-purple-100">
+            <label className="block text-xs font-semibold text-gray-900 mb-1.5">
+              Which news post? <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={newsId}
+              onChange={(e) => { setNewsId(e.target.value); setPromoTypeSlug(""); }}
+              className="w-full border border-purple-200 rounded-md px-2.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">— Pick a news post —</option>
+              {ctx.newsPosts.map((n) => (
+                <option key={n.id} value={n.id}>{n.title}</option>
+              ))}
+            </select>
+            <p className="text-[11px] text-gray-500 mt-1">Use the latest AuthorLoft News to drive engagement.</p>
           </div>
         )}
 

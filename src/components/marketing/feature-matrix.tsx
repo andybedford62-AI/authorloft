@@ -177,10 +177,6 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           name: "Legal / Disclaimer Page",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
-        {
-          name: "Dynamic OG Images",
-          tiers: { FREE: "—", STANDARD: "—", PREMIUM: "✓ Per-page social cards" },
-        },
       ],
     },
     {
@@ -223,6 +219,30 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: {
             FREE: "—",
             STANDARD: "—",
+            PREMIUM: "✓",
+          },
+        },
+        {
+          name: "Social Promote (AI post generator)",
+          tiers: {
+            FREE: "—",
+            STANDARD: "✓ Facebook, Instagram, X, Reddit, Threads, Bluesky",
+            PREMIUM: "✓ All platforms + LinkedIn, TikTok",
+          },
+        },
+        {
+          name: "  • 14 promo types (sale, launch, quote, BTS, etc.)",
+          tiers: {
+            FREE: "—",
+            STANDARD: "✓",
+            PREMIUM: "✓",
+          },
+        },
+        {
+          name: "  • Custom voice / brand tone control",
+          tiers: {
+            FREE: "—",
+            STANDARD: "✓",
             PREMIUM: "✓",
           },
         },
@@ -341,15 +361,15 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
         <div className="bg-purple-50 rounded-lg border border-purple-200 p-6">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
+              { name: "Author Mobile App", desc: "Native iOS / Android app for managing your AuthorLoft from anywhere" },
               { name: "Auto-Formatter", desc: "Convert your book to ePub, PDF, Kindle, and print formats" },
-              { name: "Affiliate Payouts", desc: "Send referral earnings directly via Stripe" },
               { name: "Reader Analytics", desc: "Track reads, engagement, and retention" },
               { name: "Email List Builder", desc: "Drag-and-drop forms and automated sequences" },
               { name: "Social Media Uploader", desc: "Schedule posts to Instagram, TikTok, and more" },
-              { name: "Reader Tiers / Patreon", desc: "Membership tiers and exclusive content" },
               { name: "Review Monitoring", desc: "Aggregate reviews from Amazon and Goodreads" },
               { name: "Native PDF Flipbook", desc: "A smoother, mobile-friendly flipbook reader" },
               { name: "Two-Factor Authentication", desc: "Extra account security for every plan" },
+              { name: "Dynamic OG Images", desc: "Per-page social cards that auto-generate for every book and post" },
             ].map((item) => (
               <div key={item.name}>
                 <p className="font-semibold text-gray-900">{item.name}</p>

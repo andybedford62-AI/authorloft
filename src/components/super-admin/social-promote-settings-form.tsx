@@ -11,8 +11,8 @@ type Settings = {
   model: string;
   timeoutMs: number;
   maxOutputTokens: number;
-  costWarnCentsPerDay: number;
-  costDisableCentsPerDay: number;
+  costWarnMicroCentsPerDay: number;
+  costDisableMicroCentsPerDay: number;
   adminAlertEmails: string;
   updatedAt: string | Date;
 };
@@ -23,14 +23,16 @@ const MODEL_OPTIONS = [
   { value: "gemini-2.5-pro",       label: "Gemini 2.5 Pro (highest quality, slower)" },
 ];
 
-function centsToDollarString(cents: number): string {
-  return (cents / 100).toFixed(2);
+// 1 cent = 10,000 microcents; $1 = 1,000,000 microcents.
+function microCentsToDollarString(microCents: number): string {
+  // toString gives "50" for whole dollars and "0.0001" for tiny amounts — ideal for an input field.
+  return (microCents / 1_000_000).toString();
 }
 
-function dollarStringToCents(input: string): number {
+function dollarStringToMicroCents(input: string): number {
   const parsed = parseFloat(input);
   if (isNaN(parsed) || parsed < 0) return 0;
-  return Math.round(parsed * 100);
+  return Math.round(parsed * 1_000_000);
 }
 
 export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
@@ -39,8 +41,8 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
   const [model, setModel] = useState(initial.model);
   const [timeoutMs, setTimeoutMs] = useState(initial.timeoutMs.toString());
   const [maxOutputTokens, setMaxOutputTokens] = useState(initial.maxOutputTokens.toString());
-  const [warnDollars, setWarnDollars] = useState(centsToDollarString(initial.costWarnCentsPerDay));
-  const [disableDollars, setDisableDollars] = useState(centsToDollarString(initial.costDisableCentsPerDay));
+  const [warnDollars, setWarnDollars] = useState(microCentsToDollarString(initial.costWarnMicroCentsPerDay));
+  const [disableDollars, setDisableDollars] = useState(microCentsToDollarString(initial.costDisableMicroCentsPerDay));
   const [adminAlertEmails, setAdminAlertEmails] = useState(initial.adminAlertEmails);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +63,8 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
         model,
         timeoutMs: parseInt(timeoutMs) || 30000,
         maxOutputTokens: parseInt(maxOutputTokens) || 800,
-        costWarnCentsPerDay: dollarStringToCents(warnDollars),
-        costDisableCentsPerDay: dollarStringToCents(disableDollars),
+        costWarnMicroCentsPerDay: dollarStringToMicroCents(warnDollars),
+        costDisableMicroCentsPerDay: dollarStringToMicroCents(disableDollars),
         adminAlertEmails,
       }),
     });
@@ -184,13 +186,14 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
               <input
                 type="number"
-                step="0.01"
+                step="0.0001"
+                min="0"
                 value={warnDollars}
                 onChange={(e) => setWarnDollars(e.target.value)}
                 className={inputCls + " pl-7"}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">Sends an alert email to admins. Does not block generations.</p>
+            <p className="text-xs text-gray-400 mt-1">Sends an alert email to admins. Does not block generations. Supports tiny values (e.g. $0.0001) for testing.</p>
           </div>
           <div>
             <label className={labelCls}>Auto-disable at (USD / day)</label>
@@ -198,7 +201,8 @@ export function SocialPromoteSettingsForm({ initial }: { initial: Settings }) {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
               <input
                 type="number"
-                step="0.01"
+                step="0.0001"
+                min="0"
                 value={disableDollars}
                 onChange={(e) => setDisableDollars(e.target.value)}
                 className={inputCls + " pl-7"}

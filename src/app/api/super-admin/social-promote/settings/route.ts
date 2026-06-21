@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
   const {
     enabled, model, timeoutMs, maxOutputTokens,
-    costWarnCentsPerDay, costDisableCentsPerDay, adminAlertEmails,
+    costWarnMicroCentsPerDay, costDisableMicroCentsPerDay, adminAlertEmails,
   } = body;
 
   const data: Record<string, unknown> = {};
@@ -40,17 +40,17 @@ export async function PATCH(req: NextRequest) {
     }
     data.maxOutputTokens = maxOutputTokens;
   }
-  if (costWarnCentsPerDay    !== undefined) {
-    if (typeof costWarnCentsPerDay !== "number" || costWarnCentsPerDay < 0) {
+  if (costWarnMicroCentsPerDay    !== undefined) {
+    if (typeof costWarnMicroCentsPerDay !== "number" || costWarnMicroCentsPerDay < 0) {
       return NextResponse.json({ error: "Cost warn ceiling must be a non-negative number." }, { status: 400 });
     }
-    data.costWarnCentsPerDay = costWarnCentsPerDay;
+    data.costWarnMicroCentsPerDay = Math.round(costWarnMicroCentsPerDay);
   }
-  if (costDisableCentsPerDay !== undefined) {
-    if (typeof costDisableCentsPerDay !== "number" || costDisableCentsPerDay < 0) {
+  if (costDisableMicroCentsPerDay !== undefined) {
+    if (typeof costDisableMicroCentsPerDay !== "number" || costDisableMicroCentsPerDay < 0) {
       return NextResponse.json({ error: "Cost disable ceiling must be a non-negative number." }, { status: 400 });
     }
-    data.costDisableCentsPerDay = costDisableCentsPerDay;
+    data.costDisableMicroCentsPerDay = Math.round(costDisableMicroCentsPerDay);
   }
   if (adminAlertEmails       !== undefined) {
     if (typeof adminAlertEmails !== "string") {

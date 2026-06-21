@@ -28,6 +28,7 @@ export type AuthorPromoteContext = {
     applicablePlatforms: string[];
   }>;
   books: Array<{ id: string; title: string; subtitle: string | null }>;
+  newsPosts: Array<{ id: string; title: string; publishedAt: Date | null }>;
 };
 
 export async function loadAuthorPromoteContext(authorId: string): Promise<AuthorPromoteContext> {
@@ -43,6 +44,7 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
     activePlatforms,
     activePromoTypes,
     books,
+    newsPosts,
     todayCount,
     monthCount,
     todaySpend,
@@ -59,6 +61,12 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
       select: { id: true, title: true, subtitle: true },
       orderBy: { title: "asc" },
     }),
+    prisma.platformPost.findMany({
+      where:  { isNews: true, isPublished: true },
+      select: { id: true, title: true, publishedAt: true },
+      orderBy: { publishedAt: "desc" },
+      take:   20,
+    }),
     prisma.generatedSocialPost.count({ where: { authorId, createdAt: { gte: startOfDay },   status: "SUCCESS" } }),
     prisma.generatedSocialPost.count({ where: { authorId, createdAt: { gte: startOfMonth }, status: "SUCCESS" } }),
     prisma.generatedSocialPost.aggregate({ where: { createdAt: { gte: startOfDay } }, _sum: { costMicroCents: true } }),
@@ -68,8 +76,8 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
   const isPremium = planTier === "PREMIUM";
 
   const envKill = !!process.env.SOCIAL_PROMOTE_KILL_SWITCH && process.env.SOCIAL_PROMOTE_KILL_SWITCH !== "false";
-  const todayCents = (todaySpend._sum.costMicroCents ?? 0) / 10_000;
-  const costCeilingHit = todayCents >= settings.costDisableCentsPerDay;
+  const todayMicroCents = todaySpend._sum.costMicroCents ?? 0;
+  const costCeilingHit = todayMicroCents >= settings.costDisableMicroCentsPerDay;
 
   return {
     enabled:        !envKill && settings.enabled,
@@ -91,5 +99,6 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
       applicableContexts: t.applicableContexts, applicablePlatforms: t.applicablePlatforms,
     })),
     books,
+    newsPosts,
   };
 }

@@ -93,7 +93,7 @@ function PainSolutionCards() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 6000);
+    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 4000);
     return () => clearInterval(timer);
   }, []);
 
