@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Star, BookOpen, ArrowRight, X, Sparkles } from "lucide-react";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
@@ -25,6 +26,12 @@ export function BookstoreQuickView({
   book: BookstoreBook | null;
   onClose: () => void;
 }) {
+  // Render into document.body via portal so the fixed-position overlay escapes
+  // any transformed ancestor (e.g. card hover translate) that would otherwise
+  // turn `position: fixed` into "fixed within that ancestor" and clip the modal.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // Close on Escape + lock body scroll while open.
   useEffect(() => {
     if (!book) return;
@@ -38,21 +45,21 @@ export function BookstoreQuickView({
     };
   }, [book, onClose]);
 
-  if (!book) return null;
+  if (!book || !mounted) return null;
 
   const price = formatPrice(book.priceCents);
 
-  return (
+  const modal = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onMouseDown={onClose}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={`${book.title} details`}
     >
       <div
         className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
-        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
@@ -156,4 +163,6 @@ export function BookstoreQuickView({
       </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }
