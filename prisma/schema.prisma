@@ -140,6 +140,7 @@ model Author {
   navShowBlog                   Boolean               @default(false)
   navShowContact                Boolean               @default(true)
   navShowMediaKit               Boolean               @default(false)
+  navShowBookstore              Boolean               @default(true)
   pressTitle                    String?
   pressBio                      String?               @db.Text
   pressContact                  String?

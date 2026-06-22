@@ -63,7 +63,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── 2. Books Catalog (leads the page) ────────────────────────────── */}
-      <section className="py-14" style={{ backgroundColor: accentColor + "0c" }}>
+      <section className="py-14" style={{ backgroundColor: accentColor + "1f" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           <div className="flex items-center justify-between mb-8">
@@ -158,7 +158,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── 4. Compact Author Bio ─────────────────────────────────────────── */}
-      <section className="py-12 border-t border-gray-100" style={{ backgroundColor: accentColor + "08" }}>
+      <section className="py-12 border-t border-gray-100" style={{ backgroundColor: accentColor + "14" }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />

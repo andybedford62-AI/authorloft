@@ -12,6 +12,7 @@ interface NavSettings {
   navShowBlog: boolean;
   navShowContact: boolean;
   navShowMediaKit: boolean;
+  navShowBookstore: boolean;
 }
 
 interface NavSettingsPanelProps {
@@ -72,6 +73,13 @@ const BUILT_IN_ITEMS = [
     alwaysOn: false,
     planGated: true,
     planGateKey: "mediaKit" as const,
+  },
+  {
+    key: "navShowBookstore" as keyof NavSettings,
+    label: "Bookstore",
+    href: "AuthorLoft bookstore (external)",
+    description: "Cross-link to the AuthorLoft Bookstore so readers can discover more authors",
+    alwaysOn: false,
   },
 ];
 

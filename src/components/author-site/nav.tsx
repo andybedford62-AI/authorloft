@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, BookOpen, LogOut, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { Menu, X, BookOpen, LogOut, LayoutDashboard, ShoppingCart, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -18,6 +18,7 @@ interface NavConfig {
   navShowBlog:      boolean;
   navShowContact:   boolean;
   navShowMediaKit:  boolean;
+  navShowBookstore: boolean;
 }
 
 interface CustomPage {
@@ -89,6 +90,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const platformBase  = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
   const dashboardUrl  = `${platformBase}/admin/dashboard`;
   const signOutUrl    = `${platformBase}/login`;
+  const bookstoreUrl  = `${platformBase}/bookstore`;
 
   // Determine active link — match pathname prefix (/ is exact only)
   function isActive(href: string) {
@@ -150,6 +152,19 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               {link.label}
             </Link>
           ))}
+          {/* AuthorLoft Bookstore — cross-link to platform discovery catalog */}
+          {(!navConfig || navConfig.navShowBookstore) && (
+            <a
+              href={bookstoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 rounded-md transition-colors inline-flex items-center gap-1"
+              title="Discover more authors on the AuthorLoft Bookstore"
+            >
+              Bookstore
+              <ExternalLink className="h-3 w-3 opacity-70" />
+            </a>
+          )}
         </nav>
 
         {/* ── Desktop right side ────────────────────────────────────────── */}
@@ -223,6 +238,19 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 {link.label}
               </Link>
             ))}
+            {/* AuthorLoft Bookstore — cross-link */}
+            {(!navConfig || navConfig.navShowBookstore) && (
+              <a
+                href={bookstoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 rounded-md text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors inline-flex items-center gap-1.5"
+              >
+                Bookstore
+                <ExternalLink className="h-3 w-3 opacity-70" />
+              </a>
+            )}
 
             {/* Divider */}
             <div className="border-t my-2" style={{ borderColor: "rgba(255,255,255,0.08)" }} />

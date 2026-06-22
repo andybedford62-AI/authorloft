@@ -21,6 +21,7 @@ export default async function AdminPagesPage() {
         navShowBlog: true,
         navShowContact: true,
         navShowMediaKit: true,
+        navShowBookstore: true,
         plan: { select: { flipBooksLimit: true, mediaKitEnabled: true } },
       },
     }),
@@ -50,6 +51,7 @@ export default async function AdminPagesPage() {
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
     navShowMediaKit: author.navShowMediaKit,
+    navShowBookstore: author.navShowBookstore,
   };
 
   return (

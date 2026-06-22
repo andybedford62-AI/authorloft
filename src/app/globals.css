@@ -105,7 +105,7 @@
 
 [data-theme='nautical'] {
   --nav-bg: #001f3f;
-  --background: 205 30% 96%;
+  --background: 205 32% 93%;
   --foreground: 0 0% 5%;
   --primary: 210 100% 12%;
   --primary-foreground: 205 30% 96%;
@@ -172,7 +172,7 @@
 
 [data-theme='aviation'] {
   --nav-bg: #0B1E33;
-  --background: 210 36% 96%;
+  --background: 210 38% 93%;
   --foreground: 219 30% 9%;
   --primary: 212 68% 17%;
   --primary-foreground: 210 36% 96%;
@@ -185,7 +185,7 @@
 
 [data-theme='scuba-diving'] {
   --nav-bg: #04282B;
-  --background: 171 37% 96%;
+  --background: 171 40% 93%;
   --foreground: 177 51% 8%;
   --primary: 184 80% 14%;
   --primary-foreground: 171 37% 96%;
@@ -198,7 +198,7 @@
 
 [data-theme='mountain-adventure'] {
   --nav-bg: #161F18;
-  --background: 100 13% 96%;
+  --background: 100 15% 93%;
   --foreground: 133 17% 10%;
   --primary: 132 14% 21%;
   --primary-foreground: 100 13% 96%;

@@ -49,6 +49,7 @@ async function resolveAuthor(domain: string) {
       navShowBlog: true,
       navShowContact: true,
       navShowMediaKit: true,
+      navShowBookstore: true,
       siteTheme: true,
       customAccentColor: true,
       isActive: true,
@@ -137,6 +138,7 @@ export default async function AuthorSiteLayout({
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
     navShowMediaKit: author.navShowMediaKit,
+    navShowBookstore: author.navShowBookstore,
   };
 
   // Enforce plan-based theme access at render time
