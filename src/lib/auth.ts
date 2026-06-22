@@ -29,7 +29,13 @@ async function uniqueSlug(base: string): Promise<string> {
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
+    // 8h max — covers a full workday for active users. After 8h of inactivity
+    // (including browser-closed-overnight) the next request bounces to /login
+    // with a fresh session, avoiding stale-state errors on return.
+    maxAge:    60 * 60 * 8,
+    // Refresh the JWT on activity, throttled to once every 30 minutes so
+    // active users never see a logout while idle ones eventually do.
+    updateAge: 60 * 30,
   },
   // Set cookie domain to root platform domain so subdomains can read the session.
   // Skipped for vercel.app and localhost (Public Suffix List restriction).
