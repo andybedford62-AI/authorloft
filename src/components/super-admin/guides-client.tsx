@@ -50,7 +50,7 @@ export function GuidesClient({ initialGuides }: { initialGuides: Guide[] }) {
       </div>
 
       {/* Table */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="border border-gray-200 rounded-lg overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
             <tr>

@@ -36,7 +36,7 @@ export default async function ResourceDownloadsPage() {
           <h2 className="text-lg font-semibold text-gray-900">Download leads</h2>
           <span className="text-sm text-gray-400">{leadCount} total · showing latest {leads.length}</span>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">

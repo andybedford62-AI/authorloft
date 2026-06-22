@@ -74,7 +74,7 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
       {/* Hint bar */}
       <div className="flex items-center justify-between px-5 py-2.5 bg-gray-50 border-b border-gray-100 text-xs text-gray-400">
         <span>Drag <GripVertical className="inline h-3 w-3" /> to reorder · the top 3 published books appear on your homepage</span>

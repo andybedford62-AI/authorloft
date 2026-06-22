@@ -151,7 +151,7 @@ export function BlogPostsClient({ initialPosts }: { initialPosts: Post[] }) {
         {visiblePosts.length} shown · {visiblePosts.filter((p) => p.isPublished).length} published · {visiblePosts.filter((p) => !p.isPublished).length} drafts
       </p>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden overflow-x-auto">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
         <table className="w-full min-w-[680px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">

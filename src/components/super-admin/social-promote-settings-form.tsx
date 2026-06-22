@@ -265,7 +265,7 @@ function CostHelpModal({ onClose }: { onClose: () => void }) {
 
           <section>
             <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Realistic daily spend at scale</h4>
-            <div className="overflow-hidden rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
@@ -290,7 +290,7 @@ function CostHelpModal({ onClose }: { onClose: () => void }) {
               These are <em>abuse-protection</em> ceilings, not "expected spend" caps. Set them so a runaway loop or
               prompt-injection abuse trips the alert well before becoming expensive.
             </p>
-            <div className="overflow-hidden rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>

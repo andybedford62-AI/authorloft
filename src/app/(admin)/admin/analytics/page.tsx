@@ -175,7 +175,7 @@ export default function AnalyticsPage() {
 
       {/* Bottom row: top pages + right column (referrers + geography) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-700">Top Pages</h2>
           </div>

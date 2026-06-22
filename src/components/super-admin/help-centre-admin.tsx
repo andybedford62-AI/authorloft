@@ -361,7 +361,7 @@ function TooltipsTab({ tooltips: initialTooltips }: { tooltips: Tooltip[] }) {
     <div className="space-y-4">
       <p className="text-sm text-gray-500">Tooltips are shown as <code className="text-xs bg-gray-100 px-1 rounded">?</code> icons next to form fields across the admin dashboard.</p>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
