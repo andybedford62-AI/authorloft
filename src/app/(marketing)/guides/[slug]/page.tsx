@@ -1,0 +1,229 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
+
+export const dynamic = "force-dynamic";
+
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+type FaqItem = { question: string; answer: string };
+
+function parseFaqs(json: string | null): FaqItem[] {
+  if (!json) return [];
+  try { return JSON.parse(json); } catch { return []; }
+}
+
+function parseSlugs(json: string | null): string[] {
+  if (!json) return [];
+  try { return JSON.parse(json); } catch { return []; }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const guide = await prisma.guide.findUnique({
+    where: { slug },
+    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, isPublished: true, seoTitle: true, metaDescription: true, focusKeyword: true },
+  }).catch(() => null);
+  if (!guide || !guide.isPublished) return {};
+
+  const metaTitle = guide.seoTitle || guide.title;
+  const metaDesc = guide.metaDescription || guide.excerpt || undefined;
+
+  return {
+    title: metaTitle,
+    description: metaDesc,
+    alternates: { canonical: `${BASE}/guides/${guide.slug}` },
+    openGraph: {
+      type: "article",
+      title: metaTitle,
+      description: metaDesc,
+      images: guide.coverImageUrl ? [{ url: guide.coverImageUrl }] : undefined,
+      authors: ["AuthorLoft"],
+      ...(guide.focusKeyword && { tags: [guide.focusKeyword] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metaTitle,
+      description: metaDesc,
+      images: guide.coverImageUrl ? [guide.coverImageUrl] : undefined,
+    },
+  };
+}
+
+export default async function GuideDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const guide = await prisma.guide.findUnique({ where: { slug } }).catch(() => null);
+  if (!guide || !guide.isPublished) notFound();
+
+  const faqs = parseFaqs(guide.faqsJson);
+  const relatedSlugs = parseSlugs(guide.relatedSlugsJson);
+  const safeContent = sanitize(guide.content);
+
+  const relatedPosts = relatedSlugs.length > 0
+    ? await prisma.platformPost.findMany({
+        where: { slug: { in: relatedSlugs }, isPublished: true, isNews: false },
+        select: { title: true, slug: true, excerpt: true, coverImageUrl: true, category: true },
+        orderBy: { publishedAt: "desc" },
+      }).catch(() => [])
+    : [];
+
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: guide.title,
+    description: guide.excerpt || undefined,
+    image: guide.coverImageUrl || undefined,
+    datePublished: guide.publishedAt?.toISOString(),
+    dateModified: guide.updatedAt.toISOString(),
+    author: { "@type": "Organization", name: "AuthorLoft" },
+    publisher: { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/guides/${guide.slug}` },
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Guides", item: `${BASE}/guides` },
+      { "@type": "ListItem", position: 3, name: guide.title, item: `${BASE}/guides/${guide.slug}` },
+    ],
+  };
+
+  const faqLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
+    })),
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1", "h2"] },
+  } : null;
+
+  return (
+    <div className="min-h-screen bg-[#F0EDE4]">
+      <MarketingNav />
+
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+        {/* Breadcrumb */}
+        <Link href="/guides" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to Guides
+        </Link>
+
+        {/* Category */}
+        {guide.category && (
+          <span className="text-xs font-mono uppercase tracking-wider text-[#C26A4A] bg-[#C26A4A]/10 px-2.5 py-1 rounded-full mb-5 inline-block">
+            {guide.category}
+          </span>
+        )}
+
+        {/* Title */}
+        <h1 className="font-serif text-4xl sm:text-5xl font-normal text-[#1B2B47] leading-tight mb-6">
+          {guide.title}
+        </h1>
+
+        {/* Excerpt */}
+        {guide.excerpt && (
+          <p className="text-lg text-[#5C6E89] leading-relaxed mb-8 border-l-4 border-[#C26A4A]/30 pl-4 italic">
+            {guide.excerpt}
+          </p>
+        )}
+
+        {/* Cover Image */}
+        {guide.coverImageUrl && (
+          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[#DCDBD3] bg-[#F0EDE4] overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={guide.coverImageUrl}
+              alt={guide.title}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )}
+
+        {/* Content */}
+        <div
+          className="rich-content"
+          dangerouslySetInnerHTML={{ __html: safeContent }}
+        />
+
+        {/* FAQs */}
+        {faqs.length > 0 && (
+          <div className="mt-16 pt-10 border-t border-[#DCDBD3]">
+            <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-8">Frequently Asked Questions</h2>
+            <div className="space-y-6">
+              {faqs.map((faq, i) => (
+                <div key={i} className="bg-white rounded-xl border border-[#DCDBD3] p-5">
+                  <h3 className="font-semibold text-[#1B2B47] mb-2">{faq.question}</h3>
+                  <p className="text-sm text-[#5C6E89] leading-relaxed">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related Blog Posts */}
+        {relatedPosts.length > 0 && (
+          <div className="mt-16 pt-10 border-t border-[#DCDBD3]">
+            <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-6">Related Articles</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {relatedPosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="group flex gap-3 bg-white rounded-xl border border-[#DCDBD3] p-4 hover:border-[#C26A4A]/40 hover:shadow-md transition-all"
+                >
+                  {post.coverImageUrl ? (
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#F0EDE4]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-[#F0EDE4] flex items-center justify-center">
+                      <BookOpen className="h-6 w-6 text-[#DCDBD3]" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors line-clamp-2">{post.title}</h3>
+                    {post.category && (
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#9b8e7e] mt-1 block">{post.category}</span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">
+          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">
+            &middot; {guide.ctaTitle || "Ready to take back control?"} &middot;
+          </p>
+          <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
+            {guide.ctaDescription || <>Own your author business <span className="italic text-[#D4AE6A]">starting today</span></>}
+          </h2>
+          <p className="text-sm text-[#D4DDEB] mb-6 max-w-sm mx-auto">
+            Keep 100 % of every sale and own every reader relationship — no middleman.
+          </p>
+          <Link
+            href={guide.ctaButtonUrl || "/register"}
+            className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+          >
+            {guide.ctaButtonText || "Get Started Free"} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </article>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {faqLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />}
+    </div>
+  );
+}

@@ -105,6 +105,9 @@ Tips, guides, and insights for independent authors on topics like selling books 
 ### News (https://www.authorloft.com/news)
 Product updates, new features, specials, and events from the AuthorLoft team. Available via RSS at https://www.authorloft.com/news/rss.xml
 
+### Author Guides (https://www.authorloft.com/guides)
+In-depth evergreen guides on topics like author websites, direct book selling, ARC programs, author branding, newsletters, and self-publishing marketing. Each guide includes definitions, examples, comparison tables, FAQs, and how AuthorLoft helps.
+
 ### Resources (https://www.authorloft.com/resources)
 Free downloadable resources for authors — guides, templates, and tools for building an author business.
 

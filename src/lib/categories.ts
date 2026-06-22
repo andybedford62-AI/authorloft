@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 
-export type CategoryType = "blog" | "resource" | "faq" | "news";
+export type CategoryType = "blog" | "resource" | "faq" | "news" | "guide";
 
 /** Active categories of a given type, ordered for display (sortOrder then name). */
 export async function getCategories(type: CategoryType) {

@@ -36,6 +36,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority:        0.7,
   }));
 
+  // Guide (pillar) pages
+  const guides = await prisma.guide.findMany({
+    where:   { isPublished: true },
+    select:  { slug: true, updatedAt: true },
+  }).catch(() => []);
+
+  const guideEntries: MetadataRoute.Sitemap = guides.map((g) => ({
+    url:             `${BASE}/guides/${g.slug}`,
+    lastModified:    g.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority:        0.8,
+  }));
+
   // Resource download detail pages
   const resourceDownloads = await prisma.resourceDownload.findMany({
     where:   { isPublished: true },
@@ -83,6 +96,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // News - company updates/announcements
     { url: `${BASE}/news`,     lastModified: new Date(), changeFrequency: "weekly",   priority: 0.8 },
     ...newsEntries,
+
+    // Guides (pillar pages) - high priority for GEO
+    { url: `${BASE}/guides`,    lastModified: new Date(), changeFrequency: "weekly",   priority: 0.85 },
+    ...guideEntries,
 
     // Resources - medium priority
     { url: `${BASE}/resources`, lastModified: new Date(), changeFrequency: "monthly",  priority: 0.7 },

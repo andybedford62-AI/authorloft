@@ -11,6 +11,7 @@ const LINKS_TOP: [string, string][] = [
 ];
 
 const RESOURCES: [string, string][] = [
+  ["/guides", "Author Guides"],
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/resources", "Tools & Communities"],

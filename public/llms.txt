@@ -28,6 +28,7 @@ AuthorLoft helps independent authors take control of their careers by providing 
 - News: https://www.authorloft.com/news
 - Bookstore: https://www.authorloft.com/bookstore
 - FAQ: https://www.authorloft.com/faq
+- Author Guides: https://www.authorloft.com/guides
 - Resources: https://www.authorloft.com/resources
 - Contact: https://www.authorloft.com/contact
 

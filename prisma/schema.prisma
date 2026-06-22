@@ -849,6 +849,34 @@ model DownloadLead {
   @@index([createdAt])
 }
 
+// ─── Guides (evergreen pillar pages for GEO / topical authority) ──────────────
+
+model Guide {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  excerpt         String    @default("") @db.Text
+  content         String    @default("") @db.Text
+  coverImageUrl   String?
+  category        String    @default("")
+  seoTitle        String?
+  metaDescription String?   @db.Text
+  focusKeyword    String?
+  faqsJson        String?   @db.Text
+  relatedSlugsJson String?  @db.Text
+  ctaTitle        String?
+  ctaDescription  String?
+  ctaButtonText   String?
+  ctaButtonUrl    String?
+  sortOrder       Int       @default(0)
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isPublished, sortOrder])
+}
+
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
 model Testimonial {

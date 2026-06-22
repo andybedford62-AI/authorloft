@@ -25,6 +25,7 @@ import {
   FileText,
   Newspaper,
   Shield,
+  BookText,
   Bot,
   Search,
   Sun,
@@ -152,6 +153,7 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
     items: [
       { href: "/super-admin/blog",               label: "Blog & News",        icon: Newspaper },
       { href: "/super-admin/subscribers",        label: "News Subscribers",   icon: Mail      },
+      { href: "/super-admin/guides",             label: "Guides",             icon: BookText   },
       { href: "/super-admin/resources",          label: "Resources",          icon: Globe     },
       { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download   },
       { href: "/super-admin/categories",         label: "Content Categories", icon: FolderTree },
