@@ -223,7 +223,9 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Apply to all routes except Next.js internals, static assets, and common file extensions
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|txt|xml|json|woff|woff2|ttf|eot)$).*)",
+    // Apply to all routes except Next.js internals and static binary assets.
+    // robots.txt and sitemap.xml must run through middleware so subdomain
+    // rewrites can route them to the per-author handlers.
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|json|woff|woff2|ttf|eot)$).*)",
   ],
 };
