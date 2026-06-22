@@ -190,15 +190,6 @@ export async function proxy(req: NextRequest) {
     });
   }
 
-  // ── SEO files served by root metadata handlers ───────────────────────────
-  // /sitemap.xml and /robots.txt are handled by app/sitemap.ts and
-  // app/robots.ts respectively, which inspect the request host header and
-  // return per-author or platform content. Skip the subdomain rewrite so
-  // these requests reach the root handlers with the original path.
-  if (url.pathname === "/sitemap.xml" || url.pathname === "/robots.txt") {
-    return NextResponse.next();
-  }
-
   // ── Subdomain routes ─────────────────────────────────────────────────────
   // e.g. apbedford.authorloft.com → rewrite to /(author-site)/apbedford/...
   const isSubdomain =
@@ -206,6 +197,21 @@ export async function proxy(req: NextRequest) {
     hostname.endsWith(`.localhost`) ||
     // Local dev: anything.localhost:3000
     /^[a-z0-9-]+\.localhost(:\d+)?$/.test(hostname);
+
+  // ── SEO files for author sites ───────────────────────────────────────────
+  // /sitemap.xml and /robots.txt on author subdomains or custom domains are
+  // routed to dedicated API handlers that read the host header. This bypasses
+  // the (author-site) [domain] catch-all that would otherwise swallow the
+  // path and return the author 404 page. Platform hosts already returned
+  // above so this only fires for non-platform hostnames.
+  if (url.pathname === "/sitemap.xml" || url.pathname === "/robots.txt") {
+    const target = url.pathname === "/sitemap.xml"
+      ? "/api/internal/sitemap"
+      : "/api/internal/robots";
+    const rewriteUrl = url.clone();
+    rewriteUrl.pathname = target;
+    return NextResponse.rewrite(rewriteUrl);
+  }
 
   if (isSubdomain) {
     const slug = hostnameWithoutPort.split(".")[0];
