@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X, Check } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X, Check, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Resource = {
@@ -28,6 +28,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
   const [error,   setError]       = useState<string | null>(null);
   const [form,    setForm]        = useState<Omit<Resource,"id"|"displayOrder">>(EMPTY);
   const [togglingId,    setTogglingId]    = useState<string | null>(null);
+  const [reorderingId,  setReorderingId]  = useState<string | null>(null);
   const [logoTab,       setLogoTab]       = useState<"upload" | "url">("upload");
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoUploadErr, setLogoUploadErr] = useState<string | null>(null);
@@ -92,6 +93,26 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     await fetch(`/api/super-admin/resources/${id}`, { method: "DELETE" });
     setResources((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  async function move(row: Resource, dir: "up" | "down") {
+    const sorted = [...resources].sort(
+      (a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name)
+    );
+    const idx = sorted.findIndex((r) => r.id === row.id);
+    const swapIdx = dir === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+    const other = sorted[swapIdx];
+    setReorderingId(row.id);
+    const [a, b] = await Promise.all([
+      fetch(`/api/super-admin/resources/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: other.displayOrder }) }),
+      fetch(`/api/super-admin/resources/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: row.displayOrder }) }),
+    ]);
+    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    setReorderingId(null);
+    if (a.ok && b.ok) {
+      setResources((prev) => prev.map((r) => r.id === ja.id ? ja : r.id === jb.id ? jb : r));
+    }
   }
 
   async function toggle(id: string, field: "isActive" | "isPartner" | "showOnHomepage", val: boolean) {
@@ -230,6 +251,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
+              <th className="text-center px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">Order</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Resource</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Category</th>
               <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Active</th>
@@ -239,10 +261,24 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {resources.map((r) => {
+            {[...resources].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name)).map((r, i, arr) => {
               const busy = togglingId === r.id;
+              const moving = reorderingId === r.id;
               return (
                 <tr key={r.id} className={`hover:bg-gray-50 transition-colors ${!r.isActive ? "opacity-50" : ""}`}>
+                  {/* Order arrows */}
+                  <td className="px-2 py-4 text-center">
+                    <div className="inline-flex flex-col items-center">
+                      <button onClick={() => move(r, "up")} disabled={moving || i === 0}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => move(r, "down")} disabled={moving || i === arr.length - 1}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
                   {/* Name + url */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">

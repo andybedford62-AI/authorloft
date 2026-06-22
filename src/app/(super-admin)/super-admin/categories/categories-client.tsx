@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Plus, Pencil, Trash2, GripVertical, Check } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, GripVertical, Check, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Category = {
@@ -32,6 +32,7 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
   const [error, setError]     = useState<string | null>(null);
   const [form, setForm]       = useState<FormState>(EMPTY);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [reorderingId, setReorderingId] = useState<string | null>(null);
 
   const visible = categories
     .filter((c) => c.type === activeType)
@@ -65,6 +66,26 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
     if (!confirm(`Delete the "${c.name}" category? Existing content keeps its current category label, but it will no longer appear in dropdowns.`)) return;
     await fetch(`/api/super-admin/categories/${c.id}`, { method: "DELETE" });
     setCategories((prev) => prev.filter((x) => x.id !== c.id));
+  }
+
+  async function move(row: Category, dir: "up" | "down") {
+    const list = categories
+      .filter((c) => c.type === row.type)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+    const idx = list.findIndex((c) => c.id === row.id);
+    const swapIdx = dir === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= list.length) return;
+    const other = list[swapIdx];
+    setReorderingId(row.id);
+    const [a, b] = await Promise.all([
+      fetch(`/api/super-admin/categories/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sortOrder: other.sortOrder }) }),
+      fetch(`/api/super-admin/categories/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sortOrder: row.sortOrder }) }),
+    ]);
+    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    setReorderingId(null);
+    if (a.ok && b.ok) {
+      setCategories((prev) => prev.map((c) => c.id === ja.id ? ja : c.id === jb.id ? jb : c));
+    }
   }
 
   async function toggleActive(c: Category) {
@@ -160,8 +181,9 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {visible.map((c) => {
+            {visible.map((c, i, arr) => {
               const busy = togglingId === c.id;
+              const moving = reorderingId === c.id;
               return (
                 <tr key={c.id} className={`hover:bg-gray-50 transition-colors ${!c.isActive ? "opacity-50" : ""}`}>
                   <td className="px-5 py-4">
@@ -176,7 +198,19 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
                   <td className="px-4 py-4 hidden sm:table-cell">
                     <code className="text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">{c.slug}</code>
                   </td>
-                  <td className="px-3 py-4 text-center text-xs text-gray-500">{c.sortOrder}</td>
+                  <td className="px-3 py-4 text-center">
+                    <div className="inline-flex items-center gap-1">
+                      <button onClick={() => move(c, "up")} disabled={moving || i === 0}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="text-xs text-gray-500 w-5 text-center">{c.sortOrder}</span>
+                      <button onClick={() => move(c, "down")} disabled={moving || i === arr.length - 1}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-3 py-4 text-center">
                     <Toggle checked={c.isActive} disabled={busy} onChange={() => toggleActive(c)} />
                   </td>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Loader2, Plus, Pencil, Trash2, Upload, Link2, X, FileDown, Download, Eye, EyeOff, Check } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Upload, Link2, X, FileDown, Download, Eye, EyeOff, Check, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -36,6 +36,7 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
   const [error, setError]     = useState<string | null>(null);
   const [form, setForm]       = useState<FormState>(EMPTY);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [reorderingId, setReorderingId] = useState<string | null>(null);
   const [coverTab, setCoverTab]     = useState<"upload" | "url">("upload");
   const [coverUploading, setCoverUploading] = useState(false);
   const [coverErr, setCoverErr]     = useState<string | null>(null);
@@ -89,6 +90,26 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
     if (!confirm(`Delete "${d.title}"? This cannot be undone.`)) return;
     await fetch(`/api/super-admin/resource-downloads/${d.id}`, { method: "DELETE" });
     setRows((prev) => prev.filter((r) => r.id !== d.id));
+  }
+
+  async function move(row: Download, dir: "up" | "down") {
+    const sorted = [...rows].sort(
+      (a, b) => a.displayOrder - b.displayOrder || a.title.localeCompare(b.title)
+    );
+    const idx = sorted.findIndex((r) => r.id === row.id);
+    const swapIdx = dir === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+    const other = sorted[swapIdx];
+    setReorderingId(row.id);
+    const [a, b] = await Promise.all([
+      fetch(`/api/super-admin/resource-downloads/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: other.displayOrder }) }),
+      fetch(`/api/super-admin/resource-downloads/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: row.displayOrder }) }),
+    ]);
+    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    setReorderingId(null);
+    if (a.ok && b.ok) {
+      setRows((prev) => prev.map((r) => r.id === ja.id ? ja : r.id === jb.id ? jb : r));
+    }
   }
 
   async function togglePublished(d: Download) {
@@ -215,6 +236,7 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
+              <th className="text-center px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">Order</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Download</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Category</th>
               <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Downloads</th>
@@ -223,10 +245,23 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {rows.map((d) => {
+            {[...rows].sort((a, b) => a.displayOrder - b.displayOrder || a.title.localeCompare(b.title)).map((d, i, arr) => {
               const busy = togglingId === d.id;
+              const moving = reorderingId === d.id;
               return (
                 <tr key={d.id} className={`hover:bg-gray-50 transition-colors ${!d.isPublished ? "opacity-50" : ""}`}>
+                  <td className="px-2 py-4 text-center">
+                    <div className="inline-flex flex-col items-center">
+                      <button onClick={() => move(d, "up")} disabled={moving || i === 0}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => move(d, "down")} disabled={moving || i === arr.length - 1}
+                        className="p-0.5 rounded text-gray-400 hover:text-purple-600 hover:bg-purple-50 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400 transition-colors">
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-lg bg-[#C26A4A]/10 flex items-center justify-center flex-shrink-0">
