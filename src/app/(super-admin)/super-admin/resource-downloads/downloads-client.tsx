@@ -106,6 +106,7 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
     const json = await res.json();
     setReorderingId(null);
     if (res.ok) setRows(json);
+    else alert(`Reorder failed: ${res.status} ${json?.error ?? ""}`);
   }
 
   async function togglePublished(d: Download) {

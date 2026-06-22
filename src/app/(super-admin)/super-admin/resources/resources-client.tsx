@@ -109,6 +109,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
     const json = await res.json();
     setReorderingId(null);
     if (res.ok) setResources(json);
+    else alert(`Reorder failed: ${res.status} ${json?.error ?? ""}`);
   }
 
   async function toggle(id: string, field: "isActive" | "isPartner" | "showOnHomepage", val: boolean) {

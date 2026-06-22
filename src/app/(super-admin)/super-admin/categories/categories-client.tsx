@@ -89,6 +89,8 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
         ...prev.filter((c) => c.type !== row.type),
         ...json,
       ]);
+    } else {
+      alert(`Reorder failed: ${res.status} ${(json as any)?.error ?? ""}`);
     }
   }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
@@ -12,6 +13,7 @@ export async function POST(req: NextRequest) {
   await prisma.$transaction(
     ids.map((id, i) => prisma.platformResource.update({ where: { id }, data: { displayOrder: i } }))
   );
+  revalidatePath("/");
   const rows = await prisma.platformResource.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
   });
