@@ -227,7 +227,8 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
 
       {/* ── Resources table ────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Resource</th>
@@ -298,6 +299,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
             })}
           </tbody>
         </table>
+        </div>
         {resources.length === 0 && (
           <div className="py-12 text-center text-gray-400 text-sm">No resources yet. Add one above.</div>
         )}

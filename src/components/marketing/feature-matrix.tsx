@@ -313,7 +313,8 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
         <div key={section.category}>
           <h2 className="text-xl font-bold text-gray-900 mb-4">{section.category}</h2>
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left px-6 py-4 font-medium text-gray-700 w-2/5">Feature</th>
@@ -351,6 +352,7 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       ))}
