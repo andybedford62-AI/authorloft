@@ -225,14 +225,14 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
         </div>
       )}
 
-      {/* ── Resources table ────────────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* ── Resources list ─────────────────────────────────────────────── */}
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Resource</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Category</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
               <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Active</th>
               <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Partner</th>
               <th className="text-center px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Homepage</th>
@@ -244,7 +244,6 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
               const busy = togglingId === r.id;
               return (
                 <tr key={r.id} className={`hover:bg-gray-50 transition-colors ${!r.isActive ? "opacity-50" : ""}`}>
-                  {/* Name + url */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-xs font-bold" style={{ background: r.avatarColor }}>
@@ -260,15 +259,12 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                       </div>
                     </div>
                   </td>
-                  {/* Category */}
-                  <td className="px-4 py-4 hidden md:table-cell">
+                  <td className="px-4 py-4">
                     <span className="text-xs text-gray-500">{r.category || "—"}</span>
                   </td>
-                  {/* Active toggle */}
                   <td className="px-3 py-4 text-center">
                     <Toggle checked={r.isActive} disabled={busy} onChange={() => toggle(r.id, "isActive", !r.isActive)} />
                   </td>
-                  {/* Partner toggle */}
                   <td className="px-3 py-4 text-center">
                     <button onClick={() => toggle(r.id, "isPartner", !r.isPartner)} disabled={busy}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${r.isPartner ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
@@ -276,14 +272,12 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                       {r.isPartner ? "Yes" : "No"}
                     </button>
                   </td>
-                  {/* Homepage toggle */}
                   <td className="px-3 py-4 text-center">
                     <button onClick={() => toggle(r.id, "showOnHomepage", !r.showOnHomepage)} disabled={busy}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${r.showOnHomepage ? "bg-blue-100 text-blue-700 hover:bg-blue-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                       {r.showOnHomepage ? <><Eye className="h-3 w-3" /> Shown</> : <><EyeOff className="h-3 w-3" /> Hidden</>}
                     </button>
                   </td>
-                  {/* Actions */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2 justify-end">
                       <button onClick={() => openEdit(r)} className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
@@ -299,9 +293,58 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
             })}
           </tbody>
         </table>
-        </div>
         {resources.length === 0 && (
           <div className="py-12 text-center text-gray-400 text-sm">No resources yet. Add one above.</div>
+        )}
+      </div>
+
+      {/* Mobile card list */}
+      <div className="md:hidden space-y-3">
+        {resources.map((r) => {
+          const busy = togglingId === r.id;
+          return (
+            <div key={r.id} className={`bg-white rounded-xl border border-gray-200 p-4 space-y-3 ${!r.isActive ? "opacity-50" : ""}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-xs font-bold" style={{ background: r.avatarColor }}>
+                    {r.logoUrl
+                      ? <img src={r.logoUrl} alt="" className="w-9 h-9 rounded-lg object-contain p-0.5" />
+                      : r.initials || r.name[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 text-sm truncate">{r.name}</p>
+                    {r.category && <p className="text-xs text-gray-400">{r.category}</p>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => openEdit(r)} className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => handleDelete(r.id, r.name)} className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button onClick={() => toggle(r.id, "isActive", !r.isActive)} disabled={busy}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${r.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"}`}>
+                  {r.isActive ? <><Eye className="h-3 w-3" /> Active</> : <><EyeOff className="h-3 w-3" /> Inactive</>}
+                </button>
+                <button onClick={() => toggle(r.id, "isPartner", !r.isPartner)} disabled={busy}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${r.isPartner ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-400"}`}>
+                  <Star className={`h-3 w-3 ${r.isPartner ? "fill-amber-500" : ""}`} />
+                  {r.isPartner ? "Partner" : "Not partner"}
+                </button>
+                <button onClick={() => toggle(r.id, "showOnHomepage", !r.showOnHomepage)} disabled={busy}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${r.showOnHomepage ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-400"}`}>
+                  {r.showOnHomepage ? <><Eye className="h-3 w-3" /> Homepage</> : <><EyeOff className="h-3 w-3" /> Not on homepage</>}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        {resources.length === 0 && (
+          <div className="py-12 text-center text-gray-400 text-sm bg-white rounded-xl border border-gray-200">No resources yet. Add one above.</div>
         )}
       </div>
 
