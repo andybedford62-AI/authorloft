@@ -74,24 +74,25 @@ const COMPETITOR_ROWS: Array<{
   label: string;
   authorloft: CompCell;
   tertulia: CompCell;
+  quilltips: CompCell;
   storyorigin: CompCell;
   bookfunnel: CompCell;
 }> = [
-  { label: "Author Platform & Site",   authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Unlimited Books & Series", authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "Limited", type: "limited" } },
-  { label: "News Posts",              authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Events",                  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Reviews & Ratings",       authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Mailing List Builder",    authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
-  { label: "Custom Pages",            authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Analytics",               authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
-  { label: "Custom Domain",           authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "eBook Sales",             authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
-  { label: "Audiobook Sales",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "Limited", type: "limited" } },
-  { label: "Print Book Sales",        authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "Limited", type: "limited" } },
-  { label: "Email Campaigns",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
-  { label: "Reader Magnets",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
-  { label: "3rd-Party Integrations",  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "Author Platform & Site",   authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✓", type: "yes" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Unlimited Books & Series", authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✓", type: "yes" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "Limited", type: "limited" } },
+  { label: "News Posts",              authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Events",                  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✓", type: "yes" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Reviews & Ratings",       authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Mailing List Builder",    authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "Limited", type: "limited" }, storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "Custom Pages",            authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Analytics",               authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✓", type: "yes" },        storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "Custom Domain",           authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✓", type: "yes" },       quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "eBook Sales",             authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "Audiobook Sales",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "Limited", type: "limited" } },
+  { label: "Print Book Sales",        authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "Limited", type: "limited" }, storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "Limited", type: "limited" } },
+  { label: "Email Campaigns",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Reader Magnets",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "Limited", type: "limited" }, storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "3rd-Party Integrations",  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
 ];
 
 // Feature comparison table rows
@@ -222,22 +223,26 @@ export default async function PricingPage() {
               AuthorLoft vs. the competition
             </h2>
             <p className="text-[#5C6E89] text-sm max-w-xl mx-auto">
-              Our free plan includes more features than competitors&apos; paid tiers — so you can grow without paying extra.
+              An apples-to-apples look at AuthorLoft <strong>Standard</strong> next to each competitor&apos;s entry paid tier.
             </p>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-[#DCDBD3]">
-            <table className="w-full text-sm min-w-[640px]">
+            <table className="w-full text-sm min-w-[720px]">
               <thead>
                 <tr className="border-b border-[#DCDBD3] bg-[#F0EDE4]">
-                  <th className="text-left px-6 py-4 font-medium text-[#8993A4] w-[34%]">Feature</th>
+                  <th className="text-left px-6 py-4 font-medium text-[#8993A4] w-[30%]">Feature</th>
                   <th className="text-center px-4 py-4 font-bold text-[#C26A4A] bg-[#F0EDE4] border-x border-[#DCDBD3]">
                     AuthorLoft
-                    <span className="block text-xs font-semibold text-[#B8893D] mt-0.5">FREE</span>
+                    <span className="block text-xs font-semibold text-[#B8893D] mt-0.5">STANDARD · $19.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
                     <Link href="/compare/tertulia" className="hover:text-[#C26A4A] hover:underline transition-colors">Tertulia</Link>
                     <span className="block text-xs font-normal text-[#8993A4] mt-0.5">$7.99/mo</span>
+                  </th>
+                  <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
+                    <Link href="/compare/quilltips" className="hover:text-[#C26A4A] hover:underline transition-colors">Quilltips</Link>
+                    <span className="block text-xs font-normal text-[#8993A4] mt-0.5">$4.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-[#1B2B47]">
                     <Link href="/compare/storyorigin" className="hover:text-[#C26A4A] hover:underline transition-colors">StoryOrigin</Link>
@@ -250,11 +255,12 @@ export default async function PricingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#DCDBD3]">
-                {COMPETITOR_ROWS.map(({ label, authorloft, tertulia, storyorigin, bookfunnel }) => (
+                {COMPETITOR_ROWS.map(({ label, authorloft, tertulia, quilltips, storyorigin, bookfunnel }) => (
                   <tr key={label} className="hover:bg-[#F0EDE4] transition-colors">
                     <td className="px-6 py-3.5 text-[#1B2B47] font-medium">{label}</td>
                     <td className={`px-4 py-3.5 text-center bg-[#F0EDE4] border-x border-[#DCDBD3] ${cellCls(authorloft.type)}`}>{authorloft.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(tertulia.type)}`}>{tertulia.val}</td>
+                    <td className={`px-4 py-3.5 text-center ${cellCls(quilltips.type)}`}>{quilltips.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(storyorigin.type)}`}>{storyorigin.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(bookfunnel.type)}`}>{bookfunnel.val}</td>
                   </tr>
@@ -262,21 +268,21 @@ export default async function PricingPage() {
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-[#DCDBD3] bg-[#F0EDE4]">
-                  <td className="px-6 py-4 text-xs text-[#8993A4] italic">Basic / entry plan compared</td>
+                  <td className="px-6 py-4 text-xs text-[#8993A4] italic">Entry paid plan compared</td>
                   <td className="px-4 py-4 text-center bg-[#F0EDE4] border-x border-[#DCDBD3]">
                     <Link href="/register" className="inline-block bg-[#B8893D] text-[#0F1A2D] text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[#D4AE6A] transition-colors">
-                      Start Free →
+                      Get Started →
                     </Link>
                   </td>
-                  <td colSpan={3} className="px-4 py-4 text-center text-xs text-[#8993A4]">
-                    Requires a paid plan to access most features
+                  <td colSpan={4} className="px-4 py-4 text-center text-xs text-[#8993A4]">
+                    Compared at each competitor&apos;s entry paid tier
                   </td>
                 </tr>
               </tfoot>
             </table>
           </div>
           <p className="text-center text-xs text-[#8993A4] mt-4">
-            Competitor features based on publicly listed plans as of May 2026. Features subject to change.
+            Competitor features based on publicly listed plans as of June 2026. Features subject to change.
           </p>
           <p className="text-center text-sm mt-3 text-[#8993A4]">
             Full comparisons:{" "}
@@ -285,6 +291,8 @@ export default async function PricingPage() {
             <Link href="/compare/storyorigin" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">vs StoryOrigin</Link>
             {" · "}
             <Link href="/compare/tertulia" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">vs Tertulia</Link>
+            {" · "}
+            <Link href="/compare/quilltips" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">vs Quilltips</Link>
           </p>
         </div>
       </section>

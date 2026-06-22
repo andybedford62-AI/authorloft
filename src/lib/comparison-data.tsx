@@ -212,6 +212,73 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       { q: "Can I use both Tertulia and AuthorLoft?", a: "Yes. You can list and get discovered on Tertulia while using AuthorLoft as your home base — your branded website, newsletter, and direct storefront for ebooks, audiobooks and print." },
     ],
   },
+
+  // ── Quilltips ──────────────────────────────────────────────────────────────
+  quilltips: {
+    slug: "quilltips",
+    name: "Quilltips",
+    metaTitle: "AuthorLoft vs Quilltips: Author Website, Sales & Tipping",
+    metaDescription:
+      "AuthorLoft vs Quilltips for authors: a full author website with direct ebook, audiobook and print sales vs tip-jar book pages and QR codes for readers.",
+    subtitle:
+      "Quilltips turns each book into a tip-jar page with a QR code; AuthorLoft is a full author website and storefront. Here's how the two stack up.",
+    tldr: (
+      <>
+        <strong>The short version:</strong> <strong>Quilltips</strong> is a lightweight <em>tip-jar</em> for authors —
+        a per-book page with a QR code so readers can leave a tip and a note. <strong>AuthorLoft</strong> is your{" "}
+        <strong>author website and storefront</strong>, with direct ebook, audiobook and print sales, newsletters, a
+        blog and events on your own domain — plus a discovery bookstore.
+      </>
+    ),
+    chooseUs: [
+      "You want a real author website on your own custom domain",
+      "You want to sell ebooks, audiobooks and print direct",
+      "You want a blog/news, events, reviews and custom pages",
+      "You want newsletter campaigns, not just signup forms",
+    ],
+    chooseThem: [
+      "You mainly want a tip jar attached to your printed books",
+      "QR codes inside print books are central to your reader funnel",
+      "You don't need a full website, blog or storefront",
+      "You're happy linking out to Amazon and other retailers for sales",
+    ],
+    rows: [
+      { label: "Full author platform & site",       us: "yes", them: "limited", note: "Quilltips offers an author profile and book pages, but not a full multi-page site." },
+      { label: "Custom domain",                     us: "yes", them: "no" },
+      { label: "Unlimited books & series",          us: "yes", them: "yes",     note: "Unlimited book pages are on the Quilltips Plus tier." },
+      { label: "Blog / news posts",                 us: "yes", them: "no" },
+      { label: "Events",                            us: "yes", them: "yes" },
+      { label: "Custom pages",                      us: "yes", them: "no" },
+      { label: "Reviews & ratings",                 us: "yes", them: "no" },
+      { label: "Direct eBook sales",                us: "yes", them: "no" },
+      { label: "Direct audiobook sales",            us: "yes", them: "no" },
+      { label: "Direct print book sales",           us: "yes", them: "limited", note: "Quilltips supports in-person payment for print books, not a full online print storefront." },
+      { label: "Reader tips / fan mail",            us: "no",  them: "yes",     note: "Quilltips' signature feature — Stripe-powered tipping and notes from readers." },
+      { label: "QR codes for print books",          us: "limited", them: "yes" },
+      { label: "Newsletter capture",                us: "yes", them: "yes" },
+      { label: "Newsletter campaigns",              us: "yes", them: "no" },
+      { label: "Reader magnets / free downloads",   us: "yes", them: "limited" },
+      { label: "Analytics",                         us: "yes", them: "yes" },
+      { label: "3rd-party integrations",            us: "yes", them: "no" },
+    ],
+    coreDifference: (
+      <>
+        Quilltips answers the question <em>&ldquo;how do my readers tip me and tell me they enjoyed the book?&rdquo;</em>{" "}
+        — a per-book page, a QR code in the back of the print edition, and Stripe-powered tipping. AuthorLoft answers a
+        bigger one: <em>&ldquo;where do readers find me, follow me, and buy from me?&rdquo;</em> That means a branded
+        website on your own domain, direct sales of ebooks, audiobooks and print, newsletter campaigns, a blog and
+        events, and a discovery bookstore. The two can sit happily side-by-side — Quilltips inside the print book,
+        AuthorLoft as the home base everything links to.
+      </>
+    ),
+    faqs: [
+      { q: "Is AuthorLoft a good Quilltips alternative?", a: "It depends on what you need. Quilltips is a focused tip-jar for authors — a book page with a QR code so readers can leave a tip and a note. AuthorLoft is a full author website and storefront with direct ebook, audiobook and print sales, newsletter campaigns, a blog and events, on your own custom domain. If you want one home base for everything an author needs, AuthorLoft is the broader fit." },
+      { q: "Can I sell books directly with Quilltips?", a: "Quilltips is built around voluntary reader tips rather than direct book sales, with some in-person payment support for selling print at events. AuthorLoft is built for direct sales — ebooks, audiobooks and print — with Stripe payouts, on your own site." },
+      { q: "Does AuthorLoft do reader tipping like Quilltips?", a: "AuthorLoft doesn't have a dedicated Stripe tip-jar with reader notes the way Quilltips does. Authors can run direct sales, reader magnets and a support-the-author link instead. Many authors use Quilltips for in-book QR tipping alongside AuthorLoft as their website and storefront." },
+      { q: "Can I use AuthorLoft and Quilltips together?", a: "Yes. A common setup is Quilltips QR codes inside your print books for tips and fan mail, with AuthorLoft as your branded author website, newsletter and storefront — the place those QR codes ultimately drive readers to follow you and buy more." },
+      { q: "How much does AuthorLoft cost compared to Quilltips?", a: "Quilltips has a Free tier and a Plus tier at $4.99/mo for unlimited book pages. AuthorLoft has a free plan and paid plans — Standard at $19.99/mo unlocks a custom domain, direct ebook/audiobook/print sales, newsletter campaigns and more. See the AuthorLoft pricing page for current plans." },
+    ],
+  },
 };
 
 export const COMPARISON_SLUGS = Object.keys(COMPARISONS);
