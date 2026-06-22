@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
@@ -111,9 +112,13 @@ export default function AcceptTermsPage() {
 
           <p className="text-xs text-center text-gray-400">
             If you do not agree, you can{" "}
-            <Link href="/api/auth/signout" className="text-red-500 hover:underline">
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-red-500 hover:underline"
+            >
               sign out
-            </Link>
+            </button>
             {" "}— no account data will be retained.
           </p>
         </div>

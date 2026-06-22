@@ -292,7 +292,7 @@ function RegisterPageInner() {
             </Link>
             <p className="text-xs text-gray-400">
               Didn&apos;t receive it? Check your spam folder or{" "}
-              <Link href="/resend-verification" className="text-blue-600 hover:underline">
+              <Link href="/verify-email/invalid" className="text-blue-600 hover:underline">
                 resend the email
               </Link>
               .
