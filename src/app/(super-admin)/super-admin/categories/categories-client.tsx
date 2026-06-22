@@ -75,16 +75,20 @@ export function CategoriesClient({ initial }: { initial: Category[] }) {
     const idx = list.findIndex((c) => c.id === row.id);
     const swapIdx = dir === "up" ? idx - 1 : idx + 1;
     if (swapIdx < 0 || swapIdx >= list.length) return;
-    const other = list[swapIdx];
+    const next = [...list];
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
     setReorderingId(row.id);
-    const [a, b] = await Promise.all([
-      fetch(`/api/super-admin/categories/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sortOrder: other.sortOrder }) }),
-      fetch(`/api/super-admin/categories/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sortOrder: row.sortOrder }) }),
-    ]);
-    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    const res = await fetch("/api/super-admin/categories/reorder", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: row.type, ids: next.map((c) => c.id) }),
+    });
+    const json: Category[] = await res.json();
     setReorderingId(null);
-    if (a.ok && b.ok) {
-      setCategories((prev) => prev.map((c) => c.id === ja.id ? ja : c.id === jb.id ? jb : c));
+    if (res.ok) {
+      setCategories((prev) => [
+        ...prev.filter((c) => c.type !== row.type),
+        ...json,
+      ]);
     }
   }
 

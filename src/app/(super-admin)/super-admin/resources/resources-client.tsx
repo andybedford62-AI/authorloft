@@ -96,23 +96,19 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
   }
 
   async function move(row: Resource, dir: "up" | "down") {
-    const sorted = [...resources].sort(
-      (a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name)
-    );
-    const idx = sorted.findIndex((r) => r.id === row.id);
+    const idx = resources.findIndex((r) => r.id === row.id);
     const swapIdx = dir === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= sorted.length) return;
-    const other = sorted[swapIdx];
+    if (swapIdx < 0 || swapIdx >= resources.length) return;
+    const next = [...resources];
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
     setReorderingId(row.id);
-    const [a, b] = await Promise.all([
-      fetch(`/api/super-admin/resources/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: other.displayOrder }) }),
-      fetch(`/api/super-admin/resources/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: row.displayOrder }) }),
-    ]);
-    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    const res = await fetch("/api/super-admin/resources/reorder", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: next.map((r) => r.id) }),
+    });
+    const json = await res.json();
     setReorderingId(null);
-    if (a.ok && b.ok) {
-      setResources((prev) => prev.map((r) => r.id === ja.id ? ja : r.id === jb.id ? jb : r));
-    }
+    if (res.ok) setResources(json);
   }
 
   async function toggle(id: string, field: "isActive" | "isPartner" | "showOnHomepage", val: boolean) {
@@ -261,7 +257,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {[...resources].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name)).map((r, i, arr) => {
+            {resources.map((r, i, arr) => {
               const busy = togglingId === r.id;
               const moving = reorderingId === r.id;
               return (

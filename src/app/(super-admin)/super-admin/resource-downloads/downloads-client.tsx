@@ -93,23 +93,19 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
   }
 
   async function move(row: Download, dir: "up" | "down") {
-    const sorted = [...rows].sort(
-      (a, b) => a.displayOrder - b.displayOrder || a.title.localeCompare(b.title)
-    );
-    const idx = sorted.findIndex((r) => r.id === row.id);
+    const idx = rows.findIndex((r) => r.id === row.id);
     const swapIdx = dir === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= sorted.length) return;
-    const other = sorted[swapIdx];
+    if (swapIdx < 0 || swapIdx >= rows.length) return;
+    const next = [...rows];
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
     setReorderingId(row.id);
-    const [a, b] = await Promise.all([
-      fetch(`/api/super-admin/resource-downloads/${row.id}`,   { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: other.displayOrder }) }),
-      fetch(`/api/super-admin/resource-downloads/${other.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ displayOrder: row.displayOrder }) }),
-    ]);
-    const [ja, jb] = await Promise.all([a.json(), b.json()]);
+    const res = await fetch("/api/super-admin/resource-downloads/reorder", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: next.map((r) => r.id) }),
+    });
+    const json = await res.json();
     setReorderingId(null);
-    if (a.ok && b.ok) {
-      setRows((prev) => prev.map((r) => r.id === ja.id ? ja : r.id === jb.id ? jb : r));
-    }
+    if (res.ok) setRows(json);
   }
 
   async function togglePublished(d: Download) {
@@ -245,7 +241,7 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {[...rows].sort((a, b) => a.displayOrder - b.displayOrder || a.title.localeCompare(b.title)).map((d, i, arr) => {
+            {rows.map((d, i, arr) => {
               const busy = togglingId === d.id;
               const moving = reorderingId === d.id;
               return (
