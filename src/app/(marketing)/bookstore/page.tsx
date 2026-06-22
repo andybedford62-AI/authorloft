@@ -56,6 +56,15 @@ export default async function BookstorePage() {
     : [];
   const topGenres = genres.slice(0, 14);
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Bookstore", item: `${BASE}/bookstore` },
+    ],
+  };
+
   // Structured data
   const collectionLd = {
     "@context": "https://schema.org",
@@ -103,6 +112,10 @@ export default async function BookstorePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <MarketingNav />
 

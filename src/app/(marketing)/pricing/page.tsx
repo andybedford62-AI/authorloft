@@ -110,11 +110,23 @@ const COMPARISON_ROWS = [
   { label: "Support",            free: "Community", standard: "Priority",   premium: "Priority"   },
 ];
 
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+    { "@type": "ListItem", position: 2, name: "Pricing", item: `${BASE}/pricing` },
+  ],
+};
+
 export default async function PricingPage() {
   const plans = await getActivePlans().catch(() => []);
 
   return (
     <div className="min-h-screen bg-[#E8E5DD]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Nav */}
       <MarketingNav activePage="pricing" />

@@ -10,6 +10,8 @@ function CellIcon({ v }: { v: Cell }) {
   return <X className="h-5 w-5 text-gray-300" aria-label="No" />;
 }
 
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
 export function ComparisonPage({ data }: { data: ComparisonData }) {
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -21,9 +23,20 @@ export function ComparisonPage({ data }: { data: ComparisonData }) {
     })),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Pricing", item: `${BASE}/pricing` },
+      { "@type": "ListItem", position: 3, name: `AuthorLoft vs ${data.name}`, item: `${BASE}/compare/${data.slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#F0EDE4]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <MarketingNav />
 
       <MarketingPageHeader

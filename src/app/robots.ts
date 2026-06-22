@@ -19,11 +19,40 @@ export default function robots(): MetadataRoute.Robots {
           "/arc/",
         ],
       },
-      // Google bot gets full access
       {
         userAgent: "Googlebot",
         allow: "/",
         disallow: ["/admin", "/super-admin", "/api/", "/_next"],
+      },
+      {
+        userAgent: "GPTBot",
+        allow: ["/", "/blog", "/news", "/bookstore", "/features", "/pricing", "/faq", "/resources", "/compare", "/llms.txt", "/llms-full.txt"],
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
+      },
+      {
+        userAgent: "ChatGPT-User",
+        allow: ["/", "/blog", "/news", "/bookstore", "/features", "/pricing", "/faq", "/resources", "/compare", "/llms.txt", "/llms-full.txt"],
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
+      },
+      {
+        userAgent: "ClaudeBot",
+        allow: ["/", "/blog", "/news", "/bookstore", "/features", "/pricing", "/faq", "/resources", "/compare", "/llms.txt", "/llms-full.txt"],
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
+      },
+      {
+        userAgent: "PerplexityBot",
+        allow: ["/", "/blog", "/news", "/bookstore", "/features", "/pricing", "/faq", "/resources", "/compare", "/llms.txt", "/llms-full.txt"],
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
+      },
+      {
+        userAgent: "Amazonbot",
+        allow: ["/", "/blog", "/news", "/bookstore", "/features", "/pricing", "/faq", "/resources", "/compare"],
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
+      },
+      {
+        userAgent: "Google-Extended",
+        allow: "/",
+        disallow: ["/admin", "/super-admin", "/api/", "/auth/", "/orders/", "/_next"],
       },
     ],
     sitemap: `https://www.${platformDomain}/sitemap.xml`,

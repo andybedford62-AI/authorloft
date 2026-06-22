@@ -64,6 +64,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 ## Marketing & SEO
 
+- [x] **GEO search readiness** — full structured data pass: llms.txt/llms-full.txt, WebSite+SearchAction schema, SoftwareApplication schema on features, Person schema on author about pages, BreadcrumbList on all marketing pages, AI bot rules in robots.txt, blog RSS feed. *(done June 22, 2026)*
 - [ ] **Feature landing pages** — deferred until PostHog traffic data (~2026-07-01).
 - [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
 

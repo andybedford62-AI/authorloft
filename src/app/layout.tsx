@@ -56,6 +56,21 @@ const orgJsonLd = {
   sameAs: [PLATFORM_URL],
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "AuthorLoft",
+  url: PLATFORM_URL,
+  description:
+    "The all-in-one platform for independent authors to own their business, sell books directly, grow their audience, and track everything.",
+  publisher: { "@type": "Organization", name: "AuthorLoft" },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${PLATFORM_URL}/bookstore?q={search_term_string}` },
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -89,6 +104,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         {children}
         <ConsentBanner />
       </body>

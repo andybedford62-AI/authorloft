@@ -61,6 +61,15 @@ export default async function FaqPage() {
     ...(bucket.has(GENERAL) ? [bucket.get(GENERAL)!] : []),
   ].filter((g) => g.items.length > 0);
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.authorloft.com/" },
+      { "@type": "ListItem", position: 2, name: "FAQ", item: "https://www.authorloft.com/faq" },
+    ],
+  };
+
   // FAQ structured data for SEO.
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
@@ -99,6 +108,7 @@ export default async function FaqPage() {
         </div>
       </section>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {faqJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       )}

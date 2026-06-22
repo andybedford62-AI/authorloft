@@ -10,6 +10,8 @@ import { sanitize } from "@/lib/sanitize";
 
 export const revalidate = 60;
 
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
 const ML = {
   midnight: "#0F1A2D", ink: "#1B2B47", bone: "#E8E5DD",
   pearl: "#F0EDE4", brass: "#B8893D", brass2: "#D4AE6A",
@@ -63,8 +65,19 @@ export default async function ResourceDownloadPage(
 
   const bodyHtml = d.body ? sanitize(d.body) : null;
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Resources", item: `${BASE}/resources` },
+      { "@type": "ListItem", position: 3, name: d.title, item: `${BASE}/resources/${d.slug}` },
+    ],
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: ML.midnight }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <MarketingNav />
 
       <MarketingPageHeader

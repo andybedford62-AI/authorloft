@@ -4,6 +4,7 @@ import { SocialLinks } from "@/components/author-site/social-links";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -74,8 +75,44 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     ...rawStats.filter((s) => s.value?.trim() && s.label?.trim()),
   ];
 
+  const base = getAuthorBaseUrl(author);
+  const sameAs = [
+    author.linkedinUrl, author.twitterUrl, author.instagramUrl,
+    author.facebookUrl, author.youtubeUrl,
+  ].filter((u): u is string => !!u);
+
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
+
+  const personLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: authorName,
+    url: base,
+    ...(author.profileImageUrl && { image: author.profileImageUrl }),
+    ...(author.tagline && { jobTitle: author.tagline }),
+    description: (author as any).bio
+      ? stripHtml((author as any).bio).slice(0, 300)
+      : author.shortBio || `Independent author on AuthorLoft.`,
+    ...(sameAs.length > 0 && { sameAs }),
+    ...(books.length > 0 && {
+      knowsAbout: "Writing, Publishing, Independent Author",
+      mainEntityOfPage: { "@type": "WebPage", "@id": `${base}/about` },
+    }),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "About", item: `${base}/about` },
+    ],
+  };
+
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       <PageBanner label="Biography" title="About the Author" accentColor={accentColor} />
 

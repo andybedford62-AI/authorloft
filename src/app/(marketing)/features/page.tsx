@@ -67,11 +67,61 @@ async function getActivePlans() {
   return { plans, defaultAiUsageCap: config?.defaultAiUsageCap ?? 20 };
 }
 
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+const softwareAppLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "AuthorLoft",
+  url: BASE,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description:
+    "The all-in-one platform for independent authors. Direct sales, reader analytics, newsletter capture, custom domains, AI writing tools, and bookstore discovery — all on one platform.",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Free",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Author website with book catalog, blog, and reader feedback — free forever.",
+    },
+    {
+      "@type": "Offer",
+      name: "Standard",
+      price: "39.99",
+      priceCurrency: "USD",
+      billingIncrement: "P1M",
+      description: "Direct sales, custom domain, newsletter, bookstore listing, AI tools, and more.",
+    },
+    {
+      "@type": "Offer",
+      name: "Premium",
+      price: "79.99",
+      priceCurrency: "USD",
+      billingIncrement: "P1M",
+      description: "Full analytics, media kit, audio previews, premium themes, and unlimited books.",
+    },
+  ],
+  creator: { "@type": "Organization", name: "AuthorLoft" },
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+    { "@type": "ListItem", position: 2, name: "Features", item: `${BASE}/features` },
+  ],
+};
+
 export default async function FeaturesPage() {
   const { plans, defaultAiUsageCap } = await getActivePlans().catch(() => ({ plans: [], defaultAiUsageCap: 20 }));
 
   return (
     <div className="min-h-screen bg-[#E8E5DD]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Nav */}
       <MarketingNav activePage="features" />
 
