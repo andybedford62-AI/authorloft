@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { FeatureMatrix } from "@/components/marketing/feature-matrix";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
+import { LANDING_PAGES, LANDING_PAGE_SLUGS } from "@/lib/landing-page-data";
 
 export const revalidate = 60;
 
@@ -163,6 +164,38 @@ export default async function FeaturesPage() {
         >
           See how AuthorLoft compares to the competition →
         </Link>
+      </section>
+
+      {/* Feature deep dives */}
+      <section className="px-4 pb-16 max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold text-[#1B2B47] mb-2 text-center" style={{ fontFamily: "Georgia, serif" }}>
+          Explore each feature in depth
+        </h2>
+        <p className="text-sm text-[#5C6E89] text-center mb-8">
+          Learn how each AuthorLoft capability helps you build your author business.
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {LANDING_PAGE_SLUGS.map((slug) => {
+            const page = LANDING_PAGES[slug];
+            return (
+              <Link
+                key={slug}
+                href={`/${slug}`}
+                className="group bg-white rounded-xl border border-gray-200 p-5 hover:border-[#B8893D] hover:shadow-md transition-all"
+              >
+                <p className="text-[11px] font-mono uppercase tracking-wider text-[#B8893D] mb-1">
+                  {page.eyebrow}
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">
+                  {page.metaDescription}
+                </p>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] group-hover:gap-2 transition-all">
+                  Learn more <ArrowRight className="h-3 w-3" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       {/* CTA Section */}

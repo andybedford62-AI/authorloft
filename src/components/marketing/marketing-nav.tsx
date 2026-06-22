@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
 import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
+import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solutions";
 
 
 export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" | "faq" }) {
@@ -78,6 +79,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Features
           </Link>
+          <MarketingNavSolutions />
           <Link
             href="/faq"
             className={`text-sm transition-colors ${

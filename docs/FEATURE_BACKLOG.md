@@ -66,7 +66,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 - [x] **GEO search readiness** — full structured data pass: llms.txt/llms-full.txt, WebSite+SearchAction schema, SoftwareApplication schema on features, Person schema on author about pages, BreadcrumbList on all marketing pages, AI bot rules in robots.txt, blog RSS feed. *(done June 22, 2026)*
 - [x] **Guides infrastructure (Phase 1)** — CMS-managed evergreen pillar pages at `/guides/[slug]` with FAQ schema, related blog links, structured data, nav/footer/sitemap. *(done June 22, 2026)*
-- [ ] **Guide content (Phase 3)** — Write and publish ~10 pillar guides: What Is an Author Website?, What Is Direct Book Selling?, What Is an ARC Program?, What Is Author Branding?, What Is an Author Newsletter?, etc. *(~20 hrs content)*
+- [x] **Guide content (Phase 3)** — 10 pillar guides published: author websites, direct book selling, ARC programs, author newsletters, author branding, author media kits, book launch marketing, self-publishing, affiliate programs, reader analytics. *(done June 22, 2026)*
 - [x] **Commercial landing pages (Phase 2)** — 11 static marketing pages for high-intent keywords: /author-website-builder, /sell-books-directly, /book-marketing-platform, /author-newsletter-platform, /arc-management, /author-media-kit, /ai-tools-for-authors, /indie-author-bookstore, /book-pre-orders, /author-affiliate-program, /reader-analytics-for-authors. *(done June 22, 2026)*
 - [ ] **Supporting blog articles (Phase 4)** — 3-5 blog posts per guide linking back to pillar pages (hub-and-spoke content strategy).
 - [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
