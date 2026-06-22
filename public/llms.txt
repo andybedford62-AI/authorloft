@@ -32,6 +32,19 @@ AuthorLoft helps independent authors take control of their careers by providing 
 - Resources: https://www.authorloft.com/resources
 - Contact: https://www.authorloft.com/contact
 
+## Feature Pages
+- Author Website Builder: https://www.authorloft.com/author-website-builder
+- Sell Books Directly: https://www.authorloft.com/sell-books-directly
+- Book Marketing Platform: https://www.authorloft.com/book-marketing-platform
+- Author Newsletter Platform: https://www.authorloft.com/author-newsletter-platform
+- ARC Management: https://www.authorloft.com/arc-management
+- Author Media Kit: https://www.authorloft.com/author-media-kit
+- AI Tools for Authors: https://www.authorloft.com/ai-tools-for-authors
+- Indie Author Bookstore: https://www.authorloft.com/indie-author-bookstore
+- Book Pre-Orders: https://www.authorloft.com/book-pre-orders
+- Author Affiliate Program: https://www.authorloft.com/author-affiliate-program
+- Reader Analytics for Authors: https://www.authorloft.com/reader-analytics-for-authors
+
 ## Comparisons
 - AuthorLoft vs BookFunnel: https://www.authorloft.com/compare/bookfunnel
 - AuthorLoft vs StoryOrigin: https://www.authorloft.com/compare/storyorigin

@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { getBookstoreData } from "@/lib/bookstore";
 import { COMPARISON_SLUGS } from "@/lib/comparison-data";
+import { LANDING_PAGE_SLUGS } from "@/lib/landing-page-data";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified:    new Date(),
       changeFrequency: "monthly" as const,
       priority:        0.75,
+    })),
+
+    // Commercial landing pages (GEO Phase 2)
+    ...LANDING_PAGE_SLUGS.map((slug) => ({
+      url:             `${BASE}/${slug}`,
+      lastModified:    new Date(),
+      changeFrequency: "monthly" as const,
+      priority:        0.8,
     })),
 
     // Blog - high priority for SEO
