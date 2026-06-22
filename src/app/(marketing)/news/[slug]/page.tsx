@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = await prisma.platformPost.findUnique({
     where: { slug },
-    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true },
+    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true },
   }).catch(() => null);
   if (!post || !post.isPublished || !post.isNews) return {};
 
@@ -32,6 +32,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description:   metaDesc,
       images:        post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
       publishedTime: post.publishedAt?.toISOString(),
+      authors:       [post.authorName],
+      ...(post.category && { section: post.category }),
+      ...(post.category && { tags: [post.category] }),
     },
     twitter: {
       card:        "summary_large_image",
@@ -62,6 +65,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
     author:           { "@type": "Organization", name: post.authorName },
     publisher:        { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/news/${post.slug}` },
+    speakable:        { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
   };
 
   const breadcrumbLd = {

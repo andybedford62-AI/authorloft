@@ -79,6 +79,7 @@ export default async function FaqPage() {
       name: f.question,
       acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
     })),
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1", "h2"] },
   } : null;
 
   return (

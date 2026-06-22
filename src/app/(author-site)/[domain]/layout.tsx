@@ -10,12 +10,6 @@ import { CartDrawer } from "@/components/author-site/cart-drawer";
 import { DemoBanner } from "@/components/demo-banner";
 import type { Metadata } from "next";
 
-// export const metadata: Metadata = {
-//   metadataBase: new URL(
-//     process.env.NEXT_PUBLIC_APP_URL ?? "https://authorloft.app"
-//   ),
-// };
-
 // Always fetch fresh data — ensures branding/content changes appear immediately
 export const dynamic = "force-dynamic";
 
@@ -156,12 +150,29 @@ export default async function AuthorSiteLayout({
   });
   const authorWithAccent = { ...author, accentColor };
 
+  const baseUrl = getAuthorBaseUrl(author);
+  const authorName = author.displayName || author.name;
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: authorName,
+    url: baseUrl,
+    description: author.shortBio || `Books and stories by ${authorName}.`,
+    publisher: {
+      "@type": "Person",
+      name: authorName,
+      url: baseUrl,
+      ...(author.profileImageUrl && { image: author.profileImageUrl }),
+    },
+  };
+
   return (
     <AdminSessionProvider>
       <CartProvider>
         <div
           data-theme={dataTheme}
         >
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
           <DemoBanner />
           <AuthorNav
             author={authorWithAccent}

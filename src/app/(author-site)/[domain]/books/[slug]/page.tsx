@@ -180,7 +180,7 @@ export default async function BookDetailPage({
     "@type":    "Book",
     name:       book.title,
     url:        bookUrl,
-    author:     { "@type": "Person", name: authorName, url: base },
+    author:     { "@type": "Person", name: authorName, url: `${base}/about`, sameAs: base, ...(author.profileImageUrl && { image: author.profileImageUrl }) },
     description: book.shortDescription || (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 300) : undefined),
     ...(book.coverImageUrl && { image: book.coverImageUrl }),
     ...(book.isbn          && { isbn: book.isbn }),
@@ -198,6 +198,20 @@ export default async function BookDetailPage({
       },
     }),
   };
+
+  const allRatings = [
+    ...book.reviews.filter((r) => r.rating).map((r) => r.rating!),
+    ...book.bookFeedback.map((fb) => fb.rating),
+  ];
+  if (allRatings.length > 0) {
+    const avg = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length;
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: avg.toFixed(1),
+      bestRating: 5,
+      ratingCount: allRatings.length,
+    };
+  }
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
