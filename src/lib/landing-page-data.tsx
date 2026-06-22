@@ -499,6 +499,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Do pre-order signups go to my email list?", a: "Yes. Every email captured through the pre-order form is added to your subscriber list, so you can continue marketing to these readers after launch." },
       { q: "Which plan includes pre-orders?", a: "Pre-order pages are available on Standard and Premium plans." },
     ],
+    relatedGuideSlug: "what-is-book-launch-marketing",
   },
 
   "author-affiliate-program": {
@@ -551,6 +552,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "How does tracking work?", a: "When a reader clicks an affiliate link, a cookie is set. If that reader purchases the book, the sale is attributed to the referring affiliate. The commission is tracked automatically." },
       { q: "Which plan includes the affiliate program?", a: "The affiliate program is available on Standard and Premium plans with direct sales enabled." },
     ],
+    relatedGuideSlug: "what-is-an-author-affiliate-program",
   },
 
   "reader-analytics-for-authors": {
@@ -603,6 +605,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Can I see which social media posts drive the most traffic?", a: "Yes. The referral tracking shows which traffic sources (social platforms, search engines, direct visits, bookstore) send readers to your site and specific book pages." },
       { q: "Do I need to install any tracking code?", a: "No. Analytics are built into your AuthorLoft site automatically. No code snippets, no pixel setup, no third-party accounts to configure." },
     ],
+    relatedGuideSlug: "what-is-reader-analytics-for-authors",
   },
 };
 
