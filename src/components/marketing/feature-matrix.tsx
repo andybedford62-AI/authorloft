@@ -252,6 +252,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
       category: "Marketing & Communications",
       features: [
         {
+          name: "Per-Book QR Code (download as SVG)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Newsletter Signup Form",
           tiers: { FREE: "✓ Full campaigns", STANDARD: "✓ Full campaigns", PREMIUM: "✓ Full campaigns" },
         },

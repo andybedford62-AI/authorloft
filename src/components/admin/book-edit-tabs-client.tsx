@@ -146,9 +146,9 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         <LaunchToolkit book={book} publicBaseUrl={publicBaseUrl} />
       )}
 
-      {/* ── QR Code — shown on Organisation tab ── */}
-      {activeTab === "organisation" && (
-        <div className="max-w-3xl mt-4">
+      {/* ── QR Code — shown on Details tab so authors can grab it without hunting ── */}
+      {activeTab === "details" && (
+        <div className="max-w-3xl mt-6">
           <BookQRCode
             bookUrl={`${publicBaseUrl}/books/${book.slug}`}
             bookTitle={book.title}
