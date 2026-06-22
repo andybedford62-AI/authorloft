@@ -190,6 +190,15 @@ export async function proxy(req: NextRequest) {
     });
   }
 
+  // ── SEO files served by root metadata handlers ───────────────────────────
+  // /sitemap.xml and /robots.txt are handled by app/sitemap.ts and
+  // app/robots.ts respectively, which inspect the request host header and
+  // return per-author or platform content. Skip the subdomain rewrite so
+  // these requests reach the root handlers with the original path.
+  if (url.pathname === "/sitemap.xml" || url.pathname === "/robots.txt") {
+    return NextResponse.next();
+  }
+
   // ── Subdomain routes ─────────────────────────────────────────────────────
   // e.g. apbedford.authorloft.com → rewrite to /(author-site)/apbedford/...
   const isSubdomain =
