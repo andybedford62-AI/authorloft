@@ -158,6 +158,22 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // ── SEO files for ALL hosts ──────────────────────────────────────────────
+  // /sitemap.xml and /robots.txt are rewritten to dedicated API handlers that
+  // read the host header — this is done BEFORE the platform / subdomain split
+  // because Next 16's metadata file routes (app/sitemap.ts, app/robots.ts)
+  // were unreliably resolving at app root when the dynamic [domain] catch-all
+  // also exists at root, intermittently 404ing the platform sitemap. The
+  // internal handler now serves both platform and author hosts.
+  if (url.pathname === "/sitemap.xml" || url.pathname === "/robots.txt") {
+    const target = url.pathname === "/sitemap.xml"
+      ? "/api/internal/sitemap"
+      : "/api/internal/robots";
+    const rewriteUrl = url.clone();
+    rewriteUrl.pathname = target;
+    return NextResponse.rewrite(rewriteUrl);
+  }
+
   // ── Platform / Admin routes ──────────────────────────────────────────────
   // If the hostname is the root platform domain (or localhost), serve normally.
   // Next.js App Router handles (marketing), (admin), (superadmin), (auth) groups.
@@ -197,21 +213,6 @@ export async function proxy(req: NextRequest) {
     hostname.endsWith(`.localhost`) ||
     // Local dev: anything.localhost:3000
     /^[a-z0-9-]+\.localhost(:\d+)?$/.test(hostname);
-
-  // ── SEO files for author sites ───────────────────────────────────────────
-  // /sitemap.xml and /robots.txt on author subdomains or custom domains are
-  // routed to dedicated API handlers that read the host header. This bypasses
-  // the (author-site) [domain] catch-all that would otherwise swallow the
-  // path and return the author 404 page. Platform hosts already returned
-  // above so this only fires for non-platform hostnames.
-  if (url.pathname === "/sitemap.xml" || url.pathname === "/robots.txt") {
-    const target = url.pathname === "/sitemap.xml"
-      ? "/api/internal/sitemap"
-      : "/api/internal/robots";
-    const rewriteUrl = url.clone();
-    rewriteUrl.pathname = target;
-    return NextResponse.rewrite(rewriteUrl);
-  }
 
   if (isSubdomain) {
     const slug = hostnameWithoutPort.split(".")[0];

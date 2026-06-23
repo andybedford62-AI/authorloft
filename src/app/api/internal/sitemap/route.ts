@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
+import { getBookstoreData } from "@/lib/bookstore";
+import { COMPARISON_SLUGS } from "@/lib/comparison-data";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
-function extractSlug(host: string): string | null {
+function isPlatformHost(host: string): boolean {
+  const h = host.toLowerCase().split(":")[0];
+  return (
+    h === PLATFORM_DOMAIN ||
+    h === `www.${PLATFORM_DOMAIN}` ||
+    h === `staging.${PLATFORM_DOMAIN}` ||
+    h === `www.staging.${PLATFORM_DOMAIN}` ||
+    h === "localhost"
+  );
+}
+
+function extractAuthorSlug(host: string): string | null {
   const h = host.toLowerCase().split(":")[0];
   if (h.endsWith(`.staging.${PLATFORM_DOMAIN}`)) return h.split(".")[0];
   if (h.endsWith(`.${PLATFORM_DOMAIN}`))         return h.split(".")[0];
@@ -33,12 +46,72 @@ function buildXml(entries: Entry[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
-export async function GET() {
-  const h = await headers();
-  const host = (h.get("host") ?? "").split(":")[0];
-  if (!host) return new NextResponse("Bad request", { status: 400 });
+async function buildPlatformSitemap(host: string): Promise<Entry[]> {
+  const base = `https://${host}`;
+  const now  = new Date();
 
-  const slug = extractSlug(host);
+  const [blogPosts, newsPosts, resourceDownloads, bookstore] = await Promise.all([
+    prisma.platformPost.findMany({
+      where:   { isPublished: true, isNews: false },
+      select:  { slug: true, updatedAt: true },
+      orderBy: { publishedAt: "desc" },
+    }).catch(() => []),
+    prisma.platformPost.findMany({
+      where:   { isPublished: true, isNews: true },
+      select:  { slug: true, updatedAt: true },
+      orderBy: { publishedAt: "desc" },
+    }).catch(() => []),
+    prisma.resourceDownload.findMany({
+      where:  { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    }).catch(() => []),
+    getBookstoreData().catch(() => ({ genres: [] as { slug: string }[] })),
+  ]);
+
+  const entries: Entry[] = [
+    { loc: `${base}/`,          lastmod: now, changefreq: "weekly",  priority: 1.0 },
+    { loc: `${base}/features`,  lastmod: now, changefreq: "monthly", priority: 0.9 },
+    { loc: `${base}/pricing`,   lastmod: now, changefreq: "monthly", priority: 0.9 },
+    { loc: `${base}/bookstore`, lastmod: now, changefreq: "weekly",  priority: 0.85 },
+  ];
+
+  for (const g of bookstore.genres) {
+    entries.push({ loc: `${base}/bookstore/genre/${g.slug}`, lastmod: now, changefreq: "weekly", priority: 0.6 });
+  }
+
+  for (const slug of COMPARISON_SLUGS) {
+    entries.push({ loc: `${base}/compare/${slug}`, lastmod: now, changefreq: "monthly", priority: 0.75 });
+  }
+
+  entries.push({ loc: `${base}/blog`, lastmod: now, changefreq: "weekly", priority: 0.85 });
+  for (const p of blogPosts) {
+    entries.push({ loc: `${base}/blog/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
+  }
+
+  entries.push({ loc: `${base}/news`, lastmod: now, changefreq: "weekly", priority: 0.8 });
+  for (const p of newsPosts) {
+    entries.push({ loc: `${base}/news/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
+  }
+
+  entries.push({ loc: `${base}/resources`, lastmod: now, changefreq: "monthly", priority: 0.7 });
+  for (const d of resourceDownloads) {
+    entries.push({ loc: `${base}/resources/${d.slug}`, lastmod: d.updatedAt, changefreq: "monthly", priority: 0.65 });
+  }
+
+  entries.push(
+    { loc: `${base}/faq`,        lastmod: now, changefreq: "monthly", priority: 0.7 },
+    { loc: `${base}/contact`,    lastmod: now, changefreq: "yearly",  priority: 0.6 },
+    { loc: `${base}/privacy`,    lastmod: now, changefreq: "yearly",  priority: 0.4 },
+    { loc: `${base}/terms`,      lastmod: now, changefreq: "yearly",  priority: 0.4 },
+    { loc: `${base}/gdpr`,       lastmod: now, changefreq: "yearly",  priority: 0.4 },
+    { loc: `${base}/us-privacy`, lastmod: now, changefreq: "yearly",  priority: 0.4 },
+  );
+
+  return entries;
+}
+
+async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
+  const slug = extractAuthorSlug(host);
   const author = await prisma.author.findFirst({
     where: {
       OR: [
@@ -54,7 +127,7 @@ export async function GET() {
     },
   }).catch(() => null);
 
-  if (!author) return new NextResponse("Not found", { status: 404 });
+  if (!author) return null;
 
   const base = `https://${host}`;
   const now  = new Date();
@@ -112,6 +185,20 @@ export async function GET() {
   for (const p of customPages) {
     entries.push({ loc: `${base}/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.6 });
   }
+
+  return entries;
+}
+
+export async function GET() {
+  const h = await headers();
+  const host = (h.get("host") ?? "").split(":")[0];
+  if (!host) return new NextResponse("Bad request", { status: 400 });
+
+  const entries = isPlatformHost(host)
+    ? await buildPlatformSitemap(host)
+    : await buildAuthorSitemap(host);
+
+  if (!entries) return new NextResponse("Not found", { status: 404 });
 
   return new NextResponse(buildXml(entries), {
     headers: {
