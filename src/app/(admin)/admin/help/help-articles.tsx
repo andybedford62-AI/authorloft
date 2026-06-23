@@ -37,9 +37,20 @@ function ArticleItem({ article, defaultOpen = false }: { article: Article; defau
       </button>
       {open && (
         <div
-          className="px-12 pb-5 prose prose-sm max-w-none text-gray-700
-            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
-            prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-code:text-xs"
+          className="px-12 pb-5 max-w-none text-sm text-gray-700 leading-relaxed
+            [&_p]:my-3 [&_p:first-child]:mt-0
+            [&_h2]:mt-5 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-gray-900
+            [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-gray-900
+            [&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:text-sm [&_h4]:font-semibold [&_h4]:text-gray-900
+            [&_ul]:my-3 [&_ul]:pl-5 [&_ul]:list-disc [&_ul]:space-y-1.5
+            [&_ol]:my-3 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol]:space-y-1.5
+            [&_li]:pl-1
+            [&_a]:text-blue-600 [&_a:hover]:underline
+            [&_strong]:font-semibold [&_strong]:text-gray-900
+            [&_em]:italic
+            [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:rounded [&_code]:text-xs
+            [&_blockquote]:border-l-2 [&_blockquote]:border-gray-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-3
+            [&_hr]:my-4 [&_hr]:border-gray-200"
           dangerouslySetInnerHTML={{ __html: sanitize(article.answer) }}
         />
       )}
