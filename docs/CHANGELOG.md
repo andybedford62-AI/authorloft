@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## June 23, 2026
+
+- **Stripe Connect onboarding — novice-friendly guidance batch** — new authors said Stripe setup felt intimidating, so the whole flow got a calm, hand-holding pass:
+  - **Help Centre — Payments & Stripe topic** rewritten and expanded. Flagship `ha06` ("How do I connect Stripe to receive payments?") rewritten as a 5-step plain-English walkthrough. Three new articles added: `ha_stripe_what` ("What is Stripe and why do I need it?" — explains the two-Stripe concept so authors stop confusing their subscription with Connect), `ha_stripe_info` ("What information will Stripe ask me for?" — previews every field so nothing feels sudden), `ha_stripe_fee` ("How does AuthorLoft's 10% platform fee work?"). Sort order reshuffled so the conceptual articles come before the how-to.
+  - **Help Centre deep-linking** — `/admin/help?article=<id>` now auto-opens and scrolls to a specific article and auto-selects its parent topic. Powers the tooltip "Learn more" links and every help link on the settings page.
+  - **`stripe-connect` tooltip refreshed** — content rewritten to set expectations ("about 5–10 minutes", separate from subscription); broken `learnMoreUrl` (`/admin/help#stripe-connect` — no anchor support existed) replaced with the new deep-link.
+  - **Settings → Stripe Payouts copy overhaul** — "How payouts work" card rewritten in reassuring novice tone with the two-Stripe distinction up front and a "Read the full beginner's guide" link. Added a collapsible **What you'll need before you click Connect** checklist (personal details, bank, tax ID, sometimes ID photo) so authors can gather everything before starting. Added reassurance under the Connect button about progress being saved if they stop partway. Onboarding-incomplete state now links to the Stripe dashboard + the dedicated help article.
+  - **Dashboard nudge banner** — new `<StripeConnectNudge />` appears on `/admin/dashboard` when an author has direct sales enabled on any book but hasn't onboarded Stripe yet. Dismissible (localStorage), links to Settings + the "What Stripe will ask for" article.
+
+---
+
 ## June 22, 2026
 
 - **Bookstore link in author nav (toggleable)** — author sites get a new "Bookstore" entry in the main nav (desktop + mobile) that cross-links to the AuthorLoft Bookstore on the platform, opens in a new tab with an external-link icon. New `Author.navShowBookstore` Boolean (default true, migration applied to Supabase) lets authors hide it from Pages & Navigation if they don't want to send visitors off-site.

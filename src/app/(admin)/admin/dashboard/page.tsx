@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
 import { SitePagesCard } from "@/components/admin/site-pages-card";
+import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 
 async function getDashboardData(authorId: string) {
@@ -268,6 +269,17 @@ export default async function DashboardPage() {
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
       )}
+
+      {/* Stripe Connect nudge — shown when author has enabled direct sales on any book
+          but hasn't onboarded Stripe yet. Dismissible (localStorage). */}
+      <StripeConnectNudge
+        show={
+          !!authorMeta?.emailVerified &&
+          !hasStripe &&
+          salesEnabled &&
+          (authorMeta?.books?.length ?? 0) > 0
+        }
+      />
 
       {/* Early bird upgrade banner */}
       {data.showEarlyBirdBanner && (

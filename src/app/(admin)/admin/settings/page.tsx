@@ -377,23 +377,82 @@ function StripeConnectSection() {
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Continue Stripe setup →"}
           </Button>
+          <p className="text-xs text-gray-500">
+            Not sure what&apos;s missing? Open your{" "}
+            <a
+              href="https://dashboard.stripe.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline inline-flex items-center gap-0.5"
+            >
+              Stripe dashboard <ExternalLink className="h-3 w-3" />
+            </a>
+            {" "}— Stripe shows exactly which verification step is outstanding.{" "}
+            <a href="/admin/help?article=ha07" className="text-blue-600 hover:underline">Learn more</a>.
+          </p>
         </div>
       ) : (
         /* ── Not connected ───────────────────────────────────────────────── */
         <div className="space-y-4">
-          <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
-            <p className="font-medium">How payouts work</p>
-            <p className="text-blue-600 text-xs">
-              Connect your Stripe account in a few minutes. When readers buy your books,
-              90% goes directly to your bank account. AuthorLoft retains a 10% platform fee.
-              You never need to chase invoices or transfer money manually.
+          <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-2">
+            <p className="font-medium">First time? Here&apos;s the short version.</p>
+            <p className="text-blue-700 text-xs leading-relaxed">
+              Stripe is the company that handles card payments and sends the money to your bank.
+              This is <strong>separate</strong> from your AuthorLoft subscription — you don&apos;t need
+              it to use the platform, only if you want to sell books directly. Setup takes about
+              5–10 minutes and Stripe walks you through every screen.
+            </p>
+            <p className="text-blue-700 text-xs leading-relaxed">
+              When a reader buys, <strong>90% goes straight to your bank</strong> and AuthorLoft
+              keeps a 10% platform fee. No invoices, no manual transfers.
+            </p>
+            <p className="pt-1">
+              <a
+                href="/admin/help?article=ha_stripe_what"
+                className="text-xs font-medium text-blue-700 hover:underline inline-flex items-center gap-1"
+              >
+                Read the full beginner&apos;s guide
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </p>
           </div>
+
+          <details className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+            <summary className="font-medium text-gray-800 cursor-pointer select-none">
+              What you&apos;ll need before you click Connect
+            </summary>
+            <ul className="mt-3 space-y-2 text-xs text-gray-600">
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Personal details</strong> — your full legal name, date of birth, home address, phone</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Bank account info</strong> — routing &amp; account number (US) or sort code &amp; account number (UK/EU)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Tax ID</strong> — your SSN (US individuals), EIN (US businesses), or your country&apos;s equivalent</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Sometimes:</strong> a photo of your driver&apos;s licence or passport — Stripe will ask only if needed</span>
+              </li>
+            </ul>
+            <p className="mt-3 text-xs text-gray-500 italic">
+              AuthorLoft never sees any of this — it goes straight from you to Stripe.
+            </p>
+          </details>
+
           <Button onClick={handleConnect} disabled={connecting}>
             {connecting
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Connect Stripe account →"}
           </Button>
+          <p className="text-xs text-gray-400">
+            You&apos;ll be taken to Stripe&apos;s secure site, then sent back here when you&apos;re done.
+            If you stop partway, your progress is saved — just come back and click <em>Continue Stripe setup</em>.
+          </p>
           {connectError && (
             <p className="text-sm text-red-600">{connectError}</p>
           )}

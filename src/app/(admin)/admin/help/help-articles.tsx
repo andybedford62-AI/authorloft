@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, ChevronDown, ChevronRight, HelpCircle } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 
@@ -12,10 +13,16 @@ function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function ArticleItem({ article }: { article: Article }) {
-  const [open, setOpen] = useState(false);
+function ArticleItem({ article, defaultOpen = false }: { article: Article; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (defaultOpen && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [defaultOpen]);
   return (
-    <div className="border-b border-gray-100 last:border-0">
+    <div ref={ref} id={`article-${article.id}`} className="border-b border-gray-100 last:border-0">
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-start gap-3 px-5 py-4 text-left hover:bg-gray-50 transition-colors"
@@ -41,6 +48,9 @@ function ArticleItem({ article }: { article: Article }) {
 }
 
 export function HelpArticles() {
+  const searchParams = useSearchParams();
+  const targetArticleId = searchParams.get("article") || "";
+
   const [topics,      setTopics]      = useState<Topic[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [fetchError,  setFetchError]  = useState("");
@@ -53,14 +63,22 @@ export function HelpArticles() {
         const r = await fetch("/api/admin/help");
         if (!r.ok) { setFetchError("Could not load help articles."); return; }
         const data = await r.json().catch(() => ({}));
-        setTopics(data.topics ?? []);
+        const loadedTopics: Topic[] = data.topics ?? [];
+        setTopics(loadedTopics);
+        if (targetArticleId) {
+          const owningTopic = loadedTopics.find((t) =>
+            t.articles.some((a) => a.id === targetArticleId) ||
+            t.subtopics.some((s) => s.articles.some((a) => a.id === targetArticleId))
+          );
+          if (owningTopic) setActiveTopicId(owningTopic.id);
+        }
       } catch {
         setFetchError("Could not load help articles. Please refresh the page.");
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [targetArticleId]);
 
   // Flatten all articles for search
   const allArticles: (Article & { topicTitle: string; subtopicTitle?: string })[] = topics.flatMap((t) => [
@@ -124,7 +142,7 @@ export function HelpArticles() {
                       {a.topicTitle}{a.subtopicTitle ? ` › ${a.subtopicTitle}` : ""}
                     </span>
                   </div>
-                  <ArticleItem article={a} />
+                  <ArticleItem article={a} defaultOpen={a.id === targetArticleId} />
                 </div>
               ))}
             </div>
