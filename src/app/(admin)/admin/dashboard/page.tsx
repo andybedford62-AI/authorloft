@@ -225,8 +225,8 @@ export default async function DashboardPage() {
     {
       done: hasStripe,
       label: "Connect Stripe for payouts",
-      hint: "Settings → Stripe Payouts → Connect Stripe account",
-      href: "/admin/settings",
+      hint: "Settings → Billing tab → Stripe Payouts → Connect Stripe account",
+      href: "/admin/settings?tab=billing",
       optional: true,
     },
     {

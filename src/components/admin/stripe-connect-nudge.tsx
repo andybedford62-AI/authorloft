@@ -46,7 +46,7 @@ export function StripeConnectNudge({
         </p>
         <div className="flex items-center gap-3 mt-3">
           <Link
-            href="/admin/settings"
+            href="/admin/settings?tab=billing"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
           >
             Set up Stripe <ArrowRight className="h-3 w-3" />
