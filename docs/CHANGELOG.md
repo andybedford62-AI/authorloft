@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## June 24, 2026
+
+- **SEO/AEO structured data enrichment** — Enhanced JSON-LD schemas across all three content templates (blog, news, guides) for stronger Google/Bing rich results and AI search engine compatibility. Blog `Article` → `BlogPosting` with `wordCount`, `keywords`, `articleSection`, `inLanguage`, `isAccessibleForFree`, and `name` fields. News `NewsArticle` schema enriched with the same fields plus `seoTitle`/`metaDescription` fallbacks for `headline`/`description`. Guides `Article` schema enriched similarly. Publisher objects now include `url`. All schemas now prefer `seoTitle` over raw `title` for `headline` and `metaDescription` over `excerpt` for `description`.
+- **CMS SEO field audit** — Backfilled missing `seoTitle` and `metaDescription` on 2 blog posts (epub-kindle, epub-nook), fixed "Social Medial" → "Social Media" typo in category field, tightened 3 overlong meta descriptions (arc-programs, sitemap, pre-orders), improved 3 weak SEO titles (chatgpt, direct-sales, self-publishing-vs-kdp).
+
 ## June 22, 2026
 
 - **Supporting blog articles + cross-linking (Phases 4 & 5 — GEO hub-and-spoke)** — 15 new blog articles published to support pillar guides: 2 for media kits, 2 for affiliate programs, 2 for reader analytics, 2 for newsletters, 2 for ARC programs, 2 for branding/websites, 2 for self-publishing, 1 for direct sales. Each article links back to its pillar guide and relevant landing pages. All 10 guides updated with `relatedSlugsJson` cross-linking the new articles. 3 additional landing pages (book-pre-orders, author-affiliate-program, reader-analytics-for-authors) now link to their matching guides via `relatedGuideSlug`. Complete hub-and-spoke content architecture: landing pages ↔ guides ↔ blog articles.

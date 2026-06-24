@@ -50,19 +50,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post || !post.isPublished || post.isNews) notFound();
 
   const safeContent = sanitize(post.content);
+  const plainText = post.content.replace(/<[^>]+>/g, "").trim();
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
   const jsonLd = {
     "@context":         "https://schema.org",
-    "@type":            "Article",
-    headline:           post.title,
-    description:        post.excerpt || undefined,
+    "@type":            "BlogPosting",
+    headline:           post.seoTitle || post.title,
+    name:               post.title,
+    description:        post.metaDescription || post.excerpt || undefined,
     image:              post.coverImageUrl || undefined,
     datePublished:      post.publishedAt?.toISOString(),
     dateModified:       post.updatedAt.toISOString(),
     author:             { "@type": "Organization", name: post.authorName },
-    publisher:          { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
+    publisher:          { "@type": "Organization", name: "AuthorLoft", url: BASE, logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
     mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/blog/${post.slug}` },
     speakable:          { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
+    inLanguage:         "en-US",
+    isAccessibleForFree: true,
+    wordCount,
+    ...(post.focusKeyword && { keywords: post.focusKeyword }),
+    ...(post.category && { articleSection: post.category }),
   };
 
   const breadcrumbLd = {

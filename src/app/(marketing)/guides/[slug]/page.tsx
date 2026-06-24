@@ -63,6 +63,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const relatedSlugs = parseSlugs(guide.relatedSlugsJson);
   const safeContent = sanitize(guide.content);
 
+  const plainText = guide.content.replace(/<[^>]+>/g, "").trim();
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+
   const relatedPosts = relatedSlugs.length > 0
     ? await prisma.platformPost.findMany({
         where: { slug: { in: relatedSlugs }, isPublished: true, isNews: false },
@@ -72,17 +75,23 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
     : [];
 
   const articleLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: guide.title,
-    description: guide.excerpt || undefined,
-    image: guide.coverImageUrl || undefined,
-    datePublished: guide.publishedAt?.toISOString(),
-    dateModified: guide.updatedAt.toISOString(),
-    author: { "@type": "Organization", name: "AuthorLoft" },
-    publisher: { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/guides/${guide.slug}` },
-    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
+    "@context":         "https://schema.org",
+    "@type":            "Article",
+    headline:           guide.seoTitle || guide.title,
+    name:               guide.title,
+    description:        guide.metaDescription || guide.excerpt || undefined,
+    image:              guide.coverImageUrl || undefined,
+    datePublished:      guide.publishedAt?.toISOString(),
+    dateModified:       guide.updatedAt.toISOString(),
+    author:             { "@type": "Organization", name: "AuthorLoft" },
+    publisher:          { "@type": "Organization", name: "AuthorLoft", url: BASE, logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
+    mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/guides/${guide.slug}` },
+    speakable:          { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
+    inLanguage:         "en-US",
+    isAccessibleForFree: true,
+    wordCount,
+    ...(guide.focusKeyword && { keywords: guide.focusKeyword }),
+    ...(guide.category && { articleSection: guide.category }),
   };
 
   const breadcrumbLd = {
