@@ -10,6 +10,14 @@ and make sure before changes are done. Ask clarifying questions if needed.
   but when the user says "push freely" proceed without asking until they say
   otherwise. Always confirm before promoting to prod.
 
+## Branch sync — mandatory
+- **Always keep branches in sync with `dev`.** After committing work on any
+  feature branch, merge it into `dev` before ending the session. Never let
+  feature branches drift out of sync with `dev`.
+- Before starting work, fetch `origin/dev` so you're working from the latest state.
+- This applies even if we're not using staging for verification — keep everything
+  aligned at all times.
+
 ## Database & migrations (Supabase) — critical
 - Migrations are NOT auto-applied on deploy (build runs `prisma generate` only).
   Apply schema changes directly to Supabase via MCP, or runtime throws
