@@ -244,8 +244,8 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
       )}
 
       {/* ── Resources table ────────────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-center px-2 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide w-16">Order</th>
@@ -276,7 +276,6 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                       </button>
                     </div>
                   </td>
-                  {/* Name + url */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-xs font-bold" style={{ background: r.avatarColor }}>
@@ -292,15 +291,12 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                       </div>
                     </div>
                   </td>
-                  {/* Category */}
                   <td className="px-4 py-4 hidden md:table-cell">
                     <span className="text-xs text-gray-500">{r.category || "—"}</span>
                   </td>
-                  {/* Active toggle */}
                   <td className="px-3 py-4 text-center">
                     <Toggle checked={r.isActive} disabled={busy} onChange={() => toggle(r.id, "isActive", !r.isActive)} />
                   </td>
-                  {/* Partner toggle */}
                   <td className="px-3 py-4 text-center">
                     <button onClick={() => toggle(r.id, "isPartner", !r.isPartner)} disabled={busy}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${r.isPartner ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
@@ -308,14 +304,12 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                       {r.isPartner ? "Yes" : "No"}
                     </button>
                   </td>
-                  {/* Homepage toggle */}
                   <td className="px-3 py-4 text-center">
                     <button onClick={() => toggle(r.id, "showOnHomepage", !r.showOnHomepage)} disabled={busy}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${r.showOnHomepage ? "bg-blue-100 text-blue-700 hover:bg-blue-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}>
                       {r.showOnHomepage ? <><Eye className="h-3 w-3" /> Shown</> : <><EyeOff className="h-3 w-3" /> Hidden</>}
                     </button>
                   </td>
-                  {/* Actions */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2 justify-end">
                       <button onClick={() => openEdit(r)} className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">

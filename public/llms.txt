@@ -1,33 +1,59 @@
 # AuthorLoft
 
-> The author website builder for independent authors. Create a professional author site with your book catalog, sell direct to readers, and capture newsletter signups — free forever.
+> The all-in-one platform for independent authors to own their business, sell books directly, grow their audience, and track everything — no coding required.
 
-AuthorLoft is a multi-tenant SaaS platform that gives independent authors everything they need to build a professional web presence, sell books directly to readers, and grow their newsletter audience — without technical knowledge. Each author gets their own subdomain (e.g. authorname.authorloft.com) or can connect a custom domain.
+AuthorLoft helps independent authors take control of their careers by providing a complete platform for building an author website, selling books directly to readers (keeping 100% of every sale), capturing newsletter subscribers, and tracking reader analytics.
 
-## Features & Pricing
+## Key Facts
+- Website: https://www.authorloft.com
+- Type: SaaS platform for independent authors
+- Pricing: Free to start, Standard ($39.99/mo), Premium ($79.99/mo)
+- No credit card required to start
 
-- [Features](https://www.authorloft.com/features): Full feature list across Free, Standard ($39.99/mo), and Premium ($79.99/mo) plans — book catalog, direct sales, custom domain, flip book previews, AI writing tools, and reader analytics.
-- [Pricing](https://www.authorloft.com/pricing): Plan comparison with full pricing details and side-by-side comparison against competitors (Tertulia, StoryOrigin, BookFunnel).
+## Core Features
+- **Direct Sales**: Sell ebooks, print books, and audiobooks directly to readers — keep 100% of revenue (minus payment processing)
+- **Author Website Builder**: Custom-domain author sites with book pages, blog, about page, and contact — no coding required
+- **Reader Analytics**: PostHog-powered analytics to understand your audience
+- **Newsletter Capture**: Built-in subscriber forms and email tools (Mailchimp integration)
+- **Bookstore Discovery**: Shared catalog at authorloft.com/bookstore where readers discover indie authors by genre
+- **AI Tools**: AI writing assistant, social media post generator, SEO auditor, and reader feedback analyzer (powered by Gemini)
+- **Pre-orders & Affiliate Program**: Accept pre-orders and run an affiliate referral program
+- **Flip Books**: Interactive page-flip book previews
+- **Media Kit**: Auto-generated press kit PDF for author marketing
 
-## Blog
+## Content Pages
+- Features: https://www.authorloft.com/features
+- Pricing: https://www.authorloft.com/pricing
+- Blog: https://www.authorloft.com/blog
+- News: https://www.authorloft.com/news
+- Bookstore: https://www.authorloft.com/bookstore
+- FAQ: https://www.authorloft.com/faq
+- Author Guides: https://www.authorloft.com/guides
+- Resources: https://www.authorloft.com/resources
+- Contact: https://www.authorloft.com/contact
 
-- [Blog](https://www.authorloft.com/blog): Tips, guides, and insights for independent authors on selling books direct, building an audience, and growing a newsletter.
+## Feature Pages
+- Author Website Builder: https://www.authorloft.com/author-website-builder
+- Sell Books Directly: https://www.authorloft.com/sell-books-directly
+- Book Marketing Platform: https://www.authorloft.com/book-marketing-platform
+- Author Newsletter Platform: https://www.authorloft.com/author-newsletter-platform
+- ARC Management: https://www.authorloft.com/arc-management
+- Author Media Kit: https://www.authorloft.com/author-media-kit
+- AI Tools for Authors: https://www.authorloft.com/ai-tools-for-authors
+- Indie Author Bookstore: https://www.authorloft.com/indie-author-bookstore
+- Book Pre-Orders: https://www.authorloft.com/book-pre-orders
+- Author Affiliate Program: https://www.authorloft.com/author-affiliate-program
+- Reader Analytics for Authors: https://www.authorloft.com/reader-analytics-for-authors
 
-## Bookstore
-
-- [Bookstore](https://www.authorloft.com/bookstore): Discover books from independent authors across all genres — buy directly from each author's own site.
-
-## Resources & News
-
-- [Resources](https://www.authorloft.com/resources): Curated directory of trusted tools, communities, and organisations every indie author should know about.
-- [News](https://www.authorloft.com/news): Platform announcements and product updates from the AuthorLoft team.
-
-## Contact
-
-- [Contact](https://www.authorloft.com/contact): Get in touch with the AuthorLoft team — replies within one business day.
+## Comparisons
+- AuthorLoft vs BookFunnel: https://www.authorloft.com/compare/bookfunnel
+- AuthorLoft vs StoryOrigin: https://www.authorloft.com/compare/storyorigin
+- AuthorLoft vs Tertulia: https://www.authorloft.com/compare/tertulia
 
 ## Legal
+- Privacy Policy: https://www.authorloft.com/privacy
+- Terms of Service: https://www.authorloft.com/terms
+- GDPR & Data Rights: https://www.authorloft.com/gdpr
 
-- [Privacy Policy](https://www.authorloft.com/privacy)
-- [Terms of Service](https://www.authorloft.com/terms)
-- [GDPR & Data Rights](https://www.authorloft.com/gdpr)
+## For More Details
+- Full documentation: https://www.authorloft.com/llms-full.txt

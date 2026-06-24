@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = await prisma.platformPost.findUnique({
     where: { slug },
-    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true },
+    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true },
   }).catch(() => null);
   if (!post || !post.isPublished || !post.isNews) return {};
 
@@ -32,6 +32,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description:   metaDesc,
       images:        post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
       publishedTime: post.publishedAt?.toISOString(),
+      authors:       [post.authorName],
+      ...(post.category && { section: post.category }),
+      ...(post.category && { tags: [post.category] }),
     },
     twitter: {
       card:        "summary_large_image",
@@ -50,18 +53,37 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
   if (!post || !post.isPublished || !post.isNews) notFound();
 
   const safeContent = sanitize(post.content);
+  const plainText = post.content.replace(/<[^>]+>/g, "").trim();
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
   const jsonLd = {
-    "@context":       "https://schema.org",
-    "@type":          "NewsArticle",
-    headline:         post.title,
-    description:      post.excerpt || undefined,
-    image:            post.coverImageUrl || undefined,
-    datePublished:    post.publishedAt?.toISOString(),
-    dateModified:     post.updatedAt.toISOString(),
-    author:           { "@type": "Organization", name: post.authorName },
-    publisher:        { "@type": "Organization", name: "AuthorLoft", logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/news/${post.slug}` },
+    "@context":         "https://schema.org",
+    "@type":            "NewsArticle",
+    headline:           post.seoTitle || post.title,
+    name:               post.title,
+    description:        post.metaDescription || post.excerpt || undefined,
+    image:              post.coverImageUrl || undefined,
+    datePublished:      post.publishedAt?.toISOString(),
+    dateModified:       post.updatedAt.toISOString(),
+    author:             { "@type": "Organization", name: post.authorName },
+    publisher:          { "@type": "Organization", name: "AuthorLoft", url: BASE, logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
+    mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/news/${post.slug}` },
+    speakable:          { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
+    inLanguage:         "en-US",
+    isAccessibleForFree: true,
+    wordCount,
+    ...(post.focusKeyword && { keywords: post.focusKeyword }),
+    ...(post.category && { articleSection: post.category }),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "News", item: `${BASE}/news` },
+      { "@type": "ListItem", position: 3, name: post.title, item: `${BASE}/news/${post.slug}` },
+    ],
   };
 
   return (
@@ -171,6 +193,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
       </article>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
     </div>
   );
 }

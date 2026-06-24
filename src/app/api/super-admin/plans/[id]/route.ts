@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-//import { prisma } from "@/lib/prisma";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 

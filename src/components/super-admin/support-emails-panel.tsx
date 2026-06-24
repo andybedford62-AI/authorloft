@@ -144,7 +144,7 @@ export function SupportEmailsPanel({ initialEmails }: { initialEmails: SupportEm
         </div>
 
         {/* Table */}
-        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
+        <div className="rounded-xl border border-gray-200 overflow-x-auto bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-gray-500 text-left border-b border-gray-200">

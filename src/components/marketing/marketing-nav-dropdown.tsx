@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 const ITEMS: [string, string][] = [
+  ["/guides", "Author Guides"],
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/resources", "Tools & Communities"],

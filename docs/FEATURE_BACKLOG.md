@@ -64,7 +64,11 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 ## Marketing & SEO
 
-- [ ] **Feature landing pages** — deferred until PostHog traffic data (~2026-07-01).
+- [x] **GEO search readiness** — full structured data pass: llms.txt/llms-full.txt, WebSite+SearchAction schema, SoftwareApplication schema on features, Person schema on author about pages, BreadcrumbList on all marketing pages, AI bot rules in robots.txt, blog RSS feed. *(done June 22, 2026)*
+- [x] **Guides infrastructure (Phase 1)** — CMS-managed evergreen pillar pages at `/guides/[slug]` with FAQ schema, related blog links, structured data, nav/footer/sitemap. *(done June 22, 2026)*
+- [x] **Guide content (Phase 3)** — 10 pillar guides published: author websites, direct book selling, ARC programs, author newsletters, author branding, author media kits, book launch marketing, self-publishing, affiliate programs, reader analytics. *(done June 22, 2026)*
+- [x] **Commercial landing pages (Phase 2)** — 11 static marketing pages for high-intent keywords: /author-website-builder, /sell-books-directly, /book-marketing-platform, /author-newsletter-platform, /arc-management, /author-media-kit, /ai-tools-for-authors, /indie-author-bookstore, /book-pre-orders, /author-affiliate-program, /reader-analytics-for-authors. *(done June 22, 2026)*
+- [x] **Supporting blog articles + cross-linking (Phases 4 & 5)** — 15 new blog articles linking back to pillar guides + landing pages; all guides updated with related blog slugs; landing pages cross-linked to guides. Hub-and-spoke content architecture complete. *(done June 22, 2026)*
 - [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
 
 ---

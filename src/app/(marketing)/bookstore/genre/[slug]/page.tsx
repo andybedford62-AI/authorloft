@@ -86,11 +86,25 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
     },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Bookstore", item: `${BASE}/bookstore` },
+      { "@type": "ListItem", position: 3, name: name, item: `${BASE}/bookstore/genre/${slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#F0EDE4]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <MarketingNav />
 

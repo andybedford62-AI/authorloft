@@ -56,7 +56,7 @@ export function SubscribersClient({ subscribers }: { subscribers: Subscriber[] }
           <p className="text-gray-500 text-sm">No subscribers yet. They&apos;ll appear here as people sign up on the News page, footer, or homepage.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">

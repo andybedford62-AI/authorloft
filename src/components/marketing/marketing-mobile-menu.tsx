@@ -10,7 +10,22 @@ const LINKS_TOP: [string, string][] = [
   ["/faq", "FAQ"],
 ];
 
+const SOLUTIONS: [string, string][] = [
+  ["/author-website-builder", "Author Website Builder"],
+  ["/sell-books-directly", "Sell Books Directly"],
+  ["/book-marketing-platform", "Book Marketing"],
+  ["/author-newsletter-platform", "Newsletter Platform"],
+  ["/arc-management", "ARC Management"],
+  ["/author-media-kit", "Author Media Kit"],
+  ["/ai-tools-for-authors", "AI Tools for Authors"],
+  ["/indie-author-bookstore", "Indie Author Bookstore"],
+  ["/book-pre-orders", "Book Pre-Orders"],
+  ["/author-affiliate-program", "Affiliate Program"],
+  ["/reader-analytics-for-authors", "Reader Analytics"],
+];
+
 const RESOURCES: [string, string][] = [
+  ["/guides", "Author Guides"],
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/resources", "Tools & Communities"],
@@ -56,6 +71,19 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                   href={href}
                   onClick={() => setOpen(false)}
                   className="py-2.5 text-sm text-gray-700 hover:text-[#C26A4A] border-b border-gray-50 transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Solutions group */}
+              <p className="pt-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">Solutions</p>
+              {SOLUTIONS.map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="py-2.5 pl-3 text-sm text-gray-700 hover:text-[#C26A4A] border-b border-gray-50 transition-colors"
                 >
                   {label}
                 </Link>

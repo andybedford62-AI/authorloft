@@ -14,7 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Blog — Tips & Guides for Authors",
     description: "Tips, guides, and insights for independent authors on selling books, building an audience, and publishing direct.",
-    alternates: { canonical: "/blog" },
+    alternates: {
+      canonical: "/blog",
+      types: { "application/rss+xml": [{ url: "/blog/rss.xml", title: "AuthorLoft Blog" }] },
+    },
     openGraph: {
       type:        "website",
       title:       "Blog — AuthorLoft",

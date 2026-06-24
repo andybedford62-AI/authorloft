@@ -126,6 +126,63 @@ async function getHomepageResources() {
   }).catch(() => []);
 }
 
+// ── Structured data ──────────────────────────────────────────────────────────
+
+const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "AuthorLoft — Own Your Author Business",
+  url: PLATFORM_URL,
+  description:
+    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
+  isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: PLATFORM_URL },
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["h1", "h2", ".hero-description"],
+  },
+  about: {
+    "@type": "SoftwareApplication",
+    name: "AuthorLoft",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+  },
+};
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to launch and grow your independent author business with AuthorLoft",
+  description: "Four steps to owning your author business: go live with a professional site, sell books directly, grow your audience, and track what works.",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Go Live",
+      text: "Launch your professional author site with an instant subdomain, genre-optimized templates, custom domain support, and branded hero banner.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Sell Direct",
+      text: "Set up your book catalog with Stripe checkout to sell ebooks, audiobooks, and print books directly — keeping 100% of every sale.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Grow Your Audience",
+      text: "Capture newsletter subscribers, offer reader magnets, generate media kit PDFs, and get discovered in the AuthorLoft Bookstore.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 4,
+      name: "Track & Optimize",
+      text: "Monitor sales and revenue, analyze traffic with PostHog analytics, use the AI content assistant, and run SEO audits to optimize your growth.",
+    },
+  ],
+};
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomepageRebrandPage() {
@@ -135,8 +192,21 @@ export default async function HomepageRebrandPage() {
   const faqs      = faqData.items;
   const faqTotal  = faqData.total;
 
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
+    })),
+  } : null;
+
   return (
     <div style={{ minHeight: '100vh', background: ML.bone, fontFamily: 'inherit' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <RebelHero />
