@@ -15,7 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Author Guides — Learn to Own Your Author Business",
     description: "In-depth guides on author websites, direct book sales, newsletters, ARCs, branding, and everything independent authors need to succeed.",
-    alternates: { canonical: "/guides" },
+    alternates: {
+      canonical: "/guides",
+      types: { "application/rss+xml": [{ url: "/guides/rss.xml", title: "AuthorLoft Guides" }] },
+    },
     openGraph: {
       type: "website",
       title: "Author Guides | AuthorLoft",

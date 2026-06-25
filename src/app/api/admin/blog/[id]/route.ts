@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { pingIndexNow } from "@/lib/indexnow";
+import { autoMetaDescription } from "@/lib/seo-utils";
 
 // GET /api/admin/blog/[id] — fetch a single post
 export async function GET(
@@ -60,6 +62,14 @@ export async function PATCH(
     : !isPublished ? null
     : post.publishedAt;
 
+  const metaDescData: Record<string, string | null> = {};
+  if (metaDescription !== undefined) {
+    const effectiveContent = content !== undefined ? content : post.content;
+    const effectiveExcerpt = excerpt !== undefined ? excerpt : post.excerpt;
+    metaDescData.metaDescription =
+      metaDescription?.trim() || effectiveExcerpt?.trim() || autoMetaDescription(effectiveContent) || null;
+  }
+
   const updated = await prisma.post.update({
     where: { id },
     data: {
@@ -70,13 +80,24 @@ export async function PATCH(
       ...(coverImageUrl   !== undefined && { coverImageUrl:   coverImageUrl?.trim()   || null }),
       ...(isPublished     !== undefined && { isPublished }),
       ...(seoTitle        !== undefined && { seoTitle:        seoTitle?.trim()        || null }),
-      ...(metaDescription !== undefined && { metaDescription: metaDescription?.trim() || null }),
+      ...metaDescData,
       ...(focusKeyword    !== undefined && { focusKeyword:    focusKeyword?.trim()    || null }),
       ...(attachmentUrl   !== undefined && { attachmentUrl:   attachmentUrl?.trim()   || null }),
       ...(attachmentLabel !== undefined && { attachmentLabel: attachmentLabel?.trim() || null }),
       publishedAt,
     },
   });
+
+  if (updated.isPublished) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { slug: true, customDomain: true },
+    });
+    if (author) {
+      const host = author.customDomain || `${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+      pingIndexNow([`https://${host}/blog/${updated.slug}`, `https://${host}/blog`]);
+    }
+  }
 
   return NextResponse.json(updated);
 }

@@ -69,7 +69,11 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 - [x] **Guide content (Phase 3)** — 10 pillar guides published: author websites, direct book selling, ARC programs, author newsletters, author branding, author media kits, book launch marketing, self-publishing, affiliate programs, reader analytics. *(done June 22, 2026)*
 - [x] **Commercial landing pages (Phase 2)** — 11 static marketing pages for high-intent keywords: /author-website-builder, /sell-books-directly, /book-marketing-platform, /author-newsletter-platform, /arc-management, /author-media-kit, /ai-tools-for-authors, /indie-author-bookstore, /book-pre-orders, /author-affiliate-program, /reader-analytics-for-authors. *(done June 22, 2026)*
 - [x] **Supporting blog articles + cross-linking (Phases 4 & 5)** — 15 new blog articles linking back to pillar guides + landing pages; all guides updated with related blog slugs; landing pages cross-linked to guides. Hub-and-spoke content architecture complete. *(done June 22, 2026)*
+- [x] **User blog SEO readiness** — IndexNow on author blog publish, auto-generate metaDescription, CollectionPage JSON-LD on author blog listing, guides RSS feed, news RSS enrichment, guides in sitemap, robots.txt/sitemap.xml rewrites. *(done June 25, 2026)*
 - [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
+- [ ] **Book schema on author site book pages** — add schema.org/Book structured data to `/[domain]/books/[slug]` for richer search results. *(small)*
+- [ ] **OG image optimization** — resize/crop uploaded OG images to recommended 1200×630 via CDN transform or build-time processing. *(medium)*
+- [ ] **Author expertise/credentials schema** — add Person schema with author bios, credentials, and expertise fields for stronger E-E-A-T signals. *(small–medium)*
 
 ---
 

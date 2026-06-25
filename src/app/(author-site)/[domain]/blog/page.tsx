@@ -5,6 +5,7 @@ import { ArrowRight, CalendarDays, Newspaper } from "lucide-react";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -15,9 +16,17 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
+  const base = getAuthorBaseUrl(author);
   return {
     title: "News",
     description: `News and updates from ${authorName}.`,
+    alternates: { canonical: `${base}/blog` },
+    openGraph: {
+      type: "website",
+      title: `Blog & News — ${authorName}`,
+      description: `News and updates from ${authorName}.`,
+      url: `${base}/blog`,
+    },
   };
 }
 
@@ -44,8 +53,31 @@ export default async function BlogListPage({
   });
 
   const authorName = author.displayName || author.name;
+  const base = getAuthorBaseUrl(author);
+
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Blog & News — ${authorName}`,
+    description: `News and updates from ${authorName}.`,
+    url: `${base}/blog`,
+    isPartOf: { "@type": "WebSite", name: authorName, url: base },
+    publisher: { "@type": "Person", name: authorName, url: base },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${base}/blog` },
+    ],
+  };
 
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
     <div className="min-h-screen">
 
       <PageBanner
@@ -122,5 +154,6 @@ export default async function BlogListPage({
         )}
       </div>
     </div>
+    </>
   );
 }

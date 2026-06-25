@@ -50,7 +50,7 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
   const base = `https://${host}`;
   const now  = new Date();
 
-  const [blogPosts, newsPosts, resourceDownloads, bookstore] = await Promise.all([
+  const [blogPosts, newsPosts, resourceDownloads, bookstore, guides] = await Promise.all([
     prisma.platformPost.findMany({
       where:   { isPublished: true, isNews: false },
       select:  { slug: true, updatedAt: true },
@@ -66,6 +66,11 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
       select: { slug: true, updatedAt: true },
     }).catch(() => []),
     getBookstoreData().catch(() => ({ genres: [] as { slug: string }[] })),
+    prisma.guide.findMany({
+      where:  { isPublished: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: [{ sortOrder: "asc" }, { publishedAt: "desc" }],
+    }).catch(() => []),
   ]);
 
   const entries: Entry[] = [
@@ -91,6 +96,11 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
   entries.push({ loc: `${base}/news`, lastmod: now, changefreq: "weekly", priority: 0.8 });
   for (const p of newsPosts) {
     entries.push({ loc: `${base}/news/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
+  }
+
+  entries.push({ loc: `${base}/guides`, lastmod: now, changefreq: "weekly", priority: 0.85 });
+  for (const g of guides) {
+    entries.push({ loc: `${base}/guides/${g.slug}`, lastmod: g.updatedAt, changefreq: "monthly", priority: 0.7 });
   }
 
   entries.push({ loc: `${base}/resources`, lastmod: now, changefreq: "monthly", priority: 0.7 });

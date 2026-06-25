@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## June 25, 2026
+
+- **User blog SEO readiness — close all gaps** — Comprehensive SEO/GEO/AEO hardening for individual author blog sites and platform content:
+  - **IndexNow for user blogs** — author blog create/update API routes now ping Bing/Yandex IndexNow on publish (previously only platform posts triggered this).
+  - **Auto-generate metaDescription** — when authors leave SEO meta description blank, it auto-generates from excerpt or content (plain-text, 160-char cap on word boundary) via new `src/lib/seo-utils.ts`.
+  - **Author blog listing CollectionPage JSON-LD** — added `CollectionPage` + `BreadcrumbList` structured data schemas to `[domain]/blog` index page (matching platform blog/news indexes). Also added canonical URL and OpenGraph metadata.
+  - **Guides RSS feed** — new `/guides/rss.xml` endpoint with category support and RSS alternate link in guides index metadata.
+  - **News RSS enrichment** — added `category`, `dc:creator`, `lastBuildDate`, and Dublin Core namespace to news RSS feed (matching blog RSS parity).
+  - **Guides in platform sitemap** — `/api/internal/sitemap` now includes published guides with proper `lastmod` and priority.
+  - **robots.txt + sitemap.xml rewrites** — added `next.config.ts` rewrites so `/robots.txt` → `/api/internal/robots` and `/sitemap.xml` → `/api/internal/sitemap` work reliably on all hosts.
+
 ## June 24, 2026
 
 - **SEO/AEO structured data enrichment** — Enhanced JSON-LD schemas across all three content templates (blog, news, guides) for stronger Google/Bing rich results and AI search engine compatibility. Blog `Article` → `BlogPosting` with `wordCount`, `keywords`, `articleSection`, `inLanguage`, `isAccessibleForFree`, and `name` fields. News `NewsArticle` schema enriched with the same fields plus `seoTitle`/`metaDescription` fallbacks for `headline`/`description`. Guides `Article` schema enriched similarly. Publisher objects now include `url`. All schemas now prefer `seoTitle` over raw `title` for `headline` and `metaDescription` over `excerpt` for `description`.

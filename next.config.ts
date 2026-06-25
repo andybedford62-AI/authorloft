@@ -33,7 +33,13 @@ const nextConfig: NextConfig = {
   env: {
     BUILD_TIME: new Date().toISOString(),
   },
-async headers() {
+  async rewrites() {
+    return [
+      { source: "/robots.txt",  destination: "/api/internal/robots" },
+      { source: "/sitemap.xml", destination: "/api/internal/sitemap" },
+    ];
+  },
+  async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
   images: {
