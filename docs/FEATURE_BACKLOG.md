@@ -59,6 +59,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 ## Auth / Account
 
 - [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*
+- [ ] **Captcha on public forms — add before exiting beta** — register, /api/contact, and /api/marketing/contact are currently protected by IP rate-limiting + (for register) the beta invite code. Once beta mode is off, /register becomes a realistic target for bot floods (Resend verification quota burn, fake author subdomains as link farms). Use **Cloudflare Turnstile** (free, no PII, invisible mode possible) — NOT reCAPTCHA. Implementation ~1 hr: `@marsidev/react-turnstile` widget client-side, verify token server-side in the API route. Trigger: flip on the same week beta mode is turned off. *(small)*
 
 ---
 
