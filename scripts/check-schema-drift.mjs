@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// (build trigger: force fresh deploy to validate updated DIRECT_URL env var)
 // Fails the build if prisma/schema.prisma describes columns/tables the live DB
 // is missing (or has extras). This is the guardrail that catches the class of
 // bug where a schema change ships to Vercel but the corresponding ALTER was
