@@ -36,6 +36,8 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 - [ ] **Open/click analytics** — track opens + CTA clicks per campaign (Resend events or tracking pixel + redirect links); show on the History tab. *(medium)*
 - [ ] **Scheduled / recurring sends** — "send later" + optional auto-digest cadence. *(medium–large)*
 - [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
+- [ ] **Reuse a prior newsletter** — "Duplicate" a past `Campaign` from the History tab to pre-fill the composer (subject, body, block selections) as a starting point for a new send. Requires storing the body/block config on `Campaign` (currently only subject + send stats are persisted). *(small–medium)*
+- [ ] **AI-assisted newsletter drafting** *(investigate — may not build)* — explore an "AI assist" button in the composer (reuse the existing Gemini/`GEMINI_API_KEY` + AI-usage-cap infra from other admin AI tools) to draft or polish newsletter copy from a short prompt or from the author's latest book/blog/special. Evaluate value vs. abuse/cost (counts against AI usage cap) before committing. *(medium — spike first)*
 
 ---
 
