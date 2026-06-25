@@ -3,7 +3,25 @@ import { prisma } from "@/lib/db";
 import { canUseFeature } from "@/lib/plan-limits";
 import { Resend } from "resend";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { resolveAccentColor } from "@/lib/themes";
 import sanitizeHtml from "sanitize-html";
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 const NEWSLETTER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
@@ -27,61 +45,126 @@ const NEWSLETTER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   },
 };
 
+interface LatestBook {
+  title: string;
+  coverImageUrl: string | null;
+  url: string;
+}
+
+interface SocialLink {
+  label: string;
+  url: string;
+}
+
 function buildEmailHtml(opts: {
   authorName: string;
+  tagline: string | null;
+  logoUrl: string | null;
+  profileImageUrl: string | null;
   accentColor: string;
   subject: string;
   body: string;
+  issueLabel: string;
   unsubscribeUrl: string;
   siteUrl: string;
+  latestBook: LatestBook | null;
+  socials: SocialLink[];
 }) {
+  const accent = opts.accentColor || "#2563eb";
+
+  // Brand mark: logo > profile photo > initials circle.
+  const brandMark = opts.logoUrl
+    ? `<img src="${escapeHtml(opts.logoUrl)}" alt="${escapeHtml(opts.authorName)}" height="52" style="display:block;max-height:52px;width:auto;border:0;" />`
+    : opts.profileImageUrl
+      ? `<img src="${escapeHtml(opts.profileImageUrl)}" alt="${escapeHtml(opts.authorName)}" width="52" height="52" style="display:block;width:52px;height:52px;border-radius:50%;border:0;object-fit:cover;" />`
+      : `<table cellpadding="0" cellspacing="0"><tr><td width="52" height="52" align="center" valign="middle" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.18);color:#ffffff;font-size:20px;font-weight:700;">${escapeHtml(initialsOf(opts.authorName))}</td></tr></table>`;
+
+  const taglineHtml = opts.tagline
+    ? `<p style="margin:3px 0 0;color:rgba(255,255,255,0.75);font-size:13px;">${escapeHtml(opts.tagline)}</p>`
+    : "";
+
+  const bookStrip = opts.latestBook
+    ? `<tr>
+          <td style="background:#faf8f3;border-top:1px solid #ece7dc;padding:18px 36px;">
+            <table cellpadding="0" cellspacing="0" width="100%"><tr>
+              ${opts.latestBook.coverImageUrl
+                ? `<td width="56" valign="top" style="padding-right:16px;"><img src="${escapeHtml(opts.latestBook.coverImageUrl)}" alt="${escapeHtml(opts.latestBook.title)}" width="56" style="display:block;width:56px;border-radius:4px;border:0;" /></td>`
+                : ""}
+              <td valign="middle">
+                <p style="margin:0;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9a8a66;">Latest release</p>
+                <p style="margin:2px 0 0;font-size:15px;font-weight:600;color:#1f2937;">${escapeHtml(opts.latestBook.title)}</p>
+                <a href="${escapeHtml(opts.latestBook.url)}" style="font-size:13px;color:${accent};text-decoration:none;">View book &rarr;</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>`
+    : "";
+
+  const socialHtml = opts.socials.length > 0
+    ? `<p style="margin:0 0 10px;font-size:13px;">${opts.socials
+        .map((s) => `<a href="${escapeHtml(s.url)}" style="color:#6b7280;text-decoration:none;">${escapeHtml(s.label)}</a>`)
+        .join('<span style="color:#d1d5db;"> &nbsp;·&nbsp; </span>')}</p>`
+    : "";
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${opts.subject}</title>
+  <title>${escapeHtml(opts.subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;">
 
-        <!-- Header -->
+        <!-- Branded header -->
         <tr>
-          <td style="background:${opts.accentColor};border-radius:12px 12px 0 0;padding:28px 36px;">
-            <a href="${opts.siteUrl}" style="text-decoration:none;">
-              <p style="margin:0;color:rgba(255,255,255,0.7);font-size:13px;text-transform:uppercase;letter-spacing:1px;">
-                Newsletter from
-              </p>
-              <p style="margin:4px 0 0;color:#ffffff;font-size:22px;font-weight:700;">
-                ${opts.authorName}
-              </p>
-            </a>
+          <td style="background:${accent};padding:26px 36px;">
+            <table cellpadding="0" cellspacing="0" width="100%"><tr>
+              <td width="52" valign="middle" style="padding-right:16px;">${brandMark}</td>
+              <td valign="middle">
+                <a href="${escapeHtml(opts.siteUrl)}" style="text-decoration:none;">
+                  <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;">${escapeHtml(opts.authorName)}</p>
+                  ${taglineHtml}
+                </a>
+              </td>
+            </tr></table>
           </td>
         </tr>
 
         <!-- Body -->
         <tr>
-          <td style="background:#ffffff;padding:36px;font-size:15px;line-height:1.7;color:#374151;">
-            ${opts.body}
+          <td style="padding:30px 36px 8px;">
+            <p style="margin:0 0 6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;">${escapeHtml(opts.issueLabel)}</p>
+            <div style="font-size:15px;line-height:1.7;color:#374151;">${opts.body}</div>
           </td>
         </tr>
 
+        <!-- CTA -->
+        <tr>
+          <td style="padding:8px 36px 30px;">
+            <table cellpadding="0" cellspacing="0"><tr>
+              <td style="border-radius:999px;background:${accent};">
+                <a href="${escapeHtml(opts.siteUrl)}" style="display:inline-block;padding:12px 26px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">Read on my site &rarr;</a>
+              </td>
+            </tr></table>
+          </td>
+        </tr>
+
+        ${bookStrip}
+
         <!-- Footer -->
         <tr>
-          <td style="background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;padding:20px 36px;text-align:center;">
+          <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:22px 36px;text-align:center;">
+            ${socialHtml}
             <p style="margin:0;font-size:12px;color:#9ca3af;">
-              You're receiving this because you subscribed to updates from ${opts.authorName}.
+              You're receiving this because you subscribed to ${escapeHtml(opts.authorName)}.
             </p>
             <p style="margin:8px 0 0;font-size:12px;">
-              <a href="${opts.unsubscribeUrl}" style="color:#6b7280;text-decoration:underline;">
-                Unsubscribe
-              </a>
+              <a href="${escapeHtml(opts.unsubscribeUrl)}" style="color:#6b7280;text-decoration:underline;">Unsubscribe</a>
               &nbsp;·&nbsp;
-              <a href="${opts.siteUrl}" style="color:#6b7280;text-decoration:underline;">
-                Visit site
-              </a>
+              <a href="${escapeHtml(opts.siteUrl)}" style="color:#6b7280;text-decoration:underline;">Visit site</a>
             </p>
           </td>
         </tr>
@@ -126,7 +209,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { subject, htmlBody, categoryFilter } = body;
+  const { subject, htmlBody, categoryFilter, includeLatestBook } = body;
 
   if (!subject?.trim()) {
     return NextResponse.json({ error: "Subject is required." }, { status: 400 });
@@ -139,7 +222,13 @@ export async function POST(req: NextRequest) {
 
   const author = await prisma.author.findUnique({
     where:  { id: authorId },
-    select: { id: true, name: true, displayName: true, accentColor: true, slug: true, contactEmail: true },
+    select: {
+      id: true, name: true, displayName: true, slug: true, contactEmail: true,
+      tagline: true, logoUrl: true, profileImageUrl: true,
+      siteTheme: true, customAccentColor: true,
+      linkedinUrl: true, youtubeUrl: true, facebookUrl: true, twitterUrl: true, instagramUrl: true,
+      plan: { select: { tier: true } },
+    },
   });
   if (!author) return NextResponse.json({ error: "Author not found." }, { status: 404 });
 
@@ -168,6 +257,35 @@ export async function POST(req: NextRequest) {
   const fromAddress  = `${authorName} via AuthorLoft <noreply@authorloft.com>`;
   const replyTo      = author.contactEmail ?? undefined;
 
+  const accentColor = resolveAccentColor({
+    planTier:          author.plan?.tier,
+    customAccentColor: author.customAccentColor,
+    siteTheme:         author.siteTheme,
+  });
+
+  const issueLabel = `Newsletter · ${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}`;
+
+  const socials: SocialLink[] = [
+    { label: "Instagram", url: author.instagramUrl },
+    { label: "Facebook",  url: author.facebookUrl  },
+    { label: "X",         url: author.twitterUrl   },
+    { label: "YouTube",   url: author.youtubeUrl   },
+    { label: "LinkedIn",  url: author.linkedinUrl  },
+  ].filter((s): s is SocialLink => !!s.url);
+
+  // Optional latest-release strip — newest published book, if the author opted in.
+  let latestBook: LatestBook | null = null;
+  if (includeLatestBook) {
+    const book = await prisma.book.findFirst({
+      where:   { authorId, isPublished: true },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      select:  { title: true, slug: true, coverImageUrl: true },
+    });
+    if (book) {
+      latestBook = { title: book.title, coverImageUrl: book.coverImageUrl, url: `${siteUrl}/books/${book.slug}` };
+    }
+  }
+
   let sent   = 0;
   let failed = 0;
 
@@ -181,7 +299,20 @@ export async function POST(req: NextRequest) {
         to:      sub.email,
         subject,
         replyTo,
-        html:    buildEmailHtml({ authorName, accentColor: author.accentColor || "#2563eb", subject, body: safeHtmlBody, unsubscribeUrl, siteUrl }),
+        html:    buildEmailHtml({
+          authorName,
+          tagline:         author.tagline,
+          logoUrl:         author.logoUrl,
+          profileImageUrl: author.profileImageUrl,
+          accentColor,
+          subject,
+          body:            safeHtmlBody,
+          issueLabel,
+          unsubscribeUrl,
+          siteUrl,
+          latestBook,
+          socials,
+        }),
         text:    htmlToPlainText(safeHtmlBody) + `\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
       };
     });

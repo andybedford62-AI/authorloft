@@ -32,14 +32,22 @@ type Campaign = {
   totalTargeted: number;
 };
 
+type LatestBook = { title: string; coverImageUrl: string | null };
+type SocialLink = { label: string; url: string };
+
 interface Props {
-  subscribers:    Subscriber[];
-  genres:         Genre[];
-  genreMap:       Record<string, string>;
-  confirmedCount: number;
-  accentColor:    string;
-  authorName:     string;
-  campaigns:      Campaign[];
+  subscribers:     Subscriber[];
+  genres:          Genre[];
+  genreMap:        Record<string, string>;
+  confirmedCount:  number;
+  accentColor:     string;
+  authorName:      string;
+  tagline:         string | null;
+  logoUrl:         string | null;
+  profileImageUrl: string | null;
+  socials:         SocialLink[];
+  latestBook:      LatestBook | null;
+  campaigns:       Campaign[];
 }
 
 type SendResult = { sent: number; failed: number; total: number } | null;
@@ -52,6 +60,11 @@ export function NewsletterClient({
   confirmedCount,
   accentColor,
   authorName,
+  tagline,
+  logoUrl,
+  profileImageUrl,
+  socials,
+  latestBook,
   campaigns: initialCampaigns,
 }: Props) {
   const router = useRouter();
@@ -61,6 +74,7 @@ export function NewsletterClient({
   const [subject,        setSubject]        = useState("");
   const [htmlBody,       setHtmlBody]       = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [includeLatestBook, setIncludeLatestBook] = useState(true);
   const [showPreview,    setShowPreview]    = useState(false);
   const [sendState,      setSendState]      = useState<"idle" | "confirming" | "sending" | "done">("idle");
   const [sendResult,     setSendResult]     = useState<SendResult>(null);
@@ -93,7 +107,7 @@ export function NewsletterClient({
       const res = await fetch("/api/admin/newsletter/send", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ subject, htmlBody, categoryFilter }),
+        body:    JSON.stringify({ subject, htmlBody, categoryFilter, includeLatestBook }),
       });
       const data = await res.json();
 
@@ -125,6 +139,7 @@ export function NewsletterClient({
     setSubject("");
     setHtmlBody("");
     setCategoryFilter([]);
+    setIncludeLatestBook(true);
     setShowPreview(false);
     setSendResult(null);
     setSendState("idle");
@@ -350,6 +365,26 @@ export function NewsletterClient({
                     </div>
                   </div>
                 )}
+
+                {latestBook && (
+                  <label className="flex items-start gap-3 pt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeLatestBook}
+                      onChange={(e) => setIncludeLatestBook(e.target.checked)}
+                      disabled={sendState === "sending"}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-gray-700">
+                        Include my latest book
+                      </span>
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        Adds a “Latest release” strip for <span className="font-medium text-gray-500">{latestBook.title}</span> below your message.
+                      </span>
+                    </span>
+                  </label>
+                )}
               </div>
 
               {/* Preview */}
@@ -382,17 +417,70 @@ export function NewsletterClient({
                       </div>
                       <div className="p-6">
                         <div className="rounded-xl overflow-hidden border border-gray-100" style={{ maxWidth: 560 }}>
-                          <div className="px-8 py-6" style={{ backgroundColor: accentColor }}>
-                            <p className="text-xs text-white/60 uppercase tracking-widest mb-1">Newsletter from</p>
-                            <p className="text-xl font-bold text-white">{authorName}</p>
+                          {/* Branded header */}
+                          <div className="px-8 py-6 flex items-center gap-4" style={{ backgroundColor: accentColor }}>
+                            {logoUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={logoUrl} alt={authorName} className="h-12 w-auto max-h-12" />
+                            ) : profileImageUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={profileImageUrl} alt={authorName} className="h-12 w-12 rounded-full object-cover" />
+                            ) : (
+                              <div className="h-12 w-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.18)" }}>
+                                {authorName.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-xl font-bold text-white leading-tight">{authorName}</p>
+                              {tagline && <p className="text-xs text-white/75 mt-0.5">{tagline}</p>}
+                            </div>
                           </div>
-                          <div
-                            className="bg-white px-8 py-7 prose prose-sm max-w-none text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: sanitize(htmlBody) }}
-                          />
+
+                          {/* Body */}
+                          <div className="bg-white px-8 pt-7 pb-3">
+                            <p className="text-[11px] uppercase tracking-widest text-gray-400 mb-2">
+                              Newsletter · {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                            </p>
+                            <div
+                              className="prose prose-sm max-w-none text-gray-700"
+                              dangerouslySetInnerHTML={{ __html: sanitize(htmlBody) }}
+                            />
+                          </div>
+
+                          {/* CTA */}
+                          <div className="bg-white px-8 pb-7">
+                            <span
+                              className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white"
+                              style={{ backgroundColor: accentColor }}
+                            >
+                              Read on my site →
+                            </span>
+                          </div>
+
+                          {/* Latest book strip */}
+                          {includeLatestBook && latestBook && (
+                            <div className="flex items-center gap-4 px-8 py-4 border-t" style={{ backgroundColor: "#faf8f3", borderColor: "#ece7dc" }}>
+                              {latestBook.coverImageUrl && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img src={latestBook.coverImageUrl} alt={latestBook.title} className="w-12 rounded" />
+                              )}
+                              <div>
+                                <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>Latest release</p>
+                                <p className="text-sm font-semibold text-gray-800">{latestBook.title}</p>
+                                <span className="text-xs" style={{ color: accentColor }}>View book →</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Footer */}
                           <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
+                            {socials.length > 0 && (
+                              <p className="text-xs text-gray-400 mb-2">
+                                {socials.map((s) => s.label).join(" · ")}
+                              </p>
+                            )}
                             <p className="text-xs text-gray-400">
-                              You&apos;re receiving this because you subscribed to updates from {authorName}.
+                              You&apos;re receiving this because you subscribed to {authorName}.
                             </p>
                             <p className="text-xs mt-2">
                               <span className="text-gray-400 underline">Unsubscribe</span>

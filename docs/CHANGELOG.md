@@ -15,6 +15,14 @@ line rather than listing every commit.
 
 ## June 25, 2026
 
+- **Newsletter email redesign — branded, not generic** — Author newsletters now ship with real branding instead of a color block + floating text:
+  - **Branded header** — author logo (`logoUrl`), falling back to profile photo, then initials, alongside name + `tagline`.
+  - **Issue eyebrow** ("Newsletter · Month Year") and a structured body so short emails no longer float in an empty void.
+  - **"Read on my site" CTA button** — the previously-missing call to action driving readers back to the author site.
+  - **Latest-release strip** — optional cover + title + link to the author's newest published book, toggled per-send via a new "Include my latest book" checkbox on the compose screen (default on; hidden when the author has no books).
+  - **Social row** in the footer from the author's configured social URLs.
+  - **Color consistency fix** — both the sent email and the compose preview now resolve the accent via `resolveAccentColor` (theme accent + Premium custom override). Previously the send route used the legacy `accentColor` field while the preview used the theme accent, so test emails could differ from the preview.
+  - Removed the unused "Email Frequency"-style dead end; the preview now mirrors the real email structure.
 - **Newsletter genre targeting — fix interest segmentation** — The author newsletter Compose & Send screen filters recipients by the author's genres, but the public sign-up form was collecting interests as four hardcoded strings (`new_releases`, `specials`, `blog`), so genre-based targeting matched zero interested subscribers and the Subscribers tab showed "None" for everyone. Unified both ends on genre IDs:
   - New public `GET /api/newsletter/genres?authorId=` endpoint returns an author's genres (id + name).
   - Sign-up modal now fetches and renders the author's genres as interest checkboxes (plus an "All" option = no preference); falls back to no picker when the author has no genres. Removed the dead "Email Frequency" field (collected but never sent; no frequency-respecting scheduler exists).
