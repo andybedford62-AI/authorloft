@@ -150,7 +150,7 @@ export function JourneySection() {
             Everything you need.<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Nothing you don&apos;t own.</span>
           </h2>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: `${ML.bone}80`, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
-            One platform replaces your website builder, email service, payment processor, and analytics — and you keep 100% of every sale.
+            One platform replaces your website, email service, payment processor, and analytics — and you keep 100% of every sale.
           </p>
         </div>
 

@@ -90,7 +90,7 @@ const NAV_GROUPS: NavGroup[] = [
     key: "website", label: "Website", defaultOpen: true,
     items: [
       { href: "/admin/pages",          label: "Pages",          icon: FileText   },
-      { href: "/admin/blog",           label: "Blog / News",    icon: Newspaper  },
+      { href: "/admin/blog",           label: "Blog",           icon: Newspaper  },
       { href: "/admin/search-engines", label: "Search Engines", icon: Globe      },
       { href: "/admin/appearance",     label: "Appearance",     icon: Paintbrush },
       { href: "/admin/branding",       label: "Branding",       icon: Palette    },
@@ -102,7 +102,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/admin/messages",   label: "Messages",          icon: Inbox     },
       { href: "/admin/feedback",   label: "Reader Feedback",   icon: Star      },
-      { href: "/admin/newsletter", label: "Email & Newsletter", icon: Mail     },
+      { href: "/admin/newsletter", label: "Newsletter",          icon: Mail     },
       { href: "/admin/media-kit",  label: "Media Kit",         icon: Megaphone },
     ],
   },

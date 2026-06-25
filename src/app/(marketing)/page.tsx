@@ -16,20 +16,20 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Own Your Author Business | AuthorLoft",
+    title: "Your All-in-One Author Platform | AuthorLoft",
     description:
-      "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Own Your Author Business | AuthorLoft",
-      description: "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — own your readers, keep every sale" }],
+      title:       "Your All-in-One Author Platform | AuthorLoft",
+      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your all-in-one author platform" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Own Your Author Business | AuthorLoft",
-      description: "Stop giving retail publishers your profit. Own your readers, keep 100% of every sale, and grow your author business — all on one platform, free to start.",
+      title:       "Your All-in-One Author Platform | AuthorLoft",
+      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
       images:      [ogImage],
     },
   };

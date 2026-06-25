@@ -266,7 +266,7 @@ export function RebelHero() {
           </div>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.6, color: ML.bone, opacity: 0.85, margin: '0 0 32px', maxWidth: 460, animation: 'rbFadeUp 0.7s 0.25s ease both' }}>
-            Stop giving retail publishers your deserved profit of every sale and building someone else&apos;s audience. AuthorLoft gives you a direct-sales storefront, a reader list nobody can take away, and many tools to grow — all free to start.
+            Website, direct sales, email newsletter, reader analytics, media kits, pre-orders — everything you need to run your author business, all in one platform. Free to start.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>
