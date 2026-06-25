@@ -19,13 +19,30 @@ and make sure before changes are done. Ask clarifying questions if needed.
   aligned at all times.
 
 ## Database & migrations (Supabase) — critical
-- Migrations are NOT auto-applied on deploy (build runs `prisma generate` only).
-  Apply schema changes directly to Supabase via MCP, or runtime throws
-  "column does not exist."
+- Migrations are NOT auto-applied on deploy. Apply schema changes directly to
+  Supabase via MCP (`apply_migration`), or runtime throws "column does not
+  exist."
+- **Build-time guardrail:** every Vercel build runs `scripts/check-schema-drift.mjs`
+  before `next build`. It runs `prisma migrate diff` between `prisma/schema.prisma`
+  and the live DB. If the schema describes a column/table/enum the DB is missing
+  (`ADD COLUMN` / `CREATE TABLE` / `CREATE TYPE`), the build is halted and the
+  required SQL is printed. Cosmetic drift (FK re-orders, TIMESTAMP precision,
+  default-clause noise) is ignored.
+  - Requires `DIRECT_URL` (or `DATABASE_URL` as fallback) in Vercel env — must
+    be the non-pooled `db.<ref>.supabase.co:5432` URL, not the PgBouncer pooler.
+  - To bypass for an emergency: `SKIP_SCHEMA_DRIFT_CHECK=1` (do not use without
+    a reason).
+- **Workflow for any schema change** (mandatory order):
+  1. Edit `prisma/schema.prisma`.
+  2. Apply the corresponding SQL to Supabase via MCP `apply_migration` **before
+     pushing the code**. (For additive changes — new nullable columns / new
+     tables — it's safe to apply to prod DB before code is promoted.)
+  3. Drop the same SQL into `prisma/migrations/<YYYYMMDD>_<name>/migration.sql`
+     so the history lives in git.
+  4. Run `npm run check:schema-drift` locally to confirm the DB is in sync,
+     then commit and push.
 - Every new table needs GRANT statements (anon, authenticated, postgres,
   service_role) — match existing tables.
-- Additive changes (new nullable columns / new tables) are safe to apply to the
-  prod DB before the code is promoted.
 
 ## Code conventions
 - Next.js: `params` in `[id]` routes is a Promise — use `const { id } = await params`.

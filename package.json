@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/gen-theme-hero-manifest.mjs && prisma generate && next build",
+    "build": "node scripts/check-schema-drift.mjs && node scripts/gen-theme-hero-manifest.mjs && prisma generate && next build",
+    "check:schema-drift": "node scripts/check-schema-drift.mjs",
     "gen:hero-manifest": "node scripts/gen-theme-hero-manifest.mjs",
     "start": "next start",
     "lint": "eslint",
