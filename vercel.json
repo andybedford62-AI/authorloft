@@ -1,4 +1,5 @@
 {
+  "_comment": "Build retriggered after Supabase pool size bumped to 50",
   "ignoreCommand": "git diff HEAD^ HEAD --quiet -- src/ prisma/schema.prisma prisma/migrations/ package.json package-lock.json public/ vercel.json next.config.ts next.config.js scripts/",
   "crons": [
     {
