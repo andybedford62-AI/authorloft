@@ -18,31 +18,55 @@ and make sure before changes are done. Ask clarifying questions if needed.
 - This applies even if we're not using staging for verification — keep everything
   aligned at all times.
 
+## Build-time guardrails (run before every deploy) — DO NOT BYPASS
+
+Three checks run in order at the start of every Vercel build. If any fail,
+the build halts and the deploy never ships. All three exist because past
+outages were caused by silent drift between the deployed code and the
+live environment.
+
+1. **`scripts/check-required-env.mjs`** — verifies every env var listed in
+   `scripts/required-env.json` is set. Catches the silent-401 class
+   (e.g. CRON_SECRET missing → all crons silently 401'd for weeks).
+   Bypass: `SKIP_REQUIRED_ENV_CHECK=1` (emergencies only).
+2. **`scripts/check-schema-drift.mjs`** — runs `prisma migrate diff`
+   between `prisma/schema.prisma` and the live DB. Fails if any
+   `ADD COLUMN` / `CREATE TABLE` / `CREATE TYPE` would be needed in the
+   DB. Cosmetic drift (FK re-orders, TIMESTAMP precision, default-clause
+   noise) is ignored. Bypass: `SKIP_SCHEMA_DRIFT_CHECK=1`.
+3. **`scripts/check-grants.mjs`** — verifies every public table has
+   SELECT/INSERT/UPDATE/DELETE for anon/authenticated/postgres/service_role.
+   Catches "new table works locally but RLS-protected queries 401 in
+   prod." Bypass: `SKIP_GRANTS_CHECK=1`.
+
+All three need `DIRECT_URL` in Vercel env (session-pooler URL —
+`aws-N-<region>.pooler.supabase.com:5432`, not the IPv6-only direct
+host). Run locally with `npm run check:all`.
+
 ## Database & migrations (Supabase) — critical
-- Migrations are NOT auto-applied on deploy. Apply schema changes directly to
-  Supabase via MCP (`apply_migration`), or runtime throws "column does not
-  exist."
-- **Build-time guardrail:** every Vercel build runs `scripts/check-schema-drift.mjs`
-  before `next build`. It runs `prisma migrate diff` between `prisma/schema.prisma`
-  and the live DB. If the schema describes a column/table/enum the DB is missing
-  (`ADD COLUMN` / `CREATE TABLE` / `CREATE TYPE`), the build is halted and the
-  required SQL is printed. Cosmetic drift (FK re-orders, TIMESTAMP precision,
-  default-clause noise) is ignored.
-  - Requires `DIRECT_URL` (or `DATABASE_URL` as fallback) in Vercel env — must
-    be the non-pooled `db.<ref>.supabase.co:5432` URL, not the PgBouncer pooler.
-  - To bypass for an emergency: `SKIP_SCHEMA_DRIFT_CHECK=1` (do not use without
-    a reason).
-- **Workflow for any schema change** (mandatory order):
+
+- Migrations are NOT auto-applied on deploy. Apply schema changes
+  directly to Supabase via MCP `apply_migration`.
+- **Mandatory workflow for any schema change** (in this order):
   1. Edit `prisma/schema.prisma`.
-  2. Apply the corresponding SQL to Supabase via MCP `apply_migration` **before
-     pushing the code**. (For additive changes — new nullable columns / new
-     tables — it's safe to apply to prod DB before code is promoted.)
-  3. Drop the same SQL into `prisma/migrations/<YYYYMMDD>_<name>/migration.sql`
+  2. Apply the corresponding SQL to Supabase via MCP `apply_migration`
+     **before pushing the code**. Additive changes (new nullable columns,
+     new tables) are safe to apply to prod DB ahead of code promotion.
+  3. **If you added a new table:** include `GRANT ALL ON TABLE "X" TO
+     anon, authenticated, postgres, service_role;` in the same migration.
+     The grants check (#3 above) will block the deploy if you forget.
+  4. Drop the same SQL into `prisma/migrations/<YYYYMMDD>_<name>/migration.sql`
      so the history lives in git.
-  4. Run `npm run check:schema-drift` locally to confirm the DB is in sync,
+  5. Run `npm run check:all` locally to confirm everything is in sync,
      then commit and push.
-- Every new table needs GRANT statements (anon, authenticated, postgres,
-  service_role) — match existing tables.
+
+## Adding a new env var
+
+- Add it to `scripts/required-env.json` under `required` (if absence
+  breaks the app) or `optional` (if it degrades gracefully).
+- Set the value in Vercel -> Settings -> Environment Variables across
+  Production + Preview + Development **before pushing the code that uses
+  it**, otherwise the check (#1 above) will fail the next build.
 
 ## Code conventions
 - Next.js: `params` in `[id]` routes is a Promise — use `const { id } = await params`.

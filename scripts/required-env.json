@@ -1,0 +1,61 @@
+{
+  "_doc": "Manifest of environment variables this app uses. The build-time check (scripts/check-required-env.mjs) fails if any 'required' key is missing in process.env, and warns if any 'optional' key is missing. Keep this list in sync with src/ usage when adding/removing env-dependent features.",
+
+  "required": [
+    { "name": "DATABASE_URL", "purpose": "Postgres pooled (PgBouncer) connection — runtime queries" },
+    { "name": "DIRECT_URL", "purpose": "Postgres direct/session connection — Prisma migrate diff + schema-drift check" },
+
+    { "name": "NEXTAUTH_SECRET", "purpose": "NextAuth JWT signing key" },
+    { "name": "NEXTAUTH_URL", "purpose": "Canonical base URL used by NextAuth callbacks" },
+    { "name": "NEXT_PUBLIC_PLATFORM_DOMAIN", "purpose": "Root platform domain (e.g. authorloft.com) — used for subdomain routing + link generation" },
+
+    { "name": "GOOGLE_CLIENT_ID", "purpose": "Google OAuth client ID — Google sign-in" },
+    { "name": "GOOGLE_CLIENT_SECRET", "purpose": "Google OAuth client secret — Google sign-in" },
+
+    { "name": "STRIPE_SECRET_KEY", "purpose": "Stripe server-side key — checkout + subscriptions" },
+    { "name": "STRIPE_WEBHOOK_SECRET", "purpose": "Stripe webhook signing secret — /api/stripe/webhook" },
+    { "name": "STRIPE_STANDARD_PRICE_ID", "purpose": "Stripe price ID for the Standard plan" },
+    { "name": "STRIPE_PREMIUM_PRICE_ID", "purpose": "Stripe price ID for the Premium plan" },
+
+    { "name": "RESEND_API_KEY", "purpose": "Resend API key — all transactional + broadcast email" },
+
+    { "name": "NEXT_PUBLIC_SUPABASE_URL", "purpose": "Supabase project URL — storage uploads" },
+    { "name": "SUPABASE_SERVICE_ROLE_KEY", "purpose": "Supabase service-role key — storage uploads (bypasses RLS)" },
+
+    { "name": "AWS_REGION", "purpose": "S3 region (large-file uploads)" },
+    { "name": "AWS_ACCESS_KEY_ID", "purpose": "S3 credentials" },
+    { "name": "AWS_SECRET_ACCESS_KEY", "purpose": "S3 credentials" },
+    { "name": "AWS_S3_BUCKET", "purpose": "S3 bucket name" },
+
+    { "name": "ENCRYPTION_KEY", "purpose": "AES key for encrypting author-provided API keys at rest" },
+
+    { "name": "REDIS_URL", "purpose": "Redis (Vercel KV) URL — rate limiting + idempotency" },
+
+    { "name": "CRON_SECRET", "purpose": "Vercel-supplied cron auth — required by every /api/cron/* route. Missing this silently 401s all crons (seen in prod Jun 2026)" },
+
+    { "name": "GEMINI_API_KEY", "purpose": "Google Gemini API key — AI assist features" },
+
+    { "name": "SUPER_ADMIN_EMAIL", "purpose": "Where contact-form / admin escalations are delivered" }
+  ],
+
+  "optional": [
+    { "name": "SMTP_FROM", "purpose": "Override default 'from' address on outbound email" },
+    { "name": "NEXT_PUBLIC_GOOGLE_ADS_ID", "purpose": "Google Ads tag — analytics-only, degrades gracefully" },
+
+    { "name": "STRIPE_EARLY_BIRD_COUPON_MONTHLY", "purpose": "Founding-member coupon ID (monthly plans)" },
+    { "name": "STRIPE_EARLY_BIRD_COUPON_ANNUAL", "purpose": "Founding-member coupon ID (annual plans)" },
+    { "name": "PLATFORM_FEE_PERCENT", "purpose": "Override default Stripe Connect platform fee %" },
+
+    { "name": "POSTHOG_PERSONAL_API_KEY", "purpose": "PostHog server-side API key — analytics queries" },
+    { "name": "POSTHOG_PROJECT_ID", "purpose": "PostHog project ID — analytics queries" },
+    { "name": "NEXT_PUBLIC_POSTHOG_KEY", "purpose": "PostHog client-side key — event capture" },
+    { "name": "NEXT_PUBLIC_POSTHOG_HOST", "purpose": "PostHog client-side host" },
+
+    { "name": "NEXT_PUBLIC_SENTRY_DSN", "purpose": "Sentry DSN — client error reporting" },
+    { "name": "SENTRY_AUTH_TOKEN", "purpose": "Sentry auth token — source map upload at build time" },
+
+    { "name": "SOCIAL_TOKEN_ENCRYPTION_KEY", "purpose": "Encryption key for stored social OAuth tokens (only needed once Social Promote phase 2 ships)" },
+    { "name": "SOCIAL_PROMOTE_ADMIN_EMAILS", "purpose": "Comma-separated admins to notify on Social Promote abuse alerts" },
+    { "name": "SOCIAL_PROMOTE_KILL_SWITCH", "purpose": "Set to '1' to globally disable Social Promote generation" }
+  ]
+}

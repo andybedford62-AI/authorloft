@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/check-schema-drift.mjs && node scripts/gen-theme-hero-manifest.mjs && prisma generate && next build",
+    "build": "node scripts/check-required-env.mjs && node scripts/check-schema-drift.mjs && node scripts/check-grants.mjs && node scripts/gen-theme-hero-manifest.mjs && prisma generate && next build",
+    "check:env": "node scripts/check-required-env.mjs",
     "check:schema-drift": "node scripts/check-schema-drift.mjs",
+    "check:grants": "node scripts/check-grants.mjs",
+    "check:all": "npm run check:env && npm run check:schema-drift && npm run check:grants",
     "gen:hero-manifest": "node scripts/gen-theme-hero-manifest.mjs",
     "start": "next start",
     "lint": "eslint",
@@ -78,6 +81,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
     "jsdom": "^29.1.0",
+    "pg": "^8.22.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.5"
