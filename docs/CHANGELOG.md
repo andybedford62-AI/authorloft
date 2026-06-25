@@ -15,6 +15,12 @@ line rather than listing every commit.
 
 ## June 25, 2026
 
+- **Newsletter "WOW" template — smart content blocks** — Extended the branded newsletter into a richer, magazine-style layout where every section auto-populates from existing data and hides when empty (no manual upkeep, no empty placeholders):
+  - **Centered masthead** with brand mark + "Author newsletter" eyebrow + name + tagline, making it explicit the email is from an author the reader subscribed to (reinforced in the footer + hidden preheader).
+  - **Featured book showcase** — newest published book (cover, short description, CTA), with a "More on the shelf" strip of up to 3 more books.
+  - **Smart review quote** — pulls the author's curated `BookReview` for the featured book, falling back to a highly-rated APPROVED reader `BookFeedback`; hidden when no review exists.
+  - **Smart special block** — reuses the author's active `Special` (respects `isActive` + `startsAt`/`endsAt` window). When multiple are live, the author picks which to feature from a dropdown on the compose screen; hidden when none are active.
+  - Compose screen shows per-send toggles only for blocks that currently have content (feature books, include review, choose special). Preview mirrors exactly what will send.
 - **Newsletter email redesign — branded, not generic** — Author newsletters now ship with real branding instead of a color block + floating text:
   - **Branded header** — author logo (`logoUrl`), falling back to profile photo, then initials, alongside name + `tagline`.
   - **Issue eyebrow** ("Newsletter · Month Year") and a structured body so short emails no longer float in an empty void.
