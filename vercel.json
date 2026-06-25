@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- src/ prisma/schema.prisma package.json package-lock.json public/ vercel.json next.config.ts next.config.js",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- src/ prisma/schema.prisma prisma/migrations/ package.json package-lock.json public/ vercel.json next.config.ts next.config.js scripts/",
   "crons": [
     {
       "path": "/api/cron/reset-ai-usage",
