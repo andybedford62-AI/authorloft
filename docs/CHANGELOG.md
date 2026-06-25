@@ -15,6 +15,11 @@ line rather than listing every commit.
 
 ## June 25, 2026
 
+- **Newsletter genre targeting — fix interest segmentation** — The author newsletter Compose & Send screen filters recipients by the author's genres, but the public sign-up form was collecting interests as four hardcoded strings (`new_releases`, `specials`, `blog`), so genre-based targeting matched zero interested subscribers and the Subscribers tab showed "None" for everyone. Unified both ends on genre IDs:
+  - New public `GET /api/newsletter/genres?authorId=` endpoint returns an author's genres (id + name).
+  - Sign-up modal now fetches and renders the author's genres as interest checkboxes (plus an "All" option = no preference); falls back to no picker when the author has no genres. Removed the dead "Email Frequency" field (collected but never sent; no frequency-respecting scheduler exists).
+  - "Empty prefs = send to everyone" behavior unchanged; selecting genres now correctly targets subscribers who chose those genres.
+- **Author platform repositioning + nav clarity** — Homepage/meta now leads with platform breadth ("Your All-in-One Author Platform") instead of the narrower "own your business" framing. Author sidebar labels clarified: "Blog / News" → "Blog" (authors don't write platform News), "Email & Newsletter" → "Newsletter". Newsletter screen now defaults to the Compose & Send tab so authors land on the writing screen.
 - **Search Engine Submission Tools** — New `/admin/search-engines` page under the Website sidebar group gives all authors (FREE+) a guided workflow to submit their sitemaps to Google Search Console and Bing Webmaster Tools:
   - **Site Verification** — Authors can paste Google/Bing verification meta tag codes (or the full HTML tag); the platform extracts the content value and injects `google-site-verification` / `msvalidate.01` meta tags into their author site's `<head>` via Next.js `generateMetadata`.
   - **Step-by-step guides** — Numbered walkthroughs for Google and Bing with inline copy buttons for the author's site URL and sitemap URL, plus direct links to the relevant console pages.
