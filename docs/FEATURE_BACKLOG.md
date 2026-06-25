@@ -24,6 +24,21 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 
 ---
 
+## Author Newsletter — rich email (WOW v2)
+
+Shipped June 25, 2026: branded email + smart content blocks (featured book showcase, "more on the shelf" strip, smart review quote from `BookReview`/approved `BookFeedback`, smart special block from active `Special`, genre targeting, compose preview that mirrors the send). Next "WOW" ideas:
+
+- [ ] **Hero banner image** — optional full-width header image (`heroImageUrl` or a per-send upload) behind the masthead, with a readable scrim + image-off fallback. *(medium — email image hosting + Outlook fallbacks)*
+- [ ] **Drag-drop content blocks** — let authors add/reorder optional promo panels (text + image + CTA) in the composer instead of the fixed block order. Biggest lift; needs a block editor + storage. *(large)*
+- [ ] **Multiple featured books / pick the featured title** — currently auto-picks newest published; let the author choose which book headlines, and optionally feature 2–3. *(small–medium)*
+- [ ] **Per-send saved layouts / templates** — save a block configuration ("monthly update", "launch announcement") to reuse. *(medium)*
+- [ ] **Subscriber preference center** — a real "update preferences" page (re-pick genres, pause) so the footer link is more than unsubscribe. Unlocks the "Update preferences" footer link we deferred. *(medium)*
+- [ ] **Open/click analytics** — track opens + CTA clicks per campaign (Resend events or tracking pixel + redirect links); show on the History tab. *(medium)*
+- [ ] **Scheduled / recurring sends** — "send later" + optional auto-digest cadence. *(medium–large)*
+- [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
+
+---
+
 ## AuthorLoft News (`/news`) — Phase 2 (email)
 
 Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture, search/filter). Deferred — see `docs/NEWSLETTER_PHASE2_PLAN.md`:

@@ -11,7 +11,7 @@ export function sanitize(html: string | null | undefined): string {
     allowedTags: [
       "h1", "h2", "h3", "h4", "h5", "h6",
       "p", "br", "hr",
-      "strong", "b", "em", "i", "u", "s", "strike",
+      "strong", "b", "em", "i", "u", "s", "strike", "mark",
       "ul", "ol", "li",
       "blockquote", "pre", "code",
       "a", "img",

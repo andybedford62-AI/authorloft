@@ -4,7 +4,8 @@ import { canUseFeature } from "@/lib/plan-limits";
 import { Resend } from "resend";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { resolveAccentColor } from "@/lib/themes";
-import sanitizeHtml from "sanitize-html";
+import { sanitize } from "@/lib/sanitize";
+import { htmlToText, featuredBookTag } from "@/lib/newsletter-format";
 
 function escapeHtml(s: string): string {
   return s
@@ -23,33 +24,13 @@ function initialsOf(name: string): string {
     .join("");
 }
 
-const NEWSLETTER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: [
-    "p", "br", "strong", "b", "em", "i", "u", "s",
-    "h1", "h2", "h3", "h4",
-    "ul", "ol", "li",
-    "a", "blockquote", "hr", "span", "div",
-  ],
-  allowedAttributes: {
-    a: ["href", "title", "target", "rel"],
-    span: ["style"],
-    p: ["style"],
-    div: ["style"],
-  },
-  allowedSchemes: ["http", "https", "mailto"],
-  transformTags: {
-    a: (tagName, attribs) => ({
-      tagName,
-      attribs: { ...attribs, rel: "noopener noreferrer" },
-    }),
-  },
-};
-
 interface FeaturedBook {
   title: string;
   blurb: string | null;
   coverImageUrl: string | null;
   url: string;
+  eyebrow: string;
+  ctaLabel: string;
 }
 
 interface ShelfBook {
@@ -113,11 +94,11 @@ function buildEmailHtml(opts: {
             ? `<td width="120" valign="top" style="padding:24px 0 24px 24px;"><img src="${escapeHtml(opts.featuredBook.coverImageUrl)}" alt="${escapeHtml(opts.featuredBook.title)}" width="96" style="display:block;width:96px;border-radius:6px;border:0;" /></td>`
             : ""}
           <td valign="middle" style="padding:24px;">
-            <p style="margin:0 0 4px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#9a8a66;">Out now</p>
+            <p style="margin:0 0 4px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#9a8a66;">${escapeHtml(opts.featuredBook.eyebrow)}</p>
             <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#1f2937;">${escapeHtml(opts.featuredBook.title)}</p>
             ${opts.featuredBook.blurb ? `<p style="margin:0 0 14px;font-size:13px;line-height:1.6;color:#5c6675;">${escapeHtml(opts.featuredBook.blurb)}</p>` : ""}
             <table cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:${accent};">
-              <a href="${escapeHtml(opts.featuredBook.url)}" style="display:inline-block;padding:10px 22px;font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">View the book &rarr;</a>
+              <a href="${escapeHtml(opts.featuredBook.url)}" style="display:inline-block;padding:10px 22px;font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">${escapeHtml(opts.featuredBook.ctaLabel)} &rarr;</a>
             </td></tr></table>
           </td>
         </tr></table>
@@ -141,9 +122,9 @@ function buildEmailHtml(opts: {
     ? `<tr><td style="padding:0 40px 28px;">
         <p style="margin:0 0 12px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#9097a3;">More on the shelf</p>
         <table cellpadding="0" cellspacing="0" width="100%"><tr>
-          ${opts.shelf.map((b) => `<td valign="top" align="center" style="padding-right:12px;">
+          ${opts.shelf.map((b) => `<td width="33%" valign="top" align="center" style="padding:0 6px;">
             <a href="${escapeHtml(b.url)}" style="text-decoration:none;">
-              ${b.coverImageUrl ? `<img src="${escapeHtml(b.coverImageUrl)}" alt="${escapeHtml(b.title)}" width="100%" style="display:block;width:100%;max-width:120px;border-radius:5px;border:0;margin:0 auto 6px;" />` : ""}
+              ${b.coverImageUrl ? `<img src="${escapeHtml(b.coverImageUrl)}" alt="${escapeHtml(b.title)}" width="100" height="150" style="display:block;width:100px;height:150px;object-fit:cover;border-radius:5px;border:0;margin:0 auto 6px;" />` : ""}
               <span style="font-size:12px;color:#5c6675;">${escapeHtml(b.title)}</span>
             </a>
           </td>`).join("")}
@@ -285,7 +266,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email body cannot be empty." }, { status: 400 });
   }
 
-  const safeHtmlBody = sanitizeHtml(htmlBody, NEWSLETTER_SANITIZE_OPTIONS);
+  const safeHtmlBody = sanitize(htmlBody);
 
   const author = await prisma.author.findUnique({
     where:  { id: authorId },
@@ -351,16 +332,22 @@ export async function POST(req: NextRequest) {
       where:   { authorId, isPublished: true },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
       take:    4,
-      select:  { id: true, title: true, slug: true, coverImageUrl: true, shortDescription: true },
+      select:  {
+        id: true, title: true, slug: true, coverImageUrl: true, shortDescription: true,
+        isPreOrder: true, directSalesEnabled: true, externalBuyUrl: true,
+      },
     });
     if (books.length > 0) {
       const [first, ...rest] = books;
       featuredBookId = first.id;
+      const tag = featuredBookTag(first);
       featuredBook = {
         title:         first.title,
-        blurb:         first.shortDescription,
+        blurb:         htmlToText(first.shortDescription),
         coverImageUrl: first.coverImageUrl,
         url:           bookUrl(first.slug),
+        eyebrow:       tag.eyebrow,
+        ctaLabel:      tag.ctaLabel,
       };
       shelf = rest.map((b) => ({ title: b.title, coverImageUrl: b.coverImageUrl, url: bookUrl(b.slug) }));
     }

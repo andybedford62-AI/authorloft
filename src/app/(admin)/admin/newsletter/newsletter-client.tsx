@@ -32,7 +32,7 @@ type Campaign = {
   totalTargeted: number;
 };
 
-type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null };
+type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null; eyebrow: string; ctaLabel: string };
 type ShelfBook = { title: string; coverImageUrl: string | null };
 type ReviewQuote = { quote: string; attribution: string };
 type ActiveSpecial = { id: string; title: string; description: string | null; ctaLabel: string | null; ctaUrl: string | null };
@@ -521,10 +521,10 @@ export function NewsletterClient({
                                   <img src={featuredBook.coverImageUrl} alt={featuredBook.title} className="w-20 rounded" />
                                 )}
                                 <div>
-                                  <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>Out now</p>
+                                  <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>{featuredBook.eyebrow}</p>
                                   <p className="text-base font-bold text-gray-800">{featuredBook.title}</p>
                                   {featuredBook.blurb && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{featuredBook.blurb}</p>}
-                                  <span className="inline-block mt-2 px-4 py-1.5 rounded-full text-xs font-semibold text-white" style={{ backgroundColor: accentColor }}>View the book →</span>
+                                  <span className="inline-block mt-2 px-4 py-1.5 rounded-full text-xs font-semibold text-white" style={{ backgroundColor: accentColor }}>{featuredBook.ctaLabel} →</span>
                                 </div>
                               </div>
                             </div>
@@ -549,7 +549,7 @@ export function NewsletterClient({
                                   <div key={i} className="flex-1 text-center">
                                     {b.coverImageUrl && (
                                       /* eslint-disable-next-line @next/next/no-img-element */
-                                      <img src={b.coverImageUrl} alt={b.title} className="w-full rounded mb-1" />
+                                      <img src={b.coverImageUrl} alt={b.title} className="w-[80px] h-[120px] object-cover rounded mb-1 mx-auto" />
                                     )}
                                     <span className="text-[11px] text-gray-500">{b.title}</span>
                                   </div>

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { NewsletterClient } from "./newsletter-client";
 import { NewsletterTabs } from "./newsletter-tabs";
 import { resolveAccentColor } from "@/lib/themes";
+import { htmlToText, featuredBookTag } from "@/lib/newsletter-format";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +56,10 @@ export default async function NewsletterPage() {
       where:   { authorId, isPublished: true },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
       take:    4,
-      select:  { id: true, title: true, coverImageUrl: true, shortDescription: true },
+      select:  {
+        id: true, title: true, coverImageUrl: true, shortDescription: true,
+        isPreOrder: true, directSalesEnabled: true, externalBuyUrl: true,
+      },
     }),
     prisma.special.findMany({
       where: {
@@ -83,7 +87,12 @@ export default async function NewsletterPage() {
 
   // Book showcase preview data — featured (first) + shelf (rest).
   const featuredBook = books[0]
-    ? { title: books[0].title, coverImageUrl: books[0].coverImageUrl, blurb: books[0].shortDescription }
+    ? {
+        title:         books[0].title,
+        coverImageUrl: books[0].coverImageUrl,
+        blurb:         htmlToText(books[0].shortDescription) || null,
+        ...featuredBookTag(books[0]),
+      }
     : null;
   const shelf = books.slice(1).map((b) => ({ title: b.title, coverImageUrl: b.coverImageUrl }));
 

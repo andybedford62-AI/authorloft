@@ -15,6 +15,11 @@ line rather than listing every commit.
 
 ## June 25, 2026
 
+- **Newsletter polish — formatting + book tag fixes** — Follow-up fixes to the WOW template:
+  - **Consistent rich-text rendering** — the email body and the compose preview now use the same sanitizer (`@/lib/sanitize`, with `<mark>` highlight support added), so paragraphs, highlighting, alignment, and colors render identically in preview and inbox.
+  - **Featured book blurb** — `shortDescription` is now stripped to plain text before display (was rendering literal `<p>` tags in the email).
+  - **Correct availability tag** — the featured book eyebrow + CTA now derive from book status: pre-orders show "Coming soon / Pre-order", books with a seller link show "Out now / Get the book", and books with no way to buy show a neutral "Featured / View the book" instead of implying a purchase.
+  - **Uniform shelf covers** — "More on the shelf" covers now render at a fixed size (object-fit cover) instead of varying by each book's aspect ratio.
 - **Newsletter "WOW" template — smart content blocks** — Extended the branded newsletter into a richer, magazine-style layout where every section auto-populates from existing data and hides when empty (no manual upkeep, no empty placeholders):
   - **Centered masthead** with brand mark + "Author newsletter" eyebrow + name + tagline, making it explicit the email is from an author the reader subscribed to (reinforced in the footer + hidden preheader).
   - **Featured book showcase** — newest published book (cover, short description, CTA), with a "More on the shelf" strip of up to 3 more books.
