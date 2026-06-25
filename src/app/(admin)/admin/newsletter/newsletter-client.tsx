@@ -55,7 +55,7 @@ export function NewsletterClient({
   campaigns: initialCampaigns,
 }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("subscribers");
+  const [tab, setTab] = useState<Tab>("compose");
 
   // Compose state
   const [subject,        setSubject]        = useState("");
@@ -170,7 +170,7 @@ export function NewsletterClient({
 
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
-        {(["subscribers", "compose", "history"] as const).map((t) => (
+        {(["compose", "subscribers", "history"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
