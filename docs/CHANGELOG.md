@@ -15,6 +15,12 @@ line rather than listing every commit.
 
 ## June 25, 2026
 
+- **Search Engine Submission Tools** — New `/admin/search-engines` page under the Website sidebar group gives all authors (FREE+) a guided workflow to submit their sitemaps to Google Search Console and Bing Webmaster Tools:
+  - **Site Verification** — Authors can paste Google/Bing verification meta tag codes (or the full HTML tag); the platform extracts the content value and injects `google-site-verification` / `msvalidate.01` meta tags into their author site's `<head>` via Next.js `generateMetadata`.
+  - **Step-by-step guides** — Numbered walkthroughs for Google and Bing with inline copy buttons for the author's site URL and sitemap URL, plus direct links to the relevant console pages.
+  - **Automatic submissions info** — Explains IndexNow auto-pings on blog publish (Bing/Yandex) and Google sitemap crawling.
+  - **Dashboard link** — Site Pages card footer now links to the new Search Engines page instead of bare external links.
+  - DB: `googleSiteVerification` and `bingSiteVerification` nullable columns on Author.
 - **User blog SEO readiness — close all gaps** — Comprehensive SEO/GEO/AEO hardening for individual author blog sites and platform content:
   - **IndexNow for user blogs** — author blog create/update API routes now ping Bing/Yandex IndexNow on publish (previously only platform posts triggered this).
   - **Auto-generate metaDescription** — when authors leave SEO meta description blank, it auto-generates from excerpt or content (plain-text, 160-char cap on word boundary) via new `src/lib/seo-utils.ts`.

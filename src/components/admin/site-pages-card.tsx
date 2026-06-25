@@ -1,4 +1,5 @@
-import { ExternalLink, Globe } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink, Globe, ChevronRight } from "lucide-react";
 import { getAuthorSitePages, type AuthorNavFlags, type AuthorCustomPage } from "@/lib/site-pages";
 import { SitemapUrlPill } from "./sitemap-url-pill";
 
@@ -44,17 +45,17 @@ export function SitePagesCard({ baseUrl, author, customPages }: Props) {
       </div>
 
       <div className="flex items-center justify-between gap-3 flex-wrap px-5 py-3 border-t border-gray-100 bg-gray-50">
-        <p className="text-xs text-gray-500">
-          Copy this sitemap URL and submit it to{" "}
-          <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
-            Google Search Console
-          </a>
-          {" "}or{" "}
-          <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
-            Bing Webmaster Tools
-          </a>
-          {" "}so search engines can find your pages:
-        </p>
+        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
+          <p className="text-xs text-gray-500">
+            Submit your sitemap to search engines so they can discover your pages.
+          </p>
+          <Link
+            href="/admin/search-engines"
+            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+          >
+            Set up search engines <ChevronRight className="h-3 w-3" />
+          </Link>
+        </div>
         <SitemapUrlPill url={`${baseUrl}/sitemap.xml`} />
       </div>
     </div>

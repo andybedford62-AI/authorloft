@@ -44,6 +44,8 @@ async function resolveAuthor(domain: string) {
       navShowContact: true,
       navShowMediaKit: true,
       navShowBookstore: true,
+      googleSiteVerification: true,
+      bingSiteVerification: true,
       siteTheme: true,
       customAccentColor: true,
       isActive: true,
@@ -94,6 +96,14 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: baseUrl,
+    },
+    verification: {
+      ...(author.googleSiteVerification && {
+        google: author.googleSiteVerification,
+      }),
+      ...(author.bingSiteVerification && {
+        other: { "msvalidate.01": author.bingSiteVerification },
+      }),
     },
   };
 }

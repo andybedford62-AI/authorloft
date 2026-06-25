@@ -89,11 +89,12 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "website", label: "Website", defaultOpen: true,
     items: [
-      { href: "/admin/pages",      label: "Pages",       icon: FileText  },
-      { href: "/admin/blog",       label: "Blog / News", icon: Newspaper },
-      { href: "/admin/appearance", label: "Appearance",  icon: Paintbrush },
-      { href: "/admin/branding",   label: "Branding",    icon: Palette   },
-      { href: "/admin/legal",      label: "Legal Pages", icon: Scale     },
+      { href: "/admin/pages",          label: "Pages",          icon: FileText   },
+      { href: "/admin/blog",           label: "Blog / News",    icon: Newspaper  },
+      { href: "/admin/search-engines", label: "Search Engines", icon: Globe      },
+      { href: "/admin/appearance",     label: "Appearance",     icon: Paintbrush },
+      { href: "/admin/branding",       label: "Branding",       icon: Palette    },
+      { href: "/admin/legal",          label: "Legal Pages",    icon: Scale      },
     ],
   },
   {

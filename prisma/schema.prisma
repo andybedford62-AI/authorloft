@@ -198,6 +198,8 @@ model Author {
   impersonationsAsTarget        ImpersonationLog[]    @relation("ImpersonationAsTarget")
   preOrderSignups               PreOrderSignup[]
   magnetLeads                   BookMagnetLead[]
+  googleSiteVerification        String?
+  bingSiteVerification          String?
   socialVoiceDescription        String?               @db.VarChar(500) // Social Promote: author's voice description for AI prompts
   generatedSocialPosts          GeneratedSocialPost[]
 
