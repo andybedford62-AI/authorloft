@@ -12,7 +12,7 @@ import { RebelHero } from "@/components/marketing/rebrand-hero";
 import { AnimatedStatsBar, JourneySection, IntegrationStrip, AISpotlight, RebelCTA } from "@/components/marketing/animated-sections";
 import { ReplacesStrip } from "@/components/marketing/replaces-strip";
 
-export const revalidate = 60;
+export const revalidate = 60; // ISR interval (seconds)
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
