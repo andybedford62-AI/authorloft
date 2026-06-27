@@ -15,6 +15,13 @@ line rather than listing every commit.
 
 ## June 27, 2026
 
+- **Author Courses — full feature** — authors can now create and sell courses (writing craft, subject expertise):
+  - **Schema:** Course → CourseModule → CourseLesson hierarchy with CourseEnrollment for access control. Reuses polymorphic OrderItem (itemType: COURSE).
+  - **Admin CRUD:** `/admin/courses` list, create, and edit pages with inline module/lesson editor (collapsible modules, per-lesson video URL + HTML content + free preview toggle). Sidebar entry under Sales group, gated to STANDARD tier.
+  - **Checkout:** Stripe checkout extended to accept `courseId` — creates a single line item. Free courses use a separate enrollment endpoint (email collection → instant access). Webhook creates CourseEnrollment on payment.
+  - **Author site display:** `/courses` listing page with cover images, module/lesson counts, and price. `/courses/[slug]` detail page with full curriculum outline, free preview badges, and buy/enroll button. `/courses/[slug]/learn` token-gated lesson viewer with sidebar navigation, YouTube/Vimeo embeds, and previous/next navigation.
+  - **Feature gates:** `/admin/courses` → STANDARD, maps to `Plan.coursesEnabled`. Nav controlled by `navShowCourses` toggle.
+- **Shared cover image upload** — extracted reusable `CoverUpload` component (drag-and-drop + click-to-browse + paste URL) used by book, bundle, and course admin forms.
 - **Book Bundles — full feature** — authors can now package multiple book formats into discounted bundles:
   - **Schema:** 6 new models (Bundle, BundleItem, Course, CourseModule, CourseLesson, CourseEnrollment), polymorphic OrderItem with OrderItemType enum (BOOK/BUNDLE/COURSE), Plan feature flags (bundlesEnabled, coursesEnabled), Author nav toggles.
   - **Admin CRUD:** `/admin/bundles` list, create, and edit pages with interactive book format picker, savings calculator, and publish toggle. Sidebar entry under Sales group, gated to STANDARD tier.

@@ -78,7 +78,7 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct Stripe checkout, nav/footer toggles, feature gating). Open ideas:
 
 - [x] **Book Bundles** — bundle multiple books/formats at a discounted price; admin CRUD at `/admin/bundles`; author site at `/bundles` + `/bundles/[slug]`; polymorphic OrderItem with `itemType: BUNDLE`; `navShowBundles` toggle; `bundlesEnabled` plan gate. *(done June 27, 2026)*
-- [ ] **Author Courses / Workshops** — authors teach writing craft or subject expertise; Course → Module → Lesson structure; rich text + external video embeds; one-time purchase; token-gated access. *(large — schema + admin CRUD + checkout + lesson viewer)*
+- [x] **Author Courses / Workshops** — authors teach writing craft or subject expertise; Course → Module → Lesson structure; rich text + external video embeds; one-time purchase; token-gated access via CourseEnrollment.accessToken. Admin CRUD at `/admin/courses`; author site at `/courses` + `/courses/[slug]` + `/courses/[slug]/learn` (lesson viewer). Free course enrollment + paid Stripe checkout. `coursesEnabled` plan gate, `navShowCourses` toggle. *(done June 27, 2026)*
 - [ ] **Merchandise** — physical items (bookmarks, signed bookplates); self-fulfilled first, print-on-demand later. *(deferred — requires shipping/fulfillment)*
 - [ ] **Bundle discount codes** — extend DiscountCode to optionally apply to bundles (new join table). *(small–medium)*
 - [ ] **Course discount codes** — extend DiscountCode to optionally apply to courses. *(small–medium)*
@@ -125,6 +125,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ## Shipped (for reference)
 
+- ✅ **Author Courses** — admin CRUD (`/admin/courses`), author site listing + detail + lesson viewer (`/courses`, `/courses/[slug]`, `/courses/[slug]/learn`), free enrollment + paid Stripe checkout, token-gated access, `coursesEnabled` plan gate, `navShowCourses` toggle. STANDARD/PREMIUM. (June 27, 2026)
 - ✅ **Book Bundles** — admin CRUD (`/admin/bundles`), author site listing + detail (`/bundles`, `/bundles/[slug]`), Stripe checkout, polymorphic OrderItem, nav/footer toggles, `bundlesEnabled` plan gate. STANDARD/PREMIUM. (June 27, 2026)
 - ✅ **Book QR Code** — per-book QR code card on the Organisation tab; SVG download; links to the public book URL. All plans. (June 16, 2026)
 - ✅ **Reader Magnet** — author marks a direct sale item as free; readers enter email on the public book page; receive a time-limited download link by email; added to the author's newsletter list automatically. Replaces BookFunnel for list-building. STANDARD/PREMIUM. New `BookMagnetLead` table + `isReaderMagnet` field. (June 16, 2026)

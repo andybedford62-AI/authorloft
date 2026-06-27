@@ -40,6 +40,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Sales Formats** (when Direct Sales enabled) | — | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |
+| **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | ❌ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book or sitewide) | ✅ (if Direct Sales enabled) | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |
