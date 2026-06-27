@@ -18,7 +18,7 @@ Website: https://www.authorloft.com
 - Reader feedback & ratings
 - Price: $0/month forever
 
-### STANDARD Plan ($39.99/month or $383.90/year)
+### STANDARD Plan ($19.99/month or $191.90/year)
 - Everything in FREE, plus:
 - Custom domain support
 - Direct sales (keep 100% of revenue minus Stripe processing)

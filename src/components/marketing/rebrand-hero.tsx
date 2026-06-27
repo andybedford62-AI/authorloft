@@ -192,7 +192,7 @@ function HeroNavDropdown({ label, items }: { label: string; items: [string, stri
   );
 }
 
-export function RebelHero() {
+export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
       <style>{`
@@ -244,12 +244,20 @@ export function RebelHero() {
           <Link href="/pricing" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>Pricing</Link>
         </div>
         <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
-          <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
-          <Link href="/register" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em' }}>
-            Start free →
-          </Link>
+          {isAuthor ? (
+            <Link href="/admin" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
+              <Link href="/register" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em' }}>
+                Start free →
+              </Link>
+            </>
+          )}
         </div>
-        <HeroMobileMenu />
+        <HeroMobileMenu isAuthor={isAuthor} />
       </nav>
 
       {/* Content grid */}

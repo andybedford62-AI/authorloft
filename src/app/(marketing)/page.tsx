@@ -3,6 +3,9 @@ import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
+import { authOptions } from "@/lib/auth";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
@@ -208,9 +211,20 @@ const howToLd = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomepageRebrandPage() {
-  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources] = await Promise.all([
+  await cookies();
+  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources, session] = await Promise.all([
     getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(),
+    getServerSession(authOptions),
   ]);
+
+  let isAuthor = false;
+  if (session?.user) {
+    const userId = (session.user as any).id as string;
+    if (userId) {
+      const author = await prisma.author.findUnique({ where: { id: userId }, select: { id: true } }).catch(() => null);
+      isAuthor = !!author;
+    }
+  }
   const faqs      = faqData.items;
   const faqTotal  = faqData.total;
 
@@ -231,7 +245,7 @@ export default async function HomepageRebrandPage() {
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <RebelHero />
+      <RebelHero isAuthor={isAuthor} />
 
       {/* ── Animated stats bar ────────────────────────────────────────────── */}
       <AnimatedStatsBar />

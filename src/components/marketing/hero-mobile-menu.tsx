@@ -36,7 +36,7 @@ const LINKS_BOTTOM: [string, string][] = [
 ];
 
 /** Dark-themed hamburger + dropdown for the homepage hero nav (below md). */
-export function HeroMobileMenu() {
+export function HeroMobileMenu({ isAuthor = false }: { isAuthor?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -111,20 +111,32 @@ export function HeroMobileMenu() {
             </Link>
           ))}
           <div style={{ height: 1, background: "rgba(232,229,221,0.12)", margin: "8px 6px" }} />
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "#E8E5DD", opacity: 0.85, textDecoration: "none" }}
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            onClick={() => setOpen(false)}
-            style={{ display: "block", margin: 6, padding: "10px 14px", fontSize: 14, fontWeight: 600, textAlign: "center", background: "#B8893D", color: "#0F1A2D", borderRadius: 999, textDecoration: "none" }}
-          >
-            Start free →
-          </Link>
+          {isAuthor ? (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              style={{ display: "block", margin: 6, padding: "10px 14px", fontSize: 14, fontWeight: 600, textAlign: "center", background: "#B8893D", color: "#0F1A2D", borderRadius: 999, textDecoration: "none" }}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "#E8E5DD", opacity: 0.85, textDecoration: "none" }}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                style={{ display: "block", margin: 6, padding: "10px 14px", fontSize: 14, fontWeight: 600, textAlign: "center", background: "#B8893D", color: "#0F1A2D", borderRadius: 999, textDecoration: "none" }}
+              >
+                Start free →
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>

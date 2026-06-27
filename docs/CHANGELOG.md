@@ -30,6 +30,7 @@ line rather than listing every commit.
   - **Hero desktop nav** — added Solutions dropdown (11 solution pages), moved FAQ to top level, restructured Resources dropdown (added Author Guides), removed anchor-only links (#how-it-works, #genres).
   - **Hero mobile menu** — unified with MarketingMobileMenu: now shows full Solutions (11 items), Resources (4 items), and proper page links instead of anchor links.
 - **CTA text update** — hero CTA changed from "Take back control →" to "Start your business →".
+- **Code review fixes** — corrected Standard plan price from $39.99 to $19.99 across all hardcoded references (llms.txt, llms-full.txt, mailer, landing pages, pricing meta, features JSON-LD, welcome email panel, dynamic llms-full.txt route). Made hero nav auth-aware so logged-in authors see "Dashboard" instead of "Sign in / Start free" on both desktop and mobile hero menus. Deleted orphaned `cycling-hero.tsx` and `midnight-hero.tsx` components.
 
 ## June 25, 2026
 

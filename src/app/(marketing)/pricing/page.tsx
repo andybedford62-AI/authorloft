@@ -14,18 +14,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Pricing — Free Author Career Platform",
     description:
-      "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
     alternates: { canonical: "/pricing" },
     openGraph: {
       type:        "website",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
       images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft pricing plans" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($39.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
       images:      [ogImage],
     },
   };

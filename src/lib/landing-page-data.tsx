@@ -127,7 +127,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "What percentage does AuthorLoft take?", a: "Zero. AuthorLoft does not take a cut of your sales. You keep 100% of the revenue minus standard Stripe processing fees (typically 2.9% + 30¢ per transaction)." },
       { q: "Can I still list my books on Amazon and other retailers?", a: "Absolutely. You can add retailer links (Amazon, Kobo, Barnes & Noble, etc.) alongside your direct sales. Many authors do both — direct sales for maximum revenue, retailers for maximum reach." },
       { q: "How do readers get their ebooks after purchase?", a: "Readers receive an instant download link after checkout. Files are delivered securely — readers can download immediately." },
-      { q: "Which plan do I need to sell books?", a: "Direct sales require the Standard plan ($39.99/month) or Premium plan ($79.99/month). The Free plan lets you list books with retailer links but not process direct sales." },
+      { q: "Which plan do I need to sell books?", a: "Direct sales require the Standard plan ($19.99/month) or Premium plan ($79.99/month). The Free plan lets you list books with retailer links but not process direct sales." },
     ],
     relatedGuideSlug: "what-is-direct-book-selling",
   },
@@ -393,7 +393,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Will AI-generated posts sound like me?", a: "Yes. You set your author voice description (up to 500 characters) in the Promote settings. Every generated post is flavored with your voice, tone, and style." },
       { q: "Are there limits on AI usage?", a: "Yes. Standard plan includes a daily and monthly generation limit. Premium plan has higher limits. Exact limits are set by the platform administrator and shown in your dashboard." },
       { q: "Do I need to know how to write AI prompts?", a: "No. AuthorLoft handles all prompt engineering behind the scenes. You just pick your book, choose a platform and promo type, and click Generate." },
-      { q: "Which plan includes AI tools?", a: "AI tools are available on Standard ($39.99/month) and Premium ($79.99/month) plans. The Free plan does not include AI features." },
+      { q: "Which plan includes AI tools?", a: "AI tools are available on Standard ($19.99/month) and Premium ($79.99/month) plans. The Free plan does not include AI features." },
     ],
   },
 
@@ -601,7 +601,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     faqs: [
       { q: "What analytics platform does AuthorLoft use?", a: "AuthorLoft uses PostHog, a privacy-friendly analytics platform. Analytics data is collected on your author site and accessible through your admin dashboard." },
       { q: "Is reader data privacy-compliant?", a: "Yes. PostHog is GDPR-compliant and AuthorLoft's analytics respect reader privacy. No personally identifiable information is shared with third parties." },
-      { q: "Which plan includes analytics?", a: "Reader analytics are available on Standard ($39.99/month) and Premium ($79.99/month) plans. The Free plan does not include analytics." },
+      { q: "Which plan includes analytics?", a: "Reader analytics are available on Standard ($19.99/month) and Premium ($79.99/month) plans. The Free plan does not include analytics." },
       { q: "Can I see which social media posts drive the most traffic?", a: "Yes. The referral tracking shows which traffic sources (social platforms, search engines, direct visits, bookstore) send readers to your site and specific book pages." },
       { q: "Do I need to install any tracking code?", a: "No. Analytics are built into your AuthorLoft site automatically. No code snippets, no pixel setup, no third-party accounts to configure." },
     ],

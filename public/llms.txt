@@ -7,7 +7,7 @@ AuthorLoft helps independent authors take control of their careers by providing 
 ## Key Facts
 - Website: https://www.authorloft.com
 - Type: SaaS platform for independent authors
-- Pricing: Free to start, Standard ($39.99/mo), Premium ($79.99/mo)
+- Pricing: Free to start, Standard ($19.99/mo), Premium ($79.99/mo)
 - No credit card required to start
 
 ## Core Features

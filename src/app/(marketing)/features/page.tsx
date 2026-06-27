@@ -90,7 +90,7 @@ const softwareAppLd = {
     {
       "@type": "Offer",
       name: "Standard",
-      price: "39.99",
+      price: "19.99",
       priceCurrency: "USD",
       billingIncrement: "P1M",
       description: "Direct sales, custom domain, newsletter, bookstore listing, AI tools, and more.",
