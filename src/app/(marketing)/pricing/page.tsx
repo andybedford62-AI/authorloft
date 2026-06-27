@@ -93,6 +93,8 @@ const COMPETITOR_ROWS: Array<{
   { label: "Email Campaigns",         authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✗", type: "no" }       },
   { label: "Reader Magnets",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "Limited", type: "limited" }, storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
   { label: "3rd-Party Integrations",  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
+  { label: "Book Bundles",            authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Author Courses",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
 ];
 
 // Feature comparison table rows
@@ -104,6 +106,8 @@ const COMPARISON_ROWS = [
   { label: "Newsletter capture", free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Newsletter campaigns",free: "—",        standard: "✓",          premium: "✓"          },
   { label: "Direct digital sales",free: "—",        standard: "✓",          premium: "✓"          },
+  { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
+  { label: "Author Courses",     free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
   { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },

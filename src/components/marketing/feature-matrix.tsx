@@ -6,6 +6,8 @@ export type FeatureMatrixPlanData = PlanData & {
   bookstoreListingEnabled: boolean;
   preOrdersEnabled: boolean;
   audioEnabled: boolean;
+  bundlesEnabled: boolean;
+  coursesEnabled: boolean;
 };
 
 type FeatureRow = {
@@ -116,6 +118,22 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
             FREE: "—",
             STANDARD: standard?.salesEnabled ? "✓" : "—",
             PREMIUM: premium?.salesEnabled ? "✓" : "—",
+          },
+        },
+        {
+          name: "Book Bundles",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.bundlesEnabled ? "✓" : "—",
+            PREMIUM: premium?.bundlesEnabled ? "✓" : "—",
+          },
+        },
+        {
+          name: "Author Courses",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.coursesEnabled ? "✓" : "—",
+            PREMIUM: premium?.coursesEnabled ? "✓" : "—",
           },
         },
         {

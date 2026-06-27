@@ -59,6 +59,8 @@ async function getActivePlans() {
       mediaKitEnabled: true,
       bookstoreListingEnabled: true,
       preOrdersEnabled: true,
+      bundlesEnabled: true,
+      coursesEnabled: true,
       isDefault: true,
     },
       orderBy: { sortOrder: "asc" },
