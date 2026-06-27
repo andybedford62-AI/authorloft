@@ -10,6 +10,7 @@ export type FeatureMatrixPlanData = PlanData & {
 
 type FeatureRow = {
   category: string;
+  description?: string;
   features: Array<{
     name: string;
     tiers: Record<string, string>;
@@ -39,6 +40,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
   const rows: FeatureRow[] = [
     {
       category: "Publishing & Content",
+      description: "Stop juggling files, retailer dashboards, and format headaches. Publish once, sell everywhere — from one catalog you control.",
       features: [
         {
           name: "Books",
@@ -136,6 +138,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
     },
     {
       category: "Site & Branding",
+      description: "Your name on the domain, your colors on the page. No 'powered by' badges, no shared templates — a site that looks like yours.",
       features: [
         {
           name: "Site URL",
@@ -181,6 +184,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
     },
     {
       category: "AI & Automation",
+      description: "Writer's block doesn't stop at the manuscript. Let AI handle blurbs, blog ideas, SEO audits, and social posts so you stay in the story.",
       features: [
         {
           name: "AI Assistant",
@@ -250,6 +254,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
     },
     {
       category: "Marketing & Communications",
+      description: "Every reader who buys through a retailer is a reader you'll never email again. Own the relationship from day one.",
       features: [
         {
           name: "Per-Book QR Code (download as SVG)",
@@ -315,7 +320,12 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
     <div className="space-y-8">
       {featureRows.map((section) => (
         <div key={section.category}>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">{section.category}</h2>
+          <h2 className={`text-xl font-bold text-gray-900 ${section.description ? 'mb-1' : 'mb-4'}`}>{section.category}</h2>
+          {section.description && (
+            <p className="text-sm text-[#5C6E89] mb-4 max-w-2xl" style={{ fontFamily: 'Georgia, serif', lineHeight: 1.6 }}>
+              {section.description}
+            </p>
+          )}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">

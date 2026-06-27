@@ -10,25 +10,26 @@ import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-se
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
 import { AnimatedStatsBar, JourneySection, IntegrationStrip, AISpotlight, RebelCTA } from "@/components/marketing/animated-sections";
+import { ReplacesStrip } from "@/components/marketing/replaces-strip";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Your All-in-One Author Platform | AuthorLoft",
+    title: "Your Books. Your Readers. Your Business. | AuthorLoft",
     description:
       "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Your All-in-One Author Platform | AuthorLoft",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
       description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your all-in-one author platform" }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your books, your readers, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Your All-in-One Author Platform | AuthorLoft",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
       description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
       images:      [ogImage],
     },
@@ -133,7 +134,7 @@ const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "
 const webPageLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "AuthorLoft — Own Your Author Business",
+  name: "AuthorLoft — Your Books. Your Readers. Your Business.",
   url: PLATFORM_URL,
   description:
     "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
@@ -222,6 +223,9 @@ export default async function HomepageRebrandPage() {
 
       {/* ── 4-step Journey ────────────────────────────────────────────────── */}
       <JourneySection />
+
+      {/* ── Replaces strip ──────────────────────────────────────────────── */}
+      <ReplacesStrip />
 
       {/* ── Integration strip ─────────────────────────────────────────────── */}
       <IntegrationStrip />

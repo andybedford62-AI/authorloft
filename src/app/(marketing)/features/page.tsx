@@ -129,8 +129,8 @@ export default async function FeaturesPage() {
       {/* Hero */}
       <MarketingPageHeader
         eyebrow="Features"
-        title={<>Complete <span className="italic text-[#D4AE6A]">Feature</span> Comparison</>}
-        subtitle="See all the features available on each plan. Everything updates automatically as we add new features."
+        title={<>Everything you need to <span className="italic text-[#D4AE6A]">own your business</span></>}
+        subtitle="Every tool an independent author needs to publish, sell, and grow — compared across Free, Standard, and Premium."
         backgroundImage="/features-header.png"
       />
       <div className="bg-[#E8E5DD] border-b border-[#DCDBD3] px-4">
