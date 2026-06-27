@@ -135,7 +135,7 @@ export default async function SalesPage() {
                     <div className="space-y-0.5">
                       {order.items.map((item) => (
                         <p key={item.id} className="text-xs text-gray-600 line-clamp-1">
-                          {item.book.title}
+                          {item.book?.title ?? "—"}
                         </p>
                       ))}
                     </div>

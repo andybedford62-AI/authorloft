@@ -31,7 +31,7 @@ export default async function ExpiredPage({ searchParams }: Props) {
 
     if (item && item.order.status === "COMPLETED" && item.order.customerEmail) {
       validToken = true;
-      bookTitle = item.book.title;
+      bookTitle = item.book?.title ?? "Your purchase";
       maskedEmail = maskEmail(item.order.customerEmail);
     }
   }

@@ -72,7 +72,7 @@ export async function GET(
     const keyParts   = item.fileKey.split("/");
     const storedName = keyParts[keyParts.length - 1]; // "1776166192590-abc.epub"
     const ext        = storedName.split(".").pop() ?? "epub";
-    const downloadName = `${item.book.slug}.${ext}`;
+    const downloadName = `${item.book?.slug ?? "download"}.${ext}`;
 
     // Increment download count BEFORE generating the link
     await prisma.orderItem.update({

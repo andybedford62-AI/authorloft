@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       totalCents:    o.totalCents,
       discountCents: o.discountCents,
       items: o.items.map((i) => ({
-        title:  i.book.title,
+        title:  i.book?.title ?? "—",
         format: i.saleItem?.format ?? "—",
         cents:  i.priceCents,
       })),

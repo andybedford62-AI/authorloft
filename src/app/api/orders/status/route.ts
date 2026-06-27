@@ -48,9 +48,9 @@ export async function GET(req: NextRequest) {
       hasFile:       !!item.fileKey,
       label:         item.saleItem?.label ?? "Download",
       format:        item.saleItem?.format ?? "EBOOK",
-      fileName:      item.saleItem?.fileName ?? item.book.slug,
-      bookTitle:     item.book.title,
-      bookSlug:      item.book.slug,
+      fileName:      item.saleItem?.fileName ?? item.book?.slug ?? "download",
+      bookTitle:     item.book?.title ?? "—",
+      bookSlug:      item.book?.slug ?? "",
     })),
   });
 }

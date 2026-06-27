@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
   // Revenue by book (top 10)
   const byBookMap: Record<string, number> = {};
   for (const item of orderItems) {
-    const title = item.book.title;
+    const title = item.book?.title ?? "Unknown";
     byBookMap[title] = (byBookMap[title] ?? 0) + item.priceCents;
   }
   const revenueByBook = Object.entries(byBookMap)

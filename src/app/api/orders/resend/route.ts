@@ -58,18 +58,19 @@ export async function POST(req: NextRequest) {
         data: { downloadExpiry: newExpiry },
       });
 
-      const downloadUrl = `https://${item.book.author.slug}.${platformDomain}/api/orders/download/${item.downloadToken}`;
-      const authorName = item.book.author.displayName || item.book.author.name;
+      const author = item.book?.author;
+      const downloadUrl = `https://${author?.slug ?? "unknown"}.${platformDomain}/api/orders/download/${item.downloadToken}`;
+      const authorName = author?.displayName || author?.name || "Author";
 
       await sendPurchaseConfirmationEmail({
         to: email,
         customerName: item.order.customerName ?? undefined,
-        bookTitle: item.book.title,
+        bookTitle: item.book?.title ?? "Your purchase",
         itemLabel: item.saleItem?.label ?? "eBook",
         downloadUrl,
         downloadExpiry: newExpiry,
         authorName,
-        authorSlug: item.book.author.slug,
+        authorSlug: author?.slug ?? "",
       });
 
     } else {
@@ -106,18 +107,19 @@ export async function POST(req: NextRequest) {
             data: { downloadExpiry: newExpiry },
           });
 
-          const downloadUrl = `https://${item.book.author.slug}.${platformDomain}/api/orders/download/${item.downloadToken}`;
-          const authorName = item.book.author.displayName || item.book.author.name;
+          const author = item.book?.author;
+          const downloadUrl = `https://${author?.slug ?? "unknown"}.${platformDomain}/api/orders/download/${item.downloadToken}`;
+          const authorName = author?.displayName || author?.name || "Author";
 
           sendPurchaseConfirmationEmail({
             to: email,
             customerName: order.customerName ?? undefined,
-            bookTitle: item.book.title,
+            bookTitle: item.book?.title ?? "Your purchase",
             itemLabel: item.saleItem?.label ?? "eBook",
             downloadUrl,
             downloadExpiry: newExpiry,
             authorName,
-            authorSlug: item.book.author.slug,
+            authorSlug: author?.slug ?? "",
           }).catch((e) => console.error("[resend] email error:", e));
         }
       }

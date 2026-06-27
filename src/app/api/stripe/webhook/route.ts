@@ -183,11 +183,11 @@ export async function POST(req: NextRequest) {
 
             // 1. Single order confirmation email for buyer (all items together)
             const orderItemsForEmail = fullItems.map((fi) => ({
-              bookTitle: fi.book.title,
+              bookTitle: fi.book?.title ?? "Your purchase",
               itemLabel: fi.saleItem?.label ?? "eBook",
-              downloadUrl: `https://${fi.book.author.slug}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
-              authorName: fi.book.author.displayName || fi.book.author.name,
-              authorSlug: fi.book.author.slug,
+              downloadUrl: `https://${fi.book?.author.slug ?? "unknown"}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
+              authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
+              authorSlug: fi.book?.author.slug ?? "",
               priceCents: fi.priceCents,
             }));
 
@@ -206,6 +206,7 @@ export async function POST(req: NextRequest) {
 
             // 2. Per-author sale notifications (each author gets notified of their sale immediately)
             for (const fi of fullItems) {
+              if (!fi.book) continue;
               const authorEmail = fi.book.author.email;
               const authorName = fi.book.author.displayName || fi.book.author.name;
 

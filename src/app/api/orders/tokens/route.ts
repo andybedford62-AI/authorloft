@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         downloadToken:  item.downloadToken,
         downloadExpiry: item.downloadExpiry,
         label:          item.saleItem?.label ?? "Download",
-        bookSlug:       item.book.slug,
+        bookSlug:       item.book?.slug ?? "",
       })),
     });
   } catch (err) {

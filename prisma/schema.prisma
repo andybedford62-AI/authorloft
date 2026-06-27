@@ -71,6 +71,9 @@ model Plan {
   mediaKitEnabled         Boolean              @default(false)
   bookstoreListingEnabled Boolean              @default(true)
   preOrdersEnabled        Boolean              @default(true)
+  bundlesEnabled          Boolean              @default(false)
+  coursesEnabled          Boolean              @default(false)
+  maxCourses              Int?
   socialDailyLimit        Int                  @default(0) // Social Promote: 0 = feature disabled for this plan
   socialMonthlyLimit      Int                  @default(0)
   featuresJson            String?
@@ -141,6 +144,8 @@ model Author {
   navShowContact                Boolean               @default(true)
   navShowMediaKit               Boolean               @default(false)
   navShowBookstore              Boolean               @default(true)
+  navShowBundles                Boolean               @default(false)
+  navShowCourses                Boolean               @default(false)
   pressTitle                    String?
   pressBio                      String?               @db.Text
   pressContact                  String?
@@ -202,6 +207,8 @@ model Author {
   bingSiteVerification          String?
   socialVoiceDescription        String?               @db.VarChar(500) // Social Promote: author's voice description for AI prompts
   generatedSocialPosts          GeneratedSocialPost[]
+  bundles                       Bundle[]
+  courses                       Course[]
 
   @@index([slug])
   @@index([customDomain])
@@ -372,6 +379,12 @@ model Book {
 
 // ─── Direct Sale Items ────────────────────────────────────────────────────────
 
+enum OrderItemType {
+  BOOK
+  BUNDLE
+  COURSE
+}
+
 enum DirectSaleFormat {
   EBOOK
   AUDIO
@@ -397,6 +410,7 @@ model BookDirectSaleItem {
   updatedAt      DateTime         @updatedAt
   orderItems     OrderItem[]
   magnetLeads    BookMagnetLead[]
+  bundleItems    BundleItem[]
 
   @@index([bookId])
 }
@@ -726,17 +740,22 @@ model DiscountCode {
 model OrderItem {
   id             String              @id @default(cuid())
   orderId        String
-  bookId         String
-  saleItemId     String? // links to BookDirectSaleItem — which format was purchased
+  itemType       OrderItemType       @default(BOOK)
+  bookId         String?
+  saleItemId     String?
+  bundleId       String?
+  courseId        String?
   priceCents     Int
-  fileKey        String? // Supabase storage path — copied at purchase time for secure delivery
+  fileKey        String?
   downloadToken  String              @unique @default(cuid())
   downloadCount  Int                 @default(0)
   maxDownloads   Int                 @default(5)
   downloadExpiry DateTime?
   order          Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  book           Book                @relation(fields: [bookId], references: [id])
+  book           Book?               @relation(fields: [bookId], references: [id])
   saleItem       BookDirectSaleItem? @relation(fields: [saleItemId], references: [id])
+  bundle         Bundle?             @relation(fields: [bundleId], references: [id])
+  course         Course?             @relation(fields: [courseId], references: [id])
 
   @@index([orderId])
   @@index([downloadToken])
@@ -1350,4 +1369,106 @@ model SocialPromoteSettings {
   costDisableMicroCentsPerDay Int      @default(200000000) // $200/day auto-disable
   adminAlertEmails       String   @default("") // comma-separated; falls back to SOCIAL_PROMOTE_ADMIN_EMAILS env
   updatedAt              DateTime @updatedAt
+}
+
+// ─── Bundles ──────────────────────────────────────────────────────────────────
+
+model Bundle {
+  id            String       @id @default(cuid())
+  authorId      String
+  title         String
+  slug          String
+  description   String?      @db.Text
+  coverImageUrl String?
+  priceCents    Int          @default(0)
+  isPublished   Boolean      @default(false)
+  displayOrder  Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  author        Author       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  items         BundleItem[]
+  orderItems    OrderItem[]
+
+  @@unique([authorId, slug])
+  @@index([authorId])
+}
+
+model BundleItem {
+  bundleId   String
+  saleItemId String
+  sortOrder  Int                @default(0)
+  bundle     Bundle             @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  saleItem   BookDirectSaleItem @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+
+  @@id([bundleId, saleItemId])
+  @@index([bundleId])
+}
+
+// ─── Courses ──────────────────────────────────────────────────────────────────
+
+model Course {
+  id            String             @id @default(cuid())
+  authorId      String
+  title         String
+  slug          String
+  description   String?            @db.Text
+  coverImageUrl String?
+  priceCents    Int                @default(0)
+  isPublished   Boolean            @default(false)
+  displayOrder  Int                @default(0)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  author        Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  modules       CourseModule[]
+  enrollments   CourseEnrollment[]
+  orderItems    OrderItem[]
+
+  @@unique([authorId, slug])
+  @@index([authorId])
+}
+
+model CourseModule {
+  id          String         @id @default(cuid())
+  courseId     String
+  title       String
+  description String?
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  course      Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     CourseLesson[]
+
+  @@index([courseId])
+}
+
+model CourseLesson {
+  id          String       @id @default(cuid())
+  moduleId    String
+  title       String
+  contentHtml String?      @db.Text
+  videoUrl    String?
+  fileKey     String?
+  fileName    String?
+  sortOrder   Int          @default(0)
+  isPreview   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  module      CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([moduleId])
+}
+
+model CourseEnrollment {
+  id              String    @id @default(cuid())
+  courseId         String
+  customerEmail   String
+  customerName    String?
+  orderId         String?
+  enrolledAt      DateTime  @default(now())
+  accessToken     String    @unique @default(cuid())
+  accessExpiresAt DateTime?
+  course          Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, customerEmail])
+  @@index([accessToken])
 }
