@@ -226,15 +226,27 @@ export function RebelHero() {
         <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(232,229,221,0.08)', borderRadius: 999, border: '1px solid rgba(232,229,221,0.15)', backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: '#E8B04B', fontWeight: 600, borderRadius: 999, textDecoration: 'none' }}>Bookstore</Link>
           <Link href="/features" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>Features</Link>
+          <HeroNavDropdown label="Solutions" items={[
+            ['/author-website-builder',       'Author Website Builder'],
+            ['/sell-books-directly',           'Sell Books Directly'],
+            ['/book-marketing-platform',       'Book Marketing'],
+            ['/author-newsletter-platform',    'Newsletter Platform'],
+            ['/arc-management',                'ARC Management'],
+            ['/author-media-kit',              'Author Media Kit'],
+            ['/ai-tools-for-authors',          'AI Tools for Authors'],
+            ['/indie-author-bookstore',        'Indie Author Bookstore'],
+            ['/book-pre-orders',               'Book Pre-Orders'],
+            ['/author-affiliate-program',      'Affiliate Program'],
+            ['/reader-analytics-for-authors',  'Reader Analytics'],
+          ]} />
+          <Link href="/faq" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>FAQ</Link>
           <HeroNavDropdown label="Resources" items={[
+            ['/guides',    'Author Guides'],
             ['/blog',      'Blog'],
             ['/news',      'News'],
-            ['/faq',       'FAQ'],
             ['/resources', 'Tools & Communities'],
           ]} />
-          <Link href="#how-it-works" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>How it works</Link>
           <Link href="/pricing" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>Pricing</Link>
-          <Link href="#genres" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>For authors</Link>
         </div>
         <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
           <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>

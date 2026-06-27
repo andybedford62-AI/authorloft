@@ -7,19 +7,32 @@ import { Menu, X } from "lucide-react";
 const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
   ["/features", "Features"],
+  ["/faq", "FAQ"],
+];
+
+const SOLUTIONS: [string, string][] = [
+  ["/author-website-builder", "Author Website Builder"],
+  ["/sell-books-directly", "Sell Books Directly"],
+  ["/book-marketing-platform", "Book Marketing"],
+  ["/author-newsletter-platform", "Newsletter Platform"],
+  ["/arc-management", "ARC Management"],
+  ["/author-media-kit", "Author Media Kit"],
+  ["/ai-tools-for-authors", "AI Tools for Authors"],
+  ["/indie-author-bookstore", "Indie Author Bookstore"],
+  ["/book-pre-orders", "Book Pre-Orders"],
+  ["/author-affiliate-program", "Affiliate Program"],
+  ["/reader-analytics-for-authors", "Reader Analytics"],
 ];
 
 const RESOURCES: [string, string][] = [
+  ["/guides", "Author Guides"],
   ["/blog", "Blog"],
   ["/news", "News"],
-  ["/faq", "FAQ"],
   ["/resources", "Tools & Communities"],
 ];
 
 const LINKS_BOTTOM: [string, string][] = [
-  ["#how-it-works", "How it works"],
   ["/pricing", "Pricing"],
-  ["#genres", "For authors"],
 ];
 
 /** Dark-themed hamburger + dropdown for the homepage hero nav (below md). */
@@ -46,9 +59,10 @@ export function HeroMobileMenu() {
       {open && (
         <div
           style={{
-            position: "absolute", right: 0, top: "calc(100% + 10px)", zIndex: 50, minWidth: 210,
+            position: "absolute", right: 0, top: "calc(100% + 10px)", zIndex: 50, minWidth: 240,
             background: "#0F1A2D", border: "1px solid rgba(232,229,221,0.18)", borderRadius: 14,
             padding: 8, boxShadow: "0 20px 44px -12px rgba(0,0,0,0.6)",
+            maxHeight: "70vh", overflowY: "auto",
           }}
         >
           {LINKS_TOP.map(([href, label]) => (
@@ -62,7 +76,18 @@ export function HeroMobileMenu() {
             </Link>
           ))}
 
-          {/* Resources group */}
+          <p style={{ padding: "10px 14px 4px", margin: 0, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(232,229,221,0.45)" }}>Solutions</p>
+          {SOLUTIONS.map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              style={{ display: "block", padding: "10px 14px 10px 24px", fontSize: 14, color: "#E8E5DD", textDecoration: "none", borderRadius: 8 }}
+            >
+              {label}
+            </Link>
+          ))}
+
           <p style={{ padding: "10px 14px 4px", margin: 0, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(232,229,221,0.45)" }}>Resources</p>
           {RESOURCES.map(([href, label]) => (
             <Link

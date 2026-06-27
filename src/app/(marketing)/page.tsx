@@ -148,6 +148,27 @@ const webPageLd = {
     name: "AuthorLoft",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Free to start — no credit card required",
+    },
+    featureList: [
+      "Author Website Builder",
+      "Direct Book Sales (ebooks, print, audiobooks)",
+      "Newsletter & Email Marketing",
+      "Reader Analytics",
+      "ARC Management",
+      "Author Media Kit",
+      "AI Writing & Marketing Tools",
+      "Indie Author Bookstore",
+      "Book Pre-Orders",
+      "Affiliate Program",
+      "Custom Domain Support",
+      "Flip Book Previews",
+      "SEO Auditor",
+    ].join(", "),
   },
 };
 

@@ -1,6 +1,6 @@
 # AuthorLoft
 
-> The all-in-one platform for independent authors to own their business, sell books directly, grow their audience, and track everything — no coding required.
+> Your Books. Your Readers. Your Business. — The complete platform for independent authors to own their business, sell books directly, grow their audience, and track everything — no coding required.
 
 AuthorLoft helps independent authors take control of their careers by providing a complete platform for building an author website, selling books directly to readers (keeping 100% of every sale), capturing newsletter subscribers, and tracking reader analytics.
 
@@ -49,6 +49,7 @@ AuthorLoft helps independent authors take control of their careers by providing 
 - AuthorLoft vs BookFunnel: https://www.authorloft.com/compare/bookfunnel
 - AuthorLoft vs StoryOrigin: https://www.authorloft.com/compare/storyorigin
 - AuthorLoft vs Tertulia: https://www.authorloft.com/compare/tertulia
+- AuthorLoft vs Quilltips: https://www.authorloft.com/compare/quilltips
 
 ## Legal
 - Privacy Policy: https://www.authorloft.com/privacy

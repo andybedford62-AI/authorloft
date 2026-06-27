@@ -13,6 +13,24 @@ line rather than listing every commit.
 
 ---
 
+## June 27, 2026
+
+- **SEO & discoverability overhaul** — comprehensive improvements to help AuthorLoft surface in search engines and AI tool searches:
+  - **Dynamic XML sitemap** (`src/app/sitemap.ts`) — covers 13 static pages, 11 solution landing pages, 4 comparison pages, and all dynamic blog/news/guide/genre content from the database.
+  - **robots.txt** (`src/app/robots.ts`) — proper crawl directives allowing all public pages, blocking admin/API/auth routes.
+  - **SoftwareApplication structured data** — homepage JSON-LD now includes `offers`, `featureList` (13 features), making AuthorLoft discoverable in AI tool searches and rich results.
+  - **SEO config expanded** — `seo-config.ts` now covers all 11 solution landing pages (was only 6 core pages), enabling per-page OG image overrides.
+  - **llms.txt updated** — tagline aligned to "Your Books. Your Readers. Your Business." positioning; added missing Quilltips comparison link.
+- **Homepage & features page repositioning** — messaging changes to reinforce "complete author business platform" positioning:
+  - **"Replaces" comparison strip** — new homepage section showing what AuthorLoft replaces (WordPress, Shopify, Mailchimp, Google Analytics, separate landing pages) with animated reveal cards.
+  - **Problem-first feature descriptions** — features page categories now have persuasive subtitles explaining the problem each feature solves.
+  - **Features page hero** — title updated to "Everything you need to own your business" with styled italic accent.
+  - **Tagline refresh** — meta titles, OG tags, footer, and structured data updated to "Your Books. Your Readers. Your Business."
+- **Nav unification** — hero desktop and mobile menus now match the main marketing nav structure:
+  - **Hero desktop nav** — added Solutions dropdown (11 solution pages), moved FAQ to top level, restructured Resources dropdown (added Author Guides), removed anchor-only links (#how-it-works, #genres).
+  - **Hero mobile menu** — unified with MarketingMobileMenu: now shows full Solutions (11 items), Resources (4 items), and proper page links instead of anchor links.
+- **CTA text update** — hero CTA changed from "Take back control →" to "Start your business →".
+
 ## June 25, 2026
 
 - **Newsletter polish — formatting + book tag fixes** — Follow-up fixes to the WOW template:
