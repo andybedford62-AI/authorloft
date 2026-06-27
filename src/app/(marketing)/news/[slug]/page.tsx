@@ -176,7 +176,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
 
         {/* CTA */}
         <div className="mt-12 bg-[#1B2B47] rounded-2xl p-8 text-center">
-          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to take back control? ·</p>
+          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to start your business? ·</p>
           <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
             Own your author business <span className="italic text-[#D4AE6A]">starting today</span>
           </h2>

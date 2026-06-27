@@ -213,7 +213,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         {/* CTA */}
         <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">
           <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">
-            &middot; {guide.ctaTitle || "Ready to take back control?"} &middot;
+            &middot; {guide.ctaTitle || "Ready to start your business?"} &middot;
           </p>
           <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
             {guide.ctaDescription || <>Own your author business <span className="italic text-[#D4AE6A]">starting today</span></>}

@@ -73,7 +73,7 @@ export default async function BlogIndexPage() {
 
       {/* Footer CTA */}
       <div className="bg-[#1B2B47] py-16 px-4 text-center mt-16">
-        <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-4">· Ready to take back control? ·</p>
+        <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-4">· Ready to start your business? ·</p>
         <h2 className="font-serif text-3xl text-[#E8E5DD] font-normal mb-6">
           Own your author business <span className="italic text-[#D4AE6A]">starting today</span>
         </h2>

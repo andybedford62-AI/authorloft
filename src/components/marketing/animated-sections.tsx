@@ -291,7 +291,7 @@ export function RebelCTA() {
       <div style={{ position: 'absolute', top: -100, right: -100, width: 500, height: 500, background: `radial-gradient(circle, ${ML.brass2}20, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: -80, left: -80, width: 400, height: 400, background: `radial-gradient(circle, ${ML.copper}12, transparent 65%)`, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto' }}>
-        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready to take back control? ·</p>
+        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 20 }}>· Ready to start your business? ·</p>
         <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(44px, 6vw, 84px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.03em', color: ML.bone, margin: '0 0 20px' }}>
           Your readers are waiting.<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Stop giving them away.</span>
         </h2>
@@ -300,7 +300,7 @@ export function RebelCTA() {
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/register" style={{ padding: '16px 36px', fontSize: 16, fontWeight: 500, background: ML.brass, color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: `0 16px 32px -10px ${ML.brass}60`, display: 'inline-block' }}>
-            Take back control →
+            Start your business →
           </a>
           <a href="/bookstore" style={{ padding: '16px 28px', fontSize: 16, fontWeight: 500, background: 'transparent', color: ML.bone, border: '1px solid rgba(232,229,221,0.3)', borderRadius: 999, textDecoration: 'none' }}>
             Browse the bookstore

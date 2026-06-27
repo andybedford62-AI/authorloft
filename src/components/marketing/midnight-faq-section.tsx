@@ -30,12 +30,14 @@ export function MidnightFaqSection({ faqs, hasMore = false }: { faqs: FaqItem[];
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, lineHeight: 1.6, color: '#5C6E89', margin: '0 0 20px' }}>
             Still have a question? We&apos;d love to hear from you.
           </p>
-          <a href="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em', color: '#0F1A2D', background: '#B8893D', borderRadius: 999, textDecoration: 'none', transition: 'background 0.2s, transform 0.2s', boxShadow: '0 4px 12px rgba(184,137,61,0.3)' }}>
-            Contact us →
-          </a>
-          <a href="/faq" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 24, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1B2B47', fontWeight: 600, textDecoration: 'none', borderBottom: '2px solid #B8893D', paddingBottom: 2 }}>
-            {hasMore ? 'See all FAQs' : 'Browse the full FAQ page'} →
-          </a>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16, marginTop: 8 }}>
+            <a href="/faq" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em', color: '#0F1A2D', background: '#B8893D', borderRadius: 999, textDecoration: 'none', transition: 'background 0.2s, transform 0.2s', boxShadow: '0 4px 12px rgba(184,137,61,0.3)' }}>
+              {hasMore ? 'See all FAQs' : 'Browse FAQs'} →
+            </a>
+            <a href="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1B2B47', fontWeight: 600, textDecoration: 'none', borderBottom: '2px solid #B8893D', paddingBottom: 2 }}>
+              Contact us →
+            </a>
+          </div>
         </div>
 
         {/* Right — accordion */}
