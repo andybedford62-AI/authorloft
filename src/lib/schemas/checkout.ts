@@ -14,6 +14,7 @@ export const checkoutRequestSchema = z
       .nonempty("At least one item required")
       .optional(),
     saleItemId: z.string().min(1, "Sale item ID required").optional(),
+    bundleId: z.string().min(1, "Bundle ID required").optional(),
     discountCode: z
       .string()
       .max(50, "Discount code too long")
@@ -21,8 +22,8 @@ export const checkoutRequestSchema = z
       .optional(),
   })
   .refine(
-    (data) => data.items || data.saleItemId,
-    "Either items array or saleItemId must be provided"
+    (data) => data.items || data.saleItemId || data.bundleId,
+    "Either items array, saleItemId, or bundleId must be provided"
   );
 
 export type CheckoutRequest = z.infer<typeof checkoutRequestSchema>;

@@ -19,6 +19,7 @@ interface NavConfig {
   navShowContact:   boolean;
   navShowMediaKit:  boolean;
   navShowBookstore: boolean;
+  navShowBundles:   boolean;
 }
 
 interface CustomPage {
@@ -57,6 +58,7 @@ function buildNavLinks(
   ];
 
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
+  if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
