@@ -68,9 +68,26 @@ host). Run locally with `npm run check:all`.
   Production + Preview + Development **before pushing the code that uses
   it**, otherwise the check (#1 above) will fail the next build.
 
+## Pre-push checklist — mandatory before every commit
+
+1. **Verify Prisma model names** — before writing any Prisma query, check
+   `prisma/schema.prisma` for the actual model name. Never assume a model
+   exists from URL patterns (e.g. `/news` uses `platformPost` with
+   `isNews: true`, not a `newsPost` model). Run `grep "^model " prisma/schema.prisma`
+   to list all models.
+2. **Run `tsc --noEmit`** — type-check all modified files. If `npm install`
+   was run with `--ignore-scripts`, Prisma types may be stale and won't
+   catch model-name errors. In that case, run `npx prisma generate` first
+   to regenerate the client types before type-checking.
+3. **Run `next build`** for big changes — catches runtime errors that `tsc`
+   alone misses (dynamic imports, server component issues, etc.).
+4. **Check env var scoping in Vercel** — when deployments fail with missing
+   env vars, the issue is usually branch-scoped variables. Env vars must be
+   scoped to **Production + Preview** (all branches, no branch filter) to
+   work on feature branches. Do not scope to a single branch name.
+
 ## Code conventions
 - Next.js: `params` in `[id]` routes is a Promise — use `const { id } = await params`.
-- Run `tsc --noEmit` (and `next build` for big changes) before pushing.
 - Read existing files/patterns before writing; match surrounding style.
 
 ## Finishing a task — always keep in sync (not a later step)
