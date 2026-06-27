@@ -98,7 +98,7 @@ export async function MarketingFooter() {
           )}
 
           <p className="text-xs text-[#5C6E89]/60 italic m-0" style={{ fontFamily: "Georgia, serif" }}>
-            —— your name, your shelf ——
+            —— your books · your readers · your business ——
           </p>
         </div>
       </div>
