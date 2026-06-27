@@ -103,7 +103,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           </Link>
           {!author && (
             <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
-              Sign In
+              Sign in
             </Link>
           )}
         </nav>
@@ -124,7 +124,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
               href="/register"
               className="hidden sm:inline-flex bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Get Started Free
+              Start free →
             </Link>
           )}
           <MarketingMobileMenu isAuthor={!!author} />

@@ -18,6 +18,9 @@ export const SEO_PAGES = [
   { id: "book-pre-orders",              label: "Book Pre-Orders",        path: "/book-pre-orders" },
   { id: "author-affiliate-program",     label: "Affiliate Program",      path: "/author-affiliate-program" },
   { id: "reader-analytics-for-authors", label: "Reader Analytics",       path: "/reader-analytics-for-authors" },
+  { id: "faq",                          label: "FAQ",                    path: "/faq" },
+  { id: "guides",                       label: "Guides",                 path: "/guides" },
+  { id: "news",                         label: "News",                   path: "/news" },
 ] as const;
 
 export type SeoPageId = typeof SEO_PAGES[number]["id"];

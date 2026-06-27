@@ -128,14 +128,14 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                       onClick={() => setOpen(false)}
                       className="text-sm text-gray-600 hover:text-gray-900 py-2 text-center"
                     >
-                      Sign In
+                      Sign in
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setOpen(false)}
                       className="bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg text-center hover:bg-blue-700 transition-colors"
                     >
-                      Get Started Free
+                      Start free →
                     </Link>
                   </>
                 )}

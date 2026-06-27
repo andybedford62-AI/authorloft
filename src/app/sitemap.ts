@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.2, lastModified: now },
     { url: `${BASE}/terms`, changeFrequency: "yearly", priority: 0.2, lastModified: now },
     { url: `${BASE}/gdpr`, changeFrequency: "yearly", priority: 0.2, lastModified: now },
+    { url: `${BASE}/us-privacy`, changeFrequency: "yearly", priority: 0.2, lastModified: now },
   ];
 
   const solutionPages: MetadataRoute.Sitemap = [
@@ -53,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: now,
   }));
 
-  const [blogPosts, newsPosts, guides, genres] = await Promise.all([
+  const [blogPosts, newsPosts, guides, genres, resourceDownloads] = await Promise.all([
     prisma.platformPost.findMany({
       where: { isPublished: true, isNews: { not: true } },
       select: { slug: true, updatedAt: true },
@@ -71,6 +72,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }).catch(() => []),
     prisma.genre.findMany({
       select: { slug: true },
+    }).catch(() => []),
+    prisma.resourceDownload.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { displayOrder: "asc" },
     }).catch(() => []),
   ]);
 
@@ -102,6 +108,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: now,
   }));
 
+  const resourceUrls: MetadataRoute.Sitemap = resourceDownloads.map((r: { slug: string; updatedAt: Date }) => ({
+    url: `${BASE}/resources/${r.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.4,
+    lastModified: r.updatedAt,
+  }));
+
   return [
     ...staticPages,
     ...solutionPages,
@@ -110,5 +123,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...newsUrls,
     ...guideUrls,
     ...genreUrls,
+    ...resourceUrls,
   ];
 }

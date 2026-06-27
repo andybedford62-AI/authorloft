@@ -196,12 +196,7 @@ export function RebelHero() {
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
       <style>{`
-        @keyframes rbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes rbFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(20px,-10px)} 66%{transform:translate(-10px,8px)} }
-        @keyframes rbPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
         @keyframes rbFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes rbShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
-        .rb-nav-link:hover { background: rgba(232,229,221,0.1) !important; }
         .rb-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(184,137,61,0.65) !important; }
         .rb-cta-secondary:hover { background: rgba(232,229,221,0.08) !important; }
         @media (max-width: 860px) {

@@ -8,10 +8,12 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { FaqPageList, type FaqGroup } from "@/components/marketing/faq-page-list";
 import { getCategories } from "@/lib/categories";
 
+const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const ogImage = await getOgImage("home");
+  const ogImage = await getOgImage("faq");
   return {
     title: "Frequently Asked Questions",
     description: "Answers to common questions about AuthorLoft — plans, publishing, selling direct, and getting started as an independent author.",
@@ -65,8 +67,8 @@ export default async function FaqPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.authorloft.com/" },
-      { "@type": "ListItem", position: 2, name: "FAQ", item: "https://www.authorloft.com/faq" },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "FAQ", item: `${BASE}/faq` },
     ],
   };
 
