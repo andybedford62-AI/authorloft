@@ -1,6 +1,6 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** June 16, 2026  
+**Last Updated:** June 27, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
 
 > **Quick reference for AI/code sessions:** Check this file first before doing a deep code dive — it lists what is built, what tier it lives in, and what is still on the roadmap. Avoids re-discovering existing features.
@@ -39,6 +39,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Reader Magnets** (give a book/file away free for a reader's email; auto-adds to subscriber list; no Stripe required) | ✅ | ✅ | ✅ |
 | **Sales Formats** (when Direct Sales enabled) | — | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
+| **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book or sitewide) | ✅ (if Direct Sales enabled) | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |

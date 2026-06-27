@@ -45,13 +45,14 @@ async function resolveAuthor(domain: string) {
       navShowMediaKit: true,
       navShowBookstore: true,
       navShowBundles: true,
+      navShowCourses: true,
       googleSiteVerification: true,
       bingSiteVerification: true,
       siteTheme: true,
       customAccentColor: true,
       isActive: true,
       plan: {
-        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true, salesEnabled: true, bundlesEnabled: true },
+        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true, salesEnabled: true, bundlesEnabled: true, coursesEnabled: true },
       },
     },
   });
@@ -145,6 +146,7 @@ export default async function AuthorSiteLayout({
     navShowMediaKit: author.navShowMediaKit,
     navShowBookstore: author.navShowBookstore,
     navShowBundles: author.navShowBundles,
+    navShowCourses: author.navShowCourses,
   };
 
   // Enforce plan-based theme access at render time

@@ -67,6 +67,107 @@ export async function POST(req: NextRequest) {
 
     const validatedBody = validationResult.data;
 
+    // ── Course checkout path ─────────────────────────────────────────────
+    if (validatedBody.courseId) {
+      const course = await prisma.course.findUnique({
+        where: { id: validatedBody.courseId },
+        include: {
+          author: {
+            select: {
+              id: true,
+              slug: true,
+              stripeConnectAccountId: true,
+              stripeConnectOnboarded: true,
+              plan: { select: { coursesEnabled: true } },
+            },
+          },
+        },
+      });
+
+      if (!course || !course.isPublished) {
+        return NextResponse.json({ error: "Course not found." }, { status: 404 });
+      }
+      if (!course.author.plan?.coursesEnabled) {
+        return NextResponse.json({ error: "Courses are not enabled for this author." }, { status: 400 });
+      }
+      if (course.priceCents <= 0) {
+        return NextResponse.json({ error: "Free course enrollment is handled separately." }, { status: 400 });
+      }
+
+      const author = course.author;
+      const totalCents = Math.max(50, course.priceCents);
+      const baseUrl = `https://${author.slug}.${PLATFORM_DOMAIN}`;
+      const successUrl = `${baseUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${baseUrl}/courses/${course.slug}`;
+      const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
+      const platformFeeCents = Math.round(totalCents * feePct);
+      const useConnect = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        billing_address_collection: "required",
+        automatic_tax: { enabled: true },
+        line_items: [{
+          price_data: {
+            currency: "usd",
+            unit_amount: totalCents,
+            product_data: {
+              name: course.title,
+              description: "Online course — lifetime access",
+              tax_code: "txcd_10401100",
+            },
+          },
+          quantity: 1,
+        }],
+        metadata: {
+          type: "course_purchase",
+          authorId: author.id,
+          courseId: course.id,
+        },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        ...(useConnect && {
+          payment_intent_data: {
+            application_fee_amount: platformFeeCents,
+            transfer_data: { destination: author.stripeConnectAccountId! },
+          },
+        }),
+      });
+
+      await prisma.order.create({
+        data: {
+          authorId: author.id,
+          customerEmail: "",
+          totalCents,
+          discountCents: 0,
+          stripeSessionId: session.id,
+          status: "PENDING",
+          items: {
+            create: [{
+              itemType: "COURSE",
+              courseId: course.id,
+              priceCents: totalCents,
+            }],
+          },
+        },
+      });
+
+      const sessionToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+      const auditContext = getAuditContext(req);
+      auditLog({
+        userId: sessionToken?.sub,
+        action: "Create checkout session",
+        endpoint: "/api/checkout",
+        method: req.method,
+        statusCode: 200,
+        ...auditContext,
+        metadata: { courseId: course.id, totalCents },
+      });
+
+      return NextResponse.json({ url: session.url });
+    }
+
     // ── Bundle checkout path ──────────────────────────────────────────────
     let bundleRecord: { id: string; title: string; priceCents: number; coverImageUrl: string | null } | null = null;
 

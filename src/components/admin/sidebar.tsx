@@ -47,6 +47,7 @@ import {
   Layers,
   ListChecks,
   Package,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -111,7 +112,8 @@ const NAV_GROUPS: NavGroup[] = [
     key: "sales", label: "Sales", defaultOpen: false,
     items: [
       { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
-      { href: "/admin/bundles",        label: "Bundles",        icon: Package     },
+      { href: "/admin/bundles",        label: "Bundles",        icon: Package        },
+      { href: "/admin/courses",        label: "Courses",        icon: GraduationCap  },
       { href: "/admin/specials",       label: "Specials",       icon: Sparkles    },
       { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
       { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },

@@ -240,6 +240,120 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      if (type === "bundle_purchase") {
+        const order = await prisma.order.findFirst({
+          where: { stripeSessionId: session.id },
+          include: { items: true },
+        });
+
+        if (order) {
+          const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
+          const customerName  = session.customer_details?.name ?? undefined;
+
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
+          });
+
+          const expiry = generateDownloadExpiry(168);
+          const missingSaleItemIds = [
+            ...new Set(
+              order.items
+                .filter((item) => !item.fileKey && item.saleItemId)
+                .map((item) => item.saleItemId!)
+                .filter(Boolean)
+            ),
+          ];
+          const saleItemFileKeys = new Map<string, string | null>();
+          if (missingSaleItemIds.length > 0) {
+            const fetched = await prisma.bookDirectSaleItem.findMany({
+              where: { id: { in: missingSaleItemIds } },
+              select: { id: true, fileKey: true },
+            });
+            for (const si of fetched) saleItemFileKeys.set(si.id, si.fileKey);
+          }
+
+          await Promise.all(
+            order.items.map((item) => {
+              let fileKey = item.fileKey;
+              if (!fileKey && item.saleItemId) {
+                fileKey = saleItemFileKeys.get(item.saleItemId) ?? null;
+              }
+              return prisma.orderItem.update({
+                where: { id: item.id },
+                data: { downloadExpiry: expiry, ...(fileKey && !item.fileKey ? { fileKey } : {}) },
+              });
+            })
+          );
+
+          if (customerEmail) {
+            const fullItems = await prisma.orderItem.findMany({
+              where: { orderId: order.id },
+              select: {
+                downloadToken: true, priceCents: true,
+                saleItem: { select: { label: true } },
+                book: { select: { title: true, author: { select: { displayName: true, name: true, slug: true, email: true } } } },
+              },
+            });
+
+            const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+            const orderItemsForEmail = fullItems.map((fi) => ({
+              bookTitle: fi.book?.title ?? "Your purchase",
+              itemLabel: fi.saleItem?.label ?? "eBook",
+              downloadUrl: `https://${fi.book?.author.slug ?? "unknown"}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
+              authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
+              authorSlug: fi.book?.author.slug ?? "",
+              priceCents: fi.priceCents,
+            }));
+
+            const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
+            sendOrderConfirmationEmail({
+              to: customerEmail, customerName, items: orderItemsForEmail, totalCents,
+              discountCents: 0, downloadExpiry: expiry, orderId: order.id,
+            }).catch((e) => console.error("[webhook] Failed to send bundle buyer email:", e));
+
+            for (const fi of fullItems) {
+              if (!fi.book) continue;
+              sendSaleNotificationEmail({
+                to: fi.book.author.email,
+                authorName: fi.book.author.displayName || fi.book.author.name,
+                customerEmail, customerName,
+                bookTitle: fi.book.title,
+                itemLabel: fi.saleItem?.label ?? "Bundle item",
+                priceCents: fi.priceCents,
+                orderId: order.id,
+              }).catch((e) => console.error("[webhook] Failed to send bundle author notification:", e));
+            }
+          }
+        }
+      }
+
+      if (type === "course_purchase") {
+        const order = await prisma.order.findFirst({
+          where: { stripeSessionId: session.id },
+          include: { items: true },
+        });
+
+        if (order) {
+          const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
+          const customerName  = session.customer_details?.name ?? undefined;
+          const courseId       = session.metadata?.courseId;
+
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
+          });
+
+          if (courseId && customerEmail) {
+            await prisma.courseEnrollment.upsert({
+              where: { courseId_customerEmail: { courseId, customerEmail } },
+              create: { courseId, customerEmail, customerName, orderId: order.id },
+              update: { customerName, orderId: order.id },
+            });
+          }
+        }
+      }
+
       if (type === "plan_subscription") {
         const { authorId } = session.metadata ?? {};
         if (authorId && session.subscription) {

@@ -1,0 +1,68 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import { prisma } from "@/lib/db";
+import { getAdminAuthorId } from "@/lib/admin-auth";
+import { CourseForm } from "@/components/admin/course-form";
+
+type Props = { params: Promise<{ id: string }> };
+
+export default async function EditCoursePage({ params }: Props) {
+  const authorId = await getAdminAuthorId();
+  const { id } = await params;
+
+  const course = await prisma.course.findFirst({
+    where: { id, authorId },
+    include: {
+      modules: {
+        include: { lessons: { orderBy: { sortOrder: "asc" } } },
+        orderBy: { sortOrder: "asc" },
+      },
+    },
+  });
+  if (!course) notFound();
+
+  return (
+    <div className="max-w-3xl space-y-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2">
+        <Link
+          href="/admin/courses"
+          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Courses
+        </Link>
+        <span className="text-gray-300">/</span>
+        <span className="text-sm text-gray-900 font-medium truncate">{course.title}</span>
+      </div>
+
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Course</h1>
+        <p className="text-sm text-gray-500 mt-1">Update the curriculum and details for this course.</p>
+      </div>
+
+      <CourseForm
+        mode="edit"
+        initial={{
+          id: course.id,
+          title: course.title,
+          description: course.description,
+          coverImageUrl: course.coverImageUrl,
+          priceCents: course.priceCents,
+          isPublished: course.isPublished,
+          modules: course.modules.map((m) => ({
+            title: m.title,
+            description: m.description ?? "",
+            lessons: m.lessons.map((l) => ({
+              title: l.title,
+              contentHtml: l.contentHtml ?? "",
+              videoUrl: l.videoUrl ?? "",
+              isPreview: l.isPreview,
+            })),
+          })),
+        }}
+      />
+    </div>
+  );
+}

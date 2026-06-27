@@ -15,6 +15,12 @@ line rather than listing every commit.
 
 ## June 27, 2026
 
+- **Book Bundles — full feature** — authors can now package multiple book formats into discounted bundles:
+  - **Schema:** 6 new models (Bundle, BundleItem, Course, CourseModule, CourseLesson, CourseEnrollment), polymorphic OrderItem with OrderItemType enum (BOOK/BUNDLE/COURSE), Plan feature flags (bundlesEnabled, coursesEnabled), Author nav toggles.
+  - **Admin CRUD:** `/admin/bundles` list, create, and edit pages with interactive book format picker, savings calculator, and publish toggle. Sidebar entry under Sales group, gated to STANDARD tier.
+  - **Checkout:** Stripe checkout extended to accept `bundleId` — creates a single line item at bundle price, then individual OrderItems per included format for per-book downloads.
+  - **Author site display:** `/bundles` listing page with stacked cover art and savings badges, `/bundles/[slug]` detail page with included items list and direct buy button. Nav + footer updated with Bundles link (controlled by navShowBundles toggle).
+  - **Feature gates:** `/admin/bundles` → STANDARD, maps to `Plan.bundlesEnabled`.
 - **SEO & discoverability overhaul** — comprehensive improvements to help AuthorLoft surface in search engines and AI tool searches:
   - **Dynamic XML sitemap** (`src/app/sitemap.ts`) — covers 13 static pages, 11 solution landing pages, 4 comparison pages, and all dynamic blog/news/guide/genre content from the database.
   - **robots.txt** (`src/app/robots.ts`) — proper crawl directives allowing all public pages, blocking admin/API/auth routes.

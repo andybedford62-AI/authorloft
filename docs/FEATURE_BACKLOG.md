@@ -4,7 +4,7 @@ Running list of ideas and enhancements to consider for future builds. Not commit
 
 **How to use:** add new ideas under the right area with a one-line rationale and a rough effort/impact note. Keep it scannable.
 
-_Last cleaned: June 11, 2026._
+_Last cleaned: June 27, 2026._
 
 ---
 
@@ -73,6 +73,20 @@ Shipped June 11, 2026 (Books CSV import — see Shipped section). Open ideas:
 
 ---
 
+## Product Expansion — Bundles & Courses
+
+Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct Stripe checkout, nav/footer toggles, feature gating). Open ideas:
+
+- [x] **Book Bundles** — bundle multiple books/formats at a discounted price; admin CRUD at `/admin/bundles`; author site at `/bundles` + `/bundles/[slug]`; polymorphic OrderItem with `itemType: BUNDLE`; `navShowBundles` toggle; `bundlesEnabled` plan gate. *(done June 27, 2026)*
+- [ ] **Author Courses / Workshops** — authors teach writing craft or subject expertise; Course → Module → Lesson structure; rich text + external video embeds; one-time purchase; token-gated access. *(large — schema + admin CRUD + checkout + lesson viewer)*
+- [ ] **Merchandise** — physical items (bookmarks, signed bookplates); self-fulfilled first, print-on-demand later. *(deferred — requires shipping/fulfillment)*
+- [ ] **Bundle discount codes** — extend DiscountCode to optionally apply to bundles (new join table). *(small–medium)*
+- [ ] **Course discount codes** — extend DiscountCode to optionally apply to courses. *(small–medium)*
+- [ ] **Bundle marketing page** — `/book-bundles` solution landing page. *(small)*
+- [ ] **Course marketing page** — `/author-courses` solution landing page. *(small)*
+
+---
+
 ## Auth / Account
 
 - [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*
@@ -111,6 +125,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ## Shipped (for reference)
 
+- ✅ **Book Bundles** — admin CRUD (`/admin/bundles`), author site listing + detail (`/bundles`, `/bundles/[slug]`), Stripe checkout, polymorphic OrderItem, nav/footer toggles, `bundlesEnabled` plan gate. STANDARD/PREMIUM. (June 27, 2026)
 - ✅ **Book QR Code** — per-book QR code card on the Organisation tab; SVG download; links to the public book URL. All plans. (June 16, 2026)
 - ✅ **Reader Magnet** — author marks a direct sale item as free; readers enter email on the public book page; receive a time-limited download link by email; added to the author's newsletter list automatically. Replaces BookFunnel for list-building. STANDARD/PREMIUM. New `BookMagnetLead` table + `isReaderMagnet` field. (June 16, 2026)
 - ✅ **US State Privacy page** — `/us-privacy` covering CCPA/CPRA, Virginia CDPA, Colorado CPA, and other state rights. Linked from Privacy Policy and GDPR pages. (June 16, 2026)
