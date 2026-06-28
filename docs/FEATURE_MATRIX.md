@@ -35,14 +35,14 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Blog Posts** (create, publish) | Up to 10 | Up to 100 | Unlimited |
 | **Book Reviews** (reader reviews on author site) | ✅ | ✅ | ✅ |
 | **Custom Book Pricing** (set per-book prices) | ✅ | ✅ | ✅ |
-| **Direct Digital Sales** (via Stripe) | ❌ | ✅ | ✅ |
+| **Direct Digital Sales** (via Stripe) | ✅ (eBook only) | ✅ | ✅ |
 | **Reader Magnets** (give a book/file away free for a reader's email; auto-adds to subscriber list; no Stripe required) | ✅ | ✅ | ✅ |
-| **Sales Formats** (when Direct Sales enabled) | — | eBook, Print | eBook, Audio, Flipbook, Print |
+| **Sales Formats** (when Direct Sales enabled) | eBook | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |
 | **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | ❌ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
-| **Discount Codes** (per-book or sitewide) | ✅ (if Direct Sales enabled) | ✅ | ✅ |
+| **Discount Codes** (per-book or sitewide) | ✅ | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |
 | **Coupon Manager** (create/manage discounts) | ❌ | ✅ | ✅ |
 | **Audio Format** (upload & sell audio books) | ❌ | ❌ | ✅ |

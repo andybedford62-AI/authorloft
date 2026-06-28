@@ -124,6 +124,7 @@ export default async function EditBookPage({
         genres={genres}
         audioEnabled={author?.plan?.audioEnabled ?? false}
         salesEnabled={author?.plan?.salesEnabled ?? false}
+        planTier={(author?.plan?.tier ?? "FREE") as "FREE" | "STANDARD" | "PREMIUM"}
         bookstoreEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         preOrdersEnabled={author?.plan?.preOrdersEnabled ?? false}
         arcEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}

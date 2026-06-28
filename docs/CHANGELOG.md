@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## June 28, 2026
+
+- **FREE plan eBook sales** — free-tier authors can now sell eBooks directly via Stripe (previously STANDARD+ only):
+  - **Direct Sales gate** moved from STANDARD to FREE in feature gates; `salesEnabled = true` on the FREE plan record.
+  - **Format enforcement by tier** — FREE: eBook only; STANDARD: eBook + Print; PREMIUM: all formats (eBook, Audio, Flipbook, Print). Server-side enforcement in the direct-sales POST route; admin UI format picker filtered by tier.
+  - **Admin UI updated** — FREE authors see "Sell eBooks & offer Reader Magnets" banner with upgrade prompt for Print/Audio/Flipbook/Bundles/Cart. Price field and Stripe Connect setup now shown for all plans.
+  - **Feature matrix & pricing page** updated — Direct Digital Sales shows "✓ eBook (Stripe)" for FREE; Sales Formats shows "eBook" for FREE; Reader Magnets and Discount Codes rows added to feature matrix.
+  - **Shopping Cart** remains STANDARD+ (FREE = single-item checkout).
+- **Bundles & Courses feature flags fixed** — `bundlesEnabled` and `coursesEnabled` set to `true` on STANDARD and PREMIUM plan records (were still `false` after June 27 ship, causing missing checkmarks on the features page).
+
 ## June 27, 2026
 
 - **Author Courses — full feature** — authors can now create and sell courses (writing craft, subject expertise):

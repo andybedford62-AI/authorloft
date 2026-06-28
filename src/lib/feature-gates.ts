@@ -22,7 +22,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/feedback":     "FREE",
   "/admin/newsletter":   "FREE",
   "/admin/sales":        "STANDARD",
-  "direct-sales":        "STANDARD",  // gates Plan.salesEnabled (Direct Sales tab on books)
+  "direct-sales":        "FREE",      // gates Plan.salesEnabled (eBook-only on FREE; all formats on STANDARD+)
   "bookstore-listing":   "FREE",      // gates Plan.bookstoreListingEnabled (AuthorLoft Bookstore opt-in)
   "pre-orders":          "STANDARD",  // gates Plan.preOrdersEnabled (Coming Soon / pre-order books)
   "/admin/bundles":      "STANDARD",

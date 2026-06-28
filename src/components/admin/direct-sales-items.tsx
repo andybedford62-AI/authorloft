@@ -271,10 +271,12 @@ function FileUploadWidget({
 export function DirectSalesItems({
   bookId,
   salesEnabled,
+  planTier = "FREE",
   stripeConnectOnboarded,
 }: {
   bookId: string;
   salesEnabled: boolean;
+  planTier?: "FREE" | "STANDARD" | "PREMIUM";
   stripeConnectOnboarded: boolean;
 }) {
   const [items, setItems] = useState<DirectSaleItem[]>([]);
@@ -454,11 +456,16 @@ export function DirectSalesItems({
   }
 
   // ── Capability flags ────────────────────────────────────────────────────────
-  // Reader Magnets are free and work on every plan with or without Stripe.
-  // Paid editions need the paid-sales plan feature AND a connected Stripe
-  // account before they can go live.
+  // All plans can now sell eBooks (FREE = eBook only). Paid editions still
+  // need a connected Stripe account before they can go live.
   const canSellPaid = salesEnabled;
   const stripeReady = stripeConnectOnboarded;
+  const isPaidPlan = planTier === "STANDARD" || planTier === "PREMIUM";
+
+  const allowedFormats: FormatKey[] =
+    planTier === "PREMIUM"  ? ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] :
+    planTier === "STANDARD" ? ["EBOOK", "PRINT"] :
+                              ["EBOOK"];
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -483,15 +490,15 @@ export function DirectSalesItems({
       </div>
 
       {/* ── Capability banners ───────────────────────────────────────────────── */}
-      {!canSellPaid && (
+      {canSellPaid && !isPaidPlan && (
         <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 flex items-start gap-3">
-          <Gift className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" />
+          <BookOpen className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" />
           <div className="text-sm">
-            <p className="font-medium text-indigo-900">Free Reader Magnets are included on your plan</p>
+            <p className="font-medium text-indigo-900">Sell eBooks &amp; offer Reader Magnets on your free plan</p>
             <p className="text-indigo-700 mt-0.5">
-              Add a format below and upload a file to give a book away free in exchange for a
-              reader&rsquo;s email — they&rsquo;re added to your subscriber list automatically.
-              To sell <em>paid</em> editions,{" "}
+              Set a price and sell your eBook directly to readers via Stripe, or give it away free
+              as a Reader Magnet to build your email list.
+              For Print, Audio, Flipbook formats, bundles, and shopping cart,{" "}
               <a href="/admin/settings#billing" className="underline font-medium">upgrade to Standard</a>.
             </p>
           </div>
@@ -552,9 +559,9 @@ export function DirectSalesItems({
         >
           <p className="text-sm font-medium text-gray-700">Add a format for direct sale</p>
 
-          {/* Format picker — free magnets must be a downloadable file, so hide Print */}
+          {/* Format picker — filtered by plan tier */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {FORMAT_KEYS.filter((key) => canSellPaid || FORMATS[key].needsFile).map((key) => {
+            {FORMAT_KEYS.filter((key) => allowedFormats.includes(key)).map((key) => {
               const fmt = FORMATS[key];
               const active = selectedFormat === key;
               return (
@@ -622,10 +629,10 @@ export function DirectSalesItems({
             )}
           </div>
 
-          {!canSellPaid && (
-            <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2 flex items-center gap-1.5">
-              <Gift className="h-3.5 w-3.5 shrink-0" />
-              This edition will be offered as a free Reader Magnet — readers download it in exchange for their email.
+          {canSellPaid && !isPaidPlan && (
+            <p className="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded px-3 py-2 flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 shrink-0" />
+              Set a price to sell, or leave at $0.00 to offer as a free Reader Magnet.
             </p>
           )}
 

@@ -15,13 +15,16 @@ Website: https://www.authorloft.com
 - Up to 5 published books
 - Blog with unlimited posts
 - Basic book pages with retailer links
+- Direct eBook sales via Stripe (keep 100% of revenue minus processing + 10% platform fee)
+- Reader Magnets (give away a book free to build your email list)
+- Discount codes
 - Reader feedback & ratings
 - Price: $0/month forever
 
 ### STANDARD Plan ($19.99/month or $191.90/year)
 - Everything in FREE, plus:
 - Custom domain support
-- Direct sales (keep 100% of revenue minus Stripe processing)
+- All sales formats (eBook + Print) with shopping cart
 - Newsletter subscriber capture
 - Bookstore catalog listing
 - Pre-order campaigns
