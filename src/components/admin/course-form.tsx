@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
+import { CourseHelpModal } from "@/components/admin/course-help-modal";
 
 interface LessonData {
   title: string;
@@ -59,6 +60,7 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
     new Set(modules.map((_, i) => i))
   );
 
+  const [showHelp, setShowHelp] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -195,6 +197,17 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <CourseHelpModal open={showHelp} onClose={() => setShowHelp(false)} />
+
+      <button
+        type="button"
+        onClick={() => setShowHelp(true)}
+        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+      >
+        <HelpCircle className="h-4 w-4" />
+        How courses work
+      </button>
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
