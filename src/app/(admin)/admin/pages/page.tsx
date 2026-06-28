@@ -22,7 +22,9 @@ export default async function AdminPagesPage() {
         navShowContact: true,
         navShowMediaKit: true,
         navShowBookstore: true,
-        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true } },
+        navShowBundles: true,
+        navShowCourses: true,
+        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true, bundlesEnabled: true, coursesEnabled: true } },
       },
     }),
     prisma.authorPage.findMany({
@@ -52,6 +54,8 @@ export default async function AdminPagesPage() {
     navShowContact: author.navShowContact,
     navShowMediaKit: author.navShowMediaKit,
     navShowBookstore: author.navShowBookstore,
+    navShowBundles: author.navShowBundles,
+    navShowCourses: author.navShowCourses,
   };
 
   return (
@@ -83,6 +87,8 @@ export default async function AdminPagesPage() {
           initial={navSettings}
           flipBooksEnabled={((author.plan as any)?.flipBooksLimit ?? 0) !== 0}
           mediaKitEnabled={!!(author.plan as any)?.mediaKitEnabled}
+          bundlesEnabled={!!(author.plan as any)?.bundlesEnabled}
+          coursesEnabled={!!(author.plan as any)?.coursesEnabled}
         />
       </section>
 

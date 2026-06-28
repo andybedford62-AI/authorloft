@@ -18,6 +18,8 @@ export async function GET() {
       navShowContact: true,
       navShowMediaKit: true,
       navShowBookstore: true,
+      navShowBundles: true,
+      navShowCourses: true,
     },
   });
 
@@ -40,6 +42,8 @@ export async function PUT(req: Request) {
     navShowContact,
     navShowMediaKit,
     navShowBookstore,
+    navShowBundles,
+    navShowCourses,
   } = body;
 
   const updated = await prisma.author.update({
@@ -53,6 +57,8 @@ export async function PUT(req: Request) {
       ...(typeof navShowContact    === "boolean" && { navShowContact }),
       ...(typeof navShowMediaKit   === "boolean" && { navShowMediaKit }),
       ...(typeof navShowBookstore  === "boolean" && { navShowBookstore }),
+      ...(typeof navShowBundles    === "boolean" && { navShowBundles }),
+      ...(typeof navShowCourses    === "boolean" && { navShowCourses }),
     },
     select: {
       navShowAbout: true,
@@ -63,6 +69,8 @@ export async function PUT(req: Request) {
       navShowContact: true,
       navShowMediaKit: true,
       navShowBookstore: true,
+      navShowBundles: true,
+      navShowCourses: true,
     },
   });
 
