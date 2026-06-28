@@ -563,6 +563,78 @@ export async function sendPurchaseConfirmationEmail({
   });
 }
 
+// ── Course access email (to buyer) ──────────────────────────────────────────
+
+export async function sendCourseAccessEmail({
+  to,
+  customerName,
+  courseTitle,
+  authorName,
+  accessUrl,
+  isPaid,
+  priceCents,
+}: {
+  to: string;
+  customerName?: string;
+  courseTitle: string;
+  authorName: string;
+  accessUrl: string;
+  isPaid: boolean;
+  priceCents?: number;
+}) {
+  const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
+  const priceStr = isPaid && priceCents ? `$${(priceCents / 100).toFixed(2)}` : "Free";
+  const enrollType = isPaid ? "Your purchase is confirmed" : "You're enrolled";
+
+  return sendMail({
+    to,
+    subject: `Your course access: ${courseTitle} — AuthorLoft`,
+    text: [
+      greeting,
+      ``,
+      `${enrollType}! You now have access to "${courseTitle}" by ${authorName}.`,
+      ``,
+      `Access your course here:`,
+      accessUrl,
+      ``,
+      `Enrollment: ${priceStr}`,
+      ``,
+      `Save this email — use the link above anytime to return to your course.`,
+      ``,
+      `Questions? Reply to this email — we're here to help.`,
+    ].join("\n"),
+    html: wrapHtml("Course Access", `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 8px;">${enrollType}! You now have access to:</p>
+
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <p style="margin:0 0 4px;font-size:18px;font-weight:700;color:#111827;">${esc(courseTitle)}</p>
+        <p style="margin:0;font-size:14px;color:#6b7280;">by ${esc(authorName)}</p>
+        <p style="margin:8px 0 0;font-size:13px;color:#0369a1;font-weight:600;">${priceStr}</p>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:0 0 24px;">
+            <a href="${accessUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              🎓 Access Your Course
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 16px;font-size:13px;color:#374151;">
+        <strong>📌 Bookmark this email</strong> — use the button above anytime to return to your course. No login required.
+      </p>
+
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're here to help.
+      </p>
+    `),
+  });
+}
+
 // ── Plan subscription welcome email (to author) ──────────────────────────────
 
 export async function sendSubscriptionWelcomeEmail({

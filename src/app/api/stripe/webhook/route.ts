@@ -3,7 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { capturePostHog } from "@/lib/posthog";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert } from "@/lib/mailer";
+import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -345,11 +345,33 @@ export async function POST(req: NextRequest) {
           });
 
           if (courseId && customerEmail) {
-            await prisma.courseEnrollment.upsert({
+            const enrollment = await prisma.courseEnrollment.upsert({
               where: { courseId_customerEmail: { courseId, customerEmail } },
               create: { courseId, customerEmail, customerName, orderId: order.id },
               update: { customerName, orderId: order.id },
+              select: { accessToken: true },
             });
+
+            const course = await prisma.course.findUnique({
+              where: { id: courseId },
+              select: { title: true, slug: true, priceCents: true, author: { select: { slug: true, displayName: true, name: true } } },
+            });
+
+            if (course) {
+              const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+              const accessUrl = `https://${course.author.slug}.${platformDomain}/courses/${course.slug}/learn?token=${enrollment.accessToken}`;
+              const authorName = course.author.displayName || course.author.name || "Author";
+
+              sendCourseAccessEmail({
+                to: customerEmail,
+                customerName,
+                courseTitle: course.title,
+                authorName,
+                accessUrl,
+                isPaid: true,
+                priceCents: course.priceCents,
+              }).catch((e) => console.error("[webhook] Failed to send course access email:", e));
+            }
           }
         }
       }
