@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCSRFToken } from "@/hooks/use-csrf-token";
 
 interface CourseBuyButtonProps {
   courseId: string;
@@ -11,6 +12,7 @@ interface CourseBuyButtonProps {
 }
 
 export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuyButtonProps) {
+  const csrfToken = useCSRFToken();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +25,10 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
+        },
         body: JSON.stringify({ courseId }),
       });
       const data = await res.json();
