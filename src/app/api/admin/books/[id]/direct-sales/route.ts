@@ -43,16 +43,32 @@ export async function POST(
   const book = await prisma.book.findFirst({ where: { id: bookId, authorId } });
   if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
 
-  // No plan/Stripe gate on creation: free Reader Magnets are available on every
-  // plan and need no Stripe account. Paid editions are gated where it matters —
-  // they can only go LIVE (be activated / shown publicly) with a paid plan and a
-  // connected Stripe account (enforced in the PATCH route and on the public page).
+  // Enforce format restrictions by plan tier: FREE = EBOOK only,
+  // STANDARD = EBOOK + PRINT, PREMIUM = all formats.
+  const author = await prisma.author.findUnique({
+    where: { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const tier = author?.plan?.tier ?? "FREE";
 
   const body = await req.json();
   const { format, label, description, priceCents, isReaderMagnet } = body;
 
   if (!format || !VALID_FORMATS.includes(format as DirectSaleFormat)) {
     return NextResponse.json({ error: "Invalid format. Must be EBOOK, AUDIO, FLIPBOOK, or PRINT." }, { status: 400 });
+  }
+
+  const TIER_FORMATS: Record<string, readonly string[]> = {
+    FREE:     ["EBOOK"],
+    STANDARD: ["EBOOK", "PRINT"],
+    PREMIUM:  ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"],
+  };
+  const allowed = TIER_FORMATS[tier] ?? TIER_FORMATS.FREE;
+  if (!allowed.includes(format)) {
+    return NextResponse.json(
+      { error: `Your plan does not include the ${format} format. Upgrade to access more formats.` },
+      { status: 403 },
+    );
   }
   if (!label?.trim()) {
     return NextResponse.json({ error: "Label is required." }, { status: 400 });

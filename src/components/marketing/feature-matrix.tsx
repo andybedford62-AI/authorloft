@@ -83,7 +83,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         {
           name: "Direct Digital Sales",
           tiers: {
-            FREE: "—",
+            FREE: free?.salesEnabled ? "✓ eBook (Stripe)" : "—",
             STANDARD: standard?.salesEnabled ? "✓ (Stripe)" : "—",
             PREMIUM: premium?.salesEnabled ? "✓ (Stripe)" : "—",
           },
@@ -91,9 +91,21 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         {
           name: "Sales Formats",
           tiers: {
-            FREE: "—",
+            FREE: free?.salesEnabled ? "eBook" : "—",
             STANDARD: standard?.salesEnabled ? "eBook, Print" : "—",
             PREMIUM: premium?.salesEnabled ? "eBook, Audio, Flipbook, Print" : "—",
+          },
+        },
+        {
+          name: "Reader Magnets",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
+          name: "Discount Codes",
+          tiers: {
+            FREE: free?.salesEnabled ? "✓" : "—",
+            STANDARD: standard?.salesEnabled ? "✓" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓" : "—",
           },
         },
         {
@@ -110,14 +122,6 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
             FREE: "—",
             STANDARD: standard?.salesEnabled ? "✓ Multi-item" : "—",
             PREMIUM: premium?.salesEnabled ? "✓ Multi-item" : "—",
-          },
-        },
-        {
-          name: "Coupon Manager",
-          tiers: {
-            FREE: "—",
-            STANDARD: standard?.salesEnabled ? "✓" : "—",
-            PREMIUM: premium?.salesEnabled ? "✓" : "—",
           },
         },
         {

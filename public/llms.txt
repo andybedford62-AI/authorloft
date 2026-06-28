@@ -11,7 +11,7 @@ AuthorLoft helps independent authors take control of their careers by providing 
 - No credit card required to start
 
 ## Core Features
-- **Direct Sales**: Sell ebooks, print books, and audiobooks directly to readers — keep 100% of revenue (minus payment processing)
+- **Direct Sales**: Sell ebooks directly to readers on every plan (including free) — upgrade for print, audio, and flipbook formats
 - **Author Website Builder**: Custom-domain author sites with book pages, blog, about page, and contact — no coding required
 - **Reader Analytics**: PostHog-powered analytics to understand your audience
 - **Newsletter Capture**: Built-in subscriber forms and email tools (Mailchimp integration)

@@ -61,6 +61,7 @@ type Props = {
   genres: Genre[];
   audioEnabled: boolean;
   salesEnabled: boolean;
+  planTier: "FREE" | "STANDARD" | "PREMIUM";
   bookstoreEnabled: boolean;
   preOrdersEnabled: boolean;
   arcEnabled: boolean;
@@ -83,7 +84,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "arcs",          label: "ARC" },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, publicBaseUrl }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, publicBaseUrl }: Props) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
@@ -171,7 +172,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
           <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-800">
             <strong>Direct Sales</strong> — Sell your eBook, PDF, or audio file directly from your AuthorLoft site. You set the price, readers pay and download instantly, and the money goes straight to you via Stripe.
           </div>
-          <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} stripeConnectOnboarded={stripeConnectOnboarded} />
+          <DirectSalesItems bookId={book.id} salesEnabled={salesEnabled} planTier={planTier} stripeConnectOnboarded={stripeConnectOnboarded} />
         </div>
       )}
 
