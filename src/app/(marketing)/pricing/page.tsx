@@ -99,12 +99,12 @@ const COMPETITOR_ROWS: Array<{
 
 // Feature comparison table rows
 const COMPARISON_ROWS = [
-  { label: "Books",              free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
+  { label: "Books",              free: "Up to 5",   standard: "Up to 25",   premium: "Unlimited"  },
   { label: "News posts",         free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
   { label: "AuthorLoft subdomain",free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Custom domain",      free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Newsletter capture", free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Newsletter campaigns",free: "—",        standard: "✓",          premium: "✓"          },
+  { label: "Newsletter campaigns",free: "✓",        standard: "✓",          premium: "✓"          },
   { label: "Direct digital sales",free: "✓ eBook",   standard: "✓",          premium: "✓"          },
   { label: "Shopping Cart",      free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
@@ -114,7 +114,7 @@ const COMPARISON_ROWS = [
   { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
   { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
   { label: "Contact form",       free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Support",            free: "Community", standard: "Priority",   premium: "Priority"   },
+  { label: "Support Community",  free: "Community", standard: "Priority",   premium: "Priority"   },
 ];
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
