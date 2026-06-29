@@ -266,9 +266,8 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
         {/* Left: copy */}
         <div style={{ color: ML.bone }}>
           {/* Headline */}
-          <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(48px, 6.5vw, 104px)', lineHeight: 0.92, letterSpacing: '-0.03em', margin: '0 0 28px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
-            <span style={{ display: 'block' }}>They sell your book.</span>
-            <span style={{ display: 'block' }}>They keep your reader.</span>
+          <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(32px, 4.5vw, 68px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
+            <span style={{ display: 'block' }}>They sell your book. They keep your reader.</span>
             <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>Take both back.</span>
           </h1>
 
