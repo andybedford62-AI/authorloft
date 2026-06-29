@@ -9,7 +9,7 @@ import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
-import { RedesignHero } from "@/components/marketing/redesign-hero";
+import { RebelHero } from "@/components/marketing/rebrand-hero";
 
 export const revalidate = 60;
 
@@ -214,7 +214,7 @@ export default async function HomePage() {
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       {/* ── Hero (with nav) ───────────────────────────────────────────── */}
-      <RedesignHero isAuthor={isAuthor} />
+      <RebelHero isAuthor={isAuthor} />
 
       {/* ── Divider ───────────────────────────────────────────────────── */}
       <hr style={{ border: 'none', borderTop: `1px solid ${C.border}` }} />
