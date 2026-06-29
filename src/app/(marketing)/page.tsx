@@ -1,62 +1,53 @@
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
-import { MidnightFaqSection } from "@/components/marketing/midnight-faq-section";
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
-import { RebelHero } from "@/components/marketing/rebrand-hero";
-import { AnimatedStatsBar, JourneySection, IntegrationStrip, AISpotlight, RebelCTA } from "@/components/marketing/animated-sections";
-import { ReplacesStrip } from "@/components/marketing/replaces-strip";
+import { RedesignHero } from "@/components/marketing/redesign-hero";
 
-export const revalidate = 60; // ISR interval (seconds)
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
     title: "Your Books. Your Readers. Your Business. | AuthorLoft",
     description:
-      "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
+      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place. Free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your books, your readers, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place.",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
       images:      [ogImage],
     },
   };
 }
 
-const ML = {
-  midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
-  pearl: '#F0EDE4', brass: '#B8893D', brass2: '#D4AE6A',
-  copper: '#C26A4A', slate: '#5C6E89', mist: '#D4DDEB',
+// ── Colors ───────────────────────────────────────────────────────────────────
+
+const C = {
+  accent:      '#c9a84c',
+  accentLight: '#d4b866',
+  bg:          '#0d1520',
+  surface:     '#1c2e48',
+  border:      '#2a4268',
+  text:        '#e8e8e0',
+  muted:       '#9a9080',
 };
 
-const GENRES = [
-  { name: "Romance & Contemporary", accent: "for the heart",  description: "Sell your series direct, capture devoted reader emails, and build the fan base that comes back every launch.", bg: "#1B2B47" },
-  { name: "Thriller & Mystery",     accent: "for the chase",  description: "Dark templates built for tension — from the moment a reader lands, they're already hooked.", bg: "#1B2B47" },
-  { name: "Fantasy & Sci-Fi",       accent: "for the epic",   description: "Showcase your world with series pages, lore sections, and a catalog that grows with your universe.", bg: "#27406B" },
-  { name: "Children's & YA",        accent: "for the young",  description: "Bright, welcoming designs with flip-book previews so young readers can explore before they buy.", bg: "#3A5577" },
-  { name: "Literary Fiction",       accent: "for the craft",  description: "Understated elegance, rich typography, and space to share the ideas behind your work.", bg: "#2A3A55" },
-  { name: "Non-Fiction & Memoir",   accent: "for the voice",  description: "Lead with credentials, build authority, and let your back catalog speak for your expertise.", bg: "#3A5577" },
-  { name: "Dystopian",              accent: "for the rebel",  description: "Vivid world-building for dark futures — showcase the series, lore, and stakes that pull readers in.", bg: "#2A3A55" },
-  { name: "Science & Technology",   accent: "for the curious", description: "Explain discoveries and complex ideas to general readers. Build authority with a catalog that grows.", bg: "#27406B" },
-];
-
-// ── Data fetching ─────────────────────────────────────────────────────────────
+// ── Data fetching (same as main homepage) ────────────────────────────────────
 
 async function getActivePlans() {
   return prisma.plan.findMany({
@@ -82,28 +73,6 @@ async function getTestimonials() {
   }).catch(() => []);
 }
 
-async function getFaqs() {
-  const [items, total] = await Promise.all([
-    prisma.homepageFaq.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-      take: 10,
-      select: { id: true, question: true, answer: true },
-    }).catch(() => []),
-    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
-  ]);
-  return { items, total };
-}
-
-async function getLatestBlogPosts() {
-  return prisma.platformPost.findMany({
-    where: { isPublished: true },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-    select: { id: true, title: true, slug: true, excerpt: true, category: true, readTimeMinutes: true, publishedAt: true },
-  }).catch(() => []);
-}
-
 async function getShowcaseAuthors() {
   return prisma.author.findMany({
     where: { showInShowcase: true, isActive: true, books: { some: { isPublished: true } } },
@@ -122,12 +91,17 @@ async function getShowcaseAuthors() {
   }).catch(() => []);
 }
 
-async function getHomepageResources() {
-  return prisma.platformResource.findMany({
-    where: { isActive: true, showOnHomepage: true },
-    orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
-    select: { id: true, name: true, category: true, websiteUrl: true, logoUrl: true, initials: true, avatarColor: true, isPartner: true },
-  }).catch(() => []);
+async function getFaqs() {
+  const [items, total] = await Promise.all([
+    prisma.homepageFaq.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: 10,
+      select: { id: true, question: true, answer: true },
+    }).catch(() => []),
+    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
+  ]);
+  return { items, total };
 }
 
 // ── Structured data ──────────────────────────────────────────────────────────
@@ -179,41 +153,35 @@ const howToLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
   name: "How to launch and grow your independent author business with AuthorLoft",
-  description: "Four steps to owning your author business: go live with a professional site, sell books directly, grow your audience, and track what works.",
+  description: "Three pillars to owning your author business: launch your storefront, sell direct, and own your reader list.",
   step: [
     {
       "@type": "HowToStep",
       position: 1,
-      name: "Go Live",
-      text: "Launch your professional author site with an instant subdomain, genre-optimized templates, custom domain support, and branded hero banner.",
+      name: "Your Storefront",
+      text: "Launch a beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand.",
     },
     {
       "@type": "HowToStep",
       position: 2,
-      name: "Sell Direct",
-      text: "Set up your book catalog with Stripe checkout to sell ebooks, audiobooks, and print books directly — keeping 100% of every sale.",
+      name: "Your Sales",
+      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.",
     },
     {
       "@type": "HowToStep",
       position: 3,
-      name: "Grow Your Audience",
-      text: "Capture newsletter subscribers, offer reader magnets, generate media kit PDFs, and get discovered in the AuthorLoft Bookstore.",
-    },
-    {
-      "@type": "HowToStep",
-      position: 4,
-      name: "Track & Optimize",
-      text: "Monitor sales and revenue, analyze traffic with PostHog analytics, use the AI content assistant, and run SEO audits to optimize your growth.",
+      name: "Your List",
+      text: "Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.",
     },
   ],
 };
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// ── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function HomepageRebrandPage() {
+export default async function HomePage() {
   await cookies();
-  const [plans, testimonials, faqData, blogPosts, showcaseAuthors, homepageResources, session] = await Promise.all([
-    getActivePlans(), getTestimonials(), getFaqs(), getLatestBlogPosts(), getShowcaseAuthors(), getHomepageResources(),
+  const [plans, testimonials, showcaseAuthors, faqData, session] = await Promise.all([
+    getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
     getServerSession(authOptions),
   ]);
 
@@ -225,9 +193,8 @@ export default async function HomepageRebrandPage() {
       isAuthor = !!author;
     }
   }
-  const faqs      = faqData.items;
-  const faqTotal  = faqData.total;
 
+  const faqs = faqData.items;
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -239,164 +206,212 @@ export default async function HomepageRebrandPage() {
   } : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: ML.bone, fontFamily: 'inherit' }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter', sans-serif", fontSize: '1rem', lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
+
+      {/* ── Structured Data (JSON-LD) ────────────────────────────────── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <RebelHero isAuthor={isAuthor} />
+      {/* ── Hero (with nav) ───────────────────────────────────────────── */}
+      <RedesignHero isAuthor={isAuthor} />
 
-      {/* ── Animated stats bar ────────────────────────────────────────────── */}
-      <AnimatedStatsBar />
+      {/* ── Divider ───────────────────────────────────────────────────── */}
+      <hr style={{ border: 'none', borderTop: `1px solid ${C.border}` }} />
 
-      {/* ── Author showcase ───────────────────────────────────────────────── */}
+      {/* ── Problem Strip ─────────────────────────────────────────────── */}
+      <ProblemStrip />
+
+      {/* ── What Is AuthorLoft — 3 Pillars ────────────────────────────── */}
+      <PillarsSection />
+
+      {/* ── Comparison Table ──────────────────────────────────────────── */}
+      <ComparisonSection />
+
+      {/* ── Author Showcase (dynamic from DB) ─────────────────────────── */}
       <AuthorShowcaseSection
         authors={showcaseAuthors}
         platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
       />
 
-      {/* ── 4-step Journey ────────────────────────────────────────────────── */}
-      <JourneySection />
-
-      {/* ── Replaces strip ──────────────────────────────────────────────── */}
-      <ReplacesStrip />
-
-      {/* ── Integration strip ─────────────────────────────────────────────── */}
-      <IntegrationStrip />
-
-      {/* ── Genre section ─────────────────────────────────────────────────── */}
-      <section id="genres" style={{ background: ML.midnight, padding: '120px 60px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Built for your genre, not a generic template ·</p>
-            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: 0 }}>
-              Your genre. <span style={{ fontStyle: 'italic', color: ML.brass2 }}>Your way.</span>
-            </h2>
-          </div>
-          <style>{`.rb-genre-card { transition: transform 0.2s, box-shadow 0.2s; } .rb-genre-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }`}</style>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 12 }}>
-            {GENRES.map((g, i) => (
-              <div key={i} className="rb-genre-card" style={{ background: g.bg, borderRadius: 16, padding: '32px 28px', color: ML.bone, border: '1px solid rgba(232,229,221,0.08)' }}>
-                <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 22, fontWeight: 400, color: ML.bone, margin: '0 0 6px' }}>{g.name}</h3>
-                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 12, color: ML.brass2, margin: '0 0 12px' }}>{g.accent}</p>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: `${ML.bone}bb`, margin: 0 }}>{g.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── AI Spotlight ──────────────────────────────────────────────────── */}
-      <AISpotlight />
-
-      {/* ── Testimonials ──────────────────────────────────────────────────── */}
+      {/* ── Testimonials (dynamic from DB) ────────────────────────────── */}
       <MidnightTestimonialsSection testimonials={testimonials} />
 
-      {/* ── Blog preview ──────────────────────────────────────────────────── */}
-      {blogPosts.length > 0 && (
-        <section style={{ background: ML.bone, padding: '120px 60px' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· From the blog ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 60px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: '0 0 16px' }}>
-                Guides for <span style={{ fontStyle: 'italic', color: ML.copper }}>the serious author.</span>
-              </h2>
-              <Link href="/blog" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
-                Browse all posts →
-              </Link>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 16 }}>
-              {blogPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="rb-blog-card" style={{ background: ML.pearl, borderRadius: 16, padding: '28px 24px', border: '1px solid #DCDBD3', textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s' }}>
-                  <div>
-                    {post.category && (
-                      <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: ML.copper, margin: '0 0 12px' }}>{post.category}</p>
-                    )}
-                    <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 20, fontWeight: 400, color: ML.ink, margin: '0 0 12px', lineHeight: 1.3 }}>{post.title}</h3>
-                    {post.excerpt && (
-                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.65, color: ML.slate, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{post.excerpt}</p>
-                    )}
-                  </div>
-                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: ML.brass, margin: 0, letterSpacing: '0.06em' }}>Read more →</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-          <style>{`.rb-blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(27,43,71,0.12); border-color: ${ML.copper}55 !important; }`}</style>
-        </section>
-      )}
+      {/* ── Newsletter mid-page ───────────────────────────────────────── */}
+      <NewsletterMidSection />
 
-      {/* ── Pricing ───────────────────────────────────────────────────────── */}
-      <section id="pricing" style={{ background: ML.mist, padding: '120px 60px' }}>
+      {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
+      <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.copper, marginBottom: 16 }}>· Pricing ·</p>
-            <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(36px, 4vw, 68px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.ink, margin: 0 }}>
-              Start free. <span style={{ fontStyle: 'italic', color: ML.copper }}>Scale when you&apos;re ready.</span>
-            </h2>
-          </div>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
+            Start free. Scale when you&apos;re ready.
+          </h2>
+          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
           <MidnightPricingSection plans={plans} />
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Link href="/pricing" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
-              View full pricing comparison →
-            </Link>
-          </div>
+          <p style={{ fontSize: '0.8125rem', color: C.muted, marginTop: 24 }}>
+            Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
+            <Link href="/pricing" style={{ color: C.muted, textDecoration: 'underline' }}>Full plan comparison →</Link>
+          </p>
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
-      <MidnightFaqSection faqs={faqs} hasMore={faqTotal > faqs.length} />
-
-      {/* ── Resources strip ───────────────────────────────────────────────── */}
-      {homepageResources.length > 0 && (
-        <section style={{ background: ML.ink, padding: '72px 60px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; communities we recommend ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 400, lineHeight: 1, letterSpacing: '-0.02em', color: ML.bone, margin: '0 0 8px' }}>
-                Trusted by the <span style={{ fontStyle: 'italic', color: ML.brass2 }}>indie author community</span>
-              </h2>
-              <Link href="/resources" style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass, textDecoration: 'none', letterSpacing: '0.08em' }}>
-                See all resources →
-              </Link>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'center' }}>
-              {homepageResources.map((r) => (
-                <a key={r.id} href={r.websiteUrl} target="_blank" rel="noopener noreferrer"
-                  className="resource-chip"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '12px 22px 12px 14px', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 999, textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: r.logoUrl ? ML.bone : r.avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: r.logoUrl ? '1px solid #DCDBD3' : 'none' }}>
-                    {r.logoUrl
-                      ? <img src={r.logoUrl} alt={r.name} style={{ width: 36, height: 36, objectFit: 'contain', padding: 4 }} />
-                      : <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: (r.initials?.length ?? 0) > 2 ? 10 : 13, fontWeight: 700, color: ML.bone }}>{r.initials || r.name[0]}</span>
-                    }
-                  </div>
-                  <div>
-                    <span style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: ML.ink, whiteSpace: 'nowrap', display: 'block', lineHeight: 1.2 }}>{r.name}</span>
-                    {r.category && <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.slate }}>{r.category}</span>}
-                  </div>
-                  {r.isPartner && (
-                    <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.brass, background: `${ML.brass}18`, border: `1px solid ${ML.brass}40`, borderRadius: 999, padding: '3px 8px' }}>Partner</span>
-                  )}
-                </a>
-              ))}
-            </div>
-          </div>
-          <style>{`.resource-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }`}</style>
-        </section>
-      )}
-
-      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
-      <RebelCTA />
-
-      {/* ── News subscribe ────────────────────────────────────────────────── */}
-      <section style={{ background: ML.bone, padding: '64px 24px' }}>
-        <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <NewsSubscribeForm source="home" variant="box" />
-        </div>
-      </section>
+      {/* ── Footer CTA ────────────────────────────────────────────────── */}
+      <FooterCTA />
 
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inline section components (specific to this redesign)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ProblemStrip() {
+  const items = [
+    { icon: '📦', title: 'Retailers own your buyers', desc: "Amazon keeps the customer relationship. You ship books and wait for royalty statements — with no idea who's reading." },
+    { icon: '✉️', title: "Your list isn't yours", desc: "Build thousands of followers on a platform you don't control, and they can be gone overnight. Email lists built on their terms aren't yours." },
+    { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
+  ];
+  return (
+    <div style={{ background: '#1c2e48', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 0 }}>
+          {items.map((item, i) => (
+            <div key={i} style={{ textAlign: 'center', padding: '24px 32px', borderRight: i < items.length - 1 ? '1px solid #2a4268' : 'none' }}>
+              <span style={{ fontSize: '1.75rem', marginBottom: 14, display: 'block' }}>{item.icon}</span>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
+              <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 820px) { .problem-strip-grid > div { border-right: none !important; border-bottom: 1px solid #2a4268; } .problem-strip-grid > div:last-child { border-bottom: none; } }`}</style>
+    </div>
+  );
+}
+
+function PillarsSection() {
+  const pillars = [
+    { num: '01', title: 'Your storefront', desc: 'A beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand — not theirs.' },
+    { num: '02', title: 'Your sales', desc: 'Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.' },
+    { num: '03', title: 'Your list', desc: 'Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.' },
+  ];
+  return (
+    <section style={{ padding: '88px 0', textAlign: 'center', background: '#0d1520' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The solution</p>
+        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
+          One platform.<br />Everything you own.
+        </h2>
+        <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto 52px', lineHeight: 1.72 }}>
+          AuthorLoft replaces your website, email service, payment processor, and analytics —
+          and puts you in control of every reader relationship you earn.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}>
+          {pillars.map((p) => (
+            <div key={p.num} style={{ background: '#1c2e48', padding: '40px 32px' }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
+              <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65 }}>{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComparisonSection() {
+  const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
+  const rows = [
+    { label: 'Your revenue', old: 'Retailers take their cut — you see 30–70%', newVal: 'You keep 100%', newSuffix: ' of every direct sale' },
+    { label: 'Your readers', old: 'Their platform, their email list, their rules', newVal: 'Your list, always.', newSuffix: ' Nobody can take it from you.' },
+  ];
+  return (
+    <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+      <style>{`
+        .rdh-cmp-table { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #3a5580; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
+        @media (max-width: 820px) {
+          .rdh-cmp-table { grid-template-columns: 1fr; }
+          .rdh-cmp-old-head, .rdh-cmp-old-cell { display: none; }
+        }
+      `}</style>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 44 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14, margin: '0 0 14px' }}>The difference</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: 0 }}>
+            What changes when you own it.
+          </h2>
+        </div>
+        <div className="rdh-cmp-table">
+          {/* Column headers */}
+          <div className="rdh-cmp-old-head" style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#15233a', textAlign: 'center', color: '#6b7a90', borderBottom: '2px solid #3a5580' }}>The old way</div>
+          <div style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#1a3050', textAlign: 'center', color: '#c9a84c', borderBottom: '2px solid #3a5580', borderLeft: '2px solid #3a5580' }}>With AuthorLoft</div>
+
+          {rows.map((row, i) => (
+            <div key={row.label} style={{ display: 'contents' }}>
+              {/* Old way cell */}
+              <div className="rdh-cmp-old-cell" style={{ background: '#0f1a2d', padding: '32px 36px', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5c6e89', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.35rem', lineHeight: 1.4, color: '#3d4f66', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.5)', fontStyle: 'italic' }}>{row.old}</div>
+              </div>
+              {/* New way cell */}
+              <div style={{ background: '#1c3358', padding: '32px 36px', borderLeft: '2px solid #3a5580', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a9bb5', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.5rem', lineHeight: 1.4, color: '#f0ede4' }}>
+                  <strong style={{ color: '#d4ae6a', fontWeight: 700 }}>{row.newVal}</strong>{row.newSuffix}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NewsletterMidSection() {
+  return (
+    <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '88px 0' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
+        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
+          Grow your readership.<br />Keep every reader.
+        </h2>
+        <p style={{ color: '#5a4a38', fontSize: '1.0625rem', marginBottom: 36, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.68 }}>
+          One tactic a week — direct sales, email strategy, and reader growth for independent authors. No fluff. Unsubscribe anytime.
+        </p>
+        <div style={{ maxWidth: 460, margin: '0 auto' }}>
+          <NewsSubscribeForm source="home" variant="box" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FooterCTA() {
+  return (
+    <section style={{ textAlign: 'center', padding: '112px 0', position: 'relative', overflow: 'hidden', background: '#0d1520' }}>
+      {/* Glow */}
+      <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
+        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
+          Your readers<br />are waiting.
+        </h2>
+        <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
+          Every sale through a middleman is a reader you&apos;ll never reach again. Start free today and own everything you build.
+        </p>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
+          <Link href="/register" className="rdh-btn-primary" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, background: '#c9a84c', color: '#000', padding: '15px 32px' }}>
+            Start your business — free →
+          </Link>
+          <Link href="/bookstore" className="rdh-btn-ghost" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, color: '#e8e8e0', border: '1px solid #2a4268', padding: '14px 28px', background: 'transparent' }}>
+            Browse the bookstore
+          </Link>
+        </div>
+        <p style={{ fontSize: '0.8125rem', color: '#9a9080' }}>No credit card. No lock-in. No middleman.</p>
+      </div>
+    </section>
   );
 }
