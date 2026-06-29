@@ -30,7 +30,7 @@ export function getAuthorSitePages(
   const pages: AuthorSitePage[] = [{ label: "Home", path: "/" }];
 
   if (author.navShowBooks) pages.push({ label: "Books", path: "/books" });
-  if (author.navShowSpecials) pages.push({ label: "Specials", path: "/books#specials" });
+  if (author.navShowSpecials) pages.push({ label: "Specials", path: "/specials" });
   if ((author.plan?.flipBooksLimit ?? 0) !== 0 && author.navShowFlipBooks) {
     pages.push({ label: "Flip Books", path: "/flip-books" });
   }

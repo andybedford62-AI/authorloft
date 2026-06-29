@@ -1,9 +1,7 @@
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
 import { getActiveSaleDiscounts } from "@/lib/discount-queries";
-import { prisma } from "@/lib/db";
 import { BooksClient } from "./books-client";
 import { PageBanner } from "@/components/author-site/page-banner";
-import { SpecialsSection } from "@/components/author-site/specials-section";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -27,24 +25,10 @@ export async function generateMetadata({
 export default async function BooksPage({ params }: { params: Promise<{ domain: string }> }) {
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
-  const now = new Date();
-  const [books, series, genreTree, specials] = await Promise.all([
+  const [books, series, genreTree] = await Promise.all([
     getAuthorBooks(author.id),
     getAuthorSeries(author.id),
     getAuthorGenres(author.id),
-    prisma.special.findMany({
-      where: {
-        authorId: author.id,
-        isActive: true,
-        OR: [{ endsAt: null }, { endsAt: { gt: now } }],
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        discountCode: {
-          select: { code: true, type: true, value: true, isActive: true },
-        },
-      },
-    }),
   ]);
 
   const flatGenres = genreTree.flatMap((g) => [g, ...g.children]);
@@ -92,8 +76,6 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
         subtitle={`Every title by ${authorName} — browse, filter, and find your next read.`}
         accentColor={author.accentColor}
       />
-
-      <SpecialsSection specials={specials} accentColor={author.accentColor} />
 
       <BooksClient
         books={clientBooks}

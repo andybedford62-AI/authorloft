@@ -61,7 +61,7 @@ function buildNavLinks(
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
   if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
   if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
-  if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/books#specials" });
+  if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
   if (config?.navShowBlog)               links.push({ label: "News",       href: "/blog" });

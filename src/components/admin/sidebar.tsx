@@ -114,6 +114,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
       { href: "/admin/bundles",        label: "Bundles",        icon: Package        },
       { href: "/admin/courses",        label: "Courses",        icon: GraduationCap  },
+      { href: "/admin/specials",       label: "Specials",       icon: Sparkles    },
       { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
       { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },
     ],
