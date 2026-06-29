@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -13,9 +14,24 @@ import { RedesignHero } from "@/components/marketing/redesign-hero";
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("home");
   return {
-    title: "Homepage Preview | AuthorLoft",
-    robots: { index: false, follow: false },
+    title: "Your Books. Your Readers. Your Business. | AuthorLoft",
+    description:
+      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place. Free to start.",
+    alternates: { canonical: "/" },
+    openGraph: {
+      type:        "website",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your books, your readers, your business" }],
+    },
+    twitter: {
+      card:        "summary_large_image",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
+      images:      [ogImage],
+    },
   };
 }
 
@@ -75,12 +91,97 @@ async function getShowcaseAuthors() {
   }).catch(() => []);
 }
 
+async function getFaqs() {
+  const [items, total] = await Promise.all([
+    prisma.homepageFaq.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: 10,
+      select: { id: true, question: true, answer: true },
+    }).catch(() => []),
+    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
+  ]);
+  return { items, total };
+}
+
+// ── Structured data ──────────────────────────────────────────────────────────
+
+const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "AuthorLoft — Your Books. Your Readers. Your Business.",
+  url: PLATFORM_URL,
+  description:
+    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
+  isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: PLATFORM_URL },
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["h1", "h2", ".hero-description"],
+  },
+  about: {
+    "@type": "SoftwareApplication",
+    name: "AuthorLoft",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Free to start — no credit card required",
+    },
+    featureList: [
+      "Author Website Builder",
+      "Direct Book Sales (ebooks, print, audiobooks)",
+      "Newsletter & Email Marketing",
+      "Reader Analytics",
+      "ARC Management",
+      "Author Media Kit",
+      "AI Writing & Marketing Tools",
+      "Indie Author Bookstore",
+      "Book Pre-Orders",
+      "Affiliate Program",
+      "Custom Domain Support",
+      "Flip Book Previews",
+      "SEO Auditor",
+    ].join(", "),
+  },
+};
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to launch and grow your independent author business with AuthorLoft",
+  description: "Three pillars to owning your author business: launch your storefront, sell direct, and own your reader list.",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Your Storefront",
+      text: "Launch a beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Your Sales",
+      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Your List",
+      text: "Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.",
+    },
+  ],
+};
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomepagePreviewPage() {
   await cookies();
-  const [plans, testimonials, showcaseAuthors, session] = await Promise.all([
-    getActivePlans(), getTestimonials(), getShowcaseAuthors(),
+  const [plans, testimonials, showcaseAuthors, faqData, session] = await Promise.all([
+    getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
     getServerSession(authOptions),
   ]);
 
@@ -93,8 +194,24 @@ export default async function HomepagePreviewPage() {
     }
   }
 
+  const faqs = faqData.items;
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
+    })),
+  } : null;
+
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter', sans-serif", fontSize: '1rem', lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
+
+      {/* ── Structured Data (JSON-LD) ────────────────────────────────── */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       {/* Preview banner */}
       <div style={{ background: '#b91c1c', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.8125rem', fontWeight: 600, position: 'relative', zIndex: 200 }}>
