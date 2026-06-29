@@ -328,43 +328,50 @@ function PillarsSection() {
 }
 
 function ComparisonSection() {
+  const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
   const rows = [
     { label: 'Your revenue', old: 'Retailers take their cut — you see 30–70%', newVal: 'You keep 100%', newSuffix: ' of every direct sale' },
     { label: 'Your readers', old: 'Their platform, their email list, their rules', newVal: 'Your list, always.', newSuffix: ' Nobody can take it from you.' },
   ];
   return (
-    <section style={{ background: 'linear-gradient(180deg, #0d1520 0%, #111c2e 50%, #0d1520 100%)', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '88px 0' }}>
+    <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+      <style>{`
+        .rdh-cmp-table { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #3a5580; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
+        @media (max-width: 820px) {
+          .rdh-cmp-table { grid-template-columns: 1fr; }
+          .rdh-cmp-old-head, .rdh-cmp-old-cell { display: none; }
+        }
+      `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
-          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The difference</p>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14, margin: '0 0 14px' }}>The difference</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: 0 }}>
             What changes when you own it.
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden' }}>
+        <div className="rdh-cmp-table">
           {/* Column headers */}
-          <div style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#9a9080' }}>The old way</div>
-          <div style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#c9a84c' }}>With AuthorLoft</div>
+          <div className="rdh-cmp-old-head" style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#15233a', textAlign: 'center', color: '#6b7a90', borderBottom: '2px solid #3a5580' }}>The old way</div>
+          <div style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#1a3050', textAlign: 'center', color: '#c9a84c', borderBottom: '2px solid #3a5580', borderLeft: '2px solid #3a5580' }}>With AuthorLoft</div>
 
-          {rows.map((row) => (
+          {rows.map((row, i) => (
             <div key={row.label} style={{ display: 'contents' }}>
               {/* Old way cell */}
-              <div style={{ background: '#111d2e', padding: '28px 32px' }}>
-                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9080', marginBottom: 8, fontWeight: 600 }}>{row.label}</div>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', lineHeight: 1.35, color: '#5a5a56', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.4)' }}>{row.old}</div>
+              <div className="rdh-cmp-old-cell" style={{ background: '#0f1a2d', padding: '32px 36px', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5c6e89', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.35rem', lineHeight: 1.4, color: '#3d4f66', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.5)', fontStyle: 'italic' }}>{row.old}</div>
               </div>
               {/* New way cell */}
-              <div style={{ background: '#162540', padding: '28px 32px' }}>
-                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9080', marginBottom: 8, fontWeight: 600 }}>{row.label}</div>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', lineHeight: 1.35, color: '#e8e8e0' }}>
-                  <strong style={{ color: '#c9a84c' }}>{row.newVal}</strong>{row.newSuffix}
+              <div style={{ background: '#1c3358', padding: '32px 36px', borderLeft: '2px solid #3a5580', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a9bb5', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.5rem', lineHeight: 1.4, color: '#f0ede4' }}>
+                  <strong style={{ color: '#d4ae6a', fontWeight: 700 }}>{row.newVal}</strong>{row.newSuffix}
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 820px) { .comparison-table { grid-template-columns: 1fr !important; } }`}</style>
     </section>
   );
 }
