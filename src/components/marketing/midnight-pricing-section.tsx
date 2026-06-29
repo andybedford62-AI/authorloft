@@ -85,34 +85,37 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
               style={{
                 borderRadius: 18,
                 padding: '32px 28px',
-                background: isFeatured ? '#1B2B47' : '#F0EDE4',
+                background: isFeatured ? '#1e3358' : '#F0EDE4',
                 color: isFeatured ? '#E8E5DD' : '#1B2B47',
-                border: isFeatured ? 'none' : '1px solid #DCDBD3',
+                border: isFeatured ? '2px solid #D4AE6A' : '1px solid #DCDBD3',
                 transform: isFeatured ? 'scale(1.04)' : 'none',
-                boxShadow: isFeatured ? '0 30px 50px -20px rgba(15,26,45,0.55)' : '0 2px 8px rgba(0,0,0,0.04)',
+                boxShadow: isFeatured ? '0 30px 50px -20px rgba(15,26,45,0.55), 0 0 20px rgba(212,174,106,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
                 position: 'relative',
+                textAlign: 'left',
               }}
             >
               {/* Badge */}
               {plan.featuredLabel && (
                 <div style={{
-                  position: 'absolute', top: -12, right: 20,
-                  background: isFeatured ? '#D4AE6A' : '#C26A4A',
+                  position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
+                  background: '#D4AE6A',
                   color: '#0F1A2D', fontSize: 11, fontWeight: 700,
-                  padding: '4px 12px', borderRadius: 999,
+                  padding: '5px 16px', borderRadius: 999,
                   fontFamily: 'var(--font-geist-mono, monospace)', letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 4px 12px rgba(212,174,106,0.3)',
                 }}>
                   {plan.featuredLabel}
                 </div>
               )}
 
               {/* Plan name */}
-              <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 32, fontWeight: 400, margin: '0 0 12px', color: isFeatured ? '#D4AE6A' : '#C26A4A' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 32, fontWeight: 400, margin: '0 0 12px', color: isFeatured ? '#D4AE6A' : '#C26A4A', textAlign: 'left' }}>
                 {plan.name}
               </h3>
 
               {/* Price */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6, textAlign: 'left' }}>
                 <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 56, fontWeight: 400, lineHeight: 0.9, letterSpacing: '-0.03em' }}>
                   {price}
                 </span>
@@ -123,7 +126,7 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
 
               {/* Description */}
               {plan.description && (
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, lineHeight: 1.6, opacity: 0.85, margin: '12px 0 20px' }}>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, lineHeight: 1.6, opacity: 0.85, margin: '12px 0 20px', textAlign: 'left' }}>
                   {plan.description}
                 </p>
               )}
