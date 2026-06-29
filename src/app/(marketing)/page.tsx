@@ -274,7 +274,7 @@ function ProblemStrip() {
     { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
   ];
   return (
-    <div style={{ background: '#1c2e48', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
+    <div style={{ background: '#111c2c', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 0 }}>
           {items.map((item, i) => (
