@@ -266,14 +266,14 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
         {/* Left: copy */}
         <div style={{ color: ML.bone }}>
           {/* Headline */}
-          <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(48px, 6.5vw, 104px)', lineHeight: 0.92, letterSpacing: '-0.03em', margin: '0 0 28px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
-            <span style={{ display: 'block' }}>You wrote the book.</span>
-            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>Own the business.</span>
+          <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(32px, 4.5vw, 68px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
+            <span style={{ display: 'block' }}>They sell your book. They keep your reader.</span>
+            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>Take both back.</span>
           </h1>
 
           {/* Mantra strip */}
           <div style={{ display: 'flex', gap: 0, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
-            {['your site', 'your readers', 'your revenue', 'your rules'].map((word, i) => (
+            {['your storefront', 'your readers', 'your revenue', 'your rules'].map((word, i) => (
               <span key={word} style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: i % 2 === 0 ? ML.bone : ML.brass2, opacity: i % 2 === 0 ? 0.55 : 0.9, marginRight: 16 }}>
                 {word}{i < 3 ? ' ·' : ''}
               </span>
@@ -281,7 +281,7 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
           </div>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.6, color: ML.bone, opacity: 0.85, margin: '0 0 32px', maxWidth: 460, animation: 'rbFadeUp 0.7s 0.25s ease both' }}>
-            Website, direct sales, email newsletter, reader analytics, media kits, pre-orders — everything you need to run your author business, all in one platform. Free to start.
+            Every sale through a retailer is a reader you&apos;ll never know, never email, never sell to again. AuthorLoft gives you your own storefront, your own list, and 100% of every dollar.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>

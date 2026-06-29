@@ -764,17 +764,19 @@ model OrderItem {
 // ─── Contact Messages ─────────────────────────────────────────────────────────
 
 model ContactMessage {
-  id          String   @id @default(cuid())
-  authorId    String
-  senderName  String
-  senderEmail String
-  website     String?
-  subject     String?
-  message     String   @db.Text
-  isRead      Boolean  @default(false)
-  isArchived  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  authorId       String
+  senderName     String
+  senderEmail    String
+  website        String?
+  subject        String?
+  message        String    @db.Text
+  isRead         Boolean   @default(false)
+  isArchived     Boolean   @default(false)
+  hasBeenReplied Boolean   @default(false)
+  lastRepliedAt  DateTime?
+  createdAt      DateTime  @default(now())
+  author         Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId, createdAt])
   @@index([authorId, isRead])

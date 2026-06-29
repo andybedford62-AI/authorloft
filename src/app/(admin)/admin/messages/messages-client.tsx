@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Mail, MailOpen, Trash2, Archive, ArchiveRestore,
   ExternalLink, ChevronDown, ChevronUp, CheckCheck,
+  Send, X, Reply, Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
@@ -17,6 +18,8 @@ type Message = {
   message: string;
   isRead: boolean;
   isArchived: boolean;
+  hasBeenReplied: boolean;
+  lastRepliedAt: Date | string | null;
   createdAt: Date | string;
 };
 
@@ -44,6 +47,42 @@ export function MessagesClient({ initialMessages }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"inbox" | "archived">("inbox");
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyBody, setReplyBody] = useState("");
+  const [replySending, setReplySending] = useState(false);
+  const [replySuccess, setReplySuccess] = useState<string | null>(null);
+
+  async function sendReply(msgId: string) {
+    if (!replyBody.trim()) return;
+    setReplySending(true);
+    try {
+      const res = await fetch(`/api/admin/messages/${msgId}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: replyBody }),
+      });
+      if (res.ok) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === msgId
+              ? { ...m, hasBeenReplied: true, lastRepliedAt: new Date().toISOString(), isRead: true }
+              : m
+          )
+        );
+        setReplyBody("");
+        setReplyingToId(null);
+        setReplySuccess(msgId);
+        setTimeout(() => setReplySuccess(null), 3000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to send reply. Please try again.");
+      }
+    } catch {
+      alert("Failed to send reply. Please try again.");
+    } finally {
+      setReplySending(false);
+    }
+  }
 
   const displayed = messages.filter((m) =>
     filter === "inbox" ? !m.isArchived : m.isArchived
@@ -234,15 +273,77 @@ export function MessagesClient({ initialMessages }: Props) {
                       )}
                     </div>
 
+                    {/* Replied badge */}
+                    {msg.hasBeenReplied && replySuccess !== msg.id && (
+                      <div className="ml-5 mt-3 flex items-center gap-1.5 text-xs text-green-600">
+                        <Check className="h-3.5 w-3.5" />
+                        Replied {msg.lastRepliedAt && formatDate(msg.lastRepliedAt)}
+                      </div>
+                    )}
+
+                    {/* Reply success toast */}
+                    {replySuccess === msg.id && (
+                      <div className="ml-5 mt-3 flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5">
+                        <Check className="h-4 w-4" />
+                        Reply sent to {msg.senderEmail}
+                      </div>
+                    )}
+
+                    {/* Inline reply form */}
+                    {replyingToId === msg.id && (
+                      <div className="ml-5 mt-4 border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">
+                            Reply to {msg.senderName} &lt;{msg.senderEmail}&gt;
+                          </span>
+                          <button
+                            onClick={() => { setReplyingToId(null); setReplyBody(""); }}
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {msg.subject && (
+                          <div className="px-4 py-2 border-b border-gray-100 text-sm text-gray-500">
+                            Re: {msg.subject}
+                          </div>
+                        )}
+                        <textarea
+                          value={replyBody}
+                          onChange={(e) => setReplyBody(e.target.value)}
+                          placeholder="Type your reply..."
+                          rows={5}
+                          className="w-full px-4 py-3 text-sm text-gray-700 placeholder-gray-400 resize-y focus:outline-none"
+                          autoFocus
+                          disabled={replySending}
+                        />
+                        <div className="bg-gray-50 px-4 py-2.5 border-t border-gray-200 flex items-center justify-between">
+                          <span className="text-xs text-gray-400">
+                            Sent via AuthorLoft &middot; recipient can reply to your author email
+                          </span>
+                          <button
+                            onClick={() => sendReply(msg.id)}
+                            disabled={replySending || !replyBody.trim()}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:opacity-90 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                          >
+                            <Send className="h-4 w-4" />
+                            {replySending ? "Sending..." : "Send Reply"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Actions */}
                     <div className="ml-5 mt-4 flex items-center gap-2 flex-wrap">
-                      <a
-                        href={`mailto:${msg.senderEmail}${msg.subject ? `?subject=Re: ${encodeURIComponent(msg.subject)}` : ""}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:opacity-90 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        <Mail className="h-4 w-4" />
-                        Reply by email
-                      </a>
+                      {replyingToId !== msg.id && (
+                        <button
+                          onClick={() => { setReplyingToId(msg.id); setReplyBody(""); }}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:opacity-90 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          <Reply className="h-4 w-4" />
+                          Reply
+                        </button>
+                      )}
 
                       <IconButton
                         icon={msg.isRead ? <Mail className="h-4 w-4" /> : <MailOpen className="h-4 w-4" />}
