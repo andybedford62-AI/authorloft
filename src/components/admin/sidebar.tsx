@@ -83,9 +83,12 @@ const NAV_GROUPS: NavGroup[] = [
   {
     key: "catalog", label: "Catalog", defaultOpen: true,
     items: [
-      { href: "/admin/books",      label: "Books",      icon: BookOpen   },
-      { href: "/admin/series",     label: "Series",     icon: Library    },
-      { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked },
+      { href: "/admin/books",      label: "Books",      icon: BookOpen      },
+      { href: "/admin/series",     label: "Series",     icon: Library       },
+      { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked    },
+      { href: "/admin/bundles",    label: "Bundles",    icon: Package       },
+      { href: "/admin/courses",    label: "Courses",    icon: GraduationCap },
+      { href: "/admin/specials",   label: "Specials",   icon: Sparkles      },
     ],
   },
   {
@@ -112,9 +115,6 @@ const NAV_GROUPS: NavGroup[] = [
     key: "sales", label: "Sales", defaultOpen: false,
     items: [
       { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
-      { href: "/admin/bundles",        label: "Bundles",        icon: Package        },
-      { href: "/admin/courses",        label: "Courses",        icon: GraduationCap  },
-      { href: "/admin/specials",       label: "Specials",       icon: Sparkles    },
       { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
       { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },
     ],
