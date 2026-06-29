@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
-import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
+import type { PlanData } from "@/components/marketing/pricing-section";
 import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
@@ -129,20 +129,7 @@ export default async function HomepagePreviewPage() {
       <NewsletterMidSection />
 
       {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
-      <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
-          <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
-            Start free. Scale when you&apos;re ready.
-          </h2>
-          <p style={{ color: C.muted, fontSize: '1.0625rem', margin: '0 0 48px' }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
-          <MidnightPricingSection plans={plans} />
-          <p style={{ fontSize: '0.8125rem', color: C.muted, marginTop: 24 }}>
-            Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
-            <Link href="/pricing" style={{ color: C.muted, textDecoration: 'underline' }}>Full plan comparison →</Link>
-          </p>
-        </div>
-      </section>
+      <RedesignPricing plans={plans} />
 
       {/* ── Footer CTA ────────────────────────────────────────────────── */}
       <FooterCTA />
@@ -281,6 +268,131 @@ function NewsletterMidSection() {
         <div style={{ maxWidth: 460, margin: '0 auto' }}>
           <NewsSubscribeForm source="home" variant="box" />
         </div>
+      </div>
+    </section>
+  );
+}
+
+function formatPrice(cents: number) {
+  if (cents === 0) return '$0';
+  const d = cents / 100;
+  return d % 1 === 0 ? `$${d.toFixed(0)}` : `$${d.toFixed(2)}`;
+}
+
+function buildFeatureList(plan: PlanData): string[] {
+  if (plan.featuresJson) {
+    try {
+      const parsed = JSON.parse(plan.featuresJson);
+      if (Array.isArray(parsed)) return parsed as string[];
+    } catch { /* fall through */ }
+  }
+  const f: string[] = [];
+  f.push(plan.maxBooks === null ? 'Unlimited books' : `Up to ${plan.maxBooks} book${plan.maxBooks === 1 ? '' : 's'}`);
+  if (plan.customDomain) f.push('Custom domain');
+  if (plan.salesEnabled) f.push('Direct digital sales (Stripe)');
+  if (plan.newsletter) f.push('Newsletter campaigns');
+  if (plan.analyticsEnabled) f.push('Reader analytics');
+  if (plan.flipBooksLimit > 0) f.push('Flipbook & audio support');
+  if (plan.mediaKitEnabled) f.push('Media kit');
+  return f;
+}
+
+function RedesignPricing({ plans }: { plans: PlanData[] }) {
+  const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
+  const SANS = "var(--font-body, 'Inter', sans-serif)";
+  const accent = '#c9a84c';
+  const accentLight = '#d4b866';
+  const bg = '#0d1520';
+  const surface = '#1c2e48';
+  const border = '#2a4268';
+  const text = '#e8e8e0';
+  const muted = '#9a9080';
+
+  return (
+    <section style={{ background: surface, borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, padding: '88px 0', textAlign: 'center' }}>
+      <style>{`
+        .rdh-pbtn { display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 0.875rem; font-family: var(--font-body, 'Inter', sans-serif); transition: all 0.18s; }
+        .rdh-pbtn-ghost { border: 1px solid ${border}; color: ${text}; background: transparent; }
+        .rdh-pbtn-ghost:hover { border-color: ${muted}; background: rgba(255,255,255,0.04); }
+        .rdh-pbtn-primary { background: ${accent}; color: #000; border: none; }
+        .rdh-pbtn-primary:hover { background: ${accentLight}; }
+      `}</style>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: accent, margin: '0 0 14px' }}>Pricing</p>
+        <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: text, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
+          Start free. Scale when you&apos;re ready.
+        </h2>
+        <p style={{ color: muted, fontSize: '1.0625rem', margin: '0 0 48px' }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(255px, 1fr))', gap: 2, background: border, borderRadius: 14, overflow: 'hidden', marginBottom: 24 }}>
+          {plans.map((plan) => {
+            const isFeatured = plan.featuredLabel !== null || plan.tier === 'STANDARD';
+            const price = formatPrice(plan.monthlyPriceCents);
+            const features = buildFeatureList(plan);
+            const tierLabel = plan.name.toUpperCase();
+            const ctaLabel = plan.tier === 'FREE'
+              ? 'Start free →'
+              : `Start free — ${plan.name} →`;
+
+            return (
+              <div key={plan.id} style={{
+                background: isFeatured ? '#1e3358' : bg,
+                padding: '36px 30px',
+                textAlign: 'left',
+                position: 'relative',
+                borderTop: isFeatured ? `2px solid ${accent}` : 'none',
+              }}>
+                {/* Badge */}
+                {isFeatured && (
+                  <div style={{
+                    position: 'absolute', top: 22, right: 22,
+                    background: accent, color: '#000',
+                    fontSize: '0.6875rem', fontWeight: 700,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    padding: '4px 10px', borderRadius: 100,
+                  }}>
+                    {plan.featuredLabel || 'Most popular'}
+                  </div>
+                )}
+
+                {/* Tier */}
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: muted, fontWeight: 600, margin: '0 0 10px' }}>
+                  {tierLabel}
+                </div>
+
+                {/* Price */}
+                <div style={{ fontFamily: SERIF, fontSize: '2.6rem', fontWeight: 700, color: text, lineHeight: 1, margin: '0 0 6px' }}>
+                  {price}<span style={{ fontSize: '1rem', color: muted, fontWeight: 400, fontFamily: SANS }}>/mo</span>
+                </div>
+
+                {/* Description */}
+                <div style={{ fontSize: '0.875rem', color: muted, margin: '0 0 22px', lineHeight: 1.5 }}>
+                  {plan.description || ''}
+                </div>
+
+                {/* Features */}
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px' }}>
+                  {features.map((f, i) => (
+                    <li key={i} style={{ fontSize: '0.875rem', color: muted, padding: '4px 0', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <span style={{ color: accent, fontWeight: 700, flexShrink: 0 }}>·</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Link href="/register" className={isFeatured ? 'rdh-pbtn rdh-pbtn-primary' : 'rdh-pbtn rdh-pbtn-ghost'}>
+                  {ctaLabel}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+
+        <p style={{ fontSize: '0.8125rem', color: muted, margin: 0 }}>
+          Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
+          <Link href="/pricing" style={{ color: muted, textDecoration: 'underline' }}>Full plan comparison →</Link>
+        </p>
       </div>
     </section>
   );
