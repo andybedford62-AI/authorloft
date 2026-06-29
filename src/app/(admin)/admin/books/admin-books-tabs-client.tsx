@@ -1,15 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, BookMarked, Copy } from "lucide-react";
+import { BookOpen, BookMarked, Copy, Sparkles, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
 import { ArcsOverview } from "./arcs-overview";
+import { SpecialsListClient } from "@/components/admin/specials-list-client";
 import { cn } from "@/lib/utils";
 
-type Tab = "my-books" | "book-shelf" | "arcs";
+type Tab = "my-books" | "book-shelf" | "arcs" | "specials";
+
+type SpecialRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  ctaLabel: string | null;
+  ctaUrl: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  isActive: boolean;
+};
 
 type BookRow = {
   id: string;
@@ -30,15 +44,23 @@ interface Props {
   books:       BookRow[];
   booksLayout: string;
   planTier:    string;
+  specials:    SpecialRow[];
 }
 
-export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>("my-books");
+const TAB_IDS: Tab[] = ["my-books", "book-shelf", "arcs", "specials"];
+
+export function AdminBooksTabsClient({ books, booksLayout, planTier, specials }: Props) {
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get("tab") as Tab | null;
+  const initialTab: Tab =
+    requestedTab && TAB_IDS.includes(requestedTab) ? requestedTab : "my-books";
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "my-books",    label: "My Books",   icon: BookOpen   },
     { id: "book-shelf",  label: "Book Shelf",  icon: BookMarked },
     { id: "arcs",        label: "ARC",        icon: Copy       },
+    { id: "specials",    label: "Specials",   icon: Sparkles   },
   ];
 
   return (
@@ -84,6 +106,29 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
 
       {activeTab === "arcs" && (
         <ArcsOverview books={books} />
+      )}
+
+      {activeTab === "specials" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              {specials.length === 0
+                ? "Promotions, limited-time deals, signed copies, and bundles."
+                : `${specials.length} special${specials.length !== 1 ? "s" : ""} — ${
+                    specials.filter(
+                      (s) => s.isActive && (!s.endsAt || new Date(s.endsAt) > new Date())
+                    ).length
+                  } active`}
+            </p>
+            <Link href="/admin/specials/new">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Special
+              </Button>
+            </Link>
+          </div>
+          <SpecialsListClient specials={specials} />
+        </div>
       )}
     </div>
   );

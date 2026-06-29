@@ -43,8 +43,8 @@ const BUILT_IN_ITEMS = [
   {
     key: "navShowSpecials" as keyof NavSettings,
     label: "Specials",
-    href: "/specials",
-    description: "Promotions and special offers",
+    href: "/books#specials",
+    description: "Promotions section shown at the top of your Books page",
     alwaysOn: false,
   },
   {

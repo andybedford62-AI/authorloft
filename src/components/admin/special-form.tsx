@@ -134,7 +134,7 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Save failed");
 
-      router.push("/admin/specials");
+      router.push("/admin/books?tab=specials");
       router.refresh();
     } catch (err: any) {
       setError(err.message);
@@ -153,7 +153,7 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
         const data = await res.json();
         throw new Error(data.error ?? "Delete failed");
       }
-      router.push("/admin/specials");
+      router.push("/admin/books?tab=specials");
       router.refresh();
     } catch (err: any) {
       setError(err.message);
@@ -451,7 +451,7 @@ export function SpecialForm({ initial, mode }: SpecialFormProps) {
                 ? <><Plus className="h-4 w-4 mr-2" />Create Special</>
                 : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
           </Button>
-          <Button type="button" variant="ghost" onClick={() => router.push("/admin/specials")}>
+          <Button type="button" variant="ghost" onClick={() => router.push("/admin/books?tab=specials")}>
             Cancel
           </Button>
         </div>

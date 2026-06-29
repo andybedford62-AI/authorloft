@@ -14,7 +14,7 @@ export default async function NewSpecialPage() {
       {/* Breadcrumb */}
       <div className="flex items-center gap-2">
         <Link
-          href="/admin/specials"
+          href="/admin/books?tab=specials"
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
         >
           <ChevronLeft className="h-4 w-4" />

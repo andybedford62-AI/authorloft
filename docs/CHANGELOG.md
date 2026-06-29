@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## June 29, 2026
+
+- **Specials consolidated into the Books page (admin + public)** — Specials (promotions, bundles, signed copies, limited-time deals) no longer live on a standalone page. They now belong with the rest of an author's "product" content:
+  - **Admin:** the standalone `/admin/specials` listing and its sidebar entry are gone. Specials are now a 4th tab on the Books page (My Books · Book Shelf · ARC · Specials), reusing the existing list UI (status badges, live/hidden toggle, edit). Create/edit forms keep their routes (`/admin/specials/new`, `/admin/specials/[id]/edit`); after save/delete they return to the Specials tab via `/admin/books?tab=specials`.
+  - **Public:** active specials render as a highlighted "Current Specials" section at the top of the author's Books page (image, countdown, description, discount code, CTA) — a high-visibility deals strip with horizontal scroll on mobile and a grid on desktop. The section is hidden entirely when there are no active specials. The old `/specials` route now permanently redirects to `/books` for bookmarked/indexed links; the "Specials" nav link points to `/books#specials`.
+
 ## June 28, 2026
 
 - **FREE plan eBook sales** — free-tier authors can now sell eBooks directly via Stripe (previously STANDARD+ only):

@@ -6,10 +6,12 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminBooksPage() {
   const authorId = await getAdminAuthorId();
 
-  const [books, author] = await Promise.all([
+  const [books, author, specials] = await Promise.all([
     prisma.book.findMany({
       where: { authorId },
       select: {
@@ -32,10 +34,27 @@ export default async function AdminBooksPage() {
       where: { id: authorId },
       select: { booksLayout: true, plan: { select: { tier: true } } },
     }),
+    prisma.special.findMany({
+      where: { authorId },
+      orderBy: [{ createdAt: "desc" }],
+    }),
   ]);
 
   const booksLayout = author?.booksLayout ?? "list";
   const planTier    = author?.plan?.tier ?? "FREE";
+
+  // Serialise Date fields so they can cross the server→client boundary
+  const serialisedSpecials = specials.map((s) => ({
+    id:          s.id,
+    title:       s.title,
+    description: s.description,
+    imageUrl:    s.imageUrl,
+    ctaLabel:    s.ctaLabel,
+    ctaUrl:      s.ctaUrl,
+    startsAt:    s.startsAt ? s.startsAt.toISOString() : null,
+    endsAt:      s.endsAt   ? s.endsAt.toISOString()   : null,
+    isActive:    s.isActive,
+  }));
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -95,6 +114,7 @@ export default async function AdminBooksPage() {
           books={books}
           booksLayout={booksLayout}
           planTier={planTier}
+          specials={serialisedSpecials}
         />
       )}
     </div>
@@ -108,16 +128,19 @@ function AdminBooksTabs({
   books,
   booksLayout,
   planTier,
+  specials,
 }: {
   books: any[];
   booksLayout: string;
   planTier: string;
+  specials: any[];
 }) {
   return (
     <AdminBooksTabsClient
       books={books}
       booksLayout={booksLayout}
       planTier={planTier}
+      specials={specials}
     />
   );
 }
