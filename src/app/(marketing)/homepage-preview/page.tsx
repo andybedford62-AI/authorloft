@@ -132,10 +132,10 @@ export default async function HomepagePreviewPage() {
       <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
             Start free. Scale when you&apos;re ready.
           </h2>
-          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
+          <p style={{ color: C.muted, fontSize: '1.0625rem', margin: '0 0 48px' }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
           <MidnightPricingSection plans={plans} />
           <p style={{ fontSize: '0.8125rem', color: C.muted, marginTop: 24 }}>
             Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
@@ -162,19 +162,28 @@ function ProblemStrip() {
     { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
   ];
   return (
-    <div style={{ background: '#1c2e48', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
+    <div style={{ background: '#1c2e48', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '52px 0' }}>
+      <style>{`
+        .rdh-problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+        .rdh-problem-item { text-align: center; padding: 24px 32px; border-right: 1px solid #2a4268; }
+        .rdh-problem-item:last-child { border-right: none; }
+        @media (max-width: 820px) {
+          .rdh-problem-grid { grid-template-columns: 1fr; }
+          .rdh-problem-item { border-right: none !important; border-bottom: 1px solid #2a4268; }
+          .rdh-problem-item:last-child { border-bottom: none; }
+        }
+      `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 0 }}>
+        <div className="rdh-problem-grid">
           {items.map((item, i) => (
-            <div key={i} style={{ textAlign: 'center', padding: '24px 32px', borderRight: i < items.length - 1 ? '1px solid #2a4268' : 'none' }}>
+            <div key={i} className="rdh-problem-item">
               <span style={{ fontSize: '1.75rem', marginBottom: 14, display: 'block' }}>{item.icon}</span>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
-              <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65 }}>{item.desc}</p>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.25rem', fontWeight: 600, margin: '0 0 8px', color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
+              <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 820px) { .problem-strip-grid > div { border-right: none !important; border-bottom: 1px solid #2a4268; } .problem-strip-grid > div:last-child { border-bottom: none; } }`}</style>
     </div>
   );
 }
@@ -188,8 +197,8 @@ function PillarsSection() {
   return (
     <section style={{ padding: '88px 0', textAlign: 'center', background: '#0d1520' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The solution</p>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14, margin: '0 0 14px' }}>The solution</p>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', margin: '0 0 16px', letterSpacing: '-0.01em' }}>
           One platform.<br />Everything you own.
         </h2>
         <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto 52px', lineHeight: 1.72 }}>
@@ -199,9 +208,9 @@ function PillarsSection() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}>
           {pillars.map((p) => (
             <div key={p.num} style={{ background: '#1c2e48', padding: '40px 32px' }}>
-              <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
-              <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65 }}>{p.desc}</p>
+              <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', margin: '0 0 10px' }}>{p.title}</h3>
+              <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65, margin: 0 }}>{p.desc}</p>
             </div>
           ))}
         </div>
@@ -220,26 +229,33 @@ function ComparisonSection() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The difference</p>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: 0 }}>
             What changes when you own it.
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden' }}>
-          {/* Column headers */}
-          <div style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#9a9080' }}>The old way</div>
-          <div style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#c9a84c' }}>With AuthorLoft</div>
+        <style>{`
+          .rdh-ctable { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: #2a4268; border-radius: 14px; overflow: hidden; }
+          @media (max-width: 820px) {
+            .rdh-ctable { grid-template-columns: 1fr; }
+            .rdh-ctable-old-head { display: none; }
+            .rdh-ctable-old-cell { display: none; }
+            .rdh-ctable-new-head { font-size: 0.875rem; letter-spacing: 0.04em; text-align: left; padding: 16px 24px; }
+            .rdh-ctable-new-cell { padding: 22px 24px; }
+          }
+        `}</style>
+        <div className="rdh-ctable">
+          <div className="rdh-ctable-old-head" style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#9a9080' }}>The old way</div>
+          <div className="rdh-ctable-new-head" style={{ padding: '20px 32px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(0,10,25,0.5)', textAlign: 'center', color: '#c9a84c' }}>With AuthorLoft</div>
 
           {rows.map((row) => (
             <div key={row.label} style={{ display: 'contents' }}>
-              {/* Old way cell */}
-              <div style={{ background: '#111d2e', padding: '28px 32px' }}>
+              <div className="rdh-ctable-old-cell" style={{ background: '#111d2e', padding: '28px 32px' }}>
                 <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9080', marginBottom: 8, fontWeight: 600 }}>{row.label}</div>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', lineHeight: 1.35, color: '#5a5a56', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.4)' }}>{row.old}</div>
+                <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', lineHeight: 1.35, color: '#5a5a56', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.4)' }}>{row.old}</div>
               </div>
-              {/* New way cell */}
-              <div style={{ background: '#162540', padding: '28px 32px' }}>
+              <div className="rdh-ctable-new-cell" style={{ background: '#162540', padding: '28px 32px' }}>
                 <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9080', marginBottom: 8, fontWeight: 600 }}>{row.label}</div>
-                <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', lineHeight: 1.35, color: '#e8e8e0' }}>
+                <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', lineHeight: 1.35, color: '#e8e8e0' }}>
                   <strong style={{ color: '#c9a84c' }}>{row.newVal}</strong>{row.newSuffix}
                 </div>
               </div>
@@ -247,7 +263,6 @@ function ComparisonSection() {
           ))}
         </div>
       </div>
-      <style>{`@media (max-width: 820px) { .comparison-table { grid-template-columns: 1fr !important; } }`}</style>
     </section>
   );
 }
@@ -257,7 +272,7 @@ function NewsletterMidSection() {
     <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '88px 0' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', margin: '0 0 14px', letterSpacing: '-0.01em' }}>
           Grow your readership.<br />Keep every reader.
         </h2>
         <p style={{ color: '#5a4a38', fontSize: '1.0625rem', marginBottom: 36, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.68 }}>
@@ -277,10 +292,10 @@ function FooterCTA() {
       {/* Glow */}
       <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', margin: '0 0 18px', letterSpacing: '-0.01em' }}>
           Your readers<br />are waiting.
         </h2>
-        <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
+        <p style={{ fontSize: '1.125rem', color: '#9a9080', margin: '0 auto 44px', maxWidth: 460, lineHeight: 1.7 }}>
           Every sale through a middleman is a reader you&apos;ll never reach again. Start free today and own everything you build.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
@@ -291,7 +306,7 @@ function FooterCTA() {
             Browse the bookstore
           </Link>
         </div>
-        <p style={{ fontSize: '0.8125rem', color: '#9a9080' }}>No credit card. No lock-in. No middleman.</p>
+        <p style={{ fontSize: '0.8125rem', color: '#9a9080', margin: 0 }}>No credit card. No lock-in. No middleman.</p>
       </div>
     </section>
   );

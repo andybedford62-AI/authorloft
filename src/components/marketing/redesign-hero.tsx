@@ -14,12 +14,15 @@ const C = {
   muted:       '#9a9080',
 };
 
+const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
+const SANS  = "var(--font-body, 'Inter', sans-serif)";
+
 function NavDropdown({ label, items }: { label: string; items: [string, string][] }) {
   const [open, setOpen] = useState(false);
   return (
     <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} style={{ position: 'relative' }}>
       <button type="button" onClick={() => setOpen((v) => !v)}
-        style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: '0.875rem', color: C.muted, fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 5, transition: 'color 0.2s' }}
+        style={{ padding: '8px 14px', fontFamily: SANS, fontSize: '0.875rem', color: C.muted, fontWeight: 500, cursor: 'pointer', background: 'none', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 5, transition: 'color 0.2s' }}
         onMouseOver={(e) => (e.currentTarget.style.color = C.text)}
         onMouseOut={(e) => (e.currentTarget.style.color = C.muted)}>
         {label} <span style={{ fontSize: 9, opacity: 0.7, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>▼</span>
@@ -71,7 +74,7 @@ export function RedesignHero({ isAuthor = false }: { isAuthor?: boolean }) {
         borderBottom: `1px solid ${C.border}`,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-          <Link href="/" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.4rem', fontWeight: 700, color: C.text, textDecoration: 'none', letterSpacing: '0.02em' }}>
+          <Link href="/" style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.4rem', fontWeight: 700, color: C.text, textDecoration: 'none', letterSpacing: '0.02em' }}>
             AuthorLoft
           </Link>
 
@@ -138,7 +141,7 @@ export function RedesignHero({ isAuthor = false }: { isAuthor?: boolean }) {
           </div>
 
           {/* Headline */}
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.8rem, 6vw, 5.25rem)', fontWeight: 700, lineHeight: 1.12, letterSpacing: '-0.01em', marginBottom: 28, fontStyle: 'italic', color: C.text }}>
+          <h1 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.8rem, 6vw, 5.25rem)', fontWeight: 700, lineHeight: 1.12, letterSpacing: '-0.01em', marginBottom: 28, fontStyle: 'italic', color: C.text }}>
             You wrote the book.<br />
             <span style={{ fontStyle: 'normal', color: C.accent }}>Own everything else.</span>
           </h1>
