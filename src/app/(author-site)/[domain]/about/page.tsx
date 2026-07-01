@@ -1,10 +1,12 @@
 import Image from "next/image";
-import { GraduationCap, Pin, BarChart2 } from "lucide-react";
+import { GraduationCap, Pin, BarChart2, Award } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getAuthorBadges } from "@/lib/badges";
+import { AuthorBadges } from "@/components/marketing/author-badges";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -41,6 +43,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const books = await getAuthorBooks(author.id);
+  const badges = author.showBadges ? await getAuthorBadges(author.id) : [];
 
   const authorName = author.displayName || author.name;
   const accentColor = author.accentColor || "#7B2D2D";
@@ -183,6 +186,17 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Achievement Badges */}
+            {badges.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Award className="h-4 w-4" style={{ color: accentColor }} />
+                  <h3 className="text-sm font-semibold text-gray-800">Achievements</h3>
+                </div>
+                <AuthorBadges badges={badges} accentColor={accentColor} />
               </div>
             )}
 

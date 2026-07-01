@@ -176,6 +176,7 @@ model Author {
   hideNextStepsChecklist        Boolean               @default(false) // paid-plan authors can dismiss the Next Steps card
   showInShowcase                Boolean               @default(false) // author has opted in to being shown on the marketing page showcase
   showcaseStyle                 String                @default("photo") // "photo" | "book" | "text" — controls what the showcase card displays
+  showBadges                    Boolean               @default(true) // author opt-out for public achievement badges (bookstore + author site)
   trialPlanId                   String? // plan ID for admin-assigned free trial
   trialPlan                     Plan?                 @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
   trialStartsAt                 DateTime? // when the trial began
@@ -939,6 +940,27 @@ model PlanFeatureConfig {
   id        String   @id @default("singleton")
   gates     Json     @default("{}")
   updatedAt DateTime @updatedAt
+}
+
+// ─── Achievement Badges ─────────────────────────────────────────────────────
+// Auto-calculated from author activity (books, sales, reviews, etc). No manual
+// application — Super Admin only controls which tiers are active and their
+// thresholds. Authors can opt out entirely via Author.showBadges.
+
+model BadgeDefinition {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. "books_5"
+  metric      String // "books" | "revenue" | "reviews" | "subscribers" | "affiliateSales" | "arcReviews" | "formats" | "bundles" | "courses" | "preorders"
+  label       String // "Growing Catalog"
+  description String?
+  icon        String   @default("Award") // lucide-react icon name
+  threshold   Int // author's metric value must be >= this to earn the badge
+  isActive    Boolean  @default(true) // Super Admin on/off switch
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([metric, isActive])
 }
 
 model StripeEvent {

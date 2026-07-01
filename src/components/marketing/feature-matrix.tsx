@@ -303,6 +303,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Achievement Badges",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Sales Dashboard",
           tiers: {
             FREE: "—",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe } from "lucide-react";
+import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
@@ -973,6 +973,83 @@ function ShowcaseToggle() {
   );
 }
 
+function BadgesToggle() {
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [saving,  setSaving]  = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    fetch("/api/admin/settings/badges")
+      .then((r) => r.json())
+      .then((d) => setEnabled(d.showBadges ?? true))
+      .catch(() => { setEnabled(true); });
+  }, []);
+
+  async function patch(showBadges: boolean) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/badges", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ showBadges }),
+      });
+      if (res.ok) {
+        setEnabled(showBadges);
+        toast("success", showBadges
+          ? "Your achievement badges will now show publicly."
+          : "Your achievement badges are now hidden.");
+      } else {
+        toast("error", "Could not update badge setting.");
+      }
+    } catch {
+      toast("error", "Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+        <Award className="h-4 w-4 text-gray-400" />
+        Achievement Badges
+      </h2>
+      <p className="text-xs text-gray-400">
+        Badges are earned automatically from your activity — books published, direct sales,
+        reviews, and more. They can appear on your Bookstore listing and author site.
+      </p>
+
+      <div className="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            {enabled ? "Badges visible" : "Badges hidden"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {enabled
+              ? "Any badges you've earned are shown publicly."
+              : "Your earned badges are hidden from public pages."}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={!!enabled}
+          disabled={saving || enabled === null}
+          onClick={() => patch(!enabled)}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+            enabled ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          {saving
+            ? <Loader2 className="h-3 w-3 animate-spin text-white absolute left-1/2 -translate-x-1/2" />
+            : <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+          }
+        </button>
+      </div>
+    </section>
+  );
+}
+
 // ── Account tab content ───────────────────────────────────────────────────────
 
 function AccountTab() {
@@ -1048,6 +1125,9 @@ function AccountTab() {
 
       {/* Marketing showcase opt-in */}
       <ShowcaseToggle />
+
+      {/* Achievement badges opt-in */}
+      <BadgesToggle />
 
       {/* Change password */}
       <section className="bg-white rounded-xl border border-gray-200 p-6">

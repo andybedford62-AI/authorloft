@@ -44,6 +44,7 @@ import {
   Download,
   SlidersHorizontal,
   Send,
+  Award,
   Layers,
   ListChecks,
   Package,
@@ -151,6 +152,7 @@ const SUPER_ADMIN_GROUPS: NavGroup[] = [
       { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard        },
       { href: "/super-admin/coupons",        label: "Coupons",       icon: Ticket            },
       { href: "/super-admin/feature-config", label: "Feature Gates", icon: SlidersHorizontal },
+      { href: "/super-admin/badges",         label: "Achievement Badges", icon: Award        },
     ],
   },
   {

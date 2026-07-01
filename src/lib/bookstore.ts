@@ -12,6 +12,7 @@ export type Spotlight = {
   bio: string;
   bookCount: number;
   sampleCovers: string[];
+  badges: import("@/lib/badges").EarnedBadge[];
 } | null;
 
 export type BookstoreData = {
@@ -73,6 +74,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
         isPreOrder: true,
         author: {
           select: {
+            id: true,
             slug: true,
             customDomain: true,
             displayName: true,
@@ -80,6 +82,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
             profileImageUrl: true,
             shortBio: true,
             bio: true,
+            showBadges: true,
             plan: { select: { tier: true } },
           },
         },
@@ -157,7 +160,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
   // ── Rotating author spotlight: authors with a photo + bio, picked by day ──
   const spotlightCandidates = new Map<
     string,
-    { name: string; url: string; image: string; bio: string; bookCount: number; sampleCovers: string[] }
+    { authorId: string; showBadges: boolean; name: string; url: string; image: string; bio: string; bookCount: number; sampleCovers: string[] }
   >();
   for (const b of rows) {
     const a = b.author;
@@ -171,6 +174,8 @@ export async function getBookstoreData(): Promise<BookstoreData> {
       if (b.coverImageUrl && entry.sampleCovers.length < 4) entry.sampleCovers.push(b.coverImageUrl);
     } else {
       spotlightCandidates.set(key, {
+        authorId: a.id,
+        showBadges: a.showBadges,
         name: a.displayName || a.name,
         url: getAuthorBaseUrl(a),
         image,
@@ -184,7 +189,10 @@ export async function getBookstoreData(): Promise<BookstoreData> {
   let spotlight: Spotlight = null;
   if (candidateList.length > 0) {
     const dayOfYear = Math.floor((now - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    spotlight = candidateList[dayOfYear % candidateList.length];
+    const picked = candidateList[dayOfYear % candidateList.length];
+    const { getAuthorBadges } = await import("@/lib/badges");
+    const badges = picked.showBadges ? await getAuthorBadges(picked.authorId) : [];
+    spotlight = { ...picked, badges };
   }
 
   return {

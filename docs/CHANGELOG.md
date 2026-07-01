@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## July 1, 2026
+
+- **Achievement Badges** — auto-calculated badges recognizing author milestones, included on all plans:
+  - **Schema:** `BadgeDefinition` (Super Admin-managed tiers per metric: books, revenue, reviews, subscribers, ARC reviews, affiliate sales, formats, bundles, courses, preorders) + `Author.showBadges` opt-out toggle. No manual/editorial badges — everything is computed live from real activity.
+  - **`lib/badges.ts`** — `getAuthorBadgeMetrics()` / `getAuthorBadges()` compute an author's metrics and resolve only their highest earned tier per metric (no clutter from lower tiers).
+  - **Super Admin** (`/super-admin/badges`) — enable/disable each badge tier and edit its threshold without a deploy. 16 starter badges seeded across 10 metrics.
+  - **Author Settings** — single "Show badges publicly" toggle (`/api/admin/settings/badges`), on by default.
+  - **Public display:** author-site About page (Achievements section) and the Bookstore's rotating Author Spotlight.
+  - **Marketing:** added "Achievement Badges" to the Features page comparison matrix and all three Plan `featuresJson` records, plus the Pricing page comparison table — included on Free, Standard, and Premium.
+
 ## June 28, 2026
 
 - **FREE plan eBook sales** — free-tier authors can now sell eBooks directly via Stripe (previously STANDARD+ only):

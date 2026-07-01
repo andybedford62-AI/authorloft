@@ -113,6 +113,7 @@ const COMPARISON_ROWS = [
   { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
   { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
+  { label: "Achievement Badges", free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Contact form",       free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Support Community",  free: "Community", standard: "Priority",   premium: "Priority"   },
 ];

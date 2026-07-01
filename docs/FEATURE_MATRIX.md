@@ -82,6 +82,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Testimonials Display** (social proof on site) | ✅ | ✅ | ✅ |
 | **AuthorLoft Bookstore** (list books in public discovery catalog at /bookstore) | ✅ | ✅ | ✅ (Featured placement) |
 | — **Bookstore Search & Discovery** (prominent search, featured section, genre browse) | ✅ | ✅ | ✅ (Featured ribbon + visibility priority) |
+| **Achievement Badges** (auto-calculated from books/sales/reviews/etc.; shown on Bookstore spotlight + author-site About page; author opt-out toggle in Settings) | ✅ | ✅ | ✅ |
 
 ---
 
@@ -171,6 +172,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Social Images (OG)** | Live | Per-page OG image override for home/blog/features/pricing/contact/resources |
 | **Platform Settings** | Live | Logo, description, contact emails, testimonials, maintenance mode, AI cap |
 | **Feature Gates** | Live | Toggle feature access per tier from Super Admin UI |
+| **Achievement Badges Manager** | Live | Enable/disable badge tiers and edit thresholds per metric; no manual/editorial badges |
 | **ARC Management** | Live | Advance Review Copy requests, per-book |
 | **Bookstore Management** | Live | Genre management, bookstore opt-in per book, featured placement |
 | **Billing & Subscriptions** | Live | View active subscriptions, manage Stripe integration |

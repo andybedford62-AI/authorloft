@@ -179,6 +179,19 @@ export default async function BookstorePage() {
                     {spotlight.bookCount} book{spotlight.bookCount !== 1 ? "s" : ""} in the bookstore
                   </p>
                   <p className="text-sm text-[#D4DDEB] leading-relaxed max-w-2xl">{spotlight.bio}</p>
+                  {spotlight.badges.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">
+                      {spotlight.badges.map((badge) => (
+                        <span
+                          key={badge.key}
+                          title={badge.description ?? badge.label}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-[#D4AE6A]/40 bg-[#D4AE6A]/10 text-[#D4AE6A]"
+                        >
+                          {badge.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <a
                     href={spotlight.url}
                     className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#D4AE6A] hover:gap-2.5 transition-all"
