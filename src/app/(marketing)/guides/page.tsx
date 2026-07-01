@@ -31,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // Pillars appear in this order; any category not listed here is appended after, alphabetically.
 const PILLAR_ORDER = [
+  "Getting Started",
   "Author Websites",
   "Direct Sales",
   "Email Marketing",
