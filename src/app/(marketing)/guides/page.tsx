@@ -105,7 +105,7 @@ export default async function GuidesIndexPage() {
               <a
                 key={pillar}
                 href={`#${pillar.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                className="text-xs font-mono uppercase tracking-wider text-[#9b8e7e] bg-white/60 px-3 py-1.5 rounded-full border border-[#DCDBD3] hover:text-[#C26A4A] hover:border-[#C26A4A]/40 transition-colors"
+                className="text-xs font-mono uppercase tracking-wider text-[#E8E5DD] bg-[#1B2B47] px-3 py-1.5 rounded-full border border-[#1B2B47] hover:bg-[#C26A4A] hover:border-[#C26A4A] transition-colors"
               >
                 {pillar}
               </a>
