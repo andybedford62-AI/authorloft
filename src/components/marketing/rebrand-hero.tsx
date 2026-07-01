@@ -236,7 +236,7 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
           ]} />
           <Link href="/faq" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: ML.bone, opacity: 0.85, borderRadius: 999, textDecoration: 'none' }}>FAQ</Link>
           <HeroNavDropdown label="Resources" items={[
-            ['/guides',    'Author Guides'],
+            ['/guides',    'Learn'],
             ['/blog',      'Blog'],
             ['/news',      'News'],
             ['/resources', 'Tools & Communities'],

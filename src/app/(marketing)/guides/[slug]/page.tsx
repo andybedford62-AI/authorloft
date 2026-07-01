@@ -99,7 +99,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
-      { "@type": "ListItem", position: 2, name: "Guides", item: `${BASE}/guides` },
+      { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/guides` },
       { "@type": "ListItem", position: 3, name: guide.title, item: `${BASE}/guides/${guide.slug}` },
     ],
   };
@@ -122,7 +122,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         {/* Breadcrumb */}
         <Link href="/guides" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to Guides
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to Learn
         </Link>
 
         {/* Category */}

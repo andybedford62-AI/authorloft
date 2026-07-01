@@ -74,14 +74,14 @@ export default async function GuidesIndexPage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
-      { "@type": "ListItem", position: 2, name: "Guides", item: `${BASE}/guides` },
+      { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/guides` },
     ],
   };
 
   const collectionLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Author Guides",
+    name: "Learn",
     description: "In-depth guides on author websites, direct book sales, newsletters, ARCs, branding, and everything independent authors need to succeed.",
     url: `${BASE}/guides`,
     isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: BASE },
@@ -92,7 +92,7 @@ export default async function GuidesIndexPage() {
       <MarketingNav />
 
       <MarketingPageHeader
-        eyebrow="Author Guides"
+        eyebrow="Learn"
         title={<>Learn to own <span className="italic text-[#D4AE6A]">your author business</span></>}
         subtitle="In-depth guides covering everything independent authors need — from building your website to selling direct and growing your audience."
       />

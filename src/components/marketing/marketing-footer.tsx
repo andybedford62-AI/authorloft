@@ -9,7 +9,7 @@ const NAV_LINKS: [string, string][] = [
   ["Pricing", "/pricing"],
   ["Blog", "/blog"],
   ["News", "/news"],
-  ["Guides", "/guides"],
+  ["Learn", "/guides"],
   ["Resources", "/resources"],
   ["FAQ", "/faq"],
   ["Contact", "/contact"],

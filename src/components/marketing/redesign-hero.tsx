@@ -98,7 +98,7 @@ export function RedesignHero({ isAuthor = false }: { isAuthor?: boolean }) {
             <Link href="/faq" style={{ color: C.muted, textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500, padding: '8px 14px', transition: 'color 0.2s' }}
               onMouseOver={(e) => (e.currentTarget.style.color = C.text)} onMouseOut={(e) => (e.currentTarget.style.color = C.muted)}>FAQ</Link>
             <NavDropdown label="Resources" items={[
-              ['/guides',    'Author Guides'],
+              ['/guides',    'Learn'],
               ['/blog',      'Blog'],
               ['/news',      'News'],
               ['/resources', 'Tools & Communities'],
