@@ -29,6 +29,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// Pillars appear in this order; any category not listed here is appended after, alphabetically.
+const PILLAR_ORDER = [
+  "Author Websites",
+  "Direct Sales",
+  "Email Marketing",
+  "Book Marketing",
+  "Author Platform",
+  "Self-Publishing",
+];
+
 export default async function GuidesIndexPage() {
   const guides = await prisma.guide.findMany({
     where: { isPublished: true },
@@ -37,6 +47,22 @@ export default async function GuidesIndexPage() {
   }).catch(() => []);
 
   const categories = [...new Set(guides.map((g) => g.category).filter(Boolean))];
+
+  const pillars = [...categories].sort((a, b) => {
+    const ai = PILLAR_ORDER.indexOf(a);
+    const bi = PILLAR_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  const guidesByPillar = pillars.map((pillar) => ({
+    pillar,
+    items: guides.filter((g) => g.category === pillar),
+  }));
+
+  const uncategorized = guides.filter((g) => !g.category);
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -67,13 +93,17 @@ export default async function GuidesIndexPage() {
       />
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 20px 96px" }}>
-        {/* Category filter pills */}
-        {categories.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((cat) => (
-              <span key={cat} className="text-xs font-mono uppercase tracking-wider text-[#9b8e7e] bg-white/60 px-3 py-1.5 rounded-full border border-[#DCDBD3]">
-                {cat}
-              </span>
+        {/* Jump-to pillar nav */}
+        {pillars.length > 1 && (
+          <div className="flex flex-wrap gap-2 mb-14">
+            {pillars.map((pillar) => (
+              <a
+                key={pillar}
+                href={`#${pillar.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                className="text-xs font-mono uppercase tracking-wider text-[#9b8e7e] bg-white/60 px-3 py-1.5 rounded-full border border-[#DCDBD3] hover:text-[#C26A4A] hover:border-[#C26A4A]/40 transition-colors"
+              >
+                {pillar}
+              </a>
             ))}
           </div>
         )}
@@ -83,35 +113,32 @@ export default async function GuidesIndexPage() {
             <p className="text-lg text-[#9b8e7e]">Guides coming soon. Check back shortly!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {guides.map((guide) => (
-              <Link
-                key={guide.id}
-                href={`/guides/${guide.slug}`}
-                className="group bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden hover:shadow-lg hover:border-[#C26A4A]/40 transition-all"
-              >
-                {guide.coverImageUrl && (
-                  <div className="h-44 bg-[#F0EDE4] overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={guide.coverImageUrl} alt={guide.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                )}
-                <div className="p-5">
-                  {guide.category && (
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#C26A4A] mb-2 block">{guide.category}</span>
-                  )}
-                  <h2 className="font-serif text-xl text-[#1B2B47] font-normal mb-2 group-hover:text-[#C26A4A] transition-colors leading-snug">
-                    {guide.title}
-                  </h2>
-                  {guide.excerpt && (
-                    <p className="text-sm text-[#5C6E89] leading-relaxed line-clamp-3">{guide.excerpt}</p>
-                  )}
-                  <span className="inline-flex items-center gap-1 text-sm text-[#C26A4A] font-medium mt-3">
-                    Read guide <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </span>
+          <div className="space-y-16">
+            {guidesByPillar.map(({ pillar, items }) => (
+              <div key={pillar} id={pillar.toLowerCase().replace(/[^a-z0-9]+/g, "-")} className="scroll-mt-24">
+                <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-6 pb-3 border-b border-[#DCDBD3]">
+                  {pillar}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {items.map((guide) => (
+                    <GuideCard key={guide.id} guide={guide} />
+                  ))}
                 </div>
-              </Link>
+              </div>
             ))}
+
+            {uncategorized.length > 0 && (
+              <div>
+                <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-6 pb-3 border-b border-[#DCDBD3]">
+                  More Guides
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {uncategorized.map((guide) => (
+                    <GuideCard key={guide.id} guide={guide} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -136,5 +163,37 @@ export default async function GuidesIndexPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }} />
     </div>
+  );
+}
+
+type GuideCardData = { id: string; title: string; slug: string; excerpt: string; coverImageUrl: string | null; category: string };
+
+function GuideCard({ guide }: { guide: GuideCardData }) {
+  return (
+    <Link
+      href={`/guides/${guide.slug}`}
+      className="group bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden hover:shadow-lg hover:border-[#C26A4A]/40 transition-all"
+    >
+      {guide.coverImageUrl && (
+        <div className="h-44 bg-[#F0EDE4] overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={guide.coverImageUrl} alt={guide.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        </div>
+      )}
+      <div className="p-5">
+        {guide.category && (
+          <span className="text-[10px] font-mono uppercase tracking-widest text-[#C26A4A] mb-2 block">{guide.category}</span>
+        )}
+        <h3 className="font-serif text-xl text-[#1B2B47] font-normal mb-2 group-hover:text-[#C26A4A] transition-colors leading-snug">
+          {guide.title}
+        </h3>
+        {guide.excerpt && (
+          <p className="text-sm text-[#5C6E89] leading-relaxed line-clamp-3">{guide.excerpt}</p>
+        )}
+        <span className="inline-flex items-center gap-1 text-sm text-[#C26A4A] font-medium mt-3">
+          Read guide <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </span>
+      </div>
+    </Link>
   );
 }

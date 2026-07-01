@@ -25,7 +25,7 @@ const SOLUTIONS: [string, string][] = [
 ];
 
 const RESOURCES: [string, string][] = [
-  ["/guides", "Author Guides"],
+  ["/guides", "Learn"],
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/resources", "Tools & Communities"],
