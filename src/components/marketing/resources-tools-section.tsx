@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Star } from "lucide-react";
+import { ArrowUpRight, Star, Search } from "lucide-react";
+import { MarketingFilterToolbar } from "./marketing-filter-toolbar";
 
 type Resource = {
   id: string;
@@ -39,44 +40,51 @@ export function ResourcesToolsSection({
   resources: Resource[];
   categories: string[];
 }) {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState("");
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return resources;
+    return resources.filter((r) => [r.name, r.description, r.category].join(" ").toLowerCase().includes(q));
+  }, [resources, query]);
 
   const visibleCategories = activeCategory ? [activeCategory] : categories;
+  const resultCount = filtered.filter((r) => !activeCategory || r.category === activeCategory).length;
 
   return (
     <div>
-      {/* Underline tab filter — dark-adapted */}
-      {categories.length > 1 && (
-        <div
-          className="flex flex-wrap gap-x-7 gap-y-1 mb-10"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}
-        >
-          {[{ key: null, label: "All" }, ...categories.map((c) => ({ key: c, label: c }))].map(({ key, label }) => {
-            const active = key === activeCategory;
-            return (
-              <button
-                key={key ?? "__all__"}
-                type="button"
-                onClick={() => setActiveCategory(key)}
-                className="relative pb-3.5 text-sm font-semibold transition-colors"
-                style={{ color: active ? ML.bone : "rgba(255,255,255,0.5)", background: "none", border: "none", cursor: "pointer", padding: "0 0 14px" }}
-                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.8)"; }}
-                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.5)"; }}
-              >
-                {label}
-                <span
-                  className={`absolute left-0 right-0 -bottom-px h-0.5 origin-left transition-transform duration-200 ${active ? "scale-x-100" : "scale-x-0"}`}
-                  style={{ background: ML.brass2 }}
-                />
-              </button>
-            );
-          })}
+      <MarketingFilterToolbar
+        variant="dark"
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search tools & communities"
+        resultCount={resultCount}
+        totalCount={resources.length}
+        itemLabel="listings"
+      />
+
+      {resultCount === 0 && resources.length > 0 && (
+        <div className="text-center py-16">
+          <Search className="h-10 w-10 mx-auto mb-4" style={{ color: `${ML.brass2}66` }} />
+          <p style={{ fontFamily: "Georgia, serif", color: "rgba(255,255,255,0.5)" }}>No listings match your filters.</p>
+          <button
+            type="button"
+            onClick={() => { setActiveCategory(""); setQuery(""); }}
+            className="mt-4 text-sm font-semibold"
+            style={{ color: ML.brass2 }}
+          >
+            Clear filters
+          </button>
         </div>
       )}
 
       {/* Category groups */}
       {visibleCategories.map((category) => {
-        const items = resources.filter((r) => r.category === category);
+        const items = filtered.filter((r) => r.category === category);
         if (items.length === 0) return null;
         const cm = catMeta(category);
         return (

@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Search, ChevronDown, ArrowRight, BookOpen, Feather, Mail, Home, PenLine,
+  Search, ArrowRight, BookOpen, Feather, Mail, Home, PenLine,
   ShoppingBag, User, Library, BookMarked, Bell, type LucideIcon,
 } from "lucide-react";
 import type { FilterablePost } from "./use-post-filters";
+import { MarketingFilterToolbar } from "./marketing-filter-toolbar";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "author tools": PenLine,
@@ -128,72 +129,20 @@ export function BlogIndex({ posts }: { posts: FilterablePost[] }) {
 
   return (
     <div>
-      {/* Category tabs */}
-      <div className="flex flex-wrap gap-x-7 gap-y-1 border-b border-[#DCDBD3]">
-        <button
-          type="button"
-          onClick={() => setCategory("")}
-          className={`relative pb-3.5 text-sm font-semibold transition-colors ${
-            category === "" ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
-          }`}
-        >
-          All
-          <span
-            className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
-              category === "" ? "scale-x-100" : "scale-x-0"
-            }`}
-          />
-        </button>
-        {categories.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setCategory(c)}
-            className={`relative pb-3.5 text-sm font-semibold transition-colors ${
-              category === c ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
-            }`}
-          >
-            {c}
-            <span
-              className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
-                category === c ? "scale-x-100" : "scale-x-0"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-5 mt-5">
-        <p className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#5C6E89]">
-          Showing {filtered.length} of {posts.length}{category ? ` in ${category}` : ""}
-        </p>
-        <div className="flex items-center gap-3 flex-wrap">
-          <label className="flex items-center gap-2 border-b-[1.5px] border-[#DCDBD3] focus-within:border-[#D4AE6A] py-1.5 min-w-[220px] transition-colors">
-            <Search className="h-4 w-4 text-[#5C6E89]" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search articles"
-              aria-label="Search articles"
-              className="border-none outline-none bg-transparent text-sm w-full placeholder:text-[#5C6E89]"
-            />
-          </label>
-          <div className="relative">
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              aria-label="Sort articles"
-              className="appearance-none text-sm font-medium text-[#1B2B47] bg-white border border-[#DCDBD3] rounded-full pl-4 pr-9 py-2 cursor-pointer hover:border-[#D4AE6A] transition-colors"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>{o.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5C6E89] pointer-events-none" />
-          </div>
-        </div>
-      </div>
+      <MarketingFilterToolbar
+        categories={categories}
+        activeCategory={category}
+        onCategoryChange={setCategory}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search articles"
+        sortOptions={SORT_OPTIONS}
+        sortValue={sort}
+        onSortChange={(v) => setSort(v as SortKey)}
+        resultCount={filtered.length}
+        totalCount={posts.length}
+        itemLabel="articles"
+      />
 
       {/* Card grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-9 gap-y-11 mt-8">

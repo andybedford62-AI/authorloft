@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   HelpCircle, CreditCard, BookOpen, Rocket, User, Settings,
-  Mail, Globe, ShoppingBag, Megaphone, BookMarked, Feather,
+  Mail, Globe, ShoppingBag, Megaphone, BookMarked, Feather, Search,
   type LucideIcon,
 } from "lucide-react";
+import { MarketingFilterToolbar } from "./marketing-filter-toolbar";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "getting-started":  Rocket,
@@ -38,7 +39,26 @@ export type FaqGroup = {
 
 export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
   const [openId, setOpenId] = useState<string | null>(groups[0]?.items[0]?.id ?? null);
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const [activeName, setActiveName] = useState("");
+  const [query, setQuery] = useState("");
+
+  const totalCount = useMemo(() => groups.reduce((n, g) => n + g.items.length, 0), [groups]);
+  const categoryNames = useMemo(() => groups.map((g) => g.name), [groups]);
+
+  const visibleGroups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return groups
+      .filter((g) => !activeName || g.name === activeName)
+      .map((g) => ({
+        ...g,
+        items: q
+          ? g.items.filter((i) => (i.question + " " + i.answer).toLowerCase().includes(q))
+          : g.items,
+      }))
+      .filter((g) => g.items.length > 0);
+  }, [groups, activeName, query]);
+
+  const resultCount = useMemo(() => visibleGroups.reduce((n, g) => n + g.items.length, 0), [visibleGroups]);
 
   if (groups.length === 0) {
     return (
@@ -48,39 +68,34 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
     );
   }
 
-  const visibleGroups = activeSlug ? groups.filter((g) => g.slug === activeSlug) : groups;
-
   return (
     <div>
-      {/* Category filter tabs — underline style matching the blog */}
-      {groups.length > 1 && (
-        <div className="flex flex-wrap gap-x-7 gap-y-1 border-b border-[#DCDBD3] mb-10">
-          {[{ slug: null, name: "All" }, ...groups.map((g) => ({ slug: g.slug, name: g.name }))].map(({ slug, name }) => {
-            const active = slug === activeSlug;
-            return (
-              <button
-                key={slug ?? "__all__"}
-                type="button"
-                onClick={() => {
-                  setActiveSlug(slug);
-                  setOpenId(null);
-                }}
-                className={`relative pb-3.5 text-sm font-semibold transition-colors ${
-                  active ? "text-[#1B2B47]" : "text-[#5C6E89] hover:text-[#1B2B47]"
-                }`}
-              >
-                {name}
-                <span
-                  className={`absolute left-0 right-0 -bottom-px h-0.5 bg-[#D4AE6A] origin-left transition-transform duration-200 ${
-                    active ? "scale-x-100" : "scale-x-0"
-                  }`}
-                />
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <MarketingFilterToolbar
+        categories={categoryNames}
+        activeCategory={activeName}
+        onCategoryChange={(c) => { setActiveName(c); setOpenId(null); }}
+        search={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search FAQs"
+        resultCount={resultCount}
+        totalCount={totalCount}
+        itemLabel="questions"
+      />
 
+      {visibleGroups.length === 0 ? (
+        <div className="text-center py-18">
+          <Search className="h-10 w-10 text-[#D4AE6A]/40 mx-auto mb-4" />
+          <h3 className="font-serif text-2xl text-[#1B2B47] mb-2">No questions found</h3>
+          <p className="text-sm text-[#5C6E89] mb-4">Try a different category or clear your search.</p>
+          <button
+            type="button"
+            onClick={() => { setActiveName(""); setQuery(""); }}
+            className="border border-[#D4AE6A] text-[#B8893D] text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#D4AE6A]/10 transition-colors"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {visibleGroups.map((group) => {
           const Icon = getCategoryIcon(group.slug);
@@ -142,6 +157,7 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
           );
         })}
       </div>
+      )}
     </div>
   );
 }
