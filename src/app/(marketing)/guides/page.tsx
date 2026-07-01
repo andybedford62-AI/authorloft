@@ -33,11 +33,15 @@ export async function generateMetadata(): Promise<Metadata> {
 const PILLAR_ORDER = [
   "Getting Started",
   "Author Websites",
+  "Book Marketing",
   "Direct Sales",
   "Email Marketing",
-  "Book Marketing",
+  "ARC Management",
+  "SEO for Authors",
+  "AI for Authors",
   "Author Platform",
   "Self-Publishing",
+  "Comparisons",
 ];
 
 export default async function GuidesIndexPage() {
