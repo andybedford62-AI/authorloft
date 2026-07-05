@@ -192,7 +192,21 @@ function HeroNavDropdown({ label, items }: { label: string; items: [string, stri
   );
 }
 
-export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
+export function RebelHero({
+  isAuthor = false,
+  headlineLine1,
+  headlineLine2,
+  subheadline,
+}: {
+  isAuthor?: boolean;
+  headlineLine1?: string | null;
+  headlineLine2?: string | null;
+  subheadline?: string | null;
+}) {
+  const line1 = headlineLine1 || "They sell your book. They keep your reader.";
+  const line2 = headlineLine2 || "Take both back.";
+  const sub    = subheadline || "Every sale through a retailer is a reader you’ll never know, never email, never sell to again. AuthorLoft gives you your own storefront, your own list, and 100% of every dollar.";
+
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
       <style>{`
@@ -267,8 +281,8 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
         <div style={{ color: ML.bone }}>
           {/* Headline */}
           <h1 style={{ fontFamily: 'var(--font-heading, serif)', fontWeight: 400, fontSize: 'clamp(32px, 4.5vw, 68px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
-            <span style={{ display: 'block' }}>They sell your book. They keep your reader.</span>
-            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>Take both back.</span>
+            <span style={{ display: 'block' }}>{line1}</span>
+            <span style={{ display: 'block', color: ML.brass2, fontStyle: 'italic' }}>{line2}</span>
           </h1>
 
           {/* Mantra strip */}
@@ -281,7 +295,7 @@ export function RebelHero({ isAuthor = false }: { isAuthor?: boolean }) {
           </div>
 
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, lineHeight: 1.6, color: ML.bone, opacity: 0.85, margin: '0 0 32px', maxWidth: 460, animation: 'rbFadeUp 0.7s 0.25s ease both' }}>
-            Every sale through a retailer is a reader you&apos;ll never know, never email, never sell to again. AuthorLoft gives you your own storefront, your own list, and 100% of every dollar.
+            {sub}
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>

@@ -180,9 +180,13 @@ const howToLd = {
 
 export default async function HomePage() {
   await cookies();
-  const [plans, testimonials, showcaseAuthors, faqData, session] = await Promise.all([
+  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings] = await Promise.all([
     getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
     getServerSession(authOptions),
+    prisma.platformSettings.findUnique({
+      where: { id: "singleton" },
+      select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
+    }).catch(() => null),
   ]);
 
   let isAuthor = false;
@@ -214,7 +218,12 @@ export default async function HomePage() {
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       {/* ── Hero (with nav) ───────────────────────────────────────────── */}
-      <RebelHero isAuthor={isAuthor} />
+      <RebelHero
+        isAuthor={isAuthor}
+        headlineLine1={heroSettings?.heroHeadlineLine1}
+        headlineLine2={heroSettings?.heroHeadlineLine2}
+        subheadline={heroSettings?.heroSubheadline}
+      />
 
       {/* ── Divider ───────────────────────────────────────────────────── */}
       <hr style={{ border: 'none', borderTop: `1px solid ${C.border}` }} />

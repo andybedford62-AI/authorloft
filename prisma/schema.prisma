@@ -927,6 +927,9 @@ model PlatformSettings {
   termsUpdatedAt        DateTime?
   contactEmail          String?
   marketingHeroImageUrl String?
+  heroHeadlineLine1     String?   @db.Text
+  heroHeadlineLine2     String?   @db.Text
+  heroSubheadline       String?   @db.Text
   socialLinks           Json      @default("[]")
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt

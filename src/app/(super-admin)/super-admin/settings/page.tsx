@@ -33,7 +33,7 @@ export default async function SuperAdminSettingsPage() {
       where:  { id: "singleton" },
       create: { id: "singleton" },
       update: {},
-      select: { marketingHeroImageUrl: true },
+      select: { marketingHeroImageUrl: true, heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
     }),
     prisma.supportEmail.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
     prisma.testimonial.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
@@ -80,6 +80,9 @@ export default async function SuperAdminSettingsPage() {
         signupNotificationEmail={systemConfig.signupNotificationEmail}
         defaultAiUsageCap={systemConfig.defaultAiUsageCap}
         marketingHeroImageUrl={platformSettings.marketingHeroImageUrl ?? null}
+        heroHeadlineLine1={platformSettings.heroHeadlineLine1 ?? null}
+        heroHeadlineLine2={platformSettings.heroHeadlineLine2 ?? null}
+        heroSubheadline={platformSettings.heroSubheadline ?? null}
         supportEmails={supportEmails}
         testimonials={testimonials}
         welcomeEmailSubject={systemConfig.welcomeEmailSubject}

@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## July 5, 2026
+
+- **Homepage hero copy — Super Admin editable** — Platform Settings → Marketing tab now has a "Homepage Hero Copy" panel to edit the hero's H1 headline (2 lines) and subheadline paragraph without a code deploy.
+  - **Schema:** `PlatformSettings.heroHeadlineLine1` / `heroHeadlineLine2` / `heroSubheadline` (nullable text, singleton row).
+  - **API:** `GET/PATCH /api/super-admin/marketing/hero-copy` — blank field reverts to the default AuthorLoft copy.
+  - **Homepage:** `RebelHero` (`components/marketing/rebrand-hero.tsx`) accepts optional overrides, falling back to the existing hardcoded copy.
+
 ## July 1, 2026
 
 - **Achievement Badges** — auto-calculated badges recognizing author milestones, included on all plans:
