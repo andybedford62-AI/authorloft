@@ -19,6 +19,8 @@ line rather than listing every commit.
   - **Schema:** `PlatformSettings.heroHeadlineLine1` / `heroHeadlineLine2` / `heroSubheadline` (nullable text, singleton row).
   - **API:** `GET/PATCH /api/super-admin/marketing/hero-copy` — blank field reverts to the default AuthorLoft copy.
   - **Homepage:** `RebelHero` (`components/marketing/rebrand-hero.tsx`) accepts optional overrides, falling back to the existing hardcoded copy.
+- **Homepage font consistency** — homepage section headings referenced `'Cormorant Garamond'`, which was never loaded (only Inter + Playfair Display are), so they silently fell back to Georgia while hero/pricing/testimonials rendered in Playfair. Repointed all 7 references to `var(--font-heading)` so every heading uses the same loaded serif.
+- **Cleanup** — removed dead/unused files: `redesign-hero.tsx` (orphaned component), `page.backup.tsx` (stale homepage backup); untracked `tsconfig.tsbuildinfo` (build artifact, already in `.gitignore`); deleted scratch files `newHomePage06292026/` and `pricing_page_snapshot.md`.
 
 ## July 1, 2026
 

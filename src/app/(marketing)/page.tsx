@@ -253,7 +253,7 @@ export default async function HomePage() {
       <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
             Start free. Scale when you&apos;re ready.
           </h2>
           <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
@@ -289,7 +289,7 @@ function ProblemStrip() {
           {items.map((item, i) => (
             <div key={i} style={{ textAlign: 'center', padding: '24px 32px', borderRight: i < items.length - 1 ? '1px solid #2a4268' : 'none' }}>
               <span style={{ fontSize: '1.75rem', marginBottom: 14, display: 'block' }}>{item.icon}</span>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
               <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65 }}>{item.desc}</p>
             </div>
           ))}
@@ -310,7 +310,7 @@ function PillarsSection() {
     <section style={{ padding: '88px 0', textAlign: 'center', background: '#0d1520' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The solution</p>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
           One platform.<br />Everything you own.
         </h2>
         <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto 52px', lineHeight: 1.72 }}>
@@ -320,8 +320,8 @@ function PillarsSection() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}>
           {pillars.map((p) => (
             <div key={p.num} style={{ background: '#1c2e48', padding: '40px 32px' }}>
-              <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
+              <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
               <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65 }}>{p.desc}</p>
             </div>
           ))}
@@ -385,7 +385,7 @@ function NewsletterMidSection() {
     <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '88px 0' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
           Grow your readership.<br />Keep every reader.
         </h2>
         <p style={{ color: '#5a4a38', fontSize: '1.0625rem', marginBottom: 36, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.68 }}>
@@ -405,7 +405,7 @@ function FooterCTA() {
       {/* Glow */}
       <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
           Your readers<br />are waiting.
         </h2>
         <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
