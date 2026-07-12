@@ -372,6 +372,7 @@ model Book {
   preOrderSignups            PreOrderSignup[]
   affiliateReferrals         AffiliateReferral[]
   magnetLeads                BookMagnetLead[]
+  formatJobs                 BookFormatJob[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -414,6 +415,28 @@ model BookDirectSaleItem {
   bundleItems    BundleItem[]
 
   @@index([bookId])
+}
+
+// ─── Book Format Jobs (Auto-Formatter: DOCX → ePUB) ───────────────────────────
+
+model BookFormatJob {
+  id            String   @id @default(cuid())
+  bookId        String
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  authorId      String
+  sourceFileKey String // uploaded .docx in Supabase Storage
+  sourceName    String
+  status        String   @default("PENDING") // PENDING | CONVERTING | DONE | FAILED
+  errorMessage  String?
+  chapterCount  Int?
+  wordCount     Int?
+  epubFileKey   String? // converted .epub in Supabase Storage
+  epubFileName  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([authorId])
 }
 
 // ─── Book Audio Tracks ────────────────────────────────────────────────────────

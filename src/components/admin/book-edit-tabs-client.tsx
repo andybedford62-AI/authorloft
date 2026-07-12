@@ -14,6 +14,7 @@ import { ArcTab } from "@/components/admin/books/arc-tab";
 import { PreOrderSignups } from "@/components/admin/preorder-signups";
 import { AffiliateSettings } from "@/components/admin/affiliate-settings";
 import { BookQRCode } from "@/components/admin/book-qr-code";
+import { BookAutoFormatter } from "@/components/admin/book-auto-formatter";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -70,7 +71,7 @@ type Props = {
   publicBaseUrl: string;
 };
 
-type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "affiliate" | "media" | "reviews" | "excerpt" | "arcs";
+type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "affiliate" | "media" | "format" | "reviews" | "excerpt" | "arcs";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "details",       label: "Details" },
@@ -79,6 +80,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "direct-sales",  label: "Direct Sales" },
   { id: "affiliate",     label: "Affiliate" },
   { id: "media",         label: "Media" },
+  { id: "format",        label: "Format" },
   { id: "reviews",       label: "Reviews" },
   { id: "excerpt",       label: "Excerpt" },
   { id: "arcs",          label: "ARC" },
@@ -186,6 +188,12 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         <div className="max-w-3xl space-y-6">
           <BookPreviewMedia bookId={book.id} initial={previewMedia} />
           <BookAudioTracks bookId={book.id} audioEnabled={audioEnabled} />
+        </div>
+      )}
+
+      {activeTab === "format" && (
+        <div className="max-w-3xl">
+          <BookAutoFormatter bookId={book.id} />
         </div>
       )}
 
