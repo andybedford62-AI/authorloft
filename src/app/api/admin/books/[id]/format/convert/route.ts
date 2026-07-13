@@ -31,7 +31,10 @@ function splitIntoChapters(html: string): ChapterHtml[] {
 
     if (match) {
       const title = match[1].replace(/<[^>]+>/g, "").trim() || `Chapter ${chapters.length + 1}`;
-      chapters.push({ title, content: part });
+      // Strip the <h1> itself from the content — epub-gen-memory re-renders `title` as
+      // its own <h1> (prependChapterTitles), so leaving it in here doubles the heading.
+      const content = part.slice(match.index! + match[0].length);
+      chapters.push({ title, content });
     } else {
       // Text before the first Heading 1 (title page, dedication, etc.)
       chapters.push({ title: "Front Matter", content: part });
