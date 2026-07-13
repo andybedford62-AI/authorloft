@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import mammoth from "mammoth";
 import epub from "epub-gen-memory";
-import JSZip from "jszip";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
 import { getSupabaseSignedUrl, uploadToSupabaseStorage } from "@/lib/supabase-storage";
@@ -54,33 +53,6 @@ function countWords(html: string): number {
   return text.split(/\s+/).length;
 }
 
-/**
- * epub-gen-memory's EPUB3 output declares the cover only via the legacy
- * <meta name="cover"> tag, without the EPUB3-required properties="cover-image"
- * manifest attribute. Most modern readers (Apple Books, Kindle's library
- * thumbnail) need that attribute to recognize the cover — without it the
- * image doesn't render as a cover at all, even though it's embedded in the
- * file. Patch it into content.opf after generation rather than relying on
- * the library's (currently broken) built-in cover handling.
- */
-async function patchCoverManifestProperty(epubBuffer: Buffer): Promise<Buffer> {
-  const zip = await JSZip.loadAsync(epubBuffer);
-  const opfFile = zip.file("OEBPS/content.opf");
-  if (!opfFile) return epubBuffer; // no cover, or unexpected layout — leave as-is
-
-  const opfXml = await opfFile.async("string");
-  if (!opfXml.includes('id="image_cover"') || opfXml.includes("cover-image")) {
-    return epubBuffer; // no cover item, or already patched
-  }
-
-  const patched = opfXml.replace(
-    /(<item id="image_cover"[^>]*?)\s*\/>/,
-    '$1 properties="cover-image" />'
-  );
-  zip.file("OEBPS/content.opf", patched);
-  return zip.generateAsync({ type: "nodebuffer" });
-}
-
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -127,13 +99,15 @@ export async function POST(
     const wordCount = countWords(html);
     const authorName = book.author.displayName || book.author.name;
 
-    // HTML chapters -> .epub buffer (EPUB3), then patch the cover manifest item —
-    // see patchCoverManifestProperty() for why.
-    const rawEpubBuffer = await epub(
-      { title: book.title, author: authorName, cover: book.coverImageUrl || undefined },
+    // HTML chapters -> .epub buffer
+    // version: 2 — epub-gen-memory's EPUB3 output declares the cover only via the legacy
+    // <meta name="cover"> tag without the EPUB3 `properties="cover-image"` manifest
+    // attribute, so Kindle's library thumbnail can't find it. EPUB2's cover convention is
+    // exactly what it already writes, and we don't use any EPUB3-only features.
+    const epubBuffer = await epub(
+      { title: book.title, author: authorName, cover: book.coverImageUrl || undefined, version: 2 },
       chapters
     );
-    const epubBuffer = await patchCoverManifestProperty(rawEpubBuffer);
 
     const epubKey = `${authorId}/manuscripts/${bookId}/${Date.now()}-converted.epub`;
     await uploadToSupabaseStorage("book-files", epubKey, epubBuffer, "application/epub+zip");
