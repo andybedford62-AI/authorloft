@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Upload, FileText, Loader2, CheckCircle, XCircle, Download,
-  ShoppingCart, Gift, BookOpen, Sparkles, ExternalLink,
+  ShoppingCart, Gift, BookOpen, Sparkles, ExternalLink, Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/use-toast";
@@ -36,6 +36,7 @@ export function BookAutoFormatter({ bookId }: { bookId: string }) {
   const [busy, setBusy] = useState<"uploading" | "converting" | null>(null);
   const [error, setError] = useState("");
   const [attachingKey, setAttachingKey] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => { loadJobs(); }, [bookId]);
 
@@ -139,6 +140,23 @@ export function BookAutoFormatter({ bookId }: { bookId: string }) {
     }
   }
 
+  async function deleteJob(jobId: string) {
+    if (!confirm("Delete this conversion? This removes the stored files too — it won't affect anything already attached to Direct Sales, Reader Magnet, or ARC.")) return;
+    setDeletingId(jobId);
+    try {
+      const res = await fetch(`/api/admin/books/${bookId}/format/jobs/${jobId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Could not delete conversion.");
+      }
+      setJobs((prev) => prev.filter((j) => j.id !== jobId));
+    } catch (err: any) {
+      showToast("error", err?.message ?? "Could not delete conversion.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const busyLabel = busy === "uploading" ? "Uploading…" : busy === "converting" ? "Converting…" : null;
 
   return (
@@ -223,14 +241,27 @@ export function BookAutoFormatter({ bookId }: { bookId: string }) {
                       </p>
                     </div>
                   </div>
-                  {job.status === "DONE" && (
-                    <a
-                      href={`/api/admin/books/${bookId}/format/download/${job.id}`}
-                      className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors"
+                  <div className="flex-shrink-0 flex items-center gap-1.5">
+                    {job.status === "DONE" && (
+                      <a
+                        href={`/api/admin/books/${bookId}/format/download/${job.id}`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-gray-200 text-xs text-gray-600 hover:bg-gray-50 transition-colors"
+                      >
+                        <Download className="h-3 w-3" /> Download
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      title="Delete this conversion"
+                      disabled={deletingId === job.id}
+                      onClick={() => deleteJob(job.id)}
+                      className="inline-flex items-center justify-center h-6 w-6 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
                     >
-                      <Download className="h-3 w-3" /> Download
-                    </a>
-                  )}
+                      {deletingId === job.id
+                        ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        : <Trash2 className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
                 </div>
 
                 {job.status === "FAILED" && job.errorMessage && (

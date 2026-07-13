@@ -80,7 +80,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "direct-sales",  label: "Direct Sales" },
   { id: "affiliate",     label: "Affiliate" },
   { id: "media",         label: "Media" },
-  { id: "format",        label: "Format" },
+  { id: "format",        label: "ePub Format" },
   { id: "reviews",       label: "Reviews" },
   { id: "excerpt",       label: "Excerpt" },
   { id: "arcs",          label: "ARC" },
