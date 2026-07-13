@@ -100,8 +100,13 @@ export async function POST(
     const authorName = book.author.displayName || book.author.name;
 
     // HTML chapters -> .epub buffer
+    // version: 2 — epub-gen-memory's EPUB3 output declares the cover only via the legacy
+    // <meta name="cover"> tag without the EPUB3 `properties="cover-image"` manifest
+    // attribute, so Kindle's library thumbnail can't find it (the image still renders fine
+    // inside the book). EPUB2's cover convention is exactly what it already writes, and we
+    // don't use any EPUB3-only features, so EPUB2 output is the Kindle-compatible choice.
     const epubBuffer = await epub(
-      { title: book.title, author: authorName, cover: book.coverImageUrl || undefined },
+      { title: book.title, author: authorName, cover: book.coverImageUrl || undefined, version: 2 },
       chapters
     );
 
