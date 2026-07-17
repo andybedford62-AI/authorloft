@@ -1,23 +1,27 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
+// PostHog is now reverse-proxied through /ingest (see rewrites() below), so the
+// browser never talks to *.i.posthog.com / *-assets.i.posthog.com directly —
+// no CSP entries needed for those hosts anymore, and it's harder for ad
+// blockers to pattern-match and drop the requests.
+const POSTHOG_INGEST_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const POSTHOG_ASSET_HOST  = POSTHOG_INGEST_HOST.replace(".i.posthog.com", "-assets.i.posthog.com");
+
 const ContentSecurityPolicy = [
   "default-src 'self'",
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
   // Google Ads (gtag.js) conversion tracking — googletagmanager.com loads gtag.js itself;
   // googleads.g.doubleclick.net loads a separate view-through-conversion script
-  // PostHog loads its own library config/assets from a separate *-assets host,
-  // distinct from the *.i.posthog.com ingest host used for capture() calls
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://us-assets.i.posthog.com https://eu-assets.i.posthog.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
   // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
   "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
-  // PostHog client-side event capture (page-view tracking) — both possible ingest regions
   // Google Ads (gtag.js) beacon/conversion calls
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://us.i.posthog.com https://eu.i.posthog.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net",
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
@@ -40,10 +44,18 @@ const nextConfig: NextConfig = {
   env: {
     BUILD_TIME: new Date().toISOString(),
   },
+  // Required alongside the /ingest/decide rewrite below — PostHog's reverse-proxy
+  // docs call this out explicitly, otherwise Next.js's own trailing-slash
+  // redirect can interfere with that specific rewrite.
+  skipTrailingSlashRedirect: true,
   async rewrites() {
     return [
       { source: "/robots.txt",  destination: "/api/internal/robots" },
       { source: "/sitemap.xml", destination: "/api/internal/sitemap" },
+      // PostHog reverse proxy — order matters, specific routes before the catch-all
+      { source: "/ingest/static/:path*", destination: `${POSTHOG_ASSET_HOST}/static/:path*` },
+      { source: "/ingest/decide",        destination: `${POSTHOG_INGEST_HOST}/decide` },
+      { source: "/ingest/:path*",        destination: `${POSTHOG_INGEST_HOST}/:path*` },
     ];
   },
   async headers() {
