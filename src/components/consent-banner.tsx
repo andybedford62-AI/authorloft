@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { initPostHogIfConsented, optOutPostHog } from "@/lib/posthog-client";
 
 export function ConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -28,6 +29,9 @@ export function ConsentBanner() {
       gtag("consent", "update", {
         analytics_storage: "granted",
       });
+      initPostHogIfConsented();
+    } else {
+      optOutPostHog();
     }
   };
 

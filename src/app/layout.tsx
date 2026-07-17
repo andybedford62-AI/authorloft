@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { ConsentBanner } from "@/components/consent-banner";
+import { PostHogPageTracker } from "@/components/posthog-page-tracker";
 import "./globals.css";
 
 const inter = Inter({
@@ -106,6 +107,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         {children}
+        <PostHogPageTracker />
         <ConsentBanner />
       </body>
     </html>
