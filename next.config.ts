@@ -6,7 +6,9 @@ const ContentSecurityPolicy = [
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
   // Google Ads (gtag.js) conversion tracking — googletagmanager.com loads gtag.js itself;
   // googleads.g.doubleclick.net loads a separate view-through-conversion script
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
+  // PostHog loads its own library config/assets from a separate *-assets host,
+  // distinct from the *.i.posthog.com ingest host used for capture() calls
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://us-assets.i.posthog.com https://eu-assets.i.posthog.com",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
   // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
