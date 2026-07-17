@@ -58,6 +58,20 @@ export async function proxy(req: NextRequest) {
     }
   }
 
+  // ── www Canonicalization ──────────────────────────────────────────────────
+  // Bare apex domain (authorloft.com) served the same content as
+  // www.authorloft.com with no redirect between them — Google was seeing two
+  // separate crawlable URLs for identical content (confirmed in Search
+  // Console: bare-domain variants showing as "not indexed" duplicates).
+  // Redirect ONLY the exact apex domain — never author subdomains.
+  const bareHost = hostname.split(":")[0].toLowerCase();
+  if (bareHost === PLATFORM_DOMAIN) {
+    const wwwUrl = url.clone();
+    wwwUrl.protocol = "https";
+    wwwUrl.host = `www.${PLATFORM_DOMAIN}`;
+    return NextResponse.redirect(wwwUrl, 301);
+  }
+
   // ── CSRF Protection ────────────────────────────────────────────────────────
   // Protect critical state-changing requests with CSRF validation
   if (STATE_CHANGING_METHODS.includes(req.method)) {
