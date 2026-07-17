@@ -4,12 +4,13 @@ import { withSentryConfig } from "@sentry/nextjs";
 const ContentSecurityPolicy = [
   "default-src 'self'",
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
-  // Google Ads (gtag.js) conversion tracking script
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com",
+  // Google Ads (gtag.js) conversion tracking — googletagmanager.com loads gtag.js itself;
+  // googleads.g.doubleclick.net loads a separate view-through-conversion script
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
-  // Google Ads conversion pixel
-  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com",
+  // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
+  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
   // PostHog client-side event capture (page-view tracking) — both possible ingest regions
