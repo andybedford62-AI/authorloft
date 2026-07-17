@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## July 17, 2026
+
+- **Fixed: Site Traffic Analytics was silently broken since launch** — the `/admin/analytics` dashboard (PostHog page-view data) always showed 0 visitors for every author, because the site never actually sent PostHog's `$pageview` event — only 7 backend lifecycle events (signup, login, etc.) existed, no browser-side tracking snippet at all. Root-caused and fixed as a chain of issues:
+  - Installed `posthog-js` client-side, consent-gated on the existing `analytics-consent` localStorage flag (honors the `/gdpr` page's no-tracking-without-consent promise); manual `$pageview` capture on route change via `usePathname()` (Next.js App Router client-side navigations don't trigger PostHog's autocapture listener)
+  - CSP (`next.config.ts`) was blocking the actual network calls even after install — `connect-src`/`script-src` had no entry for PostHog's ingest or asset hosts
+  - **Also found and fixed the same bug for Google Ads conversion tracking** (`AW-1803958972`) — CSP was blocking `googletagmanager.com` and `googleads.g.doubleclick.net` too, so ad conversion tracking has likely never worked either
+  - Found and fixed a banner-collision bug: `ConsentBanner` (analytics opt-in) and `LegalBanner` (ToS/Privacy update notice) were both fixed to the bottom of the screen, so the consent banner was rendering invisibly underneath the legal notice — moved `ConsentBanner` to a bottom-right floating card so the two can't collide
+  - Reverse-proxied PostHog through `/ingest/*` on the platform's own domain (Next.js rewrites) instead of calling `*.i.posthog.com` directly — PostHog's documented pattern for ad-blocker resilience; simplified CSP accordingly since the browser no longer talks to PostHog's domains directly
+  - Fixed `capture_pageleave` silently disabling itself (defaults to tracking only if `capture_pageview` autocapture is also on, which we intentionally disabled in favor of manual capture)
+
 ## July 5, 2026
 
 - **Homepage hero copy — Super Admin editable** — Platform Settings → Marketing tab now has a "Homepage Hero Copy" panel to edit the hero's H1 headline (2 lines) and subheadline paragraph without a code deploy.
