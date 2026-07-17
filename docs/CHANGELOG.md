@@ -22,6 +22,8 @@ line rather than listing every commit.
   - Found and fixed a banner-collision bug: `ConsentBanner` (analytics opt-in) and `LegalBanner` (ToS/Privacy update notice) were both fixed to the bottom of the screen, so the consent banner was rendering invisibly underneath the legal notice — moved `ConsentBanner` to a bottom-right floating card so the two can't collide
   - Reverse-proxied PostHog through `/ingest/*` on the platform's own domain (Next.js rewrites) instead of calling `*.i.posthog.com` directly — PostHog's documented pattern for ad-blocker resilience; simplified CSP accordingly since the browser no longer talks to PostHog's domains directly
   - Fixed `capture_pageleave` silently disabling itself (defaults to tracking only if `capture_pageview` autocapture is also on, which we intentionally disabled in favor of manual capture)
+  - Fixed `LegalBanner`'s invisible full-width click area (spanned the whole viewport at a higher z-index than the analytics banner, silently blocking clicks meant for it) — `pointer-events-none` on the wrapper, `pointer-events-auto` on the visible card
+  - Fixed `LegalBanner` showing "we've updated our policies" to brand-new visitors who have nothing to compare against — a new `bs_seen` cookie distinguishes first-time from returning visitors; first-timers are silently acknowledged instead, reducing homepage banner clutter on the exact page whose job is converting a cold visitor
 
 ## July 5, 2026
 
