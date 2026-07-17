@@ -22,6 +22,17 @@ function needsAck(updatedAt: string | null, cookieName: string): boolean {
   return new Date(ack) < new Date(updatedAt);
 }
 
+const FIRST_VISIT_COOKIE = "bs_seen";
+
+function isFirstVisit(): boolean {
+  return getCookie(FIRST_VISIT_COOKIE) === null;
+}
+
+function markVisited() {
+  const twoYears = 60 * 60 * 24 * 365 * 2;
+  document.cookie = `${FIRST_VISIT_COOKIE}=1; path=/; max-age=${twoYears}; SameSite=Lax`;
+}
+
 export function LegalBanner({ privacyUpdatedAt, termsUpdatedAt }: LegalBannerProps) {
   const [show,           setShow]           = useState(false);
   const [needsPrivacy,   setNeedsPrivacy]   = useState(false);
@@ -29,6 +40,24 @@ export function LegalBanner({ privacyUpdatedAt, termsUpdatedAt }: LegalBannerPro
   const [acknowledging,  setAcknowledging]  = useState(false);
 
   useEffect(() => {
+    // A brand-new visitor has no "previous version" to have changes explained
+    // relative to — "we've updated our policies" doesn't make sense as their
+    // first impression. Silently acknowledge current docs on their behalf
+    // instead of showing the banner; genuine future updates will still surface
+    // normally once they're a returning visitor.
+    if (isFirstVisit()) {
+      markVisited();
+      const now = new Date().toISOString();
+      fetch("/api/legal-ack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "all", timestamp: now }),
+      }).catch(() => {
+        // best-effort — worst case a returning-visitor check re-evaluates next load
+      });
+      return;
+    }
+
     const p = needsAck(privacyUpdatedAt, "bs_privacy_ack");
     const t = needsAck(termsUpdatedAt,   "bs_terms_ack");
     setNeedsPrivacy(p);
