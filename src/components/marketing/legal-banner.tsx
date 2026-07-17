@@ -61,8 +61,8 @@ export function LegalBanner({ privacyUpdatedAt, termsUpdatedAt }: LegalBannerPro
   const label = updated.join(" and ");
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 px-4 pb-4 sm:px-6" role="dialog" aria-live="polite">
-      <div className="max-w-3xl mx-auto bg-gray-900 text-white rounded-2xl shadow-2xl px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="fixed bottom-0 inset-x-0 z-50 px-4 pb-4 sm:px-6 pointer-events-none" role="dialog" aria-live="polite">
+      <div className="max-w-3xl mx-auto bg-gray-900 text-white rounded-2xl shadow-2xl px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 pointer-events-auto">
 
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <Shield className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
