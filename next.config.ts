@@ -4,14 +4,17 @@ import { withSentryConfig } from "@sentry/nextjs";
 const ContentSecurityPolicy = [
   "default-src 'self'",
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+  // Google Ads (gtag.js) conversion tracking script
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
-  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com",
+  // Google Ads conversion pixel
+  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
   // PostHog client-side event capture (page-view tracking) — both possible ingest regions
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://us.i.posthog.com https://eu.i.posthog.com",
+  // Google Ads (gtag.js) beacon/conversion calls
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://us.i.posthog.com https://eu.i.posthog.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
