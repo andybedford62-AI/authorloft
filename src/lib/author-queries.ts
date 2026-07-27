@@ -1,7 +1,30 @@
 // Reusable database queries for the public author site
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { headers } from "next/headers";
 import { resolveAccentColor, resolveSecondaryColor, isThemeAllowed } from "@/lib/themes";
+
+const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+
+/**
+ * When an author changes their site URL the old slug is retired, not freed.
+ * Anything still pointing at it — backlinks, shared links, printed QR codes,
+ * Google's index — gets a 308 to the same path on the new address instead of a
+ * 404, so accumulated search ranking transfers rather than being lost.
+ *
+ * Returns nothing on success: permanentRedirect throws.
+ */
+async function redirectIfRetiredSlug(domain: string): Promise<void> {
+  const retired = await prisma.authorSlugHistory.findUnique({
+    where: { slug: domain },
+    select: { author: { select: { slug: true, isActive: true } } },
+  });
+  if (!retired?.author?.isActive) return;
+
+  // proxy.ts stashes the pre-rewrite path so deep links survive the redirect
+  const path = (await headers()).get("x-original-path") || "/";
+  permanentRedirect(`https://${retired.author.slug}.${PLATFORM_DOMAIN}${path}`);
+}
 
 export async function getAuthorByDomain(domain: string) {
   const author = await prisma.author.findFirst({
@@ -16,7 +39,10 @@ export async function getAuthorByDomain(domain: string) {
       },
     },
   });
-  if (!author) notFound();
+  if (!author) {
+    await redirectIfRetiredSlug(domain);
+    notFound();
+  }
 
   // Enforce plan-based theme access at render time:
   // FREE authors are locked to one of the 3 base colour themes regardless of what's stored.

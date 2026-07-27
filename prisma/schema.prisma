@@ -204,6 +204,7 @@ model Author {
   impersonationsAsTarget        ImpersonationLog[]    @relation("ImpersonationAsTarget")
   preOrderSignups               PreOrderSignup[]
   magnetLeads                   BookMagnetLead[]
+  slugHistory                   AuthorSlugHistory[]
   googleSiteVerification        String?
   bingSiteVerification          String?
   socialVoiceDescription        String?               @db.VarChar(500) // Social Promote: author's voice description for AI prompts
@@ -415,6 +416,22 @@ model BookDirectSaleItem {
   bundleItems    BundleItem[]
 
   @@index([bookId])
+}
+
+// ─── Author Slug History (301 redirects after a site-URL change) ──────────────
+
+/// Every slug an author has previously used. Retired slugs are kept globally
+/// unique so nobody else can claim one — that would break the redirect and hand
+/// a stranger someone else's accumulated search traffic. Requests to a retired
+/// slug 301 to the author's current address, preserving the path.
+model AuthorSlugHistory {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([authorId])
 }
 
 // ─── Book Format Jobs (Auto-Formatter: DOCX → ePUB) ───────────────────────────

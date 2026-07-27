@@ -3,25 +3,38 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
-import { validateSlug, slugProblemMessage } from "@/lib/reserved-slugs";
+import { checkSlugAvailability, slugUnavailableMessage } from "@/lib/slug-availability";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
 
 /**
- * GET  /api/admin/settings/slug — current site URL for the signed-in author
- * PATCH /api/admin/settings/slug — change it
+ * GET   /api/admin/settings/slug            — current site URL
+ * GET   /api/admin/settings/slug?check=foo  — availability, scoped to this author
+ *                                             (so they can reclaim their own retired slug)
+ * PATCH /api/admin/settings/slug            — change it
  *
- * Signup no longer asks for a slug (it's derived from the author's name), so
- * this is where people set the URL they actually want once they've seen the
- * product. Changing it breaks any previously shared subdomain links, which the
- * UI warns about before submitting.
+ * The previous slug is recorded in AuthorSlugHistory so requests to it keep
+ * 301-redirecting to the new address — old links, backlinks, and search
+ * rankings survive the change.
  */
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const authorId = (session.user as any).id as string;
+
+  const check = req.nextUrl.searchParams.get("check");
+  if (check !== null) {
+    const slug = slugify(check);
+    const reason = await checkSlugAvailability(slug, { forAuthorId: authorId });
+    return NextResponse.json({
+      available: !reason,
+      slug,
+      ...(reason && { reason, message: slugUnavailableMessage(reason) }),
+    });
+  }
+
   const author = await prisma.author.findUnique({
     where: { id: authorId },
     select: { slug: true, customDomain: true },
@@ -38,7 +51,7 @@ export async function PATCH(req: NextRequest) {
   const authorId = (session.user as any).id as string;
 
   // Tighter than the general admin bucket — slug changes churn public URLs and
-  // shouldn't be cycled rapidly.
+  // each one permanently retires the old address.
   const _rl = await enforceRateLimit(req, {
     bucket: "slug-change", maxRequests: 5, windowSeconds: 3600, userId: authorId,
   });
@@ -47,11 +60,6 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const raw = typeof body.slug === "string" ? body.slug : "";
   const slug = slugify(raw);
-
-  const problem = validateSlug(slug);
-  if (problem) {
-    return NextResponse.json({ error: slugProblemMessage(problem) }, { status: 400 });
-  }
 
   const current = await prisma.author.findUnique({
     where: { id: authorId },
@@ -62,19 +70,20 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, slug, unchanged: true });
   }
 
-  const taken = await prisma.author.findUnique({
-    where: { slug },
-    select: { id: true },
-  });
-  if (taken) {
-    return NextResponse.json(
-      { error: "That site URL is already taken. Please choose another." },
-      { status: 409 }
-    );
+  const reason = await checkSlugAvailability(slug, { forAuthorId: authorId });
+  if (reason) {
+    const status = reason === "taken" || reason === "retired" ? 409 : 400;
+    return NextResponse.json({ error: slugUnavailableMessage(reason) }, { status });
   }
 
   try {
-    await prisma.author.update({ where: { id: authorId }, data: { slug } });
+    await prisma.$transaction([
+      // Reclaiming one of their own retired slugs — free it from history first
+      prisma.authorSlugHistory.deleteMany({ where: { slug, authorId } }),
+      // Retire the outgoing slug so it keeps redirecting here
+      prisma.authorSlugHistory.create({ data: { authorId, slug: current.slug } }),
+      prisma.author.update({ where: { id: authorId }, data: { slug } }),
+    ]);
   } catch {
     // Unique constraint can still trip if someone claimed it in between
     return NextResponse.json(
@@ -93,5 +102,5 @@ export async function PATCH(req: NextRequest) {
     metadata: { from: current.slug, to: slug },
   });
 
-  return NextResponse.json({ ok: true, slug });
+  return NextResponse.json({ ok: true, slug, previousSlug: current.slug });
 }

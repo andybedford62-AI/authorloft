@@ -238,9 +238,14 @@ export async function proxy(req: NextRequest) {
     }
 
     // Rewrite /anything → /(author-site)/[slug]/anything
+    // Carry the pre-rewrite path through so a retired slug can 308-redirect to
+    // the same page on the author's new address (see redirectIfRetiredSlug).
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-original-path", url.pathname);
+
     const rewriteUrl = url.clone();
     rewriteUrl.pathname = `/${slug}${url.pathname}`;
-    return NextResponse.rewrite(rewriteUrl);
+    return NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
   }
 
   // ── Custom domain routes ─────────────────────────────────────────────────

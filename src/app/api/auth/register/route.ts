@@ -7,7 +7,8 @@ import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mai
 import { passwordStrengthError } from "@/lib/password-validation";
 import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import { capturePostHog } from "@/lib/posthog";
-import { RESERVED_SLUGS, validateSlug, slugProblemMessage } from "@/lib/reserved-slugs";
+import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
+import { checkSlugAvailability, slugUnavailableMessage } from "@/lib/slug-availability";
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 
@@ -30,10 +31,9 @@ async function uniqueSlug(rawBase: string): Promise<string> {
 
   let candidate = base;
   let attempt = 2;
-  while (
-    validateSlug(candidate) !== null ||
-    (await prisma.author.findUnique({ where: { slug: candidate }, select: { id: true } }))
-  ) {
+  // checkSlugAvailability also rejects slugs retired by a previous author,
+  // which stay claimed so their redirects keep working.
+  while ((await checkSlugAvailability(candidate)) !== null) {
     candidate = `${base}${attempt++}`;
     if (attempt > 500) {
       candidate = `${base}-${randomBytes(4).toString("hex")}`;
@@ -125,11 +125,12 @@ export async function POST(req: NextRequest) {
     // changed later in Settings. An explicit slug is still honoured (direct API
     // callers) but must pass full validation, including the reserved list.
     if (rawSlug) {
-      const problem = validateSlug(slugify(rawSlug));
-      if (problem) {
+      const reason = await checkSlugAvailability(slugify(rawSlug));
+      if (reason) {
+        const status = reason === "taken" || reason === "retired" ? 409 : 400;
         return NextResponse.json(
-          { error: slugProblemMessage(problem), field: "slug" },
-          { status: 400 }
+          { error: slugUnavailableMessage(reason), field: "slug" },
+          { status }
         );
       }
     }
@@ -158,23 +159,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // An explicit slug must be free; a derived one auto-resolves collisions.
+    // An explicit slug was validated above; a derived one auto-resolves collisions.
     const finalSlug = rawSlug
       ? slugify(rawSlug)
       : await uniqueSlug(slugify(name.trim()));
-
-    if (rawSlug) {
-      const existingSlug = await prisma.author.findUnique({
-        where: { slug: finalSlug },
-        select: { id: true },
-      });
-      if (existingSlug) {
-        return NextResponse.json(
-          { error: "This site URL is already taken. Please choose another.", field: "slug" },
-          { status: 409 }
-        );
-      }
-    }
 
     // ── Create account ──────────────────────────────────────────────────────
     capturePostHog(email.toLowerCase().trim(), "signup_started", { signup_method: "email" });

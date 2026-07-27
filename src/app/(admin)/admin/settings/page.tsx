@@ -1061,7 +1061,8 @@ function SiteUrlSection() {
   const [currentSlug, setCurrentSlug] = useState<string | null>(null);
   const [customDomain, setCustomDomain] = useState<string | null>(null);
   const [slug, setSlug] = useState("");
-  const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const [status, setStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -1075,7 +1076,9 @@ function SiteUrlSection() {
       .catch(() => {});
   }, []);
 
-  // Debounced availability check — skipped while the value still matches what's saved
+  // Debounced availability check — skipped while the value still matches what's
+  // saved. Uses the authenticated endpoint so reclaiming one of your own retired
+  // slugs reads as available rather than "already used".
   useEffect(() => {
     if (!slug || currentSlug === null) { setStatus("idle"); return; }
     if (slug === currentSlug) { setStatus("idle"); return; }
@@ -1083,10 +1086,10 @@ function SiteUrlSection() {
     setStatus("checking");
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/auth/check-slug?slug=${encodeURIComponent(slug)}`);
+        const res = await fetch(`/api/admin/settings/slug?check=${encodeURIComponent(slug)}`);
         const data = await res.json();
-        if (data.reason) setStatus("invalid");
-        else setStatus(data.available ? "available" : "taken");
+        if (data.available) { setStatus("available"); setStatusMessage(""); }
+        else { setStatus("unavailable"); setStatusMessage(data.message || "Not available"); }
       } catch {
         setStatus("idle");
       }
@@ -1101,7 +1104,8 @@ function SiteUrlSection() {
     if (!changed) return;
     if (!confirm(
       `Change your site URL to ${slug}.${PLATFORM_DOMAIN}?\n\n` +
-      `Any links you've already shared using ${currentSlug}.${PLATFORM_DOMAIN} will stop working.`
+      `Your old address (${currentSlug}.${PLATFORM_DOMAIN}) will automatically ` +
+      `redirect here, so existing links keep working.`
     )) return;
 
     setSaving(true);
@@ -1158,27 +1162,31 @@ function SiteUrlSection() {
           {status === "available" && <Check className="h-4 w-4 text-green-500" />}
           {changed && status !== "idle" && (
             <span className={`text-xs font-medium ${
-              status === "available" ? "text-green-600" :
-              status === "taken"     ? "text-red-600"   :
-              status === "invalid"   ? "text-amber-600" : "text-gray-400"
+              status === "available"   ? "text-green-600" :
+              status === "unavailable" ? "text-red-600"   : "text-gray-400"
             }`}>
-              {status === "available" && "Available!"}
-              {status === "taken"     && "Already taken"}
-              {status === "invalid"   && "3–40 characters, letters, numbers, hyphens"}
-              {status === "checking"  && "Checking…"}
+              {status === "available"   && "Available!"}
+              {status === "unavailable" && statusMessage}
+              {status === "checking"    && "Checking…"}
             </span>
           )}
         </div>
       </div>
 
       {changed && (
-        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <p>
-            Changing this breaks any links you've already shared to{" "}
-            <span className="font-medium">{currentSlug}.{PLATFORM_DOMAIN}</span> — including
-            links in published books, social posts, and email newsletters.
-          </p>
+          <div className="space-y-1.5">
+            <p>
+              <span className="font-medium">{currentSlug}.{PLATFORM_DOMAIN}</span> will
+              automatically redirect to your new address, so links you've already shared —
+              in books, social posts, and newsletters — keep working.
+            </p>
+            <p className="text-blue-700">
+              If you've verified your site in Google Search Console, add the new address as a
+              property there too. Google follows the redirect on its own, but this speeds it up.
+            </p>
+          </div>
         </div>
       )}
 
@@ -1195,7 +1203,7 @@ function SiteUrlSection() {
 
       <Button
         onClick={handleSave}
-        disabled={saving || !changed || status === "taken" || status === "invalid" || status === "checking"}
+        disabled={saving || !changed || status === "unavailable" || status === "checking"}
       >
         {saving
           ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
