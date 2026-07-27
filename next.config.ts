@@ -48,6 +48,24 @@ const nextConfig: NextConfig = {
   // docs call this out explicitly, otherwise Next.js's own trailing-slash
   // redirect can interfere with that specific rewrite.
   skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [
+      // These two blog posts duplicated existing Guide articles on the exact
+      // same topic (confirmed via Search Console — Google was declining to
+      // index the blog versions). Posts unpublished in the CMS; redirect
+      // catches old links/bookmarks/cached search results.
+      {
+        source: "/blog/how-to-build-email-list-as-author",
+        destination: "/guides/building-your-first-author-email-list",
+        permanent: true,
+      },
+      {
+        source: "/blog/how-to-sell-books-directly-to-readers",
+        destination: "/guides/what-is-direct-book-selling",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       { source: "/robots.txt",  destination: "/api/internal/robots" },
