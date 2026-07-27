@@ -12,9 +12,14 @@ const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.c
  * Google's index — gets a 308 to the same path on the new address instead of a
  * 404, so accumulated search ranking transfers rather than being lost.
  *
+ * Exported so [domain]/layout.tsx can call it too — the layout resolves the
+ * author independently (its own query, for nav/branding data) and renders
+ * before any child page, so its notFound() would otherwise fire first and
+ * this page-level check would never be reached.
+ *
  * Returns nothing on success: permanentRedirect throws.
  */
-async function redirectIfRetiredSlug(domain: string): Promise<void> {
+export async function redirectIfRetiredSlug(domain: string): Promise<void> {
   const retired = await prisma.authorSlugHistory.findUnique({
     where: { slug: domain },
     select: { author: { select: { slug: true, isActive: true } } },

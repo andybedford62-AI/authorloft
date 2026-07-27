@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { redirectIfRetiredSlug } from "@/lib/author-queries";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -119,7 +120,13 @@ export default async function AuthorSiteLayout({
 }) {
   const { domain } = await params;
   const author = await resolveAuthor(domain);
-  if (!author) notFound();
+  if (!author) {
+    // Layout renders before any child page, so this is the one place that
+    // actually needs the retired-slug check — page.tsx's own copy (in
+    // getAuthorByDomain) never gets reached if this notFound() fires first.
+    await redirectIfRetiredSlug(domain);
+    notFound();
+  }
 
   // Fetch custom pages that are published AND set to show in nav
   const customNavPages = await prisma.authorPage.findMany({
