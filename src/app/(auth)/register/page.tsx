@@ -1,20 +1,16 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import {
-  Loader2, Check, X, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
+  Loader2, Check, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { slugify } from "@/lib/utils";
 import { sanitize } from "@/lib/sanitize";
 import { RequestAccessModal } from "@/components/auth/RequestAccessModal";
-
-const PLATFORM_DOMAIN =
-  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
 // ── Beta status ───────────────────────────────────────────────────────────────
 
@@ -28,41 +24,6 @@ function useBetaStatus(): BetaStatus {
       .then(setStatus)
       .catch(() => setStatus({ betaMode: false, betaMessage: "" }));
   }, []);
-  return status;
-}
-
-// ── Slug availability indicator ───────────────────────────────────────────────
-
-type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
-
-function useSlugCheck(slug: string): SlugStatus {
-  const [status, setStatus] = useState<SlugStatus>("idle");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!slug) { setStatus("idle"); return; }
-    if (slug.length < 3) { setStatus("invalid"); return; }
-    if (slug.length > 40) { setStatus("invalid"); return; }
-
-    setStatus("checking");
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/auth/check-slug?slug=${encodeURIComponent(slug)}`);
-        const data = await res.json();
-        if (data.reason) {
-          setStatus("invalid");
-        } else {
-          setStatus(data.available ? "available" : "taken");
-        }
-      } catch {
-        setStatus("idle");
-      }
-    }, 400);
-
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [slug]);
-
   return status;
 }
 
@@ -85,7 +46,6 @@ function passwordStrength(p: string): { score: number; label: string; color: str
 // ── Main component ────────────────────────────────────────────────────────────
 
 function RegisterPageInner() {
-  const router       = useRouter();
   const searchParams = useSearchParams();
   const betaStatus   = useBetaStatus();
 
@@ -97,8 +57,10 @@ function RegisterPageInner() {
   const intendedPlan = searchParams.get("plan")?.toLowerCase() ?? null;
   const intendedPlanLabel = intendedPlan === "premium" ? "Premium" : intendedPlan === "standard" ? "Standard" : null;
 
-  // Step 0 = invite code (beta only); Step 1 = account; Step 2 = site URL
-  const [step, setStep] = useState<0 | 1 | 2>(1);
+  // Step 0 = invite code (beta only); Step 1 = account. The site URL used to be
+  // a second step — it's now derived from the name at signup and changed later
+  // in Settings, so nothing stands between a curious visitor and an account.
+  const [step, setStep] = useState<0 | 1>(1);
   const [showRequestModal, setShowRequestModal] = useState(false);
 
   // Step 0 fields
@@ -115,11 +77,7 @@ function RegisterPageInner() {
   const [password,        setPassword]        = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword,    setShowPassword]    = useState(false);
-
-  // Step 2 fields
-  const [slug,          setSlug]          = useState("");
-  const [slugEdited,    setSlugEdited]    = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted,   setTermsAccepted]   = useState(false);
 
   // Once we know beta mode is on, start at step 0
   useEffect(() => {
@@ -128,16 +86,9 @@ function RegisterPageInner() {
     }
   }, [betaStatus]);
 
-  // Auto-generate slug from name
-  useEffect(() => {
-    if (!slugEdited && name) setSlug(slugify(name));
-  }, [name, slugEdited]);
-
-  const slugStatus = useSlugCheck(slug);
-  const strength   = passwordStrength(password);
+  const strength = passwordStrength(password);
 
   const [step1Error, setStep1Error] = useState("");
-  const [step2Error, setStep2Error] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [registered, setRegistered] = useState(false);
 
@@ -149,10 +100,11 @@ function RegisterPageInner() {
     setStep(1);
   }
 
-  // ── Step 1 validation ───────────────────────────────────────────────────
-  function handleStep1(e: React.FormEvent) {
+  // ── Submit ──────────────────────────────────────────────────────────────
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStep1Error("");
+
     if (!name.trim()) return setStep1Error("Please enter your full name.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return setStep1Error("Please enter a valid email address.");
@@ -161,22 +113,13 @@ function RegisterPageInner() {
     if (!/[0-9]/.test(password))        return setStep1Error("Password must contain at least one number.");
     if (!/[^A-Za-z0-9]/.test(password)) return setStep1Error("Password must contain at least one special character (!@#$… etc).");
     if (password !== confirmPassword)   return setStep1Error("Passwords don't match.");
-    setStep(2);
-  }
-
-  // ── Final submit ────────────────────────────────────────────────────────
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStep2Error("");
-
-    if (!termsAccepted)            return setStep2Error("You must accept the Terms of Service and Privacy Policy to create an account.");
-    if (slugStatus === "taken")    return setStep2Error("That URL is already taken. Please choose another.");
-    if (slugStatus === "invalid")  return setStep2Error("Site URL must be 3–40 characters, letters, numbers, and hyphens only.");
-    if (slugStatus === "checking") return setStep2Error("Still checking availability — please wait a moment.");
+    if (!termsAccepted)                 return setStep1Error("You must accept the Terms of Service and Privacy Policy to create an account.");
 
     setSubmitting(true);
 
     try {
+      // No slug sent — the API derives one from the name; people set the URL
+      // they actually want in Settings once they're in.
       const res = await fetch("/api/auth/register", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,7 +127,6 @@ function RegisterPageInner() {
           name: name.trim(),
           email: email.toLowerCase().trim(),
           password,
-          slug,
           termsAccepted,
           ...(betaMode && { inviteCode: inviteCode.trim().toUpperCase() }),
         }),
@@ -193,8 +135,7 @@ function RegisterPageInner() {
 
       if (!res.ok) {
         if (data.field === "inviteCode") { setStep(0); setInviteError(data.error); }
-        else if (data.field === "email") { setStep(1); setStep1Error(data.error); }
-        else setStep2Error(data.error || "Registration failed. Please try again.");
+        else setStep1Error(data.error || "Registration failed. Please try again.");
         setSubmitting(false);
         return;
       }
@@ -209,31 +150,15 @@ function RegisterPageInner() {
         window.gtag("event", "conversion", { send_to: "AW-18031958972/bEq6CJbgg6QcELy3p5ZD" });
       }
     } catch {
-      setStep2Error("Something went wrong. Please try again.");
+      setStep1Error("Something went wrong. Please try again.");
       setSubmitting(false);
     }
   }
 
-  const slugIndicator = () => {
-    if (!slug) return null;
-    if (slugStatus === "checking") return <Loader2 className="h-4 w-4 animate-spin text-gray-400" />;
-    if (slugStatus === "available") return <Check className="h-4 w-4 text-green-500" />;
-    if (slugStatus === "taken")     return <X className="h-4 w-4 text-red-500" />;
-    return null;
-  };
-
-  const previewDomain =
-    process.env.NODE_ENV === "development"
-      ? `${slug || "yourname"}.localhost:3000`
-      : `${slug || "yourname"}.${PLATFORM_DOMAIN}`;
-
-  // Total steps and labels depend on beta mode
-  const totalSteps    = betaMode ? 3 : 2;
-  const stepLabels    = betaMode
-    ? ["Invite code", "Your account", "Your site URL"]
-    : ["Your account", "Your site URL"];
-  // Visual step index (0-based) for the indicator
-  const visualStep    = betaMode ? step : step - 1;
+  // Only beta mode has more than one step, so the indicator is hidden otherwise.
+  const stepLabels = ["Invite code", "Your account"];
+  const totalSteps = stepLabels.length;
+  const visualStep = step;
 
   // Wait for beta status before rendering the form
   if (betaStatus === null) {
@@ -301,7 +226,8 @@ function RegisterPageInner() {
         ) : (
         <>
 
-        {/* Step indicator */}
+        {/* Step indicator — beta mode only; the normal flow is a single step */}
+        {betaMode && (
         <div className="flex items-center justify-center gap-2 mb-6">
           {stepLabels.map((label, idx) => (
             <div key={label} className="flex items-center gap-2">
@@ -323,6 +249,7 @@ function RegisterPageInner() {
             </div>
           ))}
         </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
 
@@ -412,7 +339,7 @@ function RegisterPageInner() {
                   </div>
                 </>
               )}
-              <form onSubmit={handleStep1} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   label="Full Name"
                   name="name"
@@ -508,6 +435,28 @@ function RegisterPageInner() {
                   }
                 />
 
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => { setTermsAccepted(e.target.checked); setStep1Error(""); }}
+                    className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
+                    I have read and agree to the{" "}
+                    <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
+                      Terms of Service
+                    </Link>
+                    {" "}and{" "}
+                    <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
+                      Privacy Policy
+                    </Link>
+                    . By creating an account I confirm I am at least 18 years of age.
+                  </label>
+                </div>
+
                 {step1Error && (
                   <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                     {step1Error}
@@ -517,12 +466,20 @@ function RegisterPageInner() {
                 <Button
                   type="submit"
                   size="lg"
+                  disabled={submitting || !termsAccepted}
                   className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
                   style={{ "--accent": "#2563EB" } as React.CSSProperties}
                 >
-                  Continue
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  {submitting ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</>
+                  ) : (
+                    <>Create my account<ArrowRight className="h-4 w-4 ml-2" /></>
+                  )}
                 </Button>
+
+                <p className="text-center text-xs text-gray-400">
+                  You&apos;ll pick your site address once you&apos;re in — it&apos;s easy to change later.
+                </p>
               </form>
 
               {betaMode && (
@@ -538,130 +495,6 @@ function RegisterPageInner() {
             </div>
           )}
 
-          {/* ── STEP 2: Site URL ────────────────────────────────────────── */}
-          {step === 2 && (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <h2 className="font-semibold text-gray-900 text-lg">Choose your site URL</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  This is the address readers will use to find your author website. You can connect a custom domain later.
-                </p>
-              </div>
-
-              {/* URL field */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">
-                  Site URL
-                </label>
-                <div className="flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden">
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => {
-                      setSlug(slugify(e.target.value));
-                      setSlugEdited(true);
-                    }}
-                    placeholder="yourname"
-                    maxLength={40}
-                    className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
-                    autoFocus
-                  />
-                  <span className="px-3 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-400 whitespace-nowrap flex-shrink-0">
-                    .{PLATFORM_DOMAIN}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5 h-5">
-                  {slugIndicator()}
-                  {slug && (
-                    <span className={`text-xs font-medium ${
-                      slugStatus === "available" ? "text-green-600" :
-                      slugStatus === "taken"     ? "text-red-600"   :
-                      slugStatus === "invalid"   ? "text-amber-600" :
-                      "text-gray-400"
-                    }`}>
-                      {slugStatus === "available" && "Available!"}
-                      {slugStatus === "taken"     && "Already taken"}
-                      {slugStatus === "invalid"   && "3–40 characters, letters, numbers, hyphens"}
-                      {slugStatus === "checking"  && "Checking…"}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Live preview */}
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-2">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Preview
-                </p>
-                <p className="font-mono text-sm text-blue-600 break-all">
-                  {process.env.NODE_ENV === "development" ? "http" : "https"}://{previewDomain}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Your readers will visit this URL to find your books, bio, and more.
-                </p>
-              </div>
-
-              {/* Terms & Conditions */}
-              <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => { setTermsAccepted(e.target.checked); setStep2Error(""); }}
-                  className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
-                />
-                <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
-                  I have read and agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
-                    Terms of Service
-                  </Link>
-                  {" "}and{" "}
-                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
-                    Privacy Policy
-                  </Link>
-                  . By creating an account I confirm I am at least 18 years of age.
-                </label>
-              </div>
-
-              {step2Error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                  {step2Error}
-                </p>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setStep(1); setStep2Error(""); }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
-                  disabled={
-                    submitting ||
-                    !slug ||
-                    !termsAccepted ||
-                    slugStatus === "taken" ||
-                    slugStatus === "invalid" ||
-                    slugStatus === "checking"
-                  }
-                >
-                  {submitting ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</>
-                  ) : (
-                    <><Check className="h-4 w-4 mr-2" />Create my account</>
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
         </div>
 
         {!registered && (

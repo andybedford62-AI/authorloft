@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## July 27, 2026 — Signup friction + author-changeable site URL
+
+- **Removed the site-URL step from signup.** Registration was two steps: account details, then picking a permanent `slug.authorloft.com` address (with live availability checking) *before* seeing any of the product. PostHog showed tagged social traffic reaching `/register` without completing, and this was the most likely culprit — a permanent commitment asked of someone who'd just clicked a link out of curiosity. Signup is now a single step (name, email, password, terms); the API derives a slug from the author's name and de-duplicates collisions automatically.
+- **Authors can now change their site URL** — Settings → Account → Site URL. This capability did **not previously exist anywhere in the product**: whatever slug you got at signup was permanent. New `GET`/`PATCH /api/admin/settings/slug` with validation, reserved-word and uniqueness checks, rate limiting (5/hour), and an audit-log entry. The UI warns that changing it breaks previously shared links, and notes that a configured custom domain is unaffected.
+- **Fixed: reserved slugs weren't actually enforced on registration.** The `RESERVED` list (`www`, `admin`, `api`, …) lived only inside the availability-check endpoint the form calls — the register API itself never checked it, so a direct POST could claim a reserved subdomain. Extracted to `src/lib/reserved-slugs.ts` and now enforced on every path that assigns a slug. Also expanded the list, which was missing live marketing routes (`news`, `guides`, `features`, `bookstore`, `pricing`, `compare`, `demo`, `ingest`, …).
+
 ## July 17, 2026
 
 - **Fixed: Site Traffic Analytics was silently broken since launch** — the `/admin/analytics` dashboard (PostHog page-view data) always showed 0 visitors for every author, because the site never actually sent PostHog's `$pageview` event — only 7 backend lifecycle events (signup, login, etc.) existed, no browser-side tracking snippet at all. Root-caused and fixed as a chain of issues:

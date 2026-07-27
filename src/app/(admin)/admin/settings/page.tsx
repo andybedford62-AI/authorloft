@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
 import { HelpTip } from "@/components/admin/help-tip";
+import { slugify } from "@/lib/utils";
+
+const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
 // ── Subscription & Billing section ───────────────────────────────────────────
 
@@ -1050,6 +1053,158 @@ function BadgesToggle() {
   );
 }
 
+// ── Site URL ──────────────────────────────────────────────────────────────────
+
+function SiteUrlSection() {
+  const toast = useToast();
+
+  const [currentSlug, setCurrentSlug] = useState<string | null>(null);
+  const [customDomain, setCustomDomain] = useState<string | null>(null);
+  const [slug, setSlug] = useState("");
+  const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/settings/slug")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.slug) { setCurrentSlug(d.slug); setSlug(d.slug); }
+        if (d.customDomain) setCustomDomain(d.customDomain);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Debounced availability check — skipped while the value still matches what's saved
+  useEffect(() => {
+    if (!slug || currentSlug === null) { setStatus("idle"); return; }
+    if (slug === currentSlug) { setStatus("idle"); return; }
+
+    setStatus("checking");
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/auth/check-slug?slug=${encodeURIComponent(slug)}`);
+        const data = await res.json();
+        if (data.reason) setStatus("invalid");
+        else setStatus(data.available ? "available" : "taken");
+      } catch {
+        setStatus("idle");
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [slug, currentSlug]);
+
+  const changed = !!currentSlug && slug !== currentSlug;
+
+  async function handleSave() {
+    setError("");
+    if (!changed) return;
+    if (!confirm(
+      `Change your site URL to ${slug}.${PLATFORM_DOMAIN}?\n\n` +
+      `Any links you've already shared using ${currentSlug}.${PLATFORM_DOMAIN} will stop working.`
+    )) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/slug", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Could not update your site URL."); return; }
+      setCurrentSlug(data.slug);
+      setSlug(data.slug);
+      setStatus("idle");
+      toast("success", "Site URL updated");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Site URL
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          The address readers use to find your author site. We picked one from your name when
+          you signed up — change it to whatever you'd like.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-gray-700">Your address</label>
+        <div className="flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden max-w-md">
+          <input
+            type="text"
+            value={slug}
+            onChange={(e) => { setSlug(slugify(e.target.value)); setError(""); }}
+            placeholder="yourname"
+            maxLength={40}
+            className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
+          />
+          <span className="px-3 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-400 whitespace-nowrap flex-shrink-0">
+            .{PLATFORM_DOMAIN}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 h-5">
+          {status === "checking"  && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
+          {status === "available" && <Check className="h-4 w-4 text-green-500" />}
+          {changed && status !== "idle" && (
+            <span className={`text-xs font-medium ${
+              status === "available" ? "text-green-600" :
+              status === "taken"     ? "text-red-600"   :
+              status === "invalid"   ? "text-amber-600" : "text-gray-400"
+            }`}>
+              {status === "available" && "Available!"}
+              {status === "taken"     && "Already taken"}
+              {status === "invalid"   && "3–40 characters, letters, numbers, hyphens"}
+              {status === "checking"  && "Checking…"}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {changed && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <p>
+            Changing this breaks any links you've already shared to{" "}
+            <span className="font-medium">{currentSlug}.{PLATFORM_DOMAIN}</span> — including
+            links in published books, social posts, and email newsletters.
+          </p>
+        </div>
+      )}
+
+      {customDomain && (
+        <p className="text-xs text-gray-400">
+          Your custom domain <span className="font-medium text-gray-500">{customDomain}</span> is
+          unaffected by this change.
+        </p>
+      )}
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+      )}
+
+      <Button
+        onClick={handleSave}
+        disabled={saving || !changed || status === "taken" || status === "invalid" || status === "checking"}
+      >
+        {saving
+          ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+          : <><Check className="h-4 w-4 mr-2" />Update Site URL</>}
+      </Button>
+    </section>
+  );
+}
+
 // ── Account tab content ───────────────────────────────────────────────────────
 
 function AccountTab() {
@@ -1122,6 +1277,9 @@ function AccountTab() {
           </div>
         </div>
       </section>
+
+      {/* Site URL */}
+      <SiteUrlSection />
 
       {/* Marketing showcase opt-in */}
       <ShowcaseToggle />

@@ -7,6 +7,7 @@ import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mai
 import { passwordStrengthError } from "@/lib/password-validation";
 import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import { capturePostHog } from "@/lib/posthog";
+import { RESERVED_SLUGS, validateSlug, slugProblemMessage } from "@/lib/reserved-slugs";
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 
@@ -14,17 +15,30 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+/**
+ * Derives a usable, unique slug from a display name. The signup form no longer
+ * asks for one — people pick their real site URL later in Settings — so this
+ * has to cope with names that don't slugify cleanly (too short, empty, or
+ * colliding with a reserved word) as well as ordinary collisions.
+ */
+async function uniqueSlug(rawBase: string): Promise<string> {
+  let base = rawBase;
+  if (base.length < 3 || RESERVED_SLUGS.includes(base)) {
+    base = base ? `${base}-author` : "author";
+  }
+  base = base.slice(0, 34); // leave headroom for a numeric suffix
 
-function isValidSlug(slug: string) {
-  return /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug);
-}
-
-// Ensure a slug is unique — appends a number if taken (e.g. janedoe → janedoe2)
-async function uniqueSlug(base: string): Promise<string> {
   let candidate = base;
   let attempt = 2;
-  while (await prisma.author.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+  while (
+    validateSlug(candidate) !== null ||
+    (await prisma.author.findUnique({ where: { slug: candidate }, select: { id: true } }))
+  ) {
     candidate = `${base}${attempt++}`;
+    if (attempt > 500) {
+      candidate = `${base}-${randomBytes(4).toString("hex")}`;
+      break;
+    }
   }
   return candidate;
 }
@@ -107,22 +121,17 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Slug handling ───────────────────────────────────────────────────────
-    const slugBase = rawSlug
-      ? slugify(rawSlug)
-      : slugify(name.trim());
-
-    if (!slugBase || slugBase.length < 3) {
-      return NextResponse.json(
-        { error: "Could not generate a valid site URL from your name. Please enter one manually." },
-        { status: 400 }
-      );
-    }
-
-    if (rawSlug && !isValidSlug(slugBase)) {
-      return NextResponse.json(
-        { error: "Site URL may only contain lowercase letters, numbers, and hyphens (3–40 characters)." },
-        { status: 400 }
-      );
+    // The signup form no longer collects a slug — it's derived from the name and
+    // changed later in Settings. An explicit slug is still honoured (direct API
+    // callers) but must pass full validation, including the reserved list.
+    if (rawSlug) {
+      const problem = validateSlug(slugify(rawSlug));
+      if (problem) {
+        return NextResponse.json(
+          { error: slugProblemMessage(problem), field: "slug" },
+          { status: 400 }
+        );
+      }
     }
 
     // ── Uniqueness checks ───────────────────────────────────────────────────
@@ -149,20 +158,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // If the user supplied a specific slug, check it's free — otherwise auto-increment
+    // An explicit slug must be free; a derived one auto-resolves collisions.
     const finalSlug = rawSlug
-      ? slugBase
-      : await uniqueSlug(slugBase);
+      ? slugify(rawSlug)
+      : await uniqueSlug(slugify(name.trim()));
 
-    const existingSlug = await prisma.author.findUnique({
-      where: { slug: finalSlug },
-      select: { id: true },
-    });
-    if (existingSlug) {
-      return NextResponse.json(
-        { error: "This site URL is already taken. Please choose another.", field: "slug" },
-        { status: 409 }
-      );
+    if (rawSlug) {
+      const existingSlug = await prisma.author.findUnique({
+        where: { slug: finalSlug },
+        select: { id: true },
+      });
+      if (existingSlug) {
+        return NextResponse.json(
+          { error: "This site URL is already taken. Please choose another.", field: "slug" },
+          { status: 409 }
+        );
+      }
     }
 
     // ── Create account ──────────────────────────────────────────────────────
