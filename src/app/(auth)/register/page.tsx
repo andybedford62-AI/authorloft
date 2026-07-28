@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sanitize } from "@/lib/sanitize";
 import { RequestAccessModal } from "@/components/auth/RequestAccessModal";
+import { authPageStyle, authCardStyle, authPrimaryStyle, authNoticeStyle, AUTH_LINK, AUTH_BRASS, AUTH_INK } from "../auth-theme";
 
 // ── Beta status ───────────────────────────────────────────────────────────────
 
@@ -163,14 +164,14 @@ function RegisterPageInner() {
   // Wait for beta status before rendering the form
   if (betaStatus === null) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={authPageStyle}>
         <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={authPageStyle}>
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -186,9 +187,9 @@ function RegisterPageInner() {
 
         {/* ── Success: email verification prompt ── */}
         {registered ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center space-y-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-50 mx-auto">
-              <svg className="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="p-8 text-center space-y-4" style={authCardStyle}>
+            <div className="flex items-center justify-center w-14 h-14 rounded-full mx-auto" style={{ backgroundColor: "#FBF3E4" }}>
+              <svg className="h-7 w-7" style={{ color: AUTH_BRASS }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0-9.75 6.75L2.25 6.75" />
               </svg>
             </div>
@@ -199,7 +200,7 @@ function RegisterPageInner() {
               <br />
               Click the link in the email to activate your account.
             </p>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800 text-left space-y-1">
+            <div className="px-4 py-3 text-sm text-left space-y-1" style={authNoticeStyle}>
               <p className="font-medium">Before you can sign in:</p>
               <ol className="list-decimal list-inside space-y-1 text-amber-700">
                 <li>Verify your email by clicking the link we just sent</li>
@@ -211,13 +212,14 @@ function RegisterPageInner() {
             </div>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center w-full mt-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+              className="inline-flex items-center justify-center w-full mt-2 px-4 py-2.5 text-sm font-medium rounded-md transition-opacity hover:opacity-90"
+              style={{ backgroundColor: AUTH_BRASS, color: AUTH_INK }}
             >
               Go to Sign In
             </Link>
             <p className="text-xs text-gray-400">
               Didn&apos;t receive it? Check your spam folder or{" "}
-              <Link href="/verify-email/invalid" className="text-blue-600 hover:underline">
+              <Link href="/verify-email/invalid" className="hover:underline" style={{ color: AUTH_LINK }}>
                 resend the email
               </Link>
               .
@@ -233,12 +235,9 @@ function RegisterPageInner() {
             <div key={label} className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  visualStep > idx
-                    ? "bg-blue-600 text-white"
-                    : visualStep === idx
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-400"
+                  visualStep >= idx ? "" : "bg-gray-200 text-gray-400"
                 }`}
+                style={visualStep >= idx ? { backgroundColor: AUTH_BRASS, color: AUTH_INK } : undefined}
               >
                 {visualStep > idx ? <Check className="h-3.5 w-3.5" /> : idx + 1}
               </div>
@@ -251,14 +250,14 @@ function RegisterPageInner() {
         </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="p-8" style={authCardStyle}>
 
           {/* ── STEP 0: Invite code (beta only) ────────────────────────── */}
           {step === 0 && (
             <form onSubmit={handleInviteCode} className="space-y-5">
               <div>
                 <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
-                  <KeyRound className="h-5 w-5 text-blue-500" />
+                  <KeyRound className="h-5 w-5" style={{ color: AUTH_BRASS }} />
                   Enter your invite code
                 </h2>
                 {betaMessage ? (
@@ -293,8 +292,8 @@ function RegisterPageInner() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                className="w-full"
+                style={authPrimaryStyle}
               >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -305,7 +304,7 @@ function RegisterPageInner() {
                 <button
                   type="button"
                   onClick={() => setShowRequestModal(true)}
-                  className="text-blue-600 hover:underline"
+                  className="hover:underline" style={{ color: AUTH_LINK }}
                 >
                   Request access
                 </button>
@@ -373,7 +372,7 @@ function RegisterPageInner() {
                       placeholder="Min. 8 chars, uppercase, number, symbol"
                       autoComplete="new-password"
                       required
-                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                     <button
                       type="button"
@@ -442,15 +441,16 @@ function RegisterPageInner() {
                     type="checkbox"
                     checked={termsAccepted}
                     onChange={(e) => { setTermsAccepted(e.target.checked); setStep1Error(""); }}
-                    className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
+                    className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 cursor-pointer"
+                    style={{ accentColor: AUTH_BRASS }}
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
                     I have read and agree to the{" "}
-                    <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
+                    <Link href="/terms" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
                       Terms of Service
                     </Link>
                     {" "}and{" "}
-                    <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
+                    <Link href="/privacy" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
                       Privacy Policy
                     </Link>
                     . By creating an account I confirm I am at least 18 years of age.
@@ -467,8 +467,8 @@ function RegisterPageInner() {
                   type="submit"
                   size="lg"
                   disabled={submitting || !termsAccepted}
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                  className="w-full mt-2"
+                  style={authPrimaryStyle}
                 >
                   {submitting ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</>
@@ -500,7 +500,7 @@ function RegisterPageInner() {
         {!registered && (
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
+            <Link href="/login" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
               Sign in
             </Link>
           </p>
@@ -520,7 +520,7 @@ function RegisterPageInner() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={authPageStyle}>
         <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     }>

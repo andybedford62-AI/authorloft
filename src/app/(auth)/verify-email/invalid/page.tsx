@@ -5,6 +5,7 @@ import Link from "next/link";
 import { XCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authPageStyle, authCardStyle, authPrimaryStyle, AUTH_LINK } from "@/app/(auth)/auth-theme";
 
 export default function VerifyEmailInvalidPage() {
   const [email, setEmail] = useState("");
@@ -35,7 +36,7 @@ export default function VerifyEmailInvalidPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={authPageStyle}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center">
@@ -44,7 +45,7 @@ export default function VerifyEmailInvalidPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
+        <div className="p-8 text-center space-y-5" style={authCardStyle}>
           {sent ? (
             <>
               <div className="flex justify-center">
@@ -87,7 +88,8 @@ export default function VerifyEmailInvalidPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full"
+                  style={authPrimaryStyle}
                   disabled={loading}
                 >
                   {loading ? "Sending…" : "Send new verification link"}
@@ -98,7 +100,7 @@ export default function VerifyEmailInvalidPage() {
 
           <p className="text-xs text-gray-400">
             Already verified?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="hover:underline" style={{ color: AUTH_LINK }}>
               Sign in
             </Link>
           </p>

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { authPageStyle, authCardStyle, authPrimaryStyle, authNoticeStyle, AUTH_LINK } from "../auth-theme";
 
 function LoginForm() {
   const router = useRouter();
@@ -43,7 +44,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={authPageStyle}>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -53,13 +54,13 @@ function LoginForm() {
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Sign in to your author dashboard</p>
           {justRegistered && (
-            <p className="mt-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <p className="mt-3 text-sm text-left px-3 py-2" style={authNoticeStyle}>
               Almost there — check your email for a verification link before signing in.
             </p>
           )}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-5">
+        <div className="p-8 space-y-5" style={authCardStyle}>
 
           {/* Google sign-in */}
           <button
@@ -95,7 +96,7 @@ function LoginForm() {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">Password</label>
-                <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+                <Link href="/forgot-password" className="text-xs hover:underline" style={{ color: AUTH_LINK }}>
                   Forgot password?
                 </Link>
               </div>
@@ -106,7 +107,7 @@ function LoginForm() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 />
                 <button
                   type="button"
@@ -129,8 +130,8 @@ function LoginForm() {
               type="submit"
               disabled={loading}
               size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              style={{ "--accent": "#2563EB" } as React.CSSProperties}
+              className="w-full"
+              style={authPrimaryStyle}
             >
               {loading ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Signing in...</>
@@ -143,7 +144,7 @@ function LoginForm() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Don't have an account?{" "}
-          <Link href="/register" className="text-blue-600 hover:underline font-medium">
+          <Link href="/register" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
             Create one free
           </Link>
         </p>

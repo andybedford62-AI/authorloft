@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2, ArrowLeft, MailCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { authPageStyle, authCardStyle, authPrimaryStyle, AUTH_LINK, AUTH_BRASS } from "@/app/(auth)/auth-theme";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -39,7 +40,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={authPageStyle}>
       <div className="w-full max-w-sm">
 
         {/* Logo */}
@@ -50,14 +51,14 @@ export default function ForgotPasswordPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="p-8" style={authCardStyle}>
 
           {sent ? (
             /* ── Success state ──────────────────────────────────────── */
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <div className="bg-blue-50 rounded-full p-4">
-                  <MailCheck className="h-8 w-8 text-blue-600" />
+                <div className="rounded-full p-4" style={{ backgroundColor: "#FBF3E4" }}>
+                  <MailCheck className="h-8 w-8" style={{ color: AUTH_BRASS }} />
                 </div>
               </div>
               <h1 className="text-xl font-bold text-gray-900">Check your inbox</h1>
@@ -69,7 +70,7 @@ export default function ForgotPasswordPage() {
                 Don't see it? Check your spam folder, or{" "}
                 <button
                   onClick={() => { setSent(false); setEmail(""); }}
-                  className="text-blue-600 hover:underline"
+                  className="hover:underline" style={{ color: AUTH_LINK }}
                 >
                   try again
                 </button>
@@ -109,8 +110,8 @@ export default function ForgotPasswordPage() {
                   type="submit"
                   disabled={loading || !email}
                   size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                  className="w-full"
+                  style={authPrimaryStyle}
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending…</>
@@ -124,7 +125,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          <Link href="/login" className="inline-flex items-center gap-1.5 text-blue-600 hover:underline font-medium">
+          <Link href="/login" className="inline-flex items-center gap-1.5 hover:underline font-medium" style={{ color: AUTH_LINK }}>
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Sign In
           </Link>

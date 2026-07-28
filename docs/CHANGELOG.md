@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## July 27, 2026 — Brand-align the auth flow (de-generic pass)
+
+Audited the codebase with the [vibecoded-design-tells](https://github.com/JCarterJohnson/vibecoded-design-tells) scanner, which ranks the visual patterns people cite when they call a site AI-generated. Fixed the findings that a real visitor actually sees:
+
+- **The entire auth flow used stock Tailwind, not AuthorLoft's brand.** All 7 pages (login, register, forgot/reset password, verify email, accept terms) shipped with `bg-gray-50` + `bg-white rounded-2xl border-gray-200` + `#2563EB` Tailwind blue as the primary action — so signing in looked like a different product than the navy/brass/cream marketing site that sent you there, in the most generic default a generator produces. New `src/app/(auth)/auth-theme.ts` anchors the flow to the real brand: warm page field, deliberate 10px card radius (instead of the blanket `rounded-2xl`), brass primary buttons with dark-navy text, brass links and focus rings. `--accent` is now set once on the page wrapper, which the shared `Input` already consumes — so inputs, buttons, and focus states all resolve from one place instead of each hardcoding blue.
+- **Emoji-as-icons replaced with real icons** — the integration strip on both marketing variants used 💳 ✉️ 📬 📊 ✨ ⚡ as UI icons; now Lucide icons in brand brass.
+- **Testimonials eyebrow badge** moved off Tailwind's stock `amber-50/600` swatch onto brand brass.
+- Kept deliberately: the FLIPBOOK `#7c3aed` (a real per-format colour system, not an unchosen default), the Playfair heading face (a genuine choice for a literary brand), and all admin/super-admin internals (never seen by prospects; changing them is risk without payoff).
+
+Presentational only — no logic changed. Verified with `tsc --noEmit` and a full `next build` (239/239 pages).
+
 ## July 27, 2026 — Signup friction + author-changeable site URL
 
 - **Removed the site-URL step from signup.** Registration was two steps: account details, then picking a permanent `slug.authorloft.com` address (with live availability checking) *before* seeing any of the product. PostHog showed tagged social traffic reaching `/register` without completing, and this was the most likely culprit — a permanent commitment asked of someone who'd just clicked a link out of curiosity. Signup is now a single step (name, email, password, terms); the API derives a slug from the author's name and de-duplicates collisions automatically.

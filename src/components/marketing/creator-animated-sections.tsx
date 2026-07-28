@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Sparkles, Zap, BarChart3, Search, MessageSquare, Share2 } from 'lucide-react';
+import { Sparkles, Zap, BarChart3, Search, MessageSquare, Share2, CreditCard, Mail, Send } from 'lucide-react';
 
 const ML = {
   midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
@@ -158,12 +158,12 @@ export function CreatorJourneySection() {
 // ── Integration strip — creator-generic ─────────────────────────────────────
 
 const INTEGRATIONS = [
-  { name: 'Stripe', desc: 'Payments', icon: '💳' },
-  { name: 'Mailchimp', desc: 'Email', icon: '✉️' },
-  { name: 'ConvertKit', desc: 'Newsletter', icon: '📬' },
-  { name: 'PostHog', desc: 'Analytics', icon: '📊' },
-  { name: 'Gemini AI', desc: 'Content AI', icon: '✨' },
-  { name: 'Resend', desc: 'Transactional', icon: '⚡' },
+  { name: 'Stripe', desc: 'Payments', Icon: CreditCard },
+  { name: 'Mailchimp', desc: 'Email', Icon: Mail },
+  { name: 'ConvertKit', desc: 'Newsletter', Icon: Send },
+  { name: 'PostHog', desc: 'Analytics', Icon: BarChart3 },
+  { name: 'Gemini AI', desc: 'Content AI', Icon: Sparkles },
+  { name: 'Resend', desc: 'Transactional', Icon: Zap },
 ];
 
 export function CreatorIntegrationStrip() {
@@ -183,7 +183,7 @@ export function CreatorIntegrationStrip() {
               onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 20px rgba(27,43,71,0.1)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.boxShadow = ''; }}
             >
-              <span style={{ fontSize: 18 }}>{tool.icon}</span>
+              <tool.Icon size={18} strokeWidth={1.75} style={{ color: ML.brass, flexShrink: 0 }} aria-hidden="true" />
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: ML.ink, lineHeight: 1.2 }}>{tool.name}</div>
                 <div style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: ML.slate }}>{tool.desc}</div>

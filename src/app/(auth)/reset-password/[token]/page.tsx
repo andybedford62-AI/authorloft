@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Loader2, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { authPageStyle, authCardStyle, authPrimaryStyle, AUTH_LINK, AUTH_BRASS } from "@/app/(auth)/auth-theme";
 
 type TokenState = "checking" | "valid" | "invalid";
 
@@ -85,7 +86,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={authPageStyle}>
       <div className="w-full max-w-sm">
 
         {/* Logo */}
@@ -96,12 +97,12 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="p-8" style={authCardStyle}>
 
           {/* ── Checking token ─────────────────────────────────────────── */}
           {tokenState === "checking" && (
             <div className="flex flex-col items-center gap-3 py-4">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              <Loader2 className="h-8 w-8 animate-spin" style={{ color: AUTH_BRASS }} />
               <p className="text-sm text-gray-500">Verifying your reset link…</p>
             </div>
           )}
@@ -119,8 +120,8 @@ export default function ResetPasswordPage() {
               <Link href="/forgot-password">
                 <Button
                   size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                  className="w-full mt-2"
+                  style={authPrimaryStyle}
                 >
                   Request a new reset link
                 </Button>
@@ -138,7 +139,7 @@ export default function ResetPasswordPage() {
               <p className="text-sm text-gray-500 leading-relaxed">
                 Your password has been changed successfully. Redirecting you to sign in…
               </p>
-              <Link href="/login" className="text-sm text-blue-600 hover:underline">
+              <Link href="/login" className="text-sm hover:underline" style={{ color: AUTH_LINK }}>
                 Sign in now
               </Link>
             </div>
@@ -169,7 +170,7 @@ export default function ResetPasswordPage() {
                       autoComplete="new-password"
                       required
                       autoFocus
-                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                     <button
                       type="button"
@@ -219,8 +220,8 @@ export default function ResetPasswordPage() {
                   type="submit"
                   disabled={loading || !password || !confirmPassword}
                   size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                  className="w-full"
+                  style={authPrimaryStyle}
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating…</>
