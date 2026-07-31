@@ -93,6 +93,12 @@ function RegisterPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [registered, setRegistered] = useState(false);
 
+  // Beta mode is off far more often than on, so the initial render assumes
+  // step 1 (the real form, with its links) rather than blocking on the
+  // fetch — crawlers and slow-JS users get real content immediately instead
+  // of an empty loading shell. The effect above flips to step 0 if beta
+  // turns out to be on.
+
   // ── Step 0: invite code ─────────────────────────────────────────────────
   function handleInviteCode(e: React.FormEvent) {
     e.preventDefault();
@@ -160,15 +166,6 @@ function RegisterPageInner() {
   const stepLabels = ["Invite code", "Your account"];
   const totalSteps = stepLabels.length;
   const visualStep = step;
-
-  // Wait for beta status before rendering the form
-  if (betaStatus === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={authPageStyle}>
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12" style={authPageStyle}>
