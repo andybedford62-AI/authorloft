@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## July 31, 2026 — SEO crawl-report cleanup + Bing indexing block
+
+Worked through a batch of Bing/SEO crawler reports (noindex, 404, 3xx-redirect, broken-outlink, no-outlink CSVs) and fixed what was real:
+
+- **Vercel Firewall was blocking Bingbot.** "Bot Protection" was set to Challenge, which issues a JS challenge to any non-browser request — including verified search crawlers, since Vercel's bot verification wasn't reliably passing them through. Confirmed via curl with Bingbot's user agent (429 + `X-Vercel-Mitigated: challenge` before, clean 200 after). Switched to Log (records bot traffic, blocks nothing) in the Vercel dashboard — this was almost certainly also affecting Googlebot and social link-unfurlers, not just Bing.
+- **Buy button 404 on 2 legacy books** (`build-a-solid-saas-app`, `build-vibe-scale`, both on `apbedford2`) — Direct Sales enabled + a price, but no `BookDirectSaleItem` row (pre-dates the per-format items system), so `/buy` always 404'd. It now provisions the missing item from the book's own price/format instead of 404ing.
+- **`/register` served an empty page to crawlers** — the whole first render blocked on a client-side beta-status fetch, so the real HTML (logo, Terms/Privacy links, sign-in link) never shipped until JS hydrated. Now renders the real form immediately; flips to the invite-code step if beta mode turns out to be on.
+- **Broken content links fixed directly in the DB**: a Guide and a News post linked to pages that were never created (`/guides/author-branding-colors-fonts-genre`, public `/help`); 8 blog posts linked to the 2 retired blog URLs (and one to a bare `http://` homepage link) that 308-redirect instead of linking straight to the canonical destination.
+
 ## July 27, 2026 — Brand-align the auth flow (de-generic pass)
 
 Audited the codebase with the [vibecoded-design-tells](https://github.com/JCarterJohnson/vibecoded-design-tells) scanner, which ranks the visual patterns people cite when they call a site AI-generated. Fixed the findings that a real visitor actually sees:

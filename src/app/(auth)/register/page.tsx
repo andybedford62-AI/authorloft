@@ -44,18 +44,38 @@ function passwordStrength(p: string): { score: number; label: string; color: str
   return             { score, label: "Strong", color: "bg-green-500" };
 }
 
+// Isolated so only this sliver needs a Suspense boundary for useSearchParams —
+// the rest of the page (logo, form, Terms/Privacy links) renders in the
+// static shell instead of being deferred to client hydration along with it.
+function SearchParamsBridge({
+  setIntendedPlan,
+  setInviteError,
+}: {
+  setIntendedPlan: (plan: string | null) => void;
+  setInviteError: (error: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    setIntendedPlan(searchParams.get("plan")?.toLowerCase() ?? null);
+    if (searchParams.get("google_beta_blocked") === "1") {
+      setInviteError("Google sign-up is not available during beta. Please use your invite code below.");
+    }
+  }, [searchParams, setIntendedPlan, setInviteError]);
+  return null;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 function RegisterPageInner() {
-  const searchParams = useSearchParams();
   const betaStatus   = useBetaStatus();
 
   // betaStatus null = still loading; defer rendering until known
   const betaMode    = betaStatus?.betaMode ?? false;
   const betaMessage = betaStatus?.betaMessage ?? "";
 
-  // Intended plan from marketing page (?plan=standard or ?plan=premium)
-  const intendedPlan = searchParams.get("plan")?.toLowerCase() ?? null;
+  // Intended plan from marketing page (?plan=standard or ?plan=premium) —
+  // populated by SearchParamsBridge after mount.
+  const [intendedPlan, setIntendedPlan] = useState<string | null>(null);
   const intendedPlanLabel = intendedPlan === "premium" ? "Premium" : intendedPlan === "standard" ? "Standard" : null;
 
   // Step 0 = invite code (beta only); Step 1 = account. The site URL used to be
@@ -66,11 +86,7 @@ function RegisterPageInner() {
 
   // Step 0 fields
   const [inviteCode,      setInviteCode]      = useState("");
-  const [inviteError,     setInviteError]     = useState(
-    searchParams.get("google_beta_blocked") === "1"
-      ? "Google sign-up is not available during beta. Please use your invite code below."
-      : ""
-  );
+  const [inviteError,     setInviteError]     = useState("");
 
   // Step 1 fields
   const [name,            setName]            = useState("");
@@ -169,6 +185,9 @@ function RegisterPageInner() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12" style={authPageStyle}>
+      <Suspense fallback={null}>
+        <SearchParamsBridge setIntendedPlan={setIntendedPlan} setInviteError={setInviteError} />
+      </Suspense>
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -515,13 +534,5 @@ function RegisterPageInner() {
 }
 
 export default function RegisterPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={authPageStyle}>
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    }>
-      <RegisterPageInner />
-    </Suspense>
-  );
+  return <RegisterPageInner />;
 }

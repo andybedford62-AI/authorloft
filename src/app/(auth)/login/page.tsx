@@ -9,10 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authPageStyle, authCardStyle, authPrimaryStyle, authNoticeStyle, AUTH_LINK } from "../auth-theme";
 
+// Isolated so only this sliver needs a Suspense boundary for useSearchParams —
+// the rest of the page (logo, form, links) renders in the static shell
+// instead of being deferred to client hydration along with it.
+function RegisteredBanner() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("registered") !== "1") return null;
+  return (
+    <p className="mt-3 text-sm text-left px-3 py-2" style={authNoticeStyle}>
+      Almost there — check your email for a verification link before signing in.
+    </p>
+  );
+}
+
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const justRegistered = searchParams.get("registered") === "1";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -53,11 +64,9 @@ function LoginForm() {
             <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Sign in to your author dashboard</p>
-          {justRegistered && (
-            <p className="mt-3 text-sm text-left px-3 py-2" style={authNoticeStyle}>
-              Almost there — check your email for a verification link before signing in.
-            </p>
-          )}
+          <Suspense fallback={null}>
+            <RegisteredBanner />
+          </Suspense>
         </div>
 
         <div className="p-8 space-y-5" style={authCardStyle}>
@@ -154,9 +163,5 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
-  return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
-  );
+  return <LoginForm />;
 }
