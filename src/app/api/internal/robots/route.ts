@@ -38,7 +38,6 @@ Disallow: /super-admin
 Disallow: /api/
 Disallow: /auth/
 Disallow: /orders/
-Disallow: /_next
 Disallow: /maintenance
 Disallow: /arc/
 
@@ -47,7 +46,6 @@ Allow: /
 Disallow: /admin
 Disallow: /super-admin
 Disallow: /api/
-Disallow: /_next
 
 Sitemap: https://${host}/sitemap.xml
 `;
