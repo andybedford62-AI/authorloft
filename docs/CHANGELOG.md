@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## July 31, 2026 — Super Admin sidebar gets its own visual zone
+
+The Super Admin nav block sits stacked directly under the regular Admin nav in the same sidebar (there's no separate view to switch into) — previously only the *active* link turned purple, so at rest the two sections were hard to tell apart while scanning. The whole Super Admin block (Platform Dashboard + all its groups) now sits in a persistent purple-tinted panel (background + border, both themes), its idle nav-item/group-label text is purple-toned instead of the neutral admin color, and a Shield icon sits next to the "Super Admin" heading so the cue doesn't rely on color alone.
+
 ## July 31, 2026 — Individual author emails + reusable follow-up templates
 
 Super Admin could only email authors two ways: the system Welcome Email (auto-sent on signup) or a Mass Email broadcast to a whole plan-tier segment. There was no way to send one author a personal note. Extended the existing mass-email infrastructure instead of building a new page:
