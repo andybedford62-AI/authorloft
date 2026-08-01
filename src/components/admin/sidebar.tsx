@@ -209,10 +209,17 @@ function tokens(theme: "dark" | "light") {
       : "text-[#6b5f53] hover:text-[#3d3328] hover:bg-[#e8e0d4]",
     navActive:    "bg-blue-600 text-white",
     superActive:  dark ? "bg-purple-700 text-white" : "bg-purple-600 text-white",
+    // Super Admin zone gets its own persistent purple wash + idle-state tint
+    // (not just an active-state color) so the whole block reads as a
+    // distinct area at a glance, not just when a link inside it is active.
+    superSectionBg: dark
+      ? "bg-purple-950/40 border border-purple-900/60"
+      : "bg-purple-50 border border-purple-200",
     superItem:    dark
-      ? "text-gray-400 hover:text-white hover:bg-gray-800"
-      : "text-[#6b5f53] hover:text-[#3d3328] hover:bg-[#e8e0d4]",
-    superLabel:   dark ? "text-gray-500"  : "text-[#9b8e7e]",
+      ? "text-purple-300 hover:text-white hover:bg-purple-900/50"
+      : "text-purple-700 hover:text-purple-950 hover:bg-purple-100",
+    superLabel:   dark ? "text-purple-400"  : "text-purple-500",
+    superHeader:  dark ? "text-purple-300"  : "text-purple-800",
     divider:      dark ? "bg-gray-800"    : "bg-[#ddd6c8]",
     signout:      dark
       ? "text-gray-400 hover:text-white hover:bg-gray-800"
@@ -530,34 +537,39 @@ export function AdminSidebar({
           />
         ))}
 
-        {/* Super Admin section — pinned dashboard + grouped collapsibles */}
+        {/* Super Admin section — visually walled off in its own purple-tinted
+            zone (persistent background + border, not just active-state color)
+            so it reads as a distinct area even when nothing in it is active. */}
         {isSuperAdmin && (
           <>
             <div className={cn("h-px mx-1", t.divider)} />
-            <p className={cn("px-3 pt-1 text-[10px] font-bold uppercase tracking-widest", t.superLabel)}>
-              Super Admin
-            </p>
+            <div className={cn("rounded-lg p-2 space-y-1", t.superSectionBg)}>
+              <p className={cn("flex items-center gap-1.5 px-1 pt-0.5 pb-1 text-[10px] font-bold uppercase tracking-widest", t.superHeader)}>
+                <Shield className="h-3 w-3 flex-shrink-0" />
+                Super Admin
+              </p>
 
-            {/* Platform Dashboard — pinned, exact-match active */}
-            <Link
-              href="/super-admin"
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                pathname === "/super-admin" ? t.superActive : t.superItem
-              )}
-            >
-              <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-              Platform Dashboard
-            </Link>
+              {/* Platform Dashboard — pinned, exact-match active */}
+              <Link
+                href="/super-admin"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  pathname === "/super-admin" ? t.superActive : t.superItem
+                )}
+              >
+                <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+                Platform Dashboard
+              </Link>
 
-            {SUPER_ADMIN_GROUPS.map((group) => (
-              <SuperNavGroupSection
-                key={group.key}
-                group={group}
-                pathname={pathname}
-                t={t}
-              />
-            ))}
+              {SUPER_ADMIN_GROUPS.map((group) => (
+                <SuperNavGroupSection
+                  key={group.key}
+                  group={group}
+                  pathname={pathname}
+                  t={t}
+                />
+              ))}
+            </div>
           </>
         )}
 
