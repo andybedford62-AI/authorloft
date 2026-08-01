@@ -38,10 +38,66 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { subject, broadcastBody, audienceFilter = "ALL" } = body;
+  const { subject, broadcastBody, audienceFilter = "ALL", authorId } = body;
 
   if (!subject?.trim()) return NextResponse.json({ error: "Subject is required." }, { status: 400 });
   if (!broadcastBody?.trim()) return NextResponse.json({ error: "Body is required." }, { status: 400 });
+
+  // ── Individual send — one author, personal reply-to, no unsubscribe footer ──
+  if (authorId) {
+    const author = await prisma.author.findUnique({
+      where:  { id: authorId },
+      select: { id: true, email: true, name: true, displayName: true },
+    });
+    if (!author) return NextResponse.json({ error: "Author not found." }, { status: 404 });
+
+    const admin = await prisma.author.findUnique({
+      where:  { id: superAdminId },
+      select: { email: true },
+    });
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const payload = buildBroadcastMailPayload({
+      to:        author.email,
+      firstName: (author.displayName || author.name).split(" ")[0],
+      subject:   subject.trim(),
+      body:      broadcastBody.trim(),
+      replyTo:   admin?.email,
+    });
+
+    let sent = 0;
+    let failed = 0;
+    try {
+      const result = await resend.emails.send(payload);
+      if (result.error) {
+        console.error("[broadcast] Individual send error:", result.error);
+        failed = 1;
+      } else {
+        sent = 1;
+      }
+    } catch (err) {
+      console.error("[broadcast] Individual send failed:", err);
+      failed = 1;
+    }
+
+    if (sent) {
+      await prisma.platformBroadcast.create({
+        data: {
+          subject:           subject.trim(),
+          body:              broadcastBody.trim(),
+          audienceFilter:    "INDIVIDUAL",
+          recipientCount:    1,
+          recipientAuthorId: author.id,
+          recipientEmail:    author.email,
+          sentBy:            superAdminId,
+        },
+      });
+    }
+
+    return NextResponse.json({ ok: sent > 0, sent, failed, total: 1 });
+  }
+
+  // ── Mass broadcast — audience segment ────────────────────────────────────
   if (!VALID_FILTERS.includes(audienceFilter)) {
     return NextResponse.json({ error: "Invalid audience filter." }, { status: 400 });
   }

@@ -155,8 +155,8 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | Feature | Status | Notes |
 |---------|--------|-------|
 | **Author Management** | Live | Search, view, edit, suspend, assign coupons |
-| **Mass Email Broadcasts** | Live | Send to FREE/STANDARD/PREMIUM segments |
-| **Email Templates** | Live | Save & reuse broadcast templates |
+| **Mass Email Broadcasts** | Live | Send to FREE/STANDARD/PREMIUM segments, or a single author (personal note, reply-to = admin) |
+| **Email Templates** | Live | Save, edit in place, categorize (Welcome/Support/Promotion/Re-engagement) & reuse |
 | **Welcome Email Editor** | Live | Customize new-author welcome |
 | **Support Email Management** | Live | Add/edit/manage platform contact emails |
 | **Testimonials Manager** | Live | Add/edit/display social proof |

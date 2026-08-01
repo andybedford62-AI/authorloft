@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
+import { SendAuthorEmailModal } from "./send-author-email-modal";
 
 type Author = {
   id: string;
@@ -67,6 +68,7 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
   const [deleting,      setDeleting]      = useState<string | null>(null);
   const [confirmId,     setConfirmId]     = useState<string | null>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [emailTarget,   setEmailTarget]   = useState<Author | null>(null);
 
   async function toggleActive(author: Author) {
     setToggling(author.id);
@@ -226,6 +228,15 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 {/* Actions */}
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-end gap-1">
+                    {/* Send personal email */}
+                    <IconButton
+                      icon={<Mail className="h-4 w-4" />}
+                      title="Send email"
+                      variant="ghost"
+                      className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                      onClick={() => setEmailTarget(author)}
+                    />
+
                     {/* Impersonate */}
                     <IconButton
                       icon={<UserCheck className="h-4 w-4" />}
@@ -310,6 +321,11 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
           </div>
         );
       })()}
+
+      {/* Send personal email modal */}
+      {emailTarget && (
+        <SendAuthorEmailModal author={emailTarget} onClose={() => setEmailTarget(null)} />
+      )}
     </>
   );
 }

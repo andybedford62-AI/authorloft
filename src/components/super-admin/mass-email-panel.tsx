@@ -1,26 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Loader2, History, Users, BookmarkPlus, FolderOpen, Trash2, Check } from "lucide-react";
+import { Send, Loader2, History, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/admin/icon-button";
+import { EmailComposer } from "./email-composer";
 
 type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM";
 
 interface Broadcast {
-  id:             string;
-  subject:        string;
-  audienceFilter: string;
-  recipientCount: number;
-  sentAt:         string;
-}
-
-interface Template {
-  id:        string;
-  name:      string;
-  subject:   string;
-  body:      string;
-  updatedAt: string;
+  id:                string;
+  subject:           string;
+  audienceFilter:    string;
+  recipientCount:    number;
+  recipientEmail:    string | null;
+  sentAt:            string;
 }
 
 const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
@@ -40,56 +33,15 @@ export function MassEmailPanel() {
   const [error,        setError]        = useState("");
   const [history,        setHistory]        = useState<Broadcast[]>([]);
   const [loadingHistory, setLoadingHistory]  = useState(true);
-  const [templates,      setTemplates]       = useState<Template[]>([]);
-  const [showSaveModal,  setShowSaveModal]   = useState(false);
-  const [templateName,   setTemplateName]    = useState("");
-  const [savingTemplate, setSavingTemplate]  = useState(false);
-  const [showTemplates,  setShowTemplates]   = useState(false);
 
-  function loadTemplates() {
-    fetch("/api/super-admin/broadcast-templates")
-      .then(r => r.json())
-      .then(setTemplates)
-      .catch(() => {});
+  function loadHistory() {
+    fetch("/api/super-admin/broadcasts").then(r => r.json()).then(setHistory).catch(() => {});
   }
 
-  // Load broadcast history + templates
   useEffect(() => {
-    fetch("/api/super-admin/broadcasts")
-      .then(r => r.json())
-      .then(setHistory)
-      .catch(() => {})
-      .finally(() => setLoadingHistory(false));
-    loadTemplates();
+    loadHistory();
+    setLoadingHistory(false);
   }, []);
-
-  async function handleSaveTemplate() {
-    if (!templateName.trim()) return;
-    setSavingTemplate(true);
-    try {
-      await fetch("/api/super-admin/broadcast-templates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: templateName.trim(), subject, body }),
-      });
-      loadTemplates();
-      setShowSaveModal(false);
-      setTemplateName("");
-    } catch {}
-    finally { setSavingTemplate(false); }
-  }
-
-  function loadTemplate(t: Template) {
-    setSubject(t.subject);
-    setBody(t.body);
-    setShowTemplates(false);
-  }
-
-  async function deleteTemplate(id: string) {
-    if (!confirm("Delete this template?")) return;
-    await fetch(`/api/super-admin/broadcast-templates/${id}`, { method: "DELETE" });
-    loadTemplates();
-  }
 
   // Live recipient count when audience changes
   useEffect(() => {
@@ -121,8 +73,7 @@ export function MassEmailPanel() {
       setResult({ sent: data.sent, failed: data.failed });
       setSubject("");
       setBody("");
-      // Refresh history
-      fetch("/api/super-admin/broadcasts").then(r => r.json()).then(setHistory).catch(() => {});
+      loadHistory();
     } catch (err: any) {
       setError(err.message || "Failed to send broadcast.");
     } finally {
@@ -135,75 +86,14 @@ export function MassEmailPanel() {
 
       {/* Compose */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <Send className="h-4 w-4 text-gray-400" />
-            New Broadcast
-          </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowTemplates(!showTemplates)}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 transition-colors"
-            >
-              <FolderOpen className="h-3.5 w-3.5" />
-              Load template {templates.length > 0 && `(${templates.length})`}
-            </button>
-            <button
-              onClick={() => { setTemplateName(""); setShowSaveModal(true); }}
-              disabled={!subject.trim() && !body.trim()}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 disabled:opacity-40 transition-colors"
-            >
-              <BookmarkPlus className="h-3.5 w-3.5" />
-              Save as template
-            </button>
-          </div>
-        </div>
-
-        {/* Template list */}
-        {showTemplates && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            {templates.length === 0 ? (
-              <p className="text-sm text-gray-400 px-4 py-3">No saved templates yet.</p>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {templates.map(t => (
-                  <li key={t.id} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50">
-                    <button onClick={() => loadTemplate(t)} className="flex-1 text-left">
-                      <p className="text-sm font-medium text-gray-900">{t.name}</p>
-                      <p className="text-xs text-gray-400 truncate">{t.subject}</p>
-                    </button>
-                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete template" variant="delete" onClick={() => deleteTemplate(t.id)} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {/* Save template modal */}
-        {showSaveModal && (
-          <div className="border border-purple-200 bg-purple-50 rounded-lg p-4 space-y-3">
-            <p className="text-sm font-medium text-purple-900">Save as template</p>
-            <input
-              type="text"
-              value={templateName}
-              onChange={e => setTemplateName(e.target.value)}
-              placeholder="Template name (e.g. Monthly Update)"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              autoFocus
-            />
-            <div className="flex items-center gap-2">
-              <Button size="sm" onClick={handleSaveTemplate} disabled={savingTemplate || !templateName.trim()}>
-                {savingTemplate ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setShowSaveModal(false)}>Cancel</Button>
-            </div>
-          </div>
-        )}
-
-        <p className="text-sm text-gray-500">
-          Send an announcement, offer, or update to your authors. An unsubscribe link is automatically included.
-          Use <code className="bg-gray-100 px-1 rounded text-xs">{"{{firstName}}"}</code> to personalise.
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Send className="h-4 w-4 text-gray-400" />
+          New Broadcast
+        </h2>
+        <p className="text-sm text-gray-500 -mt-3">
+          Send an announcement, offer, or update to a segment of your authors. An unsubscribe link is
+          automatically included. For a personal one-to-one note, use the mail icon on an author's row
+          in <a href="/super-admin/authors" className="text-purple-600 hover:underline">All Authors</a> instead.
         </p>
 
         {/* Audience */}
@@ -226,29 +116,12 @@ export function MassEmailPanel() {
           </div>
         </div>
 
-        {/* Subject */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Subject</label>
-          <input
-            type="text"
-            value={subject}
-            onChange={e => setSubject(e.target.value)}
-            placeholder="Email subject…"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        </div>
-
-        {/* Body */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Body (plain text)</label>
-          <textarea
-            value={body}
-            onChange={e => setBody(e.target.value)}
-            rows={12}
-            placeholder={`Hi {{firstName}},\n\nYour message here…\n\n— The AuthorLoft Team`}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 resize-y"
-          />
-        </div>
+        <EmailComposer
+          subject={subject}
+          body={body}
+          onSubjectChange={setSubject}
+          onBodyChange={setBody}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -292,9 +165,15 @@ export function MassEmailPanel() {
                   </td>
                   <td className="py-2.5 pr-4 max-w-[240px] truncate">{b.subject}</td>
                   <td className="py-2.5 pr-4">
-                    <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
-                      {b.audienceFilter}
-                    </span>
+                    {b.audienceFilter === "INDIVIDUAL" ? (
+                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                        {b.recipientEmail ?? "Individual"}
+                      </span>
+                    ) : (
+                      <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                        {b.audienceFilter}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2.5 text-right font-medium">{b.recipientCount.toLocaleString()}</td>
                 </tr>

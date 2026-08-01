@@ -694,14 +694,16 @@ model Campaign {
 }
 
 model PlatformBroadcast {
-  id             String   @id @default(cuid())
-  subject        String
-  body           String
-  audienceFilter String   @default("ALL")
-  recipientCount Int      @default(0)
-  sentAt         DateTime @default(now())
-  sentBy         String
-  createdAt      DateTime @default(now())
+  id                String   @id @default(cuid())
+  subject           String
+  body              String
+  audienceFilter    String   @default("ALL")
+  recipientCount    Int      @default(0)
+  recipientAuthorId String? // set only for audienceFilter "INDIVIDUAL" — the single author this was sent to
+  recipientEmail    String? // snapshot of recipient email at send time (survives author deletion)
+  sentAt            DateTime @default(now())
+  sentBy            String
+  createdAt         DateTime @default(now())
 }
 
 model BroadcastTemplate {
@@ -709,6 +711,7 @@ model BroadcastTemplate {
   name      String
   subject   String
   body      String
+  category  String   @default("general") // "welcome" | "support" | "promotion" | "re-engagement" | "general"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

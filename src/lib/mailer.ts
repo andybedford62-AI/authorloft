@@ -1203,15 +1203,18 @@ export function buildPlatformBroadcastEmail(opts: {
   firstName: string;
   subject: string;
   body: string;
-  unsubscribeUrl: string;
+  unsubscribeUrl?: string;
 }): { html: string; text: string } {
   const escapedBody = opts.body
     .split("\n")
     .map(line => `<p style="margin:0 0 10px;font-size:14px;color:#374151;line-height:1.6;">${esc(line) || "&nbsp;"}</p>`)
     .join("\n");
 
+  // Personal 1:1 sends omit the "announcements" unsubscribe footer — it reads
+  // as an automated blast rather than a direct note when there's no list to leave.
   const html = wrapHtml(opts.subject, `
     ${escapedBody}
+    ${opts.unsubscribeUrl ? `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
       <tr>
         <td align="center" style="padding:8px 0 24px;">
@@ -1221,10 +1224,10 @@ export function buildPlatformBroadcastEmail(opts: {
           </a>
         </td>
       </tr>
-    </table>
+    </table>` : ""}
   `);
 
-  const text = opts.body + `\n\n---\nUnsubscribe: ${opts.unsubscribeUrl}`;
+  const text = opts.body + (opts.unsubscribeUrl ? `\n\n---\nUnsubscribe: ${opts.unsubscribeUrl}` : "");
 
   return { html, text };
 }
@@ -1484,9 +1487,10 @@ export function buildBroadcastMailPayload(opts: {
   firstName: string;
   subject: string;
   body: string;
-  unsubscribeToken: string;
+  unsubscribeToken?: string; // omit for personal 1:1 sends — no unsubscribe footer
+  replyTo?: string;
 }) {
-  const unsubscribeUrl = buildUnsubscribeLink(opts.unsubscribeToken);
+  const unsubscribeUrl = opts.unsubscribeToken ? buildUnsubscribeLink(opts.unsubscribeToken) : undefined;
   const resolvedBody   = opts.body.replace(/\{\{firstName\}\}/g, opts.firstName);
   const { html, text } = buildPlatformBroadcastEmail({
     firstName:      opts.firstName,
@@ -1500,5 +1504,6 @@ export function buildBroadcastMailPayload(opts: {
     subject: opts.subject,
     html,
     text,
+    ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
   };
 }
