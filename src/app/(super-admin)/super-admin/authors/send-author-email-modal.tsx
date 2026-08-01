@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Send, Loader2, Mail, Reply } from "lucide-react";
+import { X, Send, Loader2, Mail, Reply, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailComposer } from "@/components/super-admin/email-composer";
 import { useActiveSupportEmails } from "@/components/super-admin/use-active-support-emails";
@@ -23,6 +23,8 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
   const { emails: supportEmails, loading: loadingSupportEmails } = useActiveSupportEmails();
   const [replyTo, setReplyTo] = useState("");
   const [defaultLoaded, setDefaultLoaded] = useState(false);
+  const [savingDefault, setSavingDefault] = useState(false);
+  const [defaultSaved,  setDefaultSaved]  = useState(false);
 
   // Preselect the global default (Settings → Mass Email) once it and the active list are both in
   useEffect(() => {
@@ -32,6 +34,21 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
       .catch(() => {})
       .finally(() => setDefaultLoaded(true));
   }, []);
+
+  async function handleSaveDefaultReplyTo() {
+    setSavingDefault(true);
+    setDefaultSaved(false);
+    try {
+      await fetch("/api/super-admin/author-reply-to", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorReplyToEmail: replyTo }),
+      });
+      setDefaultSaved(true);
+      setTimeout(() => setDefaultSaved(false), 2500);
+    } catch {}
+    finally { setSavingDefault(false); }
+  }
 
   const firstName = (author.displayName || author.name).split(" ")[0];
 
@@ -93,17 +110,32 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
                   <Reply className="h-3.5 w-3.5 text-gray-400" />
                   Reply-To
                 </label>
-                <select
-                  value={replyTo}
-                  onChange={e => setReplyTo(e.target.value)}
-                  disabled={sending || (loadingSupportEmails && !defaultLoaded)}
-                  className="w-full max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-60"
-                >
-                  <option value="">— None selected —</option>
-                  {supportEmails.map(e => (
-                    <option key={e.id} value={e.email}>{e.label} — {e.email}</option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={replyTo}
+                    onChange={e => setReplyTo(e.target.value)}
+                    disabled={sending || (loadingSupportEmails && !defaultLoaded)}
+                    className="flex-1 max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-60"
+                  >
+                    <option value="">— None selected —</option>
+                    {supportEmails.map(e => (
+                      <option key={e.id} value={e.email}>{e.label} — {e.email}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSaveDefaultReplyTo}
+                    disabled={savingDefault || sending}
+                    title="Use this address as the default reply-to for all author emails"
+                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-600 disabled:opacity-40 transition-colors flex-shrink-0"
+                  >
+                    {savingDefault
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : defaultSaved
+                        ? <Check className="h-3.5 w-3.5 text-green-600" />
+                        : null}
+                    {savingDefault ? "Saving…" : defaultSaved ? "Saved as default" : "Save as default"}
+                  </button>
+                </div>
               </div>
 
               <EmailComposer
