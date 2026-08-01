@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { GraduationCap, Pin, BarChart2, Award } from "lucide-react";
+import Link from "next/link";
+import { GraduationCap, Pin, BarChart2, Award, Mail } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
@@ -46,6 +47,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   const badges = author.showBadges ? await getAuthorBadges(author.id) : [];
 
   const authorName = author.displayName || author.name;
+  const firstName = authorName.split(" ")[0];
   const accentColor = author.accentColor || "#7B2D2D";
 
   const bioHtml = (author as any).bio || (author as any).shortBio || "<p>Bio coming soon.</p>";
@@ -140,6 +142,15 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
                 </div>
               )}
             </div>
+
+            <Link
+              href="/contact"
+              className="mt-4 flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: accentColor }}
+            >
+              <Mail className="h-4 w-4" />
+              Email {firstName}
+            </Link>
           </div>
 
           {/* ── Right: Bio content ───────────────────────────────────────────── */}

@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## July 31, 2026 — Direct "Email {author}" CTAs + contact form reason dropdown
+
+Readers had to already be on the Contact page to email an author — nothing on the homepage or About page pointed there directly.
+
+- **"Email {firstName}" link added next to each homepage template's About-the-Author CTA** (classic: next to "Meet the Author"; cinematic: next to "The full story"; bold/minimal: next to "Full biography") — all four templates, since any author could be on any one of them. Links straight to `/contact`, not a `mailto:` — keeps the reader on-site and routes through the author's configured contact form.
+- **Same "Email {firstName}" button added to the About page**, under the author photo.
+- **Contact form's Subject field is now a dropdown** (Reader Question / Newsletter / Blog Information / Book Discussion / Media & Press Inquiry / Speaking Engagement / Collaboration & Partnership / Rights & Permissions / Website & Technical Issue / Other) instead of free text, defaulting to Reader Question — gives authors a scannable reason instead of guessing from a blank field. The optional Website field moved below Message to match.
+- **Footer newsletter button relabeled** "Subscribe to Newsletter" → "Subscribe to AuthorLoft".
+
 ## July 31, 2026 — Admin search now finds sub-page tabs, not just top-level pages
 
 The command palette (below) initially only indexed the sidebar's top-level links, so searching "billing" found nothing more specific than the Settings page — you still had to know which tab it was under. New `src/lib/admin-search-extras.ts` catalogs every named tab across Settings, Branding, Newsletter, Help & Support, Legal Pages, and Super Admin Platform Settings, each deep-linking straight to that tab via `?tab=`. Added mount-time `?tab=` support to the three tabbed components that didn't have it yet (Branding, Legal Pages, Super Admin Settings) — matching the pattern already used by `/admin/settings`, book edit, Newsletter, and Help & Support. Also added a guidance-only "Affiliate Links / Affiliations" result, since per-book functionality (Books → a book → Affiliate tab) has no single URL to deep-link to — it explains where to go instead of 404ing.

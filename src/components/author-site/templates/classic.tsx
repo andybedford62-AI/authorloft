@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
@@ -22,6 +22,7 @@ const SERIES_GRADIENTS = [
 export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
+  const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
 
   // Credential pills — filter out blanks, only render if at least one has text
@@ -72,9 +73,19 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               </div>
             )}
 
-            <Link href="/about">
-              <Button variant="outline" className="mt-1">Meet the Author</Button>
-            </Link>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link href="/about">
+                <Button variant="outline">Meet the Author</Button>
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+                style={{ color: accentColor }}
+              >
+                <Mail className="h-3.5 w-3.5" />
+                Email {firstName}
+              </Link>
+            </div>
           </div>
 
           {/* Profile photo */}

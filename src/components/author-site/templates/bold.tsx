@@ -4,7 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen, ShoppingCart } from "lucide-react";
+import { ChevronRight, BookOpen, ShoppingCart, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
@@ -13,6 +13,7 @@ import type { HomeTemplateProps } from "./types";
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
+  const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
 
   // Spotlight book: resolve through books[] so we get the full BookForTemplate type
@@ -48,9 +49,14 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
               className="text-gray-300 leading-relaxed text-sm rich-content max-w-2xl"
               dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
-            <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
-              Full biography <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-1">
+              <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
+                Full biography <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link href="/contact" className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline" style={{ color: accentColor }}>
+                <Mail className="h-3.5 w-3.5" /> Email {firstName}
+              </Link>
+            </div>
           </div>
         </div>
       </section>

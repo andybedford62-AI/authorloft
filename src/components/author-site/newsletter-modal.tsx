@@ -301,7 +301,7 @@ export function NewsletterModalButton({
         style={{ backgroundColor: accentColor }}
       >
         <Mail className="h-4 w-4" />
-        Subscribe to Newsletter
+        Subscribe to AuthorLoft
       </button>
 
       {open && (

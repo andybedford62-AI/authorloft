@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { CinematicBooksFilter } from "./cinematic-books-filter";
 import type { HomeTemplateProps } from "./types";
@@ -37,6 +37,7 @@ function formatPrice(cents: number) {
 export function CinematicTemplate({ author, books, series }: HomeTemplateProps) {
   const accent       = author.accentColor || GOLD_DEFAULT;
   const authorName   = author.displayName || author.name;
+  const firstName    = authorName.split(" ")[0];
   const pressNames   = author.pressOutlets?.length ? author.pressOutlets : DEFAULT_PRESS_NAMES;
   // heroEyebrow: minimal type, used only for eyebrow label in the hero section
   const heroEyebrow = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
@@ -423,13 +424,22 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                   Author bio coming soon.
                 </p>
               )}
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border text-[#FBF6E9] transition-all duration-200 hover:border-opacity-80"
-                style={{ borderColor: accent + "55" }}
-              >
-                The full story <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border text-[#FBF6E9] transition-all duration-200 hover:border-opacity-80"
+                  style={{ borderColor: accent + "55" }}
+                >
+                  The full story <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-80"
+                  style={{ color: accent }}
+                >
+                  <Mail className="w-4 h-4" /> Email {firstName}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -9,6 +9,19 @@ interface Props {
   accentColor: string;
 }
 
+const CONTACT_REASONS = [
+  "Reader Question",
+  "Newsletter",
+  "Blog Information",
+  "Book Discussion",
+  "Media / Press Inquiry",
+  "Speaking Engagement",
+  "Collaboration / Partnership",
+  "Rights & Permissions",
+  "Website / Technical Issue",
+  "Other",
+];
+
 export function ContactForm({ domain, accentColor }: Props) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -23,7 +36,7 @@ export function ContactForm({ domain, accentColor }: Props) {
       domain,
       name:    (form.elements.namedItem("name")    as HTMLInputElement).value.trim(),
       email:   (form.elements.namedItem("email")   as HTMLInputElement).value.trim(),
-      subject: (form.elements.namedItem("subject") as HTMLInputElement).value.trim() || undefined,
+      subject: (form.elements.namedItem("subject") as HTMLSelectElement).value.trim() || undefined,
       website: (form.elements.namedItem("website") as HTMLInputElement).value.trim() || undefined,
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim(),
     };
@@ -110,10 +123,29 @@ export function ContactForm({ domain, accentColor }: Props) {
 
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Subject</label>
-          <input
+          <select
             name="subject"
-            placeholder="What's this about?"
+            defaultValue={CONTACT_REASONS[0]}
             disabled={status === "loading"}
+            className={inputClass}
+            style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+          >
+            {CONTACT_REASONS.map((reason) => (
+              <option key={reason} value={reason}>{reason}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Message <span className="text-red-400">*</span>
+          </label>
+          <textarea
+            name="message"
+            rows={5}
+            required
+            disabled={status === "loading"}
+            placeholder="Your message…"
             className={inputClass}
             style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
           />
@@ -128,21 +160,6 @@ export function ContactForm({ domain, accentColor }: Props) {
             type="url"
             placeholder="https://yoursite.com"
             disabled={status === "loading"}
-            className={inputClass}
-            style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Message <span className="text-red-400">*</span>
-          </label>
-          <textarea
-            name="message"
-            rows={5}
-            required
-            disabled={status === "loading"}
-            placeholder="Your message…"
             className={inputClass}
             style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
           />

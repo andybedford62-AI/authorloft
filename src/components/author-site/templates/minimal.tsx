@@ -4,7 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import type { HomeTemplateProps } from "./types";
@@ -12,6 +12,7 @@ import type { HomeTemplateProps } from "./types";
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
   const authorName  = author.displayName || author.name;
+  const firstName   = authorName.split(" ")[0];
 
   // Show up to 6 books in the catalog grid
   const displayBooks = books.slice(0, 6);
@@ -168,13 +169,22 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
             className="text-gray-600 leading-relaxed text-sm rich-content"
             dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
           />
-          <Link
-            href="/about"
-            className="inline-flex items-center gap-1 text-sm font-semibold mt-4 hover:underline"
-            style={{ color: accentColor }}
-          >
-            Full biography <ChevronRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-4">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+              style={{ color: accentColor }}
+            >
+              Full biography <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
+              style={{ color: accentColor }}
+            >
+              <Mail className="h-3.5 w-3.5" /> Email {firstName}
+            </Link>
+          </div>
         </div>
       </section>
 
