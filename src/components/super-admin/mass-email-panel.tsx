@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Send, Loader2, History, Users, Reply, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailComposer } from "./email-composer";
+import { useActiveSupportEmails } from "./use-active-support-emails";
 
 type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM";
 
@@ -34,6 +35,7 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
   const [history,        setHistory]        = useState<Broadcast[]>([]);
   const [loadingHistory, setLoadingHistory]  = useState(true);
 
+  const { emails: supportEmails, loading: loadingSupportEmails } = useActiveSupportEmails();
   const [replyToEmail,   setReplyToEmail]   = useState(initialReplyToEmail ?? "");
   const [savingReplyTo,  setSavingReplyTo]  = useState(false);
   const [replyToSaved,   setReplyToSaved]   = useState(false);
@@ -112,18 +114,24 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
         <p className="text-sm text-gray-500">
           Where author replies land — for both individual and mass emails. Emails still send from{" "}
           <code className="bg-gray-100 px-1 rounded text-xs">hello@authorloft.com</code> (required for
-          deliverability), but hitting Reply routes here instead. Use a Gmail alias
-          (<code className="bg-gray-100 px-1 rounded text-xs">you+tag@gmail.com</code>) if you want to
-          filter replies by topic.
+          deliverability), but hitting Reply routes here instead. Choose from{" "}
+          <a href="/super-admin/settings" className="text-purple-600 hover:underline">Settings → Email Addresses</a> —
+          only active ones are listed.
         </p>
         <div className="flex items-center gap-2">
-          <input
-            type="email"
+          <select
             value={replyToEmail}
             onChange={e => setReplyToEmail(e.target.value)}
-            placeholder="authorloft@gmail.com"
-            className="flex-1 max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+            disabled={loadingSupportEmails}
+            className="flex-1 max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-60"
+          >
+            <option value="">
+              {loadingSupportEmails ? "Loading…" : "— None selected —"}
+            </option>
+            {supportEmails.map(e => (
+              <option key={e.id} value={e.email}>{e.label} — {e.email}</option>
+            ))}
+          </select>
           <Button size="sm" onClick={handleSaveReplyTo} disabled={savingReplyTo}>
             {savingReplyTo
               ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
@@ -132,6 +140,12 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
                 : "Save"}
           </Button>
         </div>
+        {!loadingSupportEmails && supportEmails.length === 0 && (
+          <p className="text-xs text-amber-600">
+            No active email addresses yet — add one in{" "}
+            <a href="/super-admin/settings" className="underline">Settings → Email Addresses</a> first.
+          </p>
+        )}
       </div>
 
       {/* Compose */}

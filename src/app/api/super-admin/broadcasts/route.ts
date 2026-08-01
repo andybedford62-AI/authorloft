@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { subject, broadcastBody, audienceFilter = "ALL", authorId } = body;
+  const { subject, broadcastBody, audienceFilter = "ALL", authorId, replyToEmail } = body;
 
   if (!subject?.trim()) return NextResponse.json({ error: "Subject is required." }, { status: 400 });
   if (!broadcastBody?.trim()) return NextResponse.json({ error: "Body is required." }, { status: 400 });
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       firstName: (author.displayName || author.name).split(" ")[0],
       subject:   subject.trim(),
       body:      broadcastBody.trim(),
-      replyTo,
+      replyTo:   (typeof replyToEmail === "string" && replyToEmail.trim()) || replyTo,
     });
 
     let sent = 0;

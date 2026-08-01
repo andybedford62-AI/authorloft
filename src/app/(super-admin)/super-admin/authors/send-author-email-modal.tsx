@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { X, Send, Loader2, Mail } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Send, Loader2, Mail, Reply } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailComposer } from "@/components/super-admin/email-composer";
+import { useActiveSupportEmails } from "@/components/super-admin/use-active-support-emails";
 
 interface AuthorTarget {
   id:          string;
@@ -19,6 +20,19 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
   const [sent,    setSent]    = useState(false);
   const [error,   setError]   = useState("");
 
+  const { emails: supportEmails, loading: loadingSupportEmails } = useActiveSupportEmails();
+  const [replyTo, setReplyTo] = useState("");
+  const [defaultLoaded, setDefaultLoaded] = useState(false);
+
+  // Preselect the global default (Settings → Mass Email) once it and the active list are both in
+  useEffect(() => {
+    fetch("/api/super-admin/author-reply-to")
+      .then(r => r.json())
+      .then(d => setReplyTo(d.authorReplyToEmail ?? ""))
+      .catch(() => {})
+      .finally(() => setDefaultLoaded(true));
+  }, []);
+
   const firstName = (author.displayName || author.name).split(" ")[0];
 
   async function handleSend() {
@@ -32,7 +46,7 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
       const res = await fetch("/api/super-admin/broadcasts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, broadcastBody: body, authorId: author.id }),
+        body: JSON.stringify({ subject, broadcastBody: body, authorId: author.id, replyToEmail: replyTo || undefined }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || "Send failed");
@@ -54,7 +68,7 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">Email {author.displayName || author.name}</h3>
-              <p className="text-xs text-gray-400">{author.email} &middot; replies go to the address set in Settings → Mass Email</p>
+              <p className="text-xs text-gray-400">{author.email}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -74,6 +88,24 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
             </div>
           ) : (
             <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                  <Reply className="h-3.5 w-3.5 text-gray-400" />
+                  Reply-To
+                </label>
+                <select
+                  value={replyTo}
+                  onChange={e => setReplyTo(e.target.value)}
+                  disabled={sending || (loadingSupportEmails && !defaultLoaded)}
+                  className="w-full max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-60"
+                >
+                  <option value="">— None selected —</option>
+                  {supportEmails.map(e => (
+                    <option key={e.id} value={e.email}>{e.label} — {e.email}</option>
+                  ))}
+                </select>
+              </div>
+
               <EmailComposer
                 subject={subject}
                 body={body}
