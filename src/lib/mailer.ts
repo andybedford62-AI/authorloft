@@ -1490,18 +1490,19 @@ export function buildBroadcastMailPayload(opts: {
   unsubscribeToken?: string; // omit for personal 1:1 sends — no unsubscribe footer
   replyTo?: string;
 }) {
-  const unsubscribeUrl = opts.unsubscribeToken ? buildUnsubscribeLink(opts.unsubscribeToken) : undefined;
-  const resolvedBody   = opts.body.replace(/\{\{firstName\}\}/g, opts.firstName);
+  const unsubscribeUrl  = opts.unsubscribeToken ? buildUnsubscribeLink(opts.unsubscribeToken) : undefined;
+  const resolvedSubject = opts.subject.replace(/\{\{firstName\}\}/g, opts.firstName);
+  const resolvedBody    = opts.body.replace(/\{\{firstName\}\}/g, opts.firstName);
   const { html, text } = buildPlatformBroadcastEmail({
     firstName:      opts.firstName,
-    subject:        opts.subject,
+    subject:        resolvedSubject,
     body:           resolvedBody,
     unsubscribeUrl,
   });
   return {
     from:    BROADCAST_FROM_ADDRESS,
     to:      opts.to,
-    subject: opts.subject,
+    subject: resolvedSubject,
     html,
     text,
     ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
