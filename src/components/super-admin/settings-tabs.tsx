@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Database,
   Users,
@@ -145,6 +145,13 @@ const NAV_GROUPS: NavGroup[] = [
 
 export function SettingsTabs(props: SettingsTabsProps) {
   const [active, setActive] = useState<SectionId>("overview");
+
+  // Deep-link support — ?tab=mass-email opens that tab directly (used by admin search)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab") as SectionId | null;
+    const validIds = NAV_GROUPS.flatMap(g => g.items).map(i => i.id);
+    if (tabParam && validIds.includes(tabParam)) setActive(tabParam);
+  }, []);
 
   const activeItem = NAV_GROUPS.flatMap(g => g.items).find(i => i.id === active);
 

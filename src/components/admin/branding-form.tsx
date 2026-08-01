@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +51,13 @@ const TABS: { id: Tab; label: string }[] = [
 export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingFormProps) {
   const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
+
+  // Deep-link support — ?tab=about opens the About Page tab directly (used by admin search)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+    if (tabParam && TABS.some((t) => t.id === tabParam)) setActiveTab(tabParam);
+  }, []);
+
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [tagline, setTagline] = useState(initial.tagline);
   const [shortBio, setShortBio] = useState(initial.shortBio);

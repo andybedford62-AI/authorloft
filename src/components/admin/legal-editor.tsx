@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Check, AlertTriangle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -29,6 +29,13 @@ export function LegalEditor({
   initialContactEmail,
 }: LegalEditorProps) {
   const [activeTab,    setActiveTab]    = useState<Tab>("privacy");
+
+  // Deep-link support — ?tab=terms opens the Terms tab directly (used by admin search)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+    if (tabParam && ["privacy", "terms", "contact"].includes(tabParam)) setActiveTab(tabParam);
+  }, []);
+
   const [privacy,      setPrivacy]      = useState(initialPrivacy);
   const [terms,        setTerms]        = useState(initialTerms);
   const [contactEmail, setContactEmail] = useState(initialContactEmail);

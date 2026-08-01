@@ -13,11 +13,13 @@ import {
   type NavItem,
   type NavGroup,
 } from "@/lib/admin-nav-groups";
+import { ADMIN_SEARCH_EXTRAS } from "@/lib/admin-search-extras";
 
 interface SearchResult extends NavItem {
-  groupLabel: string;
-  section:    "admin" | "super-admin";
-  locked:     boolean;
+  groupLabel:   string;
+  section:      "admin" | "super-admin";
+  locked:       boolean;
+  description?: string;
 }
 
 function flatten(groups: NavGroup[], pinned: NavItem[], pinnedLabel: string, section: SearchResult["section"]) {
@@ -79,7 +81,24 @@ export function CommandPalette({ isSuperAdmin, planTier, featureGates, adminThem
           .map(it => ({ ...it, locked: false }))
       : [];
 
-    return [...adminItems, ...superItems];
+    // Sub-page tabs (e.g. Settings > Billing, Branding > About Page) — gated
+    // by their parent page's plan requirement, same as the top-level link.
+    const extraItems: SearchResult[] = ADMIN_SEARCH_EXTRAS
+      .filter(it => it.section === "admin" || isSuperAdmin)
+      .map(it => {
+        const basePath = it.href.split("?")[0];
+        return {
+          href:        it.href,
+          label:       it.label,
+          icon:        it.icon,
+          groupLabel:  it.parentLabel,
+          section:     it.section,
+          description: it.description,
+          locked:      it.section === "admin" && !isSuperAdmin && !canAccessFeature(basePath, planTier, featureGates),
+        };
+      });
+
+    return [...adminItems, ...superItems, ...extraItems];
   }, [isSuperAdmin, planTier, featureGates]);
 
   const results = useMemo(() => {
@@ -193,7 +212,14 @@ export function CommandPalette({ isSuperAdmin, planTier, featureGates, adminThem
                       )}
                     >
                       <Icon className="h-4 w-4 flex-shrink-0" />
-                      <span className="flex-1 truncate">{item.label}</span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block truncate">{item.label}</span>
+                        {item.description && (
+                          <span className={cn("block text-xs truncate", dark ? "text-gray-500" : "text-gray-400")}>
+                            {item.description}
+                          </span>
+                        )}
+                      </span>
                       <span className={cn(
                         "text-[10px] uppercase tracking-wide font-semibold px-1.5 py-0.5 rounded flex-shrink-0",
                         isSuper
