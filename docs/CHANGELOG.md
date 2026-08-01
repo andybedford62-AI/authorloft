@@ -18,11 +18,12 @@ line rather than listing every commit.
 Super Admin could only email authors two ways: the system Welcome Email (auto-sent on signup) or a Mass Email broadcast to a whole plan-tier segment. There was no way to send one author a personal note. Extended the existing mass-email infrastructure instead of building a new page:
 
 - **"Send email" action on each author row** (`/super-admin/authors`) — opens a modal to compose a one-to-one email to that author. Reuses the same compose/template UI as Mass Email.
-- **Individual sends go out with the sending admin's own email as reply-to** (not no-reply), and skip the "unsubscribe from announcements" footer — since it's a personal note, not a broadcast — while still logging to Broadcast History (shown by recipient email instead of a plan badge).
+- **Individual sends skip the "unsubscribe from announcements" footer** — since it's a personal note, not a broadcast — while still logging to Broadcast History (shown by recipient email instead of a plan badge).
 - **Templates are now reusable and editable in place.** Previously "Save as template" always created a new row; templates can now be updated in place ("Update ‹name›") after loading and editing one, in addition to saving as new. Templates also carry a `category` (Welcome / Offer Help / Promotion / Re-engagement / General) shown as a badge in the picker.
 - **Seeded 4 starter templates** (Personal Welcome, Offering a Hand, Special Offer, Just Checking In) so there's a usable library on day one — editable/deletable like any other template.
+- **Configurable Reply-To address** (Settings → Mass Email) — both individual and mass author emails previously replied to whichever Super Admin was logged in (a personal login email). Now routes to a real AuthorLoft address set once in Settings (e.g. `authorloft@gmail.com`, optionally with `+alias` tagging to filter replies by topic); falls back to the sending admin's email if unset. `From:` stays on the Resend-verified domain — only Reply-To changes.
 - Extracted the compose+template UI into a shared `EmailComposer` component (`src/components/super-admin/email-composer.tsx`) used by both Mass Email and the new per-author modal, so there's one place to extend template behavior going forward.
-- Schema: added nullable `recipientAuthorId`/`recipientEmail` to `PlatformBroadcast` and `category` to `BroadcastTemplate` (additive, applied directly to Supabase).
+- Schema: added nullable `recipientAuthorId`/`recipientEmail` to `PlatformBroadcast`, `category` to `BroadcastTemplate`, and `authorReplyToEmail` to `SystemConfig` (all additive, applied directly to Supabase). Also fixed `{{firstName}}` not substituting in the email **subject** line (only the body was resolved).
 
 ## July 31, 2026 — SEO crawl-report cleanup + Bing indexing block
 
