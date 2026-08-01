@@ -54,7 +54,7 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">Email {author.displayName || author.name}</h3>
-              <p className="text-xs text-gray-400">{author.email} &middot; replies go to your inbox</p>
+              <p className="text-xs text-gray-400">{author.email} &middot; replies go to the address set in Settings → Mass Email</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">

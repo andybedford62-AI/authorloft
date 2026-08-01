@@ -27,7 +27,7 @@ export default async function SuperAdminSettingsPage() {
       where:  { id: "main" },
       create: { id: "main", maintenanceMode: false, maintenanceMessage: "" },
       update: {},
-      select: { maintenanceMode: true, maintenanceMessage: true, newSignupNotifications: true, signupNotificationEmail: true, defaultAiUsageCap: true, welcomeEmailSubject: true, welcomeEmailBody: true },
+      select: { maintenanceMode: true, maintenanceMessage: true, newSignupNotifications: true, signupNotificationEmail: true, defaultAiUsageCap: true, welcomeEmailSubject: true, welcomeEmailBody: true, authorReplyToEmail: true },
     }),
     prisma.platformSettings.upsert({
       where:  { id: "singleton" },
@@ -87,6 +87,7 @@ export default async function SuperAdminSettingsPage() {
         testimonials={testimonials}
         welcomeEmailSubject={systemConfig.welcomeEmailSubject}
         welcomeEmailBody={systemConfig.welcomeEmailBody}
+        authorReplyToEmail={systemConfig.authorReplyToEmail}
         envValues={envValues}
       />
     </div>

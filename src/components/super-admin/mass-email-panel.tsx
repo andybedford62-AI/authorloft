@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Loader2, History, Users } from "lucide-react";
+import { Send, Loader2, History, Users, Reply, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailComposer } from "./email-composer";
 
@@ -23,7 +23,7 @@ const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
   { value: "PREMIUM",  label: "Premium Plan"    },
 ];
 
-export function MassEmailPanel() {
+export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: string | null }) {
   const [subject,      setSubject]      = useState("");
   const [body,         setBody]         = useState("");
   const [audience,     setAudience]     = useState<AudienceFilter>("ALL");
@@ -33,6 +33,25 @@ export function MassEmailPanel() {
   const [error,        setError]        = useState("");
   const [history,        setHistory]        = useState<Broadcast[]>([]);
   const [loadingHistory, setLoadingHistory]  = useState(true);
+
+  const [replyToEmail,   setReplyToEmail]   = useState(initialReplyToEmail ?? "");
+  const [savingReplyTo,  setSavingReplyTo]  = useState(false);
+  const [replyToSaved,   setReplyToSaved]   = useState(false);
+
+  async function handleSaveReplyTo() {
+    setSavingReplyTo(true);
+    setReplyToSaved(false);
+    try {
+      await fetch("/api/super-admin/author-reply-to", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorReplyToEmail: replyToEmail.trim() }),
+      });
+      setReplyToSaved(true);
+      setTimeout(() => setReplyToSaved(false), 2500);
+    } catch {}
+    finally { setSavingReplyTo(false); }
+  }
 
   function loadHistory() {
     fetch("/api/super-admin/broadcasts").then(r => r.json()).then(setHistory).catch(() => {});
@@ -83,6 +102,37 @@ export function MassEmailPanel() {
 
   return (
     <div className="space-y-6">
+
+      {/* Reply-to address */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-3">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Reply className="h-4 w-4 text-gray-400" />
+          Reply-To Address
+        </h2>
+        <p className="text-sm text-gray-500">
+          Where author replies land — for both individual and mass emails. Emails still send from{" "}
+          <code className="bg-gray-100 px-1 rounded text-xs">hello@authorloft.com</code> (required for
+          deliverability), but hitting Reply routes here instead. Use a Gmail alias
+          (<code className="bg-gray-100 px-1 rounded text-xs">you+tag@gmail.com</code>) if you want to
+          filter replies by topic.
+        </p>
+        <div className="flex items-center gap-2">
+          <input
+            type="email"
+            value={replyToEmail}
+            onChange={e => setReplyToEmail(e.target.value)}
+            placeholder="authorloft@gmail.com"
+            className="flex-1 max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <Button size="sm" onClick={handleSaveReplyTo} disabled={savingReplyTo}>
+            {savingReplyTo
+              ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
+              : replyToSaved
+                ? <><Check className="h-3.5 w-3.5 mr-1.5" />Saved</>
+                : "Save"}
+          </Button>
+        </div>
+      </div>
 
       {/* Compose */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

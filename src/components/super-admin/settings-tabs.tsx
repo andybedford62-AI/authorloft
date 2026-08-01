@@ -79,6 +79,7 @@ export interface SettingsTabsProps {
   testimonials: TestimonialRow[];
   welcomeEmailSubject: string | null;
   welcomeEmailBody:    string | null;
+  authorReplyToEmail:  string | null;
   envValues: { label: string; value: string | undefined }[];
 }
 
@@ -190,7 +191,7 @@ export function SettingsTabs(props: SettingsTabsProps) {
         {active === "testimonials"  && <TestimonialsPanel initialTestimonials={props.testimonials} />}
         {active === "emails"        && <SupportEmailsPanel initialEmails={props.supportEmails} />}
         {active === "welcome-email" && <WelcomeEmailPanel initialSubject={props.welcomeEmailSubject} initialBody={props.welcomeEmailBody} />}
-        {active === "mass-email"    && <MassEmailPanel />}
+        {active === "mass-email"    && <MassEmailPanel initialReplyToEmail={props.authorReplyToEmail} />}
         {active === "seo"           && <SeoTab />}
         {active === "configuration" && <ConfigurationTab {...props} />}
       </div>

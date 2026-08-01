@@ -43,7 +43,22 @@ export async function POST(req: NextRequest) {
   if (!subject?.trim()) return NextResponse.json({ error: "Subject is required." }, { status: 400 });
   if (!broadcastBody?.trim()) return NextResponse.json({ error: "Body is required." }, { status: 400 });
 
-  // ── Individual send — one author, personal reply-to, no unsubscribe footer ──
+  // Configured AuthorLoft reply-to (Settings → Mass Email). Falls back to the
+  // sending admin's own login email if nothing has been configured yet.
+  const config = await prisma.systemConfig.findUnique({
+    where:  { id: "main" },
+    select: { authorReplyToEmail: true },
+  });
+  let replyTo = config?.authorReplyToEmail || undefined;
+  if (!replyTo) {
+    const admin = await prisma.author.findUnique({
+      where:  { id: superAdminId },
+      select: { email: true },
+    });
+    replyTo = admin?.email;
+  }
+
+  // ── Individual send — one author, no unsubscribe footer ──────────────────
   if (authorId) {
     const author = await prisma.author.findUnique({
       where:  { id: authorId },
@@ -51,18 +66,13 @@ export async function POST(req: NextRequest) {
     });
     if (!author) return NextResponse.json({ error: "Author not found." }, { status: 404 });
 
-    const admin = await prisma.author.findUnique({
-      where:  { id: superAdminId },
-      select: { email: true },
-    });
-
     const resend = new Resend(process.env.RESEND_API_KEY);
     const payload = buildBroadcastMailPayload({
       to:        author.email,
       firstName: (author.displayName || author.name).split(" ")[0],
       subject:   subject.trim(),
       body:      broadcastBody.trim(),
-      replyTo:   admin?.email,
+      replyTo,
     });
 
     let sent = 0;
@@ -135,6 +145,7 @@ export async function POST(req: NextRequest) {
         subject:          subject.trim(),
         body:             broadcastBody.trim(),
         unsubscribeToken: author.platformEmailsToken,
+        replyTo,
       })
     );
 

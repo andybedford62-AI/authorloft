@@ -24,6 +24,7 @@ model SystemConfig {
   defaultAiUsageCap       Int      @default(20)
   welcomeEmailSubject     String?
   welcomeEmailBody        String?
+  authorReplyToEmail      String? // Reply-To for individual + mass author emails (e.g. authorloft@gmail.com) — from stays on the verified domain, replies route here
   updatedAt               DateTime @updatedAt
 }
 
