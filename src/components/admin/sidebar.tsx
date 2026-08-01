@@ -5,69 +5,26 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard,
-  BookOpen,
-  BookMarked,
-  Tag,
-  Sparkles,
-  Library,
-  Palette,
-  Paintbrush,
-  Mail,
-  Inbox,
-  ShoppingBag,
-  Settings,
   ExternalLink,
   ChevronDown,
   LogOut,
-  Users,
-  CreditCard,
-  FileText,
-  Newspaper,
   Shield,
-  BookText,
-  Bot,
-  Search,
   Sun,
   Moon,
   Lock,
-  BarChart2,
-  Megaphone,
-  Receipt,
-  HelpCircle,
-  Scale,
-  Globe,
-  Ticket,
-  Star,
-  Share2,
-  FolderTree,
-  Download,
-  SlidersHorizontal,
-  Send,
-  Award,
-  Layers,
-  ListChecks,
-  Package,
-  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
+import { CommandPalette } from "@/components/admin/command-palette";
+import {
+  ADMIN_PINNED_ITEMS,
+  NAV_GROUPS,
+  SUPER_ADMIN_PINNED_ITEMS,
+  SUPER_ADMIN_GROUPS,
+  type NavGroup,
+} from "@/lib/admin-nav-groups";
 
 // ── Types ───────────────────────────────────────────────────────────────────
-
-interface NavItem {
-  href:     string;
-  label:    string;
-  icon:     React.ElementType;
-  external?: boolean;
-}
-
-interface NavGroup {
-  key:         string;
-  label:       string;
-  defaultOpen: boolean;
-  items:       NavItem[];
-}
 
 interface SidebarProps {
   authorName:    string;
@@ -77,117 +34,6 @@ interface SidebarProps {
   featureGates?: Record<string, string>;
   adminTheme?:   "dark" | "light";
 }
-
-// ── Nav structure ────────────────────────────────────────────────────────────
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    key: "catalog", label: "Catalog", defaultOpen: true,
-    items: [
-      { href: "/admin/books",      label: "Books",      icon: BookOpen      },
-      { href: "/admin/series",     label: "Series",     icon: Library       },
-      { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked    },
-      { href: "/admin/bundles",    label: "Bundles",    icon: Package       },
-      { href: "/admin/courses",    label: "Courses",    icon: GraduationCap },
-      { href: "/admin/specials",   label: "Specials",   icon: Sparkles      },
-    ],
-  },
-  {
-    key: "website", label: "Website", defaultOpen: true,
-    items: [
-      { href: "/admin/pages",          label: "Pages",          icon: FileText   },
-      { href: "/admin/blog",           label: "Blog",           icon: Newspaper  },
-      { href: "/admin/search-engines", label: "Search Engines", icon: Globe      },
-      { href: "/admin/appearance",     label: "Appearance",     icon: Paintbrush },
-      { href: "/admin/branding",       label: "Branding",       icon: Palette    },
-      { href: "/admin/legal",          label: "Legal Pages",    icon: Scale      },
-    ],
-  },
-  {
-    key: "audience", label: "Audience", defaultOpen: false,
-    items: [
-      { href: "/admin/messages",   label: "Messages",          icon: Inbox     },
-      { href: "/admin/feedback",   label: "Reader Feedback",   icon: Star      },
-      { href: "/admin/newsletter", label: "Newsletter",          icon: Mail     },
-      { href: "/admin/media-kit",  label: "Media Kit",         icon: Megaphone },
-    ],
-  },
-  {
-    key: "sales", label: "Sales", defaultOpen: false,
-    items: [
-      { href: "/admin/sales",          label: "Sales",          icon: ShoppingBag },
-      { href: "/admin/discount-codes", label: "Discount Codes", icon: Tag         },
-      { href: "/admin/invoices",       label: "Invoices & Tax", icon: Receipt     },
-    ],
-  },
-  {
-    key: "tools", label: "Tools", defaultOpen: false,
-    items: [
-      { href: "/admin/promote",      label: "Promote",      icon: Send   },
-      { href: "/admin/ai-assistant", label: "AI Assistant", icon: Bot    },
-      { href: "/admin/seo-audit",    label: "SEO Audit",    icon: Search },
-    ],
-  },
-  {
-    key: "account", label: "Account", defaultOpen: false,
-    items: [
-      { href: "/admin/settings",   label: "Settings",            icon: Settings   },
-      { href: "/admin/compliance", label: "Reader Privacy (GDPR)", icon: Shield   },
-      { href: "/admin/help",       label: "Help & Support",      icon: HelpCircle },
-    ],
-  },
-];
-
-const SUPER_ADMIN_GROUPS: NavGroup[] = [
-  {
-    key: "sa-authors", label: "Authors", defaultOpen: true,
-    items: [
-      { href: "/super-admin/authors",         label: "All Authors",     icon: Users },
-      { href: "/super-admin/access-requests", label: "Access Requests", icon: Inbox },
-    ],
-  },
-  {
-    key: "sa-billing", label: "Billing & Plans", defaultOpen: false,
-    items: [
-      { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard        },
-      { href: "/super-admin/coupons",        label: "Coupons",       icon: Ticket            },
-      { href: "/super-admin/feature-config", label: "Feature Gates", icon: SlidersHorizontal },
-      { href: "/super-admin/badges",         label: "Achievement Badges", icon: Award        },
-    ],
-  },
-  {
-    key: "sa-marketing", label: "Marketing", defaultOpen: false,
-    items: [
-      { href: "/super-admin/blog",               label: "Blog & News",        icon: Newspaper },
-      { href: "/super-admin/subscribers",        label: "News Subscribers",   icon: Mail      },
-      { href: "/super-admin/guides",             label: "Guides",             icon: BookText   },
-      { href: "/super-admin/resources",          label: "Resources",          icon: Globe     },
-      { href: "/super-admin/resource-downloads", label: "Resource Downloads", icon: Download   },
-      { href: "/super-admin/categories",         label: "Content Categories", icon: FolderTree },
-      { href: "/super-admin/social",             label: "Social Media",       icon: Share2     },
-      { href: "/super-admin/faqs",               label: "FAQs",               icon: HelpCircle },
-    ],
-  },
-  {
-    key: "sa-social-promote", label: "Social Promote", defaultOpen: false,
-    items: [
-      { href: "/super-admin/social-promote/platforms",   label: "Platforms",       icon: Share2     },
-      { href: "/super-admin/social-promote/promo-types", label: "Promo Types",     icon: Layers     },
-      { href: "/super-admin/social-promote/prompts",     label: "Prompts & Test",  icon: Sparkles   },
-      { href: "/super-admin/social-promote/log",         label: "Generation Log",  icon: ListChecks },
-      { href: "/super-admin/social-promote/settings",    label: "Settings",        icon: Settings   },
-    ],
-  },
-  {
-    key: "sa-platform", label: "Platform", defaultOpen: false,
-    items: [
-      { href: "/admin/genres",           label: "Genres",             icon: Tag        },
-      { href: "/super-admin/help",       label: "Help Articles",      icon: HelpCircle },
-      { href: "/super-admin/legal",      label: "Platform Legal",     icon: Shield     },
-      { href: "/super-admin/settings",   label: "Platform Settings",  icon: Settings   },
-    ],
-  },
-];
 
 // ── Theme token helper ───────────────────────────────────────────────────────
 // Returns a set of class strings based on the active theme so that the
@@ -499,27 +345,31 @@ export function AdminSidebar({
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
 
+        {/* Search — Cmd/Ctrl+K opens a searchable list of every Admin + Super Admin page */}
+        <CommandPalette
+          isSuperAdmin={isSuperAdmin}
+          planTier={planTier}
+          featureGates={featureGates}
+          adminTheme={adminTheme}
+        />
+
         {/* Dashboard & Analytics — always visible, pinned, no group */}
-        <Link
-          href="/admin/dashboard"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-            pathname.startsWith("/admin/dashboard") ? t.navActive : t.navItem
-          )}
-        >
-          <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          Dashboard
-        </Link>
-        <Link
-          href="/admin/analytics"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-            pathname.startsWith("/admin/analytics") ? t.navActive : t.navItem
-          )}
-        >
-          <BarChart2 className="h-4 w-4 flex-shrink-0" />
-          Analytics
-        </Link>
+        {ADMIN_PINNED_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+          const active = exact ? pathname === href : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                active ? t.navActive : t.navItem
+              )}
+            >
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              {label}
+            </Link>
+          );
+        })}
 
         <div className={cn("h-px mx-1", t.divider)} />
 
@@ -550,16 +400,22 @@ export function AdminSidebar({
               </p>
 
               {/* Platform Dashboard — pinned, exact-match active */}
-              <Link
-                href="/super-admin"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                  pathname === "/super-admin" ? t.superActive : t.superItem
-                )}
-              >
-                <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-                Platform Dashboard
-              </Link>
+              {SUPER_ADMIN_PINNED_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+                const active = exact ? pathname === href : pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                      active ? t.superActive : t.superItem
+                    )}
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    {label}
+                  </Link>
+                );
+              })}
 
               {SUPER_ADMIN_GROUPS.map((group) => (
                 <SuperNavGroupSection
