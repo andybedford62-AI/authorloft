@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## July 31, 2026 — Admin search (Cmd/Ctrl+K command palette)
+
+Sidebar nav had grown to 6 admin groups + 5 super-admin groups of nested collapsibles — finding a page meant knowing which group it lived under and expanding it first. Added a search trigger at the top of the sidebar (and a global Cmd/Ctrl+K shortcut) that opens an overlay listing every reachable Admin + Super Admin destination, filterable by page or group name, with arrow-key navigation and Enter to jump. Locked (plan-gated) results show a lock icon and route to the upgrade page instead of 404ing, matching the sidebar's own gating; results are tagged by section so it's clear which zone (Admin vs. purple Super Admin) a result lives in. `NAV_GROUPS`/`SUPER_ADMIN_GROUPS` moved out of `sidebar.tsx` into `src/lib/admin-nav-groups.ts` as a shared source of truth so the sidebar and the palette can't drift apart.
+
 ## July 31, 2026 — Super Admin sidebar gets its own visual zone
 
 The Super Admin nav block sits stacked directly under the regular Admin nav in the same sidebar (there's no separate view to switch into) — previously only the *active* link turned purple, so at rest the two sections were hard to tell apart while scanning. The whole Super Admin block (Platform Dashboard + all its groups) now sits in a persistent purple-tinted panel (background + border, both themes), its idle nav-item/group-label text is purple-toned instead of the neutral admin color, and a Shield icon sits next to the "Super Admin" heading so the cue doesn't rely on color alone.
