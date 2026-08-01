@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Loader2, BookmarkPlus, FolderOpen, Trash2, Check, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export interface EmailTemplate {
   id:        string;
@@ -198,14 +199,13 @@ export function EmailComposer({ subject, body, onSubjectChange, onBodyChange, bo
 
       {/* Body */}
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-gray-700">Body (plain text)</label>
-        <textarea
+        <label className="text-sm font-medium text-gray-700">Body</label>
+        <RichTextEditor
           value={body}
-          onChange={e => onBodyChange(e.target.value)}
-          rows={12}
-          placeholder={bodyPlaceholder ?? `Hi {{firstName}},\n\nYour message here…\n\n— The AuthorLoft Team`}
-          disabled={disabled}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-purple-500 resize-y disabled:opacity-60"
+          onChange={onBodyChange}
+          placeholder={bodyPlaceholder ?? "Hi {{firstName}}, your message here…"}
+          minHeight="220px"
+          editable={!disabled}
         />
       </div>
     </div>

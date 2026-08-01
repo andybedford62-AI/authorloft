@@ -143,7 +143,7 @@ export function SendAuthorEmailModal({ author, onClose }: { author: AuthorTarget
                 body={body}
                 onSubjectChange={setSubject}
                 onBodyChange={setBody}
-                bodyPlaceholder={`Hi ${firstName},\n\nYour message here…\n\n— Andy, AuthorLoft`}
+                bodyPlaceholder={`Hi ${firstName}, your message here…`}
                 disabled={sending}
               />
 

@@ -11,7 +11,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -32,6 +32,7 @@ interface RichTextEditorProps {
   minHeight?: string;   // e.g. "200px" — overrides the 320px default
   resizable?: boolean;  // allow vertical resize by the user
   showSeoGuide?: boolean; // show color-coded word count + SEO target bar
+  editable?: boolean;   // default true — set false to lock editing (e.g. while sending)
 }
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────────
@@ -744,9 +745,11 @@ export function RichTextEditor({
   minHeight,
   resizable = false,
   showSeoGuide = false,
+  editable = true,
 }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
+    editable,
     extensions: [
       StarterKit.configure({ link: false, underline: false }),
       Underline,
@@ -776,6 +779,22 @@ export function RichTextEditor({
       },
     },
   });
+
+  // useEditor only applies `content` on the initial mount — if the value
+  // changes from outside (e.g. loading a saved template, resetting after
+  // send), the visible editor otherwise never picks it up. Re-sync whenever
+  // the incoming value diverges from what the editor already has; skipped
+  // when they already match so this doesn't fight the user's own typing.
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.getHTML() === value) return;
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [value, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(editable);
+  }, [editable, editor]);
 
   if (!editor) return null;
 

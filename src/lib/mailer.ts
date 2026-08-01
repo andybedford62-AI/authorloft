@@ -8,6 +8,8 @@
 
 import { Resend } from "resend";
 import { prisma } from "./db";
+import { sanitize } from "./sanitize";
+import { htmlToText } from "./newsletter-format";
 
 const FROM_ADDRESS           = process.env.SMTP_FROM || "AuthorLoft <noreply@authorloft.com>";
 const WELCOME_FROM_ADDRESS   = "AuthorLoft <welcome@authorloft.com>";
@@ -1202,18 +1204,19 @@ export async function sendMail(opts: MailOptions): Promise<boolean> {
 export function buildPlatformBroadcastEmail(opts: {
   firstName: string;
   subject: string;
-  body: string;
+  body: string; // HTML from the admin rich text editor
   unsubscribeUrl?: string;
 }): { html: string; text: string } {
-  const escapedBody = opts.body
-    .split("\n")
-    .map(line => `<p style="margin:0 0 10px;font-size:14px;color:#374151;line-height:1.6;">${esc(line) || "&nbsp;"}</p>`)
-    .join("\n");
+  // Sanitized and embedded directly (same pattern as author newsletters) —
+  // Tiptap already outputs email-safe markup (inline styles for color/
+  // highlight/alignment, semantic tags for bold/italic/lists), so no extra
+  // per-element styling is needed beyond what wrapHtml's card already sets.
+  const safeBody = sanitize(opts.body);
 
   // Personal 1:1 sends omit the "announcements" unsubscribe footer — it reads
   // as an automated blast rather than a direct note when there's no list to leave.
   const html = wrapHtml(opts.subject, `
-    ${escapedBody}
+    <div class="rich-content">${safeBody}</div>
     ${opts.unsubscribeUrl ? `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
       <tr>
@@ -1227,7 +1230,7 @@ export function buildPlatformBroadcastEmail(opts: {
     </table>` : ""}
   `);
 
-  const text = opts.body + (opts.unsubscribeUrl ? `\n\n---\nUnsubscribe: ${opts.unsubscribeUrl}` : "");
+  const text = htmlToText(opts.body) + (opts.unsubscribeUrl ? `\n\n---\nUnsubscribe: ${opts.unsubscribeUrl}` : "");
 
   return { html, text };
 }
