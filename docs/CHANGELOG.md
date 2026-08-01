@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 1, 2026 — `{{token}}` substitution is case/whitespace-insensitive everywhere
+
+`{{FirstName}}` (or any casing other than the exact lowercase `{{firstName}}`) silently failed to resolve in Mass Email and individual author emails — the regex only matched the literal lowercase token, so anything else sent with the raw `{{...}}` still in it. Audited every `{{token}}` substitution point in the app and fixed all three the same way: lowercase the lookup, tolerate stray whitespace inside the braces, leave the text alone if the token genuinely isn't known. Covers `mailer.ts`'s `buildBroadcastMailPayload` (Mass Email + individual author email — `{{firstName}}`), `substituteVars` (Welcome Email template — `{{firstName}}`, `{{siteUrl}}`, `{{dashboardUrl}}`), and Social Promote's `substituteTokens` (AI prompt templates — `{{book.title}}` and the rest of the dotted tokens).
+
 ## July 31, 2026 — Rich text editor for mass/individual author emails
 
 Mass Email and the per-author send modal only had a plain textarea, so every email went out as flat, unstyled paragraphs — no bold, no links, no color. `EmailComposer`'s Body field now uses the same rich text editor already used for newsletters, book pages, and author bios (bold/italic/underline, links, text color, highlight, alignment, headings, lists). `mailer.ts` now treats the body as sanitized HTML and embeds it directly (same pattern as author newsletters) instead of escaping it as plain text split on newlines, with a plain-text fallback derived from the HTML. Also fixed a latent bug in the shared rich text editor component: it only applied its initial content on mount, so loading a saved template or clearing the body after a successful send (both set the value from outside the editor) never visibly updated the screen — added a sync effect plus a new `editable` prop so the composer can still lock editing mid-send.
