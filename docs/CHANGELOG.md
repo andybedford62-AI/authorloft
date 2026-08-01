@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## July 31, 2026 — Admin search now finds sub-page tabs, not just top-level pages
+
+The command palette (below) initially only indexed the sidebar's top-level links, so searching "billing" found nothing more specific than the Settings page — you still had to know which tab it was under. New `src/lib/admin-search-extras.ts` catalogs every named tab across Settings, Branding, Newsletter, Help & Support, Legal Pages, and Super Admin Platform Settings, each deep-linking straight to that tab via `?tab=`. Added mount-time `?tab=` support to the three tabbed components that didn't have it yet (Branding, Legal Pages, Super Admin Settings) — matching the pattern already used by `/admin/settings`, book edit, Newsletter, and Help & Support. Also added a guidance-only "Affiliate Links / Affiliations" result, since per-book functionality (Books → a book → Affiliate tab) has no single URL to deep-link to — it explains where to go instead of 404ing.
+
 ## July 31, 2026 — Admin search (Cmd/Ctrl+K command palette)
 
 Sidebar nav had grown to 6 admin groups + 5 super-admin groups of nested collapsibles — finding a page meant knowing which group it lived under and expanding it first. Added a search trigger at the top of the sidebar (and a global Cmd/Ctrl+K shortcut) that opens an overlay listing every reachable Admin + Super Admin destination, filterable by page or group name, with arrow-key navigation and Enter to jump. Locked (plan-gated) results show a lock icon and route to the upgrade page instead of 404ing, matching the sidebar's own gating; results are tagged by section so it's clear which zone (Admin vs. purple Super Admin) a result lives in. `NAV_GROUPS`/`SUPER_ADMIN_GROUPS` moved out of `sidebar.tsx` into `src/lib/admin-nav-groups.ts` as a shared source of truth so the sidebar and the palette can't drift apart.
