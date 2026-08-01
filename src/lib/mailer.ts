@@ -303,7 +303,10 @@ Questions? Just reply to this email — we read every one.
 — The AuthorLoft Team`;
 
 function substituteVars(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? `{{${key}}}`);
+  // Case/whitespace-tolerant — {{firstName}}, {{FirstName}}, {{ SITEURL }} all resolve
+  const lowerVars: Record<string, string> = {};
+  for (const key in vars) lowerVars[key.toLowerCase()] = vars[key];
+  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key) => lowerVars[key.toLowerCase()] ?? match);
 }
 
 function plainTextToHtml(text: string): string {
@@ -1493,9 +1496,11 @@ export function buildBroadcastMailPayload(opts: {
   unsubscribeToken?: string; // omit for personal 1:1 sends — no unsubscribe footer
   replyTo?: string;
 }) {
-  const unsubscribeUrl  = opts.unsubscribeToken ? buildUnsubscribeLink(opts.unsubscribeToken) : undefined;
-  const resolvedSubject = opts.subject.replace(/\{\{firstName\}\}/g, opts.firstName);
-  const resolvedBody    = opts.body.replace(/\{\{firstName\}\}/g, opts.firstName);
+  const unsubscribeUrl = opts.unsubscribeToken ? buildUnsubscribeLink(opts.unsubscribeToken) : undefined;
+  // Case/whitespace-tolerant — {{firstName}}, {{FirstName}}, {{ FIRSTNAME }} all resolve
+  const firstNameToken  = /\{\{\s*firstname\s*\}\}/gi;
+  const resolvedSubject = opts.subject.replace(firstNameToken, opts.firstName);
+  const resolvedBody    = opts.body.replace(firstNameToken, opts.firstName);
   const { html, text } = buildPlatformBroadcastEmail({
     firstName:      opts.firstName,
     subject:        resolvedSubject,

@@ -54,9 +54,10 @@ function clip(s: string | null | undefined, maxChars: number): string {
 }
 
 function substituteTokens(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_match, key) => {
-    return vars[key] ?? `{{${key}}}`;
-  });
+  // Case-tolerant — {{book.title}}, {{Book.Title}}, {{BOOK.TITLE}} all resolve
+  const lowerVars: Record<string, string> = {};
+  for (const key in vars) lowerVars[key.toLowerCase()] = vars[key];
+  return template.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, key) => lowerVars[key.toLowerCase()] ?? match);
 }
 
 export function assemblePrompt(inputs: AssemblyInputs): string {
