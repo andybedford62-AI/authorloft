@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 3, 2026 — Author-site footer QR code
+
+Every author site footer now shows a QR code linking to that author's own site, as a fourth column to the right of Quick Links. A desktop visitor can scan to carry the site to their phone, and — the case that isn't redundant on mobile — an author can hold their screen out at a signing or conference for a reader to scan. Built on `getAuthorBaseUrl()`, so it resolves to a custom domain when one is configured and otherwise the `slug.authorloft.com` subdomain, and it follows a site-URL change automatically. Rendered on a white plate because a QR needs a light quiet zone to scan reliably against the near-black footer panel. Shown at every breakpoint; no per-author toggle.
+
 ## August 1, 2026 — `{{token}}` substitution is case/whitespace-insensitive everywhere
 
 `{{FirstName}}` (or any casing other than the exact lowercase `{{firstName}}`) silently failed to resolve in Mass Email and individual author emails — the regex only matched the literal lowercase token, so anything else sent with the raw `{{...}}` still in it. Audited every `{{token}}` substitution point in the app and fixed all three the same way: lowercase the lookup, tolerate stray whitespace inside the braces, leave the text alone if the token genuinely isn't known. Covers `mailer.ts`'s `buildBroadcastMailPayload` (Mass Email + individual author email — `{{firstName}}`), `substituteVars` (Welcome Email template — `{{firstName}}`, `{{siteUrl}}`, `{{dashboardUrl}}`), and Social Promote's `substituteTokens` (AI prompt templates — `{{book.title}}` and the rest of the dotted tokens).

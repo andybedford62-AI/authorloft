@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { NewsletterModalButton } from "./newsletter-modal";
+import { SiteQrCode } from "./site-qr-code";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,6 +28,7 @@ interface FooterProps {
   author: {
     id:             string;
     slug:           string;
+    customDomain?:  string | null;
     displayName?:   string | null;
     name:           string;
     linkedinUrl?:   string | null;
@@ -79,6 +82,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
   const showMediaKit  = !!(author.plan?.mediaKitEnabled);
   const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks, showMediaKit);
+  const siteUrl      = getAuthorBaseUrl(author);
 
   const socialLinks = [
     { href: author.linkedinUrl,  label: "LinkedIn" },
@@ -97,7 +101,8 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
       {/* ── Dark panel ─────────────────────────────────────────────────────── */}
       <div className="bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
+          {/* QR takes only the width it needs; the three text columns share the rest */}
+          <div className="grid gap-8 sm:gap-12 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
 
             {/* Col 1 — Brand */}
             <div className="space-y-3">
@@ -151,6 +156,9 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 </div>
               </div>
             )}
+
+            {/* Col 4 — Scan to open on a phone */}
+            <SiteQrCode url={siteUrl} authorName={displayName} />
           </div>
         </div>
       </div>
