@@ -17,17 +17,22 @@ export function SiteQrCode({ url, authorName }: { url: string; authorName: strin
         Visit on Mobile
       </p>
       <div className="inline-block bg-white p-2 rounded-md">
+        {/* Rendered at 256 and scaled by CSS (react-qr-code's responsive
+            pattern) so it stays crisp at any size. Smaller on laptop, where a
+            full-size code overpowers the footer. */}
         <QRCode
           value={url}
-          size={104}
+          size={256}
+          viewBox="0 0 256 256"
           level="M"
           bgColor="#FFFFFF"
           fgColor="#111827"
           title={`QR code linking to ${authorName}'s website`}
+          className="block h-[104px] w-[104px] lg:h-[80px] lg:w-[80px]"
         />
       </div>
-      <p className="text-gray-400 text-xs leading-relaxed max-w-[140px]">
-        Scan with your camera to open this site on your phone.
+      <p className="text-gray-400 text-xs leading-relaxed max-w-[130px]">
+        Scan to open on your phone.
       </p>
     </div>
   );
