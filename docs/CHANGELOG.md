@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 5, 2026 — Guided catalog completion for returning authors
+
+Addressed a new-user-experience gap: onboarding guidance previously vanished the moment an author created one book, even a title-only draft, and the only fallback ("Next Steps" card) was hidden from FREE-tier authors entirely. Added `src/lib/book-completeness.ts` as a shared "is this book reader-ready" signal (cover, description, buy link/direct-sale file) used consistently across three surfaces: the Dashboard's Next Steps card (now un-gated from plan tier, driven by real completeness instead of "a book row exists"), a "Needs: cover, description, buy link" note under any unfinished book on the Books list (plus a summary banner when any book is incomplete), and the book editor, where the 10 tabs are now grouped into Essentials / Sell / Advanced with live completion dots, and the old one-shot "book created" banner is replaced by a persistent guidance banner that only disappears once the book is actually done. Verified end-to-end on staging with a disposable test account.
+
 ## August 5, 2026 — FREE tier gets full newsletter sending; new authors get a default reply-to
 
 Fixed a live drift: the platform-newsletter feature gate (Super Admin → Feature Gates) had `/admin/newsletter` set to `STANDARD`, so FREE-tier authors could collect subscribers via the site signup form but got a 403 trying to actually send a campaign — contradicting the pricing page and features page, which have always advertised "Newsletter campaigns ✓" for every tier. Reset the gate to `FREE` and cascaded `Plan.newsletter = true` to all three tiers in prod. Also: new authors (email/password and Google signup) now get `contactEmail` defaulted to their account email at creation, so the "new message" notification for reader contact-form submissions fires out of the box instead of silently landing only in the admin inbox until they opt in via Settings.
