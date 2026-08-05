@@ -197,7 +197,7 @@ export function FoundingOfferPanel({ coupons }: { coupons: StripeCoupon[] }) {
           </div>
         </div>
         {!form && (
-          <Button type="button" size="sm" onClick={openCreate}>
+          <Button type="button" size="sm" onClick={openCreate} className="flex-shrink-0 whitespace-nowrap">
             <Plus className="h-3.5 w-3.5 mr-1.5" /> New Offer
           </Button>
         )}

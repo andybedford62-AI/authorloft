@@ -129,7 +129,7 @@ export function CouponsClient() {
             <button onClick={load} title="Refresh" className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500">
               <RefreshCw className="h-4 w-4" />
             </button>
-            <Button size="sm" onClick={() => setShowForm(v => !v)}>
+            <Button size="sm" onClick={() => setShowForm(v => !v)} className="whitespace-nowrap">
               <Plus className="h-3.5 w-3.5 mr-1.5" /> New Coupon
             </Button>
           </div>
