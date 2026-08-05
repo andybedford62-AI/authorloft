@@ -243,7 +243,7 @@ export default async function DashboardPage() {
       // modal/checklist already owns that message, this one picks up after.
       done: !hasBook || data.incompleteBookCount === 0,
       label: hasBook && data.incompleteBookCount > 0
-        ? `Finish book details (${data.incompleteBookCount} book${data.incompleteBookCount === 1 ? "" : "s"} need more info)`
+        ? `Finish book details (${data.incompleteBookCount} book${data.incompleteBookCount === 1 ? "" : "s"} ${data.incompleteBookCount === 1 ? "needs" : "need"} more info)`
         : "Book details complete",
       hint: "Add a cover, description, and a buy link or direct-sale file — see which books need what on the Books page",
       href: "/admin/books",
