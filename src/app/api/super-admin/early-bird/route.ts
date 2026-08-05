@@ -2,73 +2,58 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
-const SELECT = {
-  earlyBirdEnabled:         true,
-  earlyBirdPercentOff:      true,
-  earlyBirdDurationMonths:  true,
-  earlyBirdWindowDays:      true,
-  earlyBirdCouponIdMonthly: true,
-  earlyBirdCouponIdAnnual:  true,
-} as const;
-
-// GET /api/super-admin/early-bird — current founding-member offer settings
-export async function GET() {
-  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const config = await prisma.systemConfig.upsert({
-    where:  { id: "main" },
-    create: { id: "main" },
-    update: {},
-    select: SELECT,
-  });
-  return NextResponse.json(config);
+function validateTerms(body: any) {
+  const percentOff = Number(body.percentOff);
+  if (!Number.isFinite(percentOff) || percentOff < 1 || percentOff > 100) {
+    return "Percent off must be between 1 and 100.";
+  }
+  const durationMonths = Number(body.durationMonths);
+  if (!Number.isFinite(durationMonths) || durationMonths < 1) {
+    return "Duration must be at least 1 month.";
+  }
+  const windowDays = Number(body.windowDays);
+  if (!Number.isFinite(windowDays) || windowDays < 1) {
+    return "Window must be at least 1 day.";
+  }
+  return null;
 }
 
-// PATCH /api/super-admin/early-bird — update the offer (enable/disable, terms, which coupons apply)
-export async function PATCH(req: NextRequest) {
+// GET /api/super-admin/early-bird — list all saved founding-member offer presets
+export async function GET() {
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const offers = await prisma.earlyBirdOffer.findMany({ orderBy: { createdAt: "asc" } });
+  return NextResponse.json(offers);
+}
+
+// POST /api/super-admin/early-bird — save a new offer preset
+export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
 
-  const {
-    earlyBirdEnabled,
-    earlyBirdPercentOff,
-    earlyBirdDurationMonths,
-    earlyBirdWindowDays,
-    earlyBirdCouponIdMonthly,
-    earlyBirdCouponIdAnnual,
-  } = body;
-
-  if (earlyBirdPercentOff !== undefined) {
-    const v = Number(earlyBirdPercentOff);
-    if (!Number.isFinite(v) || v < 1 || v > 100) {
-      return NextResponse.json({ error: "Percent off must be between 1 and 100." }, { status: 400 });
-    }
+  if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
+    return NextResponse.json({ error: "Name is required." }, { status: 400 });
   }
-  if (earlyBirdDurationMonths !== undefined) {
-    const v = Number(earlyBirdDurationMonths);
-    if (!Number.isFinite(v) || v < 1) {
-      return NextResponse.json({ error: "Duration must be at least 1 month." }, { status: 400 });
-    }
-  }
-  if (earlyBirdWindowDays !== undefined) {
-    const v = Number(earlyBirdWindowDays);
-    if (!Number.isFinite(v) || v < 1) {
-      return NextResponse.json({ error: "Window must be at least 1 day." }, { status: 400 });
-    }
-  }
+  const termsError = validateTerms(body);
+  if (termsError) return NextResponse.json({ error: termsError }, { status: 400 });
 
-  const data: Record<string, unknown> = {};
-  if (earlyBirdEnabled !== undefined)         data.earlyBirdEnabled = !!earlyBirdEnabled;
-  if (earlyBirdPercentOff !== undefined)      data.earlyBirdPercentOff = Math.round(Number(earlyBirdPercentOff));
-  if (earlyBirdDurationMonths !== undefined)  data.earlyBirdDurationMonths = Math.round(Number(earlyBirdDurationMonths));
-  if (earlyBirdWindowDays !== undefined)      data.earlyBirdWindowDays = Math.round(Number(earlyBirdWindowDays));
-  if (earlyBirdCouponIdMonthly !== undefined) data.earlyBirdCouponIdMonthly = earlyBirdCouponIdMonthly?.trim() || null;
-  if (earlyBirdCouponIdAnnual !== undefined)  data.earlyBirdCouponIdAnnual = earlyBirdCouponIdAnnual?.trim() || null;
+  const data = {
+    name:              body.name.trim(),
+    percentOff:        Math.round(Number(body.percentOff)),
+    durationMonths:    Math.round(Number(body.durationMonths)),
+    windowDays:        Math.round(Number(body.windowDays)),
+    couponIdMonthly:   body.couponIdMonthly?.trim() || null,
+    couponIdAnnual:    body.couponIdAnnual?.trim() || null,
+    headline:          body.headline?.trim() || null,
+    subtext:           body.subtext?.trim() || null,
+  };
 
-  const config = await prisma.systemConfig.upsert({
-    where:  { id: "main" },
-    create: { id: "main", ...data },
-    update: data,
-    select: SELECT,
+  // Only one offer may be enabled at a time — creating a new enabled offer
+  // demotes any currently-enabled one.
+  const enabled = !!body.enabled;
+  const offer = await prisma.$transaction(async (tx) => {
+    if (enabled) await tx.earlyBirdOffer.updateMany({ where: { enabled: true }, data: { enabled: false } });
+    return tx.earlyBirdOffer.create({ data: { ...data, enabled } });
   });
-  return NextResponse.json(config);
+
+  return NextResponse.json(offer, { status: 201 });
 }

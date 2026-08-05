@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Trash2, Copy, Check, Loader2, Tag, RefreshCw, PartyPopper } from "lucide-react";
+import { Plus, Trash2, Copy, Check, Loader2, Tag, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FoundingOfferPanel } from "./founding-offer-panel";
 
 type StripeCoupon = {
   id: string;
@@ -16,15 +17,6 @@ type StripeCoupon = {
   times_redeemed: number;
   valid: boolean;
   created: number;
-};
-
-type EarlyBirdSettings = {
-  earlyBirdEnabled: boolean;
-  earlyBirdPercentOff: number;
-  earlyBirdDurationMonths: number;
-  earlyBirdWindowDays: number;
-  earlyBirdCouponIdMonthly: string | null;
-  earlyBirdCouponIdAnnual: string | null;
 };
 
 const input   = "w-full rounded-lg bg-white border border-gray-200 px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500";
@@ -58,45 +50,6 @@ export function CouponsClient() {
     duration: "once", durationMonths: "3", maxRedemptions: "",
   });
 
-  // ── Founding member / early bird offer ──────────────────────────────────────
-  const [eb, setEb]               = useState<EarlyBirdSettings | null>(null);
-  const [ebLoading, setEbLoading] = useState(true);
-  const [ebSaving, setEbSaving]   = useState(false);
-  const [ebMsg, setEbMsg]         = useState("");
-  const [ebError, setEbError]     = useState("");
-
-  const loadEarlyBird = useCallback(async () => {
-    setEbLoading(true);
-    const res = await fetch("/api/super-admin/early-bird");
-    if (res.ok) setEb(await res.json());
-    setEbLoading(false);
-  }, []);
-
-  function setEbField<K extends keyof EarlyBirdSettings>(key: K, val: EarlyBirdSettings[K]) {
-    setEb(prev => prev ? { ...prev, [key]: val } : prev);
-  }
-
-  async function handleSaveEarlyBird() {
-    if (!eb) return;
-    setEbSaving(true);
-    setEbError("");
-    setEbMsg("");
-    const res = await fetch("/api/super-admin/early-bird", {
-      method:  "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(eb),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setEbError(data.error ?? "Failed to save.");
-    } else {
-      setEb(data);
-      setEbMsg("Saved");
-      setTimeout(() => setEbMsg(""), 2500);
-    }
-    setEbSaving(false);
-  }
-
   const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/super-admin/coupons");
@@ -105,7 +58,7 @@ export function CouponsClient() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); loadEarlyBird(); }, [load, loadEarlyBird]);
+  useEffect(() => { load(); }, [load]);
 
   function set<K extends keyof typeof form>(key: K, val: string) {
     setForm(f => ({ ...f, [key]: val }));
@@ -159,98 +112,8 @@ export function CouponsClient() {
         </div>
       </div>
 
-      {/* Founding member / early bird offer */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 space-y-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <PartyPopper className="h-4 w-4 text-amber-600" />
-            </div>
-            <div>
-              <h2 className="font-semibold text-gray-900 text-sm">Founding Member Offer</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                The upgrade banner new FREE-tier authors see on their dashboard. Turn it off, change the terms,
-                or swap which coupon actually applies at checkout — no code changes or redeploys needed.
-              </p>
-            </div>
-          </div>
-          {eb && (
-            <div
-              role="switch"
-              aria-checked={eb.earlyBirdEnabled}
-              onClick={() => setEbField("earlyBirdEnabled", !eb.earlyBirdEnabled)}
-              className={`relative flex-shrink-0 w-10 h-6 rounded-full cursor-pointer transition-colors ${eb.earlyBirdEnabled ? "bg-amber-500" : "bg-gray-300"}`}
-            >
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${eb.earlyBirdEnabled ? "translate-x-5" : "translate-x-1"}`} />
-            </div>
-          )}
-        </div>
-
-        {ebLoading || !eb ? (
-          <div className="flex items-center gap-2 text-sm text-gray-400 py-4">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading offer settings…
-          </div>
-        ) : (
-          <>
-            {ebError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{ebError}</p>}
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className={label}>Percent off</label>
-                <input type="number" min={1} max={100} value={eb.earlyBirdPercentOff}
-                  onChange={e => setEbField("earlyBirdPercentOff", Number(e.target.value))} className={input} />
-              </div>
-              <div>
-                <label className={label}>Duration (months)</label>
-                <input type="number" min={1} value={eb.earlyBirdDurationMonths}
-                  onChange={e => setEbField("earlyBirdDurationMonths", Number(e.target.value))} className={input} />
-              </div>
-              <div>
-                <label className={label}>Eligibility window (days since signup)</label>
-                <input type="number" min={1} value={eb.earlyBirdWindowDays}
-                  onChange={e => setEbField("earlyBirdWindowDays", Number(e.target.value))} className={input} />
-              </div>
-              <div>
-                <label className={label}>Coupon applied — Monthly plans</label>
-                <select value={eb.earlyBirdCouponIdMonthly ?? ""}
-                  onChange={e => setEbField("earlyBirdCouponIdMonthly", e.target.value || null)} className={input}>
-                  <option value="">— use STRIPE_EARLY_BIRD_COUPON_MONTHLY env var —</option>
-                  {coupons.map(c => (
-                    <option key={c.id} value={c.id}>{c.name ?? c.id} ({formatDiscount(c)})</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={label}>Coupon applied — Annual plans</label>
-                <select value={eb.earlyBirdCouponIdAnnual ?? ""}
-                  onChange={e => setEbField("earlyBirdCouponIdAnnual", e.target.value || null)} className={input}>
-                  <option value="">— use STRIPE_EARLY_BIRD_COUPON_ANNUAL env var —</option>
-                  {coupons.map(c => (
-                    <option key={c.id} value={c.id}>{c.name ?? c.id} ({formatDiscount(c)})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-white border border-amber-100 px-4 py-3">
-              <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-1">Dashboard preview</p>
-              <p className="text-sm font-semibold text-amber-900">
-                Founding member offer — {eb.earlyBirdPercentOff}% off for your first {eb.earlyBirdDurationMonths} month{eb.earlyBirdDurationMonths === 1 ? "" : "s"}
-              </p>
-              <p className="text-xs text-amber-700 mt-0.5">
-                Upgrade within {eb.earlyBirdWindowDays} day{eb.earlyBirdWindowDays === 1 ? "" : "s"} to lock in your discount. Auto-applied at checkout.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button type="button" onClick={handleSaveEarlyBird} disabled={ebSaving}>
-                {ebSaving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : "Save Offer Settings"}
-              </Button>
-              {ebMsg && <span className="text-sm text-green-600 flex items-center gap-1"><Check className="h-4 w-4" />{ebMsg}</span>}
-            </div>
-          </>
-        )}
-      </div>
+      {/* Founding member / early bird offers */}
+      <FoundingOfferPanel coupons={coupons} />
 
       {/* Create form */}
       {showForm && (

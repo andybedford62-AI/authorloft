@@ -161,7 +161,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Support Email Management** | Live | Add/edit/manage platform contact emails |
 | **Testimonials Manager** | Live | Add/edit/display social proof |
 | **Coupon Manager** | Live | Create Stripe coupons + assign per-author; separate from author-level book discount codes |
-| **Founding Member / Early Bird Offer** | Live | Fully admin-controlled (Super Admin → Coupons): on/off, percent, duration, signup window, and which Stripe coupon applies per billing interval — no code changes needed |
+| **Founding Member / Early Bird Offers** | Live | Save unlimited offer presets (Super Admin → Coupons); exactly one live at a time; edit, duplicate, or swap which Stripe coupon applies per billing interval — no code changes needed |
 | **Blog & News CMS** | Live | One editor; "Blog Article / News" toggle routes a post to /blog or /news |
 | **AuthorLoft News** | Live | Public /news archive; one-click email to platform subscribers |
 | **News Subscribers** | Live | Subscribe form → platform subscriber list + CSV export |

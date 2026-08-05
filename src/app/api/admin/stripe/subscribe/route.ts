@@ -72,14 +72,14 @@ export async function POST(req: NextRequest) {
     });
     if (!plan) return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
 
-    const [author, earlyBirdConfig] = await Promise.all([
+    const [author, earlyBirdOffer] = await Promise.all([
       prisma.author.findUnique({
         where:  { id: authorId },
         select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true, assignedCouponId: true },
       }),
-      prisma.systemConfig.findUnique({
-        where:  { id: "main" },
-        select: { earlyBirdEnabled: true, earlyBirdWindowDays: true, earlyBirdCouponIdMonthly: true, earlyBirdCouponIdAnnual: true },
+      prisma.earlyBirdOffer.findFirst({
+        where:  { enabled: true },
+        select: { windowDays: true, couponIdMonthly: true, couponIdAnnual: true },
       }),
     ]);
     if (!author) return NextResponse.json({ error: "Author not found" }, { status: 404 });
@@ -112,15 +112,15 @@ export async function POST(req: NextRequest) {
     // coupon gets applied are controlled from Super Admin → Coupons (falls back to env vars).
     const daysSinceSignup = (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     const isOnTrial = !!author.trialEndsAt && author.trialEndsAt > new Date();
-    const earlyBirdWindowDays = earlyBirdConfig?.earlyBirdWindowDays ?? 30;
-    const isEarlyBird = (earlyBirdConfig?.earlyBirdEnabled ?? true) && !assignedCouponId && daysSinceSignup <= earlyBirdWindowDays && !isOnTrial;
+    const earlyBirdWindowDays = earlyBirdOffer?.windowDays ?? 30;
+    const isEarlyBird = !!earlyBirdOffer && !assignedCouponId && daysSinceSignup <= earlyBirdWindowDays && !isOnTrial;
 
     const isMonthly = plan.stripePriceIdMonthly === priceId;
 
     const earlyBirdCouponId = isEarlyBird
       ? (isMonthly
-          ? (earlyBirdConfig?.earlyBirdCouponIdMonthly || process.env.STRIPE_EARLY_BIRD_COUPON_MONTHLY)
-          : (earlyBirdConfig?.earlyBirdCouponIdAnnual || process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL))
+          ? (earlyBirdOffer?.couponIdMonthly || process.env.STRIPE_EARLY_BIRD_COUPON_MONTHLY)
+          : (earlyBirdOffer?.couponIdAnnual || process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL))
       : undefined;
 
     // Use assigned coupon if present, otherwise fall back to early bird

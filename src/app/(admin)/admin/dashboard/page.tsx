@@ -25,7 +25,7 @@ async function getDashboardData(authorId: string) {
     recentOrders,
     books,
     plan,
-    earlyBirdConfig,
+    earlyBirdOffer,
   ] = await Promise.all([
     // Total published books
     prisma.book.count({ where: { authorId, isPublished: true } }),
@@ -78,10 +78,10 @@ async function getDashboardData(authorId: string) {
       },
     }),
 
-    // Founding member offer settings — Super Admin → Coupons
-    prisma.systemConfig.findUnique({
-      where:  { id: "main" },
-      select: { earlyBirdEnabled: true, earlyBirdPercentOff: true, earlyBirdDurationMonths: true, earlyBirdWindowDays: true },
+    // Whichever founding-member offer is currently live — Super Admin → Coupons
+    prisma.earlyBirdOffer.findFirst({
+      where:  { enabled: true },
+      select: { percentOff: true, durationMonths: true, windowDays: true, headline: true, subtext: true },
     }),
   ]);
 
@@ -89,11 +89,15 @@ async function getDashboardData(authorId: string) {
   const daysSinceSignup = plan?.createdAt
     ? (Date.now() - new Date(plan.createdAt).getTime()) / (1000 * 60 * 60 * 24)
     : 999;
-  const earlyBirdWindowDays = earlyBirdConfig?.earlyBirdWindowDays ?? 30;
-  const showEarlyBirdBanner = (earlyBirdConfig?.earlyBirdEnabled ?? true) && planTier === "FREE" && daysSinceSignup <= earlyBirdWindowDays;
+  const earlyBirdWindowDays = earlyBirdOffer?.windowDays ?? 30;
+  const showEarlyBirdBanner = !!earlyBirdOffer && planTier === "FREE" && daysSinceSignup <= earlyBirdWindowDays;
   const earlyBirdDaysLeft   = Math.max(0, Math.ceil(earlyBirdWindowDays - daysSinceSignup));
-  const earlyBirdPercentOff = earlyBirdConfig?.earlyBirdPercentOff ?? 20;
-  const earlyBirdDurationMonths = earlyBirdConfig?.earlyBirdDurationMonths ?? 3;
+  const earlyBirdPercentOff = earlyBirdOffer?.percentOff ?? 20;
+  const earlyBirdDurationMonths = earlyBirdOffer?.durationMonths ?? 3;
+  const earlyBirdHeadline = earlyBirdOffer?.headline?.trim()
+    || `Founding member offer — ${earlyBirdPercentOff}% off for your first ${earlyBirdDurationMonths} month${earlyBirdDurationMonths !== 1 ? "s" : ""}`;
+  const earlyBirdSubtext = earlyBirdOffer?.subtext?.trim()
+    || `Upgrade within ${earlyBirdDaysLeft} day${earlyBirdDaysLeft !== 1 ? "s" : ""} to lock in your discount. Auto-applied at checkout.`;
 
   // How many books are missing a cover, description, or a way for a reader to actually
   // get the book — the signal that drives the "finish your book" dashboard nudge.
@@ -125,6 +129,8 @@ async function getDashboardData(authorId: string) {
     earlyBirdDaysLeft,
     earlyBirdPercentOff,
     earlyBirdDurationMonths,
+    earlyBirdHeadline,
+    earlyBirdSubtext,
     incompleteBookCount,
   };
 }
@@ -326,8 +332,8 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎉</span>
             <div>
-              <p className="font-semibold text-amber-900 text-sm">Founding member offer — {data.earlyBirdPercentOff}% off for your first {data.earlyBirdDurationMonths} month{data.earlyBirdDurationMonths !== 1 ? "s" : ""}</p>
-              <p className="text-xs text-amber-700 mt-0.5">Upgrade within {data.earlyBirdDaysLeft} day{data.earlyBirdDaysLeft !== 1 ? "s" : ""} to lock in your discount. Auto-applied at checkout.</p>
+              <p className="font-semibold text-amber-900 text-sm">{data.earlyBirdHeadline}</p>
+              <p className="text-xs text-amber-700 mt-0.5">{data.earlyBirdSubtext}</p>
             </div>
           </div>
           <a

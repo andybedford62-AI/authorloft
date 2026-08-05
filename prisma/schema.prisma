@@ -25,15 +25,29 @@ model SystemConfig {
   welcomeEmailSubject     String?
   welcomeEmailBody        String?
   authorReplyToEmail      String? // Reply-To for individual + mass author emails (e.g. authorloft@gmail.com) — from stays on the verified domain, replies route here
-  // Founding member / "early bird" upgrade offer — Super Admin → Coupons page.
-  // Coupon IDs fall back to STRIPE_EARLY_BIRD_COUPON_MONTHLY/ANNUAL env vars when null.
-  earlyBirdEnabled         Boolean  @default(true)
-  earlyBirdPercentOff      Int      @default(20)
-  earlyBirdDurationMonths  Int      @default(3)
-  earlyBirdWindowDays      Int      @default(30)
-  earlyBirdCouponIdMonthly String?
-  earlyBirdCouponIdAnnual  String?
   updatedAt               DateTime @updatedAt
+}
+
+// ─── Founding Member / "Early Bird" Upgrade Offers ────────────────────────────
+// A library of saved offer presets — Super Admin → Coupons page. Exactly one may
+// be `enabled` at a time (enforced in the API, not the DB); that's the offer the
+// dashboard banner shows and checkout applies. Coupon IDs fall back to
+// STRIPE_EARLY_BIRD_COUPON_MONTHLY/ANNUAL env vars when null.
+model EarlyBirdOffer {
+  id                String   @id @default(cuid())
+  name              String   // internal label only, e.g. "Founding Member — Launch"
+  enabled           Boolean  @default(false)
+  percentOff        Int
+  durationMonths    Int
+  windowDays        Int
+  couponIdMonthly   String?
+  couponIdAnnual    String?
+  headline          String?  // optional override of the generated banner headline
+  subtext           String?  // optional override of the generated banner subtext
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([enabled])
 }
 
 // ─── Beta Invite Codes ────────────────────────────────────────────────────────

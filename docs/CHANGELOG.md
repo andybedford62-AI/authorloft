@@ -13,9 +13,16 @@ line rather than listing every commit.
 
 ---
 
-## August 5, 2026 — Founding Member Offer is now a real admin control
+## August 5, 2026 — Founding Member Offer is now a real admin control, with a saved-offer library
 
-The dashboard's "Founding member offer — 20% off for your first 3 months" banner was fully hardcoded, and the actual checkout discount was a separate Stripe coupon ID living in an env var — the two could silently drift out of sync, and changing either required a code deploy. Added a **Founding Member Offer** panel to Super Admin → Coupons (`SystemConfig.earlyBird*` fields, migration `20260805_early_bird_offer_settings`): enable/disable, percent off, duration, eligibility window (days since signup), and which existing Stripe coupon actually applies at checkout for monthly vs. annual plans — with a live preview of the exact dashboard copy. Coupon fields fall back to `STRIPE_EARLY_BIRD_COUPON_MONTHLY`/`ANNUAL` env vars when left blank, so nothing changed for existing authors until the offer is edited. Dashboard banner ([dashboard/page.tsx](../src/app/(admin)/admin/dashboard/page.tsx)) and checkout coupon selection ([stripe/subscribe/route.ts](../src/app/api/admin/stripe/subscribe/route.ts)) both read from the same settings now.
+The dashboard's "Founding member offer — 20% off for your first 3 months" banner was fully hardcoded, and the actual checkout discount was a separate Stripe coupon ID living in an env var — the two could silently drift out of sync, and changing either required a code deploy. Added a **Founding Member Offers** panel to Super Admin → Coupons, backed by a new `EarlyBirdOffer` table (migrations `20260805_early_bird_offer_settings` → `20260805_early_bird_offers_table`, the latter superseding a same-day singleton-config first pass once multi-offer support was requested):
+
+- Save any number of offer presets (name, percent off, duration, eligibility window in days since signup, optional custom headline/subtext override) and pick which existing Stripe coupon applies at checkout for monthly vs. annual — with a live preview of the exact banner copy.
+- Exactly one offer is ever "live" at a time — turning one on automatically turns off whichever was previously active, so the dashboard banner slot is never ambiguous.
+- Edit any saved offer in place, or duplicate one as a starting point for a new one (e.g. clone "Founding Member" into "Black Friday 2026" without retyping terms).
+- Coupon fields fall back to `STRIPE_EARLY_BIRD_COUPON_MONTHLY`/`ANNUAL` env vars when left blank, so nothing changed for existing authors until an offer is actually edited.
+
+Dashboard banner ([dashboard/page.tsx](../src/app/(admin)/admin/dashboard/page.tsx)) and checkout coupon selection ([stripe/subscribe/route.ts](../src/app/api/admin/stripe/subscribe/route.ts)) both read from whichever `EarlyBirdOffer` row has `enabled = true`.
 
 ## August 5, 2026 — Fixed dead "Dashboard" link on marketing site, gave "Sign in" real visual weight
 
