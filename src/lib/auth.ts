@@ -179,6 +179,7 @@ export const authOptions: NextAuthOptions = {
               isActive:       true,
               emailVerified:  new Date(),   // Google has already verified the email
               profileImageUrl: user.image ?? null,
+              contactEmail:   email,
               ...(freePlan && { planId: freePlan.id }),
             },
           });

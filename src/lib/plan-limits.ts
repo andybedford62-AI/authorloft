@@ -8,7 +8,7 @@ const OPEN_LIMITS = {
   maxStorageMb:    null as number | null,
   customDomain:    false,
   salesEnabled:    true,
-  newsletter:      false,
+  newsletter:      true,
   analyticsEnabled:false,
   flipBooksLimit:  -1,  // unlimited when no plan assigned
   audioEnabled:    false,

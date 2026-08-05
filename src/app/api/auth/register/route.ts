@@ -192,6 +192,7 @@ export async function POST(req: NextRequest) {
         emailVerifyExpiry,
         termsAcceptedAt: new Date(),
         aiUsageCap: aiUsageCap,
+        contactEmail: email.toLowerCase().trim(),
         ...(freePlan && { planId: freePlan.id }),
       },
     });

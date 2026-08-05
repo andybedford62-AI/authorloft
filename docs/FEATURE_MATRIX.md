@@ -131,7 +131,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Billing & Subscription** (manage plan) | ✅ | ✅ | ✅ |
 | **Contact Support** (ticket form) | ✅ | ✅ | ✅ |
 | **Appearance & Branding** (theme, logo) | ✅ | ✅ | ✅ |
-| **Newsletter Settings** (list & templates) | ❌ | ✅ | ✅ |
+| **Newsletter Settings** (list & templates) | ✅ | ✅ | ✅ |
 | **Coupon Assignment** (super admin assigns codes) | ❌ | ✅ | ✅ |
 | **Sales Dashboard** | ❌ | ✅ | ✅ |
 

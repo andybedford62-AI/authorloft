@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 5, 2026 — FREE tier gets full newsletter sending; new authors get a default reply-to
+
+Fixed a live drift: the platform-newsletter feature gate (Super Admin → Feature Gates) had `/admin/newsletter` set to `STANDARD`, so FREE-tier authors could collect subscribers via the site signup form but got a 403 trying to actually send a campaign — contradicting the pricing page and features page, which have always advertised "Newsletter campaigns ✓" for every tier. Reset the gate to `FREE` and cascaded `Plan.newsletter = true` to all three tiers in prod. Also: new authors (email/password and Google signup) now get `contactEmail` defaulted to their account email at creation, so the "new message" notification for reader contact-form submissions fires out of the box instead of silently landing only in the admin inbox until they opt in via Settings.
+
 ## August 3, 2026 — Author-site footer QR code
 
 Every author site footer now shows a QR code linking to that author's own site, as a fourth column to the right of Quick Links. A desktop visitor can scan to carry the site to their phone, and — the case that isn't redundant on mobile — an author can hold their screen out at a signing or conference for a reader to scan. Built on `getAuthorBaseUrl()`, so it resolves to a custom domain when one is configured and otherwise the `slug.authorloft.com` subdomain, and it follows a site-URL change automatically. Rendered on a white plate because a QR needs a light quiet zone to scan reliably against the near-black footer panel. Shown at every breakpoint; no per-author toggle.
