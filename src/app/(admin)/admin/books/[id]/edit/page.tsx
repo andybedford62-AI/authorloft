@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BookEditTabsClient } from "@/components/admin/book-edit-tabs-client";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { CheckCircle2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 export default async function EditBookPage({
   params,
@@ -19,7 +20,10 @@ export default async function EditBookPage({
   const [book, seriesList, genreTree, author, previewMedia] = await Promise.all([
     prisma.book.findFirst({
       where: { id, authorId },
-      include: { genres: { select: { genreId: true } } },
+      include: {
+        genres: { select: { genreId: true } },
+        _count:  { select: { retailerLinks: true, directSaleItems: true } },
+      },
     }),
     prisma.series.findMany({
       where: { authorId },
@@ -88,6 +92,14 @@ export default async function EditBookPage({
     sampleContent: book.sampleContent ?? null,
   };
 
+  const completion = getBookCompletionSummary({
+    coverImageUrl:        book.coverImageUrl,
+    description:          book.description,
+    shortDescription:     book.shortDescription,
+    retailerLinksCount:   book._count.retailerLinks,
+    directSaleItemsCount: book._count.directSaleItems,
+  });
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="sticky top-0 z-20 bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-3">
@@ -100,19 +112,35 @@ export default async function EditBookPage({
         </h1>
       </div>
 
-      {/* First-time guidance banner */}
-      {isNew === "1" && (
-        <div className="rounded-xl bg-green-50 border border-green-200 p-4">
+      {/* Setup guidance — persists until the book actually has a cover, description, and a
+          buy link / direct-sale file, not just on the first visit right after creation. */}
+      {!completion.isComplete && (
+        <div className="rounded-xl bg-blue-50 border border-blue-200 p-4">
           <div className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-green-900 text-sm">Book created — here's what to do next</p>
-              <ul className="mt-2 space-y-1 text-sm text-green-800">
-                <li>1. <strong>Details tab</strong> — add a cover image and description so readers know what your book is about</li>
-                <li>2. <strong>Direct Sales tab</strong> — upload your eBook or PDF, then set a price to sell it or give it away free as a Reader Magnet</li>
-                <li>3. <strong>Buy Links tab</strong> — add links to Amazon, Apple Books, or other retailers</li>
+            <AlertCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-blue-900 text-sm">
+                {isNew === "1" ? "Book created — here's what to do next" : "Finish setting up this book"}
+              </p>
+              <ul className="mt-2 space-y-1.5 text-sm text-blue-800">
+                {completion.steps.map((step) => (
+                  <li key={step.key} className="flex items-center gap-2">
+                    <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      step.done ? "bg-green-500 border-green-500" : "border-blue-300"
+                    }`}>
+                      {step.done && (
+                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
+                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className={step.done ? "line-through text-blue-400" : ""}>{step.label}</span>
+                  </li>
+                ))}
               </ul>
-              <p className="mt-2 text-xs text-green-700">Use <strong>Save Changes</strong> on the Details and Organisation tabs; the other tabs save as you go. Skip any step and come back later.</p>
+              <p className="mt-2 text-xs text-blue-600">
+                Use <strong>Save Changes</strong> on the Details and Organisation tabs; the other tabs save as you go. Skip any step and come back later.
+              </p>
             </div>
           </div>
         </div>
@@ -130,6 +158,8 @@ export default async function EditBookPage({
         arcEnabled={(author?.plan?.tier ?? "FREE") !== "FREE"}
         stripeConnectOnboarded={author?.stripeConnectOnboarded ?? false}
         previewMedia={previewMedia}
+        retailerLinksCount={book._count.retailerLinks}
+        directSaleItemsCount={book._count.directSaleItems}
         publicBaseUrl={author ? getAuthorBaseUrl(author) : ""}
       />
     </div>

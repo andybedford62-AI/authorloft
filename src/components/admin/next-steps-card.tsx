@@ -12,7 +12,13 @@ interface Step {
   href: string | null;
 }
 
-export function NextStepsCard({ steps }: { steps: Step[] }) {
+export function NextStepsCard({
+  steps,
+  subtitle = "Optional — set these up to enable direct book sales",
+}: {
+  steps: Step[];
+  subtitle?: string;
+}) {
   const router = useRouter();
   const [dismissing, setDismissing] = useState(false);
 
@@ -27,9 +33,7 @@ export function NextStepsCard({ steps }: { steps: Step[] }) {
       <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
         <div>
           <h2 className="font-semibold text-gray-900">Next Steps</h2>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Optional — set these up to enable direct book sales
-          </p>
+          <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
         </div>
         <button
           onClick={handleDismiss}

@@ -15,6 +15,7 @@ import { PreOrderSignups } from "@/components/admin/preorder-signups";
 import { AffiliateSettings } from "@/components/admin/affiliate-settings";
 import { BookQRCode } from "@/components/admin/book-qr-code";
 import { BookAutoFormatter } from "@/components/admin/book-auto-formatter";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -68,58 +69,136 @@ type Props = {
   arcEnabled: boolean;
   stripeConnectOnboarded: boolean;
   previewMedia: PreviewMedia[];
+  retailerLinksCount: number;
+  directSaleItemsCount: number;
   publicBaseUrl: string;
 };
 
 type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "affiliate" | "media" | "format" | "reviews" | "excerpt" | "arcs";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "details",       label: "Details" },
-  { id: "organisation",  label: "Organisation" },
-  { id: "buy-links",     label: "Buy Links" },
-  { id: "direct-sales",  label: "Direct Sales" },
-  { id: "affiliate",     label: "Affiliate" },
-  { id: "media",         label: "Media" },
-  { id: "format",        label: "ePub Format" },
-  { id: "reviews",       label: "Reviews" },
-  { id: "excerpt",       label: "Excerpt" },
-  { id: "arcs",          label: "ARC" },
+// Grouped so a first-time author sees "what a book needs" before "how to monetise it"
+// before "advanced/optional extras" — instead of 10 flat, equal-weight tabs.
+const TAB_GROUPS: { group: string; tabs: { id: TabId; label: string }[] }[] = [
+  {
+    group: "Essentials",
+    tabs: [
+      { id: "details",      label: "Details" },
+      { id: "organisation", label: "Organisation" },
+      { id: "media",        label: "Media" },
+    ],
+  },
+  {
+    group: "Sell",
+    tabs: [
+      { id: "buy-links",    label: "Buy Links" },
+      { id: "direct-sales", label: "Direct Sales" },
+      { id: "affiliate",    label: "Affiliate" },
+    ],
+  },
+  {
+    group: "Advanced",
+    tabs: [
+      { id: "format",  label: "ePub Format" },
+      { id: "reviews", label: "Reviews" },
+      { id: "excerpt", label: "Excerpt" },
+      { id: "arcs",    label: "ARC" },
+    ],
+  },
 ];
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, publicBaseUrl }: Props) {
+const TABS = TAB_GROUPS.flatMap((g) => g.tabs);
+
+type DotState = "done" | "partial" | "empty";
+
+function TabDot({ state }: { state: DotState }) {
+  if (state === "done") {
+    return (
+      <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" title="Complete" />
+    );
+  }
+  if (state === "partial") {
+    return (
+      <span className="w-2 h-2 rounded-full border-2 border-amber-400 flex-shrink-0" title="In progress" />
+    );
+  }
+  return (
+    <span className="w-2 h-2 rounded-full border-2 border-gray-200 flex-shrink-0" title="Not started" />
+  );
+}
+
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, retailerLinksCount, directSaleItemsCount, publicBaseUrl }: Props) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
     return tab && TABS.some((t) => t.id === tab) ? tab : "details";
   });
 
+  // ── Tab completion dots — reuses the same signal as the Dashboard/Books list
+  //    so a returning author sees identical guidance everywhere. ──────────────
+  const bookCompletion = getBookCompletionSummary({
+    coverImageUrl:    book.coverImageUrl,
+    description:      book.description,
+    shortDescription: book.shortDescription,
+    retailerLinksCount,
+    directSaleItemsCount,
+  });
+  const hasCover       = bookCompletion.steps.find((s) => s.key === "cover")!.done;
+  const hasDescription = bookCompletion.steps.find((s) => s.key === "description")!.done;
+
+  const dotStates: Partial<Record<TabId, DotState>> = {
+    details: hasCover && hasDescription ? "done" : (hasCover || hasDescription) ? "partial" : "empty",
+    organisation: (book.genreIds.length > 0 || !!book.seriesId) ? "done" : "empty",
+    media: previewMedia.length > 0 ? "done" : "empty",
+    "buy-links": retailerLinksCount > 0 ? "done" : "empty",
+    "direct-sales": directSaleItemsCount > 0 ? "done" : "empty",
+    excerpt: book.sampleContent?.trim() ? "done" : "empty",
+  };
+
   return (
     <div className="space-y-0">
-      {/* ── Tab bar ── */}
+      {/* ── Tab bar — grouped into Essentials / Sell / Advanced ── */}
       <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex gap-1 overflow-x-auto">
-          {TABS.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActiveTab(id)}
-              className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                activeTab === id
-                  ? "border-[var(--accent)] text-[var(--accent)]"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              {label}
-              {id === "direct-sales" && !salesEnabled && (
-                <Lock className="h-3 w-3 text-amber-400" />
+        <nav className="-mb-px flex items-stretch gap-1 overflow-x-auto">
+          {TAB_GROUPS.map(({ group, tabs }, groupIdx) => (
+            <div key={group} className="flex items-stretch">
+              {groupIdx > 0 && (
+                <div className="w-px bg-gray-200 my-2 mx-1.5 flex-shrink-0" aria-hidden="true" />
               )}
-              {id === "affiliate" && !salesEnabled && (
-                <Lock className="h-3 w-3 text-amber-400" />
-              )}
-              {id === "arcs" && !arcEnabled && (
-                <Lock className="h-3 w-3 text-amber-400" />
-              )}
-            </button>
+              <div className="flex flex-col">
+                <span className="px-4 pt-1 text-[10px] font-semibold uppercase tracking-wide text-gray-300">
+                  {group}
+                </span>
+                <div className="flex gap-1">
+                  {tabs.map(({ id, label }) => {
+                    const dotState = dotStates[id];
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setActiveTab(id)}
+                        className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                          activeTab === id
+                            ? "border-[var(--accent)] text-[var(--accent)]"
+                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                      >
+                        {dotState && <TabDot state={dotState} />}
+                        {label}
+                        {id === "direct-sales" && !salesEnabled && (
+                          <Lock className="h-3 w-3 text-amber-400" />
+                        )}
+                        {id === "affiliate" && !salesEnabled && (
+                          <Lock className="h-3 w-3 text-amber-400" />
+                        )}
+                        {id === "arcs" && !arcEnabled && (
+                          <Lock className="h-3 w-3 text-amber-400" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           ))}
         </nav>
       </div>

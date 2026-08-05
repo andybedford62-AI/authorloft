@@ -16,6 +16,8 @@ type BookRow = {
   title: string;
   subtitle: string | null;
   coverImageUrl: string | null;
+  description: string | null;
+  shortDescription: string | null;
   isFeatured: boolean;
   isPublished: boolean;
   directSalesEnabled: boolean;

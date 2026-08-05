@@ -14,6 +14,7 @@ import { EmailVerificationBanner } from "@/components/admin/email-verification-b
 import { SitePagesCard } from "@/components/admin/site-pages-card";
 import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 async function getDashboardData(authorId: string) {
   const [
@@ -56,11 +57,15 @@ async function getDashboardData(authorId: string) {
       take: 5,
     }),
 
-    // All books for the list
+    // All books for the list (+ the fields needed to judge whether each one is reader-ready)
     prisma.book.findMany({
       where: { authorId },
       orderBy: { sortOrder: "asc" },
-      select: { id: true, title: true, priceCents: true, isFeatured: true, isPublished: true },
+      select: {
+        id: true, title: true, priceCents: true, isFeatured: true, isPublished: true,
+        coverImageUrl: true, description: true, shortDescription: true,
+        _count: { select: { retailerLinks: true, directSaleItems: true } },
+      },
     }),
 
     // Author plan
@@ -80,6 +85,16 @@ async function getDashboardData(authorId: string) {
   const showEarlyBirdBanner = planTier === "FREE" && daysSinceSignup <= 30;
   const earlyBirdDaysLeft   = Math.max(0, Math.ceil(30 - daysSinceSignup));
 
+  // How many books are missing a cover, description, or a way for a reader to actually
+  // get the book — the signal that drives the "finish your book" dashboard nudge.
+  const incompleteBookCount = books.filter((b) => !getBookCompletionSummary({
+    coverImageUrl:        b.coverImageUrl,
+    description:          b.description,
+    shortDescription:     b.shortDescription,
+    retailerLinksCount:   b._count.retailerLinks,
+    directSaleItemsCount: b._count.directSaleItems,
+  }).isComplete).length;
+
   return {
     totalBooks,
     totalSubscribers,
@@ -98,6 +113,7 @@ async function getDashboardData(authorId: string) {
       : ["Up to 5 books"],
     showEarlyBirdBanner,
     earlyBirdDaysLeft,
+    incompleteBookCount,
   };
 }
 
@@ -223,6 +239,17 @@ export default async function DashboardPage() {
       optional: false,
     },
     {
+      // Trivially "done" before any book exists — the pre-first-book onboarding
+      // modal/checklist already owns that message, this one picks up after.
+      done: !hasBook || data.incompleteBookCount === 0,
+      label: hasBook && data.incompleteBookCount > 0
+        ? `Finish book details (${data.incompleteBookCount} book${data.incompleteBookCount === 1 ? "" : "s"} need more info)`
+        : "Book details complete",
+      hint: "Add a cover, description, and a buy link or direct-sale file — see which books need what on the Books page",
+      href: "/admin/books",
+      optional: true,
+    },
+    {
       done: hasStripe,
       label: "Connect Stripe for payouts",
       hint: "Settings → Billing tab → Stripe Payouts → Connect Stripe account",
@@ -315,12 +342,15 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Optional next steps — paid plans only, dismissible, shown until complete or hidden */}
-      {authorMeta?.onboardingCompletedAt &&
-        data.planTier !== "FREE" &&
-        !authorMeta.hideNextStepsChecklist &&
+      {/* Next steps — every plan tier, dismissible, shown from the first book until complete or hidden.
+          Gated on hasBook (not onboardingCompletedAt) so it doesn't duplicate the pre-first-book modal. */}
+      {hasBook &&
+        !authorMeta?.hideNextStepsChecklist &&
         optionalSteps.some((s) => !s.done) && (
-        <NextStepsCard steps={optionalSteps} />
+        <NextStepsCard
+          steps={optionalSteps}
+          subtitle="Finish these so readers see a complete, sellable book"
+        />
       )}
 
       {/* Your Site Pages — visual sitemap of the live author site */}

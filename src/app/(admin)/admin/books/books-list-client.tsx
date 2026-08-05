@@ -2,14 +2,17 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical, Store, Clock } from "lucide-react";
+import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical, Store, Clock, AlertCircle } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 type BookRow = {
   id: string;
   title: string;
   subtitle: string | null;
   coverImageUrl: string | null;
+  description: string | null;
+  shortDescription: string | null;
   isFeatured: boolean;
   isPublished: boolean;
   directSalesEnabled: boolean;
@@ -104,7 +107,15 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {books.map((book, idx) => (
+          {books.map((book, idx) => {
+          const completion = getBookCompletionSummary({
+            coverImageUrl:        book.coverImageUrl,
+            description:          book.description,
+            shortDescription:     book.shortDescription,
+            retailerLinksCount:   book._count.retailerLinks,
+            directSaleItemsCount: book._count.directSaleItems,
+          });
+          return (
             <tr
               key={book.id}
               draggable
@@ -153,6 +164,12 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                     </div>
                     {book.subtitle && (
                       <p className="text-xs text-gray-400 line-clamp-1">{book.subtitle}</p>
+                    )}
+                    {!completion.isComplete && (
+                      <p className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-600">
+                        <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
+                        Needs {completion.steps.filter((s) => !s.done).map((s) => s.shortLabel).join(", ")}
+                      </p>
                     )}
                   </div>
                 </Link>
@@ -236,7 +253,7 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                 </div>
               </td>
             </tr>
-          ))}
+          );})}
         </tbody>
       </table>
     </div>

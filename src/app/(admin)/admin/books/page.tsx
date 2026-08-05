@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Plus, BookOpen, ArrowRight, Upload } from "lucide-react";
+import { Plus, BookOpen, ArrowRight, Upload, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 export default async function AdminBooksPage() {
   const authorId = await getAdminAuthorId();
@@ -17,6 +18,8 @@ export default async function AdminBooksPage() {
         title: true,
         subtitle: true,
         coverImageUrl: true,
+        description: true,
+        shortDescription: true,
         isFeatured: true,
         isPublished: true,
         directSalesEnabled: true,
@@ -36,6 +39,14 @@ export default async function AdminBooksPage() {
 
   const booksLayout = author?.booksLayout ?? "list";
   const planTier    = author?.plan?.tier ?? "FREE";
+
+  const incompleteBooks = books.filter((b) => !getBookCompletionSummary({
+    coverImageUrl:        b.coverImageUrl,
+    description:          b.description,
+    shortDescription:     b.shortDescription,
+    retailerLinksCount:   b._count.retailerLinks,
+    directSaleItemsCount: b._count.directSaleItems,
+  }).isComplete);
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -63,6 +74,20 @@ export default async function AdminBooksPage() {
           </Link>
         </div>
       </div>
+
+      {/* Finish-your-catalog nudge — visible whenever a book is missing a cover,
+          description, or a way for a reader to buy/download it. Disappears on its own
+          once every book clears those, so it doesn't need a dismiss control. */}
+      {incompleteBooks.length > 0 && (
+        <div className="flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800">
+            <strong>{incompleteBooks.length} book{incompleteBooks.length !== 1 ? "s" : ""}</strong> still{" "}
+            {incompleteBooks.length !== 1 ? "need" : "needs"} a cover, description, or buy link before it looks
+            complete to a reader — look for the <span className="font-medium">"Needs…"</span> note under the title below.
+          </p>
+        </div>
+      )}
 
       {/* Empty state — first time author */}
       {books.length === 0 ? (
