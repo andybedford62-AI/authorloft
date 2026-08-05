@@ -259,12 +259,12 @@ export function RebelHero({
         </div>
         <div style={{ alignItems: 'center', gap: 16 }} className="hidden md:flex">
           {isAuthor ? (
-            <Link href="/admin" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Link href="/admin/dashboard" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               Dashboard
             </Link>
           ) : (
             <>
-              <Link href="/login" style={{ fontFamily: 'inherit', fontSize: 14, color: ML.bone, opacity: 0.85, textDecoration: 'none' }}>Sign in</Link>
+              <Link href="/login" style={{ padding: '10px 20px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, color: ML.bone, background: 'transparent', border: '1px solid rgba(232,229,221,0.35)', borderRadius: 999, textDecoration: 'none' }}>Sign in</Link>
               <Link href="/register" style={{ padding: '10px 22px', fontFamily: 'inherit', fontSize: 14, fontWeight: 600, background: '#E8B04B', color: ML.midnight, borderRadius: 999, textDecoration: 'none', boxShadow: '0 4px 18px -4px rgba(232,176,75,0.7)', letterSpacing: '0.01em' }}>
                 Start free →
               </Link>

@@ -113,7 +113,7 @@ export function HeroMobileMenu({ isAuthor = false }: { isAuthor?: boolean }) {
           <div style={{ height: 1, background: "rgba(232,229,221,0.12)", margin: "8px 6px" }} />
           {isAuthor ? (
             <Link
-              href="/admin"
+              href="/admin/dashboard"
               onClick={() => setOpen(false)}
               style={{ display: "block", margin: 6, padding: "10px 14px", fontSize: 14, fontWeight: 600, textAlign: "center", background: "#B8893D", color: "#0F1A2D", borderRadius: 999, textDecoration: "none" }}
             >
@@ -124,7 +124,7 @@ export function HeroMobileMenu({ isAuthor = false }: { isAuthor?: boolean }) {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                style={{ display: "block", padding: "10px 14px", fontSize: 14, color: "#E8E5DD", opacity: 0.85, textDecoration: "none" }}
+                style={{ display: "block", margin: 6, padding: "10px 14px", fontSize: 14, fontWeight: 600, textAlign: "center", color: "#E8E5DD", background: "transparent", border: "1px solid rgba(232,229,221,0.35)", borderRadius: 999, textDecoration: "none" }}
               >
                 Sign in
               </Link>

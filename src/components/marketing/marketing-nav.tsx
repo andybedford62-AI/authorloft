@@ -50,7 +50,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-sm text-gray-500">{displayName}</span>
                 <Link
-                  href="/admin"
+                  href="/admin/dashboard"
                   className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
@@ -101,11 +101,6 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Pricing
           </Link>
-          {!author && (
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
-              Sign in
-            </Link>
-          )}
         </nav>
 
         {/* Right CTA + mobile menu */}
@@ -113,19 +108,27 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           {author ? (
             /* Mobile: show Dashboard button on the right when logo area is too small */
             <Link
-              href="/admin"
+              href="/admin/dashboard"
               className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
             >
               <LayoutDashboard className="h-3.5 w-3.5" />
               Dashboard
             </Link>
           ) : (
-            <Link
-              href="/register"
-              className="hidden sm:inline-flex bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Start free →
-            </Link>
+            <>
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex items-center border border-gray-300 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className="hidden sm:inline-flex bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Start free →
+              </Link>
+            </>
           )}
           <MarketingMobileMenu isAuthor={!!author} />
         </div>

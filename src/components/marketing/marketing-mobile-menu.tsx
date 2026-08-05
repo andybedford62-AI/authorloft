@@ -115,7 +115,7 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
               <div className="mt-3 mb-2 flex flex-col gap-2">
                 {isAuthor ? (
                   <Link
-                    href="/admin"
+                    href="/admin/dashboard"
                     onClick={() => setOpen(false)}
                     className="inline-flex items-center justify-center gap-1.5 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-2.5 rounded-lg"
                   >
@@ -126,7 +126,7 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                     <Link
                       href="/login"
                       onClick={() => setOpen(false)}
-                      className="text-sm text-gray-600 hover:text-gray-900 py-2 text-center"
+                      className="border border-gray-300 text-gray-700 text-sm font-semibold px-4 py-2.5 rounded-lg text-center hover:border-gray-400 hover:bg-gray-50 transition-colors"
                     >
                       Sign in
                     </Link>
