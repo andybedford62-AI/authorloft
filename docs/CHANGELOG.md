@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 5, 2026 — Founding Member Offer is now a real admin control
+
+The dashboard's "Founding member offer — 20% off for your first 3 months" banner was fully hardcoded, and the actual checkout discount was a separate Stripe coupon ID living in an env var — the two could silently drift out of sync, and changing either required a code deploy. Added a **Founding Member Offer** panel to Super Admin → Coupons (`SystemConfig.earlyBird*` fields, migration `20260805_early_bird_offer_settings`): enable/disable, percent off, duration, eligibility window (days since signup), and which existing Stripe coupon actually applies at checkout for monthly vs. annual plans — with a live preview of the exact dashboard copy. Coupon fields fall back to `STRIPE_EARLY_BIRD_COUPON_MONTHLY`/`ANNUAL` env vars when left blank, so nothing changed for existing authors until the offer is edited. Dashboard banner ([dashboard/page.tsx](../src/app/(admin)/admin/dashboard/page.tsx)) and checkout coupon selection ([stripe/subscribe/route.ts](../src/app/api/admin/stripe/subscribe/route.ts)) both read from the same settings now.
+
 ## August 5, 2026 — Fixed dead "Dashboard" link on marketing site, gave "Sign in" real visual weight
 
 The marketing header's "Dashboard" button (shown to logged-in authors on the homepage hero and other marketing pages, desktop + mobile) linked to bare `/admin`, which has no page — confirmed live that it was resolving to the author-site 404 ("Author Not Found"), not a normal 404. Every real admin page lives under `/admin/dashboard`; fixed all 5 occurrences across `rebrand-hero.tsx`, `hero-mobile-menu.tsx`, `marketing-nav.tsx` (×2), and `marketing-mobile-menu.tsx`. Also restyled "Sign in" (logged-out state) from low-opacity plain text into an outlined pill button matching "Start Free"'s shape, in both header variants, desktop and mobile — it existed but was easy to miss.

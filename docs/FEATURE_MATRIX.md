@@ -21,7 +21,7 @@ This document lists all features by plan tier (FREE, STANDARD, PREMIUM) organize
 - **STANDARD** — $19.99/month or $199.99/year (save ~17%)
 - **PREMIUM** — $59.99/month or $599.99/year (save ~17%)
 
-Early bird discount (20% off) available to FREE users within 30 days of signup.
+Early bird / founding member discount available to FREE users within a configurable signup window (default 20% off, 3 months, 30-day window — adjustable in Super Admin → Coupons).
 
 ---
 
@@ -161,7 +161,7 @@ Early bird discount (20% off) available to FREE users within 30 days of signup.
 | **Support Email Management** | Live | Add/edit/manage platform contact emails |
 | **Testimonials Manager** | Live | Add/edit/display social proof |
 | **Coupon Manager** | Live | Create Stripe coupons + assign per-author; separate from author-level book discount codes |
-| **Early Bird Coupon** | Live | Auto-applied to new FREE users (30-day window); excluded for trial conversions |
+| **Founding Member / Early Bird Offer** | Live | Fully admin-controlled (Super Admin → Coupons): on/off, percent, duration, signup window, and which Stripe coupon applies per billing interval — no code changes needed |
 | **Blog & News CMS** | Live | One editor; "Blog Article / News" toggle routes a post to /blog or /news |
 | **AuthorLoft News** | Live | Public /news archive; one-click email to platform subscribers |
 | **News Subscribers** | Live | Subscribe form → platform subscriber list + CSV export |

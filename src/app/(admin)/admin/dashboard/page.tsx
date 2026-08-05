@@ -25,6 +25,7 @@ async function getDashboardData(authorId: string) {
     recentOrders,
     books,
     plan,
+    earlyBirdConfig,
   ] = await Promise.all([
     // Total published books
     prisma.book.count({ where: { authorId, isPublished: true } }),
@@ -76,14 +77,23 @@ async function getDashboardData(authorId: string) {
         plan: true,
       },
     }),
+
+    // Founding member offer settings — Super Admin → Coupons
+    prisma.systemConfig.findUnique({
+      where:  { id: "main" },
+      select: { earlyBirdEnabled: true, earlyBirdPercentOff: true, earlyBirdDurationMonths: true, earlyBirdWindowDays: true },
+    }),
   ]);
 
   const planTier = plan?.plan?.tier ?? "FREE";
   const daysSinceSignup = plan?.createdAt
     ? (Date.now() - new Date(plan.createdAt).getTime()) / (1000 * 60 * 60 * 24)
     : 999;
-  const showEarlyBirdBanner = planTier === "FREE" && daysSinceSignup <= 30;
-  const earlyBirdDaysLeft   = Math.max(0, Math.ceil(30 - daysSinceSignup));
+  const earlyBirdWindowDays = earlyBirdConfig?.earlyBirdWindowDays ?? 30;
+  const showEarlyBirdBanner = (earlyBirdConfig?.earlyBirdEnabled ?? true) && planTier === "FREE" && daysSinceSignup <= earlyBirdWindowDays;
+  const earlyBirdDaysLeft   = Math.max(0, Math.ceil(earlyBirdWindowDays - daysSinceSignup));
+  const earlyBirdPercentOff = earlyBirdConfig?.earlyBirdPercentOff ?? 20;
+  const earlyBirdDurationMonths = earlyBirdConfig?.earlyBirdDurationMonths ?? 3;
 
   // How many books are missing a cover, description, or a way for a reader to actually
   // get the book — the signal that drives the "finish your book" dashboard nudge.
@@ -113,6 +123,8 @@ async function getDashboardData(authorId: string) {
       : ["Up to 5 books"],
     showEarlyBirdBanner,
     earlyBirdDaysLeft,
+    earlyBirdPercentOff,
+    earlyBirdDurationMonths,
     incompleteBookCount,
   };
 }
@@ -314,7 +326,7 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎉</span>
             <div>
-              <p className="font-semibold text-amber-900 text-sm">Founding member offer — 20% off for your first 3 months</p>
+              <p className="font-semibold text-amber-900 text-sm">Founding member offer — {data.earlyBirdPercentOff}% off for your first {data.earlyBirdDurationMonths} month{data.earlyBirdDurationMonths !== 1 ? "s" : ""}</p>
               <p className="text-xs text-amber-700 mt-0.5">Upgrade within {data.earlyBirdDaysLeft} day{data.earlyBirdDaysLeft !== 1 ? "s" : ""} to lock in your discount. Auto-applied at checkout.</p>
             </div>
           </div>

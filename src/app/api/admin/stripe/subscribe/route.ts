@@ -72,10 +72,16 @@ export async function POST(req: NextRequest) {
     });
     if (!plan) return NextResponse.json({ error: "Invalid plan." }, { status: 400 });
 
-    const author = await prisma.author.findUnique({
-      where:  { id: authorId },
-      select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true, assignedCouponId: true },
-    });
+    const [author, earlyBirdConfig] = await Promise.all([
+      prisma.author.findUnique({
+        where:  { id: authorId },
+        select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true, assignedCouponId: true },
+      }),
+      prisma.systemConfig.findUnique({
+        where:  { id: "main" },
+        select: { earlyBirdEnabled: true, earlyBirdWindowDays: true, earlyBirdCouponIdMonthly: true, earlyBirdCouponIdAnnual: true },
+      }),
+    ]);
     if (!author) return NextResponse.json({ error: "Author not found" }, { status: 404 });
 
     // If author already has an active subscription, send them to the Customer Portal
@@ -101,18 +107,20 @@ export async function POST(req: NextRequest) {
     // Assigned coupon takes priority — set by super-admin on this author's profile
     const assignedCouponId = author.assignedCouponId ?? undefined;
 
-    // Early bird discount — within 30 days of account creation, FREE users only (not trial conversions)
-    // Only applies when no assigned coupon is present
+    // Early bird discount — within the configured window of account creation, FREE users only
+    // (not trial conversions). Only applies when no assigned coupon is present. Terms and which
+    // coupon gets applied are controlled from Super Admin → Coupons (falls back to env vars).
     const daysSinceSignup = (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     const isOnTrial = !!author.trialEndsAt && author.trialEndsAt > new Date();
-    const isEarlyBird = !assignedCouponId && daysSinceSignup <= 30 && !isOnTrial;
+    const earlyBirdWindowDays = earlyBirdConfig?.earlyBirdWindowDays ?? 30;
+    const isEarlyBird = (earlyBirdConfig?.earlyBirdEnabled ?? true) && !assignedCouponId && daysSinceSignup <= earlyBirdWindowDays && !isOnTrial;
 
     const isMonthly = plan.stripePriceIdMonthly === priceId;
 
     const earlyBirdCouponId = isEarlyBird
       ? (isMonthly
-          ? process.env.STRIPE_EARLY_BIRD_COUPON_MONTHLY
-          : process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL)
+          ? (earlyBirdConfig?.earlyBirdCouponIdMonthly || process.env.STRIPE_EARLY_BIRD_COUPON_MONTHLY)
+          : (earlyBirdConfig?.earlyBirdCouponIdAnnual || process.env.STRIPE_EARLY_BIRD_COUPON_ANNUAL))
       : undefined;
 
     // Use assigned coupon if present, otherwise fall back to early bird

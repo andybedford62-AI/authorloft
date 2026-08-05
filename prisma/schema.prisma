@@ -25,6 +25,14 @@ model SystemConfig {
   welcomeEmailSubject     String?
   welcomeEmailBody        String?
   authorReplyToEmail      String? // Reply-To for individual + mass author emails (e.g. authorloft@gmail.com) — from stays on the verified domain, replies route here
+  // Founding member / "early bird" upgrade offer — Super Admin → Coupons page.
+  // Coupon IDs fall back to STRIPE_EARLY_BIRD_COUPON_MONTHLY/ANNUAL env vars when null.
+  earlyBirdEnabled         Boolean  @default(true)
+  earlyBirdPercentOff      Int      @default(20)
+  earlyBirdDurationMonths  Int      @default(3)
+  earlyBirdWindowDays      Int      @default(30)
+  earlyBirdCouponIdMonthly String?
+  earlyBirdCouponIdAnnual  String?
   updatedAt               DateTime @updatedAt
 }
 
