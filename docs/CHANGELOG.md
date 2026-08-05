@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 5, 2026 — Fixed dead "Dashboard" link on marketing site, gave "Sign in" real visual weight
+
+The marketing header's "Dashboard" button (shown to logged-in authors on the homepage hero and other marketing pages, desktop + mobile) linked to bare `/admin`, which has no page — confirmed live that it was resolving to the author-site 404 ("Author Not Found"), not a normal 404. Every real admin page lives under `/admin/dashboard`; fixed all 5 occurrences across `rebrand-hero.tsx`, `hero-mobile-menu.tsx`, `marketing-nav.tsx` (×2), and `marketing-mobile-menu.tsx`. Also restyled "Sign in" (logged-out state) from low-opacity plain text into an outlined pill button matching "Start Free"'s shape, in both header variants, desktop and mobile — it existed but was easy to miss.
+
 ## August 5, 2026 — Guided catalog completion for returning authors
 
 Addressed a new-user-experience gap: onboarding guidance previously vanished the moment an author created one book, even a title-only draft, and the only fallback ("Next Steps" card) was hidden from FREE-tier authors entirely. Added `src/lib/book-completeness.ts` as a shared "is this book reader-ready" signal (cover, description, buy link/direct-sale file) used consistently across three surfaces: the Dashboard's Next Steps card (now un-gated from plan tier, driven by real completeness instead of "a book row exists"), a "Needs: cover, description, buy link" note under any unfinished book on the Books list (plus a summary banner when any book is incomplete), and the book editor, where the 10 tabs are now grouped into Essentials / Sell / Advanced with live completion dots, and the old one-shot "book created" banner is replaced by a persistent guidance banner that only disappears once the book is actually done. Verified end-to-end on staging with a disposable test account.
