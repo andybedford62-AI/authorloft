@@ -115,7 +115,7 @@ export default async function CourseLearnPage({
             return (
               <Link
                 key={entry.lesson.id}
-                href={accessible ? `/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${entry.globalIndex}` : "#"}
+                href={accessible ? `/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${entry.globalIndex}#lesson-content` : "#"}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
                     ? "bg-white shadow-sm border border-gray-200 font-medium text-gray-900"
@@ -138,7 +138,7 @@ export default async function CourseLearnPage({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
+      <main id="lesson-content" className="flex-1 overflow-y-auto scroll-mt-4">
         <div className="max-w-3xl mx-auto px-6 py-10">
           <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
             Module {activeLessonEntry.moduleIndex + 1}: {activeLessonEntry.moduleTitle}
@@ -170,7 +170,7 @@ export default async function CourseLearnPage({
           <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-200">
             {requestedIndex > 0 ? (
               <Link
-                href={`/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${requestedIndex - 1}`}
+                href={`/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${requestedIndex - 1}#lesson-content`}
                 className="text-sm font-medium hover:underline"
                 style={{ color: accentColor }}
               >
@@ -181,7 +181,7 @@ export default async function CourseLearnPage({
             )}
             {requestedIndex < allLessons.length - 1 && (hasAccess || allLessons[requestedIndex + 1]?.lesson.isPreview) ? (
               <Link
-                href={`/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${requestedIndex + 1}`}
+                href={`/courses/${slug}/learn?${token ? `token=${token}&` : ""}lesson=${requestedIndex + 1}#lesson-content`}
                 className="text-sm font-medium hover:underline"
                 style={{ color: accentColor }}
               >
