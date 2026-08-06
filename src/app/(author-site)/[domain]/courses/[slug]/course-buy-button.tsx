@@ -95,6 +95,10 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
 
     return (
       <form onSubmit={handleFreeEnroll} className="space-y-3">
+        <p className="text-xs text-gray-500">
+          Enter your email to get instant access — you&apos;ll go straight into the course, and
+          we&apos;ll also send the link to your inbox so you can pick up where you left off later.
+        </p>
         <input
           type="email"
           value={email}

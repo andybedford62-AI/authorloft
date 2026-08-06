@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, BookOpen, ArrowLeft, Play, Eye, Lock, Video } from "lucide-react";
+import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { formatCents } from "@/lib/utils";
@@ -59,6 +59,16 @@ export default async function CourseDetailPage({
     0
   );
 
+  // Global lesson index matches the flat ordering the /learn page builds,
+  // so a preview link here lands on the right lesson.
+  const lessonGlobalIndex = new Map<string, number>();
+  let lessonCounter = 0;
+  for (const mod of course.modules) {
+    for (const les of mod.lessons) {
+      lessonGlobalIndex.set(les.id, lessonCounter++);
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
       {/* Breadcrumb */}
@@ -106,27 +116,40 @@ export default async function CourseDetailPage({
                   )}
                 </div>
                 <div className="divide-y divide-gray-50">
-                  {mod.lessons.map((les, li) => (
-                    <div
-                      key={les.id}
-                      className="flex items-center gap-3 px-4 py-3 text-sm"
-                    >
-                      <span className="text-gray-400 text-xs w-6 text-center">{li + 1}</span>
-                      {les.videoUrl ? (
-                        <Video className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      ) : (
-                        <BookOpen className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      )}
-                      <span className="flex-1 text-gray-700">{les.title}</span>
-                      {les.isPreview ? (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium">
-                          Free preview
-                        </span>
-                      ) : (
-                        <Lock className="h-3.5 w-3.5 text-gray-300" />
-                      )}
-                    </div>
-                  ))}
+                  {mod.lessons.map((les, li) => {
+                    const rowContent = (
+                      <>
+                        <span className="text-gray-400 text-xs w-6 text-center">{li + 1}</span>
+                        {les.videoUrl ? (
+                          <Video className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                        ) : (
+                          <BookOpen className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                        )}
+                        <span className="flex-1 text-gray-700">{les.title}</span>
+                        {les.isPreview ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-medium">
+                            <Eye className="h-3 w-3" /> Free preview
+                          </span>
+                        ) : (
+                          <Lock className="h-3.5 w-3.5 text-gray-300" />
+                        )}
+                      </>
+                    );
+
+                    return les.isPreview ? (
+                      <Link
+                        key={les.id}
+                        href={`/courses/${slug}/learn?lesson=${lessonGlobalIndex.get(les.id)}`}
+                        className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors"
+                      >
+                        {rowContent}
+                      </Link>
+                    ) : (
+                      <div key={les.id} className="flex items-center gap-3 px-4 py-3 text-sm">
+                        {rowContent}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -141,7 +164,11 @@ export default async function CourseDetailPage({
               <p className="text-3xl font-bold text-gray-900">
                 {course.priceCents === 0 ? "Free" : formatCents(course.priceCents)}
               </p>
-              <p className="text-sm text-gray-500 mt-1">Lifetime access</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {course.priceCents === 0
+                  ? "Lifetime access — watch/read online, no download"
+                  : "Lifetime access"}
+              </p>
             </div>
 
             {/* Buy/Enroll button */}
