@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { slugify } from "@/lib/utils";
 import { capturePostHog } from "@/lib/posthog";
+import { canAddCourse } from "@/lib/plan-limits";
 
 export async function GET() {
   const authorId = await getAdminAuthorIdForApi();
@@ -32,6 +33,11 @@ export async function POST(req: NextRequest) {
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
+
+  const courseCheck = await canAddCourse(authorId);
+  if (!courseCheck.allowed) {
+    return NextResponse.json({ error: courseCheck.reason }, { status: 403 });
   }
 
   const slug = slugify(title);

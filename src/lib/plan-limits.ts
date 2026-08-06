@@ -14,6 +14,8 @@ const OPEN_LIMITS = {
   audioEnabled:    false,
   mediaKitEnabled: false,
   preOrdersEnabled: true,
+  coursesEnabled:  true,
+  maxCourses:      null as number | null,
 };
 
 // ─── Core lookup ─────────────────────────────────────────────────────────────
@@ -47,6 +49,30 @@ export async function canAddBook(
     return {
       allowed: false,
       reason: `Your plan allows up to ${limits.maxBooks} book${limits.maxBooks === 1 ? "" : "s"}. Upgrade your plan to add more.`,
+    };
+  }
+  return { allowed: true };
+}
+
+export async function canAddCourse(
+  authorId: string
+): Promise<{ allowed: boolean; reason?: string }> {
+  const limits = await getAuthorPlanLimits(authorId);
+  if (!(limits as any).coursesEnabled) {
+    return {
+      allowed: false,
+      reason: "Your current plan does not include courses. Upgrade your plan to create one.",
+    };
+  }
+
+  const maxCourses = (limits as any).maxCourses as number | null;
+  if (maxCourses === null || maxCourses === undefined) return { allowed: true };
+
+  const current = await prisma.course.count({ where: { authorId } });
+  if (current >= maxCourses) {
+    return {
+      allowed: false,
+      reason: `Your plan allows up to ${maxCourses} course${maxCourses === 1 ? "" : "s"}. Upgrade your plan to add more.`,
     };
   }
   return { allowed: true };
