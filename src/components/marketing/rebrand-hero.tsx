@@ -84,16 +84,18 @@ function StarField() {
 const PAIN_CARDS = [
   { pain: "Retail publishers take most of your profit", solution: "You keep 100%", image: "/hero-card-1.png", title: "Your Profit" },
   { pain: "Their email list, their rules",        solution: "Your list, nobody can take it", image: "/hero-card-2.png", title: "Your Readers" },
-  { pain: "No idea who your readers are",         solution: "Full reader analytics, always", image: "/hero-card-3.png", title: "Your Analytics" },
+  { pain: "No idea who your audience is",         solution: "Full audience analytics, always", image: "/hero-card-3.png", title: "Your Analytics" },
   { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.png", title: "Your Platform" },
   { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.png", title: "Your Brand" },
+  { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.png", title: "For Authors" },
+  { pain: "Udemy owns your students",               solution: "Sell direct, own your students", image: "/hero-card-4.png", title: "For Course Creators" },
 ];
 
 function PainSolutionCards() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 4000);
+    const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 3000);
     return () => clearInterval(timer);
   }, []);
 
@@ -203,9 +205,9 @@ export function RebelHero({
   headlineLine2?: string | null;
   subheadline?: string | null;
 }) {
-  const line1 = headlineLine1 || "They sell your book. They keep your reader.";
+  const line1 = headlineLine1 || "They sell your work. They keep your audience.";
   const line2 = headlineLine2 || "Take both back.";
-  const sub    = subheadline || "Every sale through a retailer is a reader you’ll never know, never email, never sell to again. AuthorLoft gives you your own storefront, your own list, and 100% of every dollar.";
+  const sub    = subheadline || "Every sale through someone else's platform is a person you'll never know, never email, never reach again. AuthorLoft gives you your own storefront, your own list — and you own your career. For your books, your courses, or both.";
 
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
@@ -287,7 +289,7 @@ export function RebelHero({
 
           {/* Mantra strip */}
           <div style={{ display: 'flex', gap: 0, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
-            {['your storefront', 'your readers', 'your revenue', 'your rules'].map((word, i) => (
+            {['your storefront', 'your audience', 'your revenue', 'your rules'].map((word, i) => (
               <span key={word} style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: i % 2 === 0 ? ML.bone : ML.brass2, opacity: i % 2 === 0 ? 0.55 : 0.9, marginRight: 16 }}>
                 {word}{i < 3 ? ' ·' : ''}
               </span>

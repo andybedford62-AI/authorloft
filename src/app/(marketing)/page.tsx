@@ -278,7 +278,7 @@ export default async function HomePage() {
 
 function ProblemStrip() {
   const items = [
-    { icon: '📦', title: 'Retailers own your buyers', desc: "Amazon keeps the customer relationship. You ship books and wait for royalty statements — with no idea who's reading." },
+    { icon: '📦', title: 'Retailers own your buyers', desc: "The platform keeps the relationship. You get a payout — with no idea who bought, enrolled, or is reading." },
     { icon: '✉️', title: "Your list isn't yours", desc: "Build thousands of followers on a platform you don't control, and they can be gone overnight. Email lists built on their terms aren't yours." },
     { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
   ];
@@ -303,7 +303,7 @@ function ProblemStrip() {
 function PillarsSection() {
   const pillars = [
     { num: '01', title: 'Your storefront', desc: 'A beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand — not theirs.' },
-    { num: '02', title: 'Your sales', desc: 'Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.' },
+    { num: '02', title: 'Your sales', desc: 'Sell eBooks, audiobooks, and courses direct to your audience via Stripe. Zero platform fees — every dollar from every sale goes straight to you.' },
     { num: '03', title: 'Your list', desc: 'Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.' },
   ];
   return (
@@ -406,10 +406,10 @@ function FooterCTA() {
       <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
         <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
-          Your readers<br />are waiting.
+          Your audience<br />is waiting.
         </h2>
         <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
-          Every sale through a middleman is a reader you&apos;ll never reach again. Start free today and own everything you build.
+          Every sale through a middleman is someone you&apos;ll never reach again. Start free today and own everything you build — books, courses, or both.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
           <Link href="/register" className="rdh-btn-primary" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, background: '#c9a84c', color: '#000', padding: '15px 32px' }}>
