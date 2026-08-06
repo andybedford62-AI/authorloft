@@ -77,6 +77,18 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // First course ever for this author — turn on the "Courses" nav link so it's
+  // actually reachable from the live site. Off by default (existing authors who
+  // never touch courses shouldn't get an empty nav item); gated on count === 1
+  // so it never re-enables a nav item someone deliberately turned back off later.
+  const totalCourses = await prisma.course.count({ where: { authorId } });
+  if (totalCourses === 1) {
+    await prisma.author.updateMany({
+      where: { id: authorId, navShowCourses: false },
+      data:  { navShowCourses: true },
+    });
+  }
+
   // Mark onboarding complete on first course — mirrors the same stamp on first book,
   // so a course-first signup isn't stuck showing the onboarding modal forever.
   const { count: onboardingJustCompleted } = await prisma.author.updateMany({
