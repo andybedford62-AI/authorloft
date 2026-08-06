@@ -348,9 +348,16 @@ export function OnboardingGuidedModal({
             Welcome to AuthorLoft
           </p>
           <h2 className="text-2xl font-bold text-gray-900">Tell your audience about yourself</h2>
-          <p className="text-sm text-gray-500 mt-1 mb-6">
+          <p className="text-sm text-gray-500 mt-1 mb-3">
             This appears on your live site right away.
           </p>
+          <button
+            type="button"
+            onClick={() => setPhase("type")}
+            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 mb-4"
+          >
+            <ChevronLeft className="h-3 w-3" /> Change what I&apos;m creating{creatorType ? ` (currently: ${creatorType === "both" ? "Book + Course" : creatorType === "course" ? "Course" : "Book"})` : ""}
+          </button>
 
           {/* Profile photo */}
           <div className="mb-5">
