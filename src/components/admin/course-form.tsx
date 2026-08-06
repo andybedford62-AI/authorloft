@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -18,6 +18,8 @@ interface LessonData {
   contentHtml: string;
   videoUrl: string;
   isPreview: boolean;
+  fileKey: string;
+  fileName: string;
 }
 
 interface ModuleData {
@@ -42,11 +44,84 @@ interface CourseFormProps {
 }
 
 function emptyLesson(): LessonData {
-  return { title: "", contentHtml: "", videoUrl: "", isPreview: false };
+  return { title: "", contentHtml: "", videoUrl: "", isPreview: false, fileKey: "", fileName: "" };
 }
 
 function emptyModule(): ModuleData {
   return { title: "", description: "", lessons: [emptyLesson()] };
+}
+
+function LessonFileAttachment({
+  fileKey,
+  fileName,
+  onChange,
+}: {
+  fileKey: string;
+  fileName: string;
+  onChange: (patch: { fileKey: string; fileName: string }) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload/course-file", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      onChange({ fileKey: data.fileKey, fileName: data.fileName });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="pl-8">
+      <div className="flex items-center gap-2">
+        <Paperclip className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+        {fileKey ? (
+          <div className="flex-1 flex items-center gap-2 text-xs">
+            <span className="text-gray-600 truncate">{fileName || "Attached file"}</span>
+            <button
+              type="button"
+              onClick={() => onChange({ fileKey: "", fileName: "" })}
+              className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+              title="Remove attachment"
+            >
+              <Trash2 className="h-3 w-3" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50 flex items-center gap-1"
+          >
+            {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+            {uploading ? "Uploading…" : "Attach a downloadable file (worksheet, slides, etc.)"}
+          </button>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"
+          onChange={handleFile}
+          className="hidden"
+        />
+      </div>
+      {error && <p className="text-xs text-red-600 mt-1 pl-5">{error}</p>}
+    </div>
+  );
 }
 
 export function CourseForm({ initial, mode }: CourseFormProps) {
@@ -159,6 +234,8 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
               contentHtml: l.contentHtml || null,
               videoUrl: l.videoUrl.trim() || null,
               isPreview: l.isPreview,
+              fileKey: l.fileKey || null,
+              fileName: l.fileName || null,
             })),
         })),
       };
@@ -359,6 +436,11 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
                               minHeight="140px"
                             />
                           </div>
+                          <LessonFileAttachment
+                            fileKey={les.fileKey}
+                            fileName={les.fileName}
+                            onChange={(patch) => updateLesson(mi, li, patch)}
+                          />
                         </div>
                       ))}
                     </div>

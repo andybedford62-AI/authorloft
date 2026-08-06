@@ -59,6 +59,8 @@ export default async function EditCoursePage({ params }: Props) {
               contentHtml: l.contentHtml ?? "",
               videoUrl: l.videoUrl ?? "",
               isPreview: l.isPreview,
+              fileKey: l.fileKey ?? "",
+              fileName: l.fileName ?? "",
             })),
           })),
         }}

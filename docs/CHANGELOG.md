@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Course lessons can now have a downloadable attachment
+
+Fixed the free-preview eyeball, dashboard onboarding false-positives, and pre-order book completeness bugs from earlier today, then added the actual feature request behind them: authors can attach an optional downloadable file (worksheet, slide deck, cheat sheet) to any course lesson. Uses the `CourseLesson.fileKey`/`fileName` fields that already existed in the schema but were never wired up. New `/api/admin/upload/course-file` endpoint (private `course-files` Supabase bucket, 50MB cap, PDF/Office/ZIP/text) plugs into the course editor's lesson rows; a new gated `/api/courses/lesson-resource/[lessonId]` route delivers it via a short-lived signed URL, using the exact same preview-lesson/enrollment-token access check the `/learn` page already enforces. Deferred: exporting lesson text to PDF (video lessons would show the source URL as a link, not an embedded/downloadable video) — logged in `docs/FEATURE_BACKLOG.md`, no PDF library in the codebase yet.
+
 ## August 6, 2026 — Seeded Anthony Bedford's first Author Course: "The Software Development Lifecycle: A Practical Guide"
 
 Content-only change (no schema/code changes — the `Course`/`CourseModule`/`CourseLesson` tables already existed). Authored and inserted a full free, published course for `apbedford` (Anthony Bedford) covering the SDLC end to end: 7 modules (Introduction to the SDLC; Requirements Gathering & Planning; System Design & Architecture; Development & Code Quality; Testing & Quality Assurance; Deployment & CI/CD; Maintenance & Continuous Improvement) with 24 lessons total, each with full written `contentHtml`. `navShowCourses` was left off for his site pending his own launch decision — course is reachable directly at `/courses/the-software-development-lifecycle-a-practical-guide` once nav is enabled.

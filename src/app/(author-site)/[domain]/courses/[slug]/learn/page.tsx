@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Video, CheckCircle, Lock } from "lucide-react";
+import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import type { Metadata } from "next";
@@ -164,6 +164,17 @@ export default async function CourseLearnPage({
               className="prose prose-gray max-w-none"
               dangerouslySetInnerHTML={{ __html: activeLesson.contentHtml }}
             />
+          )}
+
+          {/* Downloadable resource */}
+          {activeLesson.fileKey && (
+            <a
+              href={`/api/courses/lesson-resource/${activeLesson.id}${token ? `?token=${token}` : ""}`}
+              className="mt-8 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Paperclip className="h-4 w-4 flex-shrink-0" style={{ color: accentColor }} />
+              Download {activeLesson.fileName || "lesson resource"}
+            </a>
           )}
 
           {/* Navigation */}

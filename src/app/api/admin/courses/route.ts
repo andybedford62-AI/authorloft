@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
               title: les.title?.trim() || `Lesson ${li + 1}`,
               contentHtml: les.contentHtml || null,
               videoUrl: les.videoUrl?.trim() || null,
+              fileKey: les.fileKey?.trim() || null,
+              fileName: les.fileName?.trim() || null,
               sortOrder: li,
               isPreview: les.isPreview ?? false,
             })),
