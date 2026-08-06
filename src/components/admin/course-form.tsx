@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
+
+const RichTextEditor = dynamic(
+  () => import("@/components/admin/rich-text-editor").then((m) => m.RichTextEditor),
+  { ssr: false, loading: () => <div className="h-40 border border-gray-200 rounded-lg bg-gray-50 animate-pulse" /> }
+);
 
 interface LessonData {
   title: string;
@@ -346,12 +352,11 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
                             />
                           </div>
                           <div className="pl-8">
-                            <textarea
+                            <RichTextEditor
                               value={les.contentHtml}
-                              onChange={(e) => updateLesson(mi, li, { contentHtml: e.target.value })}
-                              rows={2}
-                              className="w-full border border-gray-200 rounded-md px-3 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Lesson content (HTML supported)..."
+                              onChange={(html) => updateLesson(mi, li, { contentHtml: html })}
+                              placeholder="Lesson content…"
+                              minHeight="140px"
                             />
                           </div>
                         </div>
