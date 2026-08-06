@@ -83,8 +83,8 @@ export function BookstoreBookCard({
       </div>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-4">
-        <h3 className="font-serif text-base text-[#1B2B47] leading-snug line-clamp-2">
+      <div className={`flex flex-col flex-1 ${compact ? "p-2.5" : "p-4"}`}>
+        <h3 className={`font-serif text-[#1B2B47] leading-snug line-clamp-2 ${compact ? "text-sm" : "text-base"}`}>
           <a
             href={book.bookUrl}
             className="group-hover:text-[#C26A4A] transition-colors after:absolute after:inset-0 after:z-0"

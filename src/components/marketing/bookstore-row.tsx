@@ -34,9 +34,9 @@ export function BookstoreRow({
   if (books.length === 0) return null;
 
   const cards = (
-    <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x scroll-smooth">
+    <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x scroll-smooth">
       {books.map((b) => (
-        <div key={b.id} className="w-40 sm:w-44 shrink-0 snap-start">
+        <div key={b.id} className="w-32 sm:w-36 shrink-0 snap-start">
           <BookstoreBookCard book={b} compact={compact} quickView={quickView} />
         </div>
       ))}

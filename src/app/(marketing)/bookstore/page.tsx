@@ -58,8 +58,21 @@ export default async function BookstorePage() {
     getBookstoreCourses(),
   ]);
 
-  // Derived rows — capped at 6 so each stays on a single clean line
-  const newBooks = [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 6);
+  // "New on the Shelf" — genuinely new (released within the last 30 days,
+  // same window as the per-card "New" badge) when there's enough volume;
+  // falls back to the most recent handful (honestly relabeled, not claimed
+  // as new) during sparse periods so the section is never empty-looking.
+  // Capped at 6 either way so it stays small as more authors join.
+  const genuinelyNewBooks = books
+    .filter((b) => b.isNew)
+    .sort((a, b) => b.sortTimestamp - a.sortTimestamp)
+    .slice(0, 6);
+  const newBooks = genuinelyNewBooks.length > 0
+    ? genuinelyNewBooks
+    : [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 6);
+  const newBooksSubtitle = genuinelyNewBooks.length > 0
+    ? "Sorted by release date, most recent first — across every author in the bookstore."
+    : "No new releases in the last 30 days — here are the latest additions.";
   const anyViews = books.some((b) => b.views > 0);
   const trending = anyViews
     ? [...books].sort((a, b) => b.views - a.views).slice(0, 6)
@@ -228,7 +241,7 @@ export default async function BookstorePage() {
         {/* ── New on the Shelf — highlighted gold band, simplified cards ──── */}
         <BookstoreRow
           title="New on the Shelf"
-          subtitle="The latest titles added to the bookstore."
+          subtitle={newBooksSubtitle}
           icon={<Clock className="h-5 w-5 text-[#B8893D]" />}
           books={newBooks}
           variant="gold"
