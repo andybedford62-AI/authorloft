@@ -845,7 +845,7 @@ export function RichTextEditor({
               <span className="text-sm font-semibold text-gray-700">
                 {wordCount.toLocaleString()} <span className="font-normal text-gray-400">words</span>
               </span>
-              {wordCount > 0 && (
+              {wordCount > 0 && showSeoGuide && (
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusColor}`}>
                   {statusText}
                 </span>

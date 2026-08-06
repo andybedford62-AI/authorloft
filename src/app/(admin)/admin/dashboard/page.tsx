@@ -229,7 +229,7 @@ export default async function DashboardPage() {
   // ── Setup checklist state ────────────────────────────────────────────────
   // Bio alone satisfies "complete profile" — photo is optional since new onboarding flow
   const hasProfile     = !!authorMeta?.bio;
-  const hasBook        = data.totalBooks > 0;
+  const hasBook        = data.books.length > 0;
   const hasStripe      = !!authorMeta?.stripeConnectOnboarded;
   const hasFile        = !!(authorMeta?.books?.[0]?.directSaleItems?.length);
   const salesEnabled   = !!authorMeta?.plan?.salesEnabled;
