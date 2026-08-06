@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Seeded Anthony Bedford's first Author Course: "The Software Development Lifecycle: A Practical Guide"
+
+Content-only change (no schema/code changes — the `Course`/`CourseModule`/`CourseLesson` tables already existed). Authored and inserted a full free, published course for `apbedford` (Anthony Bedford) covering the SDLC end to end: 7 modules (Introduction to the SDLC; Requirements Gathering & Planning; System Design & Architecture; Development & Code Quality; Testing & Quality Assurance; Deployment & CI/CD; Maintenance & Continuous Improvement) with 24 lessons total, each with full written `contentHtml`. `navShowCourses` was left off for his site pending his own launch decision — course is reachable directly at `/courses/the-software-development-lifecycle-a-practical-guide` once nav is enabled.
+
 ## August 5, 2026 — Founding Member Offer is now a real admin control, with a saved-offer library
 
 The dashboard's "Founding member offer — 20% off for your first 3 months" banner was fully hardcoded, and the actual checkout discount was a separate Stripe coupon ID living in an env var — the two could silently drift out of sync, and changing either required a code deploy. Added a **Founding Member Offers** panel to Super Admin → Coupons, backed by a new `EarlyBirdOffer` table (migrations `20260805_early_bird_offer_settings` → `20260805_early_bird_offers_table`, the latter superseding a same-day singleton-config first pass once multi-offer support was requested):
