@@ -26,7 +26,7 @@ export const DEFAULT_GATES: Record<string, string> = {
   "bookstore-listing":   "FREE",      // gates Plan.bookstoreListingEnabled (AuthorLoft Bookstore opt-in)
   "pre-orders":          "STANDARD",  // gates Plan.preOrdersEnabled (Coming Soon / pre-order books)
   "/admin/bundles":      "STANDARD",
-  "/admin/courses":      "STANDARD",
+  "/admin/courses":      "FREE",
   "/admin/appearance":   "STANDARD",
   "/admin/branding":     "FREE",
   "/admin/legal":        "FREE",

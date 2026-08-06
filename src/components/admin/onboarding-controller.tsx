@@ -5,8 +5,6 @@ import Link from "next/link";
 import { BookOpen, GraduationCap, User, ArrowRight, PlayCircle } from "lucide-react";
 import { OnboardingGuidedModal } from "./onboarding-guided-modal";
 
-const DISMISSED_KEY = "al_onboarding_dismissed";
-
 export function OnboardingController({
   authorSlug,
   hasBio,
@@ -22,14 +20,19 @@ export function OnboardingController({
 }) {
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Scoped per-account (by slug), not global — otherwise dismissing onboarding on
+  // one account silently suppresses it for every other account signed into later
+  // in the same browser (e.g. testing multiple signups in one Chrome profile).
+  const dismissedKey = `al_onboarding_dismissed_${authorSlug}`;
+
   // Read localStorage only after mount (SSR-safe)
   useEffect(() => {
-    const dismissed = localStorage.getItem(DISMISSED_KEY);
+    const dismissed = localStorage.getItem(dismissedKey);
     if (!dismissed) setModalOpen(true);
-  }, []);
+  }, [dismissedKey]);
 
   function handleDismiss() {
-    localStorage.setItem(DISMISSED_KEY, "1");
+    localStorage.setItem(dismissedKey, "1");
     setModalOpen(false);
   }
 
