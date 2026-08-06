@@ -1508,6 +1508,7 @@ model Course {
   coverImageUrl String?
   priceCents    Int                @default(0)
   isPublished   Boolean            @default(false)
+  allowDownload Boolean            @default(true)
   displayOrder  Int                @default(0)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt

@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -84,6 +84,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       coverImageUrl: coverImageUrl !== undefined ? (coverImageUrl?.trim() || null) : existing.coverImageUrl,
       priceCents: priceCents ?? existing.priceCents,
       isPublished: isPublished ?? existing.isPublished,
+      allowDownload: allowDownload ?? existing.allowDownload,
     },
     include: {
       modules: {

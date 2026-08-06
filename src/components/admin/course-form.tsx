@@ -35,6 +35,7 @@ export interface CourseData {
   coverImageUrl: string | null;
   priceCents: number;
   isPublished: boolean;
+  allowDownload: boolean;
   modules: ModuleData[];
 }
 
@@ -134,6 +135,7 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
     initial?.priceCents ? (initial.priceCents / 100).toFixed(2) : ""
   );
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
+  const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
   const [modules, setModules] = useState<ModuleData[]>(
     initial?.modules?.length ? initial.modules : [emptyModule()]
   );
@@ -224,6 +226,7 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
         coverImageUrl: coverImageUrl.trim() || null,
         priceCents,
         isPublished,
+        allowDownload,
         modules: nonEmptyModules.map((m) => ({
           title: m.title.trim(),
           description: m.description.trim() || null,
@@ -467,6 +470,20 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
         />
         <label htmlFor="isPublished" className="text-sm text-gray-700">
           Published (visible on your site)
+        </label>
+      </div>
+
+      {/* Allow download/print */}
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          id="allowDownload"
+          checked={allowDownload}
+          onChange={(e) => setAllowDownload(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="allowDownload" className="text-sm text-gray-700">
+          Let readers print or download the full course (readers still need access to a lesson to see it)
         </label>
       </div>
 

@@ -620,4 +620,9 @@ input[type="file"] {
   img { max-width: 100%; page-break-inside: avoid; }
   h2, h3 { page-break-after: avoid; }
   p { orphans: 3; widows: 3; }
+
+  /* Course full-export print view */
+  .course-print-module { page-break-before: always; }
+  .course-print-module:first-of-type { page-break-before: avoid; }
+  .course-print-lesson { page-break-inside: avoid; }
 }

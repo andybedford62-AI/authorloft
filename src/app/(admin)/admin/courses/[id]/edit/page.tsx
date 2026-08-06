@@ -51,6 +51,7 @@ export default async function EditCoursePage({ params }: Props) {
           coverImageUrl: course.coverImageUrl,
           priceCents: course.priceCents,
           isPublished: course.isPublished,
+          allowDownload: course.allowDownload,
           modules: course.modules.map((m) => ({
             title: m.title,
             description: m.description ?? "",

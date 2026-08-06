@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video } from "lucide-react";
+import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { formatCents } from "@/lib/utils";
@@ -166,7 +166,9 @@ export default async function CourseDetailPage({
               </p>
               <p className="text-sm text-gray-500 mt-1">
                 {course.priceCents === 0
-                  ? "Lifetime access — watch/read online, no download"
+                  ? course.allowDownload
+                    ? "Lifetime access — read online or download the full course"
+                    : "Lifetime access — watch/read online, no download"
                   : "Lifetime access"}
               </p>
             </div>
@@ -177,6 +179,16 @@ export default async function CourseDetailPage({
               priceCents={course.priceCents}
               accentColor={accentColor}
             />
+
+            {course.allowDownload && (
+              <Link
+                href={`/courses/${slug}/print`}
+                className="flex items-center justify-center gap-2 text-sm font-medium border border-gray-200 rounded-lg px-4 py-2.5 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                <Download className="h-4 w-4" style={{ color: accentColor }} />
+                Print / Download full course
+              </Link>
+            )}
 
             {/* Summary */}
             <div className="pt-4 border-t border-gray-100 space-y-2 text-sm text-gray-600">

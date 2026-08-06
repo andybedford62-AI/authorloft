@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       coverImageUrl: coverImageUrl?.trim() || null,
       priceCents: priceCents ?? 0,
       isPublished: isPublished ?? false,
+      allowDownload: allowDownload ?? true,
       modules: {
         create: (modules ?? []).map((mod: any, mi: number) => ({
           title: mod.title?.trim() || `Module ${mi + 1}`,

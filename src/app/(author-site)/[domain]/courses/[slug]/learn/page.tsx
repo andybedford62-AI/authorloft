@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip } from "lucide-react";
+import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip, Download } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { sanitize } from "@/lib/sanitize";
@@ -108,6 +108,15 @@ export default async function CourseLearnPage({
             <ArrowLeft className="h-3.5 w-3.5" /> Course overview
           </Link>
           <h2 className="font-semibold text-gray-900 mt-2 text-sm truncate">{course.title}</h2>
+          {course.allowDownload && (
+            <Link
+              href={`/courses/${slug}/print${token ? `?token=${token}` : ""}`}
+              className="inline-flex items-center gap-1.5 text-xs mt-2 hover:underline"
+              style={{ color: accentColor }}
+            >
+              <Download className="h-3 w-3" /> Print / Download full course
+            </Link>
+          )}
         </div>
         <nav className="p-2 space-y-1">
           {allLessons.map((entry) => {
