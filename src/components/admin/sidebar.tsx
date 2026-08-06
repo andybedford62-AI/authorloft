@@ -443,7 +443,7 @@ export function AdminSidebar({
           </div>
           <button
             className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
-            onClick={() => signOut({ callbackUrl: "https://www.authorloft.com/login" })}
+            onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="h-4 w-4" />
             Sign Out
