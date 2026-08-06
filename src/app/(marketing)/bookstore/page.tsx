@@ -10,13 +10,15 @@ import {
   Store,
   Library,
   Tag,
+  GraduationCap,
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
-import { getBookstoreData } from "@/lib/bookstore";
+import { BookstoreCourseCard } from "@/components/marketing/bookstore-course-card";
+import { getBookstoreData, getBookstoreCourses } from "@/lib/bookstore";
 
 export const revalidate = 1800;
 
@@ -46,7 +48,10 @@ export const metadata: Metadata = {
 };
 
 export default async function BookstorePage() {
-  const { books, genres, stats, spotlight } = await getBookstoreData();
+  const [{ books, genres, stats, spotlight }, courses] = await Promise.all([
+    getBookstoreData(),
+    getBookstoreCourses(),
+  ]);
 
   // Derived rows — capped at 6 so each stays on a single clean line
   const newBooks = [...books].sort((a, b) => b.sortTimestamp - a.sortTimestamp).slice(0, 6);
@@ -257,6 +262,21 @@ export default async function BookstorePage() {
                     {g.count}
                   </span>
                 </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Courses ───────────────────────────────────────────────────── */}
+        {courses.length > 0 && (
+          <section className="mb-12">
+            <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
+              <GraduationCap className="h-5 w-5 text-[#C26A4A]" />
+              Courses from Independent Creators
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+              {courses.map((course) => (
+                <BookstoreCourseCard key={course.id} course={course} />
               ))}
             </div>
           </section>

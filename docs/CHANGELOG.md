@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Courses now discoverable in the AuthorLoft Bookstore
+
+Third step of the dual book-author / course-creator promotion strategy. Scoped as a first pass, not full parity with books — Course has no genre or rating tables yet, so this is a separate section, not merged into the book catalog/filter grid (unified filtering deferred, see `docs/FEATURE_BACKLOG.md`):
+
+- New `Course.listInBookstore` field (mirrors `Book.listInBookstore`), with the same "List in AuthorLoft Bookstore" toggle in the course editor (edit mode only, STANDARD+ gated the same way the book toggle already is) and the same `bookstoreListingLimit` enforcement on `PUT /api/admin/courses/[id]`.
+- New `getBookstoreCourses()` in `lib/bookstore.ts` and a lightweight `BookstoreCourseCard` component (cover, title, author, price — no genre/rating UI since those don't exist for courses).
+- `/bookstore` now shows a "Courses from Independent Creators" section (only rendered once at least one course opts in) ahead of the existing "Browse All Books" catalog.
+- Logged follow-up work in the backlog: course categories/taxonomy (needed before unified genre browsing or Books/Courses filter tabs make sense), course ratings, and adding courses to the page's JSON-LD structured data.
+
 ## August 6, 2026 — Courses and Bundles now show in the dashboard's "Your Site Pages" card
 
 `getAuthorSitePages()` (`lib/site-pages.ts`), which builds the pill list in the dashboard's "Your Site Pages" card, only knew about Home/Books/Specials/Flip Books/News/custom pages/About/Contact/Media Kit — Courses and Bundles were never added even though both have real public routes (`/courses`, `/bundles`) and their own nav toggles. A course creator turning on the Courses nav (from Admin -> Pages, or automatically via the onboarding fix from earlier today) had no quick link to their live course page from the dashboard. Added both, gated the same way Media Kit already was (`plan.coursesEnabled`/`bundlesEnabled` AND the nav toggle both true), so the pill only appears once the page is actually reachable on the live site.

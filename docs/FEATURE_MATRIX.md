@@ -80,7 +80,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Contact Support Form** (reach platform) | ✅ | ✅ | ✅ |
 | **Reader Feedback Dashboard** (moderate ratings) | ✅ | ✅ | ✅ |
 | **Testimonials Display** (social proof on site) | ✅ | ✅ | ✅ |
-| **AuthorLoft Bookstore** (list books in public discovery catalog at /bookstore) | ✅ | ✅ | ✅ (Featured placement) |
+| **AuthorLoft Bookstore** (list books *and courses* in public discovery catalog at /bookstore; courses shipped Aug 6 2026, own section, no genre/rating parity yet) | ✅ | ✅ | ✅ (Featured placement) |
 | — **Bookstore Search & Discovery** (prominent search, featured section, genre browse) | ✅ | ✅ | ✅ (Featured ribbon + visibility priority) |
 | **Achievement Badges** (auto-calculated from books/sales/reviews/etc.; shown on Bookstore spotlight + author-site About page; author opt-out toggle in Settings) | ✅ | ✅ | ✅ |
 

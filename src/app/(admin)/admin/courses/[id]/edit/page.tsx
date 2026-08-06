@@ -11,16 +11,20 @@ export default async function EditCoursePage({ params }: Props) {
   const authorId = await getAdminAuthorId();
   const { id } = await params;
 
-  const course = await prisma.course.findFirst({
-    where: { id, authorId },
-    include: {
-      modules: {
-        include: { lessons: { orderBy: { sortOrder: "asc" } } },
-        orderBy: { sortOrder: "asc" },
+  const [course, author] = await Promise.all([
+    prisma.course.findFirst({
+      where: { id, authorId },
+      include: {
+        modules: {
+          include: { lessons: { orderBy: { sortOrder: "asc" } } },
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-  });
+    }),
+    prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+  ]);
   if (!course) notFound();
+  const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -44,6 +48,7 @@ export default async function EditCoursePage({ params }: Props) {
 
       <CourseForm
         mode="edit"
+        bookstoreEnabled={bookstoreEnabled}
         initial={{
           id: course.id,
           title: course.title,
@@ -52,6 +57,7 @@ export default async function EditCoursePage({ params }: Props) {
           priceCents: course.priceCents,
           isPublished: course.isPublished,
           allowDownload: course.allowDownload,
+          listInBookstore: course.listInBookstore,
           modules: course.modules.map((m) => ({
             title: m.title,
             description: m.description ?? "",

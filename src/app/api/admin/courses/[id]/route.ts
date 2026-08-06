@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, listInBookstore, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -46,6 +46,24 @@ export async function PUT(req: NextRequest, { params }: Params) {
   });
   if (slugConflict) {
     return NextResponse.json({ error: "A course with this slug already exists" }, { status: 400 });
+  }
+
+  // Enforce bookstore listing limit when the author is turning this on (mirrors the same check on Book)
+  if (listInBookstore && !existing.listInBookstore) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { plan: { select: { bookstoreListingLimit: true } } },
+    });
+    const limit = author?.plan?.bookstoreListingLimit ?? -1;
+    if (limit !== -1) {
+      const currentCount = await prisma.course.count({ where: { authorId, listInBookstore: true, id: { not: id } } });
+      if (currentCount >= limit) {
+        return NextResponse.json(
+          { error: `Your plan allows up to ${limit} bookstore listing${limit === 1 ? "" : "s"}. Upgrade to list more.` },
+          { status: 403 }
+        );
+      }
+    }
   }
 
   // Replace modules + lessons atomically
@@ -85,6 +103,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       priceCents: priceCents ?? existing.priceCents,
       isPublished: isPublished ?? existing.isPublished,
       allowDownload: allowDownload ?? existing.allowDownload,
+      listInBookstore: listInBookstore ?? existing.listInBookstore,
     },
     include: {
       modules: {

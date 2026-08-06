@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -36,12 +36,14 @@ export interface CourseData {
   priceCents: number;
   isPublished: boolean;
   allowDownload: boolean;
+  listInBookstore: boolean;
   modules: ModuleData[];
 }
 
 interface CourseFormProps {
   initial?: Partial<CourseData>;
   mode: "create" | "edit";
+  bookstoreEnabled?: boolean;
 }
 
 function emptyLesson(): LessonData {
@@ -125,7 +127,7 @@ function LessonFileAttachment({
   );
 }
 
-export function CourseForm({ initial, mode }: CourseFormProps) {
+export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFormProps) {
   const router = useRouter();
 
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -136,6 +138,7 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
   );
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
+  const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
   const [modules, setModules] = useState<ModuleData[]>(
     initial?.modules?.length ? initial.modules : [emptyModule()]
   );
@@ -227,6 +230,7 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
         priceCents,
         isPublished,
         allowDownload,
+        listInBookstore,
         modules: nonEmptyModules.map((m) => ({
           title: m.title.trim(),
           description: m.description.trim() || null,
@@ -486,6 +490,44 @@ export function CourseForm({ initial, mode }: CourseFormProps) {
           Let readers print or download the full course (readers still need access to a lesson to see it)
         </label>
       </div>
+
+      {/* AuthorLoft Bookstore opt-in — edit mode only (new courses redirect to edit) */}
+      {mode === "edit" && (
+        <div className="pt-2 border-t border-gray-100">
+          {bookstoreEnabled ? (
+            <>
+              <div className="flex items-center gap-4 cursor-pointer select-none"
+                onClick={() => setListInBookstore((v) => !v)}>
+                <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${listInBookstore ? "bg-emerald-600" : "bg-gray-300"}`}>
+                  <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${listInBookstore ? "translate-x-5" : "translate-x-1"}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                    <Store className="h-3.5 w-3.5 text-emerald-600" />
+                    List in AuthorLoft Bookstore
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Feature this course in the public AuthorLoft Bookstore for cross-discovery. Readers click through to this course on your own site — no payment is taken there.
+                  </p>
+                </div>
+              </div>
+              {listInBookstore && (
+                <div className="ml-14 mt-2 rounded-lg p-3 text-xs bg-emerald-50 border border-emerald-100 text-emerald-700">
+                  Listed once this course is <strong>Published</strong>. Make sure it has a cover image and description so it looks its best in the catalog.
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+              <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
+                <span className="font-semibold">The AuthorLoft Bookstore requires a Standard plan or higher.</span>{" "}
+                <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to list your courses in the public bookstore for extra discovery.
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center gap-3 pt-4 border-t">

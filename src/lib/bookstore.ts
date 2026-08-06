@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { slugify } from "@/lib/utils";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import type { BookstoreCourse } from "@/components/marketing/bookstore-course-card";
 
 export type GenreCount = { name: string; slug: string; count: number };
 
@@ -201,4 +202,54 @@ export async function getBookstoreData(): Promise<BookstoreData> {
     stats: { books: books.length, authors: uniqueAuthors.size, genres: genres.length },
     spotlight,
   };
+}
+
+/**
+ * Public bookstore courses — parallel to getBookstoreData() but for the
+ * (much simpler) Course model, which has no genres or ratings yet. Kept as
+ * a separate function/section rather than merged into the book grid.
+ */
+export async function getBookstoreCourses(): Promise<BookstoreCourse[]> {
+  const rows = await prisma.course
+    .findMany({
+      where: {
+        listInBookstore: true,
+        isPublished: true,
+        author: {
+          isActive: true,
+          plan: { bookstoreListingEnabled: true },
+        },
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        coverImageUrl: true,
+        description: true,
+        priceCents: true,
+        createdAt: true,
+        author: {
+          select: {
+            slug: true,
+            customDomain: true,
+            displayName: true,
+            name: true,
+          },
+        },
+      },
+    })
+    .catch(() => []);
+
+  return rows.map((c) => ({
+    id: c.id,
+    title: c.title,
+    coverImageUrl: c.coverImageUrl,
+    authorName: c.author.displayName || c.author.name,
+    authorUrl: getAuthorBaseUrl(c.author),
+    courseUrl: `${getAuthorBaseUrl(c.author)}/courses/${c.slug}`,
+    description: c.description ? stripHtml(c.description) : null,
+    priceCents: c.priceCents > 0 ? c.priceCents : null,
+    sortTimestamp: new Date(c.createdAt).getTime(),
+  }));
 }

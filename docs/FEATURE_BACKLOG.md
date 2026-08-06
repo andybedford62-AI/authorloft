@@ -21,6 +21,11 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [x] **Clickable author name on book cards** — shipped June 15, 2026; restructured the card with a stretched-link pattern so the whole card still opens the book while the author name links separately to their site. *(done)*
 - [x] **Unify genre-page headers** — shipped June 15, 2026; `/bookstore/genre/[slug]` now uses the shared `MarketingPageHeader` brand band (same banner as the main Bookstore page) with an "All books" breadcrumb. *(done)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
+- [x] **Courses in the Bookstore** — shipped Aug 6, 2026; `Course.listInBookstore` opt-in toggle (mirrors Book), separate "Courses from Independent Creators" section on `/bookstore` with a simple card (no genres/ratings — Course has neither yet). *(done)*
+- [ ] **Course categories / taxonomy** — Course has no genre-equivalent field today. Before courses can share genre browsing or unified filter tabs with books, need to decide: reuse the existing `Genre` model (would need a `CourseGenre` join table, or a shared polymorphic tagging approach), or a separate `CourseCategory` model with its own taxonomy (writing craft, business, tech, creative, etc. — likely a different shape than book genres). Plan this before building unified filtering. *(medium — design first)*
+- [ ] **Unified Books/Courses filter tabs on `/bookstore`** — deferred from the Aug 6 2026 pass; currently books and courses are two separate sections/grids, not a merged filterable catalog. Depends on course categories above (a meaningful "browse by category" needs the taxonomy decided first). *(medium, blocked on course categories)*
+- [ ] **Course ratings on the Bookstore** — Course has no feedback/rating table yet (Book has `BookFeedback`). Needed before course cards can show stars like book cards do. *(medium)*
+- [ ] **Course entries in Bookstore structured data (JSON-LD)** — the `/bookstore` `CollectionPage`/`ItemList` schema only lists `@type: Book` items today; courses aren't included in search-engine structured data yet. *(small)*
 
 ---
 
