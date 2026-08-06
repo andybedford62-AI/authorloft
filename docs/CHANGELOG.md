@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Homepage messaging broadened to books + courses; onboarding forks by creator type
+
+First two steps of the dual book-author / course-creator promotion strategy:
+
+- **Homepage**: hero, pain/solution cards, problem strip, pillars, and footer CTA rewritten to speak to both book authors and course creators instead of assuming every visitor is a book author. Two new cycling hero cards ("Amazon owns your readers" / "Udemy owns your students") speak directly to each audience. Nav, `/bookstore` link, and SEO title deliberately left unchanged for now.
+- **Onboarding**: new `Author.creatorType` field (`"book" | "course" | "both"`, default `"book"` — informational only, doesn't gate any feature). The guided onboarding modal now opens with a "What will you create first?" choice and branches: book-only keeps the existing 2-step flow, course-only walks through a lightweight course setup (title, description, first module, first lesson) via `/api/admin/courses`, and "both" does book then course (skippable). Fixed a real gap in the process: `/api/admin/courses` POST never stamped `onboardingCompletedAt`, so a course-first signup would have seen the onboarding modal forever — it now mirrors the same stamp the books route already had. The dashboard's fallback checklist (`onboarding-controller.tsx`) also adapts its nudge based on `creatorType`. Both content types stay fully available in admin regardless of the initial choice — nothing is gated by it.
+- Note for follow-up: `Plan.coursesEnabled` / `Plan.maxCourses` exist on the schema but `/api/admin/courses` doesn't check them — courses are currently creatable on every plan tier including FREE, despite `docs/FEATURE_MATRIX.md` listing them as STANDARD+. Pre-existing gap, not introduced here — flagged for a decision on whether to wire up the gate or update the docs.
+
 ## August 6, 2026 — Fixed course lesson formatting; full-course print/download export
 
 Two fixes to the SDLC course content and rendering, then the deferred PDF-export feature:

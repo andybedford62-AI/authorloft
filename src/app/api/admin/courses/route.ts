@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { slugify } from "@/lib/utils";
+import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
   const authorId = await getAdminAuthorIdForApi();
@@ -75,6 +76,29 @@ export async function POST(req: NextRequest) {
       },
     },
   });
+
+  // Mark onboarding complete on first course — mirrors the same stamp on first book,
+  // so a course-first signup isn't stuck showing the onboarding modal forever.
+  const { count: onboardingJustCompleted } = await prisma.author.updateMany({
+    where: { id: authorId, onboardingCompletedAt: null },
+    data:  { onboardingCompletedAt: new Date() },
+  });
+
+  if (onboardingJustCompleted > 0) {
+    const author = await prisma.author.findUnique({
+      where:  { id: authorId },
+      select: { createdAt: true, plan: { select: { tier: true } } },
+    });
+    if (author) {
+      const daysSinceSignup = Math.round(
+        (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      capturePostHog(authorId, "first_course_created", {
+        days_since_signup: daysSinceSignup,
+        plan_tier: author.plan?.tier ?? "FREE",
+      });
+    }
+  }
 
   return NextResponse.json({ course }, { status: 201 });
 }

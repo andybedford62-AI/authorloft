@@ -183,7 +183,7 @@ function ChecklistRow({
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
 
-  const [data, authorMeta, customPages] = await Promise.all([
+  const [data, authorMeta, customPages, courseCount] = await Promise.all([
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
@@ -197,6 +197,7 @@ export default async function DashboardPage() {
         profileImageUrl: true,
         bio: true,
         onboardingCompletedAt: true,
+        creatorType: true,
         stripeConnectOnboarded: true,
         hideNextStepsChecklist: true,
         navShowAbout: true,
@@ -225,6 +226,7 @@ export default async function DashboardPage() {
       select: { slug: true, title: true, navTitle: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
+    prisma.course.count({ where: { authorId } }),
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
@@ -309,6 +311,8 @@ export default async function DashboardPage() {
           authorSlug={authorMeta?.slug ?? ""}
           hasBio={hasProfile}
           hasBook={hasBook}
+          hasCourse={courseCount > 0}
+          creatorType={authorMeta?.creatorType}
         />
       )}
       {/* Email verification banner */}

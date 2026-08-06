@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, User, ArrowRight, PlayCircle } from "lucide-react";
+import { BookOpen, GraduationCap, User, ArrowRight, PlayCircle } from "lucide-react";
 import { OnboardingGuidedModal } from "./onboarding-guided-modal";
 
 const DISMISSED_KEY = "al_onboarding_dismissed";
@@ -11,10 +11,14 @@ export function OnboardingController({
   authorSlug,
   hasBio,
   hasBook,
+  hasCourse = false,
+  creatorType = "book",
 }: {
   authorSlug: string;
   hasBio: boolean;
   hasBook: boolean;
+  hasCourse?: boolean;
+  creatorType?: string;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -29,9 +33,15 @@ export function OnboardingController({
     setModalOpen(false);
   }
 
+  // The signup-time choice only decides what's shown here as the "required" nudge —
+  // both content types stay fully available in admin regardless of creatorType.
+  const wantsCourse = creatorType === "course" || creatorType === "both";
+  const wantsBook   = creatorType !== "course";
+
   const incompleteTasks = [
-    !hasBio  && { label: "Complete your author bio and profile photo", href: "/admin/branding",   icon: User },
-    !hasBook && { label: "Add your first book",                        href: "/admin/books/new",  icon: BookOpen },
+    !hasBio                    && { label: "Complete your author bio and profile photo", href: "/admin/branding",   icon: User },
+    wantsBook   && !hasBook    && { label: "Add your first book",                        href: "/admin/books/new",  icon: BookOpen },
+    wantsCourse && !hasCourse  && { label: "Add your first course",                      href: "/admin/courses/new", icon: GraduationCap },
   ].filter(Boolean) as { label: string; href: string; icon: React.ElementType }[];
 
   return (
