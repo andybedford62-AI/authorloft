@@ -114,6 +114,7 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
             shortDescription:     book.shortDescription,
             retailerLinksCount:   book._count.retailerLinks,
             directSaleItemsCount: book._count.directSaleItems,
+            isPreOrder:           book.isPreOrder,
           });
           return (
             <tr

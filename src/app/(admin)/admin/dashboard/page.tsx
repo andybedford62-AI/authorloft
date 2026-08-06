@@ -64,7 +64,7 @@ async function getDashboardData(authorId: string) {
       orderBy: { sortOrder: "asc" },
       select: {
         id: true, title: true, priceCents: true, isFeatured: true, isPublished: true,
-        coverImageUrl: true, description: true, shortDescription: true,
+        coverImageUrl: true, description: true, shortDescription: true, isPreOrder: true,
         _count: { select: { retailerLinks: true, directSaleItems: true } },
       },
     }),
@@ -107,6 +107,7 @@ async function getDashboardData(authorId: string) {
     shortDescription:     b.shortDescription,
     retailerLinksCount:   b._count.retailerLinks,
     directSaleItemsCount: b._count.directSaleItems,
+    isPreOrder:           b.isPreOrder,
   }).isComplete).length;
 
   return {

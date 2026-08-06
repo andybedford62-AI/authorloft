@@ -8,6 +8,9 @@ export type BookCompletenessInput = {
   shortDescription: string | null;
   retailerLinksCount:   number;
   directSaleItemsCount: number;
+  /** Pre-order ("Coming Soon") books show a wishlist signup instead of buy
+   *  buttons, so they don't need a retailer link or direct-sale file yet. */
+  isPreOrder?: boolean;
 };
 
 export type BookCompletionStep = {
@@ -36,9 +39,11 @@ export function getBookCompletionSteps(book: BookCompletenessInput): BookComplet
     },
     {
       key:        "whereToBuy",
-      label:      "Add a buy link or direct-sale file",
+      label:      book.isPreOrder
+        ? "Buy link (not needed — pre-order shows a wishlist signup)"
+        : "Add a buy link or direct-sale file",
       shortLabel: "buy link",
-      done:       book.retailerLinksCount > 0 || book.directSaleItemsCount > 0,
+      done:       !!book.isPreOrder || book.retailerLinksCount > 0 || book.directSaleItemsCount > 0,
       tab:        "buy-links",
     },
   ];

@@ -141,6 +141,7 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
     shortDescription: book.shortDescription,
     retailerLinksCount,
     directSaleItemsCount,
+    isPreOrder:       book.isPreOrder,
   });
   const hasCover       = bookCompletion.steps.find((s) => s.key === "cover")!.done;
   const hasDescription = bookCompletion.steps.find((s) => s.key === "description")!.done;

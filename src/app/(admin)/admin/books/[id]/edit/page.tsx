@@ -98,6 +98,7 @@ export default async function EditBookPage({
     shortDescription:     book.shortDescription,
     retailerLinksCount:   book._count.retailerLinks,
     directSaleItemsCount: book._count.directSaleItems,
+    isPreOrder:           book.isPreOrder,
   });
 
   return (

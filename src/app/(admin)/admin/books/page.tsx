@@ -46,6 +46,7 @@ export default async function AdminBooksPage() {
     shortDescription:     b.shortDescription,
     retailerLinksCount:   b._count.retailerLinks,
     directSaleItemsCount: b._count.directSaleItems,
+    isPreOrder:           b.isPreOrder,
   }).isComplete);
 
   return (
