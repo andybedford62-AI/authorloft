@@ -64,8 +64,6 @@ export default async function BookstorePage() {
   const trending = anyViews
     ? [...books].sort((a, b) => b.views - a.views).slice(0, 6)
     : [];
-  const topGenres = genres.slice(0, 14);
-
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -250,34 +248,13 @@ export default async function BookstorePage() {
           />
         )}
 
-        {/* ── Browse by genre ────────────────────────────────────────────── */}
-        {topGenres.length > 0 && (
-          <section className="mb-12">
-            <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-4">
-              <Tag className="h-5 w-5 text-[#C26A4A]" />
-              Browse by Genre
-            </h2>
-            <div className="flex flex-wrap gap-2.5">
-              {topGenres.map((g) => (
-                <Link
-                  key={g.slug}
-                  href={`/bookstore/genre/${g.slug}`}
-                  className="group inline-flex items-center gap-2 bg-white border border-[#DCDBD3] rounded-xl px-4 py-2.5 hover:border-[#C26A4A] hover:shadow-sm transition-all"
-                >
-                  <span className="text-sm font-medium text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors">
-                    {g.name}
-                  </span>
-                  <span className="text-xs text-[#9b8e7e] bg-[#F0EDE4] rounded-full px-2 py-0.5">
-                    {g.count}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Full catalog ───────────────────────────────────────────────── */}
-        <section className="mb-12">
+        {/* ── Full catalog ─── colored panel (same blue as the "Support authors"
+             hero band above — saturated enough to actually contrast against
+             the white search bar and book cards inside it, not a near-white
+             tint that would wash out). Genre chips live inside the filter
+             bar now, so the separate "Browse by Genre" list was pure
+             duplication and has been removed. ──────────────────────────── */}
+        <section className="mb-12 rounded-2xl border border-[#A9BDD6] bg-[#C5D3E6] p-4 sm:p-6">
           <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
             <Library className="h-5 w-5 text-[#C26A4A]" />
             Browse All Books
