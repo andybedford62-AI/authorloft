@@ -1,4 +1,4 @@
-import { Star, BookOpen, Eye, Sparkles } from "lucide-react";
+import { Star, BookOpen, Eye } from "lucide-react";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
 function formatPrice(cents: number | null): string | null {
@@ -21,13 +21,13 @@ export function BookstoreListCard({
   book: BookstoreBook;
   onQuickView?: (book: BookstoreBook) => void;
 }) {
-  // One priority badge to keep the compact card uncluttered.
-  const badge = book.featured
-    ? { label: "Featured", icon: true, cls: "text-[#3a2417] bg-gradient-to-r from-[#E8B04B] to-[#D4AE6A]" }
-    : book.isNew
-    ? { label: "New", icon: false, cls: "text-[#1B2B47] bg-[#F0D9B5]" }
+  // One priority badge to keep the compact card uncluttered. "Featured" (Premium
+  // tier) deliberately omitted here — this grid is the plain catalog listing,
+  // not a promotional row, so every book shows on equal footing.
+  const badge = book.isNew
+    ? { label: "New", cls: "text-[#1B2B47] bg-[#F0D9B5]" }
     : book.isPreOrder
-    ? { label: "Soon", icon: false, cls: "text-white bg-[#5C6E89]" }
+    ? { label: "Soon", cls: "text-white bg-[#5C6E89]" }
     : null;
 
   const price = formatPrice(book.priceCents);
@@ -51,8 +51,7 @@ export function BookstoreListCard({
         )}
 
         {badge && (
-          <span className={`absolute top-1 left-1 inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-sm ${badge.cls}`}>
-            {badge.icon && <Sparkles className="h-2 w-2" />}
+          <span className={`absolute top-1 left-1 inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-sm ${badge.cls}`}>
             {badge.label}
           </span>
         )}
