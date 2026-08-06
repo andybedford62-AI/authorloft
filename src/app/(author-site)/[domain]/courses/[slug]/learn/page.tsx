@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -161,8 +162,8 @@ export default async function CourseLearnPage({
           {/* Lesson content */}
           {activeLesson.contentHtml && (
             <div
-              className="prose prose-gray max-w-none"
-              dangerouslySetInnerHTML={{ __html: activeLesson.contentHtml }}
+              className="rich-content"
+              dangerouslySetInnerHTML={{ __html: sanitize(activeLesson.contentHtml) }}
             />
           )}
 
