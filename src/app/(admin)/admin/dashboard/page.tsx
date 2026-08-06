@@ -207,7 +207,9 @@ export default async function DashboardPage() {
         navShowBlog: true,
         navShowContact: true,
         navShowMediaKit: true,
-        plan: { select: { salesEnabled: true, flipBooksLimit: true, mediaKitEnabled: true } },
+        navShowCourses: true,
+        navShowBundles: true,
+        plan: { select: { salesEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, coursesEnabled: true, bundlesEnabled: true } },
         books: {
           where: { directSalesEnabled: true },
           select: {

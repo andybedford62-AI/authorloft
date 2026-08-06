@@ -14,7 +14,9 @@ export interface AuthorNavFlags {
   navShowBlog: boolean;
   navShowContact: boolean;
   navShowMediaKit: boolean;
-  plan?: { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
+  navShowCourses: boolean;
+  navShowBundles: boolean;
+  plan?: { flipBooksLimit: number; mediaKitEnabled: boolean; coursesEnabled: boolean; bundlesEnabled: boolean } | null;
 }
 
 export interface AuthorCustomPage {
@@ -30,6 +32,12 @@ export function getAuthorSitePages(
   const pages: AuthorSitePage[] = [{ label: "Home", path: "/" }];
 
   if (author.navShowBooks) pages.push({ label: "Books", path: "/books" });
+  if (author.plan?.bundlesEnabled && author.navShowBundles) {
+    pages.push({ label: "Bundles", path: "/bundles" });
+  }
+  if (author.plan?.coursesEnabled && author.navShowCourses) {
+    pages.push({ label: "Courses", path: "/courses" });
+  }
   if (author.navShowSpecials) pages.push({ label: "Specials", path: "/specials" });
   if ((author.plan?.flipBooksLimit ?? 0) !== 0 && author.navShowFlipBooks) {
     pages.push({ label: "Flip Books", path: "/flip-books" });

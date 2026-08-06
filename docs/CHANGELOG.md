@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Courses and Bundles now show in the dashboard's "Your Site Pages" card
+
+`getAuthorSitePages()` (`lib/site-pages.ts`), which builds the pill list in the dashboard's "Your Site Pages" card, only knew about Home/Books/Specials/Flip Books/News/custom pages/About/Contact/Media Kit — Courses and Bundles were never added even though both have real public routes (`/courses`, `/bundles`) and their own nav toggles. A course creator turning on the Courses nav (from Admin -> Pages, or automatically via the onboarding fix from earlier today) had no quick link to their live course page from the dashboard. Added both, gated the same way Media Kit already was (`plan.coursesEnabled`/`bundlesEnabled` AND the nav toggle both true), so the pill only appears once the page is actually reachable on the live site.
+
 ## August 6, 2026 — Super Admin Feature Gates page was missing 4 real gates
 
 `feature-config-form.tsx` has its own manually-maintained `FEATURES` list for display, separate from the actual source of truth (`DEFAULT_GATES` in `lib/feature-gates.ts`) that the sidebar/command-palette/cascade logic all read from. The two lists had drifted: Courses, Bundles, Promote, and Reader Feedback all had real, functioning gates but weren't in the UI list, so a super admin had no way to see or change their tier from Super Admin → Feature Gates — the exact reason yesterday's `/admin/courses` STANDARD-lock was hard to spot and fix from the UI. Added all four to the display list with matching icons; no logic changed, this was a display-only gap.
