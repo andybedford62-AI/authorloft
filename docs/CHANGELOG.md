@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 6, 2026 — Super Admin Feature Gates page was missing 4 real gates
+
+`feature-config-form.tsx` has its own manually-maintained `FEATURES` list for display, separate from the actual source of truth (`DEFAULT_GATES` in `lib/feature-gates.ts`) that the sidebar/command-palette/cascade logic all read from. The two lists had drifted: Courses, Bundles, Promote, and Reader Feedback all had real, functioning gates but weren't in the UI list, so a super admin had no way to see or change their tier from Super Admin → Feature Gates — the exact reason yesterday's `/admin/courses` STANDARD-lock was hard to spot and fix from the UI. Added all four to the display list with matching icons; no logic changed, this was a display-only gap.
+
 ## August 6, 2026 — Two more course-creator onboarding bugs: stale dismiss flag, third gating layer
 
 Found testing a fresh signup through the course-creator onboarding path:

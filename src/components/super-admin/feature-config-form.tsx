@@ -5,6 +5,7 @@ import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag, ShoppingCart,
   Paintbrush, Palette, Shield, Bot, Search, Settings, Check, Loader2, Globe, Megaphone, Store, CalendarClock,
+  GraduationCap, Package, Send, Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
@@ -19,9 +20,12 @@ const FEATURES = [
   { key: "/admin/books",        label: "Books",          icon: BookOpen        },
   { key: "/admin/branding",     label: "Branding",       icon: Palette         },
   { key: "bookstore-listing",   label: "Bookstore Listing", icon: Store        },
+  { key: "/admin/bundles",      label: "Bundles",        icon: Package         },
+  { key: "/admin/courses",      label: "Courses",        icon: GraduationCap   },
   { key: "/admin/pages",        label: "Custom Pages",   icon: FileText        },
   { key: "/admin/dashboard",    label: "Dashboard",      icon: LayoutDashboard },
   { key: "direct-sales",        label: "Direct Sales",   icon: ShoppingCart    },
+  { key: "/admin/feedback",     label: "Reader Feedback", icon: Star           },
   { key: "/admin/flip-books",   label: "Flip Books",     icon: BookMarked      },
   { key: "/admin/genres",       label: "Genres",         icon: Tag             },
   { key: "/admin/media-kit",    label: "Media Kit",      icon: Megaphone       },
@@ -29,6 +33,7 @@ const FEATURES = [
   { key: "/admin/legal",        label: "My Site Legal",  icon: Shield          },
   { key: "/admin/newsletter",   label: "Newsletter",     icon: Mail            },
   { key: "pre-orders",          label: "Pre-orders / Coming Soon", icon: CalendarClock },
+  { key: "/admin/promote",      label: "Promote",        icon: Send            },
   { key: "/admin/sales",        label: "Sales",          icon: ShoppingBag     },
   { key: "/admin/series",       label: "Series",         icon: Library         },
   { key: "/admin/seo-audit",    label: "SEO Audit",      icon: Search          },
