@@ -11,6 +11,7 @@ import {
   Library,
   Tag,
   GraduationCap,
+  Sparkles,
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -21,6 +22,10 @@ import { BookstoreCourseCard } from "@/components/marketing/bookstore-course-car
 import { getBookstoreData, getBookstoreCourses } from "@/lib/bookstore";
 
 export const revalidate = 1800;
+
+// Toggle to bring back the "Trending Now" row — hidden because it read too
+// similar to "New on the Shelf" right above it. Data/component untouched.
+const SHOW_TRENDING = false;
 
 const PLATFORM = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com";
 const BASE = `https://www.${PLATFORM}`;
@@ -166,26 +171,26 @@ export default async function BookstorePage() {
 
         {/* ── Author spotlight ───────────────────────────────────────────── */}
         {spotlight && (
-          <section className="mb-12">
-            <div className="relative overflow-hidden rounded-3xl bg-[#27406B] text-white p-6 sm:p-8">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#D4AE6A] mb-4">
-                · Author Spotlight ·
-              </p>
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <section className="mb-8">
+            <div className="relative overflow-hidden rounded-2xl bg-[#27406B] text-white p-4 sm:p-5">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#1B2B47] bg-[#D4AE6A] px-3 py-1 rounded-full mb-3">
+                <Sparkles className="h-3 w-3" /> Author Spotlight
+              </div>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={spotlight.image}
                   alt={spotlight.name}
-                  className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover border-4 border-white/15 shadow-lg flex-shrink-0"
+                  className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-white/15 shadow-lg flex-shrink-0"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <h2 className="font-serif text-2xl sm:text-3xl mb-1">{spotlight.name}</h2>
-                  <p className="text-xs text-[#9fb0c9] mb-3">
+                  <h2 className="font-serif text-lg sm:text-xl mb-0.5">{spotlight.name}</h2>
+                  <p className="text-xs text-[#9fb0c9] mb-1.5">
                     {spotlight.bookCount} book{spotlight.bookCount !== 1 ? "s" : ""} in the bookstore
                   </p>
-                  <p className="text-sm text-[#D4DDEB] leading-relaxed max-w-2xl">{spotlight.bio}</p>
+                  <p className="text-sm text-[#D4DDEB] leading-relaxed max-w-2xl line-clamp-2">{spotlight.bio}</p>
                   {spotlight.badges.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">
+                    <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
                       {spotlight.badges.map((badge) => (
                         <span
                           key={badge.key}
@@ -199,7 +204,7 @@ export default async function BookstorePage() {
                   )}
                   <a
                     href={spotlight.url}
-                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#D4AE6A] hover:gap-2.5 transition-all"
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[#D4AE6A] hover:gap-2.5 transition-all"
                   >
                     Visit {spotlight.name}&apos;s site <ArrowRight className="h-4 w-4" />
                   </a>
@@ -212,7 +217,7 @@ export default async function BookstorePage() {
                         key={i}
                         src={c}
                         alt=""
-                        className="h-32 w-auto rounded-lg shadow-md object-cover"
+                        className="h-20 w-auto rounded-lg shadow-md object-cover"
                       />
                     ))}
                   </div>
@@ -233,13 +238,17 @@ export default async function BookstorePage() {
         />
 
         {/* ── Trending ───────────────────────────────────────────────────── */}
-        <BookstoreRow
-          title="Trending Now"
-          icon={<TrendingUp className="h-5 w-5 text-[#C26A4A]" />}
-          books={trending}
-          variant="slate"
-          quickView
-        />
+        {/* Hidden for now — too similar to "New on the Shelf" right above it.
+            Kept in code (not deleted) in case it's wanted again later. */}
+        {SHOW_TRENDING && (
+          <BookstoreRow
+            title="Trending Now"
+            icon={<TrendingUp className="h-5 w-5 text-[#C26A4A]" />}
+            books={trending}
+            variant="slate"
+            quickView
+          />
+        )}
 
         {/* ── Browse by genre ────────────────────────────────────────────── */}
         {topGenres.length > 0 && (
@@ -267,9 +276,18 @@ export default async function BookstorePage() {
           </section>
         )}
 
+        {/* ── Full catalog ───────────────────────────────────────────────── */}
+        <section className="mb-12">
+          <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
+            <Library className="h-5 w-5 text-[#C26A4A]" />
+            Browse All Books
+          </h2>
+          <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
+        </section>
+
         {/* ── Courses ───────────────────────────────────────────────────── */}
         {courses.length > 0 && (
-          <section className="mb-12">
+          <section>
             <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
               <GraduationCap className="h-5 w-5 text-[#C26A4A]" />
               Courses from Independent Creators
@@ -281,37 +299,28 @@ export default async function BookstorePage() {
             </div>
           </section>
         )}
-
-        {/* ── Full catalog ───────────────────────────────────────────────── */}
-        <section>
-          <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
-            <Library className="h-5 w-5 text-[#C26A4A]" />
-            Browse All Books
-          </h2>
-          <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
-        </section>
       </div>
 
       {/* ── How it works (author signup nudge) ───────────────────────────── */}
       <div className="bg-white border-y border-[#DCDBD3]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
-          <p className="text-center text-xs font-mono uppercase tracking-widest text-[#C26A4A] mb-2">
-            · For authors ·
-          </p>
-          <h2 className="text-center font-serif text-3xl text-[#1B2B47] mb-10">
-            How the Bookstore works
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <p className="text-xs font-mono uppercase tracking-widest text-[#C26A4A]">· For authors ·</p>
+            <h2 className="font-serif text-lg sm:text-xl text-[#1B2B47]">How the Bookstore works</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {steps.map(({ icon: Icon, title, text }, i) => (
-              <div key={title} className="text-center">
-                <div className="relative inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-[#F0EDE4] mb-4">
-                  <Icon className="h-6 w-6 text-[#C26A4A]" />
-                  <span className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-[#1B2B47] text-white text-xs font-bold flex items-center justify-center">
+              <div key={title} className="flex items-center gap-3 text-left sm:flex-col sm:text-center">
+                <div className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl bg-[#F0EDE4] flex-shrink-0">
+                  <Icon className="h-4.5 w-4.5 text-[#C26A4A]" />
+                  <span className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-[#1B2B47] text-white text-[10px] font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
                 </div>
-                <h3 className="font-serif text-lg text-[#1B2B47] mb-1">{title}</h3>
-                <p className="text-sm text-[#5C6E89] leading-relaxed max-w-xs mx-auto">{text}</p>
+                <div>
+                  <h3 className="font-serif text-sm text-[#1B2B47]">{title}</h3>
+                  <p className="text-xs text-[#5C6E89] leading-snug sm:max-w-[200px] sm:mx-auto">{text}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -319,23 +328,18 @@ export default async function BookstorePage() {
       </div>
 
       {/* ── Author CTA band ──────────────────────────────────────────────── */}
-      <div className="bg-[#1B2B47] py-16 px-4 text-center">
-        <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">
-          · Are you an author? ·
-        </p>
-        <h2 className="font-serif text-2xl sm:text-3xl text-[#E8E5DD] font-normal mb-4">
-          List your books in the <span className="italic text-[#D4AE6A]">AuthorLoft Bookstore</span>
-        </h2>
-        <p className="text-sm text-[#D4DDEB] mb-6 max-w-md mx-auto leading-relaxed">
-          Reach new readers through our shared catalog — then sell directly from your own
-          author site. Available on the Standard and Premium plans.
-        </p>
-        <Link
-          href="/register"
-          className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
-        >
-          Get Started Free <ArrowRight className="h-4 w-4" />
-        </Link>
+      <div className="bg-[#1B2B47] py-6 px-4 text-center">
+        <div className="max-w-3xl mx-auto flex items-center justify-center gap-4 flex-wrap">
+          <p className="font-serif text-base sm:text-lg text-[#E8E5DD] font-normal">
+            List your books in the <span className="italic text-[#D4AE6A]">AuthorLoft Bookstore</span> — available on Standard and Premium.
+          </p>
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-1.5 bg-[#B8893D] text-[#1B2B47] font-semibold px-4 py-2 rounded-full hover:bg-[#D4AE6A] transition-colors text-sm flex-shrink-0"
+          >
+            Get Started Free <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -24,8 +24,8 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
 
   return (
     <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
-      {/* Cover (portrait 2:3, matches book cards for a consistent grid) */}
-      <div className="relative w-full aspect-[2/3] bg-[#E8E2D5] overflow-hidden">
+      {/* Cover (16:9 — course covers are landscape, unlike portrait book covers) */}
+      <div className="relative w-full aspect-video bg-[#E8E2D5] overflow-hidden">
         {course.coverImageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
