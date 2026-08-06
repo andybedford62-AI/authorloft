@@ -8,6 +8,7 @@ export type FeatureMatrixPlanData = PlanData & {
   audioEnabled: boolean;
   bundlesEnabled: boolean;
   coursesEnabled: boolean;
+  maxCourses: number | null;
 };
 
 type FeatureRow = {
@@ -135,7 +136,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         {
           name: "Author Courses",
           tiers: {
-            FREE: "—",
+            FREE: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—",
             STANDARD: standard?.coursesEnabled ? "✓" : "—",
             PREMIUM: premium?.coursesEnabled ? "✓" : "—",
           },

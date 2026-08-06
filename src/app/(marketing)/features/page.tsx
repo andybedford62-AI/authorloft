@@ -61,6 +61,7 @@ async function getActivePlans() {
       preOrdersEnabled: true,
       bundlesEnabled: true,
       coursesEnabled: true,
+      maxCourses: true,
       isDefault: true,
     },
       orderBy: { sortOrder: "asc" },

@@ -109,7 +109,7 @@ const COMPARISON_ROWS = [
   { label: "Shopping Cart",      free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
   { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
-  { label: "Author Courses",     free: "—",         standard: "✓",          premium: "✓"          },
+  { label: "Author Courses",     free: "Up to 5",   standard: "✓",          premium: "✓"          },
   { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
   { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
   { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
