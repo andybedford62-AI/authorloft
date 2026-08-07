@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 7, 2026 — Course CSV bulk import (Phase 1, admin only)
+
+One-row-per-lesson CSV import at `/admin/courses/import`, mirroring the Books importer's shape (papaparse, alias-based column auto-detect, downloadable template):
+
+- `src/lib/csv-import-courses.ts` — field defs, alias detection, and `groupRowsIntoCourses()` (flat lesson rows → nested Course → Module → Lesson tree, since a course is a 3-level structure unlike a flat book row).
+- `CourseImportWizard` — same 4-step upload/map/preview/results flow as books, with a nested tree preview instead of a flat table.
+- `POST /api/admin/courses/import` — plan-limit slicing (via `maxCourses`), duplicate-title dedup with a `(2)`/`(3)` suffix (courses always import as drafts, so re-importing a CSV creates a reviewable copy rather than erroring), and mirrors the `navShowCourses`/`onboardingCompletedAt` first-course side effects from the single-course create route.
+- Content only for now — no pricing, no PDF/file import (schema requires an actual upload, not a CSV URL), no onboarding-modal entry point yet (admin page only).
+- Verified live on staging with two hand-built sample CSVs (exact template headers, and a deliberately-aliased-header file to exercise auto-detection): happy path, duplicate-title renaming, empty-lesson flagging, and the plan-limit skip path all confirmed correct. Found and fixed two small bugs in the process — a grammar slip and a raw `[object Object]` render when an API error body isn't the route's own `{error: string}` shape (e.g. a platform firewall block).
+
 ## August 6, 2026 — Courses now discoverable in the AuthorLoft Bookstore
 
 Third step of the dual book-author / course-creator promotion strategy. Scoped as a first pass, not full parity with books — Course has no genre or rating tables yet, so this is a separate section, not merged into the book catalog/filter grid (unified filtering deferred, see `docs/FEATURE_BACKLOG.md`):
