@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, GraduationCap } from "lucide-react";
+import { Plus, GraduationCap, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/db";
@@ -32,12 +32,20 @@ export default async function AdminCoursesPage() {
             {courses.filter((c) => c.isPublished).length} published
           </p>
         </div>
-        <Link href="/admin/courses/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Course
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/courses/import">
+            <Button variant="outline">
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+            </Button>
+          </Link>
+          <Link href="/admin/courses/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Course
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* List */}
