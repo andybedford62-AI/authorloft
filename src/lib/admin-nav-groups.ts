@@ -168,6 +168,7 @@ export const SUPER_ADMIN_GROUPS: NavGroup[] = [
     key: "sa-platform", label: "Platform", defaultOpen: false,
     items: [
       { href: "/admin/genres",           label: "Genres",             icon: Tag        },
+      { href: "/admin/course-categories",label: "Course Categories",  icon: GraduationCap },
       { href: "/super-admin/help",       label: "Help Articles",      icon: HelpCircle },
       { href: "/super-admin/legal",      label: "Platform Legal",     icon: Shield     },
       { href: "/super-admin/settings",   label: "Platform Settings",  icon: Settings   },

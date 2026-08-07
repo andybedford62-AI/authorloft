@@ -18,7 +18,7 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
-import { BookstoreCourseCard } from "@/components/marketing/bookstore-course-card";
+import { BookstoreCourseGrid } from "@/components/marketing/bookstore-course-grid";
 import { getBookstoreData, getBookstoreCourses } from "@/lib/bookstore";
 
 export const revalidate = 1800;
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BookstorePage() {
-  const [{ books, genres, stats, spotlight }, courses] = await Promise.all([
+  const [{ books, genres, stats, spotlight }, { courses, categories: courseCategories }] = await Promise.all([
     getBookstoreData(),
     getBookstoreCourses(),
   ]);
@@ -282,11 +282,7 @@ export default async function BookstorePage() {
               <GraduationCap className="h-5 w-5 text-[#C26A4A]" />
               Courses from Independent Creators
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-              {courses.map((course) => (
-                <BookstoreCourseCard key={course.id} course={course} />
-              ))}
-            </div>
+            <BookstoreCourseGrid courses={courses} allCategories={courseCategories.map((c) => c.name)} />
           </section>
         )}
       </div>

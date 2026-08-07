@@ -235,6 +235,7 @@ model Author {
   generatedSocialPosts          GeneratedSocialPost[]
   bundles                       Bundle[]
   courses                       Course[]
+  courseCategories              CourseCategory[]
 
   @@index([slug])
   @@index([customDomain])
@@ -1518,9 +1519,42 @@ model Course {
   modules       CourseModule[]
   enrollments   CourseEnrollment[]
   orderItems    OrderItem[]
+  categories    CourseCategoryAssignment[]
 
   @@unique([authorId, slug])
   @@index([authorId])
+}
+
+// Author-scoped course taxonomy, structurally identical to Genre (self-
+// referential tree, same slug-uniqueness pattern) but kept as its own
+// table — course subject matter (Watercolor Painting, Freelance Writing)
+// doesn't belong in the same list as book genres (Romance, Sci-Fi).
+model CourseCategory {
+  id          String                     @id @default(cuid())
+  authorId    String
+  name        String
+  slug        String
+  description String?
+  parentId    String?
+  sortOrder   Int                        @default(0)
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  author      Author                     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent      CourseCategory?            @relation("CourseCategoryChildren", fields: [parentId], references: [id])
+  children    CourseCategory[]           @relation("CourseCategoryChildren")
+  courses     CourseCategoryAssignment[]
+
+  @@unique([authorId, slug, parentId])
+  @@index([authorId])
+}
+
+model CourseCategoryAssignment {
+  courseId   String
+  categoryId String
+  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  category   CourseCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, categoryId])
 }
 
 model CourseModule {

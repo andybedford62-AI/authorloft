@@ -11,7 +11,7 @@ export default async function EditCoursePage({ params }: Props) {
   const authorId = await getAdminAuthorId();
   const { id } = await params;
 
-  const [course, author] = await Promise.all([
+  const [course, author, categoryTree] = await Promise.all([
     prisma.course.findFirst({
       where: { id, authorId },
       include: {
@@ -19,12 +19,23 @@ export default async function EditCoursePage({ params }: Props) {
           include: { lessons: { orderBy: { sortOrder: "asc" } } },
           orderBy: { sortOrder: "asc" },
         },
+        categories: { select: { categoryId: true } },
       },
     }),
     prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+    prisma.courseCategory.findMany({
+      where: { authorId, parentId: null },
+      include: { children: { orderBy: { sortOrder: "asc" } } },
+      orderBy: { sortOrder: "asc" },
+    }),
   ]);
   if (!course) notFound();
   const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
+
+  const categories = categoryTree.flatMap((c) => [
+    { id: c.id, name: c.name, parentName: undefined },
+    ...c.children.map((child) => ({ id: child.id, name: child.name, parentName: c.name })),
+  ]);
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -49,6 +60,7 @@ export default async function EditCoursePage({ params }: Props) {
       <CourseForm
         mode="edit"
         bookstoreEnabled={bookstoreEnabled}
+        categories={categories}
         initial={{
           id: course.id,
           title: course.title,
@@ -58,6 +70,7 @@ export default async function EditCoursePage({ params }: Props) {
           isPublished: course.isPublished,
           allowDownload: course.allowDownload,
           listInBookstore: course.listInBookstore,
+          categoryIds: course.categories.map((c) => c.categoryId),
           modules: course.modules.map((m) => ({
             title: m.title,
             description: m.description ?? "",

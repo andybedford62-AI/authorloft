@@ -9,6 +9,7 @@ export type BookstoreCourse = {
   courseUrl: string;   // absolute URL to the course page on the author's own site
   description: string | null; // stripped plain-text blurb
   priceCents: number | null;
+  categories: string[];
   sortTimestamp: number; // for "Newest" sort (createdAt)
 };
 

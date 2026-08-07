@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, listInBookstore, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, listInBookstore, categoryIds, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -63,6 +63,16 @@ export async function PUT(req: NextRequest, { params }: Params) {
           { status: 403 }
         );
       }
+    }
+  }
+
+  // Replace category assignments
+  if (categoryIds !== undefined) {
+    await prisma.courseCategoryAssignment.deleteMany({ where: { courseId: id } });
+    if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+      await prisma.courseCategoryAssignment.createMany({
+        data: categoryIds.map((categoryId: string) => ({ courseId: id, categoryId })),
+      });
     }
   }
 

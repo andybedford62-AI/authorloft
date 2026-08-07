@@ -28,6 +28,8 @@ interface ModuleData {
   lessons: LessonData[];
 }
 
+export type CourseCategoryOption = { id: string; name: string; parentName?: string };
+
 export interface CourseData {
   id?: string;
   title: string;
@@ -37,6 +39,7 @@ export interface CourseData {
   isPublished: boolean;
   allowDownload: boolean;
   listInBookstore: boolean;
+  categoryIds: string[];
   modules: ModuleData[];
 }
 
@@ -44,6 +47,7 @@ interface CourseFormProps {
   initial?: Partial<CourseData>;
   mode: "create" | "edit";
   bookstoreEnabled?: boolean;
+  categories?: CourseCategoryOption[];
 }
 
 function emptyLesson(): LessonData {
@@ -127,7 +131,7 @@ function LessonFileAttachment({
   );
 }
 
-export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFormProps) {
+export function CourseForm({ initial, mode, bookstoreEnabled = false, categories = [] }: CourseFormProps) {
   const router = useRouter();
 
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -139,6 +143,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFo
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initial?.categoryIds ?? []);
   const [modules, setModules] = useState<ModuleData[]>(
     initial?.modules?.length ? initial.modules : [emptyModule()]
   );
@@ -153,6 +158,12 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFo
 
   const priceCents = Math.round(parseFloat(priceDollars || "0") * 100);
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
+
+  function toggleCategory(id: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  }
 
   function toggleModuleExpanded(idx: number) {
     setExpandedModules((prev) => {
@@ -231,6 +242,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFo
         isPublished,
         allowDownload,
         listInBookstore,
+        categoryIds: selectedCategories,
         modules: nonEmptyModules.map((m) => ({
           title: m.title.trim(),
           description: m.description.trim() || null,
@@ -349,6 +361,28 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false }: CourseFo
         </div>
         <p className="text-xs text-gray-500 mt-1">Set to $0 for a free course</p>
       </div>
+
+      {/* Categories */}
+      {categories.length > 0 && (
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">Categories</label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((c) => (
+              <button key={c.id} type="button" onClick={() => toggleCategory(c.id)}
+                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                  selectedCategories.includes(c.id)
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
+                }`}>
+                {c.parentName ? `${c.parentName} › ${c.name}` : c.name}
+              </button>
+            ))}
+          </div>
+          {selectedCategories.length > 0 && (
+            <p className="text-xs text-gray-400">{selectedCategories.length} categor{selectedCategories.length !== 1 ? "ies" : "y"} selected</p>
+          )}
+        </div>
+      )}
 
       {/* Modules & Lessons */}
       <div>

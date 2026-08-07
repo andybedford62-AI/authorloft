@@ -204,12 +204,20 @@ export async function getBookstoreData(): Promise<BookstoreData> {
   };
 }
 
+export type CategoryCount = { name: string; slug: string; count: number };
+
+export type BookstoreCoursesData = {
+  courses: BookstoreCourse[];
+  categories: CategoryCount[];
+};
+
 /**
  * Public bookstore courses — parallel to getBookstoreData() but for the
- * (much simpler) Course model, which has no genres or ratings yet. Kept as
- * a separate function/section rather than merged into the book grid.
+ * Course model. Courses now have their own category taxonomy (CourseCategory,
+ * separate from book Genre — see prisma/schema.prisma), kept as a separate
+ * facet/section rather than merged into the book grid.
  */
-export async function getBookstoreCourses(): Promise<BookstoreCourse[]> {
+export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
   const rows = await prisma.course
     .findMany({
       where: {
@@ -237,19 +245,41 @@ export async function getBookstoreCourses(): Promise<BookstoreCourse[]> {
             name: true,
           },
         },
+        categories: { select: { category: { select: { name: true } } } },
       },
     })
     .catch(() => []);
 
-  return rows.map((c) => ({
-    id: c.id,
-    title: c.title,
-    coverImageUrl: c.coverImageUrl,
-    authorName: c.author.displayName || c.author.name,
-    authorUrl: getAuthorBaseUrl(c.author),
-    courseUrl: `${getAuthorBaseUrl(c.author)}/courses/${c.slug}`,
-    description: c.description ? stripHtml(c.description) : null,
-    priceCents: c.priceCents > 0 ? c.priceCents : null,
-    sortTimestamp: new Date(c.createdAt).getTime(),
-  }));
+  const categoryCounts = new Map<string, { name: string; count: number }>();
+
+  const courses: BookstoreCourse[] = rows.map((c) => {
+    const categoryNames = c.categories.map((cat) => cat.category.name);
+    for (const name of categoryNames) {
+      const trimmed = name.trim();
+      const slug = slugify(trimmed);
+      if (!slug) continue;
+      const existing = categoryCounts.get(slug);
+      if (existing) existing.count += 1;
+      else categoryCounts.set(slug, { name: trimmed, count: 1 });
+    }
+
+    return {
+      id: c.id,
+      title: c.title,
+      coverImageUrl: c.coverImageUrl,
+      authorName: c.author.displayName || c.author.name,
+      authorUrl: getAuthorBaseUrl(c.author),
+      courseUrl: `${getAuthorBaseUrl(c.author)}/courses/${c.slug}`,
+      description: c.description ? stripHtml(c.description) : null,
+      priceCents: c.priceCents > 0 ? c.priceCents : null,
+      categories: categoryNames,
+      sortTimestamp: new Date(c.createdAt).getTime(),
+    };
+  });
+
+  const categories: CategoryCount[] = Array.from(categoryCounts.entries())
+    .map(([slug, { name, count }]) => ({ slug, name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+  return { courses, categories };
 }
