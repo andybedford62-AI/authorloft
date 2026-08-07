@@ -58,6 +58,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: { FREE: "✓ Goodreads or template", STANDARD: "✓ Goodreads or template", PREMIUM: "✓ Goodreads or template" },
         },
         {
+          name: "Auto-Formatter (DOCX → ePub)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Pre-orders / \"Coming Soon\"",
           tiers: {
             FREE: "—",
@@ -137,8 +141,8 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           name: "Author Courses",
           tiers: {
             FREE: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—",
-            STANDARD: standard?.coursesEnabled ? "✓" : "—",
-            PREMIUM: premium?.coursesEnabled ? "✓" : "—",
+            STANDARD: standard?.coursesEnabled ? formatLimit(standard?.maxCourses, 25) : "—",
+            PREMIUM: premium?.coursesEnabled ? formatLimit(premium?.maxCourses, 0) : "—",
           },
         },
         {
@@ -316,6 +320,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Reader Analytics (page views, trends, referrers)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Media Kit Page",
           tiers: {
             FREE: free?.mediaKitEnabled ? "✓" : "—",
@@ -398,21 +406,24 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
         </div>
       ))}
 
-      {/* Upcoming features */}
+      {/* Upcoming features — NOT built yet, verified against the codebase Aug 7 2026.
+          Keep this in sync: per CLAUDE.md's "Finishing a task" checklist, when a
+          feature listed here ships, remove it from this array (and add a real row
+          to buildFeatureRows() above if it belongs in the comparison table). Don't
+          let a shipped feature linger here — it directly contradicts the table
+          above it, which pulls live from the Plan model. */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-4">On the Roadmap</h2>
         <div className="bg-purple-50 rounded-lg border border-purple-200 p-6">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { name: "Author Mobile App", desc: "Native iOS / Android app for managing your AuthorLoft from anywhere" },
-              { name: "Auto-Formatter", desc: "Convert your book to ePub, PDF, Kindle, and print formats" },
-              { name: "Reader Analytics", desc: "Track reads, engagement, and retention" },
-              { name: "Email List Builder", desc: "Drag-and-drop forms and automated sequences" },
-              { name: "Social Media Uploader", desc: "Schedule posts to Instagram, TikTok, and more" },
+              { name: "Author Social Scheduling", desc: "Connect your own accounts and auto-publish posts on a schedule (Social Promote today generates ready-to-paste post copy, but doesn't connect accounts or publish for you)" },
+              { name: "Email List Builder", desc: "Drag-and-drop signup forms and automated email sequences" },
               { name: "Review Monitoring", desc: "Aggregate reviews from Amazon and Goodreads" },
-              { name: "Native PDF Flipbook", desc: "A smoother, mobile-friendly flipbook reader" },
+              { name: "Native PDF Flipbook", desc: "A smoother, mobile-friendly flipbook reader, built into the page instead of an external embed link" },
               { name: "Two-Factor Authentication", desc: "Extra account security for every plan" },
-              { name: "Dynamic OG Images", desc: "Per-page social cards that auto-generate for every book and post" },
+              { name: "Dynamic OG Images", desc: "Auto-generated per-page social cards for every individual book and post, not just fixed marketing pages" },
             ].map((item) => (
               <div key={item.name}>
                 <p className="font-semibold text-gray-900">{item.name}</p>

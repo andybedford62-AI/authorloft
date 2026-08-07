@@ -1,6 +1,6 @@
 # AuthorLoft Feature Matrix — Master Copy
 
-**Last Updated:** August 6, 2026  
+**Last Updated:** August 7, 2026  
 **Status:** LIVE (www.authorloft.com on Stripe LIVE keys)
 
 > **Quick reference for AI/code sessions:** Check this file first before doing a deep code dive — it lists what is built, what tier it lives in, and what is still on the roadmap. Avoids re-discovering existing features.
@@ -40,7 +40,8 @@ Early bird / founding member discount available to FREE users within a configura
 | **Sales Formats** (when Direct Sales enabled) | eBook | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |
-| **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | Up to 5 | ✅ | ✅ |
+| **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | Up to 5 | Up to 25 | Unlimited |
+| **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book or sitewide) | ✅ | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |
@@ -111,8 +112,8 @@ Early bird / founding member discount available to FREE users within a configura
 | **Sales Revenue Charts** (revenue over time, by book, by format — area + bar charts) | ❌ | ✅ | ✅ |
 | **Sales Reports / Invoices** (year-filtered invoice view, downloadable CSV, discount breakdown) | ❌ | ✅ | ✅ |
 | **Order History** (track each sale with customer info) | ❌ | ✅ | ✅ |
-| **Site Traffic Analytics** (PostHog: page views, referrers, countries — 7/30/90d) | ❌ | ✅ | ✅ |
-| **Reader Analytics** (read engagement, retention) | ❌ | ❌ | Roadmap |
+| **Site Traffic Analytics** (PostHog: page views, referrers, countries — 7/30/90d; `/admin/analytics`) | ✅ | ✅ | ✅ |
+| **Deep Reading Engagement Analytics** (per-chapter/page read depth & retention, beyond site-traffic pageviews) | ❌ | ❌ | Roadmap |
 | **Review Monitoring** (aggregate Amazon/Goodreads scores) | ❌ | ❌ | Roadmap |
 
 ---
@@ -188,9 +189,8 @@ Early bird / founding member discount available to FREE users within a configura
 | **Book Launch Mode** | STANDARD/PREMIUM | In progress | Countdown timer on book page, launch checklist, social copy toolkit |
 | **Per-Author Social Posting** | PREMIUM | Roadmap | Authors post to their own Instagram/X/Facebook from dashboard (OAuth per author) |
 | **Shareable Promo Graphics** | STANDARD/PREMIUM | Roadmap | Auto-generate book promo image sized for social platforms |
-| **Auto-Formatter** | PREMIUM | Roadmap | Convert to ePub, PDF, Kindle, print formats |
 | **Email List Builder** | PREMIUM | Roadmap | Drag-drop forms, automation sequences |
-| **Reader Analytics** | PREMIUM | Roadmap | Track reads, engagement, retention |
+| **Deep Reading Engagement Analytics** | PREMIUM | Roadmap | Per-chapter/page read depth & retention (distinct from the live Site Traffic Analytics — see Analytics & Sales) |
 | **Review Monitoring** | PREMIUM | Roadmap | Aggregate Amazon, Goodreads reviews |
 | **Reader Tiers / Patreon** | All tiers | Roadmap | Membership & exclusive content |
 | **Native PDF Flipbook** | PREMIUM | Deferred | Better mobile experience for flipbook readers |

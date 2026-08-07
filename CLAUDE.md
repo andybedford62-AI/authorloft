@@ -95,6 +95,12 @@ host). Run locally with `npm run check:all`.
 - Accomplished: log shipped work in `docs/CHANGELOG.md` (newest first, by date).
 - TODO/backlog: add future/deferred ideas to `docs/FEATURE_BACKLOG.md`; move
   shipped items to its "Shipped (for reference)" list.
+- `/features` page (`src/components/marketing/feature-matrix.tsx`): if the
+  shipped feature belongs in the plan-tier comparison table, add a real row
+  to `buildFeatureRows()`. If it's listed in the "On the Roadmap" array
+  further down that same file, remove it from there — a shipped feature
+  left on the roadmap directly contradicts the table above it on the same
+  page. `docs/FEATURE_MATRIX.md` should match too.
 - Test before declaring done.
 
 ## Source of truth (check before planning features)

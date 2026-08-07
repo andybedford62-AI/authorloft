@@ -127,7 +127,7 @@ function buildComparisonRows(plans: Awaited<ReturnType<typeof getActivePlans>>) 
     { label: "Shopping Cart",      free: "—",         standard: "✓",          premium: "✓"          },
     { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
     { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
-    { label: "Author Courses",     free: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—", standard: standard?.coursesEnabled ? "✓" : "—", premium: premium?.coursesEnabled ? "✓" : "—" },
+    { label: "Author Courses",     free: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—", standard: standard?.coursesEnabled ? formatLimit(standard?.maxCourses, 25) : "—", premium: premium?.coursesEnabled ? formatLimit(premium?.maxCourses, 0) : "—" },
     { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
     { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
     { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
