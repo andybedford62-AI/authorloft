@@ -41,9 +41,6 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
             <span className="text-xs font-serif italic px-4 text-center line-clamp-3">{course.title}</span>
           </div>
         )}
-        <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shadow-sm text-white bg-[#27406B]">
-          <GraduationCap className="h-2.5 w-2.5" /> Course
-        </span>
       </div>
 
       {/* Body */}
