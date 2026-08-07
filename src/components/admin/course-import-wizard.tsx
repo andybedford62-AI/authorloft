@@ -169,7 +169,8 @@ export function CourseImportWizard({ remainingSlots, maxCourses, planTier }: Pro
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Import failed.");
+        const message = typeof data.error === "string" ? data.error : "Import failed. Please try again.";
+        throw new Error(message);
       }
       const data: ImportResult = await res.json();
       setResult(data);
@@ -346,7 +347,7 @@ export function CourseImportWizard({ remainingSlots, maxCourses, planTier }: Pro
             <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
               <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
               <span>
-                {lessonsMissingContent} lesson{lessonsMissingContent === 1 ? "" : "s"} have no content or video URL —
+                {lessonsMissingContent} lesson{lessonsMissingContent === 1 ? "" : "s"} {lessonsMissingContent === 1 ? "has" : "have"} no content or video URL —
                 they'll still be imported, empty, for you to fill in later.
               </span>
             </div>
