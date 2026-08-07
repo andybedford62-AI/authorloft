@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
         customDomain: body.customDomain ?? false, salesEnabled: body.salesEnabled ?? false,
         flipBooksLimit: body.flipBooksLimit ?? 0, audioEnabled: body.audioEnabled ?? false,
         newsletter: body.newsletter ?? false, analyticsEnabled: body.analyticsEnabled ?? false,
+        coursesEnabled: body.coursesEnabled ?? false, maxCourses: body.maxCourses ?? null,
         badgeColor: body.badgeColor ?? "gray", featuredLabel: body.featuredLabel ?? null,
         sortOrder: body.sortOrder ?? 0, isActive: body.isActive ?? true, isDefault: body.isDefault ?? false,
       } as any,

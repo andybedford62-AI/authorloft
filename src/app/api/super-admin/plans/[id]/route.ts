@@ -29,6 +29,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.audioEnabled !== undefined && { audioEnabled: body.audioEnabled }),
         ...(body.newsletter !== undefined && { newsletter: body.newsletter }),
         ...(body.analyticsEnabled !== undefined && { analyticsEnabled: body.analyticsEnabled }),
+        ...(body.coursesEnabled !== undefined && { coursesEnabled: body.coursesEnabled }),
+        ...(body.maxCourses !== undefined && { maxCourses: body.maxCourses }),
         ...(body.featuresJson !== undefined && { featuresJson: body.featuresJson }),
         ...(body.badgeColor !== undefined && { badgeColor: body.badgeColor }),
         ...(body.featuredLabel !== undefined && { featuredLabel: body.featuredLabel }),

@@ -10,11 +10,11 @@ type PlanFormData = {
   featuresText: string;  // one bullet per line, stored as newline-separated text
   monthlyPrice: string; annualPrice: string;   // dollars, e.g. "29.00"
   stripePriceIdMonthly: string; stripePriceIdAnnual: string;
-  maxBooks: string; maxPosts: string; maxStorageMb: string;
+  maxBooks: string; maxPosts: string; maxStorageMb: string; maxCourses: string;
   customDomain: boolean; salesEnabled: boolean;
   flipBooksLimit: string;          // "0" | "3" | "-1" | any number as string
   bookstoreListingLimit: string;   // "-1" = unlimited, "0" = none, n = max listings
-  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
+  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean; coursesEnabled: boolean;
   badgeColor: string; featuredLabel: string; sortOrder: number;
   isActive: boolean; isDefault: boolean;
 };
@@ -24,10 +24,10 @@ type Plan = {
   featuresJson: string | null;
   monthlyPriceCents: number; annualPriceCents: number;
   stripePriceIdMonthly: string | null; stripePriceIdAnnual: string | null;
-  maxBooks: number | null; maxPosts: number | null; maxStorageMb: number | null;
+  maxBooks: number | null; maxPosts: number | null; maxStorageMb: number | null; maxCourses: number | null;
   customDomain: boolean; salesEnabled: boolean;
   flipBooksLimit: number; bookstoreListingLimit: number;
-  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
+  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean; coursesEnabled: boolean;
   badgeColor: string; featuredLabel: string | null; sortOrder: number;
   isActive: boolean; isDefault: boolean;
 };
@@ -55,6 +55,9 @@ function buildAutoFeatures(plan: Plan): string[] {
   if (plan.salesEnabled) f.push("Direct digital sales (Stripe)");
   if (plan.flipBooksLimit !== 0) {
     f.push(plan.flipBooksLimit === -1 ? "Unlimited flip books" : `Up to ${plan.flipBooksLimit} flip book${plan.flipBooksLimit === 1 ? "" : "s"}`);
+  }
+  if (plan.coursesEnabled) {
+    f.push(plan.maxCourses === null ? "Unlimited courses" : `Up to ${plan.maxCourses} course${plan.maxCourses === 1 ? "" : "s"}`);
   }
   if (plan.analyticsEnabled) f.push("Analytics dashboard");
   if (plan.maxStorageMb !== null) {
@@ -84,6 +87,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
     maxBooks: plan?.maxBooks?.toString() ?? "",
     maxPosts: plan?.maxPosts?.toString() ?? "",
     maxStorageMb: plan?.maxStorageMb?.toString() ?? "",
+    maxCourses: plan?.maxCourses?.toString() ?? "",
     customDomain: plan?.customDomain ?? false,
     salesEnabled: plan?.salesEnabled ?? false,
     flipBooksLimit: plan?.flipBooksLimit?.toString() ?? "0",
@@ -91,6 +95,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
     audioEnabled: plan?.audioEnabled ?? false,
     newsletter: plan?.newsletter ?? false,
     analyticsEnabled: plan?.analyticsEnabled ?? false,
+    coursesEnabled: plan?.coursesEnabled ?? false,
     badgeColor: plan?.badgeColor ?? "gray",
     featuredLabel: plan?.featuredLabel ?? "",
     sortOrder: plan?.sortOrder ?? 0,
@@ -126,6 +131,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       maxBooks: form.maxBooks === "" ? null : parseInt(form.maxBooks, 10),
       maxPosts: form.maxPosts === "" ? null : parseInt(form.maxPosts, 10),
       maxStorageMb: form.maxStorageMb === "" ? null : parseInt(form.maxStorageMb, 10),
+      maxCourses: form.maxCourses === "" ? null : parseInt(form.maxCourses, 10),
       flipBooksLimit: parseInt(form.flipBooksLimit, 10),
       bookstoreListingLimit: parseInt(form.bookstoreListingLimit, 10),
       stripePriceIdMonthly: form.stripePriceIdMonthly || null,
@@ -239,7 +245,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       <section className="rounded-xl bg-white border border-gray-200 p-6">
         <h2 className="font-semibold text-gray-900 mb-1">Quantity Limits</h2>
         <p className="text-xs text-gray-500 mb-5">Leave blank for unlimited (∞)</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div>
             <label className={label}>Max Books</label>
             <input type="number" min={0} value={form.maxBooks} onChange={(e) => set("maxBooks", e.target.value)} placeholder="∞ unlimited" className={input} />
@@ -247,6 +253,10 @@ export function PlanForm({ plan }: { plan?: Plan }) {
           <div>
             <label className={label}>Max Blog Posts</label>
             <input type="number" min={0} value={form.maxPosts} onChange={(e) => set("maxPosts", e.target.value)} placeholder="∞ unlimited" className={input} />
+          </div>
+          <div>
+            <label className={label}>Max Courses</label>
+            <input type="number" min={0} value={form.maxCourses} onChange={(e) => set("maxCourses", e.target.value)} placeholder="∞ unlimited" className={input} />
           </div>
           <div>
             <label className={label}>Storage (MB)</label>
@@ -344,6 +354,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
             { key: "audioEnabled",    label: "Audio Previews", desc: "MP3/WAV narrations & excerpts" },
             { key: "newsletter",      label: "Newsletter",     desc: "Email subscriber management" },
             { key: "analyticsEnabled",label: "Analytics",      desc: "Traffic & sales reporting" },
+            { key: "coursesEnabled",  label: "Courses",        desc: "Create & sell author courses" },
           ] as const).map(({ key, label: lbl, desc }) => (
             <label
               key={key}

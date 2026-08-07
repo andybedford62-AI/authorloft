@@ -47,6 +47,8 @@ async function getActivePlans() {
       maxBooks: true,
       maxPosts: true,
       maxStorageMb: true,
+      coursesEnabled: true,
+      maxCourses: true,
       customDomain: true,
       salesEnabled: true,
       newsletter: true,
@@ -57,6 +59,15 @@ async function getActivePlans() {
     },
     orderBy: { sortOrder: "asc" },
   });
+}
+
+function planByTier<T extends { tier: string }>(plans: T[], tier: string) {
+  return plans.find((p) => p.tier === tier);
+}
+
+function formatLimit(value: number | null | undefined, fallback: number): string {
+  if (value === null || value === undefined) return "Unlimited";
+  return `Up to ${value || fallback}`;
 }
 
 type CellType = "yes" | "no" | "limited" | "text";
@@ -97,26 +108,34 @@ const COMPETITOR_ROWS: Array<{
   { label: "Author Courses",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
 ];
 
-// Feature comparison table rows
-const COMPARISON_ROWS = [
-  { label: "Books",              free: "Up to 5",   standard: "Up to 25",   premium: "Unlimited"  },
-  { label: "News posts",         free: "Up to 5",   standard: "Unlimited",  premium: "Unlimited"  },
-  { label: "AuthorLoft subdomain",free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Custom domain",      free: "—",         standard: "✓",          premium: "✓"          },
-  { label: "Newsletter capture", free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Newsletter campaigns",free: "✓",        standard: "✓",          premium: "✓"          },
-  { label: "Direct digital sales",free: "✓ eBook",   standard: "✓",          premium: "✓"          },
-  { label: "Shopping Cart",      free: "—",         standard: "✓",          premium: "✓"          },
-  { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
-  { label: "Author Courses",     free: "Up to 5",   standard: "✓",          premium: "✓"          },
-  { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
-  { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
-  { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
-  { label: "Achievement Badges", free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Contact form",       free: "✓",         standard: "✓",          premium: "✓"          },
-  { label: "Support Community",  free: "Community", standard: "Priority",   premium: "Priority"   },
-];
+// Feature comparison table rows. "Books" / "News posts" / "Author Courses" are
+// computed live from each plan's quantity limits (see buildComparisonRows) —
+// everything else here is curated marketing copy, not a raw feature-flag mirror.
+function buildComparisonRows(plans: Awaited<ReturnType<typeof getActivePlans>>) {
+  const free = planByTier(plans, "FREE");
+  const standard = planByTier(plans, "STANDARD");
+  const premium = planByTier(plans, "PREMIUM");
+
+  return [
+    { label: "Books",              free: formatLimit(free?.maxBooks, 5), standard: formatLimit(standard?.maxBooks, 25), premium: formatLimit(premium?.maxBooks, 0) },
+    { label: "News posts",         free: formatLimit(free?.maxPosts, 5), standard: formatLimit(standard?.maxPosts, 0),  premium: formatLimit(premium?.maxPosts, 0) },
+    { label: "AuthorLoft subdomain",free: "✓",         standard: "✓",          premium: "✓"          },
+    { label: "Custom domain",      free: "—",         standard: "✓",          premium: "✓"          },
+    { label: "Newsletter capture", free: "✓",         standard: "✓",          premium: "✓"          },
+    { label: "Newsletter campaigns",free: "✓",        standard: "✓",          premium: "✓"          },
+    { label: "Direct digital sales",free: "✓ eBook",   standard: "✓",          premium: "✓"          },
+    { label: "Shopping Cart",      free: "—",         standard: "✓",          premium: "✓"          },
+    { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
+    { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
+    { label: "Author Courses",     free: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—", standard: standard?.coursesEnabled ? "✓" : "—", premium: premium?.coursesEnabled ? "✓" : "—" },
+    { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
+    { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
+    { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },
+    { label: "Achievement Badges", free: "✓",         standard: "✓",          premium: "✓"          },
+    { label: "Contact form",       free: "✓",         standard: "✓",          premium: "✓"          },
+    { label: "Support Community",  free: "Community", standard: "Priority",   premium: "Priority"   },
+  ];
+}
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
@@ -131,6 +150,7 @@ const breadcrumbLd = {
 
 export default async function PricingPage() {
   const plans = await getActivePlans().catch(() => []);
+  const comparisonRows = buildComparisonRows(plans);
 
   return (
     <div className="min-h-screen bg-[#E8E5DD]">
@@ -196,7 +216,7 @@ export default async function PricingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#DCDBD3]">
-                {COMPARISON_ROWS.map(({ label, free, standard, premium }) => (
+                {comparisonRows.map(({ label, free, standard, premium }) => (
                   <tr key={label} className="hover:bg-[#F0EDE4] transition-colors">
                     <td className="px-6 py-3.5 text-[#1B2B47] font-medium">{label}</td>
                     <td className="px-6 py-3.5 text-center text-[#5C6E89]">{free}</td>

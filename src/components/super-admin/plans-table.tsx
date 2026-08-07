@@ -16,10 +16,12 @@ type Plan = {
   maxBooks: number | null;
   maxPosts: number | null;
   maxStorageMb: number | null;
+  maxCourses: number | null;
   customDomain: boolean;
   salesEnabled: boolean;
   newsletter: boolean;
   analyticsEnabled: boolean;
+  coursesEnabled: boolean;
   badgeColor: string;
   featuredLabel: string | null;
   isActive: boolean;
@@ -104,6 +106,7 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
               <th className="px-4 py-3 font-medium">Books</th>
               <th className="px-4 py-3 font-medium">Posts</th>
               <th className="px-4 py-3 font-medium">Storage</th>
+              <th className="px-4 py-3 font-medium">Courses</th>
               <th className="px-4 py-3 font-medium text-center">Domain</th>
               <th className="px-4 py-3 font-medium text-center">Sales</th>
               <th className="px-4 py-3 font-medium text-center">Newsletter</th>
@@ -133,6 +136,9 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
                 <td className="px-4 py-4 text-gray-700">
                   {plan.maxStorageMb === null ? "∞" : plan.maxStorageMb >= 1000 ? `${(plan.maxStorageMb / 1000).toFixed(0)} GB` : `${plan.maxStorageMb} MB`}
                 </td>
+                <td className="px-4 py-4 text-gray-700">
+                  {plan.coursesEnabled ? (plan.maxCourses === null ? "∞" : plan.maxCourses) : "—"}
+                </td>
                 <td className="px-4 py-4">{plan.customDomain ? <Check /> : <Cross />}</td>
                 <td className="px-4 py-4">{plan.salesEnabled ? <Check /> : <Cross />}</td>
                 <td className="px-4 py-4">{plan.newsletter ? <Check /> : <Cross />}</td>
@@ -161,7 +167,7 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
               </tr>
             ))}
             {plans.length === 0 && (
-              <tr><td colSpan={12} className="px-4 py-12 text-center text-gray-400">
+              <tr><td colSpan={13} className="px-4 py-12 text-center text-gray-400">
                 No plans yet. <Link href="/super-admin/plans/new" className="text-purple-600 hover:underline">Create your first plan →</Link>
               </td></tr>
             )}
