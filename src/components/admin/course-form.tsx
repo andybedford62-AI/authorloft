@@ -598,8 +598,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex items-center gap-3 pt-4 border-t">
+      {/* Actions — sticky to the bottom of the viewport so long courses (lots of
+          modules/lessons) don't require scrolling all the way down to save. */}
+      <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 flex items-center gap-3 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.08)]">
         <Button type="submit" disabled={saving}>
           {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           {mode === "create" ? "Create Course" : "Save Changes"}
