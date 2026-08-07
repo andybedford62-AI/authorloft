@@ -32,10 +32,11 @@ export default async function EditCoursePage({ params }: Props) {
   if (!course) notFound();
   const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
 
-  const categories = categoryTree.flatMap((c) => [
-    { id: c.id, name: c.name, parentName: undefined },
-    ...c.children.map((child) => ({ id: child.id, name: child.name, parentName: c.name })),
-  ]);
+  const categories = categoryTree.map((c) => ({
+    id: c.id,
+    name: c.name,
+    children: c.children.map((child) => ({ id: child.id, name: child.name })),
+  }));
 
   return (
     <div className="max-w-3xl space-y-6">

@@ -28,7 +28,8 @@ interface ModuleData {
   lessons: LessonData[];
 }
 
-export type CourseCategoryOption = { id: string; name: string; parentName?: string };
+export type CourseSubcategoryOption = { id: string; name: string };
+export type CourseCategoryOption = { id: string; name: string; children: CourseSubcategoryOption[] };
 
 export interface CourseData {
   id?: string;
@@ -56,6 +57,18 @@ function emptyLesson(): LessonData {
 
 function emptyModule(): ModuleData {
   return { title: "", description: "", lessons: [emptyLesson()] };
+}
+
+/** Given the flat list of assigned category IDs (may include a parent, a
+ *  child, or both — see how the picker below saves), figure out which
+ *  dropdown selections they represent. */
+function deriveCategorySelection(categoryIds: string[], categories: CourseCategoryOption[]) {
+  for (const cat of categories) {
+    const child = cat.children.find((c) => categoryIds.includes(c.id));
+    if (child) return { categoryId: cat.id, subcategoryId: child.id };
+    if (categoryIds.includes(cat.id)) return { categoryId: cat.id, subcategoryId: "" };
+  }
+  return { categoryId: "", subcategoryId: "" };
 }
 
 function LessonFileAttachment({
@@ -143,7 +156,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(initial?.categoryIds ?? []);
+  const initialSelection = deriveCategorySelection(initial?.categoryIds ?? [], categories);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialSelection.categoryId);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(initialSelection.subcategoryId);
   const [modules, setModules] = useState<ModuleData[]>(
     initial?.modules?.length ? initial.modules : [emptyModule()]
   );
@@ -159,11 +174,12 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const priceCents = Math.round(parseFloat(priceDollars || "0") * 100);
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
 
-  function toggleCategory(id: string) {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
-    );
+  function handleCategoryChange(id: string) {
+    setSelectedCategoryId(id);
+    setSelectedSubcategoryId(""); // subcategory options change with the parent — reset
   }
+
+  const subcategoryOptions = categories.find((c) => c.id === selectedCategoryId)?.children ?? [];
 
   function toggleModuleExpanded(idx: number) {
     setExpandedModules((prev) => {
@@ -242,7 +258,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         isPublished,
         allowDownload,
         listInBookstore,
-        categoryIds: selectedCategories,
+        categoryIds: selectedCategoryId
+          ? (selectedSubcategoryId ? [selectedCategoryId, selectedSubcategoryId] : [selectedCategoryId])
+          : [],
         modules: nonEmptyModules.map((m) => ({
           title: m.title.trim(),
           description: m.description.trim() || null,
@@ -362,25 +380,42 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         <p className="text-xs text-gray-500 mt-1">Set to $0 for a free course</p>
       </div>
 
-      {/* Categories */}
+      {/* Category / Subcategory — optional, linked dropdowns */}
       {categories.length > 0 && (
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Categories</label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((c) => (
-              <button key={c.id} type="button" onClick={() => toggleCategory(c.id)}
-                className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                  selectedCategories.includes(c.id)
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-600 border-gray-300 hover:border-blue-400"
-                }`}>
-                {c.parentName ? `${c.parentName} › ${c.name}` : c.name}
-              </button>
-            ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">— None —</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">Optional</p>
           </div>
-          {selectedCategories.length > 0 && (
-            <p className="text-xs text-gray-400">{selectedCategories.length} categor{selectedCategories.length !== 1 ? "ies" : "y"} selected</p>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+            <select
+              value={selectedSubcategoryId}
+              onChange={(e) => setSelectedSubcategoryId(e.target.value)}
+              disabled={!selectedCategoryId || subcategoryOptions.length === 0}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
+            >
+              <option value="">— None —</option>
+              {subcategoryOptions.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">
+              {selectedCategoryId
+                ? (subcategoryOptions.length === 0 ? "No subcategories for this category" : "Optional")
+                : "Choose a category first"}
+            </p>
+          </div>
         </div>
       )}
 
