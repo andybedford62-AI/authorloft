@@ -22,7 +22,9 @@ Repo audit found `Author.customDomain` and hostname-based routing already existe
 - **Admin → Settings → Custom Domain card** — self-serve: type a domain, get the exact DNS record to add, check status on demand, and **unlink** at any time — unlinking just clears `Author.customDomain`, which every author-lookup query and the routing middleware already fall back to `slug` for, so reverting to the subdomain needed no extra code.
 - Schema: added `customDomainStatus`, `customDomainVerification` (cached DNS records), `customDomainAddedAt` to `Author`.
 - Scope: bring-your-own-domain only — no domain purchasing/registrar integration (author still buys the domain themselves elsewhere, e.g. Namecheap/GoDaddy).
-- `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_TEAM_ID` (this project is team-scoped) are now all configured in Vercel — confirmed via a build's `[required-env]` log rather than ever viewing the values directly. This commit forces a fresh build of the feature so the deployment actually has all three at build time (the first staging build predates `VERCEL_TEAM_ID` being set).
+- `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_TEAM_ID` (this project is team-scoped) are all configured in Vercel across Production, Preview, and Development — confirmed via build `[required-env]` logs rather than ever viewing the values directly. Took three rounds to get right: the token/project ID landed first, then team ID was set on Production only (missed on Preview, which is what staging actually runs), then corrected.
+- **Verified working on staging** — linked a real test domain (`test-example-checkme.com`) through the live UI: came back "Pending DNS" with the correct DNS record (A → `76.76.21.21` for an apex domain), confirming the Vercel API round-trip actually works, not just that the UI renders.
+- **Not yet promoted to prod** — live and tested on `dev`/staging only as of this writing.
 
 ## August 8, 2026 — Security hardening sweep + branch cleanup
 
@@ -32,7 +34,11 @@ Repo audit surfaced a security-fix branch (`claude/authorloft-project-access-v6u
 - **SSRF** — media-kit image download proxy checked `url.startsWith(allowedOrigin)`, which a lookalike host (`https://<ref>.supabase.co.evil.com`) can pass; now compares full parsed `URL.origin`.
 - **Abuse/spam hardening** — added rate limiting + input validation (length caps, email/discount-code format checks) to `/api/auth/request-access` and `/api/checkout/validate-discount` (previously unlimited, discount codes were brute-forceable); added length caps to `/api/marketing/contact` and `/api/newsletter/subscribe`.
 - **DoS** — `proxy.ts` now rejects JSON bodies over 2MB before they reach route handlers.
-- Also audited: `feature/arc-management` (May 2026, unmerged) turned out to be an abandoned early prototype of ARC — the feature actually shipped later through a different, more complete implementation already live on `dev`/staging (see May 20 entry below) but never promoted to prod; branch deleted as obsolete. Pruned 20 other stale branches (mix of already-merged session branches and one deliberately-abandoned rebrand attempt) to get every branch back in sync with `dev`.
+- Also audited: `feature/arc-management` (May 2026, unmerged) turned out to be an abandoned early prototype of ARC — the feature actually shipped later through a different, more complete implementation already live on `dev`/staging (see May 20 entry below), but had never been promoted to prod. Promoted today — ARC is now live in production. Branch deleted as obsolete. Pruned 20 other stale branches (mix of already-merged session branches and one deliberately-abandoned rebrand attempt) to get every branch back in sync with `dev`.
+
+## August 8, 2026 — Author-site nav: Login for visitors, Join moved to footer
+
+The top nav's "Join AuthorLoft" CTA only made sense for logged-out marketing traffic, but it showed to any non-owner — including the author themselves before they'd logged in, with no way to reach their own site's admin without going through the main authorloft.com landing page first. Swapped it: nav now shows a **Login** link (→ platform `/login`) whenever nobody's signed in; "Join AuthorLoft" moved to the footer's brand column instead, next to the AuthorLoft.com logo/description where it's a better fit as a passive CTA rather than a nav-level action.
 
 ## August 7, 2026 — Course CSV bulk import (Phase 1, admin only)
 

@@ -103,6 +103,17 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 
 ---
 
+## Custom Domains
+
+Self-serve "bring your own domain" shipped Aug 8, 2026 (Admin → Settings → Custom Domain; link/check-status/unlink against Vercel's Domains API). Verified working end-to-end on staging (linked a test domain, got back the correct DNS record, status showed Pending). Scoped to BYOD only — deliberately excluded from that build:
+
+- [ ] **Domain purchase through AuthorLoft** — let an author search + buy a brand-new domain right in the admin instead of bringing their own. Needs a registrar decision (Vercel-as-registrar charged via Stripe vs. a third-party reseller API with the author as registrant of record) — see project chat from Aug 8, 2026 for the tradeoffs discussed. Explicitly deferred, not started. *(large — registrar integration + billing)*
+- [ ] **Promote custom domains to production** — the feature is live and tested on `dev`/staging only as of Aug 8, 2026; needs a prod promotion. *(small — deploy step, not code)*
+- [ ] **Automated verification polling** — today an author must click "Check status" manually; no cron/webhook auto-detects when DNS finishes propagating or notifies the author by email when their domain goes live. *(small–medium)*
+- [ ] **www ↔ apex handling** — current DNS instructions only cover one record (A for apex, CNAME for a subdomain like `www`); doesn't yet offer to set up both apex + www together or redirect one to the other. *(small)*
+
+---
+
 ## Auth / Account
 
 - [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*
