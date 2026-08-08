@@ -95,12 +95,15 @@ host). Run locally with `npm run check:all`.
 - Accomplished: log shipped work in `docs/CHANGELOG.md` (newest first, by date).
 - TODO/backlog: add future/deferred ideas to `docs/FEATURE_BACKLOG.md`; move
   shipped items to its "Shipped (for reference)" list.
-- `/features` page (`src/components/marketing/feature-matrix.tsx`): if the
-  shipped feature belongs in the plan-tier comparison table, add a real row
-  to `buildFeatureRows()`. If it's listed in the "On the Roadmap" array
-  further down that same file, remove it from there — a shipped feature
-  left on the roadmap directly contradicts the table above it on the same
-  page. `docs/FEATURE_MATRIX.md` should match too.
+- `/features` page (`src/components/marketing/feature-matrix.tsx`): **any
+  time a feature is added, majorly enhanced, or its plan-tier gating
+  changes** (e.g. newly promoted to prod, moved between tiers, a Plan
+  boolean flipped) — check it against `buildFeatureRows()` and update the
+  row. If it's listed in the "On the Roadmap" array further down that same
+  file, remove it from there — a shipped feature left on the roadmap
+  directly contradicts the table above it on the same page. Don't treat
+  this as done just because the feature itself shipped — go check the
+  table explicitly, every time. `docs/FEATURE_MATRIX.md` should match too.
 - Test before declaring done.
 
 ## Source of truth (check before planning features)
