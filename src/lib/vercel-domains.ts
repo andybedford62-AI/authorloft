@@ -17,6 +17,9 @@ export class VercelDomainError extends Error {
   }
 }
 
+// This project lives under a Vercel team, so VERCEL_TEAM_ID is required in
+// practice — without it, Vercel's API can't tell which account's project the
+// domain calls are for and will reject them even with a valid token.
 function teamQuery(): string {
   const teamId = process.env.VERCEL_TEAM_ID;
   return teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";

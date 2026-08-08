@@ -22,7 +22,7 @@ Repo audit found `Author.customDomain` and hostname-based routing already existe
 - **Admin → Settings → Custom Domain card** — self-serve: type a domain, get the exact DNS record to add, check status on demand, and **unlink** at any time — unlinking just clears `Author.customDomain`, which every author-lookup query and the routing middleware already fall back to `slug` for, so reverting to the subdomain needed no extra code.
 - Schema: added `customDomainStatus`, `customDomainVerification` (cached DNS records), `customDomainAddedAt` to `Author`.
 - Scope: bring-your-own-domain only — no domain purchasing/registrar integration (author still buys the domain themselves elsewhere, e.g. Namecheap/GoDaddy).
-- **Not yet live**: needs `VERCEL_API_TOKEN` set in Vercel env vars before the linking flow will work — code is deployed but gated on that token being configured.
+- `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_TEAM_ID` (this project is team-scoped) are now all configured in Vercel — confirmed via a build's `[required-env]` log rather than ever viewing the values directly. This commit forces a fresh build of the feature so the deployment actually has all three at build time (the first staging build predates `VERCEL_TEAM_ID` being set).
 
 ## August 8, 2026 — Security hardening sweep + branch cleanup
 
