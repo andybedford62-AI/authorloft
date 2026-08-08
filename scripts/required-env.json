@@ -56,6 +56,10 @@
 
     { "name": "SOCIAL_TOKEN_ENCRYPTION_KEY", "purpose": "Encryption key for stored social OAuth tokens (only needed once Social Promote phase 2 ships)" },
     { "name": "SOCIAL_PROMOTE_ADMIN_EMAILS", "purpose": "Comma-separated admins to notify on Social Promote abuse alerts" },
-    { "name": "SOCIAL_PROMOTE_KILL_SWITCH", "purpose": "Set to '1' to globally disable Social Promote generation" }
+    { "name": "SOCIAL_PROMOTE_KILL_SWITCH", "purpose": "Set to '1' to globally disable Social Promote generation" },
+
+    { "name": "VERCEL_API_TOKEN", "purpose": "Vercel API token — self-serve custom domain linking (Admin > Settings). Without it, linking a domain fails cleanly with an error; nothing else degrades." },
+    { "name": "VERCEL_PROJECT_ID", "purpose": "Vercel project ID that custom domains get registered against" },
+    { "name": "VERCEL_TEAM_ID", "purpose": "Vercel team ID, only needed if the project lives under a team scope" }
   ]
 }

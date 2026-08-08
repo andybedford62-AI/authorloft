@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## August 8, 2026 — Self-serve custom domains (bring your own)
+
+Repo audit found `Author.customDomain` and hostname-based routing already existed, but the only way to actually set it was a super-admin manually editing the field *and* separately adding the domain in the Vercel dashboard by hand — no author-facing UI, no Vercel API integration, no verification flow. Built the missing half:
+
+- **`src/lib/vercel-domains.ts`** — thin client over Vercel's Domains API (`addDomain`, `getDomainStatus`, `removeDomain`), scoped to `VERCEL_PROJECT_ID` (+ optional `VERCEL_TEAM_ID`).
+- **`/api/admin/settings/custom-domain`** (GET/POST/DELETE) — plan-gated (Standard/Premium, via the existing `canUseFeature`), rate-limited, validates domain format, registers with Vercel, and stores status (`PENDING`/`VERIFIED`/`ERROR`) + the DNS record to show. A `?refresh=1` GET re-polls Vercel for both ownership verification and live DNS configuration.
+- **Admin → Settings → Custom Domain card** — self-serve: type a domain, get the exact DNS record to add, check status on demand, and **unlink** at any time — unlinking just clears `Author.customDomain`, which every author-lookup query and the routing middleware already fall back to `slug` for, so reverting to the subdomain needed no extra code.
+- Schema: added `customDomainStatus`, `customDomainVerification` (cached DNS records), `customDomainAddedAt` to `Author`.
+- Scope: bring-your-own-domain only — no domain purchasing/registrar integration (author still buys the domain themselves elsewhere, e.g. Namecheap/GoDaddy).
+- **Not yet live**: needs `VERCEL_API_TOKEN` set in Vercel env vars before the linking flow will work — code is deployed but gated on that token being configured.
+
 ## August 8, 2026 — Security hardening sweep + branch cleanup
 
 Repo audit surfaced a security-fix branch (`claude/authorloft-project-access-v6ufnd`, May 2026) that never got merged. Its diff was 3 months stale against current `dev` — a raw merge would have reverted since-added features (pre-order fields, bookstore listing limits, www-canonicalization/sitemap routing in `proxy.ts`). Re-applied the still-relevant fixes by hand instead of merging:

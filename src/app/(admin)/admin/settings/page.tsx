@@ -1213,6 +1213,208 @@ function SiteUrlSection() {
   );
 }
 
+// ── Custom Domain (bring your own) ──────────────────────────────────────────────
+
+type CustomDomainState = {
+  domain: string | null;
+  status?: "PENDING" | "VERIFIED" | "ERROR" | null;
+  dnsInstructions?: { type: string; name: string; value: string } | null;
+};
+
+function CustomDomainSection() {
+  const toast = useToast();
+
+  const [loading, setLoading]   = useState(true);
+  const [gated, setGated]       = useState(false);
+  const [gateReason, setGateReason] = useState("");
+  const [state, setState]       = useState<CustomDomainState | null>(null);
+  const [input, setInput]       = useState("");
+  const [linking, setLinking]   = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
+  const [error, setError]       = useState("");
+
+  async function load() {
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain");
+      const data = await res.json();
+      if (res.status === 403) { setGated(true); setGateReason(data.error || ""); return; }
+      setState(data);
+    } catch {
+      // best-effort — leave state null, section stays quiet rather than erroring loudly
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  async function handleLink() {
+    setError("");
+    if (!input.trim()) return;
+    setLinking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: input.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Could not link that domain."); return; }
+      setState(data);
+      setInput("");
+      toast("success", "Domain linked — add the DNS record below to finish setup.");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLinking(false);
+    }
+  }
+
+  async function handleCheck() {
+    setChecking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain?refresh=1");
+      const data = await res.json();
+      if (res.ok) {
+        setState(data);
+        if (data.status === "VERIFIED") toast("success", "Your domain is live!");
+        else if (data.status === "ERROR") toast("error", "Couldn't verify that domain — double-check the DNS record.");
+      }
+    } catch {
+      // leave current state as-is on network failure
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  async function handleUnlink() {
+    if (!state?.domain) return;
+    if (!confirm(
+      `Unlink ${state.domain}? Your site will immediately revert to its AuthorLoft subdomain address.`
+    )) return;
+    setUnlinking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain", { method: "DELETE" });
+      if (res.ok) {
+        setState({ domain: null });
+        toast("success", "Domain unlinked — your site is back on its subdomain.");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast("error", data.error || "Could not unlink that domain.");
+      }
+    } finally {
+      setUnlinking(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6">
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      </section>
+    );
+  }
+
+  if (gated) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-3">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Custom Domain
+        </h2>
+        <p className="text-sm text-gray-500">
+          {gateReason || "Custom domains are available on the Standard and Premium plans."}
+        </p>
+        <a
+          href="/admin/settings#billing"
+          className="inline-block px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+        >
+          Upgrade Plan
+        </a>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Custom Domain
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Optional — use a domain you already own instead of your AuthorLoft subdomain.
+          Unlink anytime to go back.
+        </p>
+      </div>
+
+      {!state?.domain ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 max-w-md">
+            <Input
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(""); }}
+              placeholder="yourname.com"
+              className="flex-1"
+            />
+            <Button onClick={handleLink} disabled={linking || !input.trim()}>
+              {linking ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Linking…</> : "Link domain"}
+            </Button>
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-gray-900">{state.domain}</span>
+            {state.status === "VERIFIED" && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                <Check className="h-3 w-3" /> Live
+              </span>
+            )}
+            {state.status === "PENDING" && (
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                Pending DNS
+              </span>
+            )}
+            {state.status === "ERROR" && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+                <AlertCircle className="h-3 w-3" /> Error
+              </span>
+            )}
+          </div>
+
+          {state.status !== "VERIFIED" && state.dnsInstructions && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 space-y-2">
+              <p className="font-medium">Add this DNS record at your domain registrar:</p>
+              <div className="font-mono text-xs bg-white rounded border border-blue-100 px-3 py-2 flex flex-wrap gap-x-6 gap-y-1">
+                <span>Type: <strong>{state.dnsInstructions.type}</strong></span>
+                <span>Name: <strong>{state.dnsInstructions.name}</strong></span>
+                <span>Value: <strong>{state.dnsInstructions.value}</strong></span>
+              </div>
+              <p className="text-blue-700 text-xs">
+                DNS changes can take anywhere from a few minutes to a few hours to take effect.
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={handleCheck} disabled={checking}>
+              {checking ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Checking…</> : "Check status"}
+            </Button>
+            <Button variant="danger" onClick={handleUnlink} disabled={unlinking}>
+              {unlinking
+                ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Unlinking…</>
+                : <><Trash2 className="h-4 w-4 mr-2" />Unlink</>}
+            </Button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 // ── Account tab content ───────────────────────────────────────────────────────
 
 function AccountTab() {
@@ -1288,6 +1490,9 @@ function AccountTab() {
 
       {/* Site URL */}
       <SiteUrlSection />
+
+      {/* Custom Domain */}
+      <CustomDomainSection />
 
       {/* Marketing showcase opt-in */}
       <ShowcaseToggle />

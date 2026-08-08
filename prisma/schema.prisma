@@ -122,6 +122,9 @@ model Author {
   displayName                   String?
   slug                          String                @unique
   customDomain                  String?               @unique
+  customDomainStatus            String? // "PENDING" | "VERIFIED" | "ERROR" — null when no custom domain is linked
+  customDomainVerification      Json? // DNS records Vercel wants (A/CNAME/TXT), cached so the UI can render instructions without re-polling
+  customDomainAddedAt           DateTime?
   bio                           String?               @db.Text
   shortBio                      String?
   profileImageUrl               String?
