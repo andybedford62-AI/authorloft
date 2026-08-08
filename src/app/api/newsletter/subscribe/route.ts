@@ -19,9 +19,9 @@ function checkRateLimit(key: string): boolean {
 
 const schema = z.object({
   authorId: z.string(),
-  name: z.string().optional(),
-  email: z.string().email(),
-  categoryPrefs: z.array(z.string()).optional(),
+  name: z.string().max(200).optional(),
+  email: z.string().email().max(200),
+  categoryPrefs: z.array(z.string().max(100)).max(50).optional(),
 });
 
 export async function POST(req: NextRequest) {

@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 8, 2026 — Security hardening sweep + branch cleanup
+
+Repo audit surfaced a security-fix branch (`claude/authorloft-project-access-v6ufnd`, May 2026) that never got merged. Its diff was 3 months stale against current `dev` — a raw merge would have reverted since-added features (pre-order fields, bookstore listing limits, www-canonicalization/sitemap routing in `proxy.ts`). Re-applied the still-relevant fixes by hand instead of merging:
+
+- **Stored XSS** — author media-kit "Press Biography" was rendered via `dangerouslySetInnerHTML` with zero sanitization; now runs through `sanitize()` like every other rich-text field in the app.
+- **SSRF** — media-kit image download proxy checked `url.startsWith(allowedOrigin)`, which a lookalike host (`https://<ref>.supabase.co.evil.com`) can pass; now compares full parsed `URL.origin`.
+- **Abuse/spam hardening** — added rate limiting + input validation (length caps, email/discount-code format checks) to `/api/auth/request-access` and `/api/checkout/validate-discount` (previously unlimited, discount codes were brute-forceable); added length caps to `/api/marketing/contact` and `/api/newsletter/subscribe`.
+- **DoS** — `proxy.ts` now rejects JSON bodies over 2MB before they reach route handlers.
+- Also audited: `feature/arc-management` (May 2026, unmerged) turned out to be an abandoned early prototype of ARC — the feature actually shipped later through a different, more complete implementation already live on `dev`/staging (see May 20 entry below) but never promoted to prod; branch deleted as obsolete. Pruned 20 other stale branches (mix of already-merged session branches and one deliberately-abandoned rebrand attempt) to get every branch back in sync with `dev`.
+
 ## August 7, 2026 — Course CSV bulk import (Phase 1, admin only)
 
 One-row-per-lesson CSV import at `/admin/courses/import`, mirroring the Books importer's shape (papaparse, alias-based column auto-detect, downloadable template):

@@ -32,6 +32,11 @@ export async function POST(req: NextRequest) {
   if (!email?.trim())   return NextResponse.json({ error: "Email is required" },   { status: 400 });
   if (!message?.trim()) return NextResponse.json({ error: "Message is required" }, { status: 400 });
 
+  if (name.trim().length > 200)     return NextResponse.json({ error: "Name too long (max 200 characters)." },    { status: 400 });
+  if (email.trim().length > 200)    return NextResponse.json({ error: "Email too long (max 200 characters)." },   { status: 400 });
+  if (subject?.trim().length > 200) return NextResponse.json({ error: "Subject too long (max 200 characters)." }, { status: 400 });
+  if (message.trim().length > 5000) return NextResponse.json({ error: "Message too long (max 5000 characters)." }, { status: 400 });
+
   // Resolve destination: selected SupportEmail → contactEmail → env fallback
   const [supportEmail, settings, superAdmin] = await Promise.all([
     supportEmailId

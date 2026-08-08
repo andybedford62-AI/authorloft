@@ -9,9 +9,17 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing url" }, { status: 400 });
   }
 
-  // Only proxy URLs from our own Supabase storage
+  // Only proxy URLs from our own Supabase storage — compare full origins so a
+  // lookalike host (e.g. "https://<ref>.supabase.co.evil.com") can't pass a
+  // simple prefix check, and fail closed if the env var isn't configured.
   const allowed = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (allowed && !url.startsWith(allowed)) {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return NextResponse.json({ error: "Invalid url" }, { status: 400 });
+  }
+  if (!allowed || parsedUrl.origin !== new URL(allowed).origin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

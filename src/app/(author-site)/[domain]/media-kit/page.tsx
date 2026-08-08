@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
+import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -144,7 +145,7 @@ export default async function MediaKitPage({
                     [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:mb-3
                     [&_li]:mb-1
                     [&_a]:underline"
-                  dangerouslySetInnerHTML={{ __html: bio }}
+                  dangerouslySetInnerHTML={{ __html: sanitize(bio) }}
                 />
               </div>
             ) : (

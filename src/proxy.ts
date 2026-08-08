@@ -44,6 +44,10 @@ const CSRF_EXEMPT_PATHS = [
 // State-changing methods that require CSRF protection
 const STATE_CHANGING_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
 
+// Max body size for JSON requests. File uploads use multipart/form-data and
+// enforce their own (larger) per-route limits, so this only caps JSON bodies.
+const MAX_JSON_BODY_BYTES = 2 * 1024 * 1024; // 2MB
+
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
@@ -70,6 +74,16 @@ export async function proxy(req: NextRequest) {
     wwwUrl.protocol = "https";
     wwwUrl.host = `www.${PLATFORM_DOMAIN}`;
     return NextResponse.redirect(wwwUrl, 301);
+  }
+
+  // ── JSON body size guard ──────────────────────────────────────────────────
+  // Reject obviously oversized JSON payloads before they're parsed downstream.
+  if (STATE_CHANGING_METHODS.includes(req.method)) {
+    const contentType = req.headers.get("content-type") || "";
+    const contentLength = Number(req.headers.get("content-length") || "0");
+    if (contentType.includes("application/json") && contentLength > MAX_JSON_BODY_BYTES) {
+      return NextResponse.json({ error: "Request body too large." }, { status: 413 });
+    }
   }
 
   // ── CSRF Protection ────────────────────────────────────────────────────────
