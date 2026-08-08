@@ -82,6 +82,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
+          name: "ARC (Advance Reader Copy) Management",
+          tiers: { FREE: "—", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Custom Book Pricing & Discount Codes",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
