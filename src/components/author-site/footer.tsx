@@ -121,6 +121,15 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 A platform for authors to establish their web presence, showcase their work,
                 and connect with readers worldwide.
               </p>
+              <a
+                href="https://www.authorloft.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
+                style={{ color: "#22c55e", borderColor: "#22c55e" }}
+              >
+                Join AuthorLoft
+              </a>
             </div>
 
             {/* Col 2 — Stay Updated */}

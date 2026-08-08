@@ -185,14 +185,14 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </button>
           )}
 
-          {/* Join AuthorLoft CTA — shown to non-owners */}
-          {!isOwner && (
+          {/* Login — shown to visitors who aren't signed in (incl. the author, so they can reach their own admin) */}
+          {!session?.user && (
             <a
-              href={platformBase}
+              href={`${platformBase}/login`}
               className="text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
               style={{ color: "#22c55e", borderColor: "#22c55e" }}
             >
-              Join AuthorLoft
+              Login
             </a>
           )}
         </div>
@@ -280,13 +280,14 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               </>
             )}
 
-            {!isOwner && (
+            {!session?.user && (
               <a
-                href={platformBase}
+                href={`${platformBase}/login`}
+                onClick={() => setOpen(false)}
                 className="mt-1 text-center text-sm font-semibold px-4 py-2 rounded-md border transition-colors"
                 style={{ color: "#22c55e", borderColor: "#22c55e" }}
               >
-                Join AuthorLoft
+                Login
               </a>
             )}
           </nav>
