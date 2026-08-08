@@ -6,6 +6,10 @@
  *   - `misconfigured`  → whether the domain's DNS currently points at Vercel
  *                        (A/CNAME records), i.e. whether traffic actually routes.
  * Both are surfaced so the UI can tell an author exactly what's left to do.
+ *
+ * Requires VERCEL_API_TOKEN, VERCEL_PROJECT_ID, and VERCEL_TEAM_ID to be set
+ * on every environment scope (Production, Preview, Development) — a var
+ * present only on Production won't help staging, which runs as Preview.
  */
 
 const VERCEL_API_BASE = "https://api.vercel.com";
