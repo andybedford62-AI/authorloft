@@ -169,6 +169,98 @@ export async function sendSaleNotificationEmail({
   });
 }
 
+// ── Course sale/enrollment notification (to author) — free or paid ───────────
+
+export async function sendCourseSaleNotificationEmail({
+  to,
+  authorName,
+  customerEmail,
+  customerName,
+  courseTitle,
+  priceCents,
+  orderId,
+}: {
+  to: string;
+  authorName: string;
+  customerEmail: string;
+  customerName?: string;
+  courseTitle: string;
+  priceCents: number;
+  orderId?: string;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const salesUrl = `https://www.${platformDomain}/admin/sales`;
+  const isFree = priceCents === 0;
+  const dollars = (priceCents / 100).toFixed(2);
+  const buyer = customerName ? `${esc(customerName)} (${esc(customerEmail)})` : esc(customerEmail);
+  const now = new Date().toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
+
+  return sendMail({
+    to,
+    subject: isFree ? `🎓 New enrollment — ${courseTitle}` : `💰 New sale — ${courseTitle} — $${dollars}`,
+    text: [
+      `Hi ${authorName},`,
+      isFree ? `Someone just enrolled in your course!` : `You just made a sale!`,
+      `Course: ${courseTitle}`,
+      isFree ? null : `Amount: $${dollars}`,
+      `${isFree ? "Student" : "Buyer"}: ${buyer}`,
+      `Date: ${now}`,
+      `View all sales: ${salesUrl}`,
+    ].filter((line): line is string => line !== null).join("\n\n"),
+    html: wrapHtml(isFree ? "New course enrollment! 🎓" : "You just made a sale! 🎉", `
+      <p style="margin:0 0 16px;">Hi ${esc(authorName)},</p>
+      <p style="margin:0 0 24px;">${isFree ? "Someone just enrolled in your course on AuthorLoft!" : "Great news — someone just purchased your course on AuthorLoft!"}</p>
+
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:0 0 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:6px 0;">
+              <span style="font-size:13px;color:#6b7280;">Course</span><br/>
+              <span style="font-size:15px;font-weight:600;color:#111827;">${esc(courseTitle)}</span>
+            </td>
+          </tr>
+          ${isFree ? "" : `
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Amount</span><br/>
+              <span style="font-size:22px;font-weight:700;color:#15803d;">$${dollars}</span>
+            </td>
+          </tr>`}
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">${isFree ? "Student" : "Buyer"}</span><br/>
+              <span style="font-size:14px;color:#374151;">${buyer}</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Date</span><br/>
+              <span style="font-size:14px;color:#374151;">${now}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 24px;">
+            <a href="${salesUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              View Sales Dashboard
+            </a>
+          </td>
+        </tr>
+      </table>
+      ${orderId ? `
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Order ID: <span style="font-family:monospace;">${orderId}</span>
+      </p>` : ""}
+    `),
+  });
+}
+
 // ── New signup notification (to super admin) ─────────────────────────────────
 
 export async function sendNewSignupNotificationEmail({

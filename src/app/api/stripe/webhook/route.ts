@@ -3,7 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { capturePostHog } from "@/lib/posthog";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail } from "@/lib/mailer";
+import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -168,6 +168,7 @@ export async function POST(req: NextRequest) {
                     title: true,
                     author: {
                       select: {
+                        id: true,
                         displayName: true,
                         name: true,
                         slug: true,
@@ -209,6 +210,14 @@ export async function POST(req: NextRequest) {
               if (!fi.book) continue;
               const authorEmail = fi.book.author.email;
               const authorName = fi.book.author.displayName || fi.book.author.name;
+
+              // Save the buyer as a subscriber for the author's newsletter/correspondence,
+              // same as a free reader-magnet download already does.
+              prisma.subscriber.upsert({
+                where: { authorId_email: { authorId: fi.book.author.id, email: customerEmail } },
+                update: { name: customerName },
+                create: { authorId: fi.book.author.id, email: customerEmail, name: customerName, isConfirmed: true },
+              }).catch((e) => console.error("[webhook] Failed to upsert subscriber:", e));
 
               sendSaleNotificationEmail({
                 to:            authorEmail,
@@ -354,7 +363,7 @@ export async function POST(req: NextRequest) {
 
             const course = await prisma.course.findUnique({
               where: { id: courseId },
-              select: { title: true, slug: true, priceCents: true, author: { select: { slug: true, displayName: true, name: true } } },
+              select: { title: true, slug: true, priceCents: true, author: { select: { id: true, slug: true, displayName: true, name: true, email: true } } },
             });
 
             if (course) {
@@ -371,6 +380,24 @@ export async function POST(req: NextRequest) {
                 isPaid: true,
                 priceCents: course.priceCents,
               }).catch((e) => console.error("[webhook] Failed to send course access email:", e));
+
+              // Save the buyer as a subscriber, same as a paid book purchase now does.
+              prisma.subscriber.upsert({
+                where: { authorId_email: { authorId: course.author.id, email: customerEmail } },
+                update: { name: customerName },
+                create: { authorId: course.author.id, email: customerEmail, name: customerName, isConfirmed: true },
+              }).catch((e) => console.error("[webhook] Failed to upsert subscriber:", e));
+
+              // Notify the author someone purchased their course, same as a book sale does.
+              sendCourseSaleNotificationEmail({
+                to: course.author.email,
+                authorName,
+                customerEmail,
+                customerName,
+                courseTitle: course.title,
+                priceCents: course.priceCents,
+                orderId: order.id,
+              }).catch((e) => console.error("[webhook] Failed to send course author notification:", e));
             }
           }
         }

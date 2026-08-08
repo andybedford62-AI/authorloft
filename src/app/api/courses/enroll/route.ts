@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendCourseAccessEmail } from "@/lib/mailer";
+import { sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { z } from "zod";
 
 const schema = z.object({
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   const course = await prisma.course.findUnique({
     where: { id: courseId },
-    select: { id: true, title: true, slug: true, isPublished: true, priceCents: true, authorId: true, author: { select: { slug: true, displayName: true, name: true } } },
+    select: { id: true, title: true, slug: true, isPublished: true, priceCents: true, authorId: true, author: { select: { slug: true, displayName: true, name: true, email: true } } },
   });
 
   if (!course || !course.isPublished) {
@@ -38,17 +38,36 @@ export async function POST(req: NextRequest) {
     select: { accessToken: true },
   });
 
+  // Save the student as a subscriber for the author's newsletter/correspondence,
+  // same as a free reader-magnet download does for books.
+  await prisma.subscriber.upsert({
+    where: { authorId_email: { authorId: course.authorId, email } },
+    update: { name },
+    create: { authorId: course.authorId, email, name, isConfirmed: true },
+  }).catch((e) => console.error("[enroll] Failed to upsert subscriber:", e));
+
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const accessUrl = `https://${course.author.slug}.${platformDomain}/courses/${course.slug}/learn?token=${enrollment.accessToken}`;
+  const authorName = course.author.displayName || course.author.name || "Author";
 
   sendCourseAccessEmail({
     to: email,
     customerName: name,
     courseTitle: course.title,
-    authorName: course.author.displayName || course.author.name || "Author",
+    authorName,
     accessUrl,
     isPaid: false,
   }).catch((e) => console.error("[enroll] Failed to send course access email:", e));
+
+  // Notify the author someone selected their course, same as a paid book sale does.
+  sendCourseSaleNotificationEmail({
+    to: course.author.email,
+    authorName,
+    customerEmail: email,
+    customerName: name,
+    courseTitle: course.title,
+    priceCents: 0,
+  }).catch((e) => console.error("[enroll] Failed to send author notification:", e));
 
   return NextResponse.json({ accessUrl, accessToken: enrollment.accessToken });
 }
