@@ -1,9 +1,14 @@
 import Image from "next/image";
-import { GraduationCap, Pin, BarChart2 } from "lucide-react";
+import Link from "next/link";
+import { GraduationCap, Pin, BarChart2, Award, Mail } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getAuthorBadges } from "@/lib/badges";
+import { AuthorBadges } from "@/components/marketing/author-badges";
+import { FoundingMemberBadge } from "@/components/marketing/founding-member-badge";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -14,7 +19,10 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
-  const description = author.bio || author.shortBio || `Learn more about ${authorName}.`;
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
+  const description = (author.bio ? stripHtml(author.bio).slice(0, 160) : null)
+    || author.shortBio
+    || `Learn more about ${authorName}.`;
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
     : [];
@@ -37,8 +45,10 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const books = await getAuthorBooks(author.id);
+  const badges = author.showBadges ? await getAuthorBadges(author.id) : [];
 
   const authorName = author.displayName || author.name;
+  const firstName = authorName.split(" ")[0];
   const accentColor = author.accentColor || "#7B2D2D";
 
   const bioHtml = (author as any).bio || (author as any).shortBio || "<p>Bio coming soon.</p>";
@@ -50,6 +60,7 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     { href: author.instagramUrl, icon: "instagram", label: "Instagram"   },
     { href: author.facebookUrl,  icon: "facebook",  label: "Facebook"    },
     { href: author.youtubeUrl,   icon: "youtube",   label: "YouTube"     },
+    { href: (author as any).supportUrl, icon: "heart", label: "Support" },
     ...(author.contactEmail ? [{ href: "/contact", icon: "mail", label: "Contact" }] : []),
   ].filter((s): s is { href: string; icon: string; label: string } => !!s.href);
 
@@ -70,8 +81,44 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     ...rawStats.filter((s) => s.value?.trim() && s.label?.trim()),
   ];
 
+  const base = getAuthorBaseUrl(author);
+  const sameAs = [
+    author.linkedinUrl, author.twitterUrl, author.instagramUrl,
+    author.facebookUrl, author.youtubeUrl,
+  ].filter((u): u is string => !!u);
+
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
+
+  const personLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: authorName,
+    url: base,
+    ...(author.profileImageUrl && { image: author.profileImageUrl }),
+    ...(author.tagline && { jobTitle: author.tagline }),
+    description: (author as any).bio
+      ? stripHtml((author as any).bio).slice(0, 300)
+      : author.shortBio || `Independent author on AuthorLoft.`,
+    ...(sameAs.length > 0 && { sameAs }),
+    ...(books.length > 0 && {
+      knowsAbout: "Writing, Publishing, Independent Author",
+      mainEntityOfPage: { "@type": "WebPage", "@id": `${base}/about` },
+    }),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "About", item: `${base}/about` },
+    ],
+  };
+
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       <PageBanner label="Biography" title="About the Author" accentColor={accentColor} />
 
@@ -96,6 +143,15 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
                 </div>
               )}
             </div>
+
+            <Link
+              href="/contact"
+              className="mt-4 flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: accentColor }}
+            >
+              <Mail className="h-4 w-4" />
+              Email {firstName}
+            </Link>
           </div>
 
           {/* ── Right: Bio content ───────────────────────────────────────────── */}
@@ -107,6 +163,11 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
               <p className="mt-1 text-base font-semibold" style={{ color: accentColor }}>
                 {author.tagline}
               </p>
+            )}
+            {(author as any).isFoundingMember && (
+              <div className="mt-3">
+                <FoundingMemberBadge since={(author as any).foundingMemberSince} />
+              </div>
             )}
 
             <hr className="my-5 border-gray-200" />
@@ -142,6 +203,17 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Achievement Badges */}
+            {badges.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Award className="h-4 w-4" style={{ color: accentColor }} />
+                  <h3 className="text-sm font-semibold text-gray-800">Achievements</h3>
+                </div>
+                <AuthorBadges badges={badges} accentColor={accentColor} />
               </div>
             )}
 

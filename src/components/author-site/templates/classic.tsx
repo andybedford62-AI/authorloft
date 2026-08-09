@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
@@ -22,13 +22,14 @@ const SERIES_GRADIENTS = [
 export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
+  const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
 
   // Credential pills — filter out blanks, only render if at least one has text
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
 
   // Featured book for hero: use heroFeaturedBook if set, otherwise fall back to isFeatured book
-  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? null;
+  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
@@ -39,7 +40,8 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+      <section className="px-4 sm:px-6 py-16" style={{ backgroundColor: accentColor + "1f" }}>
+        <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
           {/* Text + credentials */}
@@ -71,9 +73,19 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               </div>
             )}
 
-            <Link href="/about">
-              <Button variant="outline" className="mt-1">Meet the Author</Button>
-            </Link>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link href="/about">
+                <Button variant="outline">Meet the Author</Button>
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+                style={{ color: accentColor }}
+              >
+                <Mail className="h-3.5 w-3.5" />
+                Email {firstName}
+              </Link>
+            </div>
           </div>
 
           {/* Profile photo */}
@@ -91,6 +103,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               )}
             </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -128,12 +141,12 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
                       <BookOpen className="h-12 w-12 text-gray-300" />
                     </div>
                   )}
-                  {book.caption && (
+                  {(book.caption || book.isPreOrder) && (
                     <span
                       className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide text-white shadow"
                       style={{ backgroundColor: accentColor }}
                     >
-                      {book.caption}
+                      {book.caption || "Coming Soon"}
                     </span>
                   )}
                 </div>
@@ -153,7 +166,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
 
       {/* ── Browse by Series ────────────────────────────────────────────────── */}
       {series.length > 0 && (
-        <section className="bg-gray-50 py-16">
+        <section className="py-16" style={{ backgroundColor: accentColor + "1f" }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Explore</p>

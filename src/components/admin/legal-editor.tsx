@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Save, Loader2, Check, AlertTriangle, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loader2, Check, AlertTriangle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -29,6 +29,13 @@ export function LegalEditor({
   initialContactEmail,
 }: LegalEditorProps) {
   const [activeTab,    setActiveTab]    = useState<Tab>("privacy");
+
+  // Deep-link support — ?tab=terms opens the Terms tab directly (used by admin search)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+    if (tabParam && ["privacy", "terms", "contact"].includes(tabParam)) setActiveTab(tabParam);
+  }, []);
+
   const [privacy,      setPrivacy]      = useState(initialPrivacy);
   const [terms,        setTerms]        = useState(initialTerms);
   const [contactEmail, setContactEmail] = useState(initialContactEmail);
@@ -162,7 +169,7 @@ export function LegalEditor({
               ) : saved === "privacy" ? (
                 <><Check className="h-4 w-4 mr-2" />Published!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Publish Privacy Policy</>
+                <><Check className="h-4 w-4 mr-2" />Publish Privacy Policy</>
               )}
             </Button>
           </div>
@@ -210,7 +217,7 @@ export function LegalEditor({
               ) : saved === "terms" ? (
                 <><Check className="h-4 w-4 mr-2" />Published!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Publish Terms of Service</>
+                <><Check className="h-4 w-4 mr-2" />Publish Terms of Service</>
               )}
             </Button>
           </div>
@@ -244,7 +251,7 @@ export function LegalEditor({
               ) : saved === "contact" ? (
                 <><Check className="h-4 w-4 mr-2" />Saved!</>
               ) : (
-                <><Save className="h-4 w-4 mr-2" />Save Settings</>
+                <><Check className="h-4 w-4 mr-2" />Save Settings</>
               )}
             </Button>
           </div>

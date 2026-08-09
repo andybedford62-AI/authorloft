@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { randomBytes } from "crypto";
-
-async function isSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return false;
-  const allowed = (process.env.SUPER_ADMIN_EMAIL ?? "").split(",").map((e) => e.trim().toLowerCase());
-  return allowed.includes(session.user.email.toLowerCase());
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
@@ -19,14 +11,14 @@ function generateCode(): string {
 
 // GET — list all codes
 export async function GET() {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const codes = await prisma.inviteCode.findMany({ orderBy: { createdAt: "desc" } });
   return NextResponse.json(codes);
 }
 
 // POST — generate one or more codes
 export async function POST(req: NextRequest) {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body    = await req.json();
   const count   = Math.min(Math.max(Number(body.count)   || 1, 1), 50);

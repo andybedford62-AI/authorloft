@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Eye, EyeOff, ExternalLink, Loader2, BookOpen } from "lucide-react";
+import { Upload, X, Eye, EyeOff, ExternalLink, Loader2, BookOpen, Check, Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export interface FlipBookData {
   id?: string;
@@ -383,33 +384,24 @@ export function FlipBookForm({ initial, mode }: FlipBookFormProps) {
       {/* ── Actions ────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mode === "create" ? "Create Flip Book" : "Save Changes"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/flip-books")}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-lg border border-gray-300 hover:border-gray-400"
-          >
+          <Button type="submit" disabled={saving}>
+            {saving
+              ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Saving…</>
+              : mode === "create"
+                ? <><Plus className="h-4 w-4 mr-2" />Create Flip Book</>
+                : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
+          </Button>
+          <Button type="button" variant="ghost" onClick={() => router.push("/admin/flip-books")}>
             Cancel
-          </button>
+          </Button>
         </div>
 
         {mode === "edit" && initial?.id && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="px-4 py-2 text-sm text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 rounded-lg disabled:opacity-50 flex items-center gap-2"
-          >
-            {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Delete Flip Book
-          </button>
+          <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
+            {deleting
+              ? <Loader2 className="h-4 w-4 animate-spin" />
+              : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Flip Book</>}
+          </Button>
         )}
       </div>
     </form>

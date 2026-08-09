@@ -1,142 +1,53 @@
+import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
-import {
-  BookOpen,
-  Globe,
-  CreditCard,
-  Users,
-  Search,
-  Layers,
-  Mail,
-  Shield,
-  ArrowRight,
-  ChevronRight,
-  Sparkles,
-  Tag,
-  Heart,
-  Zap,
-  Wand2,
-  Star,
-  Feather,
-  Lightbulb,
-  Check,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PricingSection } from "@/components/marketing/pricing-section";
-import { ScrollReveal } from "@/components/marketing/scroll-reveal";
-import Image from "next/image";
 import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
+import { authOptions } from "@/lib/auth";
+import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
+import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
+import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
+import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
+import { RebelHero } from "@/components/marketing/rebrand-hero";
 
-export const revalidate = 3600; // fallback: refresh at most every hour
+export const revalidate = 60;
 
-// ── Data ─────────────────────────────────────────────────────────────────────
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("home");
+  return {
+    title: "Your Books. Your Readers. Your Business. | AuthorLoft",
+    description:
+      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place. Free to start.",
+    alternates: { canonical: "/" },
+    openGraph: {
+      type:        "website",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your books, your readers, your business" }],
+    },
+    twitter: {
+      card:        "summary_large_image",
+      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
+      images:      [ogImage],
+    },
+  };
+}
 
-const TRUST_ITEMS = [
-  { icon: Check, text: "Free plan, forever" },
-  { icon: Check, text: "No credit card required" },
-  { icon: Check, text: "Live in under 5 minutes" },
-];
+// ── Colors ───────────────────────────────────────────────────────────────────
 
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Create your account",
-    body: "Sign up free in seconds. No technical knowledge needed — just your name and email.",
-  },
-  {
-    step: "02",
-    title: "Add your books",
-    body: "Upload covers, write descriptions, link to retailers, and organise by series or genre.",
-  },
-  {
-    step: "03",
-    title: "Share with readers",
-    body: "Your site goes live instantly on your own subdomain. Add a custom domain whenever you're ready.",
-  },
-];
+const C = {
+  accent:      '#c9a84c',
+  accentLight: '#d4b866',
+  bg:          '#0d1520',
+  surface:     '#1c2e48',
+  border:      '#2a4268',
+  text:        '#e8e8e0',
+  muted:       '#9a9080',
+};
 
-const AUTHOR_TYPES = [
-  {
-    icon: Heart,
-    genre: "Romance & Contemporary",
-    description: "Build a beautiful home for your series, capture subscriber emails, and sell direct to your most devoted readers.",
-    gradient: "linear-gradient(135deg, #ec4899, #f43f5e)",
-  },
-  {
-    icon: Zap,
-    genre: "Thriller & Mystery",
-    description: "Dark, dramatic themes with templates designed to create tension — from the moment a reader lands on your page.",
-    gradient: "linear-gradient(135deg, #dc2626, #7c3aed)",
-  },
-  {
-    icon: Wand2,
-    genre: "Fantasy & Sci-Fi",
-    description: "Showcase complex world-building with series pages, lore sections, and a catalog that grows with your universe.",
-    gradient: "linear-gradient(135deg, #7c3aed, #2563eb)",
-  },
-  {
-    icon: Star,
-    genre: "Children's & YA",
-    description: "Bright, welcoming designs with flip-book previews so young readers can explore before they commit.",
-    gradient: "linear-gradient(135deg, #f59e0b, #10b981)",
-  },
-  {
-    icon: Feather,
-    genre: "Literary Fiction",
-    description: "Understated elegance, rich typography, and a space to share the craft and ideas behind your work.",
-    gradient: "linear-gradient(135deg, #1e293b, #334155)",
-  },
-  {
-    icon: Lightbulb,
-    genre: "Non-Fiction & Memoir",
-    description: "Lead with your credentials, build authority, and let your back catalog speak for your expertise.",
-    gradient: "linear-gradient(135deg, #0891b2, #0d9488)",
-  },
-];
-
-const features = [
-  {
-    icon: BookOpen,
-    title: "Full Book Catalog",
-    description: "List every title with cover art, series grouping, genre hierarchy, pricing, and buy links.",
-  },
-  {
-    icon: Layers,
-    title: "Series & Genre Hierarchy",
-    description: "Organize books with unlimited nesting — Fiction → Thriller → Underwater Thriller — as deep as you need.",
-  },
-  {
-    icon: Globe,
-    title: "Your Own Domain",
-    description: "Get a subdomain instantly. Bring your own custom domain on Standard and Premium plans.",
-  },
-  {
-    icon: CreditCard,
-    title: "Direct Sales",
-    description: "Sell ebooks and PDFs directly through your site. Secure Stripe checkout, instant download links.",
-  },
-  {
-    icon: Search,
-    title: "Search & Filtering",
-    description: "Readers can filter your catalog by genre, series, format, and price. Discovery made easy.",
-  },
-  {
-    icon: Mail,
-    title: "Newsletter Capture",
-    description: "Collect subscribers with category preferences. Export to Mailchimp, ConvertKit, or any tool.",
-  },
-  {
-    icon: Users,
-    title: "Flip Book Previews",
-    description: "Upload a PDF and give readers an interactive page-turn preview before they buy.",
-  },
-  {
-    icon: Shield,
-    title: "Built for Authors",
-    description: "No coding required. A purpose-built admin panel makes managing your catalog effortless.",
-  },
-];
-
-// ── Server data ───────────────────────────────────────────────────────────────
+// ── Data fetching (same as main homepage) ────────────────────────────────────
 
 async function getActivePlans() {
   return prisma.plan.findMany({
@@ -147,325 +58,369 @@ async function getActivePlans() {
       featuredLabel: true, badgeColor: true,
       maxBooks: true, maxPosts: true, maxStorageMb: true,
       customDomain: true, salesEnabled: true, newsletter: true,
-      analyticsEnabled: true, flipBooksLimit: true, isDefault: true,
+      analyticsEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, isDefault: true,
     },
     orderBy: { sortOrder: "asc" },
   }).catch(() => []);
 }
 
-async function getHeroImageUrl(): Promise<string> {
-  try {
-    const settings = await prisma.platformSettings.findUnique({
-      where:  { id: "singleton" },
-      select: { marketingHeroImageUrl: true },
-    });
-    return settings?.marketingHeroImageUrl || "/author-site-preview.png";
-  } catch {
-    return "/author-site-preview.png";
-  }
+async function getTestimonials() {
+  return prisma.testimonial.findMany({
+    where: { isActive: true },
+    orderBy: { displayOrder: "asc" },
+    take: 3,
+    select: { id: true, authorName: true, authorRole: true, quote: true, rating: true, image: true },
+  }).catch(() => []);
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+async function getShowcaseAuthors() {
+  return prisma.author.findMany({
+    where: { showInShowcase: true, isActive: true, books: { some: { isPublished: true } } },
+    select: {
+      id: true, slug: true, displayName: true, name: true, tagline: true,
+      profileImageUrl: true, customDomain: true, showcaseStyle: true,
+      books: {
+        where: { isPublished: true, coverImageUrl: { not: null } },
+        orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
+        take: 1,
+        select: { coverImageUrl: true, title: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 8,
+  }).catch(() => []);
+}
 
-export default async function MarketingPage() {
-  const [plans, heroImageUrl] = await Promise.all([getActivePlans(), getHeroImageUrl()]);
+async function getFaqs() {
+  const [items, total] = await Promise.all([
+    prisma.homepageFaq.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: 10,
+      select: { id: true, question: true, answer: true },
+    }).catch(() => []),
+    prisma.homepageFaq.count({ where: { isActive: true } }).catch(() => 0),
+  ]);
+  return { items, total };
+}
+
+// ── Structured data ──────────────────────────────────────────────────────────
+
+const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "AuthorLoft — Your Books. Your Readers. Your Business.",
+  url: PLATFORM_URL,
+  description:
+    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
+  isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: PLATFORM_URL },
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["h1", "h2", ".hero-description"],
+  },
+  about: {
+    "@type": "SoftwareApplication",
+    name: "AuthorLoft",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Free to start — no credit card required",
+    },
+    featureList: [
+      "Author Website Builder",
+      "Direct Book Sales (ebooks, print, audiobooks)",
+      "Newsletter & Email Marketing",
+      "Reader Analytics",
+      "ARC Management",
+      "Author Media Kit",
+      "AI Writing & Marketing Tools",
+      "Indie Author Bookstore",
+      "Book Pre-Orders",
+      "Affiliate Program",
+      "Custom Domain Support",
+      "Flip Book Previews",
+      "SEO Auditor",
+    ].join(", "),
+  },
+};
+
+const howToLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to launch and grow your independent author business with AuthorLoft",
+  description: "Three pillars to owning your author business: launch your storefront, sell direct, and own your reader list.",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Your Storefront",
+      text: "Launch a beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Your Sales",
+      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Your List",
+      text: "Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.",
+    },
+  ],
+};
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function HomePage() {
+  await cookies();
+  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings] = await Promise.all([
+    getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
+    getServerSession(authOptions),
+    prisma.platformSettings.findUnique({
+      where: { id: "singleton" },
+      select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
+    }).catch(() => null),
+  ]);
+
+  let isAuthor = false;
+  if (session?.user) {
+    const userId = (session.user as any).id as string;
+    if (userId) {
+      const author = await prisma.author.findUnique({ where: { id: userId }, select: { id: true } }).catch(() => null);
+      isAuthor = !!author;
+    }
+  }
+
+  const faqs = faqData.items;
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
+    })),
+  } : null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Inter', sans-serif", fontSize: '1rem', lineHeight: 1.6, WebkitFontSmoothing: 'antialiased' }}>
 
-      {/* ── Nav ───────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-gray-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image src="/AL_site_Logo-Blue.png" alt="AuthorLoft" width={160} height={48} className="h-10 w-auto" priority />
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Features</a>
-            <a href="#how-it-works" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">How it works</a>
-            <Link href="/pricing" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Pricing</Link>
-            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200">Sign In</Link>
-          </nav>
-          <Link href="/register">
-            <Button size="sm" className="shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-px">
-              Get Started Free
-            </Button>
-          </Link>
-        </div>
-      </header>
+      {/* ── Structured Data (JSON-LD) ────────────────────────────────── */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#060d1f] via-[#0d1b3e] to-[#0a1a3a] text-white min-h-[92vh] flex items-center">
-        {/* Background blobs */}
-        <div className="absolute -top-48 -right-48 w-[36rem] h-[36rem] bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-blue-400/5 rounded-full blur-2xl pointer-events-none" />
+      {/* ── Hero (with nav) ───────────────────────────────────────────── */}
+      <RebelHero
+        isAuthor={isAuthor}
+        headlineLine1={heroSettings?.heroHeadlineLine1}
+        headlineLine2={heroSettings?.heroHeadlineLine2}
+        subheadline={heroSettings?.heroSubheadline}
+      />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 grid lg:grid-cols-2 gap-16 items-center">
+      {/* ── Divider ───────────────────────────────────────────────────── */}
+      <hr style={{ border: 'none', borderTop: `1px solid ${C.border}` }} />
 
-          {/* Left — text */}
-          <div className="space-y-8">
-            <div className="animate-fade-up inline-flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5 text-sm font-medium text-blue-200">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              Now in early access — free plan available
-            </div>
+      {/* ── Problem Strip ─────────────────────────────────────────────── */}
+      <ProblemStrip />
 
-            <h1 className="animate-fade-up animate-delay-100 font-heading text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              Your books
-              <br />
-              deserve a
-              <br />
-              <span className="text-shimmer">better home.</span>
-            </h1>
+      {/* ── What Is AuthorLoft — 3 Pillars ────────────────────────────── */}
+      <PillarsSection />
 
-            <p className="animate-fade-up animate-delay-200 text-lg sm:text-xl text-blue-100/80 max-w-lg leading-relaxed">
-              AuthorLoft gives every author a beautiful website — complete with book catalog,
-              newsletter, and digital storefront — up and running in minutes.
-            </p>
+      {/* ── Comparison Table ──────────────────────────────────────────── */}
+      <ComparisonSection />
 
-            <div className="animate-fade-up animate-delay-300 flex flex-col sm:flex-row gap-3">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-950 hover:bg-blue-50 font-bold px-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto"
-                >
-                  Start for Free <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-              <a href="https://demo.authorloft.com">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/25 text-white hover:bg-white/10 transition-all duration-300 w-full sm:w-auto"
-                >
-                  View Demo Site <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </a>
-            </div>
+      {/* ── Author Showcase (dynamic from DB) ─────────────────────────── */}
+      <AuthorShowcaseSection
+        authors={showcaseAuthors}
+        platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
+      />
 
-            {/* Trust pills */}
-            <div className="animate-fade-up animate-delay-400 flex flex-wrap gap-4">
-              {TRUST_ITEMS.map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-1.5 text-sm text-blue-200/70">
-                  <Icon className="h-3.5 w-3.5 text-green-400" />
-                  {text}
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* ── Testimonials (dynamic from DB) ────────────────────────────── */}
+      <MidnightTestimonialsSection testimonials={testimonials} />
 
-          {/* Right — author site screenshot */}
-          <div className="animate-fade-up animate-delay-200 hidden lg:flex justify-end items-start">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-lg w-full">
-              <Image
-                src={heroImageUrl}
-                alt="Example author site built on AuthorLoft"
-                width={1092}
-                height={1404}
-                className="w-full h-auto"
-                priority
-                unoptimized={heroImageUrl.startsWith("http")}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Newsletter mid-page ───────────────────────────────────────── */}
+      <NewsletterMidSection />
 
-      {/* ── How it works ──────────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              Simple setup
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Live in three steps
-            </h2>
-            <p className="text-gray-500 text-lg max-w-md mx-auto">
-              No developers. No agencies. No months of waiting.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connector line on desktop */}
-            <div className="hidden md:block absolute top-10 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] h-px bg-gradient-to-r from-blue-200 via-blue-300 to-blue-200 pointer-events-none" />
-
-            {HOW_IT_WORKS.map(({ step, title, body }, i) => (
-              <ScrollReveal key={step} delay={i * 100} direction="up">
-                <div className="relative text-center space-y-4 px-4">
-                  <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25 mx-auto">
-                    <span className="text-2xl font-black tracking-tight">{step}</span>
-                  </div>
-                  <h3 className="font-heading text-xl font-bold text-gray-900">{title}</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm">{body}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-
-          <ScrollReveal className="text-center mt-14">
-            <Link href="/register">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                Create my free site <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* ── Features ──────────────────────────────────────────────────────── */}
-      <section id="features" className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              Features
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Everything an author needs
-            </h2>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              Purpose-built features that go way beyond a basic website builder.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map(({ icon: Icon, title, description }, index) => (
-              <ScrollReveal key={title} delay={index * 60} direction={index % 2 === 0 ? "up" : "scale"}>
-                <div className="group h-full bg-white rounded-xl border border-gray-200 p-6 space-y-3 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 cursor-default">
-                  <div className="p-2.5 bg-blue-50 rounded-lg w-fit group-hover:bg-blue-100 group-hover:scale-110 transition-all duration-300">
-                    <Icon className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-300">
-                    {title}
-                  </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Who It's For ──────────────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Users className="h-3.5 w-3.5" />
-              Who It&apos;s For
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Built for every kind of author
-            </h2>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              Whether you write sweeping epics or slim novellas, AuthorLoft gives you a home that fits.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {AUTHOR_TYPES.map(({ icon: Icon, genre, description, gradient }, i) => (
-              <ScrollReveal key={genre} delay={i * 70} direction={i % 3 === 1 ? "scale" : "up"}>
-                <div className="group h-full bg-white rounded-2xl border border-gray-100 p-6 space-y-3 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300"
-                    style={{ background: gradient }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{genre}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Pricing ───────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-24 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <ScrollReveal className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide mb-4">
-              <Tag className="h-3.5 w-3.5" />
-              Pricing
-            </div>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-gray-500 text-lg">
-              Start free. Upgrade when you&apos;re ready to grow.
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal direction="scale">
-            {plans.length > 0 ? (
-              <PricingSection plans={plans} />
-            ) : (
-              <div className="text-center py-12 text-gray-400 text-sm">
-                Pricing plans coming soon.
-              </div>
-            )}
-          </ScrollReveal>
-
-          <div className="text-center mt-8">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              View full feature comparison <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Final CTA ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-900 py-24">
-        <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-400/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-8">
-          <ScrollReveal>
-            <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white leading-tight">
-              Ready to build your author platform?
-            </h2>
-            <p className="text-blue-100/80 text-lg mt-4 max-w-xl mx-auto">
-              Join AuthorLoft free today. Your readers are looking for you — make it easy for them to find you.
-            </p>
-          </ScrollReveal>
-          <ScrollReveal delay={100}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-950 hover:bg-blue-50 font-bold px-10 shadow-2xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
-                >
-                  Start for Free <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-              <p className="text-blue-300/60 text-sm">No credit card · Free plan forever</p>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-400 py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center">
-            <Image src="/AL_site_Logo-Dark_footer.png" alt="AuthorLoft" width={140} height={40} className="h-8 w-auto" />
-          </div>
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
+      {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
+      <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
+          <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
+            Start free. Scale when you&apos;re ready.
+          </h2>
+          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
+          <MidnightPricingSection plans={plans} />
+          <p style={{ fontSize: '0.8125rem', color: C.muted, marginTop: 24 }}>
+            Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
+            <Link href="/pricing" style={{ color: C.muted, textDecoration: 'underline' }}>Full plan comparison →</Link>
           </p>
-          <div className="flex gap-4 text-sm">
-            <Link href="/pricing" className="hover:text-white transition-colors duration-200">Pricing</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors duration-200">Privacy</Link>
-            <Link href="/terms"   className="hover:text-white transition-colors duration-200">Terms</Link>
-            <Link href="/contact" className="hover:text-white transition-colors duration-200">Contact</Link>
-          </div>
         </div>
-      </footer>
+      </section>
+
+      {/* ── Footer CTA ────────────────────────────────────────────────── */}
+      <FooterCTA />
 
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inline section components (specific to this redesign)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ProblemStrip() {
+  const items = [
+    { icon: '📦', title: 'Retailers own your buyers', desc: "The platform keeps the relationship. You get a payout — with no idea who bought, enrolled, or is reading." },
+    { icon: '✉️', title: "Your list isn't yours", desc: "Build thousands of followers on a platform you don't control, and they can be gone overnight. Email lists built on their terms aren't yours." },
+    { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
+  ];
+  return (
+    <div style={{ background: '#111c2c', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 0 }}>
+          {items.map((item, i) => (
+            <div key={i} style={{ textAlign: 'center', padding: '24px 32px', borderRight: i < items.length - 1 ? '1px solid #2a4268' : 'none' }}>
+              <span style={{ fontSize: '1.75rem', marginBottom: 14, display: 'block' }}>{item.icon}</span>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
+              <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`@media (max-width: 820px) { .problem-strip-grid > div { border-right: none !important; border-bottom: 1px solid #2a4268; } .problem-strip-grid > div:last-child { border-bottom: none; } }`}</style>
+    </div>
+  );
+}
+
+function PillarsSection() {
+  const pillars = [
+    { num: '01', title: 'Your storefront', desc: 'A beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand — not theirs.' },
+    { num: '02', title: 'Your sales', desc: 'Sell eBooks, audiobooks, and courses direct to your audience via Stripe. Zero platform fees — every dollar from every sale goes straight to you.' },
+    { num: '03', title: 'Your list', desc: 'Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.' },
+  ];
+  return (
+    <section style={{ padding: '88px 0', textAlign: 'center', background: '#0d1520' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The solution</p>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
+          One platform.<br />Everything you own.
+        </h2>
+        <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto 52px', lineHeight: 1.72 }}>
+          AuthorLoft replaces your website, email service, payment processor, and analytics —
+          and puts you in control of every reader relationship you earn.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}>
+          {pillars.map((p) => (
+            <div key={p.num} style={{ background: '#1c2e48', padding: '40px 32px' }}>
+              <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
+              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
+              <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65 }}>{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ComparisonSection() {
+  const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
+  const rows = [
+    { label: 'Your revenue', old: 'Retailers take their cut — you see 30–70%', newVal: 'You keep 100%', newSuffix: ' of every direct sale' },
+    { label: 'Your readers', old: 'Their platform, their email list, their rules', newVal: 'Your list, always.', newSuffix: ' Nobody can take it from you.' },
+  ];
+  return (
+    <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+      <style>{`
+        .rdh-cmp-table { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #3a5580; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
+        @media (max-width: 820px) {
+          .rdh-cmp-table { grid-template-columns: 1fr; }
+          .rdh-cmp-old-head, .rdh-cmp-old-cell { display: none; }
+        }
+      `}</style>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 44 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14, margin: '0 0 14px' }}>The difference</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: 0 }}>
+            What changes when you own it.
+          </h2>
+        </div>
+        <div className="rdh-cmp-table">
+          {/* Column headers */}
+          <div className="rdh-cmp-old-head" style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#15233a', textAlign: 'center', color: '#6b7a90', borderBottom: '2px solid #3a5580' }}>The old way</div>
+          <div style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#1a3050', textAlign: 'center', color: '#c9a84c', borderBottom: '2px solid #3a5580', borderLeft: '2px solid #3a5580' }}>With AuthorLoft</div>
+
+          {rows.map((row, i) => (
+            <div key={row.label} style={{ display: 'contents' }}>
+              {/* Old way cell */}
+              <div className="rdh-cmp-old-cell" style={{ background: '#0f1a2d', padding: '32px 36px', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5c6e89', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.35rem', lineHeight: 1.4, color: '#3d4f66', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.5)', fontStyle: 'italic' }}>{row.old}</div>
+              </div>
+              {/* New way cell */}
+              <div style={{ background: '#1c3358', padding: '32px 36px', borderLeft: '2px solid #3a5580', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
+                <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a9bb5', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.5rem', lineHeight: 1.4, color: '#f0ede4' }}>
+                  <strong style={{ color: '#d4ae6a', fontWeight: 700 }}>{row.newVal}</strong>{row.newSuffix}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NewsletterMidSection() {
+  return (
+    <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '88px 0' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
+          Grow your readership.<br />Keep every reader.
+        </h2>
+        <p style={{ color: '#5a4a38', fontSize: '1.0625rem', marginBottom: 36, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.68 }}>
+          One tactic a week — direct sales, email strategy, and reader growth for independent authors. No fluff. Unsubscribe anytime.
+        </p>
+        <div style={{ maxWidth: 460, margin: '0 auto' }}>
+          <NewsSubscribeForm source="home" variant="box" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FooterCTA() {
+  return (
+    <section style={{ textAlign: 'center', padding: '112px 0', position: 'relative', overflow: 'hidden', background: '#0d1520' }}>
+      {/* Glow */}
+      <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
+        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
+          Your audience<br />is waiting.
+        </h2>
+        <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
+          Every sale through a middleman is someone you&apos;ll never reach again. Start free today and own everything you build — books, courses, or both.
+        </p>
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
+          <Link href="/register" className="rdh-btn-primary" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, background: '#c9a84c', color: '#000', padding: '15px 32px' }}>
+            Start your business — free →
+          </Link>
+          <Link href="/bookstore" className="rdh-btn-ghost" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, color: '#e8e8e0', border: '1px solid #2a4268', padding: '14px 28px', background: 'transparent' }}>
+            Browse the bookstore
+          </Link>
+        </div>
+        <p style={{ fontSize: '0.8125rem', color: '#9a9080' }}>No credit card. No lock-in. No middleman.</p>
+      </div>
+    </section>
   );
 }

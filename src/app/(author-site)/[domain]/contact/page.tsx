@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ContactForm } from "./contact-form";
 import { Mail, Clock, MessageSquare } from "lucide-react";
 import { PageBanner } from "@/components/author-site/page-banner";
-import { getThemeAccentHex } from "@/lib/themes";
+import { resolveAccentColor } from "@/lib/themes";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +47,8 @@ export default async function ContactPage({
       contactResponseTime: true,
       contactOpenTo: true,
       siteTheme: true,
+      customAccentColor: true,
+      plan: { select: { tier: true } },
       linkedinUrl: true,
       youtubeUrl: true,
       facebookUrl: true,
@@ -58,7 +60,11 @@ export default async function ContactPage({
   if (!author) notFound();
 
   const displayName = author.displayName || author.name;
-  const accentColor = getThemeAccentHex(author.siteTheme);
+  const accentColor = resolveAccentColor({
+    planTier: author.plan?.tier,
+    customAccentColor: author.customAccentColor,
+    siteTheme: author.siteTheme,
+  });
 
   const responseTime = author.contactResponseTime || "Typically within 24–48 hours";
   const openTo      = author.contactOpenTo || "Reader questions, media inquiries, speaking engagements, and book club discussions.";

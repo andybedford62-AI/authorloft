@@ -6,6 +6,9 @@ import {
   Loader2, Copy, Check, Pencil, X,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
+import { HelpTip } from "@/components/admin/help-tip";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -48,8 +51,9 @@ export default function DiscountCodesPage() {
   const [saving,     setSaving]     = useState(false);
   const [error,      setError]      = useState("");
   const [copied,     setCopied]     = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId,   setDeletingId]   = useState<string | null>(null);
+  const [togglingId,   setTogglingId]   = useState<string | null>(null);
+  const [actionError,  setActionError]  = useState("");
 
   // Edit modal state
   const [editingCode, setEditingCode] = useState<DiscountCode | null>(null);
@@ -132,6 +136,7 @@ export default function DiscountCodesPage() {
   }
 
   async function toggleActive(code: DiscountCode) {
+    setActionError("");
     setTogglingId(code.id);
     try {
       const res = await fetch(`/api/admin/discount-codes/${code.id}`, {
@@ -142,6 +147,9 @@ export default function DiscountCodesPage() {
       if (res.ok) {
         const updated = await res.json();
         setCodes((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error || "Could not update the discount code. Please try again.");
       }
     } finally {
       setTogglingId(null);
@@ -149,10 +157,16 @@ export default function DiscountCodesPage() {
   }
 
   async function deleteCode(id: string) {
+    setActionError("");
     setDeletingId(id);
     try {
       const res = await fetch(`/api/admin/discount-codes/${id}`, { method: "DELETE" });
-      if (res.ok) setCodes((prev) => prev.filter((c) => c.id !== id));
+      if (res.ok) {
+        setCodes((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error || "Could not delete the discount code. Please try again.");
+      }
     } finally {
       setDeletingId(null);
     }
@@ -235,7 +249,10 @@ export default function DiscountCodesPage() {
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Discount Codes</h1>
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          Discount Codes
+          <HelpTip id="discount-codes" />
+        </h1>
         <p className="text-sm text-gray-500 mt-1">
           Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print).
           Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.
@@ -387,17 +404,20 @@ export default function DiscountCodesPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex justify-end pt-1">
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            <Button type="submit" disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
               Create Code
-            </button>
+            </Button>
           </div>
         </form>
       </div>
+
+      {/* ── Action error ─────────────────────────────────────────────────── */}
+      {actionError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          {actionError}
+        </p>
+      )}
 
       {/* ── Code list ────────────────────────────────────────────────────── */}
       {codes.length === 0 ? (
@@ -406,7 +426,7 @@ export default function DiscountCodesPage() {
           <p className="text-gray-500 text-sm">No discount codes yet. Create one above.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -478,35 +498,36 @@ export default function DiscountCodesPage() {
                   {/* Actions */}
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => openEdit(code)}
+                      <IconButton
+                        icon={<Pencil className="h-4 w-4" />}
                         title="Edit"
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
+                        onClick={() => openEdit(code)}
+                        variant="edit"
+                      />
+                      <IconButton
+                        icon={
+                          togglingId === code.id
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : code.isActive
+                              ? <ToggleRight className="h-4 w-4" />
+                              : <ToggleLeft className="h-4 w-4" />
+                        }
+                        title={code.isActive ? "Deactivate" : "Activate"}
                         onClick={() => toggleActive(code)}
                         disabled={!!togglingId}
-                        title={code.isActive ? "Deactivate" : "Activate"}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-40"
-                      >
-                        {togglingId === code.id
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : code.isActive
-                            ? <ToggleRight className="h-4 w-4 text-green-500" />
-                            : <ToggleLeft className="h-4 w-4" />}
-                      </button>
-                      <button
+                        variant="ghost"
+                      />
+                      <IconButton
+                        icon={
+                          deletingId === code.id
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : <Trash2 className="h-4 w-4" />
+                        }
+                        title="Delete"
                         onClick={() => deleteCode(code.id)}
                         disabled={!!deletingId}
-                        title="Delete"
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
-                      >
-                        {deletingId === code.id
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : <Trash2 className="h-4 w-4" />}
-                      </button>
+                        variant="delete"
+                      />
                     </div>
                   </td>
                 </tr>
@@ -657,21 +678,13 @@ export default function DiscountCodesPage() {
               {editError && <p className="text-sm text-red-600">{editError}</p>}
 
               <div className="flex justify-end gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setEditingCode(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
+                <Button type="button" variant="ghost" onClick={() => setEditingCode(null)}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={editSaving}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                >
-                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                </Button>
+                <Button type="submit" disabled={editSaving}>
+                  {editSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
                   Save Changes
-                </button>
+                </Button>
               </div>
             </form>
           </div>

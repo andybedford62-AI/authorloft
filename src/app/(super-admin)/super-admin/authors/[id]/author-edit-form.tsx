@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Save, Loader2, CheckCircle, AlertTriangle,
-  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw,
+  Check, Loader2, CheckCircle, AlertTriangle,
+  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X, Tag, Star,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Plan = {
   id: string;
@@ -27,16 +29,23 @@ type Author = {
   contactEmail: string | null;
   isActive: boolean;
   isSuperAdmin: boolean;
+  hideNextStepsChecklist: boolean;
+  isFoundingMember: boolean;
+  foundingMemberSince: Date | null;
   planId: string | null;
 };
 
 interface Props {
   author: Author;
   plans: Plan[];
-  aiUsageCount:  number;
-  aiUsageCap:    number;
+  aiUsageCount:   number;
+  aiUsageCap:     number;
   aiUsageResetAt: Date | null;
-  hasOwnKey:     boolean;
+  hasOwnKey:      boolean;
+  trialPlanId:      string | null;
+  trialStartsAt:    Date | null;
+  trialEndsAt:      Date | null;
+  assignedCouponId: string | null;
 }
 
 function Section({ title, icon: Icon, children }: {
@@ -75,7 +84,7 @@ const inputClass =
 const textareaClass =
   "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none";
 
-export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey }: Props) {
+export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsageResetAt, hasOwnKey, trialPlanId, trialStartsAt, trialEndsAt, assignedCouponId: initialCouponId }: Props) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -88,14 +97,91 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
     shortBio:     author.shortBio     ?? "",
     tagline:      author.tagline      ?? "",
     contactEmail: author.contactEmail ?? "",
-    isActive:     author.isActive,
-    isSuperAdmin: author.isSuperAdmin,
-    planId:       author.planId       ?? "",
+    isActive:               author.isActive,
+    isSuperAdmin:           author.isSuperAdmin,
+    hideNextStepsChecklist: author.hideNextStepsChecklist,
+    isFoundingMember:       author.isFoundingMember,
+    planId:                 author.planId ?? "",
   });
 
   const [saving,  setSaving]  = useState(false);
   const [status,  setStatus]  = useState<"idle" | "success" | "error">("idle");
   const [errMsg,  setErrMsg]  = useState("");
+
+  // Founding member — instant PATCH toggle, tracked outside `form` so we can show the "since" date
+  const [foundingMemberSince, setFoundingMemberSince] = useState<Date | null>(author.foundingMemberSince);
+
+  // Trial section state
+  const [currentTrialPlanId,  setCurrentTrialPlanId]  = useState<string | null>(trialPlanId);
+  const [currentTrialEndsAt,  setCurrentTrialEndsAt]  = useState<Date | null>(trialEndsAt ?? null);
+  const [trialSelectedPlanId, setTrialSelectedPlanId] = useState<string>(trialPlanId ?? "");
+  const [trialDuration,       setTrialDuration]       = useState<number>(3);
+  const [trialSaving,         setTrialSaving]         = useState(false);
+  const [trialStatus,         setTrialStatus]         = useState<"idle" | "success" | "error">("idle");
+
+  // Coupon section state
+  const [assignedCouponId,    setAssignedCouponId]    = useState<string | null>(initialCouponId);
+  const [couponInput,         setCouponInput]         = useState("");
+  const [couponSaving,        setCouponSaving]        = useState(false);
+  const [couponStatus,        setCouponStatus]        = useState<"idle" | "success" | "error">("idle");
+  const [couponErrMsg,        setCouponErrMsg]        = useState("");
+  const [trialErrMsg,         setTrialErrMsg]         = useState("");
+
+  async function handleSetTrial() {
+    if (!trialSelectedPlanId) return;
+    setTrialSaving(true);
+    setTrialStatus("idle");
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}/trial`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ planId: trialSelectedPlanId, durationMonths: trialDuration }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCurrentTrialPlanId(trialSelectedPlanId);
+        setCurrentTrialEndsAt(new Date(data.trialEndsAt));
+        setTrialStatus("success");
+        setTimeout(() => setTrialStatus("idle"), 4000);
+      } else {
+        setTrialErrMsg(data.error || "Could not set trial.");
+        setTrialStatus("error");
+      }
+    } catch {
+      setTrialErrMsg("Network error.");
+      setTrialStatus("error");
+    } finally {
+      setTrialSaving(false);
+    }
+  }
+
+  async function handleClearTrial() {
+    setTrialSaving(true);
+    setTrialStatus("idle");
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}/trial`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ planId: null }),
+      });
+      if (res.ok) {
+        setCurrentTrialPlanId(null);
+        setCurrentTrialEndsAt(null);
+        setTrialSelectedPlanId("");
+        setTrialStatus("success");
+        setTimeout(() => setTrialStatus("idle"), 4000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setTrialErrMsg(data.error || "Could not clear trial.");
+        setTrialStatus("error");
+      }
+    } catch {
+      setTrialErrMsg("Network error.");
+      setTrialStatus("error");
+    } finally {
+      setTrialSaving(false);
+    }
+  }
 
   // AI Usage section state
   const [aiCap,      setAiCap]      = useState(aiUsageCap);
@@ -214,19 +300,17 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
           />
         </Field>
         <Field label="Short bio" hint="Used in cards and previews (1–2 sentences)">
-          <textarea
+          <RichTextEditor
             value={form.shortBio}
-            onChange={(e) => set("shortBio", e.target.value)}
-            rows={2}
-            className={textareaClass}
+            onChange={(val) => set("shortBio", val)}
+            placeholder="A brief intro shown on the homepage…"
           />
         </Field>
         <Field label="Full bio" hint="Shown on the About page">
-          <textarea
+          <RichTextEditor
             value={form.bio}
-            onChange={(e) => set("bio", e.target.value)}
-            rows={5}
-            className={textareaClass}
+            onChange={(val) => set("bio", val)}
+            placeholder="Full biography shown on the About page…"
           />
         </Field>
       </Section>
@@ -308,6 +392,176 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
         </Field>
       </Section>
 
+      {/* ── Trial Upgrade ────────────────────────────────────────────── */}
+      <Section title="Trial Upgrade" icon={Gift}>
+        <div className="space-y-4">
+          {/* Active trial banner */}
+          {currentTrialPlanId && currentTrialEndsAt && (() => {
+            const daysLeft = Math.ceil((currentTrialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            const trialPlanName = plans.find((p) => p.id === currentTrialPlanId)?.name ?? "paid";
+            const expired = daysLeft <= 0;
+            return (
+              <div className={`flex items-start justify-between gap-4 rounded-xl border px-4 py-3 ${expired ? "bg-red-50 border-red-200" : "bg-green-50 border-green-200"}`}>
+                <div>
+                  <p className={`text-sm font-semibold ${expired ? "text-red-700" : "text-green-700"}`}>
+                    {expired ? "Trial expired" : `Active ${trialPlanName} trial`}
+                  </p>
+                  <p className={`text-xs mt-0.5 ${expired ? "text-red-500" : "text-green-600"}`}>
+                    {expired
+                      ? `Expired on ${currentTrialEndsAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`
+                      : `Expires ${currentTrialEndsAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} — ${daysLeft} day${daysLeft === 1 ? "" : "s"} remaining`
+                    }
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={trialSaving}
+                  onClick={handleClearTrial}
+                  className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                  title="End trial and revert to Free"
+                >
+                  <X className="h-3.5 w-3.5" /> End trial
+                </button>
+              </div>
+            );
+          })()}
+
+          {/* No trial — set new one */}
+          {!currentTrialPlanId && (
+            <p className="text-sm text-gray-500">
+              No active trial. Grant this author a time-limited free upgrade below.
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Field label="Plan to trial">
+              <select
+                value={trialSelectedPlanId}
+                onChange={(e) => setTrialSelectedPlanId(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">— Select a plan —</option>
+                {plans.filter((p) => p.tier !== "FREE").map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name} ({plan.tier})
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Duration">
+              <select
+                value={trialDuration}
+                onChange={(e) => setTrialDuration(Number(e.target.value))}
+                className={inputClass}
+              >
+                {[1, 2, 3, 6, 12].map((m) => (
+                  <option key={m} value={m}>{m} month{m > 1 ? "s" : ""}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <Button
+            type="button"
+            disabled={trialSaving || !trialSelectedPlanId}
+            onClick={handleSetTrial}
+          >
+            {trialSaving
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{currentTrialPlanId ? "Updating…" : "Granting…"}</>
+              : <><Check className="h-4 w-4 mr-2" />{currentTrialPlanId ? "Update Trial" : "Grant Trial"}</>}
+          </Button>
+
+          <p className="text-xs text-gray-400">
+            A trial sets the author's plan immediately. They'll receive a 7-day warning email before it expires, then auto-revert to Free.
+          </p>
+
+          {trialStatus === "success" && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" /> {currentTrialPlanId ? "Trial updated." : "Trial cleared — author is back on Free."}
+            </p>
+          )}
+          {trialStatus === "error" && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" /> {trialErrMsg}
+            </p>
+          )}
+        </div>
+      </Section>
+
+      {/* ── Coupon Assignment ────────────────────────────────────────── */}
+      <Section title="Assign Coupon" icon={Tag}>
+        <div className="space-y-3">
+          <p className="text-xs text-gray-500">
+            Assign a Stripe coupon ID to this author. It will auto-apply the next time they start a subscription checkout. Create coupons first on the{" "}
+            <a href="/super-admin/coupons" className="text-purple-600 hover:underline">Coupons page</a>.
+          </p>
+
+          {assignedCouponId ? (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 border border-green-200">
+              <div>
+                <p className="text-xs font-medium text-green-800">Coupon assigned</p>
+                <code className="text-xs font-mono text-green-700">{assignedCouponId}</code>
+              </div>
+              <button
+                onClick={async () => {
+                  setCouponSaving(true); setCouponStatus("idle");
+                  const res = await fetch(`/api/super-admin/authors/${author.id}/coupon`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ couponId: null }),
+                  });
+                  setCouponSaving(false);
+                  if (res.ok) { setAssignedCouponId(null); setCouponStatus("success"); setCouponErrMsg(""); }
+                  else { setCouponStatus("error"); setCouponErrMsg("Failed to remove coupon."); }
+                }}
+                disabled={couponSaving}
+                className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-800 font-medium disabled:opacity-50"
+              >
+                {couponSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                value={couponInput}
+                onChange={e => setCouponInput(e.target.value)}
+                placeholder="Paste coupon ID (e.g. 0gNAZ9ms)"
+                className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <Button
+                onClick={async () => {
+                  if (!couponInput.trim()) return;
+                  setCouponSaving(true); setCouponStatus("idle");
+                  const res = await fetch(`/api/super-admin/authors/${author.id}/coupon`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ couponId: couponInput.trim() }),
+                  });
+                  setCouponSaving(false);
+                  if (res.ok) { setAssignedCouponId(couponInput.trim()); setCouponInput(""); setCouponStatus("success"); setCouponErrMsg(""); }
+                  else { setCouponStatus("error"); setCouponErrMsg("Failed to assign coupon."); }
+                }}
+                disabled={couponSaving || !couponInput.trim()}
+              >
+                {couponSaving ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Assigning…</> : <><Tag className="h-4 w-4 mr-1.5" />Assign</>}
+              </Button>
+            </div>
+          )}
+
+          {couponStatus === "success" && (
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" /> {assignedCouponId ? "Coupon assigned." : "Coupon removed."}
+            </p>
+          )}
+          {couponStatus === "error" && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" /> {couponErrMsg}
+            </p>
+          )}
+        </div>
+      </Section>
+
       {/* ── Account flags ────────────────────────────────────────────── */}
       <Section title="Account Flags" icon={Shield}>
         <div className="space-y-3">
@@ -335,7 +589,7 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
           </div>
 
           {/* Super admin toggle */}
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
             <div>
               <p className="text-sm font-medium text-gray-800">Super admin</p>
               <p className="text-xs text-gray-400">Grants access to the Super Admin area — use with caution</p>
@@ -352,6 +606,80 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                   form.isSuperAdmin ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Next Steps checklist — instant PATCH, no Save needed */}
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm font-medium text-gray-800">Hide Next Steps checklist</p>
+              <p className="text-xs text-gray-400">
+                {form.hideNextStepsChecklist
+                  ? "Author has dismissed this card. Toggle off to restore it."
+                  : "Next Steps card is visible on the author's dashboard."}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.hideNextStepsChecklist}
+              onClick={async () => {
+                const next = !form.hideNextStepsChecklist;
+                set("hideNextStepsChecklist", next);
+                await fetch(`/api/super-admin/authors/${author.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ hideNextStepsChecklist: next }),
+                });
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                form.hideNextStepsChecklist ? "bg-amber-500" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  form.hideNextStepsChecklist ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Founding member — instant PATCH, no Save needed */}
+          <div className="flex items-center justify-between py-2 border-t border-gray-100 pt-3">
+            <div>
+              <p className="text-sm font-medium text-gray-800 flex items-center gap-1.5">
+                <Star className={`h-3.5 w-3.5 ${form.isFoundingMember ? "fill-amber-500 text-amber-500" : "text-gray-300"}`} />
+                Founding Member
+              </p>
+              <p className="text-xs text-gray-400">
+                {form.isFoundingMember && foundingMemberSince
+                  ? `Awarded ${new Date(foundingMemberSince).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}. Shows a public badge on their author site and a badge on their dashboard.`
+                  : "Manually award founding member status — shows a public badge on their author site and a badge on their dashboard."}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.isFoundingMember}
+              onClick={async () => {
+                const next = !form.isFoundingMember;
+                set("isFoundingMember", next);
+                setFoundingMemberSince(next ? new Date() : null);
+                await fetch(`/api/super-admin/authors/${author.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ isFoundingMember: next }),
+                });
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+                form.isFoundingMember ? "bg-amber-500" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  form.isFoundingMember ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
@@ -401,28 +729,25 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
                 className={`${inputClass} w-28`}
               />
             </div>
-            <button
+            <Button
               type="button"
               disabled={aiSaving}
               onClick={() => handleAiSave({ cap: aiCap })}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {aiSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save Cap
-            </button>
+              {aiSaving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Cap</>}
+            </Button>
           </div>
 
           {/* Reset counter */}
           <div className="pt-1 border-t border-gray-100">
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={aiSaving}
               onClick={() => handleAiSave({ resetCount: true })}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset Counter to 0
-            </button>
+              <RotateCcw className="h-4 w-4 mr-2" />Reset Counter to 0
+            </Button>
             <p className="text-xs text-gray-400 mt-1.5">Resets the monthly count immediately.</p>
           </div>
 
@@ -453,17 +778,16 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
             </span>
           )}
         </div>
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {saving
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
-            : <><Save className="h-4 w-4" /> Save Changes</>
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+            : <><Check className="h-4 w-4 mr-2" />Save Changes</>
           }
-        </button>
+        </Button>
       </div>
 
     </div>

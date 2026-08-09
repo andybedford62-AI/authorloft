@@ -4,6 +4,7 @@ import { randomBytes } from "crypto";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/mailer";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -12,6 +13,24 @@ export async function POST(req: NextRequest) {
   }
 
   const authorId = (session.user as any).id as string;
+
+  // Rate limit: 5 attempts per 15 minutes per user
+  const rateLimitKey = `user:${authorId}:resend-verification`;
+  const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.auth);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: "Too many verification requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil(
+            (rateLimitResult.resetAt - Date.now()) / 1000
+          ).toString(),
+        },
+      }
+    );
+  }
 
   const author = await prisma.author.findUnique({
     where: { id: authorId },

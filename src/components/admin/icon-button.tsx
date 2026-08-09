@@ -3,15 +3,29 @@
 import { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 
-type Variant = "primary" | "success" | "danger" | "warning" | "ghost";
+// Canonical semantic variants for admin/super-admin icon actions.
+// Keep this list small so the whole admin reads as one cohesive palette.
+type Variant = "edit" | "add" | "delete" | "warning" | "view" | "ghost";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white",
-  success: "bg-green-600 hover:bg-green-700 text-white",
-  danger:  "bg-red-600  hover:bg-red-700  text-white",
-  warning: "bg-amber-500 hover:bg-amber-600 text-white",
-  ghost:   "bg-transparent hover:bg-gray-100 text-gray-600",
+  edit:    "text-blue-600  hover:text-blue-700  hover:bg-blue-50",   // edit / configure
+  add:     "text-green-600 hover:text-green-700 hover:bg-green-50",  // add / create / activate / save
+  delete:  "text-red-600   hover:text-red-700   hover:bg-red-50",    // destructive
+  warning: "text-amber-600 hover:text-amber-700 hover:bg-amber-50",  // deactivate / caution / archive
+  view:    "text-gray-900  hover:text-gray-800  hover:bg-gray-100",  // view / preview
+  ghost:   "text-gray-500  hover:text-gray-700  hover:bg-gray-100",  // secondary / more / reorder / cancel
 };
+
+interface IconButtonProps {
+  icon:      ReactNode;
+  title:     string;
+  onClick?:  () => void;
+  disabled?: boolean;
+  loading?:  boolean;
+  variant?:  Variant;
+  type?:     "button" | "submit";
+  className?: string;
+}
 
 export function IconButton({
   icon,
@@ -21,15 +35,8 @@ export function IconButton({
   loading  = false,
   variant  = "ghost",
   type     = "button",
-}: {
-  icon:      ReactNode;
-  title:     string;
-  onClick?:  () => void;
-  disabled?: boolean;
-  loading?:  boolean;
-  variant?:  Variant;
-  type?:     "button" | "submit";
-}) {
+  className,
+}: IconButtonProps) {
   return (
     <button
       type={type}
@@ -41,6 +48,7 @@ export function IconButton({
         relative group/tip p-1.5 rounded transition-colors cursor-pointer
         disabled:opacity-50 disabled:cursor-not-allowed
         ${VARIANT_CLASSES[variant]}
+        ${className || ""}
       `}
     >
       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon}

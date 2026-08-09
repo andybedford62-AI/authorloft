@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Loader2, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit, Check, X } from "lucide-react";
+import { Plus, Loader2, Check, ExternalLink, ToggleLeft, ToggleRight, Trash2, Edit } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -36,7 +37,8 @@ export function RetailerLinks({ bookId }: Props) {
   const [saving, setSaving] = useState(false);
 
   // Per-link pending state (for activate/deactivate/delete)
-  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [pending,      setPending]      = useState<Record<string, boolean>>({});
+  const [actionError,  setActionError]  = useState("");
 
   // Per-link edit state
   const [editing, setEditing] = useState<Record<string, boolean>>({});
@@ -91,6 +93,7 @@ export function RetailerLinks({ bookId }: Props) {
 
   // ── Toggle active ──────────────────────────────────────────────────────────
   async function toggleActive(link: RetailerLink) {
+    setActionError("");
     setPending((p) => ({ ...p, [link.id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/retailers/${link.id}`, {
       method: "PATCH",
@@ -100,6 +103,9 @@ export function RetailerLinks({ bookId }: Props) {
     if (res.ok) {
       const updated = await res.json();
       setLinks((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || "Could not update the link. Please try again.");
     }
     setPending((p) => ({ ...p, [link.id]: false }));
   }
@@ -107,12 +113,16 @@ export function RetailerLinks({ bookId }: Props) {
   // ── Delete ─────────────────────────────────────────────────────────────────
   async function deleteLink(id: string, label: string) {
     if (!confirm(`Remove "${label}"? This cannot be undone.`)) return;
+    setActionError("");
     setPending((p) => ({ ...p, [id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/retailers/${id}`, {
       method: "DELETE",
     });
     if (res.ok || res.status === 204) {
       setLinks((prev) => prev.filter((l) => l.id !== id));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || "Could not remove the link. Please try again.");
     }
     setPending((p) => ({ ...p, [id]: false }));
   }
@@ -191,14 +201,9 @@ export function RetailerLinks({ bookId }: Props) {
           </p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Add Link
-          </button>
+          <Button type="button" size="sm" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1.5" />Add Link
+          </Button>
         )}
       </div>
 
@@ -268,23 +273,28 @@ export function RetailerLinks({ bookId }: Props) {
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-              {saving ? "Adding…" : "Add Link"}
-            </button>
-            <button
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
+                : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Link</>}
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => { setAdding(false); setAddError(""); setUrl(""); setCustomLabel(""); }}
-              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
+      )}
+
+      {/* ── Action error ─────────────────────────────────────────────────────── */}
+      {actionError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {actionError}
+        </p>
       )}
 
       {/* ── Link list ────────────────────────────────────────────────────────── */}
@@ -415,28 +425,12 @@ export function RetailerLinks({ bookId }: Props) {
                     {error && <p className="text-xs text-red-600">{error}</p>}
 
                     <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => saveEdit(link)}
-                        disabled={isBusy}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-                      >
-                        {isBusy ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Check className="h-3.5 w-3.5" />
-                        )}
-                        {isBusy ? "Saving…" : "Save"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => cancelEdit(link.id)}
-                        disabled={isBusy}
-                        className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors disabled:opacity-60"
-                      >
-                        <X className="h-3.5 w-3.5" />
+                      <Button type="button" size="sm" disabled={isBusy} onClick={() => saveEdit(link)}>
+                        {isBusy ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" disabled={isBusy} onClick={() => cancelEdit(link.id)}>
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}

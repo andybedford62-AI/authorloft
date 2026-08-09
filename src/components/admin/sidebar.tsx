@@ -5,111 +5,37 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard,
-  BookOpen,
-  BookMarked,
-  Tag,
-  Sparkles,
-  Library,
-  Palette,
-  Paintbrush,
-  Mail,
-  Inbox,
-  ShoppingBag,
-  Settings,
   ExternalLink,
   ChevronDown,
   LogOut,
-  Users,
-  CreditCard,
-  FileText,
-  Newspaper,
   Shield,
-  Bot,
-  Search,
   Sun,
   Moon,
   Lock,
-  BarChart2,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
+import { CommandPalette } from "@/components/admin/command-palette";
+import {
+  ADMIN_PINNED_ITEMS,
+  NAV_GROUPS,
+  SUPER_ADMIN_PINNED_ITEMS,
+  SUPER_ADMIN_GROUPS,
+  type NavGroup,
+} from "@/lib/admin-nav-groups";
 
 // ── Types ───────────────────────────────────────────────────────────────────
-
-interface NavItem {
-  href:     string;
-  label:    string;
-  icon:     React.ElementType;
-  external?: boolean;
-}
-
-interface NavGroup {
-  key:         string;
-  label:       string;
-  defaultOpen: boolean;
-  items:       NavItem[];
-}
 
 interface SidebarProps {
   authorName:    string;
   authorSlug:    string;
   isSuperAdmin?: boolean;
+  isFoundingMember?: boolean;
   planTier?:     string;
   featureGates?: Record<string, string>;
   adminTheme?:   "dark" | "light";
 }
-
-// ── Nav structure ────────────────────────────────────────────────────────────
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    key: "content", label: "Content", defaultOpen: true,
-    items: [
-      { href: "/admin/books",      label: "Books",       icon: BookOpen   },
-      { href: "/admin/flip-books", label: "Flip Books",  icon: BookMarked },
-      { href: "/admin/specials",   label: "Specials",    icon: Sparkles   },
-      { href: "/admin/series",     label: "Series",      icon: Library    },
-      { href: "/admin/pages",      label: "Pages",       icon: FileText   },
-      { href: "/admin/blog",       label: "Blog / News", icon: Newspaper  },
-    ],
-  },
-  {
-    key: "marketing", label: "Marketing", defaultOpen: true,
-    items: [
-      { href: "/admin/newsletter",      label: "Newsletter",      icon: Mail       },
-      { href: "/admin/sales",           label: "Sales",           icon: ShoppingBag},
-      { href: "/admin/discount-codes",  label: "Discount Codes",  icon: Tag        },
-      { href: "/admin/ai-assistant",    label: "AI Assistant",    icon: Bot        },
-      { href: "/admin/seo-audit",       label: "SEO Audit",       icon: Search     },
-    ],
-  },
-  {
-    key: "customize", label: "Customize", defaultOpen: false,
-    items: [
-      { href: "/admin/appearance", label: "Appearance", icon: Paintbrush },
-      { href: "/admin/branding",   label: "Branding",   icon: Palette    },
-    ],
-  },
-  {
-    key: "account", label: "Account", defaultOpen: false,
-    items: [
-      { href: "/admin/messages",  label: "Messages",      icon: Inbox    },
-      { href: "/admin/legal",     label: "My Site Legal", icon: Shield   },
-      { href: "/admin/settings",  label: "Settings",      icon: Settings },
-    ],
-  },
-];
-
-const SUPER_ADMIN_ITEMS: NavItem[] = [
-  { href: "/super-admin/authors",        label: "All Authors",   icon: Users      },
-  { href: "/super-admin/plans",          label: "Plans",         icon: CreditCard },
-  { href: "/super-admin/feature-config", label: "Feature Gates", icon: Bot        },
-  { href: "/admin/genres",               label: "Genres",        icon: Tag        },
-  { href: "/super-admin/legal",          label: "Legal",         icon: Shield     },
-  { href: "/super-admin/settings",       label: "Platform",      icon: Settings   },
-  { href: "https://us.posthog.com/shared/PJJkxbjMkF2F5sJe-XCSQ6Cx0gYM6g", label: "Analytics", icon: BarChart2, external: true },
-];
 
 // ── Theme token helper ───────────────────────────────────────────────────────
 // Returns a set of class strings based on the active theme so that the
@@ -131,10 +57,17 @@ function tokens(theme: "dark" | "light") {
       : "text-[#6b5f53] hover:text-[#3d3328] hover:bg-[#e8e0d4]",
     navActive:    "bg-blue-600 text-white",
     superActive:  dark ? "bg-purple-700 text-white" : "bg-purple-600 text-white",
+    // Super Admin zone gets its own persistent purple wash + idle-state tint
+    // (not just an active-state color) so the whole block reads as a
+    // distinct area at a glance, not just when a link inside it is active.
+    superSectionBg: dark
+      ? "bg-purple-950/40 border border-purple-900/60"
+      : "bg-purple-50 border border-purple-200",
     superItem:    dark
-      ? "text-gray-400 hover:text-white hover:bg-gray-800"
-      : "text-[#6b5f53] hover:text-[#3d3328] hover:bg-[#e8e0d4]",
-    superLabel:   dark ? "text-gray-500"  : "text-[#9b8e7e]",
+      ? "text-purple-300 hover:text-white hover:bg-purple-900/50"
+      : "text-purple-700 hover:text-purple-950 hover:bg-purple-100",
+    superLabel:   dark ? "text-purple-400"  : "text-purple-500",
+    superHeader:  dark ? "text-purple-300"  : "text-purple-800",
     divider:      dark ? "bg-gray-800"    : "bg-[#ddd6c8]",
     signout:      dark
       ? "text-gray-400 hover:text-white hover:bg-gray-800"
@@ -255,7 +188,7 @@ function NavGroupSection({
               );
             }
 
-            const active = pathname.startsWith(href);
+            const active = pathname === href || pathname.startsWith(href + "/");
             const badge  = href === "/admin/messages" && unreadMessages > 0 ? unreadMessages : null;
             return (
               <Link
@@ -282,37 +215,91 @@ function NavGroupSection({
   );
 }
 
+// ── Super-admin collapsible group ────────────────────────────────────────────
+// Like NavGroupSection but with no feature-gating (super admins see everything)
+// and purple active styling to set the elevated section apart.
+
+function SuperNavGroupSection({
+  group, pathname, t,
+}: {
+  group: NavGroup;
+  pathname: string;
+  t: ReturnType<typeof tokens>;
+}) {
+  const storageKey = `admin-nav-${group.key}`;
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined") return group.defaultOpen;
+    const saved = localStorage.getItem(storageKey);
+    return saved !== null ? saved === "true" : group.defaultOpen;
+  });
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    localStorage.setItem(storageKey, String(next));
+  };
+
+  const hasActive = group.items.some((it) => pathname.startsWith(it.href));
+  useEffect(() => {
+    if (hasActive) {
+      setOpen(true);
+      localStorage.setItem(storageKey, "true");
+    }
+  }, [hasActive, storageKey]);
+
+  return (
+    <div>
+      <button
+        onClick={toggle}
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-colors",
+          t.groupBtn
+        )}
+      >
+        <span className={t.superLabel}>{group.label}</span>
+        <ChevronDown
+          className={cn("h-3.5 w-3.5 transition-transform duration-200", t.superLabel, open && "rotate-180")}
+        />
+      </button>
+
+      {open && (
+        <div className="mt-0.5 space-y-0.5">
+          {group.items.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  active ? t.superActive : t.superItem
+                )}
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main sidebar ─────────────────────────────────────────────────────────────
 
 export function AdminSidebar({
   authorName,
   authorSlug,
   isSuperAdmin = false,
+  isFoundingMember = false,
   planTier = "FREE",
   featureGates = {},
   adminTheme = "light",
 }: SidebarProps) {
   const pathname = usePathname();
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [superOpen, setSuperOpen] = useState(false);
   const t = tokens(adminTheme);
-
-  // Load super-admin group open state from localStorage
-  useEffect(() => {
-    if (!isSuperAdmin) return;
-    const saved = localStorage.getItem("admin-nav-superadmin");
-    if (saved !== null) setSuperOpen(saved === "true");
-    else {
-      const hasActive = SUPER_ADMIN_ITEMS.some((it) => pathname.startsWith(it.href));
-      if (hasActive) setSuperOpen(true);
-    }
-  }, [isSuperAdmin, pathname]);
-
-  const toggleSuper = () => {
-    const next = !superOpen;
-    setSuperOpen(next);
-    localStorage.setItem("admin-nav-superadmin", String(next));
-  };
 
   useEffect(() => {
     fetch("/api/admin/messages?filter=inbox")
@@ -322,7 +309,7 @@ export function AdminSidebar({
   }, [pathname]);
 
   return (
-    <aside className={cn("w-64 flex-shrink-0 min-h-screen flex flex-col border-r", t.sidebar)}>
+    <aside className={cn("w-64 flex-shrink-0 h-full flex flex-col border-r", t.sidebar)}>
 
       {/* Logo */}
       <div className={cn("h-16 flex items-center px-4 gap-2 border-b", t.logoBorder)}>
@@ -348,6 +335,12 @@ export function AdminSidebar({
       <div className={cn("px-5 py-4 border-b", t.authorBorder)}>
         <p className={cn("text-xs uppercase tracking-widest mb-1", t.authorLabel)}>Your Site</p>
         <p className={cn("text-sm font-medium truncate", t.authorName)}>{authorName}</p>
+        {isFoundingMember && (
+          <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800">
+            <Star className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+            Founding Member
+          </span>
+        )}
         <a
           href={`https://${authorSlug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
           target="_blank"
@@ -361,17 +354,31 @@ export function AdminSidebar({
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
 
-        {/* Dashboard — always visible, no group */}
-        <Link
-          href="/admin/dashboard"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-            pathname.startsWith("/admin/dashboard") ? t.navActive : t.navItem
-          )}
-        >
-          <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-          Dashboard
-        </Link>
+        {/* Search — Cmd/Ctrl+K opens a searchable list of every Admin + Super Admin page */}
+        <CommandPalette
+          isSuperAdmin={isSuperAdmin}
+          planTier={planTier}
+          featureGates={featureGates}
+          adminTheme={adminTheme}
+        />
+
+        {/* Dashboard & Analytics — always visible, pinned, no group */}
+        {ADMIN_PINNED_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+          const active = exact ? pathname === href : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                active ? t.navActive : t.navItem
+              )}
+            >
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              {label}
+            </Link>
+          );
+        })}
 
         <div className={cn("h-px mx-1", t.divider)} />
 
@@ -389,77 +396,69 @@ export function AdminSidebar({
           />
         ))}
 
-        {/* Super Admin collapsible section */}
+        {/* Super Admin section — visually walled off in its own purple-tinted
+            zone (persistent background + border, not just active-state color)
+            so it reads as a distinct area even when nothing in it is active. */}
         {isSuperAdmin && (
           <>
             <div className={cn("h-px mx-1", t.divider)} />
-            <div>
-              <button
-                onClick={toggleSuper}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-colors",
-                  t.groupBtn
-                )}
-              >
-                <span className={t.superLabel}>Super Admin</span>
-                <ChevronDown
-                  className={cn("h-3.5 w-3.5 transition-transform duration-200", t.superLabel, superOpen && "rotate-180")}
-                />
-              </button>
+            <div className={cn("rounded-lg p-2 space-y-1", t.superSectionBg)}>
+              <p className={cn("flex items-center gap-1.5 px-1 pt-0.5 pb-1 text-[10px] font-bold uppercase tracking-widest", t.superHeader)}>
+                <Shield className="h-3 w-3 flex-shrink-0" />
+                Super Admin
+              </p>
 
-              {superOpen && (
-                <div className="mt-0.5 space-y-0.5">
-                  {SUPER_ADMIN_ITEMS.map(({ href, label, icon: Icon, external }) => {
-                    const active = !external && pathname.startsWith(href) &&
-                      (href !== "/admin/dashboard");
-                    const cls = cn(
+              {/* Platform Dashboard — pinned, exact-match active */}
+              {SUPER_ADMIN_PINNED_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+                const active = exact ? pathname === href : pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
                       active ? t.superActive : t.superItem
-                    );
-                    return external ? (
-                      <a
-                        key={href}
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cls}
-                      >
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {label}
-                      </a>
-                    ) : (
-                      <Link key={href} href={href} className={cls}>
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {label}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
+                    )}
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    {label}
+                  </Link>
+                );
+              })}
+
+              {SUPER_ADMIN_GROUPS.map((group) => (
+                <SuperNavGroupSection
+                  key={group.key}
+                  group={group}
+                  pathname={pathname}
+                  t={t}
+                />
+              ))}
             </div>
           </>
         )}
-      </nav>
 
-      {/* Bottom: theme indicator + sign out */}
-      <div className={cn("px-3 py-4 border-t space-y-1", t.bottomBorder)}>
-        {/* Subtle theme indicator */}
-        <div className={cn("flex items-center gap-2 px-3 py-1.5 text-xs", t.authorLabel)}>
-          {adminTheme === "dark"
-            ? <><Moon className="h-3.5 w-3.5" /> Dark mode</>
-            : <><Sun  className="h-3.5 w-3.5" /> Light mode</>}
-          <Link href="/admin/settings" className="ml-auto underline underline-offset-2 hover:opacity-80">
-            Change
-          </Link>
+        {/* Theme indicator + sign out — flow directly after the menu items
+            (not pinned to the bottom) so they shift as groups open/close */}
+        <div className={cn("h-px mx-1 mt-1", t.divider)} />
+        <div className="space-y-1 pt-1">
+          <div className={cn("flex items-center gap-2 px-3 py-1.5 text-xs", t.authorLabel)}>
+            {adminTheme === "dark"
+              ? <><Moon className="h-3.5 w-3.5" /> Dark mode</>
+              : <><Sun  className="h-3.5 w-3.5" /> Light mode</>}
+            <Link href="/admin/settings" className="ml-auto underline underline-offset-2 hover:opacity-80">
+              Change
+            </Link>
+          </div>
+          <button
+            className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
         </div>
-        <button
-          className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
-          onClick={() => signOut({ callbackUrl: "https://www.authorloft.com/login" })}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
-      </div>
+      </nav>
     </aside>
   );
 }

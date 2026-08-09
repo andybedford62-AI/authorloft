@@ -1,25 +1,13 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  const caller = await prisma.author.findUnique({
-    where: { id: (session.user as any).id },
-    select: { isSuperAdmin: true },
-  });
-  return caller?.isSuperAdmin ? session : null;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // GET /api/super-admin/authors/[id] — fetch single author for edit form
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const author = await prisma.author.findUnique({
@@ -51,23 +39,30 @@ export async function GET(
   return NextResponse.json(author);
 }
 
-// PATCH /api/super-admin/authors/[id] — toggle isActive (quick action from table)
+// PATCH /api/super-admin/authors/[id] — quick boolean toggles (table + edit form)
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
-  const { isActive } = await req.json();
+  const { isActive, hideNextStepsChecklist, isFoundingMember } = await req.json();
 
   const author = await prisma.author.update({
     where: { id },
     data: {
-      ...(typeof isActive === "boolean" && { isActive }),
+      ...(typeof isActive               === "boolean" && { isActive }),
+      ...(typeof hideNextStepsChecklist === "boolean" && { hideNextStepsChecklist }),
+      ...(typeof isFoundingMember       === "boolean" && {
+        isFoundingMember,
+        foundingMemberSince: isFoundingMember ? new Date() : null,
+      }),
     },
-    select: { id: true, name: true, slug: true, isActive: true },
+    select: {
+      id: true, name: true, slug: true, isActive: true, hideNextStepsChecklist: true,
+      isFoundingMember: true, foundingMemberSince: true,
+    },
   });
 
   return NextResponse.json(author);
@@ -78,8 +73,7 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const body = await req.json();
@@ -96,6 +90,7 @@ export async function PUT(
     contactEmail,
     isActive,
     isSuperAdmin,
+    hideNextStepsChecklist,
     planId,
   } = body;
 
@@ -125,8 +120,9 @@ export async function PUT(
       ...(shortBio      !== undefined && { shortBio: shortBio || null }),
       ...(tagline       !== undefined && { tagline: tagline || null }),
       ...(contactEmail  !== undefined && { contactEmail: contactEmail || null }),
-      ...(typeof isActive     === "boolean" && { isActive }),
-      ...(typeof isSuperAdmin === "boolean" && { isSuperAdmin }),
+      ...(typeof isActive               === "boolean" && { isActive }),
+      ...(typeof isSuperAdmin           === "boolean" && { isSuperAdmin }),
+      ...(typeof hideNextStepsChecklist === "boolean" && { hideNextStepsChecklist }),
       ...(planId !== undefined && { planId: planId || null }),
     },
     select: {
@@ -143,13 +139,13 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const superAdminId = await requireSuperAdminId();
+  if (!superAdminId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
 
   // Safety: prevent super admin from deleting themselves
-  if ((session.user as any).id === id) {
+  if (superAdminId === id) {
     return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
   }
 

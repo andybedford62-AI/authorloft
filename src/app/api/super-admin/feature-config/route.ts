@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { TIER_RANK, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
-
-async function isSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return false;
-  const allowed = (process.env.SUPER_ADMIN_EMAIL ?? "").split(",").map((e) => e.trim().toLowerCase());
-  return allowed.includes(session.user.email.toLowerCase());
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // ── Cascade: update Plan model fields to match the saved gates ────────────────
 //
@@ -50,14 +42,14 @@ async function cascadeToPlanFields(gates: Record<string, string>) {
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 export async function GET() {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const config = await prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } });
   return NextResponse.json({ gates: (config?.gates as Record<string, string>) ?? {} });
 }
 
 export async function PUT(req: NextRequest) {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { gates } = await req.json();
   if (!gates || typeof gates !== "object") {

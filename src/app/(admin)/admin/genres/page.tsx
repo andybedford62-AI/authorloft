@@ -104,14 +104,14 @@ function GenreRow({
         {/* Action buttons */}
         {editing ? (
           <div className="flex items-center gap-1 ml-2">
-            <IconButton icon={<Check className="h-4 w-4" />} title="Save" variant="success" onClick={handleSave} loading={saving} />
+            <IconButton icon={<Check className="h-4 w-4" />} title="Save" variant="ghost" onClick={handleSave} loading={saving} />
             <IconButton icon={<X className="h-4 w-4" />} title="Cancel" variant="ghost" onClick={() => { setEditing(false); setEditName(genre.name); setError(""); }} />
           </div>
         ) : (
           <div className="flex items-center gap-1 ml-2">
-            <IconButton icon={<Pencil className="h-4 w-4" />} title="Rename" variant="ghost" onClick={() => { setEditing(true); setEditName(genre.name); }} />
-            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="ghost" onClick={() => onAddChild(genre.id, genre.name)} />
-            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="ghost" onClick={handleDelete} loading={deleting} />
+            <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" onClick={() => { setEditing(true); setEditName(genre.name); }} />
+            <IconButton icon={<Plus className="h-4 w-4" />} title="Add sub-genre" variant="add" onClick={() => onAddChild(genre.id, genre.name)} />
+            <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="delete" onClick={handleDelete} loading={deleting} />
           </div>
         )}
       </div>

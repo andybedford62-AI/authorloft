@@ -1,0 +1,29 @@
+@startuml Social Promote Abuse Check
+!theme plain
+title Social Promote — Hourly Abuse Check
+
+participant "Vercel Cron\n(15 * * * *)" as Cron
+participant "/api/cron/\nsocial-promote-abuse-check" as Check
+database "Supabase" as DB
+participant "Resend" as Email
+
+Cron -> Check : GET (Bearer CRON_SECRET)
+Check -> DB : groupBy authorId,\ncount gens in last 24h
+Check -> DB : groupBy ipAddress,\ncount gens in last 24h
+Check -> DB : findUnique SocialPromoteSettings
+
+note over Check
+  avgPerAuthor = total / activeAuthors
+  authorThreshold = max(20, avg * 5)
+  ipThreshold = 100
+end note
+
+alt any author or IP over threshold
+  Check -> DB : enrich flagged authors\nwith name/email
+  Check -> Email : digest email to\nadminAlertEmails
+  Check --> Cron : {ok:true, flaggedAuthors, flaggedIps, sent:true}
+else nothing flagged
+  Check --> Cron : {ok:true, flagged:0}
+end
+
+@enduml

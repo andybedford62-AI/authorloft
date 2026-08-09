@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type PlanFormData = {
   name: string; slug: string; description: string;
   featuresText: string;  // one bullet per line, stored as newline-separated text
   monthlyPrice: string; annualPrice: string;   // dollars, e.g. "29.00"
   stripePriceIdMonthly: string; stripePriceIdAnnual: string;
-  maxBooks: string; maxPosts: string; maxStorageMb: string;
+  maxBooks: string; maxPosts: string; maxStorageMb: string; maxCourses: string;
   customDomain: boolean; salesEnabled: boolean;
-  flipBooksLimit: string;  // "0" | "3" | "-1" | any number as string
-  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
+  flipBooksLimit: string;          // "0" | "3" | "-1" | any number as string
+  bookstoreListingLimit: string;   // "-1" = unlimited, "0" = none, n = max listings
+  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean; coursesEnabled: boolean;
   badgeColor: string; featuredLabel: string; sortOrder: number;
   isActive: boolean; isDefault: boolean;
 };
@@ -21,10 +24,10 @@ type Plan = {
   featuresJson: string | null;
   monthlyPriceCents: number; annualPriceCents: number;
   stripePriceIdMonthly: string | null; stripePriceIdAnnual: string | null;
-  maxBooks: number | null; maxPosts: number | null; maxStorageMb: number | null;
+  maxBooks: number | null; maxPosts: number | null; maxStorageMb: number | null; maxCourses: number | null;
   customDomain: boolean; salesEnabled: boolean;
-  flipBooksLimit: number;
-  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean;
+  flipBooksLimit: number; bookstoreListingLimit: number;
+  audioEnabled: boolean; newsletter: boolean; analyticsEnabled: boolean; coursesEnabled: boolean;
   badgeColor: string; featuredLabel: string | null; sortOrder: number;
   isActive: boolean; isDefault: boolean;
 };
@@ -52,6 +55,9 @@ function buildAutoFeatures(plan: Plan): string[] {
   if (plan.salesEnabled) f.push("Direct digital sales (Stripe)");
   if (plan.flipBooksLimit !== 0) {
     f.push(plan.flipBooksLimit === -1 ? "Unlimited flip books" : `Up to ${plan.flipBooksLimit} flip book${plan.flipBooksLimit === 1 ? "" : "s"}`);
+  }
+  if (plan.coursesEnabled) {
+    f.push(plan.maxCourses === null ? "Unlimited courses" : `Up to ${plan.maxCourses} course${plan.maxCourses === 1 ? "" : "s"}`);
   }
   if (plan.analyticsEnabled) f.push("Analytics dashboard");
   if (plan.maxStorageMb !== null) {
@@ -81,12 +87,15 @@ export function PlanForm({ plan }: { plan?: Plan }) {
     maxBooks: plan?.maxBooks?.toString() ?? "",
     maxPosts: plan?.maxPosts?.toString() ?? "",
     maxStorageMb: plan?.maxStorageMb?.toString() ?? "",
+    maxCourses: plan?.maxCourses?.toString() ?? "",
     customDomain: plan?.customDomain ?? false,
     salesEnabled: plan?.salesEnabled ?? false,
     flipBooksLimit: plan?.flipBooksLimit?.toString() ?? "0",
+    bookstoreListingLimit: plan?.bookstoreListingLimit?.toString() ?? "-1",
     audioEnabled: plan?.audioEnabled ?? false,
     newsletter: plan?.newsletter ?? false,
     analyticsEnabled: plan?.analyticsEnabled ?? false,
+    coursesEnabled: plan?.coursesEnabled ?? false,
     badgeColor: plan?.badgeColor ?? "gray",
     featuredLabel: plan?.featuredLabel ?? "",
     sortOrder: plan?.sortOrder ?? 0,
@@ -122,7 +131,9 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       maxBooks: form.maxBooks === "" ? null : parseInt(form.maxBooks, 10),
       maxPosts: form.maxPosts === "" ? null : parseInt(form.maxPosts, 10),
       maxStorageMb: form.maxStorageMb === "" ? null : parseInt(form.maxStorageMb, 10),
+      maxCourses: form.maxCourses === "" ? null : parseInt(form.maxCourses, 10),
       flipBooksLimit: parseInt(form.flipBooksLimit, 10),
+      bookstoreListingLimit: parseInt(form.bookstoreListingLimit, 10),
       stripePriceIdMonthly: form.stripePriceIdMonthly || null,
       stripePriceIdAnnual: form.stripePriceIdAnnual || null,
       featuredLabel: form.featuredLabel || null,
@@ -234,7 +245,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       <section className="rounded-xl bg-white border border-gray-200 p-6">
         <h2 className="font-semibold text-gray-900 mb-1">Quantity Limits</h2>
         <p className="text-xs text-gray-500 mb-5">Leave blank for unlimited (∞)</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div>
             <label className={label}>Max Books</label>
             <input type="number" min={0} value={form.maxBooks} onChange={(e) => set("maxBooks", e.target.value)} placeholder="∞ unlimited" className={input} />
@@ -242,6 +253,10 @@ export function PlanForm({ plan }: { plan?: Plan }) {
           <div>
             <label className={label}>Max Blog Posts</label>
             <input type="number" min={0} value={form.maxPosts} onChange={(e) => set("maxPosts", e.target.value)} placeholder="∞ unlimited" className={input} />
+          </div>
+          <div>
+            <label className={label}>Max Courses</label>
+            <input type="number" min={0} value={form.maxCourses} onChange={(e) => set("maxCourses", e.target.value)} placeholder="∞ unlimited" className={input} />
           </div>
           <div>
             <label className={label}>Storage (MB)</label>
@@ -287,6 +302,47 @@ export function PlanForm({ plan }: { plan?: Plan }) {
         </div>
       </section>
 
+      {/* Bookstore Listing Limit */}
+      <section className="rounded-xl bg-white border border-gray-200 p-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Bookstore Listing Limit</h2>
+        <p className="text-xs text-gray-500 mb-5">
+          How many books can authors on this plan list in the public AuthorLoft Bookstore?
+          Use <code className="text-purple-600">-1</code> for unlimited, <code className="text-purple-600">0</code> to disallow.
+        </p>
+        <div className="flex flex-wrap gap-3 mb-4">
+          {[
+            { value: "0",  label: "None",      desc: "Not allowed" },
+            { value: "3",  label: "Up to 3",   desc: "Standard" },
+            { value: "10", label: "Up to 10",  desc: "Higher tier" },
+            { value: "-1", label: "Unlimited", desc: "Premium" },
+          ].map((preset) => (
+            <button
+              key={preset.value}
+              type="button"
+              onClick={() => set("bookstoreListingLimit", preset.value)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                form.bookstoreListingLimit === preset.value
+                  ? "border-purple-500 bg-purple-50 text-purple-700"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-purple-300"
+              }`}
+            >
+              <span className="font-bold">{preset.label}</span>
+              <span className="text-xs ml-1.5 opacity-60">{preset.desc}</span>
+            </button>
+          ))}
+        </div>
+        <div className="max-w-xs">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">Custom value (0 = none, -1 = unlimited, n = exact limit)</label>
+          <input
+            type="number"
+            min={-1}
+            value={form.bookstoreListingLimit}
+            onChange={(e) => set("bookstoreListingLimit", e.target.value)}
+            className={input}
+          />
+        </div>
+      </section>
+
       {/* Features */}
       <section className="rounded-xl bg-white border border-gray-200 p-6">
         <h2 className="font-semibold text-gray-900 mb-1">Feature Access</h2>
@@ -298,6 +354,7 @@ export function PlanForm({ plan }: { plan?: Plan }) {
             { key: "audioEnabled",    label: "Audio Previews", desc: "MP3/WAV narrations & excerpts" },
             { key: "newsletter",      label: "Newsletter",     desc: "Email subscriber management" },
             { key: "analyticsEnabled",label: "Analytics",      desc: "Traffic & sales reporting" },
+            { key: "coursesEnabled",  label: "Courses",        desc: "Create & sell author courses" },
           ] as const).map(({ key, label: lbl, desc }) => (
             <label
               key={key}
@@ -368,10 +425,10 @@ export function PlanForm({ plan }: { plan?: Plan }) {
       </section>
 
       <div className="flex items-center justify-between">
-        <button type="button" onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-900">← Cancel</button>
-        <button type="submit" disabled={saving} className="rounded-lg bg-purple-600 hover:bg-purple-500 px-6 py-2.5 text-sm font-medium text-white disabled:opacity-50">
-          {saving ? "Saving…" : isEditing ? "Save Changes" : "Create Plan"}
-        </button>
+        <Button type="button" variant="ghost" onClick={() => router.back()}>Cancel</Button>
+        <Button type="submit" disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />{isEditing ? "Save Changes" : "Create Plan"}</>}
+        </Button>
       </div>
     </form>
   );

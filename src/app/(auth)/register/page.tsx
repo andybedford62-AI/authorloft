@@ -1,19 +1,17 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import {
-  Loader2, Check, X, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
+  Loader2, Check, ArrowRight, ArrowLeft, Eye, EyeOff, KeyRound, AlertTriangle,
 } from "lucide-react";
-import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { slugify } from "@/lib/utils";
-
-const PLATFORM_DOMAIN =
-  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+import { sanitize } from "@/lib/sanitize";
+import { RequestAccessModal } from "@/components/auth/RequestAccessModal";
+import { authPageStyle, authCardStyle, authPrimaryStyle, authNoticeStyle, AUTH_LINK, AUTH_BRASS, AUTH_INK } from "../auth-theme";
 
 // ── Beta status ───────────────────────────────────────────────────────────────
 
@@ -27,41 +25,6 @@ function useBetaStatus(): BetaStatus {
       .then(setStatus)
       .catch(() => setStatus({ betaMode: false, betaMessage: "" }));
   }, []);
-  return status;
-}
-
-// ── Slug availability indicator ───────────────────────────────────────────────
-
-type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
-
-function useSlugCheck(slug: string): SlugStatus {
-  const [status, setStatus] = useState<SlugStatus>("idle");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!slug) { setStatus("idle"); return; }
-    if (slug.length < 3) { setStatus("invalid"); return; }
-    if (slug.length > 40) { setStatus("invalid"); return; }
-
-    setStatus("checking");
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/auth/check-slug?slug=${encodeURIComponent(slug)}`);
-        const data = await res.json();
-        if (data.reason) {
-          setStatus("invalid");
-        } else {
-          setStatus(data.available ? "available" : "taken");
-        }
-      } catch {
-        setStatus("idle");
-      }
-    }, 400);
-
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [slug]);
-
   return status;
 }
 
@@ -81,27 +44,49 @@ function passwordStrength(p: string): { score: number; label: string; color: str
   return             { score, label: "Strong", color: "bg-green-500" };
 }
 
+// Isolated so only this sliver needs a Suspense boundary for useSearchParams —
+// the rest of the page (logo, form, Terms/Privacy links) renders in the
+// static shell instead of being deferred to client hydration along with it.
+function SearchParamsBridge({
+  setIntendedPlan,
+  setInviteError,
+}: {
+  setIntendedPlan: (plan: string | null) => void;
+  setInviteError: (error: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    setIntendedPlan(searchParams.get("plan")?.toLowerCase() ?? null);
+    if (searchParams.get("google_beta_blocked") === "1") {
+      setInviteError("Google sign-up is not available during beta. Please use your invite code below.");
+    }
+  }, [searchParams, setIntendedPlan, setInviteError]);
+  return null;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 function RegisterPageInner() {
-  const router       = useRouter();
-  const searchParams = useSearchParams();
   const betaStatus   = useBetaStatus();
 
   // betaStatus null = still loading; defer rendering until known
   const betaMode    = betaStatus?.betaMode ?? false;
   const betaMessage = betaStatus?.betaMessage ?? "";
 
-  // Step 0 = invite code (beta only); Step 1 = account; Step 2 = site URL
-  const [step, setStep] = useState<0 | 1 | 2>(1);
+  // Intended plan from marketing page (?plan=standard or ?plan=premium) —
+  // populated by SearchParamsBridge after mount.
+  const [intendedPlan, setIntendedPlan] = useState<string | null>(null);
+  const intendedPlanLabel = intendedPlan === "premium" ? "Premium" : intendedPlan === "standard" ? "Standard" : null;
+
+  // Step 0 = invite code (beta only); Step 1 = account. The site URL used to be
+  // a second step — it's now derived from the name at signup and changed later
+  // in Settings, so nothing stands between a curious visitor and an account.
+  const [step, setStep] = useState<0 | 1>(1);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   // Step 0 fields
   const [inviteCode,      setInviteCode]      = useState("");
-  const [inviteError,     setInviteError]     = useState(
-    searchParams.get("google_beta_blocked") === "1"
-      ? "Google sign-up is not available during beta. Please use your invite code below."
-      : ""
-  );
+  const [inviteError,     setInviteError]     = useState("");
 
   // Step 1 fields
   const [name,            setName]            = useState("");
@@ -109,11 +94,7 @@ function RegisterPageInner() {
   const [password,        setPassword]        = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword,    setShowPassword]    = useState(false);
-
-  // Step 2 fields
-  const [slug,          setSlug]          = useState("");
-  const [slugEdited,    setSlugEdited]    = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted,   setTermsAccepted]   = useState(false);
 
   // Once we know beta mode is on, start at step 0
   useEffect(() => {
@@ -122,17 +103,17 @@ function RegisterPageInner() {
     }
   }, [betaStatus]);
 
-  // Auto-generate slug from name
-  useEffect(() => {
-    if (!slugEdited && name) setSlug(slugify(name));
-  }, [name, slugEdited]);
-
-  const slugStatus = useSlugCheck(slug);
-  const strength   = passwordStrength(password);
+  const strength = passwordStrength(password);
 
   const [step1Error, setStep1Error] = useState("");
-  const [step2Error, setStep2Error] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [registered, setRegistered] = useState(false);
+
+  // Beta mode is off far more often than on, so the initial render assumes
+  // step 1 (the real form, with its links) rather than blocking on the
+  // fetch — crawlers and slow-JS users get real content immediately instead
+  // of an empty loading shell. The effect above flips to step 0 if beta
+  // turns out to be on.
 
   // ── Step 0: invite code ─────────────────────────────────────────────────
   function handleInviteCode(e: React.FormEvent) {
@@ -142,10 +123,11 @@ function RegisterPageInner() {
     setStep(1);
   }
 
-  // ── Step 1 validation ───────────────────────────────────────────────────
-  function handleStep1(e: React.FormEvent) {
+  // ── Submit ──────────────────────────────────────────────────────────────
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStep1Error("");
+
     if (!name.trim()) return setStep1Error("Please enter your full name.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return setStep1Error("Please enter a valid email address.");
@@ -154,22 +136,13 @@ function RegisterPageInner() {
     if (!/[0-9]/.test(password))        return setStep1Error("Password must contain at least one number.");
     if (!/[^A-Za-z0-9]/.test(password)) return setStep1Error("Password must contain at least one special character (!@#$… etc).");
     if (password !== confirmPassword)   return setStep1Error("Passwords don't match.");
-    setStep(2);
-  }
-
-  // ── Final submit ────────────────────────────────────────────────────────
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStep2Error("");
-
-    if (!termsAccepted)            return setStep2Error("You must accept the Terms of Service and Privacy Policy to create an account.");
-    if (slugStatus === "taken")    return setStep2Error("That URL is already taken. Please choose another.");
-    if (slugStatus === "invalid")  return setStep2Error("Site URL must be 3–40 characters, letters, numbers, and hyphens only.");
-    if (slugStatus === "checking") return setStep2Error("Still checking availability — please wait a moment.");
+    if (!termsAccepted)                 return setStep1Error("You must accept the Terms of Service and Privacy Policy to create an account.");
 
     setSubmitting(true);
 
     try {
+      // No slug sent — the API derives one from the name; people set the URL
+      // they actually want in Settings once they're in.
       const res = await fetch("/api/auth/register", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -177,7 +150,6 @@ function RegisterPageInner() {
           name: name.trim(),
           email: email.toLowerCase().trim(),
           password,
-          slug,
           termsAccepted,
           ...(betaMode && { inviteCode: inviteCode.trim().toUpperCase() }),
         }),
@@ -186,63 +158,36 @@ function RegisterPageInner() {
 
       if (!res.ok) {
         if (data.field === "inviteCode") { setStep(0); setInviteError(data.error); }
-        else if (data.field === "email") { setStep(1); setStep1Error(data.error); }
-        else setStep2Error(data.error || "Registration failed. Please try again.");
+        else setStep1Error(data.error || "Registration failed. Please try again.");
         setSubmitting(false);
         return;
       }
 
-      posthog.capture("signed_up", { method: "email", slug: data.slug });
+      setRegistered(true);
+      if (intendedPlan) {
+        localStorage.setItem("intendedPlan", intendedPlan);
+      }
 
-      const signInResult = await signIn("credentials", {
-        email: email.toLowerCase().trim(),
-        password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        router.push("/login?registered=1");
-      } else {
-        router.push("/admin/dashboard");
+      // Fire Google Ads signup conversion
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "conversion", { send_to: "AW-18031958972/bEq6CJbgg6QcELy3p5ZD" });
       }
     } catch {
-      setStep2Error("Something went wrong. Please try again.");
+      setStep1Error("Something went wrong. Please try again.");
       setSubmitting(false);
     }
   }
 
-  const slugIndicator = () => {
-    if (!slug) return null;
-    if (slugStatus === "checking") return <Loader2 className="h-4 w-4 animate-spin text-gray-400" />;
-    if (slugStatus === "available") return <Check className="h-4 w-4 text-green-500" />;
-    if (slugStatus === "taken")     return <X className="h-4 w-4 text-red-500" />;
-    return null;
-  };
-
-  const previewDomain =
-    process.env.NODE_ENV === "development"
-      ? `${slug || "yourname"}.localhost:3000`
-      : `${slug || "yourname"}.${PLATFORM_DOMAIN}`;
-
-  // Total steps and labels depend on beta mode
-  const totalSteps    = betaMode ? 3 : 2;
-  const stepLabels    = betaMode
-    ? ["Invite code", "Your account", "Your site URL"]
-    : ["Your account", "Your site URL"];
-  // Visual step index (0-based) for the indicator
-  const visualStep    = betaMode ? step : step - 1;
-
-  // Wait for beta status before rendering the form
-  if (betaStatus === null) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  // Only beta mode has more than one step, so the indicator is hidden otherwise.
+  const stepLabels = ["Invite code", "Your account"];
+  const totalSteps = stepLabels.length;
+  const visualStep = step;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={authPageStyle}>
+      <Suspense fallback={null}>
+        <SearchParamsBridge setIntendedPlan={setIntendedPlan} setInviteError={setInviteError} />
+      </Suspense>
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -252,22 +197,63 @@ function RegisterPageInner() {
             <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
           </Link>
           <p className="text-gray-500 mt-2 text-sm">
-            Create your free author website
+            Start your author career — free
           </p>
         </div>
 
-        {/* Step indicator */}
+        {/* ── Success: email verification prompt ── */}
+        {registered ? (
+          <div className="p-8 text-center space-y-4" style={authCardStyle}>
+            <div className="flex items-center justify-center w-14 h-14 rounded-full mx-auto" style={{ backgroundColor: "#FBF3E4" }}>
+              <svg className="h-7 w-7" style={{ color: AUTH_BRASS }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5H4.5a2.25 2.25 0 00-2.25 2.25m19.5 0-9.75 6.75L2.25 6.75" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Check your inbox!</h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              We sent a verification email to{" "}
+              <span className="font-medium text-gray-900">{email.toLowerCase().trim()}</span>.
+              <br />
+              Click the link in the email to activate your account.
+            </p>
+            <div className="px-4 py-3 text-sm text-left space-y-1" style={authNoticeStyle}>
+              <p className="font-medium">Before you can sign in:</p>
+              <ol className="list-decimal list-inside space-y-1 text-amber-700">
+                <li>Verify your email by clicking the link we just sent</li>
+                <li>Sign in to your new account</li>
+                {intendedPlanLabel && (
+                  <li>Go to <span className="font-medium">Settings → Billing</span> to upgrade to {intendedPlanLabel}</li>
+                )}
+              </ol>
+            </div>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center w-full mt-2 px-4 py-2.5 text-sm font-medium rounded-md transition-opacity hover:opacity-90"
+              style={{ backgroundColor: AUTH_BRASS, color: AUTH_INK }}
+            >
+              Go to Sign In
+            </Link>
+            <p className="text-xs text-gray-400">
+              Didn&apos;t receive it? Check your spam folder or{" "}
+              <Link href="/verify-email/invalid" className="hover:underline" style={{ color: AUTH_LINK }}>
+                resend the email
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
+        <>
+
+        {/* Step indicator — beta mode only; the normal flow is a single step */}
+        {betaMode && (
         <div className="flex items-center justify-center gap-2 mb-6">
           {stepLabels.map((label, idx) => (
             <div key={label} className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  visualStep > idx
-                    ? "bg-blue-600 text-white"
-                    : visualStep === idx
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-400"
+                  visualStep >= idx ? "" : "bg-gray-200 text-gray-400"
                 }`}
+                style={visualStep >= idx ? { backgroundColor: AUTH_BRASS, color: AUTH_INK } : undefined}
               >
                 {visualStep > idx ? <Check className="h-3.5 w-3.5" /> : idx + 1}
               </div>
@@ -278,20 +264,28 @@ function RegisterPageInner() {
             </div>
           ))}
         </div>
+        )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="p-8" style={authCardStyle}>
 
           {/* ── STEP 0: Invite code (beta only) ────────────────────────── */}
           {step === 0 && (
             <form onSubmit={handleInviteCode} className="space-y-5">
               <div>
                 <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
-                  <KeyRound className="h-5 w-5 text-blue-500" />
+                  <KeyRound className="h-5 w-5" style={{ color: AUTH_BRASS }} />
                   Enter your invite code
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {betaMessage || "AuthorLoft is currently in private beta. You need an invite code to create an account."}
-                </p>
+                {betaMessage ? (
+                  <div
+                    className="rich-content mt-1"
+                    dangerouslySetInnerHTML={{ __html: sanitize(betaMessage) }}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500 mt-1">
+                    AuthorLoft is currently in private beta. You need an invite code to create an account.
+                  </p>
+                )}
               </div>
 
               <Input
@@ -314,8 +308,8 @@ function RegisterPageInner() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                className="w-full"
+                style={authPrimaryStyle}
               >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -323,9 +317,13 @@ function RegisterPageInner() {
 
               <p className="text-center text-xs text-gray-400">
                 Don&apos;t have an invite code?{" "}
-                <a href="mailto:andybedford52+AL@gmail.com" className="text-blue-600 hover:underline">
+                <button
+                  type="button"
+                  onClick={() => setShowRequestModal(true)}
+                  className="hover:underline" style={{ color: AUTH_LINK }}
+                >
                   Request access
-                </a>
+                </button>
               </p>
             </form>
           )}
@@ -356,7 +354,7 @@ function RegisterPageInner() {
                   </div>
                 </>
               )}
-              <form onSubmit={handleStep1} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   label="Full Name"
                   name="name"
@@ -390,7 +388,7 @@ function RegisterPageInner() {
                       placeholder="Min. 8 chars, uppercase, number, symbol"
                       autoComplete="new-password"
                       required
-                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                     <button
                       type="button"
@@ -452,6 +450,29 @@ function RegisterPageInner() {
                   }
                 />
 
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => { setTermsAccepted(e.target.checked); setStep1Error(""); }}
+                    className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 cursor-pointer"
+                    style={{ accentColor: AUTH_BRASS }}
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
+                    I have read and agree to the{" "}
+                    <Link href="/terms" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
+                      Terms of Service
+                    </Link>
+                    {" "}and{" "}
+                    <Link href="/privacy" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
+                      Privacy Policy
+                    </Link>
+                    . By creating an account I confirm I am at least 18 years of age.
+                  </label>
+                </div>
+
                 {step1Error && (
                   <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                     {step1Error}
@@ -461,12 +482,20 @@ function RegisterPageInner() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
+                  disabled={submitting || !termsAccepted}
+                  className="w-full mt-2"
+                  style={authPrimaryStyle}
                 >
-                  Continue
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  {submitting ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</>
+                  ) : (
+                    <>Create my account<ArrowRight className="h-4 w-4 ml-2" /></>
+                  )}
                 </Button>
+
+                <p className="text-center text-xs text-gray-400">
+                  You&apos;ll pick your site address once you&apos;re in — it&apos;s easy to change later.
+                </p>
               </form>
 
               {betaMode && (
@@ -482,151 +511,28 @@ function RegisterPageInner() {
             </div>
           )}
 
-          {/* ── STEP 2: Site URL ────────────────────────────────────────── */}
-          {step === 2 && (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <h2 className="font-semibold text-gray-900 text-lg">Choose your site URL</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  This is the address readers will use to find your author website. You can connect a custom domain later.
-                </p>
-              </div>
-
-              {/* URL field */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">
-                  Site URL
-                </label>
-                <div className="flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden">
-                  <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => {
-                      setSlug(slugify(e.target.value));
-                      setSlugEdited(true);
-                    }}
-                    placeholder="yourname"
-                    maxLength={40}
-                    className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
-                    autoFocus
-                  />
-                  <span className="px-3 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-400 whitespace-nowrap flex-shrink-0">
-                    .{PLATFORM_DOMAIN}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5 h-5">
-                  {slugIndicator()}
-                  {slug && (
-                    <span className={`text-xs font-medium ${
-                      slugStatus === "available" ? "text-green-600" :
-                      slugStatus === "taken"     ? "text-red-600"   :
-                      slugStatus === "invalid"   ? "text-amber-600" :
-                      "text-gray-400"
-                    }`}>
-                      {slugStatus === "available" && "Available!"}
-                      {slugStatus === "taken"     && "Already taken"}
-                      {slugStatus === "invalid"   && "3–40 characters, letters, numbers, hyphens"}
-                      {slugStatus === "checking"  && "Checking…"}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Live preview */}
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-2">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  Preview
-                </p>
-                <p className="font-mono text-sm text-blue-600 break-all">
-                  {process.env.NODE_ENV === "development" ? "http" : "https"}://{previewDomain}
-                </p>
-                <p className="text-xs text-gray-400">
-                  Your readers will visit this URL to find your books, bio, and more.
-                </p>
-              </div>
-
-              {/* Terms & Conditions */}
-              <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => { setTermsAccepted(e.target.checked); setStep2Error(""); }}
-                  className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
-                />
-                <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
-                  I have read and agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
-                    Terms of Service
-                  </Link>
-                  {" "}and{" "}
-                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
-                    Privacy Policy
-                  </Link>
-                  . By creating an account I confirm I am at least 18 years of age.
-                </label>
-              </div>
-
-              {step2Error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                  {step2Error}
-                </p>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setStep(1); setStep2Error(""); }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                  style={{ "--accent": "#2563EB" } as React.CSSProperties}
-                  disabled={
-                    submitting ||
-                    !slug ||
-                    !termsAccepted ||
-                    slugStatus === "taken" ||
-                    slugStatus === "invalid" ||
-                    slugStatus === "checking"
-                  }
-                >
-                  {submitting ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating account…</>
-                  ) : (
-                    <><Check className="h-4 w-4 mr-2" />Create my account</>
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
-            Sign in
-          </Link>
-        </p>
+        {!registered && (
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
+              Sign in
+            </Link>
+          </p>
+        )}
+        </>
+        )}
       </div>
+
+      <RequestAccessModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+      />
     </div>
   );
 }
 
 export default function RegisterPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-      </div>
-    }>
-      <RegisterPageInner />
-    </Suspense>
-  );
+  return <RegisterPageInner />;
 }

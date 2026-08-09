@@ -13,7 +13,12 @@ export type ThemeId =
   | "nautical"
   | "childrens"
   | "literary"
-  | "western";
+  | "western"
+  | "cinematic"
+  // Subgenre palettes
+  | "aviation"
+  | "scuba-diving"
+  | "mountain-adventure";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -29,6 +34,7 @@ export interface ThemeDefinition {
   swatches?: string[];  // colour strip for genre palettes
   emoji?: string;
   mood?: string;
+  defaultHeroImageUrl?: string;  // curated fallback hero image when the author hasn't uploaded one
 }
 
 // ── Base Themes (Standard+) ──────────────────────────────────────────────────
@@ -60,47 +66,50 @@ export const BASE_THEMES: ThemeDefinition[] = [
   },
 ];
 
-// ── Genre Palettes (Premium only) ───────────────────────────────────────────
+// ── Genre & Style Palettes (Standard+) ──────────────────────────────────────
+// Merged genre + subgenre palettes — no internal premium/non-premium split.
+// Premium differentiation comes from custom accent/secondary colours and the
+// Cinematic page-structure template, not from palette access.
 
 export const GENRE_PALETTES: ThemeDefinition[] = [
   {
     id: "thriller",
     name: "Thriller / Suspense",
     description: "High-contrast, tense, cinematic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "thriller",
     emoji: "🎬",
     mood: "High-contrast, tense, cinematic",
-    preview: { bg: "#e5e5e5", primary: "#0b1220", accent: "#c0392b" },
+    preview: { bg: "#d8dbe0", primary: "#0b1220", accent: "#c0392b" },
     swatches: ["#0b1220", "#1a3550", "#c0392b", "#e74c3c", "#e5e5e5", "#bdc3c7", "#95a5a6", "#7f8c8d", "#2c3e50"],
   },
   {
     id: "fantasy",
     name: "Epic Fantasy",
     description: "Mythic, luminous, magical",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "fantasy",
     emoji: "✨",
     mood: "Mythic, luminous, magical",
-    preview: { bg: "#f5f0e8", primary: "#2d1b5e", accent: "#d4a843" },
+    preview: { bg: "#e9ddd0", primary: "#2d1b5e", accent: "#d4a843" },
     swatches: ["#2d1b5e", "#6b35a8", "#d4a843", "#f0c060", "#f5f0e8", "#e8dcc8", "#9b7fd4", "#4a2080", "#1a0d38"],
   },
   {
     id: "romance",
     name: "Romance",
     description: "Warm, soft, emotional",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "romance",
     emoji: "💕",
     mood: "Warm, soft, emotional",
-    preview: { bg: "#fff8f6", primary: "#7a2040", accent: "#f4a8b8" },
+    preview: { bg: "#f8e2df", primary: "#7a2040", accent: "#f4a8b8" },
     swatches: ["#7a2040", "#b84c6e", "#f4a8b8", "#ffd4a8", "#fff8f6", "#ffe4e0", "#e87090", "#c0385a", "#4a1028"],
   },
   {
     id: "scifi",
     name: "Science Fiction",
     description: "Neon, sleek, futuristic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "scifi",
     emoji: "🚀",
     mood: "Neon, sleek, futuristic",
@@ -111,49 +120,107 @@ export const GENRE_PALETTES: ThemeDefinition[] = [
     id: "nautical",
     name: "Nautical / Marine",
     description: "Pressure, depth, cold metallic",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "nautical",
     emoji: "🌊",
     mood: "Pressure, depth, cold metallic",
-    preview: { bg: "#eef4f8", primary: "#001f3f", accent: "#ff9500" },
+    preview: { bg: "#dde9f0", primary: "#001f3f", accent: "#ff9500" },
     swatches: ["#001f3f", "#003366", "#ff9500", "#ffb84d", "#eef4f8", "#c8dce8", "#4a7fa0", "#1a4060", "#002850"],
   },
   {
     id: "childrens",
     name: "Children's Books",
     description: "Bright, friendly, playful",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "childrens",
     emoji: "🌈",
     mood: "Bright, friendly, playful",
-    preview: { bg: "#ffffff", primary: "#1a5c5a", accent: "#ffd93d" },
+    preview: { bg: "#eaf8f6", primary: "#1a5c5a", accent: "#ffd93d" },
     swatches: ["#1a5c5a", "#2eada8", "#ffd93d", "#ff6b6b", "#ffffff", "#f0fafa", "#4ecdc4", "#ffe66d", "#ff8e53"],
   },
   {
     id: "literary",
     name: "Literary Fiction",
     description: "Minimalist, elegant, muted",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "literary",
     emoji: "📖",
     mood: "Minimalist, elegant, muted",
-    preview: { bg: "#fafafa", primary: "#1a1a1a", accent: "#8b6f5e" },
+    preview: { bg: "#ece7e2", primary: "#1a1a1a", accent: "#8b6f5e" },
     swatches: ["#1a1a1a", "#2c2c2c", "#8b6f5e", "#a88070", "#fafafa", "#f0f0f0", "#d4c4bc", "#6a5048", "#3a2820"],
   },
   {
     id: "western",
     name: "Country / Western",
     description: "Rustic, warm, earthy",
-    isPremium: true,
+    isPremium: false,
     dataTheme: "western",
     emoji: "🤠",
     mood: "Rustic, warm, earthy",
-    preview: { bg: "#f5ede0", primary: "#3d1f0d", accent: "#c07830" },
+    preview: { bg: "#e9d8c2", primary: "#3d1f0d", accent: "#c07830" },
     swatches: ["#3d1f0d", "#6b3518", "#c07830", "#d4944a", "#f5ede0", "#e8d4b8", "#a06028", "#804818", "#2a1008"],
+  },
+  {
+    id: "cinematic",
+    name: "Cinematic",
+    description: "Deep navy editorial with gold accents — atmospheric and immersive.",
+    isPremium: false,
+    dataTheme: "cinematic",
+    emoji: "🎬",
+    mood: "Cinematic · Editorial · Atmospheric",
+    preview: { bg: "#0A192F", primary: "#FBF6E9", accent: "#D4AF37" },
+    swatches: ["#050D1C","#0A192F","#1E3A5F","#D4AF37","#E8D08A","#B8932A","#FBF6E9","#F5EBD3","#E8DCB6"],
   },
 ];
 
-export const ALL_THEMES = [...BASE_THEMES, ...GENRE_PALETTES];
+// ── Subgenre Palettes (Standard+) ───────────────────────────────────────────
+// Specialised palettes for niche subgenres — merged with GENRE_PALETTES above
+// into STYLE_PALETTES (no separate gating). Added to over time — this is the
+// first phase (aviation, scuba/underwater).
+
+export const SUBGENRE_PALETTES: ThemeDefinition[] = [
+  {
+    id: "aviation",
+    name: "Aviation / Flying Adventure",
+    description: "Open sky, chrome cockpit, golden-hour horizon — soaring and adventurous.",
+    isPremium: false,
+    dataTheme: "aviation",
+    emoji: "✈️",
+    mood: "Soaring, technical, golden-hour adventure",
+    preview: { bg: "#dce6f0", primary: "#0E2A4A", accent: "#FF7A30" },
+    swatches: ["#0E2A4A", "#1B4D7E", "#4F9FD6", "#A9D6F0", "#F0F4F8", "#C9D6E0", "#FF7A30", "#FFB677", "#08182C"],
+    defaultHeroImageUrl: "/images/themes/aviation-hero.jpg",
+  },
+  {
+    id: "scuba-diving",
+    name: "Scuba / Underwater Adventure",
+    description: "Deep-reef teal with coral accents — immersive and exploratory.",
+    isPremium: false,
+    dataTheme: "scuba-diving",
+    emoji: "🤿",
+    mood: "Immersive, exploratory, deep-reef adventure",
+    preview: { bg: "#dbf0ee", primary: "#073B3F", accent: "#FF6F5E" },
+    swatches: ["#073B3F", "#0E5E5C", "#1FA8A0", "#7FE0D6", "#F2F9F8", "#CDEDE8", "#FF6F5E", "#FFB199", "#04282B"],
+    defaultHeroImageUrl: "/images/themes/scuba-diving-hero.jpg",
+  },
+  {
+    id: "mountain-adventure",
+    name: "Mountain / Outdoor Adventure",
+    description: "Granite peaks, pine forests, and glacier-blue horizons — rugged and expansive.",
+    isPremium: false,
+    dataTheme: "mountain-adventure",
+    emoji: "🏔️",
+    mood: "Rugged, expansive, alpine adventure",
+    preview: { bg: "#e1e7e0", primary: "#2E3D31", accent: "#4A90A4" },
+    swatches: ["#2E3D31", "#4F6B52", "#9CB89E", "#D6E2D7", "#F3F5F2", "#DCE3DD", "#4A90A4", "#A8D2DC", "#161F18"],
+    defaultHeroImageUrl: "/images/themes/mountain-adventure-hero.jpg",
+  },
+];
+
+/** Merged genre + subgenre palettes — single Standard+ collection, no internal split. */
+export const STYLE_PALETTES = [...GENRE_PALETTES, ...SUBGENRE_PALETTES];
+
+export const ALL_THEMES = [...BASE_THEMES, ...STYLE_PALETTES];
 
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];
@@ -165,19 +232,49 @@ export function getThemeAccentHex(siteTheme: string | null | undefined): string 
 }
 
 /**
- * Which themes are available per plan tier.
- * FREE   → Modern Minimal only
- * STANDARD → all 3 base themes
- * PREMIUM  → all base themes + all genre palettes
+ * Resolves the effective accent colour for an author across the public site.
+ * PREMIUM authors may override the theme accent with a custom hex colour;
+ * everyone else (and Premium authors who haven't set one) gets the theme accent.
  */
-export const BASE_THEME_IDS  = BASE_THEMES.map((t) => t.id);
-export const GENRE_PALETTE_IDS = GENRE_PALETTES.map((t) => t.id);
+export function resolveAccentColor(opts: {
+  planTier:          string | null | undefined;
+  customAccentColor: string | null | undefined;
+  siteTheme:         string | null | undefined;
+}): string {
+  if (opts.planTier === "PREMIUM" && opts.customAccentColor) {
+    return opts.customAccentColor;
+  }
+  return getThemeAccentHex(opts.siteTheme);
+}
+
+/**
+ * Resolves the Premium "secondary/highlight" colour override for the hero
+ * banner two-tone treatment. Returns null when not set (or not Premium) —
+ * callers should fall back to accent-only styling with no visual change.
+ */
+export function resolveSecondaryColor(opts: {
+  planTier:             string | null | undefined;
+  customSecondaryColor: string | null | undefined;
+}): string | null {
+  if (opts.planTier === "PREMIUM" && opts.customSecondaryColor) {
+    return opts.customSecondaryColor;
+  }
+  return null;
+}
+
+/**
+ * Which themes are available per plan tier.
+ * FREE     → all 3 base colour themes (Classic Literary, Modern Minimal, Dark Elegant)
+ * STANDARD → base themes + all genre/style palettes (STYLE_PALETTES)
+ * PREMIUM  → everything, plus Cinematic layout template + custom accent/secondary colours
+ */
+export const BASE_THEME_IDS = BASE_THEMES.map((t) => t.id);
+export const STYLE_PALETTE_IDS = STYLE_PALETTES.map((t) => t.id);
 
 export function isThemeAllowed(themeId: string, planTier: string): boolean {
-  if (planTier === "PREMIUM") return true;
-  if (planTier === "STANDARD") return BASE_THEME_IDS.includes(themeId as ThemeId);
-  // FREE — only Modern Minimal
-  return themeId === "modern-minimal";
+  if (planTier === "PREMIUM" || planTier === "STANDARD") return true;
+  // FREE — the 3 base colour themes only (no genre/style palettes)
+  return (BASE_THEME_IDS as string[]).includes(themeId);
 }
 
 /** The default theme for each plan tier (used on downgrade). */

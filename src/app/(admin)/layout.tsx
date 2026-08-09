@@ -1,11 +1,11 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/sidebar";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
-import { PostHogIdentify } from "@/components/posthog-provider";
-import { LogoutButton } from "@/components/admin/logout-button";
+import { ToastProvider } from "@/components/toast-provider";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
+import { TrialReminderBanner }   from "@/components/admin/trial-reminder-banner";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
@@ -40,7 +40,10 @@ export default async function AdminLayout({
         slug:             true,
         adminTheme:       true,
         termsAcceptedAt:  true,
+        isFoundingMember: true,
         plan:             { select: { tier: true } },
+        trialEndsAt:      true,
+        trialPlan:        { select: { name: true } },
       },
     }),
     prisma.planFeatureConfig.findUnique({ where: { id: "singleton" } }),
@@ -61,6 +64,9 @@ export default async function AdminLayout({
   const authorName   = authorRecord.displayName || authorRecord.name;
   const authorSlug   = authorRecord.slug;
   const planTier     = authorRecord.plan?.tier ?? "FREE";
+  const trialEndsAt  = authorRecord.trialEndsAt ?? null;
+  const trialPlanName = authorRecord.trialPlan?.name ?? null;
+  const isOnTrial    = !!trialEndsAt && trialEndsAt > new Date();
   const featureGates = (featureConfig?.gates as Record<string, string>) ?? {};
   const adminTheme   = (authorRecord.adminTheme === "dark" ? "dark" : "light") as "dark" | "light";
 
@@ -71,7 +77,7 @@ export default async function AdminLayout({
 
   return (
     <AdminSessionProvider>
-      <PostHogIdentify />
+      <ToastProvider />
       <div
         data-admin-theme={adminTheme}
         className="flex min-h-screen flex-col"
@@ -85,34 +91,23 @@ export default async function AdminLayout({
           <RenewalReminderBanner currentPeriodEnd={subscription.currentPeriodEnd} />
         )}
 
-        <div className="flex flex-1 min-h-0">
-          <AdminSidebar
-            authorName={authorName}
-            authorSlug={authorSlug}
-            isSuperAdmin={isSuperAdmin}
-            planTier={planTier}
-            featureGates={featureGates}
-            adminTheme={adminTheme}
-          />
-          <div className="flex-1 flex flex-col min-w-0">
-            <header
-              className="h-16 border-b flex items-center px-6 flex-shrink-0"
-              style={{ background: bg.header, borderColor: bg.headerBorder }}
-            >
-              <div className="flex-1" />
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-500">{authorName}</span>
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-700">
-                  {authorName[0]}
-                </div>
-                <LogoutButton />
-              </div>
-            </header>
-            <main className="flex-1 p-6 overflow-y-auto">
-              {children}
-            </main>
-          </div>
-        </div>
+        {/* Trial reminder — shown when author is on an admin-granted trial */}
+        {!impersonatedId && isOnTrial && trialEndsAt && trialPlanName && (
+          <TrialReminderBanner trialEndsAt={trialEndsAt} planName={trialPlanName} />
+        )}
+
+        <AdminShell
+          authorName={authorName}
+          authorSlug={authorSlug}
+          isSuperAdmin={isSuperAdmin}
+          isFoundingMember={authorRecord.isFoundingMember}
+          planTier={planTier}
+          featureGates={featureGates}
+          adminTheme={adminTheme}
+          bg={{ header: bg.header, headerBorder: bg.headerBorder }}
+        >
+          {children}
+        </AdminShell>
       </div>
     </AdminSessionProvider>
   );

@@ -1,0 +1,1 @@
+ALTER TABLE "Course" ADD COLUMN "allowDownload" BOOLEAN NOT NULL DEFAULT true;

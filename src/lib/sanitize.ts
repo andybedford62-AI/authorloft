@@ -11,7 +11,7 @@ export function sanitize(html: string | null | undefined): string {
     allowedTags: [
       "h1", "h2", "h3", "h4", "h5", "h6",
       "p", "br", "hr",
-      "strong", "b", "em", "i", "u", "s", "strike",
+      "strong", "b", "em", "i", "u", "s", "strike", "mark",
       "ul", "ol", "li",
       "blockquote", "pre", "code",
       "a", "img",
@@ -23,7 +23,7 @@ export function sanitize(html: string | null | undefined): string {
       img: ["src", "alt", "width", "height"],
       td: ["colspan", "rowspan"],
       th: ["colspan", "rowspan"],
-      "*": ["class"],
+      "*": ["class", "style"],
     },
     allowedSchemes: ["http", "https", "mailto"],
     // Force external links to open safely

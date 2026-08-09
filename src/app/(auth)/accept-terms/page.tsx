@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { authPageStyle, authCardStyle, AUTH_LINK, AUTH_BRASS } from "@/app/(auth)/auth-theme";
 
 export default function AcceptTermsPage() {
   const router = useRouter();
@@ -30,7 +32,7 @@ export default function AcceptTermsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={authPageStyle}>
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -41,7 +43,7 @@ export default function AcceptTermsPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-6">
+        <div className="p-8 space-y-6" style={authCardStyle}>
           <div>
             <h1 className="text-xl font-bold text-gray-900">One last step</h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -51,7 +53,7 @@ export default function AcceptTermsPage() {
 
           {/* Summary boxes */}
           <div className="space-y-3 text-sm text-gray-600">
-            <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 space-y-1">
+            <div className="rounded-md px-4 py-3 space-y-1" style={{ backgroundColor: "#FBF7EE", border: "1px solid #EADFC6" }}>
               <p className="font-semibold text-blue-800">What you&apos;re agreeing to</p>
               <ul className="list-disc list-inside text-blue-700 text-xs space-y-0.5">
                 <li>AuthorLoft may be used only for lawful author-related purposes</li>
@@ -62,9 +64,9 @@ export default function AcceptTermsPage() {
             </div>
             <p className="text-xs text-gray-400">
               Read the full{" "}
-              <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Service</Link>
+              <Link href="/terms" target="_blank" className="hover:underline" style={{ color: AUTH_LINK }}>Terms of Service</Link>
               {" "}and{" "}
-              <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</Link>
+              <Link href="/privacy" target="_blank" className="hover:underline" style={{ color: AUTH_LINK }}>Privacy Policy</Link>
               {" "}before accepting.
             </p>
           </div>
@@ -77,15 +79,15 @@ export default function AcceptTermsPage() {
                 type="checkbox"
                 checked={accepted}
                 onChange={(e) => { setAccepted(e.target.checked); setError(""); }}
-                className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 text-blue-600 cursor-pointer"
+                className="h-4 w-4 mt-0.5 flex-shrink-0 rounded border-gray-300 cursor-pointer" style={{ accentColor: AUTH_BRASS }}
               />
               <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
                 I have read and agree to the{" "}
-                <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
+                <Link href="/terms" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
                   Terms of Service
                 </Link>
                 {" "}and{" "}
-                <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
+                <Link href="/privacy" target="_blank" className="hover:underline font-medium" style={{ color: AUTH_LINK }}>
                   Privacy Policy
                 </Link>
                 . I confirm I am at least 18 years of age.
@@ -101,7 +103,7 @@ export default function AcceptTermsPage() {
             <button
               type="submit"
               disabled={!accepted || submitting}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-semibold text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 rounded-lg  disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5 text-sm font-semibold text-white transition-colors"
             >
               {submitting
                 ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
@@ -111,9 +113,13 @@ export default function AcceptTermsPage() {
 
           <p className="text-xs text-center text-gray-400">
             If you do not agree, you can{" "}
-            <Link href="/api/auth/signout" className="text-red-500 hover:underline">
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-red-500 hover:underline"
+            >
               sign out
-            </Link>
+            </button>
             {" "}— no account data will be retained.
           </p>
         </div>

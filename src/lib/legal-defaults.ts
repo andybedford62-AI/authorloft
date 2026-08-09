@@ -54,6 +54,14 @@ Our services are not directed to individuals under 13. We do not knowingly colle
 
 We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice on our platform and updating the "Last Updated" date. Continued use of our services after changes constitutes acceptance of the updated policy.
 
+**U.S. State Privacy Rights**
+
+If you are a resident of California, Virginia, Colorado, Connecticut, Utah, Texas, Oregon, Montana, Delaware, Iowa, Nebraska, New Hampshire, New Jersey, Tennessee, Minnesota, Maryland, Indiana, or another U.S. state with a comprehensive privacy law, you may have additional rights over your personal data — including the right to know, correct, delete, and port your information.
+
+We do not sell or share your personal data for advertising purposes.
+
+For a full explanation of your U.S. state privacy rights and how to submit a request, please see our dedicated U.S. State Privacy Rights page at authorloft.com/us-privacy.
+
 **Contact Us**
 
 If you have questions about this Privacy Policy, please contact us at the email address listed on our Contact page.`;

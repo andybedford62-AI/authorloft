@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Linkedin, Youtube, Facebook, Twitter, Instagram, Mail, type LucideIcon } from "lucide-react";
+import { Linkedin, Youtube, Facebook, Twitter, Instagram, Mail, Heart, type LucideIcon } from "lucide-react";
 
 type SocialItem = {
   href: string;
@@ -17,6 +17,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   twitter:   Twitter,
   instagram: Instagram,
   mail:      Mail,
+  heart:     Heart,
 };
 
 // ── Icon-only circular button (default, used on nav/profile etc.) ─────────────

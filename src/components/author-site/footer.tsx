@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { NewsletterModalButton } from "./newsletter-modal";
+import { SiteQrCode } from "./site-qr-code";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -11,6 +13,9 @@ interface NavConfig {
   navShowFlipBooks: boolean;
   navShowBlog:      boolean;
   navShowContact:   boolean;
+  navShowMediaKit:  boolean;
+  navShowBundles?:  boolean;
+  navShowCourses?:  boolean;
 }
 
 interface CustomPage {
@@ -23,6 +28,7 @@ interface FooterProps {
   author: {
     id:             string;
     slug:           string;
+    customDomain?:  string | null;
     displayName?:   string | null;
     name:           string;
     linkedinUrl?:   string | null;
@@ -30,8 +36,9 @@ interface FooterProps {
     facebookUrl?:   string | null;
     twitterUrl?:    string | null;
     instagramUrl?:  string | null;
+    supportUrl?:    string | null;
     accentColor:    string;
-    plan?:          { flipBooksLimit: number } | null;
+    plan?:          { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
   };
   navConfig?:    NavConfig;
   customPages?:  CustomPage[];
@@ -43,21 +50,26 @@ function buildQuickLinks(
   config?: NavConfig,
   customPages?: CustomPage[],
   showFlipBooks?: boolean,
+  showMediaKit?: boolean,
 ): { label: string; href: string }[] {
   const links: { label: string; href: string }[] = [];
 
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
+  if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
+  if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
-  if (config?.navShowBlog)               links.push({ label: "Blog",       href: "/blog" });
+  if (config?.navShowBlog)               links.push({ label: "News",       href: "/blog" });
 
   for (const page of customPages ?? []) {
     links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
   }
 
-  if (!config || config.navShowAbout)   links.push({ label: "About",   href: "/about" });
-  if (!config || config.navShowContact) links.push({ label: "Contact", href: "/contact" });
+  if (!config || config.navShowAbout)    links.push({ label: "About",     href: "/about" });
+  if (!config || config.navShowContact)  links.push({ label: "Contact",   href: "/contact" });
+  if (showMediaKit && config?.navShowMediaKit)
+                                         links.push({ label: "Media Kit", href: "/media-kit" });
 
   return links;
 }
@@ -68,7 +80,9 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const year         = new Date().getFullYear();
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
+  const showMediaKit  = !!(author.plan?.mediaKitEnabled);
+  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks, showMediaKit);
+  const siteUrl      = getAuthorBaseUrl(author);
 
   const socialLinks = [
     { href: author.linkedinUrl,  label: "LinkedIn" },
@@ -76,6 +90,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
     { href: author.facebookUrl,  label: "Facebook" },
     { href: author.twitterUrl,   label: "X / Twitter" },
     { href: author.instagramUrl, label: "Instagram" },
+    { href: author.supportUrl,  label: "Support" },
   ].filter((s) => !!s.href);
 
   return (
@@ -86,7 +101,8 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
       {/* ── Dark panel ─────────────────────────────────────────────────────── */}
       <div className="bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
+          {/* QR takes only the width it needs; the three text columns share the rest */}
+          <div className="grid gap-8 sm:gap-12 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
 
             {/* Col 1 — Brand */}
             <div className="space-y-3">
@@ -105,6 +121,15 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 A platform for authors to establish their web presence, showcase their work,
                 and connect with readers worldwide.
               </p>
+              <a
+                href="https://www.authorloft.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
+                style={{ color: "#22c55e", borderColor: "#22c55e" }}
+              >
+                Join AuthorLoft
+              </a>
             </div>
 
             {/* Col 2 — Stay Updated */}
@@ -140,6 +165,9 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                 </div>
               </div>
             )}
+
+            {/* Col 4 — Scan to open on a phone */}
+            <SiteQrCode url={siteUrl} authorName={displayName} />
           </div>
         </div>
       </div>

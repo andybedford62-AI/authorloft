@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSupabaseUploadUrl } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 const ALLOWED_EXTENSIONS = new Set(["pdf", "epub", "mobi"]);
 
@@ -22,6 +23,8 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: authorId });
+    if (_rl) return _rl;
 
     const body = await req.json();
     const { itemId, fileName } = body;

@@ -10,17 +10,17 @@ export default async function VerifyEmailTokenPage({ params }: Props) {
 
   if (!token) redirect("/verify-email/invalid");
 
+  const author = await prisma.author.findFirst({
+    where: {
+      emailVerifyToken: token,
+      emailVerifyExpiry: { gt: new Date() },
+    },
+    select: { id: true },
+  });
+
+  if (!author) redirect("/verify-email/invalid");
+
   try {
-    const author = await prisma.author.findFirst({
-      where: {
-        emailVerifyToken: token,
-        emailVerifyExpiry: { gt: new Date() },
-      },
-      select: { id: true },
-    });
-
-    if (!author) redirect("/verify-email/invalid");
-
     await prisma.author.update({
       where: { id: author.id },
       data: {
@@ -29,9 +29,9 @@ export default async function VerifyEmailTokenPage({ params }: Props) {
         emailVerifyExpiry: null,
       },
     });
-
-    redirect("/verify-email/success");
   } catch {
     redirect("/verify-email/invalid");
   }
+
+  redirect("/verify-email/success");
 }

@@ -3,6 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./db";
 import { slugify } from "./utils";
+import { generateCSRFToken, getCsrfSecret } from "./csrf";
+import { sendNewSignupNotificationEmail, sendWelcomeEmail } from "./mailer";
+import { capturePostHog } from "./posthog";
 import bcrypt from "bcryptjs";
 import { checkLoginRateLimit } from "./login-rate-limit";
 
@@ -26,7 +29,13 @@ async function uniqueSlug(base: string): Promise<string> {
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
+    // 8h max — covers a full workday for active users. After 8h of inactivity
+    // (including browser-closed-overnight) the next request bounces to /login
+    // with a fresh session, avoiding stale-state errors on return.
+    maxAge:    60 * 60 * 8,
+    // Refresh the JWT on activity, throttled to once every 30 minutes so
+    // active users never see a logout while idle ones eventually do.
+    updateAge: 60 * 30,
   },
   // Set cookie domain to root platform domain so subdomains can read the session.
   // Skipped for vercel.app and localhost (Public Suffix List restriction).
@@ -62,14 +71,14 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        if (!checkLoginRateLimit(credentials.email)) {
+        if (!(await checkLoginRateLimit(credentials.email))) {
           throw new Error("TooManyAttempts");
         }
 
         let author;
         try {
           author = await prisma.author.findUnique({
-            where: { email: credentials.email },
+            where: { email: credentials.email.toLowerCase().trim() },
             include: { plan: true },
           });
         } catch (err) {
@@ -84,6 +93,16 @@ export const authOptions: NextAuthOptions = {
 
         if (!author.emailVerified) {
           throw new Error("EmailNotVerified");
+        }
+
+        // Fire first_login only on the very first successful sign-in
+        if (!author.lastLoginAt) {
+          const daysSinceSignup = Math.round((Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+          capturePostHog(author.id, "first_login", {
+            signup_method: "email",
+            plan_tier: author.plan?.tier ?? "FREE",
+            days_since_signup: daysSinceSignup,
+          });
         }
 
         return {
@@ -151,7 +170,7 @@ export const authOptions: NextAuthOptions = {
           const slugBase  = slugify(baseName) || "author";
           const finalSlug = await uniqueSlug(slugBase.slice(0, 38));
 
-          await prisma.author.create({
+          const newAuthor = await prisma.author.create({
             data: {
               email,
               name:           baseName,
@@ -160,9 +179,32 @@ export const authOptions: NextAuthOptions = {
               isActive:       true,
               emailVerified:  new Date(),   // Google has already verified the email
               profileImageUrl: user.image ?? null,
+              contactEmail:   email,
               ...(freePlan && { planId: freePlan.id }),
             },
           });
+
+          capturePostHog(newAuthor.id, "google_signup_completed", { signup_method: "google", plan_tier: "FREE", slug: finalSlug });
+
+          // Send welcome email (fire-and-forget)
+          sendWelcomeEmail(email, baseName, finalSlug).catch((err) =>
+            console.error("[auth] Failed to send Google welcome email:", err)
+          );
+
+          // Send admin signup notification if enabled (fire-and-forget)
+          prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true, signupNotificationEmail: true } })
+            .then((cfg) => {
+              if (cfg?.newSignupNotifications && cfg.signupNotificationEmail) {
+                sendNewSignupNotificationEmail({
+                  to:          cfg.signupNotificationEmail,
+                  authorName:  baseName,
+                  authorEmail: email,
+                  slug:        finalSlug,
+                  method:      "google",
+                }).catch((err) => console.error("[auth] Failed to send signup notification:", err));
+              }
+            })
+            .catch(() => {});
         }
         return true;
       } catch (err) {
@@ -192,6 +234,12 @@ export const authOptions: NextAuthOptions = {
         token.isSuperAdmin = (user as any).isSuperAdmin;
         token.planTier    = (user as any).planTier;
       }
+
+      // Generate CSRF token for authenticated requests (regenerated on each token refresh)
+      if (token.sub) {
+        token.csrfToken = generateCSRFToken(token.sub, getCsrfSecret());
+      }
+
       return token;
     },
 
@@ -201,6 +249,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).slug        = token.slug;
         (session.user as any).isSuperAdmin = token.isSuperAdmin;
         (session.user as any).planTier    = token.planTier;
+        (session.user as any).csrfToken   = token.csrfToken;
       }
       return session;
     },

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { LegalBanner } from "@/components/marketing/legal-banner";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   // Fetch platform settings for legal-update banner
@@ -14,6 +15,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
   return (
     <>
       {children}
+      <MarketingFooter />
       <LegalBanner privacyUpdatedAt={privacyUpdatedAt} termsUpdatedAt={termsUpdatedAt} />
     </>
   );

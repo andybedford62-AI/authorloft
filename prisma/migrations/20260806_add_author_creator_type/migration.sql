@@ -1,0 +1,1 @@
+ALTER TABLE "Author" ADD COLUMN "creatorType" TEXT NOT NULL DEFAULT 'book';

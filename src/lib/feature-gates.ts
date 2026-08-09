@@ -10,6 +10,7 @@ export const TIER_RANK: Record<string, number> = {
 // Default gates — used when no config has been saved yet.
 export const DEFAULT_GATES: Record<string, string> = {
   "/admin/dashboard":    "FREE",
+  "/admin/arcs":         "STANDARD",
   "/admin/books":        "FREE",
   "/admin/flip-books":   "PREMIUM",   // premium-only from day one
   "/admin/specials":     "FREE",
@@ -18,15 +19,22 @@ export const DEFAULT_GATES: Record<string, string> = {
   "/admin/pages":        "STANDARD",
   "/admin/blog":         "FREE",
   "/admin/messages":     "FREE",
-  "/admin/newsletter":   "STANDARD",
+  "/admin/feedback":     "FREE",
+  "/admin/newsletter":   "FREE",
   "/admin/sales":        "STANDARD",
-  "direct-sales":        "STANDARD",  // gates Plan.salesEnabled (Direct Sales tab on books)
+  "direct-sales":        "FREE",      // gates Plan.salesEnabled (eBook-only on FREE; all formats on STANDARD+)
+  "bookstore-listing":   "FREE",      // gates Plan.bookstoreListingEnabled (AuthorLoft Bookstore opt-in)
+  "pre-orders":          "STANDARD",  // gates Plan.preOrdersEnabled (Coming Soon / pre-order books)
+  "/admin/bundles":      "STANDARD",
+  "/admin/courses":      "FREE",
   "/admin/appearance":   "STANDARD",
   "/admin/branding":     "FREE",
   "/admin/legal":        "FREE",
   "/admin/ai-assistant": "PREMIUM",
   "/admin/seo-audit":    "PREMIUM",
+  "/admin/promote":      "STANDARD",
   "/admin/settings":     "FREE",
+  "/admin/media-kit":    "STANDARD",
 };
 
 // Features that map to a Plan model field.
@@ -36,10 +44,16 @@ export const FEATURE_PLAN_MAP: Record<
   string,
   { field: string; enabledValue: number | boolean; disabledValue: number | boolean } | null
 > = {
-  "/admin/flip-books": { field: "flipBooksLimit", enabledValue: -1,   disabledValue: 0     },
-  "direct-sales":      { field: "salesEnabled",   enabledValue: true,  disabledValue: false },
-  "/admin/newsletter": { field: "newsletter",     enabledValue: true,  disabledValue: false },
+  "/admin/flip-books": { field: "flipBooksLimit",   enabledValue: -1,   disabledValue: 0     },
+  "direct-sales":      { field: "salesEnabled",    enabledValue: true,  disabledValue: false },
+  "/admin/newsletter": { field: "newsletter",      enabledValue: true,  disabledValue: false },
+  "/admin/media-kit":  { field: "mediaKitEnabled", enabledValue: true,  disabledValue: false },
+  "bookstore-listing": { field: "bookstoreListingEnabled", enabledValue: true, disabledValue: false },
+  "pre-orders":        { field: "preOrdersEnabled", enabledValue: true, disabledValue: false },
+  "/admin/bundles":    { field: "bundlesEnabled",   enabledValue: true, disabledValue: false },
+  "/admin/courses":    { field: "coursesEnabled",   enabledValue: true, disabledValue: false },
   // Admin-only — no public-site Plan field to update:
+  "/admin/arcs":         null,
   "/admin/dashboard":    null,
   "/admin/books":        null,
   "/admin/sales":        null,
@@ -49,11 +63,13 @@ export const FEATURE_PLAN_MAP: Record<
   "/admin/pages":        null,
   "/admin/blog":         null,
   "/admin/messages":     null,
+  "/admin/feedback":     null,
   "/admin/appearance":   null,
   "/admin/branding":     null,
   "/admin/legal":        null,
   "/admin/ai-assistant": null,
   "/admin/seo-audit":    null,
+  "/admin/promote":      null,
   "/admin/settings":     null,
 };
 

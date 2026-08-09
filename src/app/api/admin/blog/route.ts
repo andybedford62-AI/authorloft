@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { canPublishPost } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { pingIndexNow } from "@/lib/indexnow";
+import { autoMetaDescription } from "@/lib/seo-utils";
 
 // GET /api/admin/blog — list all posts for this author
 export async function GET() {
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, slug, excerpt, content, coverImageUrl, isPublished } = body;
+  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword, attachmentUrl, attachmentLabel } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -64,6 +66,9 @@ export async function POST(req: Request) {
     }
   }
 
+  const effectiveMetaDesc =
+    metaDescription?.trim() || excerpt?.trim() || autoMetaDescription(content) || null;
+
   const post = await prisma.post.create({
     data: {
       authorId,
@@ -71,11 +76,27 @@ export async function POST(req: Request) {
       slug: slugClean,
       excerpt: excerpt?.trim() || null,
       content: content?.trim() || null,
-      coverImageUrl: coverImageUrl?.trim() || null,
-      isPublished: isPublished ?? false,
-      publishedAt: isPublished ? new Date() : null,
+      coverImageUrl:   coverImageUrl?.trim()   || null,
+      isPublished:     isPublished ?? false,
+      publishedAt:     isPublished ? new Date() : null,
+      seoTitle:        seoTitle?.trim()        || null,
+      metaDescription: effectiveMetaDesc,
+      focusKeyword:    focusKeyword?.trim()    || null,
+      attachmentUrl:   attachmentUrl?.trim()   || null,
+      attachmentLabel: attachmentLabel?.trim() || null,
     },
   });
+
+  if (post.isPublished) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { slug: true, customDomain: true },
+    });
+    if (author) {
+      const host = author.customDomain || `${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+      pingIndexNow([`https://${host}/blog/${post.slug}`, `https://${host}/blog`]);
+    }
+  }
 
   return NextResponse.json(post, { status: 201 });
 }

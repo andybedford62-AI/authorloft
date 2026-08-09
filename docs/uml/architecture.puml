@@ -1,0 +1,68 @@
+@startuml AuthorLoft Architecture
+!theme plain
+title AuthorLoft — System Architecture
+
+skinparam componentStyle rectangle
+skinparam roundCorner 8
+
+actor "Author" as Author
+actor "Public Visitor" as Visitor
+actor "Super Admin" as SA
+actor "Custom Domain Visitor" as CD
+
+cloud "Vercel (Edge + Serverless)" as Vercel {
+  component "Edge Middleware\n(proxy.ts)"               as Proxy
+  component "Next.js 16\nApp Router"                    as NextApp
+  component "Vercel Cron\n(7 schedules)"                as Cron
+  database  "Vercel KV / Redis\n(rate limits, sessions)" as KV
+  database  "Vercel Blob\n(covers, uploads)"             as Blob
+}
+
+cloud "Supabase" as Supabase {
+  database "PostgreSQL\n(Authors, Books, Plans,\nOrders, Subscribers,\nSocialPromote*)" as DB
+  note bottom of DB
+    RLS enabled (no policies = deny)
+    Prisma bypasses as postgres
+  end note
+}
+
+cloud "External Services" as Ext {
+  component "Stripe"     as Stripe
+  component "Resend"     as Resend
+  component "Gemini AI"  as Gemini
+  component "PostHog"    as PostHog
+  component "Sentry"     as Sentry
+  component "Cloudinary" as Cloudinary
+}
+
+Author    --> NextApp : /admin/*
+Visitor   --> NextApp : /, /bookstore, /blog
+SA        --> NextApp : /super-admin/*
+CD        --> Proxy   : authorname.com
+Proxy     --> NextApp : rewrite to apex
+
+NextApp   --> DB
+NextApp   --> KV
+NextApp   --> Blob
+NextApp   --> Stripe
+NextApp   --> Resend
+NextApp   --> Gemini
+NextApp   --> PostHog
+NextApp   --> Sentry
+NextApp   --> Cloudinary
+
+Cron      --> NextApp : hits /api/cron/*
+Stripe    ..> NextApp : webhooks
+
+legend right
+  | Cron Path | Schedule | Purpose |
+  | reset-ai-usage | 0 0 1 * * | Monthly AI usage reset |
+  | cleanup-unverified | 0 3 * * * | Daily unverified purge |
+  | onboarding-cleanup | 0 4 * * * | Daily stale onboarding |
+  | process-social-posts | 0 9 * * * | Daily super-admin social |
+  | expire-trials | 0 5 * * * | Daily trial expiration |
+  | launch-preorders | 0 8 * * * | Daily pre-order launch |
+  | social-promote-abuse-check | 15 * * * * | Hourly abuse digest |
+endlegend
+
+@enduml

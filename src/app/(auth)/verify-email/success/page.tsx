@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { authPageStyle, authCardStyle, authPrimaryStyle } from "@/app/(auth)/auth-theme";
 
 export default function VerifyEmailSuccessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={authPageStyle}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center">
@@ -13,7 +14,7 @@ export default function VerifyEmailSuccessPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center space-y-5">
+        <div className="p-8 text-center space-y-5" style={authCardStyle}>
           <div className="flex justify-center">
             <div className="bg-green-50 rounded-full p-4">
               <CheckCircle2 className="h-10 w-10 text-green-500" />
@@ -25,13 +26,13 @@ export default function VerifyEmailSuccessPage() {
               Your email address has been confirmed. Your AuthorLoft account is fully activated.
             </p>
           </div>
-          <Link href="/admin/dashboard">
+          <Link href="/login">
             <Button
               size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              style={{ "--accent": "#2563EB" } as React.CSSProperties}
+              className="w-full"
+              style={authPrimaryStyle}
             >
-              Go to your dashboard
+              Sign in to continue
             </Button>
           </Link>
         </div>

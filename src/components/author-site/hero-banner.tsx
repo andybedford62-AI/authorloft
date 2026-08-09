@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { getTheme } from "@/lib/themes";
+import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
 import type { AuthorForTemplate } from "./templates/types";
 
 interface HeroBannerProps {
@@ -18,7 +19,13 @@ function getHeroColors(siteTheme: string) {
   const theme = getTheme(siteTheme);
   const darkBgThemes = ["dark-elegant", "scifi"];
   const bg = darkBgThemes.includes(siteTheme) ? theme.preview.bg : theme.preview.primary;
-  return { bg, accent: theme.preview.accent };
+  // Hero image resolution: an explicit defaultHeroImageUrl wins; otherwise fall
+  // back to the naming convention /images/themes/{id}-hero.jpg if that file was
+  // present at build time (see THEME_HERO_IDS). No file → undefined → solid colour.
+  const heroImage =
+    theme.defaultHeroImageUrl ??
+    (THEME_HERO_IDS.includes(theme.id) ? `/images/themes/${theme.id}-hero.jpg` : undefined);
+  return { bg, accent: theme.preview.accent, defaultHeroImageUrl: heroImage };
 }
 
 /** Rough luminance check — returns true if color is light (use dark text on it). */
@@ -33,10 +40,30 @@ function isLightColor(hex: string): boolean {
 
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
-  const { bg, accent } = getHeroColors(author.siteTheme);
+  const { bg, accent, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
+  // PREMIUM two-tone override — falls back to accent-only styling when not set.
+  const secondary = author.secondaryColor || accent;
+  const hasSecondary = !!author.secondaryColor;
   const buyHref = featuredBook ? `/books/${featuredBook.slug}` : "/books";
+  // Author portrait — their own uploads only. The theme's scenic image is NOT a
+  // portrait stand-in; it's used as the full hero backdrop below (subgenre themes).
   const photoSrc = author.heroImageUrl || author.profileImageUrl;
   const layout = author.heroLayout ?? "author-right";
+
+  // Subgenre palettes (mountain/scuba/aviation) ship a scenic image used as the
+  // full-bleed hero background, behind all content, with a dark overlay for text.
+  const sceneBg = defaultHeroImageUrl;
+  const SceneBackdrop = sceneBg ? (
+    <>
+      <div className="absolute inset-0">
+        <Image src={sceneBg} alt="" fill priority className="object-cover object-center" />
+      </div>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.58) 100%)" }}
+      />
+    </>
+  ) : null;
 
   // ── Classic layout (formerly "portrait") — accent bg, text left, book right ──
   if (layout === "portrait") {
@@ -46,6 +73,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
         style={{ backgroundColor: accent }}
         aria-label="Author hero"
       >
+        {SceneBackdrop}
         {/* Depth overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-black/40 pointer-events-none" />
         {/* Decorative blobs */}
@@ -77,7 +105,8 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest border border-white/40 text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+                style={{ border: hasSecondary ? `1px solid ${secondary}80` : "1px solid rgba(255,255,255,0.4)" }}
               >
                 Learn More
               </Link>
@@ -152,6 +181,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               src={photoSrc}
               alt={authorName}
               fill
+              priority
               className="object-cover object-center"
               style={{
                 maskImage:
@@ -201,11 +231,14 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
       style={{ background: bg }}
       aria-label="Author hero"
     >
-      {/* Soft accent glow */}
+      {SceneBackdrop}
+      {/* Soft accent glow — two-tone blend when a Premium secondary colour is set */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 70% 60% at 50% 60%, ${accent}22 0%, transparent 70%)`,
+          background: hasSecondary
+            ? `radial-gradient(ellipse 60% 55% at 25% 35%, ${accent}22 0%, transparent 60%), radial-gradient(ellipse 60% 55% at 75% 75%, ${secondary}22 0%, transparent 60%)`
+            : `radial-gradient(ellipse 70% 60% at 50% 60%, ${accent}22 0%, transparent 70%)`,
         }}
       />
 
@@ -244,7 +277,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             <Link
               href="/about"
               className="w-full py-3 px-6 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
-              style={{ border: `2px solid ${accent}60`, color: "rgba(255,255,255,0.85)" }}
+              style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
               Learn More
             </Link>
@@ -296,7 +329,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             <Link
               href="/about"
               className="w-full py-3 px-4 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
-              style={{ border: `2px solid ${accent}60`, color: "rgba(255,255,255,0.85)" }}
+              style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
               Learn More
             </Link>

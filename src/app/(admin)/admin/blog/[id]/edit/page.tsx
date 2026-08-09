@@ -24,6 +24,11 @@ export default async function EditPostPage({
       content: true,
       coverImageUrl: true,
       isPublished: true,
+      seoTitle: true,
+      metaDescription: true,
+      focusKeyword: true,
+      attachmentUrl: true,
+      attachmentLabel: true,
     },
   });
 

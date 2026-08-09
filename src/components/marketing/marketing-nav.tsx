@@ -4,8 +4,12 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
+import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
+import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solutions";
 
-export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" }) {
+
+export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" | "faq" }) {
   // Reading cookies opts this component into dynamic rendering so the session
   // is never served from a stale static cache.
   await cookies();
@@ -28,13 +32,16 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
 
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-11 w-auto" />
+            <svg viewBox="0 0 260 38" width={200} height={34} aria-label="AuthorLoft" role="img">
+              <text x="0" y="30" style={{ fontFamily: 'Georgia, serif', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
+                <tspan fill="#B8893D">Author</tspan><tspan fill="#1B2B47">Loft</tspan>
+              </text>
+            </svg>
           </Link>
 
           {author && (
@@ -43,7 +50,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-sm text-gray-500">{displayName}</span>
                 <Link
-                  href="/admin"
+                  href="/admin/dashboard"
                   className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
@@ -56,8 +63,14 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
 
         {/* Middle nav links */}
         <nav className="hidden md:flex items-center gap-6">
-          <a
-            href="/#features"
+          <Link
+            href="/bookstore"
+            className="text-sm font-medium text-[#C26A4A] hover:text-[#a8573a] transition-colors"
+          >
+            Bookstore
+          </Link>
+          <Link
+            href="/features"
             className={`text-sm transition-colors ${
               activePage === "features"
                 ? "font-medium text-blue-600"
@@ -65,7 +78,19 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             }`}
           >
             Features
-          </a>
+          </Link>
+          <MarketingNavSolutions />
+          <Link
+            href="/faq"
+            className={`text-sm transition-colors ${
+              activePage === "faq"
+                ? "font-medium text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            FAQ
+          </Link>
+          <MarketingNavDropdown />
           <Link
             href="/pricing"
             className={`text-sm transition-colors ${
@@ -76,31 +101,37 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Pricing
           </Link>
-          {!author && (
-            <Link href="/login" className="text-sm text-gray-600 hover:text-gray-900">
-              Sign In
-            </Link>
-          )}
         </nav>
 
-        {/* Right CTA */}
-        {author ? (
-          /* Mobile: show Dashboard button on the right when logo area is too small */
-          <Link
-            href="/admin"
-            className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            Dashboard
-          </Link>
-        ) : (
-          <Link
-            href="/register"
-            className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Get Started Free
-          </Link>
-        )}
+        {/* Right CTA + mobile menu */}
+        <div className="flex items-center gap-2">
+          {author ? (
+            /* Mobile: show Dashboard button on the right when logo area is too small */
+            <Link
+              href="/admin/dashboard"
+              className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex items-center border border-gray-300 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className="hidden sm:inline-flex bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Start free →
+              </Link>
+            </>
+          )}
+          <MarketingMobileMenu isAuthor={!!author} />
+        </div>
       </div>
     </header>
   );

@@ -19,6 +19,8 @@ export default async function MessagesPage() {
       message: true,
       isRead: true,
       isArchived: true,
+      hasBeenReplied: true,
+      lastRepliedAt: true,
       createdAt: true,
     },
   });

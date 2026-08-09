@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-
-function isSuperAdmin(session: any) {
-  return !!(session?.user as any)?.isSuperAdmin;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // POST /api/super-admin/trigger-cleanup
 // Proxies the onboarding-cleanup cron server-side so the CRON_SECRET
 // never has to be exposed as a NEXT_PUBLIC_ env var.
 export async function POST(_req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) {
+  if (!await requireSuperAdminId()) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

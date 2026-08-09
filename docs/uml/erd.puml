@@ -1,0 +1,185 @@
+@startuml AuthorLoft ERD
+!theme plain
+title AuthorLoft — Data Model (Core Domain)
+
+hide circle
+skinparam linetype ortho
+
+entity Author {
+  *id : string <<PK>>
+  --
+  name : string
+  displayName : string
+  email : string <<UK>>
+  slug : string <<UK>>
+  customDomain : string
+  socialVoiceDescription : string
+  stripeCustomerId : string
+  *planId : string <<FK>>
+  aiUsageResetAt : datetime
+  aiUsageCount : int
+}
+
+entity Plan {
+  *id : string <<PK>>
+  --
+  tier : string
+  monthlyPriceCents : int
+  annualPriceCents : int
+  maxBooks : int
+  socialDailyLimit : int
+  socialMonthlyLimit : int
+  salesEnabled : boolean
+  newsletter : boolean
+}
+
+entity Book {
+  *id : string <<PK>>
+  --
+  *authorId : string <<FK>>
+  title : string
+  slug : string
+  shortDescription : string
+  description : text
+  coverImageUrl : string
+  isPublished : boolean
+  preOrderEnabled : boolean
+  preOrderReleaseAt : datetime
+}
+
+entity Order {
+  *id : string <<PK>>
+  --
+  *authorId : string <<FK>>
+  customerEmail : string
+  totalCents : int
+  stripeSessionId : string
+  status : string
+  createdAt : datetime
+}
+
+entity OrderItem {
+  *id : string <<PK>>
+  --
+  *orderId : string <<FK>>
+  *bookId : string <<FK>>
+  format : string
+  unitPriceCents : int
+}
+
+entity Subscriber {
+  *id : string <<PK>>
+  --
+  *authorId : string <<FK>>
+  email : string
+  unsubscribed : boolean
+}
+
+entity Coupon {
+  *id : string <<PK>>
+  --
+  code : string <<UK>>
+  scope : string
+  percentOff : int
+  amountOffCents : int
+}
+
+entity AffiliateReferral {
+  *id : string <<PK>>
+  --
+  *authorId : string <<FK>>
+  code : string
+  clicks : int
+  sales : int
+  earningsCents : int
+}
+
+entity SocialPromotePlatform {
+  *id : string <<PK>>
+  --
+  slug : string <<UK>>
+  name : string
+  maxChars : int
+  hashtagStyle : string
+  isPremiumOnly : boolean
+  isActive : boolean
+  promptAddendum : text
+}
+
+entity SocialPromoteType {
+  *id : string <<PK>>
+  --
+  slug : string <<UK>>
+  name : string
+  description : string
+  promptTemplate : text
+  applicableContexts : string[]
+  applicablePlatforms : string[]
+  isActive : boolean
+}
+
+entity GeneratedSocialPost {
+  *id : string <<PK>>
+  --
+  *authorId : string <<FK>>
+  *platformId : string <<FK>>
+  *promoTypeId : string <<FK>>
+  contextType : string
+  contextRefId : string
+  promptUsed : text
+  outputText : text
+  modelUsed : string
+  inputTokens : int
+  outputTokens : int
+  costMicroCents : int
+  status : string
+  wasCopied : boolean
+  copiedAt : datetime
+  ipAddress : string
+  createdAt : datetime
+}
+
+entity SocialPromoteSettings {
+  *id : string <<PK>> (always "main")
+  --
+  enabled : boolean
+  model : string
+  timeoutMs : int
+  maxOutputTokens : int
+  costWarnMicroCentsPerDay : int
+  costDisableMicroCentsPerDay : int
+  adminAlertEmails : string
+}
+
+Author      ||--o{ Book                : writes
+Author      }o--|| Plan                : subscribed to
+Author      ||--o{ Order               : receives
+Author      ||--o{ Subscriber          : owns
+Author      ||--o{ AffiliateReferral   : earns from
+Author      ||--o{ GeneratedSocialPost : generates
+
+Book        ||--o{ OrderItem           : appears in
+Order       ||--o{ OrderItem           : contains
+Order       }o--o| Coupon              : optionally uses
+Order       }o--o| AffiliateReferral   : attributed to
+
+Plan        ||--o{ Coupon              : scoped to
+
+GeneratedSocialPost }o--|| SocialPromotePlatform : targets
+GeneratedSocialPost }o--|| SocialPromoteType     : uses
+
+note bottom of GeneratedSocialPost
+  contextRefId is polymorphic:
+    contextType=book  → Book.id
+    contextType=news  → PlatformPost.id
+    contextType=topic → null (free text)
+end note
+
+note bottom of SocialPromoteSettings
+  Singleton row, id = "main".
+  Microcent precision so admins
+  can configure ceilings as low
+  as $0.000001/day.
+end note
+
+@enduml

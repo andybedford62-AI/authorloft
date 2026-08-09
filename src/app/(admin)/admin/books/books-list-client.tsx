@@ -2,15 +2,22 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical } from "lucide-react";
+import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical, Store, Clock, AlertCircle } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 type BookRow = {
   id: string;
   title: string;
   subtitle: string | null;
   coverImageUrl: string | null;
+  description: string | null;
+  shortDescription: string | null;
   isFeatured: boolean;
   isPublished: boolean;
+  directSalesEnabled: boolean;
+  listInBookstore: boolean;
+  isPreOrder: boolean;
   caption: string | null;
   series: { name: string } | null;
   _count: { directSaleItems: number; retailerLinks: number };
@@ -18,8 +25,9 @@ type BookRow = {
 
 export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
   const [books, setBooks]       = useState<BookRow[]>(initialBooks);
-  const [saving, setSaving]     = useState(false);
-  const [saveMsg, setSaveMsg]   = useState("");
+  const [saving,    setSaving]    = useState(false);
+  const [saveMsg,   setSaveMsg]   = useState("");
+  const [saveOk,    setSaveOk]    = useState(true);
   const dragId  = useRef<string | null>(null);
   const dragOver = useRef<string | null>(null);
 
@@ -57,9 +65,11 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderedIds: books.map((b) => b.id) }),
       });
-      setSaveMsg(res.ok ? "Order saved" : "Could not save order");
+      setSaveOk(res.ok);
+      setSaveMsg(res.ok ? "Order saved" : "Could not save order. Please try again.");
     } catch {
-      setSaveMsg("Network error saving order");
+      setSaveOk(false);
+      setSaveMsg("Network error — order not saved. Please try again.");
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(""), 2500);
@@ -67,12 +77,14 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
       {/* Hint bar */}
       <div className="flex items-center justify-between px-5 py-2.5 bg-gray-50 border-b border-gray-100 text-xs text-gray-400">
         <span>Drag <GripVertical className="inline h-3 w-3" /> to reorder · the top 3 published books appear on your homepage</span>
         {saving && <span className="text-blue-500 animate-pulse">Saving…</span>}
-        {saveMsg && !saving && <span className="text-green-600">{saveMsg}</span>}
+        {saveMsg && !saving && (
+          <span className={saveOk ? "text-green-600" : "text-red-600"}>{saveMsg}</span>
+        )}
       </div>
 
       <table className="w-full text-sm">
@@ -95,7 +107,16 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {books.map((book, idx) => (
+          {books.map((book, idx) => {
+          const completion = getBookCompletionSummary({
+            coverImageUrl:        book.coverImageUrl,
+            description:          book.description,
+            shortDescription:     book.shortDescription,
+            retailerLinksCount:   book._count.retailerLinks,
+            directSaleItemsCount: book._count.directSaleItems,
+            isPreOrder:           book.isPreOrder,
+          });
+          return (
             <tr
               key={book.id}
               draggable
@@ -145,6 +166,12 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                     {book.subtitle && (
                       <p className="text-xs text-gray-400 line-clamp-1">{book.subtitle}</p>
                     )}
+                    {!completion.isComplete && (
+                      <p className="mt-0.5 flex items-center gap-1 text-[10px] text-amber-600">
+                        <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
+                        Needs {completion.steps.filter((s) => !s.done).map((s) => s.shortLabel).join(", ")}
+                      </p>
+                    )}
                   </div>
                 </Link>
               </td>
@@ -181,29 +208,53 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
 
               {/* Status */}
               <td className="px-4 py-4 hidden lg:table-cell">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                  book.isPublished
-                    ? "bg-green-100 text-green-700"
-                    : "bg-amber-100 text-amber-700"
-                }`}>
-                  {book.isPublished ? "Published" : "Draft"}
-                </span>
+                <div className="flex flex-col gap-1">
+                  {/* Published / Draft — primary state */}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium w-fit ${
+                    book.isPreOrder
+                      ? "bg-blue-100 text-blue-700"
+                      : book.isPublished
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700"
+                  }`}>
+                    {book.isPreOrder
+                      ? <><Clock className="h-2.5 w-2.5" /> Pre-order</>
+                      : book.isPublished
+                        ? "Published"
+                        : "Draft"}
+                  </span>
+
+                  {/* Secondary badges */}
+                  <div className="flex flex-wrap gap-1">
+                    {book.isFeatured && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-600">
+                        <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" /> Featured
+                      </span>
+                    )}
+                    {book.directSalesEnabled && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-600">
+                        <ShoppingCart className="h-2.5 w-2.5" /> Direct sales
+                      </span>
+                    )}
+                    {book.listInBookstore && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-600">
+                        <Store className="h-2.5 w-2.5" /> Bookstore
+                      </span>
+                    )}
+                  </div>
+                </div>
               </td>
 
               {/* Edit */}
               <td className="px-4 py-4">
                 <div className="flex items-center justify-end">
-                  <Link
-                    href={`/admin/books/${book.id}/edit`}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors cursor-pointer"
-                    title="Edit book"
-                  >
-                    <Pencil className="h-4 w-4" />
+                  <Link href={`/admin/books/${book.id}/edit`}>
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" />
                   </Link>
                 </div>
               </td>
             </tr>
-          ))}
+          );})}
         </tbody>
       </table>
     </div>

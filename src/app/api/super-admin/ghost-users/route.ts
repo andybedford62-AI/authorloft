@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendOnboardingReminderEmail } from "@/lib/mailer";
-
-function isSuperAdmin(session: any) {
-  return !!(session?.user as any)?.isSuperAdmin;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // GET /api/super-admin/ghost-users
 // Returns all verified authors with no books and no onboardingCompletedAt
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) {
+  if (!await requireSuperAdminId()) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -44,8 +38,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/super-admin/ghost-users  { action: "remind" | "delete", authorId }
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) {
+  if (!await requireSuperAdminId()) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

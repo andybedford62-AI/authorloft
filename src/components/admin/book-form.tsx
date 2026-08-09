@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock } from "lucide-react";
+import { Loader2, Trash2, Check, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
+import { lookupByIsbn, isKdpIsbn, type IsbnLookupResult } from "@/lib/isbn-lookup";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Series = { id: string; name: string };
@@ -26,6 +27,12 @@ type BookData = {
   isFeatured: boolean;
   isPublished: boolean;
   directSalesEnabled: boolean;
+  listInBookstore: boolean;
+  isPreOrder: boolean;
+  preOrderDate: string | null; // YYYY-MM-DD string for the date input
+  autoSendLaunchEmail: boolean;
+  showCountdown: boolean;
+  launchDate: string | null;   // YYYY-MM-DDTHH:MM string for datetime-local input
   genreIds: string[];
   availableFormats: string[];
   caption: string | null;
@@ -39,6 +46,8 @@ type BookFormProps = {
   genres: Genre[];
   activeTab?: string; // injected by BookEditTabsClient; undefined = standalone (new book)
   salesEnabled?: boolean;
+  bookstoreEnabled?: boolean; // STANDARD+ may opt books into the public AuthorLoft Bookstore
+  preOrdersEnabled?: boolean; // STANDARD+ may mark books "Coming Soon" and collect wishlist signups
 };
 
 // ── Cover upload widget ────────────────────────────────────────────────────────
@@ -61,10 +70,17 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
     const body = new FormData();
     body.append("file", file);
     try {
-      const res  = await fetch("/api/admin/upload/cover", { method: "POST", body });
-      const data = await res.json();
-      if (!res.ok) setUploadError(data.error ?? "Upload failed. Please try again.");
-      else onChange(data.url);
+      const res = await fetch("/api/admin/upload/cover", { method: "POST", body });
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!res.ok) {
+        const msg = contentType.includes("application/json")
+          ? (await res.json()).error
+          : `Upload failed (HTTP ${res.status})`;
+        setUploadError(msg ?? "Upload failed. Please try again.");
+      } else {
+        const data = await res.json();
+        onChange(data.url);
+      }
     } catch {
       setUploadError("Network error — could not upload image.");
     } finally {
@@ -92,7 +108,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
   if (value) {
     return (
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">Cover Image</label>
+        <label className="block text-sm font-medium text-gray-700">Cover Image <span className="font-normal text-gray-400">(optional)</span></label>
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt="Cover preview"
@@ -129,7 +145,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">Cover Image</label>
+      <label className="block text-sm font-medium text-gray-700">Cover Image <span className="font-normal text-gray-400">(optional)</span></label>
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
@@ -168,6 +184,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
         )}
       </div>
       {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
+      <p className="text-xs text-gray-400">You can skip this and add a cover later.</p>
       <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
         className="sr-only" onChange={handleFileChange} />
     </div>
@@ -187,9 +204,12 @@ function Req() {
 
 // ── BookForm ───────────────────────────────────────────────────────────────────
 
-export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true }: BookFormProps) {
+export function BookForm({ mode, book, series, genres, activeTab, salesEnabled = true, bookstoreEnabled = false, preOrdersEnabled = false }: BookFormProps) {
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const [dirty, setDirty]       = useState(false);
+  const formRef                 = useRef<HTMLFormElement>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError]       = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -210,6 +230,12 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [isFeatured, setIsFeatured]               = useState(book?.isFeatured ?? false);
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
   const [directSalesEnabled, setDirectSalesEnabled] = useState(book?.directSalesEnabled ?? false);
+  const [listInBookstore, setListInBookstore]     = useState(book?.listInBookstore ?? false);
+  const [isPreOrder, setIsPreOrder]               = useState(book?.isPreOrder ?? false);
+  const [preOrderDate, setPreOrderDate]           = useState(book?.preOrderDate ?? "");
+  const [autoSendLaunchEmail, setAutoSendLaunchEmail] = useState(book?.autoSendLaunchEmail ?? false);
+  const [showCountdown, setShowCountdown]         = useState(book?.showCountdown ?? false);
+  const [launchDate, setLaunchDate]               = useState(book?.launchDate ?? "");
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
   const [availableFormats, setAvailableFormats]   = useState<string[]>(book?.availableFormats ?? []);
   const [caption, setCaption]                     = useState(book?.caption ?? "");
@@ -218,15 +244,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   // ── ISBN lookup state ─────────────────────────────────────────────────────
   const [isbnQuery,      setIsbnQuery]      = useState("");
   const [isbnLooking,    setIsbnLooking]    = useState(false);
-  const [isbnResult,     setIsbnResult]     = useState<{
-    title: string;
-    subtitle: string;
-    description: string;
-    coverUrl: string;
-    pageCount: number | null;
-    isbn13: string;
-    previewText: string; // author(s) line for the result card
-  } | null>(null);
+  const [isbnResult,     setIsbnResult]     = useState<IsbnLookupResult | null>(null);
   const [isbnError,      setIsbnError]      = useState("");
   const [isbnApplied,    setIsbnApplied]    = useState(false);
 
@@ -239,78 +257,17 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     setIsbnResult(null);
     setIsbnApplied(false);
 
-    // ── 1. Try Google Books ──────────────────────────────────────────────────
-    try {
-      const gbRes  = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(q)}&maxResults=1`);
-      const gbData = await gbRes.json();
-
-      if (gbData.items?.length) {
-        const vol  = gbData.items[0].volumeInfo ?? {};
-        const ids: { type: string; identifier: string }[] = vol.industryIdentifiers ?? [];
-        const isbn13Entry = ids.find((x) => x.type === "ISBN_13");
-        const isbn10Entry = ids.find((x) => x.type === "ISBN_10");
-
-        let coverUrl = vol.imageLinks?.thumbnail ?? vol.imageLinks?.smallThumbnail ?? "";
-        if (coverUrl) coverUrl = coverUrl.replace(/^http:/, "https:");
-
-        setIsbnResult({
-          title:       vol.title ?? "",
-          subtitle:    vol.subtitle ?? "",
-          description: vol.description ?? "",
-          coverUrl,
-          pageCount:   typeof vol.pageCount === "number" ? vol.pageCount : null,
-          isbn13:      isbn13Entry?.identifier ?? isbn10Entry?.identifier ?? q,
-          previewText: (vol.authors ?? []).join(", ") || "Unknown author",
-        });
-        setIsbnLooking(false);
-        return;
-      }
-    } catch {
-      // Google Books unavailable — fall through to Open Library
+    const result = await lookupByIsbn(q);
+    if (result) {
+      setIsbnResult(result);
+      setIsbnLooking(false);
+      return;
     }
 
-    // ── 2. Fallback: Open Library ────────────────────────────────────────────
-    // Covers Amazon KDP (979-8) and other self-published books not in Google Books
-    try {
-      const olRes  = await fetch(
-        `https://openlibrary.org/api/books?bibkeys=ISBN:${q}&format=json&jscmd=data`
-      );
-      const olData = await olRes.json();
-      const entry  = olData[`ISBN:${q}`];
-
-      if (entry) {
-        const authors  = (entry.authors ?? []).map((a: { name: string }) => a.name).join(", ");
-        const coverUrl = entry.cover?.large ?? entry.cover?.medium ?? entry.cover?.small ?? "";
-        const isbnList: string[] = entry.identifiers?.isbn_13 ?? entry.identifiers?.isbn_10 ?? [q];
-
-        // Open Library stores description as a plain string or { value: string }
-        const rawDesc   = entry.description;
-        const description =
-          typeof rawDesc === "string" ? rawDesc
-          : typeof rawDesc === "object" && rawDesc?.value ? rawDesc.value
-          : "";
-
-        setIsbnResult({
-          title:       entry.title ?? "",
-          subtitle:    entry.subtitle ?? "",
-          description,
-          coverUrl,
-          pageCount:   typeof entry.number_of_pages === "number" ? entry.number_of_pages : null,
-          isbn13:      isbnList[0] ?? q,
-          previewText: authors || "Unknown author",
-        });
-        setIsbnLooking(false);
-        return;
-      }
-    } catch {
-      // Open Library also unavailable
-    }
-
-    // ── 3. Not found in either source ────────────────────────────────────────
+    // Not found in either source
     setIsbn(q);
-    const isKdp = q.startsWith("9798");
     setIsbnError(
-      isKdp
+      isKdpIsbn(q)
         ? "This looks like an Amazon KDP ISBN (979-8‑…). KDP books often aren't in public databases — the ISBN has been filled in below. Please enter the title, description, and cover manually."
         : "No book found for that ISBN. The ISBN has been filled in below — please enter the remaining details manually."
     );
@@ -374,6 +331,12 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       isFeatured,
       isPublished,
       directSalesEnabled,
+      listInBookstore,
+      isPreOrder,
+      preOrderDate: preOrderDate || null,
+      autoSendLaunchEmail: isPreOrder ? autoSendLaunchEmail : false,
+      showCountdown,
+      launchDate: launchDate || null,
       genreIds: selectedGenres,
       availableFormats,
       caption:     caption || null,
@@ -405,13 +368,44 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     const saved = await res.json();
 
     if (mode === "new" && saved?.id) {
-      // Go straight to edit so the author can add Direct Sales items and Buy Links
-      router.push(`/admin/books/${saved.id}/edit`);
-    } else {
-      router.push("/admin/books");
+      // First save of a brand-new book → open the edit screen so the author can
+      // add Direct Sales items and Buy Links.
+      router.push(`/admin/books/${saved.id}/edit?new=1`);
+      router.refresh();
+      return;
     }
+
+    // Edit mode → stay exactly where the author is (same tab) instead of kicking
+    // them back to the book list. Just confirm the save and refresh server data.
+    setSaving(false);
+    setDirty(false);
+    setJustSaved(true);
+    setTimeout(() => setJustSaved(false), 2500);
     router.refresh();
   }
+
+  // Save with Ctrl/Cmd+S from anywhere in the form.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        formRef.current?.requestSubmit();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Warn before a hard navigation / tab close when there are unsaved edits.
+  useEffect(() => {
+    if (!dirty) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 
   async function handleDelete() {
     if (!confirm(`Delete "${book?.title}"? This cannot be undone.`)) return;
@@ -440,7 +434,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6${formHidden ? " hidden" : ""}`}>
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setDirty(true)} className={`space-y-6${formHidden ? " hidden" : ""}`}>
 
       {/* ── ISBN Lookup ──────────────────────────────────────────────────────── */}
       {showDetails && <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
@@ -465,16 +459,11 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             placeholder="e.g. 978-0-7432-7356-5"
             className="flex-1 rounded-md border border-blue-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <button
-            type="button"
-            onClick={lookupByISBN}
-            disabled={isbnLooking || !isbnQuery.trim()}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+          <Button type="button" onClick={lookupByISBN} disabled={isbnLooking || !isbnQuery.trim()}>
             {isbnLooking
-              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Looking up…</>
-              : <><Search className="h-3.5 w-3.5" />Look up</>}
-          </button>
+              ? <><Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />Looking up…</>
+              : <><Search className="h-3.5 w-3.5 mr-1.5" />Look up</>}
+          </Button>
         </div>
 
         {/* Error state */}
@@ -516,13 +505,9 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 <p className="text-xs text-gray-500 line-clamp-2 mt-1">{isbnResult.description.replace(/<[^>]+>/g, "")}</p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={applyIsbnData}
-              className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
+            <Button type="button" size="sm" onClick={applyIsbnData} className="flex-shrink-0">
               Use this data
-            </button>
+            </Button>
           </div>
         )}
 
@@ -802,7 +787,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 <p className="font-medium">Next steps to go live:</p>
                 <ol className="list-decimal list-inside space-y-0.5 ml-1">
                   <li>Add at least one format in the <strong>Direct Sales</strong> tab and set its price</li>
-                  <li>Connect Stripe in your platform settings</li>
+                  <li>
+                    Connect Stripe in your{" "}
+                    <a
+                      href="/admin/settings#billing"
+                      className="underline font-medium hover:text-blue-900"
+                    >
+                      billing settings
+                    </a>
+                  </li>
                 </ol>
               </div>
             )}
@@ -811,10 +804,147 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
           <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
             <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
             <div className="text-sm text-amber-800">
-              <span className="font-semibold">Direct Sales requires a paid plan.</span>{" "}
-              <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to enable
-              direct sales on your books.
+              <span className="font-semibold">Paid Direct Sales require a paid plan.</span>{" "}
+              <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to sell
+              editions of your books. You can still offer a <strong>free Reader Magnet</strong> — give a book away in
+              exchange for a reader&rsquo;s email — from the <strong>Direct Sales</strong> tab on any plan.
             </div>
+          </div>
+        )}
+
+        {/* AuthorLoft Bookstore opt-in — edit mode only (new books redirect to edit) */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            {bookstoreEnabled ? (
+              <>
+                <div className="flex items-center gap-4 cursor-pointer select-none"
+                  onClick={() => setListInBookstore((v) => !v)}>
+                  <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${listInBookstore ? "bg-emerald-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${listInBookstore ? "translate-x-5" : "translate-x-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <Store className="h-3.5 w-3.5 text-emerald-600" />
+                      List in AuthorLoft Bookstore
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Feature this book in the public AuthorLoft Bookstore for cross-discovery. Readers click through to this book on your own site — no payment is taken there.
+                    </p>
+                  </div>
+                </div>
+                {listInBookstore && (
+                  <div className="ml-14 mt-2 rounded-lg p-3 text-xs bg-emerald-50 border border-emerald-100 text-emerald-700">
+                    Listed once this book is <strong>Published</strong>. Make sure it has a cover image and description so it looks its best in the catalog.
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-semibold">The AuthorLoft Bookstore requires a Standard plan or higher.</span>{" "}
+                  <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to list your books in the public bookstore for extra discovery.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pre-order / Coming Soon — edit mode only */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            {preOrdersEnabled ? (
+              <>
+                <div className="flex items-center gap-4 cursor-pointer select-none"
+                  onClick={() => setIsPreOrder((v) => !v)}>
+                  <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${isPreOrder ? "bg-purple-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${isPreOrder ? "translate-x-5" : "translate-x-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <CalendarClock className="h-3.5 w-3.5 text-purple-600" />
+                      Pre-order / Coming Soon
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Show a "Coming Soon" banner with a notify-me signup form instead of buy buttons until the launch date.
+                    </p>
+                  </div>
+                </div>
+                {isPreOrder && (
+                  <div className="ml-14 mt-3 space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">Expected Launch Date</label>
+                    <input
+                      type="date"
+                      value={preOrderDate ?? ""}
+                      onChange={(e) => setPreOrderDate(e.target.value)}
+                      className="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                    />
+                    <p className="text-xs text-gray-400">Shown to readers as "Coming {`{date}`}". Leave blank to show "Coming Soon" without a date.</p>
+
+                    <div className="pt-3 border-t border-gray-100 mt-3">
+                      <div
+                        className="flex items-start gap-3 cursor-pointer select-none"
+                        onClick={() => setAutoSendLaunchEmail((v) => !v)}
+                      >
+                        <div className={`relative flex-shrink-0 mt-0.5 w-9 h-5 rounded-full transition-colors ${autoSendLaunchEmail ? "bg-green-600" : "bg-gray-300"}`}>
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${autoSendLaunchEmail ? "translate-x-4" : "translate-x-0.5"}`} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                            <Rocket className="h-3.5 w-3.5 text-green-600" />
+                            Auto-send launch email
+                          </p>
+                          <p className="text-xs text-gray-400 leading-relaxed">
+                            When the pre-order date passes and the book is published with a cover and price, we&apos;ll automatically notify your signups and mark the book as live. You can still use the manual &ldquo;Send Launch Email&rdquo; button at any time.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-semibold">Pre-orders / Coming Soon requires a Standard plan or higher.</span>{" "}
+                  <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to build anticipation and collect reader signups before launch.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Book Launch Mode */}
+        {mode === "edit" && (
+          <div className="pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-4 cursor-pointer select-none"
+              onClick={() => setShowCountdown((v) => !v)}>
+              <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${showCountdown ? "bg-rose-500" : "bg-gray-300"}`}>
+                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${showCountdown ? "translate-x-5" : "translate-x-1"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                  <Rocket className="h-3.5 w-3.5 text-rose-500" />
+                  Launch Countdown
+                </p>
+                <p className="text-xs text-gray-400">
+                  Show a live countdown timer on your book page leading up to launch day.
+                </p>
+              </div>
+            </div>
+            {showCountdown && (
+              <div className="ml-14 mt-3 space-y-1">
+                <label className="block text-sm font-medium text-gray-700">Launch Date & Time</label>
+                <input
+                  type="datetime-local"
+                  value={launchDate ?? ""}
+                  onChange={(e) => setLaunchDate(e.target.value)}
+                  className="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+                <p className="text-xs text-gray-400">The countdown hides automatically once this date passes.</p>
+              </div>
+            )}
           </div>
         )}
       </section>}
@@ -836,22 +966,34 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       )}
 
       <div className="flex items-center justify-between pb-8">
-        <Button type="submit" disabled={saving} size="lg">
-          {saving
-            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
-            : mode === "edit" ? "Save Changes" : "Create Book"}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={saving} size="md">
+            {saving
+              ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving...</>
+              : <><Check className="h-4 w-4 mr-2" />{mode === "edit" ? "Save Changes" : "Create Book"}</>}
+          </Button>
+          {justSaved && (
+            <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+              <CheckCircle2 className="h-4 w-4" />
+              Saved
+            </span>
+          )}
+        </div>
 
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.push("/admin/books")}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              if (dirty && !confirm("You have unsaved changes. Leave without saving?")) return;
+              router.push("/admin/books");
+            }}
+          >
             Cancel
           </Button>
           {mode === "edit" && (
-            <Button type="button" variant="outline" onClick={handleDelete} disabled={deleting}
-              className="text-red-600 hover:bg-red-50 border-red-200">
-              {deleting
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Book</>}
+            <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Book</>}
             </Button>
           )}
         </div>

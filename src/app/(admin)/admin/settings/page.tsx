@@ -2,9 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap } from "lucide-react";
+import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/lib/use-toast";
+import { HelpTip } from "@/components/admin/help-tip";
+import { slugify } from "@/lib/utils";
+
+const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
 // ── Subscription & Billing section ───────────────────────────────────────────
 
@@ -18,17 +23,24 @@ type BillingPlan = {
 type BillingData = {
   currentTier: string; currentPlanName: string;
   subscription: { currentPeriodEnd: string | null; billingInterval: string; status: string } | null;
+  isAdminAssigned: boolean;
+  isOnTrial:   boolean;
+  trialEndsAt: string | null;
   plans: BillingPlan[];
 };
 
 function SubscriptionSection() {
   const [data,     setData]     = useState<BillingData | null>(null);
-  const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const [interval, setInterval] = useState<"monthly" | "annual">("annual");
   const [busy,     setBusy]     = useState<string | null>(null); // priceId being loaded
   const [portalBusy, setPortalBusy] = useState(false);
+  const [intendedPlan, setIntendedPlan] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     fetch("/api/admin/billing").then((r) => r.json()).then(setData).catch(() => {});
+    const stored = localStorage.getItem("intendedPlan");
+    if (stored) setIntendedPlan(stored);
   }, []);
 
   async function handleUpgrade(priceId: string) {
@@ -40,7 +52,17 @@ function SubscriptionSection() {
         body:    JSON.stringify({ priceId }),
       });
       const json = await res.json();
-      if (json.url) window.location.href = json.url;
+      if (json.url) {
+        localStorage.removeItem("intendedPlan");
+        window.open(json.url, "_blank");
+      } else if (json.error) {
+        toast("error", json.error);
+      } else {
+        toast("error", "Unable to start checkout. Please try again.");
+      }
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      toast("error", "Network error. Please check your connection and try again.");
     } finally {
       setBusy(null);
     }
@@ -51,13 +73,30 @@ function SubscriptionSection() {
     try {
       const res  = await fetch("/api/admin/stripe/portal", { method: "POST" });
       const json = await res.json();
-      if (json.url) window.location.href = json.url;
+      if (json.url) {
+        window.open(json.url, "_blank");
+      } else if (json.error) {
+        toast("error", json.error);
+      } else {
+        toast("error", "Unable to open billing portal. Please try again.");
+      }
+    } catch (err) {
+      console.error("Portal error:", err);
+      toast("error", "Network error. Please try again.");
     } finally {
       setPortalBusy(false);
     }
   }
 
-  const isFree = !data || data.currentTier === "FREE";
+  const isFree          = !data || data.currentTier === "FREE";
+  const isAdminAssigned = data?.isAdminAssigned ?? false;
+  const isOnTrial       = data?.isOnTrial ?? false;
+  const trialExpiryStr  = data?.trialEndsAt
+    ? new Date(data.trialEndsAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : null;
+  const trialDaysLeft   = data?.trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(data.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   const renewalDate = data?.subscription?.currentPeriodEnd
     ? new Date(data.subscription.currentPeriodEnd).toLocaleDateString("en-US", {
@@ -81,31 +120,73 @@ function SubscriptionSection() {
         </div>
       ) : (
         <>
+          {/* Intended plan banner — shown after signup from marketing page */}
+          {intendedPlan && isFree && (
+            <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+              <Zap className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-blue-900">
+                  You&apos;re one step away from {intendedPlan.charAt(0).toUpperCase() + intendedPlan.slice(1)}!
+                </p>
+                <p className="text-xs text-blue-700 mt-0.5">
+                  Select the {intendedPlan.charAt(0).toUpperCase() + intendedPlan.slice(1)} plan below to complete your upgrade.
+                </p>
+              </div>
+              <button
+                onClick={() => { setIntendedPlan(null); localStorage.removeItem("intendedPlan"); }}
+                className="text-blue-400 hover:text-blue-600 text-xs flex-shrink-0"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           {/* Current plan */}
           <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-200">
             <div>
               <p className="text-sm font-semibold text-gray-900">{data.currentPlanName}</p>
               {renewalDate && (
-                <p className="text-xs text-gray-400 mt-0.5">Renews {renewalDate}</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {data.subscription?.status === "active" ? "Renews" : "Expires"} {renewalDate}
+                </p>
               )}
               {isFree && (
                 <p className="text-xs text-gray-400 mt-0.5">Free plan — upgrade to unlock more features</p>
               )}
+              {isOnTrial && trialExpiryStr && (
+                <p className="text-xs text-amber-600 mt-0.5 font-medium">
+                  Trial — expires {trialExpiryStr}
+                  {trialDaysLeft !== null && trialDaysLeft > 0 && ` (${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left)`}
+                  {trialDaysLeft === 0 && " (expires today)"}
+                </p>
+              )}
+              {isAdminAssigned && !isOnTrial && (
+                <p className="text-xs text-gray-400 mt-0.5">Plan assigned by admin</p>
+              )}
             </div>
-            {!isFree && (
-              <button
-                onClick={handlePortal}
-                disabled={portalBusy}
-                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {portalBusy ? "Opening…" : "Manage billing"}
-              </button>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {isFree ? (
+                <p className="text-xs text-gray-400">Upgrade to manage billing</p>
+              ) : isOnTrial ? (
+                <p className="text-xs text-amber-600 font-medium">Subscribe below to keep access</p>
+              ) : isAdminAssigned ? (
+                <p className="text-xs text-gray-400">Contact support to manage billing</p>
+              ) : (
+                <button
+                  onClick={handlePortal}
+                  disabled={portalBusy}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {portalBusy ? "Opening…" : "Manage billing"}
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Upgrade options — only shown to free users */}
-          {isFree && data.plans.length > 0 && (
+          {/* Upgrade options — shown to free users and trial users */}
+          {(isFree || isOnTrial) && data.plans.length > 0 && (
             <>
               {/* Monthly / Annual toggle */}
               <div className="flex items-center gap-2">
@@ -127,7 +208,7 @@ function SubscriptionSection() {
                       : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  Annual <span className="text-green-600 ml-1">Save 20%</span>
+                  Annual <span className="text-green-600 ml-1">2 mo. free</span>
                 </button>
               </div>
 
@@ -139,7 +220,7 @@ function SubscriptionSection() {
                   const cents = interval === "annual"
                     ? plan.annualPriceCents
                     : plan.monthlyPriceCents;
-                  const dollars = cents > 0 ? `$${(cents / 100).toFixed(0)}` : null;
+                  const dollars = cents > 0 ? `$${(cents / 100).toFixed(2)}` : null;
                   const features: string[] = plan.featuresJson
                     ? JSON.parse(plan.featuresJson)
                     : [];
@@ -169,7 +250,7 @@ function SubscriptionSection() {
                       </div>
                       {features.length > 0 && (
                         <ul className="space-y-1 flex-1">
-                          {features.slice(0, 5).map((f, i) => (
+                          {features.map((f, i) => (
                             <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
                               <CheckCircle className="h-3.5 w-3.5 text-green-500 flex-shrink-0 mt-0.5" />
                               {f}
@@ -186,7 +267,7 @@ function SubscriptionSection() {
                           ? <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
                           : !priceId
                           ? "Coming soon"
-                          : <><Zap className="h-4 w-4" /> Upgrade to {plan.name}</>
+                          : <><Zap className="h-4 w-4" /> {isOnTrial && data.currentTier === plan.tier ? `Subscribe · Keep ${plan.name}` : `Upgrade to ${plan.name}`}</>
                         }
                       </button>
                     </div>
@@ -246,6 +327,7 @@ function StripeConnectSection() {
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Banknote className="h-4 w-4 text-gray-400" />
           Stripe Payouts
+          <HelpTip id="stripe-connect" />
         </h2>
         <p className="text-xs text-gray-400 mt-1">
           Connect your Stripe account to receive direct sales revenue. A 10% platform fee applies per sale.
@@ -298,23 +380,82 @@ function StripeConnectSection() {
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Continue Stripe setup →"}
           </Button>
+          <p className="text-xs text-gray-500">
+            Not sure what&apos;s missing? Open your{" "}
+            <a
+              href="https://dashboard.stripe.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline inline-flex items-center gap-0.5"
+            >
+              Stripe dashboard <ExternalLink className="h-3 w-3" />
+            </a>
+            {" "}— Stripe shows exactly which verification step is outstanding.{" "}
+            <a href="/admin/help?article=ha07" className="text-blue-600 hover:underline">Learn more</a>.
+          </p>
         </div>
       ) : (
         /* ── Not connected ───────────────────────────────────────────────── */
         <div className="space-y-4">
-          <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
-            <p className="font-medium">How payouts work</p>
-            <p className="text-blue-600 text-xs">
-              Connect your Stripe account in a few minutes. When readers buy your books,
-              90% goes directly to your bank account. AuthorLoft retains a 10% platform fee.
-              You never need to chase invoices or transfer money manually.
+          <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-2">
+            <p className="font-medium">First time? Here&apos;s the short version.</p>
+            <p className="text-blue-700 text-xs leading-relaxed">
+              Stripe is the company that handles card payments and sends the money to your bank.
+              This is <strong>separate</strong> from your AuthorLoft subscription — you don&apos;t need
+              it to use the platform, only if you want to sell books directly. Setup takes about
+              5–10 minutes and Stripe walks you through every screen.
+            </p>
+            <p className="text-blue-700 text-xs leading-relaxed">
+              When a reader buys, <strong>90% goes straight to your bank</strong> and AuthorLoft
+              keeps a 10% platform fee. No invoices, no manual transfers.
+            </p>
+            <p className="pt-1">
+              <a
+                href="/admin/help?article=ha_stripe_what"
+                className="text-xs font-medium text-blue-700 hover:underline inline-flex items-center gap-1"
+              >
+                Read the full beginner&apos;s guide
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </p>
           </div>
+
+          <details className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+            <summary className="font-medium text-gray-800 cursor-pointer select-none">
+              What you&apos;ll need before you click Connect
+            </summary>
+            <ul className="mt-3 space-y-2 text-xs text-gray-600">
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Personal details</strong> — your full legal name, date of birth, home address, phone</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Bank account info</strong> — routing &amp; account number (US) or sort code &amp; account number (UK/EU)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Tax ID</strong> — your SSN (US individuals), EIN (US businesses), or your country&apos;s equivalent</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Sometimes:</strong> a photo of your driver&apos;s licence or passport — Stripe will ask only if needed</span>
+              </li>
+            </ul>
+            <p className="mt-3 text-xs text-gray-500 italic">
+              AuthorLoft never sees any of this — it goes straight from you to Stripe.
+            </p>
+          </details>
+
           <Button onClick={handleConnect} disabled={connecting}>
             {connecting
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Connect Stripe account →"}
           </Button>
+          <p className="text-xs text-gray-400">
+            You&apos;ll be taken to Stripe&apos;s secure site, then sent back here when you&apos;re done.
+            If you stop partway, your progress is saved — just come back and click <em>Continue Stripe setup</em>.
+          </p>
           {connectError && (
             <p className="text-sm text-red-600">{connectError}</p>
           )}
@@ -376,6 +517,8 @@ function AiKeySection() {
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <Bot className="h-4 w-4 text-gray-400" />
           AI Assistant
+          <HelpTip id="ai-key" />
+          <HelpTip id="ai-usage-cap" />
         </h2>
         <p className="text-xs text-gray-400 mt-1">
           Add your own Gemini API key to unlock unlimited AI requests. Without it, a monthly usage cap applies.{" "}
@@ -437,13 +580,13 @@ function AiKeySection() {
                 onClick={() => handleAction("save")}
                 className="text-sm"
               >
-                Save New Key
+                <Check className="h-4 w-4 mr-1.5" /> Save New Key
               </Button>
               <Button
-                variant="outline"
+                variant="danger"
                 disabled={busy}
                 onClick={() => handleAction("remove")}
-                className="text-sm text-red-600 hover:bg-red-50 border-red-200 ml-auto"
+                className="text-sm ml-auto"
               >
                 <Trash2 className="h-4 w-4 mr-1.5" /> Remove Key
               </Button>
@@ -485,7 +628,7 @@ function AiKeySection() {
               onClick={() => handleAction("save")}
               className="text-sm"
             >
-              Save Key
+              <Check className="h-4 w-4 mr-1.5" />Save Key
             </Button>
           </div>
         </div>
@@ -622,13 +765,662 @@ function AdminThemeSection() {
   );
 }
 
-// ── Main Settings page ────────────────────────────────────────────────────────
+// ── Email Preferences section ─────────────────────────────────────────────────
 
-export default function SettingsPage() {
+function EmailPreferencesSection() {
+  const [optOut,   setOptOut]   = useState(false);
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
+  const [saved,    setSaved]    = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/email-preferences")
+      .then(r => r.json())
+      .then(d => setOptOut(d.optOut ?? false))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleToggle() {
+    const newValue = !optOut;
+    setSaving(true);
+    setSaved(false);
+    try {
+      await fetch("/api/admin/settings/email-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ optOut: newValue }),
+      });
+      setOptOut(newValue);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {}
+    finally { setSaving(false); }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <Bell className="h-4 w-4 text-gray-400" />
+        <h2 className="font-semibold text-gray-900">Platform Communications</h2>
+      </div>
+      <p className="text-sm text-gray-500">
+        Control whether you receive announcements, offers, and updates from the AuthorLoft team.
+      </p>
+
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      ) : (
+        <div className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <button
+              role="switch"
+              aria-checked={!optOut}
+              onClick={handleToggle}
+              disabled={saving}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 ${
+                !optOut ? "bg-[var(--accent)]" : "bg-gray-200"
+              }`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${!optOut ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className="text-sm font-medium text-gray-700">
+              {!optOut ? "Receiving platform emails" : "Opted out of platform emails"}
+            </span>
+            {saving && <Loader2 className="h-3.5 w-3.5 animate-spin text-gray-400" />}
+            {saved  && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
+          </label>
+          <p className="text-xs text-gray-400">
+            You will always receive transactional emails (password resets, billing receipts, order confirmations) regardless of this setting.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ── Tab types ────────────────────────────────────────────────────────────────
+
+type SettingsTab = "account" | "billing" | "integrations" | "appearance" | "communications" | "danger";
+
+const TABS: { id: SettingsTab; label: string }[] = [
+  { id: "account",        label: "Account"        },
+  { id: "billing",        label: "Billing"        },
+  { id: "integrations",   label: "Integrations"   },
+  { id: "appearance",     label: "Appearance"     },
+  { id: "communications", label: "Communications" },
+  { id: "danger",         label: "Danger Zone"    },
+];
+
+// ── Showcase opt-in toggle ────────────────────────────────────────────────────
+
+type ShowcaseStyle = "photo" | "book" | "text";
+
+const SHOWCASE_STYLES: { value: ShowcaseStyle; label: string; description: string }[] = [
+  { value: "photo", label: "Profile photo",  description: "Your author photo, name, and tagline" },
+  { value: "book",  label: "Book cover",     description: "Your featured book cover, name, and tagline" },
+  { value: "text",  label: "Text only",      description: "Name and tagline only — no image" },
+];
+
+function ShowcaseToggle() {
+  const [enabled,  setEnabled]  = useState<boolean | null>(null);
+  const [style,    setStyle]    = useState<ShowcaseStyle>("photo");
+  const [saving,   setSaving]   = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    fetch("/api/admin/settings/showcase")
+      .then((r) => r.json())
+      .then((d) => {
+        setEnabled(d.showInShowcase ?? false);
+        setStyle(d.showcaseStyle ?? "photo");
+      })
+      .catch(() => { setEnabled(false); });
+  }, []);
+
+  async function patch(updates: { showInShowcase?: boolean; showcaseStyle?: ShowcaseStyle }) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/showcase", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(updates),
+      });
+      if (res.ok) {
+        if (updates.showInShowcase !== undefined) {
+          setEnabled(updates.showInShowcase);
+          toast("success", updates.showInShowcase
+            ? "Your site will appear in the AuthorLoft showcase."
+            : "Your site has been removed from the showcase.");
+        }
+        if (updates.showcaseStyle !== undefined) {
+          setStyle(updates.showcaseStyle);
+          toast("success", "Display style updated.");
+        }
+      } else {
+        toast("error", "Could not update showcase setting.");
+      }
+    } catch {
+      toast("error", "Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+        <Globe className="h-4 w-4 text-gray-400" />
+        Marketing Showcase
+      </h2>
+      <p className="text-xs text-gray-400">
+        Opt in to have your author site featured as a real example on the AuthorLoft homepage, inspiring potential new authors.
+      </p>
+
+      {/* Opt-in toggle */}
+      <div className="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            {enabled ? "Featured in showcase" : "Not in showcase"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {enabled
+              ? "Your site is visible to visitors on the AuthorLoft homepage."
+              : "Opt in to help inspire new authors by showcasing your site."}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={!!enabled}
+          disabled={saving || enabled === null}
+          onClick={() => patch({ showInShowcase: !enabled })}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+            enabled ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          {saving
+            ? <Loader2 className="h-3 w-3 animate-spin text-white absolute left-1/2 -translate-x-1/2" />
+            : <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+          }
+        </button>
+      </div>
+
+      {/* Display style — only shown when opted in */}
+      {enabled && (
+        <div className="space-y-2 pt-1">
+          <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Display style</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {SHOWCASE_STYLES.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={saving}
+                onClick={() => { if (style !== opt.value) patch({ showcaseStyle: opt.value }); }}
+                className={`text-left px-4 py-3 rounded-xl border-2 transition-all text-sm disabled:opacity-50 ${
+                  style === opt.value
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
+                }`}
+              >
+                <p className={`font-semibold text-sm ${style === opt.value ? "text-blue-700" : "text-gray-800"}`}>
+                  {opt.label}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{opt.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function BadgesToggle() {
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [saving,  setSaving]  = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    fetch("/api/admin/settings/badges")
+      .then((r) => r.json())
+      .then((d) => setEnabled(d.showBadges ?? true))
+      .catch(() => { setEnabled(true); });
+  }, []);
+
+  async function patch(showBadges: boolean) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/badges", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ showBadges }),
+      });
+      if (res.ok) {
+        setEnabled(showBadges);
+        toast("success", showBadges
+          ? "Your achievement badges will now show publicly."
+          : "Your achievement badges are now hidden.");
+      } else {
+        toast("error", "Could not update badge setting.");
+      }
+    } catch {
+      toast("error", "Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+        <Award className="h-4 w-4 text-gray-400" />
+        Achievement Badges
+      </h2>
+      <p className="text-xs text-gray-400">
+        Badges are earned automatically from your activity — books published, direct sales,
+        reviews, and more. They can appear on your Bookstore listing and author site.
+      </p>
+
+      <div className="flex items-center justify-between gap-4 py-3 border-t border-gray-100">
+        <div>
+          <p className="text-sm font-medium text-gray-800">
+            {enabled ? "Badges visible" : "Badges hidden"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {enabled
+              ? "Any badges you've earned are shown publicly."
+              : "Your earned badges are hidden from public pages."}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={!!enabled}
+          disabled={saving || enabled === null}
+          onClick={() => patch(!enabled)}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+            enabled ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          {saving
+            ? <Loader2 className="h-3 w-3 animate-spin text-white absolute left-1/2 -translate-x-1/2" />
+            : <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+          }
+        </button>
+      </div>
+    </section>
+  );
+}
+
+// ── Site URL ──────────────────────────────────────────────────────────────────
+
+function SiteUrlSection() {
+  const toast = useToast();
+
+  const [currentSlug, setCurrentSlug] = useState<string | null>(null);
+  const [customDomain, setCustomDomain] = useState<string | null>(null);
+  const [slug, setSlug] = useState("");
+  const [status, setStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/settings/slug")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.slug) { setCurrentSlug(d.slug); setSlug(d.slug); }
+        if (d.customDomain) setCustomDomain(d.customDomain);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Debounced availability check — skipped while the value still matches what's
+  // saved. Uses the authenticated endpoint so reclaiming one of your own retired
+  // slugs reads as available rather than "already used".
+  useEffect(() => {
+    if (!slug || currentSlug === null) { setStatus("idle"); return; }
+    if (slug === currentSlug) { setStatus("idle"); return; }
+
+    setStatus("checking");
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/admin/settings/slug?check=${encodeURIComponent(slug)}`);
+        const data = await res.json();
+        if (data.available) { setStatus("available"); setStatusMessage(""); }
+        else { setStatus("unavailable"); setStatusMessage(data.message || "Not available"); }
+      } catch {
+        setStatus("idle");
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [slug, currentSlug]);
+
+  const changed = !!currentSlug && slug !== currentSlug;
+
+  async function handleSave() {
+    setError("");
+    if (!changed) return;
+    if (!confirm(
+      `Change your site URL to ${slug}.${PLATFORM_DOMAIN}?\n\n` +
+      `Your old address (${currentSlug}.${PLATFORM_DOMAIN}) will automatically ` +
+      `redirect here, so existing links keep working.`
+    )) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings/slug", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Could not update your site URL."); return; }
+      setCurrentSlug(data.slug);
+      setSlug(data.slug);
+      setStatus("idle");
+      toast("success", "Site URL updated");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Site URL
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          The address readers use to find your author site. We picked one from your name when
+          you signed up — change it to whatever you'd like.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-gray-700">Your address</label>
+        <div className="flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 overflow-hidden max-w-md">
+          <input
+            type="text"
+            value={slug}
+            onChange={(e) => { setSlug(slugify(e.target.value)); setError(""); }}
+            placeholder="yourname"
+            maxLength={40}
+            className="flex-1 px-3 py-2 text-sm bg-transparent focus:outline-none"
+          />
+          <span className="px-3 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-400 whitespace-nowrap flex-shrink-0">
+            .{PLATFORM_DOMAIN}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 h-5">
+          {status === "checking"  && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
+          {status === "available" && <Check className="h-4 w-4 text-green-500" />}
+          {changed && status !== "idle" && (
+            <span className={`text-xs font-medium ${
+              status === "available"   ? "text-green-600" :
+              status === "unavailable" ? "text-red-600"   : "text-gray-400"
+            }`}>
+              {status === "available"   && "Available!"}
+              {status === "unavailable" && statusMessage}
+              {status === "checking"    && "Checking…"}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {changed && (
+        <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <div className="space-y-1.5">
+            <p>
+              <span className="font-medium">{currentSlug}.{PLATFORM_DOMAIN}</span> will
+              automatically redirect to your new address, so links you've already shared —
+              in books, social posts, and newsletters — keep working.
+            </p>
+            <p className="text-blue-700">
+              If you've verified your site in Google Search Console, add the new address as a
+              property there too. Google follows the redirect on its own, but this speeds it up.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {customDomain && (
+        <p className="text-xs text-gray-400">
+          Your custom domain <span className="font-medium text-gray-500">{customDomain}</span> is
+          unaffected by this change.
+        </p>
+      )}
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
+      )}
+
+      <Button
+        onClick={handleSave}
+        disabled={saving || !changed || status === "unavailable" || status === "checking"}
+      >
+        {saving
+          ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+          : <><Check className="h-4 w-4 mr-2" />Update Site URL</>}
+      </Button>
+    </section>
+  );
+}
+
+// ── Custom Domain (bring your own) ──────────────────────────────────────────────
+
+type CustomDomainState = {
+  domain: string | null;
+  status?: "PENDING" | "VERIFIED" | "ERROR" | null;
+  dnsInstructions?: { type: string; name: string; value: string } | null;
+};
+
+function CustomDomainSection() {
+  const toast = useToast();
+
+  const [loading, setLoading]   = useState(true);
+  const [gated, setGated]       = useState(false);
+  const [gateReason, setGateReason] = useState("");
+  const [state, setState]       = useState<CustomDomainState | null>(null);
+  const [input, setInput]       = useState("");
+  const [linking, setLinking]   = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
+  const [error, setError]       = useState("");
+
+  async function load() {
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain");
+      const data = await res.json();
+      if (res.status === 403) { setGated(true); setGateReason(data.error || ""); return; }
+      setState(data);
+    } catch {
+      // best-effort — leave state null, section stays quiet rather than erroring loudly
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  async function handleLink() {
+    setError("");
+    if (!input.trim()) return;
+    setLinking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: input.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Could not link that domain."); return; }
+      setState(data);
+      setInput("");
+      toast("success", "Domain linked — add the DNS record below to finish setup.");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLinking(false);
+    }
+  }
+
+  async function handleCheck() {
+    setChecking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain?refresh=1");
+      const data = await res.json();
+      if (res.ok) {
+        setState(data);
+        if (data.status === "VERIFIED") toast("success", "Your domain is live!");
+        else if (data.status === "ERROR") toast("error", "Couldn't verify that domain — double-check the DNS record.");
+      }
+    } catch {
+      // leave current state as-is on network failure
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  async function handleUnlink() {
+    if (!state?.domain) return;
+    if (!confirm(
+      `Unlink ${state.domain}? Your site will immediately revert to its AuthorLoft subdomain address.`
+    )) return;
+    setUnlinking(true);
+    try {
+      const res = await fetch("/api/admin/settings/custom-domain", { method: "DELETE" });
+      if (res.ok) {
+        setState({ domain: null });
+        toast("success", "Domain unlinked — your site is back on its subdomain.");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast("error", data.error || "Could not unlink that domain.");
+      }
+    } finally {
+      setUnlinking(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6">
+        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+      </section>
+    );
+  }
+
+  if (gated) {
+    return (
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-3">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Custom Domain
+        </h2>
+        <p className="text-sm text-gray-500">
+          {gateReason || "Custom domains are available on the Standard and Premium plans."}
+        </p>
+        <a
+          href="/admin/settings#billing"
+          className="inline-block px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+        >
+          Upgrade Plan
+        </a>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+      <div>
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-gray-400" />
+          Custom Domain
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Optional — use a domain you already own instead of your AuthorLoft subdomain.
+          Unlink anytime to go back.
+        </p>
+      </div>
+
+      {!state?.domain ? (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 max-w-md">
+            <Input
+              value={input}
+              onChange={(e) => { setInput(e.target.value); setError(""); }}
+              placeholder="yourname.com"
+              className="flex-1"
+            />
+            <Button onClick={handleLink} disabled={linking || !input.trim()}>
+              {linking ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Linking…</> : "Link domain"}
+            </Button>
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-gray-900">{state.domain}</span>
+            {state.status === "VERIFIED" && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                <Check className="h-3 w-3" /> Live
+              </span>
+            )}
+            {state.status === "PENDING" && (
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                Pending DNS
+              </span>
+            )}
+            {state.status === "ERROR" && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+                <AlertCircle className="h-3 w-3" /> Error
+              </span>
+            )}
+          </div>
+
+          {state.status !== "VERIFIED" && state.dnsInstructions && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 space-y-2">
+              <p className="font-medium">Add this DNS record at your domain registrar:</p>
+              <div className="font-mono text-xs bg-white rounded border border-blue-100 px-3 py-2 flex flex-wrap gap-x-6 gap-y-1">
+                <span>Type: <strong>{state.dnsInstructions.type}</strong></span>
+                <span>Name: <strong>{state.dnsInstructions.name}</strong></span>
+                <span>Value: <strong>{state.dnsInstructions.value}</strong></span>
+              </div>
+              <p className="text-blue-700 text-xs">
+                DNS changes can take anywhere from a few minutes to a few hours to take effect.
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={handleCheck} disabled={checking}>
+              {checking ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Checking…</> : "Check status"}
+            </Button>
+            <Button variant="danger" onClick={handleUnlink} disabled={unlinking}>
+              {unlinking
+                ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Unlinking…</>
+                : <><Trash2 className="h-4 w-4 mr-2" />Unlink</>}
+            </Button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ── Account tab content ───────────────────────────────────────────────────────
+
+function AccountTab() {
   const { data: session } = useSession();
   const user = session?.user as any;
 
-  // Change password state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -651,13 +1443,8 @@ export default function SettingsPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
-
     const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
+    if (validationError) { setError(validationError); return; }
     setSaving(true);
     try {
       const res = await fetch("/api/admin/settings/change-password", {
@@ -665,38 +1452,23 @@ export default function SettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
-        return;
-      }
-
-      // Success — clear the form
+      if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return; }
       setSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="space-y-8 max-w-2xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account preferences.</p>
-      </div>
-
-      {/* ── Account Info ──────────────────────────────────────────── */}
+    <div className="space-y-6">
+      {/* Account info */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2">
           <User className="h-4 w-4 text-gray-400" />
-          Account
+          Account Info
         </h2>
-
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">Name</label>
@@ -705,62 +1477,51 @@ export default function SettingsPage() {
               {user?.name || "—"}
             </div>
           </div>
-
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-600">
               <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
               {user?.email || "—"}
             </div>
-            <p className="text-xs text-gray-400">
-              To change your email address, please contact support.
-            </p>
+            <p className="text-xs text-gray-400">To change your email, please contact support.</p>
           </div>
         </div>
       </section>
 
-      {/* ── Change Password ───────────────────────────────────────── */}
+      {/* Site URL */}
+      <SiteUrlSection />
+
+      {/* Custom Domain */}
+      <CustomDomainSection />
+
+      {/* Marketing showcase opt-in */}
+      <ShowcaseToggle />
+
+      {/* Achievement badges opt-in */}
+      <BadgesToggle />
+
+      {/* Change password */}
       <section className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-5">
           <KeyRound className="h-4 w-4 text-gray-400" />
           Change Password
         </h2>
-
         {success ? (
           <div className="flex flex-col items-center gap-3 py-8 text-center">
             <CheckCircle className="h-10 w-10 text-green-500" />
             <p className="font-medium text-gray-900">Password updated successfully</p>
             <p className="text-sm text-gray-500">Your new password is active.</p>
-            <Button
-              variant="outline"
-              className="mt-2"
-              onClick={() => setSuccess(false)}
-            >
-              Change Again
-            </Button>
+            <Button variant="outline" className="mt-2" onClick={() => setSuccess(false)}>Change Again</Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Current Password"
-              type="password"
-              value={currentPassword}
+            <Input label="Current Password" type="password" value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
-              autoComplete="current-password"
-              required
-            />
-
+              placeholder="Enter your current password" autoComplete="current-password" required />
             <div className="space-y-1.5">
-              <Input
-                label="New Password"
-                type="password"
-                value={newPassword}
+              <Input label="New Password" type="password" value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Uppercase, number, special char"
-                autoComplete="new-password"
-                required
-              />
+                placeholder="Uppercase, number, special char" autoComplete="new-password" required />
               {newPassword && (
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
                   {[
@@ -777,71 +1538,103 @@ export default function SettingsPage() {
                 </ul>
               )}
             </div>
-
             <div className="space-y-1">
-              <Input
-                label="Confirm New Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  if (error === "New passwords do not match.") setError("");
-                }}
-                placeholder="Repeat your new password"
-                autoComplete="new-password"
-                required
-              />
-              {/* Live match indicator */}
+              <Input label="Confirm New Password" type="password" value={confirmPassword}
+                onChange={(e) => { setConfirmPassword(e.target.value); if (error === "New passwords do not match.") setError(""); }}
+                placeholder="Repeat your new password" autoComplete="new-password" required />
               {confirmPassword.length > 0 && (
                 <p className={`text-xs ${newPassword === confirmPassword ? "text-green-600" : "text-red-500"}`}>
                   {newPassword === confirmPassword ? "✓ Passwords match" : "Passwords do not match"}
                 </p>
               )}
             </div>
-
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                {error}
-              </p>
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
             )}
-
             <div className="pt-1">
               <Button type="submit" disabled={saving}>
-                {saving
-                  ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Updating...</>
-                  : "Update Password"}
+                {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Updating...</> : "Update Password"}
               </Button>
             </div>
           </form>
         )}
       </section>
+    </div>
+  );
+}
 
-      {/* ── Subscription & Billing ───────────────────────────────── */}
-      <SubscriptionSection />
+// ── Main Settings page ────────────────────────────────────────────────────────
 
-      {/* ── Stripe Connect ───────────────────────────────────────── */}
-      <StripeConnectSection />
+export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState<SettingsTab>("account");
 
-      {/* ── AI Assistant ─────────────────────────────────────────── */}
-      <AiKeySection />
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab") as SettingsTab | null;
+    if (tabParam && TABS.some((t) => t.id === tabParam)) {
+      setActiveTab(tabParam);
+    } else if (window.location.hash === "#billing") {
+      setActiveTab("billing");
+    }
+  }, []);
 
-      {/* ── Admin Theme ──────────────────────────────────────────── */}
-      <AdminThemeSection />
+  return (
+    <div className="space-y-0 max-w-2xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage your account preferences.</p>
+      </div>
 
-      {/* ── Danger Zone ───────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-red-100 p-6">
-        <h2 className="font-semibold text-red-700 mb-2">Danger Zone</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Permanently delete your AuthorLoft account and all associated data. This action cannot be undone.
-        </p>
-        <Button
-          variant="outline"
-          className="text-red-600 hover:bg-red-50 border-red-200"
-          onClick={() => alert("To delete your account, please contact support@authorloft.com")}
-        >
-          Delete Account
-        </Button>
-      </section>
+      {/* ── Tab bar ── */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex gap-1 overflow-x-auto">
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === id
+                  ? "border-[var(--accent)] text-[var(--accent)]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } ${id === "danger" ? (activeTab === "danger" ? "text-red-600 border-red-500" : "text-red-400 hover:text-red-600 hover:border-red-300") : ""}`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* ── Tab panels ── */}
+      {activeTab === "account" && <AccountTab />}
+
+      {activeTab === "billing" && (
+        <div className="space-y-6">
+          <SubscriptionSection />
+          <StripeConnectSection />
+        </div>
+      )}
+
+      {activeTab === "integrations" && <AiKeySection />}
+
+      {activeTab === "appearance" && <AdminThemeSection />}
+
+      {activeTab === "communications" && <EmailPreferencesSection />}
+
+      {activeTab === "danger" && (
+        <section className="bg-white rounded-xl border border-red-100 p-6">
+          <h2 className="font-semibold text-red-700 mb-2">Danger Zone</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Permanently delete your AuthorLoft account and all associated data. This action cannot be undone.
+          </p>
+          <Button
+            variant="danger"
+            onClick={() => alert("To delete your account, please contact support@authorloft.com")}
+          >
+            <Trash2 className="h-4 w-4 mr-1.5" />Delete Account
+          </Button>
+        </section>
+      )}
     </div>
   );
 }

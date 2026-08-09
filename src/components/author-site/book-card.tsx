@@ -7,6 +7,7 @@ import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getRetailer } from "@/lib/retailers";
 import { CoverTilt } from "./cover-tilt";
+import { sanitize } from "@/lib/sanitize";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ interface BookCardProps {
     seriesSlug?: string | null;
     externalBuyUrl?: string | null;   // legacy single-URL field
     caption?: string | null;          // e.g. "New Release!", "Coming Soon!"
+    isPreOrder?: boolean;
     releaseDate?: Date | string | null;
     salesEnabled?: boolean;
     directSalesEnabled?: boolean;
@@ -162,10 +164,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
 
         {/* Content */}
         <div className="flex-1 space-y-2">
-          {/* Caption badge */}
-          {book.caption && (
+          {/* Caption badge — falls back to "Coming Soon" for pre-order books */}
+          {(book.caption || book.isPreOrder) && (
             <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: accentColor }}>
-              {book.caption}
+              {book.caption || "Coming Soon"}
             </p>
           )}
 
@@ -248,9 +250,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
 
           {/* Description */}
           {book.shortDescription && (
-            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-              {book.shortDescription}
-            </p>
+            <div
+              className="text-sm text-gray-600 leading-relaxed line-clamp-3"
+              dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
+            />
           )}
 
           {/* Release date */}
@@ -296,14 +299,17 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
         )}
       </div>
       <div className="p-4 flex flex-col gap-2 flex-1">
-        {book.caption && (
+        {(book.caption || book.isPreOrder) && (
           <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: accentColor }}>
-            {book.caption}
+            {book.caption || "Coming Soon"}
           </p>
         )}
         <h3 className="font-semibold text-gray-900 text-sm leading-tight">{book.title}</h3>
         {book.shortDescription && (
-          <p className="text-xs text-gray-500 line-clamp-2 flex-1">{book.shortDescription}</p>
+          <div
+            className="text-xs text-gray-500 line-clamp-2 flex-1"
+            dangerouslySetInnerHTML={{ __html: sanitize(book.shortDescription) }}
+          />
         )}
 
         {/* Per-format direct sale items (card layout) */}

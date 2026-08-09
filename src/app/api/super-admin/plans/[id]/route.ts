@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
-//import { prisma } from "@/lib/prisma";
 import { prisma } from "@/lib/db";
-
-async function isSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return false;
-  const allowed = (process.env.SUPER_ADMIN_EMAIL ?? "").split(",").map((e) => e.trim().toLowerCase());
-  return allowed.includes(session.user.email.toLowerCase());
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   const body = await req.json();
   try {
@@ -34,9 +25,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.customDomain !== undefined && { customDomain: body.customDomain }),
         ...(body.salesEnabled !== undefined && { salesEnabled: body.salesEnabled }),
         ...(body.flipBooksLimit !== undefined && { flipBooksLimit: body.flipBooksLimit }),
+        ...(body.bookstoreListingLimit !== undefined && { bookstoreListingLimit: body.bookstoreListingLimit }),
         ...(body.audioEnabled !== undefined && { audioEnabled: body.audioEnabled }),
         ...(body.newsletter !== undefined && { newsletter: body.newsletter }),
         ...(body.analyticsEnabled !== undefined && { analyticsEnabled: body.analyticsEnabled }),
+        ...(body.coursesEnabled !== undefined && { coursesEnabled: body.coursesEnabled }),
+        ...(body.maxCourses !== undefined && { maxCourses: body.maxCourses }),
         ...(body.featuresJson !== undefined && { featuresJson: body.featuresJson }),
         ...(body.badgeColor !== undefined && { badgeColor: body.badgeColor }),
         ...(body.featuredLabel !== undefined && { featuredLabel: body.featuredLabel }),
@@ -47,6 +41,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     revalidatePath("/");
     revalidatePath("/pricing");
+    revalidatePath("/features");
     return NextResponse.json(plan);
   } catch (err: any) {
     if (err?.code === "P2002") return NextResponse.json({ error: "A plan with that slug already exists." }, { status: 400 });
@@ -55,7 +50,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   const subCount = await prisma.authorSubscription.count({ where: { planId: id } });
   if (subCount > 0) return NextResponse.json({ error: `Cannot delete — ${subCount} author(s) are on this plan.` }, { status: 400 });

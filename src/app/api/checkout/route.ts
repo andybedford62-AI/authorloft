@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { calcDiscount } from "@/lib/discount-queries";
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
+import { auditLog, getAuditContext } from "@/lib/audit-logger";
+import { validateCheckoutRequest } from "@/lib/schemas/checkout";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -17,14 +21,179 @@ const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.c
  */
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate Limiting ──────────────────────────────────────────────────────
+    const rateLimitKey = getRateLimitKey(req, "ip", "checkout");
+    const rateLimitResult = await checkRateLimit(
+      rateLimitKey,
+      RATE_LIMITS.checkout
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn("[checkout] Rate limit exceeded:", { rateLimitKey });
+      return NextResponse.json(
+        {
+          error: "Too many checkout attempts. Please try again in a moment.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetAt - Date.now()) / 1000
+            ).toString(),
+            "RateLimit-Limit": rateLimitResult.limit.toString(),
+            "RateLimit-Remaining": "0",
+            "RateLimit-Reset": Math.floor(rateLimitResult.resetAt / 1000).toString(),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
 
-    // Support both new cart format and legacy single-item format
+    // ── Input Validation ───────────────────────────────────────────────────
+    const validationResult = validateCheckoutRequest(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid checkout request",
+          details: validationResult.error.issues.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
+
+    const validatedBody = validationResult.data;
+
+    // ── Course checkout path ─────────────────────────────────────────────
+    if (validatedBody.courseId) {
+      const course = await prisma.course.findUnique({
+        where: { id: validatedBody.courseId },
+        include: {
+          author: {
+            select: {
+              id: true,
+              slug: true,
+              stripeConnectAccountId: true,
+              stripeConnectOnboarded: true,
+              plan: { select: { coursesEnabled: true } },
+            },
+          },
+        },
+      });
+
+      if (!course || !course.isPublished) {
+        return NextResponse.json({ error: "Course not found." }, { status: 404 });
+      }
+      if (!course.author.plan?.coursesEnabled) {
+        return NextResponse.json({ error: "Courses are not enabled for this author." }, { status: 400 });
+      }
+      if (course.priceCents <= 0) {
+        return NextResponse.json({ error: "Free course enrollment is handled separately." }, { status: 400 });
+      }
+
+      const author = course.author;
+      const totalCents = Math.max(50, course.priceCents);
+      const baseUrl = `https://${author.slug}.${PLATFORM_DOMAIN}`;
+      const successUrl = `${baseUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${baseUrl}/courses/${course.slug}`;
+      const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
+      const platformFeeCents = Math.round(totalCents * feePct);
+      const useConnect = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        billing_address_collection: "required",
+        automatic_tax: { enabled: true },
+        line_items: [{
+          price_data: {
+            currency: "usd",
+            unit_amount: totalCents,
+            product_data: {
+              name: course.title,
+              description: "Online course — lifetime access",
+              tax_code: "txcd_10401100",
+            },
+          },
+          quantity: 1,
+        }],
+        metadata: {
+          type: "course_purchase",
+          authorId: author.id,
+          courseId: course.id,
+        },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        ...(useConnect && {
+          payment_intent_data: {
+            application_fee_amount: platformFeeCents,
+            transfer_data: { destination: author.stripeConnectAccountId! },
+          },
+        }),
+      });
+
+      await prisma.order.create({
+        data: {
+          authorId: author.id,
+          customerEmail: "",
+          totalCents,
+          discountCents: 0,
+          stripeSessionId: session.id,
+          status: "PENDING",
+          items: {
+            create: [{
+              itemType: "COURSE",
+              courseId: course.id,
+              priceCents: totalCents,
+            }],
+          },
+        },
+      });
+
+      const sessionToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+      const auditContext = getAuditContext(req);
+      auditLog({
+        userId: sessionToken?.sub,
+        action: "Create checkout session",
+        endpoint: "/api/checkout",
+        method: req.method,
+        statusCode: 200,
+        ...auditContext,
+        metadata: { courseId: course.id, totalCents },
+      });
+
+      return NextResponse.json({ url: session.url });
+    }
+
+    // ── Bundle checkout path ──────────────────────────────────────────────
+    let bundleRecord: { id: string; title: string; priceCents: number; coverImageUrl: string | null } | null = null;
+
     let saleItemIds: string[];
-    if (Array.isArray(body.items) && body.items.length > 0) {
-      saleItemIds = body.items.map((i: { saleItemId: string }) => i.saleItemId).filter(Boolean);
-    } else if (typeof body.saleItemId === "string") {
-      saleItemIds = [body.saleItemId];
+    if (validatedBody.bundleId) {
+      const bundle = await prisma.bundle.findUnique({
+        where: { id: validatedBody.bundleId },
+        include: {
+          items: { include: { saleItem: { select: { id: true } } }, orderBy: { sortOrder: "asc" } },
+          author: { select: { id: true, slug: true, stripeConnectAccountId: true, stripeConnectOnboarded: true, plan: { select: { bundlesEnabled: true } } } },
+        },
+      });
+
+      if (!bundle || !bundle.isPublished) {
+        return NextResponse.json({ error: "Bundle not found." }, { status: 404 });
+      }
+      if (!bundle.author.plan?.bundlesEnabled) {
+        return NextResponse.json({ error: "Bundles are not enabled for this author." }, { status: 400 });
+      }
+
+      saleItemIds = bundle.items.map((i) => i.saleItem.id);
+      bundleRecord = { id: bundle.id, title: bundle.title, priceCents: bundle.priceCents, coverImageUrl: bundle.coverImageUrl };
+    } else if (validatedBody.items && validatedBody.items.length > 0) {
+      saleItemIds = validatedBody.items.map((i) => i.saleItemId);
+    } else if (validatedBody.saleItemId) {
+      saleItemIds = [validatedBody.saleItemId];
     } else {
       return NextResponse.json({ error: "items array is required" }, { status: 400 });
     }
@@ -33,7 +202,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No items provided." }, { status: 400 });
     }
 
-    const { discountCode } = body;
+    const { discountCode } = validatedBody;
 
     // Load all sale items with their books and author
     const saleItems = await prisma.bookDirectSaleItem.findMany({
@@ -53,6 +222,22 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // ── Affiliate referral attribution (cookie set by AffiliateRefTracker) ───
+    let affiliateBookId: string | null = null;
+    let affiliateRefCode: string | null = null;
+    const refCookie = req.cookies.get("al_ref")?.value;
+    if (refCookie) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(refCookie));
+        if (parsed?.bookId && parsed?.refCode) {
+          affiliateBookId = String(parsed.bookId);
+          affiliateRefCode = String(parsed.refCode).slice(0, 60);
+        }
+      } catch {
+        // ignore malformed cookie
+      }
+    }
 
     if (saleItems.length === 0) {
       return NextResponse.json({ error: "No valid items found." }, { status: 404 });
@@ -123,26 +308,45 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Calculate per-item price after discount ───────────────────────────────
-    const lineItems = saleItems.map((item) => {
-      let itemPrice = item.priceCents;
-      let itemDiscount = 0;
+    let hasBelowMinimumPricing = false;
 
-      if (discount) {
-        const restrictedBookIds = discount.books.map((b) => b.bookId);
-        const bookAllowed =
-          restrictedBookIds.length === 0 || restrictedBookIds.includes(item.book.id);
+    let lineItems: { item: typeof saleItems[0]; itemPrice: number; itemDiscount: number; originalPrice: number }[];
 
-        if (bookAllowed) {
-          const calc = calcDiscount(item.priceCents, discount.type, discount.value);
-          itemDiscount = calc.discountCents;
-          itemPrice    = Math.max(50, calc.finalPriceCents);
+    if (bundleRecord) {
+      const perItemPrice = Math.max(50, Math.round(bundleRecord.priceCents / saleItems.length));
+      lineItems = saleItems.map((item) => ({
+        item,
+        itemPrice: perItemPrice,
+        itemDiscount: 0,
+        originalPrice: item.priceCents,
+      }));
+    } else {
+      lineItems = saleItems.map((item) => {
+        const originalPrice = item.priceCents;
+        let itemPrice = Math.max(50, item.priceCents);
+        let itemDiscount = 0;
+
+        if (originalPrice < 50) {
+          hasBelowMinimumPricing = true;
         }
-      }
 
-      return { item, itemPrice, itemDiscount };
-    });
+        if (discount) {
+          const restrictedBookIds = discount.books.map((b) => b.bookId);
+          const bookAllowed =
+            restrictedBookIds.length === 0 || restrictedBookIds.includes(item.book.id);
 
-    const totalCents    = lineItems.reduce((s, l) => s + l.itemPrice, 0);
+          if (bookAllowed) {
+            const calc = calcDiscount(itemPrice, discount.type, discount.value);
+            itemDiscount = calc.discountCents;
+            itemPrice    = Math.max(50, calc.finalPriceCents);
+          }
+        }
+
+        return { item, itemPrice, itemDiscount, originalPrice };
+      });
+    }
+
+    const totalCents    = bundleRecord ? Math.max(50, bundleRecord.priceCents) : lineItems.reduce((s, l) => s + l.itemPrice, 0);
     const discountCents = lineItems.reduce((s, l) => s + l.itemDiscount, 0);
     const discountCodeId = discount ? discount.id : null;
 
@@ -156,18 +360,31 @@ export async function POST(req: NextRequest) {
     const useConnect       = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
 
     // Build Stripe line items
-    const stripeLineItems = lineItems.map(({ item, itemPrice }) => ({
-      price_data: {
-        currency:     "usd",
-        unit_amount:  itemPrice,
-        product_data: {
-          name:     `${item.book.title} — ${item.label}`,
-          ...(item.description ? { description: item.description } : {}),
-          tax_code: "txcd_10401100",
-        },
-      },
-      quantity: 1,
-    }));
+    const stripeLineItems = bundleRecord
+      ? [{
+          price_data: {
+            currency:     "usd",
+            unit_amount:  totalCents,
+            product_data: {
+              name:     bundleRecord.title,
+              description: `Bundle — ${saleItems.length} items included`,
+              tax_code: "txcd_10401100",
+            },
+          },
+          quantity: 1,
+        }]
+      : lineItems.map(({ item, itemPrice }) => ({
+          price_data: {
+            currency:     "usd",
+            unit_amount:  itemPrice,
+            product_data: {
+              name:     `${item.book.title} — ${item.label}`,
+              ...(item.description ? { description: item.description } : {}),
+              tax_code: "txcd_10401100",
+            },
+          },
+          quantity: 1,
+        }));
 
     // Include all saleItemIds in metadata (comma-separated for webhook)
     const session = await stripe.checkout.sessions.create({
@@ -177,12 +394,17 @@ export async function POST(req: NextRequest) {
       automatic_tax:            { enabled: true },
       line_items:               stripeLineItems,
       metadata: {
-        type:        "book_purchase",
+        type:        bundleRecord ? "bundle_purchase" : "book_purchase",
         authorId,
         saleItemIds: saleItemIds.join(","),
-        // Keep single saleItemId for backward-compat webhook (first item)
         saleItemId:  saleItemIds[0],
         bookId:      saleItems[0].book.id,
+        ...(bundleRecord && { bundleId: bundleRecord.id }),
+        hasBelowMinimumPricing: hasBelowMinimumPricing ? "true" : "false",
+        ...(affiliateBookId && affiliateRefCode && saleItems.some((i) => i.book.id === affiliateBookId && i.book.affiliateEnabled) && {
+          affiliateBookId,
+          affiliateRefCode,
+        }),
       },
       success_url: successUrl,
       cancel_url:  cancelUrl,
@@ -206,8 +428,10 @@ export async function POST(req: NextRequest) {
         status:          "PENDING",
         items: {
           create: lineItems.map(({ item, itemPrice }) => ({
+            itemType:   bundleRecord ? "BUNDLE" : "BOOK",
             bookId:     item.book.id,
             saleItemId: item.id,
+            bundleId:   bundleRecord?.id ?? null,
             priceCents: itemPrice,
             fileKey:    item.fileKey ?? null,
           })),
@@ -215,10 +439,51 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // ── Audit Log ──────────────────────────────────────────────────────
+    const sessionToken = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const auditContext = getAuditContext(req);
+    auditLog({
+      userId: sessionToken?.sub,
+      action: "Create checkout session",
+      endpoint: "/api/checkout",
+      method: req.method,
+      statusCode: 200,
+      ...auditContext,
+      metadata: {
+        saleItemIds: saleItemIds.slice(0, 3), // First 3 items only
+        itemCount: saleItemIds.length,
+        totalCents,
+        hasDiscount: !!discountCodeId,
+      },
+    });
+
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     const msg = err?.message ?? String(err);
     console.error("[checkout] Error:", msg);
-    return NextResponse.json({ error: `Something went wrong: ${msg}` }, { status: 500 });
+
+    // ── Audit Log for Error ─────────────────────────────────────────────
+    const sessionToken = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const auditContext = getAuditContext(req);
+    auditLog({
+      userId: sessionToken?.sub,
+      action: "Create checkout session",
+      endpoint: "/api/checkout",
+      method: req.method,
+      statusCode: 500,
+      errorMessage: msg,
+      ...auditContext,
+    });
+
+    return NextResponse.json(
+      { error: "We couldn't complete your checkout. Please try again, or contact support if this continues." },
+      { status: 500 }
+    );
   }
 }

@@ -19,6 +19,8 @@ export interface CartItem {
   format:        string;
   label:         string;
   priceCents:    number;
+  itemType?:     "book" | "bundle";
+  bundleId?:     string;
 }
 
 interface CartContextValue {
