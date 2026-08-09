@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 9, 2026 — `main`/`dev` sync (PR #138) confirms months of backlog already live in prod
+
+Audit triggered by "did Course Creator actually make it to prod?" turned up a much bigger finding: `main` had drifted 26 commits behind `dev` (stale scaffolding, one real fix already present in `dev`), so `main` no longer reflected reality. Vercel's **Production** environment tracks `main` (confirmed in Settings → Environments), while `dev`-branch builds have been getting to production the whole time via manual **Promote to Production** in the Vercel dashboard — a legitimate, intentional part of the documented dev → staging → prod workflow, not a misconfiguration. The result: production has actually been current with `dev` all along, but `main` itself (and this changelog) didn't reflect it.
+
+- Merged `dev` into `main` via [PR #138](https://github.com/andybedford62-AI/authorloft/pull/138) (merge commit `1f479768`) instead of a force-push, so no history was rewritten.
+- Verified via Vercel deployment history: the current production deployment is built from that exact merge commit, and prior `dev` commits going back months all show `action: "promote"` to production.
+- **Consequence:** every changelog entry previously marked "not yet promoted to prod" (18 entries, June 14 – Aug 8) is now confirmed live in production, including all of the Course Creator work (CSV import, categories, onboarding fork, FREE-tier enablement, bookstore listing) and self-serve custom domains. Tags updated below to reflect this.
+
 ## August 9, 2026 — Founding Member designation
 
 Manual (non-metric) status for early authors, distinct from the existing achievement-badge system (`BadgeDefinition`, auto-calculated from books/revenue/reviews thresholds) — this is Super-Admin-awarded, not earned.
@@ -36,7 +44,7 @@ Repo audit found `Author.customDomain` and hostname-based routing already existe
 - Scope: bring-your-own-domain only — no domain purchasing/registrar integration (author still buys the domain themselves elsewhere, e.g. Namecheap/GoDaddy).
 - `VERCEL_API_TOKEN`, `VERCEL_PROJECT_ID`, and `VERCEL_TEAM_ID` (this project is team-scoped) are all configured in Vercel across Production, Preview, and Development — confirmed via build `[required-env]` logs rather than ever viewing the values directly. Took three rounds to get right: the token/project ID landed first, then team ID was set on Production only (missed on Preview, which is what staging actually runs), then corrected.
 - **Verified working on staging** — linked a real test domain (`test-example-checkme.com`) through the live UI: came back "Pending DNS" with the correct DNS record (A → `76.76.21.21` for an apex domain), confirming the Vercel API round-trip actually works, not just that the UI renders.
-- **Not yet promoted to prod** — live and tested on `dev`/staging only as of this writing.
+- **Promoted to prod Aug 9, 2026** — confirmed live via the `main`/`dev` sync (PR #138) and current production deployment.
 
 ## August 8, 2026 — Security hardening sweep + branch cleanup
 
@@ -399,7 +407,7 @@ Presentational only — no logic changed. Verified with `tsc --noEmit` and a ful
 - **Auto pre-order launch email** — new `autoSendLaunchEmail` opt-in toggle on the book pre-order section. A new daily cron (`/api/cron/launch-preorders`, 08:00 UTC) fires when `preOrderDate` has passed; passes a readiness gate (published + cover + buy option) before sending; flips `isPreOrder` off automatically. Manual override button unchanged.
 
 ## June 16, 2026 — Admin CRUD UI standardization (rolling)
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 Locked and applied a consistent button/icon standard across the entire admin section. Standard: **Check icon = Save/Update**, **Plus icon = Create/Add**, **Trash2 icon = Delete**, **ghost variant = Cancel** (no fill), **danger variant = muted-to-red delete** (not solid red). Rolling out in 7 commits:
 - **Foundation:** reconciled `IconButton` variants; updated `ICON_BUTTON_GUIDE.md`; converted Direct Sales and Audio Previews row actions.
 - **Page-level Add buttons** swept across all admin list pages (affiliate, pre-orders, resources, specials, ARC, etc.) — now consistently use accent `Button` with Plus icon.
@@ -420,7 +428,7 @@ Locked and applied a consistent button/icon standard across the entire admin sec
 - **`src/components/super-admin/` full sweep** (21 files) — the entire shared super-admin component directory (FAQs, Testimonials, Support Emails, Feature Config, Platform Post, Social Post, Welcome Email, Help Article, Help Centre Admin, Plan Form, SEO Panel, Subscribers, Social Links, Social Platform Connect, Beta Mode, AI Cap Control, Marketing Hero Image, Maintenance Toggle, Signup Notifications, Plans Table, Mass Email) — all hand-rolled purple/blue/red/gray-900 buttons converted to the locked `Button`/`IconButton` standard.
 
 ## June 16, 2026 — Book edit UX polish batch
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Sticky book title** — the accent-colored book title now stays pinned to the top of the edit screen while you scroll, so it's always clear which book you're working on.
 - **Accurate first-book guidance** — the green "what to do next" banner now references the real tab names (**Direct Sales**, **Buy Links**) and correctly explains that Details/Organisation use Save Changes while other tabs save as you go (removed the inaccurate "everything auto-saves" line).
 - **Unsaved-changes guard** — editing fields on Details/Organisation and then closing the tab or hitting Cancel now prompts "You have unsaved changes" instead of silently discarding them.
@@ -429,12 +437,12 @@ _(on staging — not yet promoted to prod)_
 - **Consistent "Saved" feedback** — Direct Sales actions (add format, file upload, toggle magnet/active, edit, remove) now show a success toast, matching the "Saved ✓" confirmation on the main form.
 
 ## June 16, 2026 — Book edit UX: stay on tab after save + prominent title
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Saving a book no longer kicks you back to the book list.** On the Details/Organisation tabs, "Save Changes" now keeps you exactly where you are (same tab) and shows a brief "Saved ✓" confirmation, instead of navigating away to `/admin/books`. First save of a brand-new book still opens the edit screen as before.
 - **Book title is now prominent on the edit page** — the book's name is the large, accent-colored heading (with a small "Editing book" eyebrow) so it's always clear which book you're working on.
 
 ## June 16, 2026 — Reader Magnets decoupled from Stripe + available on all plans
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Reader Magnets reworked to be simple and Stripe-independent.** A Reader Magnet is now understood as "give this edition away free in exchange for a reader's email" — it never touches Stripe, since no money changes hands. Changes:
   - **Available on every plan** (FREE/STANDARD/PREMIUM), not just paid plans. Free-plan authors see a "Free Reader Magnets" mode in the Direct Sales tab: add a downloadable format, upload a file, and it's automatically offered free (no price field, no Stripe).
   - **The full-screen "Connect Stripe" wall is gone.** The Direct Sales tab always shows the editions list + Add Format. Stripe is now a non-blocking banner that only matters for *paid* editions.
@@ -444,40 +452,40 @@ _(on staging — not yet promoted to prod)_
   - Files touched: public book page, `direct-sales` create/activate APIs, `DirectSalesItems` admin component, `BookForm` copy. Billing link from the Enable Direct Sales toggle (earlier today) retained.
 
 ## June 16, 2026 — QR Code Generator + Reader Magnet + US Privacy
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Book QR Code** — the Organisation tab of every book in admin now includes a **QR Code card** showing a scannable QR code that links directly to the book's public URL. One click downloads the code as an SVG file, ready to drop into bookmarks, event table cards, author swag, newsletters, or printed materials. No plan restriction — available on all tiers. *(zero schema changes; `react-qr-code` SVG component)*
 - **Reader Magnet** — authors can now mark any direct sale file as a free reader magnet (toggle appears on items with a file uploaded). On the public book page, magnet items show a **"[Format] — Free"** gift button instead of a buy button. Readers click it, enter their name and email, and instantly receive a **time-limited download link** by email (7-day expiry, up to 3 downloads). The reader is simultaneously added to the author's newsletter subscriber list. Replaces the need for BookFunnel for list-building. New DB table `BookMagnetLead`; new API routes `POST /api/author/reader-magnet` and `GET /api/reader-magnet/download/[token]`; rate-limited at 5 requests/IP:email/hour. *(STANDARD and PREMIUM plans)*
 - **US State Privacy page** — `/us-privacy` now live; California, Virginia, Colorado, and other state privacy rights (opt-out of sale/sharing, deletion, correction requests). Linked from the Privacy Policy and GDPR pages.
 
 ## June 16, 2026 — Sales Revenue Charts + Book Launch Mode
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Sales Revenue Charts** — three new data panels on the `/admin/sales` dashboard sitting between the stat cards and the orders table. A period selector (30 days / 90 days / 12 months) controls all three simultaneously: an **Area Chart** traces revenue day by day over the selected window, a **Horizontal Bar Chart** ranks your top 10 books by revenue earned, and a **Format Breakdown** shows the percentage split across eBook, Audio, Flip Book, and Print with progress bars. All data comes from your real completed orders — no estimates. Powered by Recharts; live-reloads on period change without a page refresh. (STANDARD and PREMIUM plans)
 - **Book Launch Mode — Countdown Timer** — a new "Launch Countdown" toggle in each book's Organisation tab (Visibility & Publishing section). Enable it, set a launch date and time, save — and a live days/hours/minutes/seconds countdown appears on your public book page in your site's accent color. It counts down to the second and disappears the moment the date passes, automatically, with no further action needed. Use it alongside the existing Pre-order Coming Soon feature, or standalone for a relaunch, paperback drop, or limited-time event. (All plans)
 - **Launch Toolkit panel** — a new card appears on the Organisation tab every time you edit a book. It shows a 5-point **readiness checklist** (cover uploaded, description added, genre assigned, sales or buy links configured, published or pre-order active) with a live done count so you can spot what's still missing before launch day. Below that, a pre-written **social announcement** ("🚀 My new book [Title] is live — [URL]") is ready to copy with one click for Instagram, X/Twitter, Facebook, or LinkedIn. No formatting needed.
 
 ## June 16, 2026 — Admin Books: rich Status column
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Books list Status column** — the single Published / Draft badge on the `/admin/books` list is replaced by a richer set of badges showing all five Visibility & Publishing flags at once. The primary badge reflects the real state — **Pre-order** (blue clock), **Published** (green), or **Draft** (amber). Up to three secondary badges then appear inline: **Featured** (amber star, appears when the book is the homepage hero), **Direct Sales** (blue cart, appears when direct selling is enabled), and **Bookstore** (purple store, appears when listed in the AuthorLoft Bookstore). At a glance you can see exactly how each book is configured without clicking into it.
 
 ## June 16, 2026 — Feature Matrix updated + code quality pass
-_(on staging — not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Feature Matrix** (`docs/FEATURE_MATRIX.md`) overhauled as the canonical "what's built" reference — expanded Super Admin section with 15+ previously undocumented features (Resources CMS, FAQ Manager, Content Categories, Social Poster, ARC Management, Bookstore Management, etc.); Analytics section split into stat cards vs. revenue charts; Book Launch Mode, Per-Author Social Posting, and Shareable Promo Graphics added to Upcoming; quick-reference note added at top so future sessions check the matrix first and skip the code dive
 - **Code quality / security review** — all findings from a full codebase review addressed: coupon validation (allowlist for currency/duration/discount-type; percent cap at 100; name non-empty check); OG image URL validation (must be `https://` + image extension); OG upload 5 MB file-size cap before reading to memory; Stripe subscribe route merged a duplicate Prisma query; trial days display guarded against negative values; author coupon assignment API wrapped in try/catch with correct 404 vs 500 responses
 
 ## June 15, 2026 — Bookstore card cleanup: price in body, modern vertical card
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Price moved off the cover into the card body** on every card (vertical New/Trending cards + All Books list cards), shown alongside the title/author/rating data (green for "Free"). No more price chip overlapping the cover art
 - **Modernized the vertical card** (New on the Shelf + Trending): a single priority badge instead of a stack, removed the "Buy on Author's Site" CTA (the whole card already links to the book), and a hairline divider + standalone "Quick view" action. Card is now a client component that self-manages its Quick View modal, so it works inside the server-rendered showcase rows
 - Trending cards now expose Quick View; the All Books list cards are unchanged except for the added price
 
 ## June 15, 2026 — Bookstore "All Books" layout redesign
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Compact horizontal list cards** — the All Books catalog moved from a 4-up vertical-cover grid to a denser 3-up grid of horizontal cards (cover left; title, author, rating, genres right). Drops price + the "Buy" CTA from the card — those live in Quick View and on the book page. New `bookstore-list-card.tsx`; the curated New/Trending rows keep their vertical covers so the two zones read differently
 - **Whole card + cover** still open the book (stretched link); the **author name** links to the author's site; **Quick view** fades in on hover (always visible on touch, keyboard-focusable) and opens the existing modal
 - **Per-page selector** — All Books defaults to 24/page with a "Show 24 / 48 / 96" dropdown (only appears once there are more than 24 results); numbered pagination retained for SEO/deep-linking
 
 ## June 15, 2026 — Backlog batch: 5 small features
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Clickable author name on bookstore cards** — the card was a single wrapping link, so the author name couldn't be its own link. Restructured `bookstore-book-card.tsx` with a stretched-link pattern: the whole card still opens the book, while the author name links separately to the author's site. Added `authorUrl` to the bookstore data. Applies to grid + New/Trending rows
 - **Bookstore quick-view modal** — a "Quick view" button on each catalog card opens a modal (cover, blurb, rating, formats, price, genres, author link, "Buy on Author's Site" CTA) without leaving the store. New `bookstore-quick-view.tsx`; state lifted into the (already client) `BookstoreGrid`; closes on backdrop/Esc with body-scroll lock. Added a stripped `description` to the bookstore data
 - **Email the gated download** — unlocking an email-gated resource now also emails the lead a copy of the download link (`sendResourceDownloadEmail`), in addition to the instant link. Best-effort — never blocks the unlock
@@ -485,7 +493,7 @@ _(not yet promoted to prod)_
 - **Publish News post → email subscribers (one-click)** — a checkbox on published News posts emails the issue (headline, excerpt, cover, read link) to confirmed `PlatformSubscriber`s, reusing the broadcast batch infra. New `POST /api/super-admin/blog/posts/[id]/email`, a platform-subscriber unsubscribe route (`/api/newsletter/unsubscribe/platform`), and a `PlatformPost.newsEmailedAt` timestamp that guards against double-sends. **DB:** additive nullable column `PlatformPost.newsEmailedAt` (apply to Supabase before promoting)
 
 ## June 15, 2026 — GEO: comparison pages (BookFunnel, StoryOrigin, Tertulia)
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Three "vs" comparison landing pages** (GEO/SEO assets from the AI-visibility plan): `/compare/bookfunnel`, `/compare/storyorigin`, `/compare/tertulia`. Each has the shared brand-band header, "choose which" cards, a feature comparison table, core-difference prose, and an FAQ section with `FAQPage` structured data (high-value for AI extraction)
 - **Refactored to a single dynamic route** `/compare/[competitor]` + a `comparison-data.tsx` source of truth and a shared `ComparisonPage` component (the original static bookfunnel page was folded in). Adding a competitor is now a data-only change; `sitemap.ts` generates entries from the same list
 - **Accuracy checked** against each product's real positioning (web-verified): BookFunnel = delivery/reader-magnets; StoryOrigin = author marketing toolkit (newsletter swaps — credited as its win); Tertulia = reader discovery app with a basic author site that links out to retailers. Comparisons are fair, not hit pieces
@@ -493,23 +501,23 @@ _(not yet promoted to prod)_
 - **Cross-linking** — the pricing comparison grid's column headers (Tertulia/StoryOrigin/BookFunnel) now link to their `/compare/*` page, and each comparison page has a "← Back to pricing & comparisons" link at the top (previously only the bottom-CTA "See pricing" existed)
 
 ## June 15, 2026 — Genre page SEO title fix
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Bookstore genre `<title>` fixed** — genre pages were the only page hardcoding the brand in the top-level title, so the root `%s | AuthorLoft` template produced a doubled brand ("… | AuthorLoft Bookstore | AuthorLoft") plus a "Books Books" redundancy and dropped the apostrophe (slug-derived "Childrens" vs "Children's"). `generateMetadata` now uses the real genre name, avoids the duplicate "Books", and sets a brandless title so the template brands it once. (SEO audit also confirmed: sitemap covers all public pages incl. blog/news/genre, no admin URLs leak, robots disallows private areas, all 15 marketing pages carry canonicals)
 
 ## June 15, 2026 — Unify bookstore genre-page header
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Super Admin nav: Content Categories moved Platform → Marketing** — it powers the blog/news/resource/FAQ category dropdowns, so it sits more naturally under Marketing alongside Blog & News and Resources
 - **Genre pages use the shared brand band** — `/bookstore/genre/[slug]` had its own older brown-gradient hero; it now uses the shared `MarketingPageHeader` (same navy band + `/bookstore-header.png` banner as the main Bookstore/Blog/News pages), with the genre name as the title and an "All books" breadcrumb above the grid
 
 ## June 14, 2026 — Quick wins: dashboard/nav fixes, book views, News RSS
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Dashboard "Upgrade" no longer shows on Premium** — the Current Plan card always rendered an "Upgrade" button; it now shows "Manage" on PREMIUM (and links to `?tab=billing`), "Upgrade" on FREE/STANDARD
 - **Admin sidebar: Light mode + Sign Out flow with the menu** — moved them out of the pinned bottom bar into the nav flow, directly after the last menu item, so they shift up/down dynamically as groups open/close (no more fixed gap)
 - **Bookstore "Trending Now" now has data** — `Book.views` was never incremented anywhere, so the views-sorted Trending row never appeared. Added a fire-and-forget view increment on author book-page visits
 - **News RSS feed** — new `/news/rss.xml` (RSS 2.0, latest 50 published news posts); the `/news` page now advertises it via an `application/rss+xml` alternate link for feed-reader discovery
 
 ## June 14, 2026 — Mobile Support for Super Admin + Settings
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Feature Gates rows stack on mobile** — each gate row showed the label plus four tier buttons (FREE/STANDARD/PREMIUM/DISABLED) on one line, clipping the right-most buttons on phones. The row now stacks (`flex-col sm:flex-row`) with the buttons wrapping (`flex-wrap`), so all tiers are reachable. Verified on staging (overflow offenders 58 → 0). Desktop unchanged
 - **Sidebar drawer now scrolls on mobile** — the sidebar `aside` used `min-h-screen`, so inside the fixed mobile drawer it grew taller than the viewport and the inner nav's `overflow-y-auto` never engaged, leaving the lower nav items (Super Admin section, Sign Out) unreachable. Changed to `h-full` so the aside is capped to the fixed drawer height (verified on staging: nav `scrollHeight > clientHeight`, bottom items reachable). Desktop unchanged (wrapper is content-height there, so `h-full` matches the prior `min-h-screen` behavior)
 - **Super Admin is now mobile-capable** — the `/super-admin/*` layout previously rendered the 256px sidebar permanently with no hamburger, making it unusable on phones. It now reuses the author-side `AdminShell` (slide-in drawer + overlay + hamburger, responsive header/padding). Added an optional `headerBadge` slot to `AdminShell` so super-admin keeps its purple "Super Admin" badge in the top bar
@@ -517,7 +525,7 @@ _(not yet promoted to prod)_
 - Audit note: the author admin shell was already mobile-ready (drawer/hamburger since earlier work); most admin/super-admin data tables already use `overflow-x-auto` so they scroll horizontally on small screens. A device-width visual pass on staging is still recommended for dense tables and forms
 
 ## June 14, 2026 — Super Admin Menu Reorganization
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Super Admin nav grouped** — the flat 15-item "Super Admin" list in the sidebar is now four collapsible groups: **Authors** (All Authors, Access Requests), **Billing & Plans** (Plans, Coupons, Feature Gates), **Marketing** (Blog & News, News Subscribers, Resources, Resource Downloads, Social Media), and **Platform** (Content Categories, Genres, Help Articles, Platform Legal, Platform Settings)
 - **Platform Dashboard link added** — the super-admin sidebar now has a pinned link to `/super-admin` (the platform dashboard), which previously had no nav entry
 - **Renames for clarity** — "Legal" → "Platform Legal", "Help Centre" → "Help Articles" (distinguishes the super-admin content-management pages from the author-side Help & Support); "Feature Gates" given a sliders icon
@@ -525,7 +533,7 @@ _(not yet promoted to prod)_
 - Navigation/IA only; no routes, APIs, or permissions changed
 
 ## June 14, 2026 — Admin Menu Reorganization (author side)
-_(not yet promoted to prod)_
+_(confirmed live in prod Aug 9, 2026 — via `main`/`dev` sync, PR #138)_
 - **Sidebar regrouped by job-to-be-done** — replaced the old Content / Marketing / Sales / Customize / Account groups with six clearer groups: **Catalog** (Books, Series, Flip Books), **Website** (Pages, Blog/News, Appearance, Branding, Legal Pages), **Audience** (Messages, Reader Feedback, Email & Newsletter, Media Kit), **Sales** (Sales, Specials, Discount Codes, Invoices & Tax), **Tools** (AI Assistant, SEO Audit), and **Account** (Settings, Reader Privacy (GDPR), Help & Support)
 - **Analytics pinned** — promoted out of the (collapsed) Marketing group to a top-level pinned link next to Dashboard, since it's high-frequency
 - **Renames for findability** — "My Site Legal" → "Legal Pages" (moved into Website, distinct Scale icon vs the GDPR shield), "Privacy & GDPR" → "Reader Privacy (GDPR)"
