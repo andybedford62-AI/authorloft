@@ -9,18 +9,18 @@ export default async function AppearancePage() {
   const author = await prisma.author.findUnique({
     where: { id: authorId },
     select: {
-      siteTheme: true,
-      slug:      true,
-      plan:      { select: { tier: true } },
+      siteTheme:            true,
+      homeTemplate:         true,
+      slug:                 true,
+      customAccentColor:    true,
+      customSecondaryColor: true,
+      plan:                 { select: { tier: true } },
     },
   });
 
   if (!author) redirect("/login");
 
   const tier = author.plan?.tier ?? "FREE";
-
-  // FREE authors have no theme choice — redirect to branding
-  if (tier === "FREE") redirect("/admin/branding");
 
   return (
     <div className="space-y-6">
@@ -32,8 +32,11 @@ export default async function AppearancePage() {
       </div>
       <AppearanceClient
         currentTheme={author.siteTheme ?? "classic-literary"}
+        currentTemplate={author.homeTemplate ?? "classic"}
         authorSlug={author.slug}
         planTier={tier}
+        currentCustomAccent={author.customAccentColor}
+        currentCustomSecondary={author.customSecondaryColor}
       />
     </div>
   );

@@ -1,0 +1,170 @@
+# AuthorLoft — Full Reference
+
+> The all-in-one platform for independent authors to own their business, sell books directly, grow their audience, and track everything — no coding required.
+
+## About AuthorLoft
+
+AuthorLoft is a SaaS platform built for independent authors who want to own their reader relationships and revenue instead of depending on retailers like Amazon. Authors get a complete, professionally designed website with direct sales, reader analytics, newsletter capture, and AI-powered marketing tools — all without writing a single line of code.
+
+Website: https://www.authorloft.com
+
+## Plans & Pricing
+
+### FREE Plan
+- Author website with subdomain (yourname.authorloft.com)
+- Up to 5 published books
+- Blog with unlimited posts
+- Basic book pages with retailer links
+- Direct eBook sales via Stripe (keep 100% of revenue minus processing + 10% platform fee)
+- Reader Magnets (give away a book free to build your email list)
+- Discount codes
+- Reader feedback & ratings
+- Price: $0/month forever
+
+### STANDARD Plan ($19.99/month or $191.90/year)
+- Everything in FREE, plus:
+- Custom domain support
+- All sales formats (eBook + Print) with shopping cart
+- Newsletter subscriber capture
+- Bookstore catalog listing
+- Pre-order campaigns
+- Affiliate referral program
+- AI writing assistant (usage-capped)
+- Social media post generator (6 platforms)
+- Flip book previews
+- SEO audit tools
+- Up to 25 published books
+
+### PREMIUM Plan ($79.99/month or $767.90/year)
+- Everything in STANDARD, plus:
+- Full PostHog analytics dashboard
+- Auto-generated media kit PDF
+- Audio previews for audiobooks
+- Social media generator with LinkedIn & TikTok
+- Premium site themes & custom accent colors
+- Extended AI usage caps
+- Unlimited published books
+- Priority support
+
+## Feature Details
+
+### Direct Sales
+Authors sell ebooks (PDF, EPUB), print books, and audiobooks directly from their AuthorLoft site. Payments are processed through Stripe — the author keeps 100% of the sale price (minus Stripe's standard processing fee). Supports multiple formats per book, custom pricing, and discount codes.
+
+### Author Website
+Each author gets a professionally designed website with:
+- Customizable theme and accent colors
+- Book catalog with cover images, descriptions, genres, and buy links
+- Individual book detail pages with excerpts, preview galleries, and purchase options
+- Blog with categories, cover images, and rich text content
+- About page with bio, credentials, stats, and social links
+- Contact page with form
+- Custom pages for flexible content
+
+### Bookstore Discovery
+AuthorLoft runs a shared bookstore at authorloft.com/bookstore where readers can browse books from all AuthorLoft authors. Books are organized by genre, with sections for new releases, trending titles, and a daily author spotlight. Each book links back to the author's own site for purchase.
+
+### Newsletter & Email
+Built-in subscriber capture forms on author sites and the platform. Integration with Mailchimp for email campaigns. Platform-level news subscriber list with RSS feed.
+
+### AI Tools (Powered by Google Gemini)
+- **Writing Assistant**: Get help with book descriptions, blurbs, and marketing copy
+- **Social Media Promoter**: Generate platform-specific social posts for Facebook, Instagram, X/Twitter, Reddit, Threads, Bluesky (Standard), plus LinkedIn and TikTok (Premium)
+- **SEO Auditor**: Analyze pages for keyword density, meta tags, and internal links
+- **Reader Feedback Analyzer**: AI-powered analysis of reader reviews and feedback
+
+### Pre-orders
+Authors can set up pre-order campaigns for upcoming books with:
+- Pre-order signup forms to capture reader interest
+- Launch countdown timers
+- Optional auto-send launch email when the book releases
+- Readiness gates (published, cover uploaded, buy option set)
+
+### Affiliate Program
+Authors can run referral programs where promoters earn a percentage of sales they drive. Features include:
+- Configurable commission rates per book
+- Unique referral tracking links
+- Click and conversion tracking
+- Earnings accrual per referral
+
+### Flip Books
+Interactive page-turning book previews that let readers flip through sample pages in the browser — a visual way to preview before buying.
+
+### Media Kit
+Auto-generated PDF press kits for author marketing, including bio, book covers, stats, and contact information. Premium feature.
+
+### Analytics
+Premium authors get a PostHog-powered analytics dashboard showing:
+- Page views and visitor trends
+- Book page performance
+- Geographic distribution
+- Referral sources
+
+## Content & Resources
+
+### Blog (https://www.authorloft.com/blog)
+Tips, guides, and insights for independent authors on topics like selling books directly, building an audience, marketing, and publishing.
+
+### News (https://www.authorloft.com/news)
+Product updates, new features, specials, and events from the AuthorLoft team. Available via RSS at https://www.authorloft.com/news/rss.xml
+
+### Author Guides (https://www.authorloft.com/guides)
+In-depth evergreen guides on topics like author websites, direct book selling, ARC programs, author branding, newsletters, and self-publishing marketing. Each guide includes definitions, examples, comparison tables, FAQs, and how AuthorLoft helps.
+
+Published guides:
+- What Is an Author Website? — https://www.authorloft.com/guides/what-is-an-author-website
+- What Is Direct Book Selling? — https://www.authorloft.com/guides/what-is-direct-book-selling
+- What Is an ARC Program? — https://www.authorloft.com/guides/what-is-an-arc-program
+- What Is an Author Newsletter? — https://www.authorloft.com/guides/what-is-an-author-newsletter
+- What Is Author Branding? — https://www.authorloft.com/guides/what-is-author-branding
+- What Is an Author Media Kit? — https://www.authorloft.com/guides/what-is-an-author-media-kit
+- What Is Book Launch Marketing? — https://www.authorloft.com/guides/what-is-book-launch-marketing
+- What Is Self-Publishing? — https://www.authorloft.com/guides/what-is-self-publishing
+- What Is an Author Affiliate Program? — https://www.authorloft.com/guides/what-is-an-author-affiliate-program
+- What Is Reader Analytics for Authors? — https://www.authorloft.com/guides/what-is-reader-analytics-for-authors
+
+### Resources (https://www.authorloft.com/resources)
+Free downloadable resources for authors — guides, templates, and tools for building an author business.
+
+### FAQ (https://www.authorloft.com/faq)
+Answers to common questions about AuthorLoft plans, publishing, selling direct, and getting started.
+
+## Feature Landing Pages
+
+Dedicated pages explaining each major AuthorLoft capability in depth, with FAQs and structured data:
+
+- **Author Website Builder** (https://www.authorloft.com/author-website-builder) — Build a professional author website with book pages, blog, custom domain, and direct sales — no coding required.
+- **Sell Books Directly** (https://www.authorloft.com/sell-books-directly) — Sell ebooks, print books, and audiobooks directly to readers. Keep 100% of revenue.
+- **Book Marketing Platform** (https://www.authorloft.com/book-marketing-platform) — AI social posts, SEO tools, pre-order campaigns, affiliate programs, and bookstore discovery.
+- **Author Newsletter Platform** (https://www.authorloft.com/author-newsletter-platform) — Subscriber capture, reader magnets, Mailchimp integration, and newsletter tools.
+- **ARC Management** (https://www.authorloft.com/arc-management) — Collect reader reviews, manage advance reader copies, and display approved feedback on book pages.
+- **Author Media Kit** (https://www.authorloft.com/author-media-kit) — Auto-generated press kit with bio, headshots, book covers, and press-ready assets.
+- **AI Tools for Authors** (https://www.authorloft.com/ai-tools-for-authors) — Social media post generator, SEO auditor, writing assistant, and reader feedback analysis powered by AI.
+- **Indie Author Bookstore** (https://www.authorloft.com/indie-author-bookstore) — Shared bookstore catalog for indie authors, organized by genre, with cross-promotion and discovery.
+- **Book Pre-Orders** (https://www.authorloft.com/book-pre-orders) — Pre-order pages with launch countdowns, email signups, and automatic reader notifications.
+- **Author Affiliate Program** (https://www.authorloft.com/author-affiliate-program) — Built-in affiliate program with tracked referral links and customizable commissions.
+- **Reader Analytics for Authors** (https://www.authorloft.com/reader-analytics-for-authors) — PostHog-powered analytics for page views, book popularity, audience insights, and growth tracking.
+
+## Competitor Comparisons
+
+### AuthorLoft vs BookFunnel
+BookFunnel focuses on ebook delivery and reader magnets. AuthorLoft is a complete author platform with direct sales, website, analytics, and marketing tools. Comparison: https://www.authorloft.com/compare/bookfunnel
+
+### AuthorLoft vs StoryOrigin
+StoryOrigin focuses on cross-promotion and newsletter swaps. AuthorLoft provides the full author business platform — website, sales, analytics, and growth tools. Comparison: https://www.authorloft.com/compare/storyorigin
+
+### AuthorLoft vs Tertulia
+Tertulia is a curated bookshop. AuthorLoft puts the author in control with their own storefront, reader data, and business tools. Comparison: https://www.authorloft.com/compare/tertulia
+
+## Technical Details
+- Built with Next.js on Vercel
+- Database: Supabase (PostgreSQL)
+- Payments: Stripe
+- Analytics: PostHog
+- Email: Mailchimp integration
+- AI: Google Gemini
+- Error tracking: Sentry
+
+## Contact
+- Contact form: https://www.authorloft.com/contact
+- Website: https://www.authorloft.com

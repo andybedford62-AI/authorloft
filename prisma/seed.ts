@@ -30,8 +30,8 @@ async function main() {
     where: { tier: "FREE" },
     update: {},
     create: {
-      name: "Free", tier: "FREE", maxBooks: 5, maxStorageMb: 100,
-      customDomain: false, salesEnabled: false, flipBooksEnabled: false, monthlyPriceCents: 0,
+      name: "Free", slug: "free", tier: "FREE", maxBooks: 5, maxStorageMb: 100,
+      customDomain: false, salesEnabled: false, flipBooksLimit: 0, monthlyPriceCents: 0,
     },
   });
 
@@ -39,8 +39,8 @@ async function main() {
     where: { tier: "STANDARD" },
     update: {},
     create: {
-      name: "Standard", tier: "STANDARD", maxBooks: -1, maxStorageMb: 2000,
-      customDomain: true, salesEnabled: true, flipBooksEnabled: true, monthlyPriceCents: 1200,
+      name: "Standard", slug: "standard", tier: "STANDARD", maxBooks: -1, maxStorageMb: 2000,
+      customDomain: true, salesEnabled: true, flipBooksLimit: -1, monthlyPriceCents: 1200,
     },
   });
 
@@ -48,8 +48,8 @@ async function main() {
     where: { tier: "PREMIUM" },
     update: {},
     create: {
-      name: "Premium", tier: "PREMIUM", maxBooks: -1, maxStorageMb: 10000,
-      customDomain: true, salesEnabled: true, flipBooksEnabled: true,
+      name: "Premium", slug: "premium", tier: "PREMIUM", maxBooks: -1, maxStorageMb: 10000,
+      customDomain: true, salesEnabled: true, flipBooksLimit: -1,
       analyticsEnabled: true, monthlyPriceCents: 2900,
     },
   });
@@ -158,7 +158,7 @@ async function main() {
     const book = await prisma.book.upsert({
       where: { authorId_slug: { authorId: author.id, slug: data.slug } },
       update: {},
-      create: { authorId: author.id, isPublished: true, format: "EBOOK", externalBuyUrl: "#", ...data },
+      create: { authorId: author.id, isPublished: true, availableFormats: ["EBOOK"], externalBuyUrl: "#", ...data },
     });
     for (const genreId of genres) {
       await prisma.bookGenre.upsert({
@@ -170,6 +170,104 @@ async function main() {
   }
 
   console.log("✓ Books created");
+
+  // ── Help Center ────────────────────────────────────────────────────────────
+  const seoTopic = await prisma.helpTopic.upsert({
+    where: { slug: "seo-discoverability" },
+    update: {},
+    create: {
+      title: "SEO & Discoverability",
+      slug: "seo-discoverability",
+      description: "Optimize your author site for search engines and readers",
+      icon: "Search",
+      sortOrder: 5,
+      isPublished: true,
+    },
+  });
+
+  await prisma.helpArticle.upsert({
+    where: { id: "sitemap-help-article" },
+    update: {},
+    create: {
+      id: "sitemap-help-article",
+      topicId: seoTopic.id,
+      question: "What is a sitemap and where do readers find mine?",
+      answer: `<h3>Your Author Sitemap</h3>
+<p>Every author site automatically includes a <strong>sitemap.xml</strong> file that helps search engines discover and index all your content.</p>
+
+<h3>Where to Find It</h3>
+<p>Your sitemap is available at:</p>
+<ul>
+  <li><strong>Using your slug:</strong> <code>https://yourauthor.authorloft.com/sitemap.xml</code></li>
+  <li><strong>Using custom domain:</strong> <code>https://yourdomain.com/sitemap.xml</code></li>
+</ul>
+
+<h3>What's Included</h3>
+<p>Your sitemap automatically includes:</p>
+<ul>
+  <li><strong>Home page</strong> – your author profile</li>
+  <li><strong>About page</strong> – if enabled in your site navigation</li>
+  <li><strong>Books & book pages</strong> – all published books (if books section is enabled)</li>
+  <li><strong>Blog posts</strong> – all published blog posts (if blog is enabled)</li>
+  <li><strong>Contact page</strong> – if enabled in navigation</li>
+  <li><strong>Flip books</strong> – any flip book pages (if enabled)</li>
+  <li><strong>Custom pages</strong> – any custom pages you've created</li>
+</ul>
+
+<h3>Why This Matters</h3>
+<p>Your sitemap helps search engines like Google understand the structure of your site and index your content faster. This improves your SEO and helps readers discover your books and writing.</p>
+
+<p><strong>The good news:</strong> This is completely automatic! Your sitemap updates whenever you publish new content, change page settings, or update your site.</p>`,
+      sortOrder: 1,
+      isPublished: true,
+    },
+  });
+
+  console.log("✓ Help articles created");
+
+  // ── Social Promote ─────────────────────────────────────────────────────────
+  await prisma.socialPromoteSettings.upsert({
+    where: { id: "main" },
+    update: {},
+    create: { id: "main" },
+  });
+
+  const platforms = [
+    { id: "plat_facebook",  slug: "facebook",  name: "Facebook",    maxChars: 2000, hashtagStyle: "trailing", isPremiumOnly: false, sortOrder: 1, promptAddendum: "Conversational tone. 1–3 short paragraphs. Hashtags optional and minimal." },
+    { id: "plat_instagram", slug: "instagram", name: "Instagram",   maxChars: 2200, hashtagStyle: "trailing", isPremiumOnly: false, sortOrder: 2, promptAddendum: "Visual, evocative tone. Strong opening hook. Use line breaks. 5–10 relevant hashtags at the end." },
+    { id: "plat_x",         slug: "x",         name: "X (Twitter)", maxChars: 280,  hashtagStyle: "inline",   isPremiumOnly: false, sortOrder: 3, promptAddendum: "Punchy, single-thought post. Hard 280-char limit including spaces. 1–2 hashtags max." },
+    { id: "plat_linkedin",  slug: "linkedin",  name: "LinkedIn",    maxChars: 3000, hashtagStyle: "none",     isPremiumOnly: true,  sortOrder: 4, promptAddendum: "Professional, thoughtful tone. Lead with insight, end with a question or CTA. Hashtags optional and sparse." },
+    { id: "plat_tiktok",    slug: "tiktok",    name: "TikTok",      maxChars: 2200, hashtagStyle: "trailing", isPremiumOnly: true,  sortOrder: 5, promptAddendum: "Short, hook-driven caption written as if narrating a vertical video. Trending-aware. 3–5 hashtags." },
+    { id: "plat_reddit",    slug: "reddit",    name: "Reddit",      maxChars: 8000, hashtagStyle: "none",     isPremiumOnly: false, sortOrder: 6, promptAddendum: "Reddit format. Open with a short, attention-grabbing title on its own line, then a blank line, then the body. Conversational and human — Reddit punishes anything that reads like marketing copy. No hashtags, no emoji, no superlatives. Mention the book naturally if at all; never lead with a sales pitch. Do not invent or name a subreddit — the author will pick one." },
+    { id: "plat_threads",   slug: "threads",   name: "Threads",     maxChars: 500,  hashtagStyle: "inline",   isPremiumOnly: false, sortOrder: 7, promptAddendum: "Threads tone — casual, candid, like talking to a friend in line for coffee. Short paragraphs and line breaks are fine. 1–2 inline hashtags max if any. Avoid corporate or promotional voice." },
+    { id: "plat_bluesky",   slug: "bluesky",   name: "Bluesky",     maxChars: 300,  hashtagStyle: "inline",   isPremiumOnly: false, sortOrder: 8, promptAddendum: "Bluesky tone — conversational and quietly witty. Tighter than Twitter and less performative. Hard 300-char limit. 0–1 hashtags max. Skip emoji unless it genuinely adds something." },
+  ];
+  for (const p of platforms) {
+    await prisma.socialPromotePlatform.upsert({ where: { slug: p.slug }, update: {}, create: p });
+  }
+
+  const promoTypes = [
+    { id: "promo_new_release",        slug: "new-release",        name: "New Release Announcement",     description: "Announce a newly published book.",                       promptTemplate: 'Write a social post announcing the new release of "{{book.title}}" by {{author.displayName}}. Tease the premise without spoilers and invite readers to grab a copy.', applicableContexts: ["book"], sortOrder: 1 },
+    { id: "promo_pre_order",          slug: "pre-order",          name: "Pre-Order Open",               description: "Drive pre-orders before launch day.",                    promptTemplate: 'Write a social post announcing that pre-orders are open for "{{book.title}}". Build anticipation, highlight what makes it worth waiting for, and link to the pre-order page.', applicableContexts: ["book"], sortOrder: 2 },
+    { id: "promo_cover_reveal",       slug: "cover-reveal",       name: "Cover Reveal",                 description: "Reveal a new book cover.",                               promptTemplate: 'Write a social post unveiling the new cover for "{{book.title}}". Build excitement around the visual, hint at the story tone, and invite reactions.', applicableContexts: ["book"], sortOrder: 3 },
+    { id: "promo_sale",               slug: "sale",               name: "Sale / Discount",              description: "Promote a limited-time price drop.",                     promptTemplate: 'Write a social post announcing a limited-time sale on "{{book.title}}". Create urgency without being pushy and make the value clear.', applicableContexts: ["book"], sortOrder: 4 },
+    { id: "promo_free_magnet",        slug: "free-magnet",        name: "Free / Reader Magnet",         description: "Promote a free download or reader magnet.",              promptTemplate: 'Write a social post offering a free download tied to "{{book.title}}". Frame it as a low-friction way for new readers to try the work.', applicableContexts: ["book"], sortOrder: 5 },
+    { id: "promo_review_quote",       slug: "review-quote",       name: "Reader Review Quote",          description: "Share a glowing reader review.",                         promptTemplate: 'Write a social post featuring a reader review of "{{book.title}}". Lead with the most compelling line and add a brief note inviting new readers in.', applicableContexts: ["book"], sortOrder: 6 },
+    { id: "promo_behind_scenes",      slug: "behind-the-scenes",  name: "Behind-the-Scenes",            description: "Share a writing-life or production moment.",             promptTemplate: 'Write a social post sharing a behind-the-scenes glimpse of {{author.displayName}}\'s work on "{{book.title}}". Make it feel personal and human.', applicableContexts: ["book","topic"], sortOrder: 7 },
+    { id: "promo_character_spotlight",slug: "character-spotlight",name: "Character Spotlight",          description: "Spotlight a character from the book.",                   promptTemplate: 'Write a social post spotlighting a memorable character from "{{book.title}}". Tease who they are and what makes them compelling without spoilers.', applicableContexts: ["book"], sortOrder: 8 },
+    { id: "promo_setting_spotlight",  slug: "setting-spotlight",  name: "Setting / World Spotlight",    description: "Spotlight the world or setting.",                        promptTemplate: 'Write a social post about the world or setting of "{{book.title}}". Make readers want to step inside it.', applicableContexts: ["book"], sortOrder: 9 },
+    { id: "promo_book_quote",         slug: "book-quote",         name: "Quote from the Book",          description: "Share a memorable line from the book.",                  promptTemplate: 'Write a social post built around a short, evocative quote from "{{book.title}}". Let the quote do the heavy lifting and add only minimal framing.', applicableContexts: ["book"], sortOrder: 10 },
+    { id: "promo_milestone",          slug: "milestone",          name: "Milestone Celebration",        description: "Celebrate a sales, review, or anniversary milestone.",   promptTemplate: 'Write a social post celebrating a milestone for "{{book.title}}" (e.g. sales, reviews, anniversary). Thank readers and invite new ones to join in.', applicableContexts: ["book","news"], sortOrder: 11 },
+    { id: "promo_writing_tip",        slug: "writing-tip",        name: "Writing Process / Tip",        description: "Share a craft insight or process note.",                 promptTemplate: 'Write a social post from {{author.displayName}} sharing a short writing process insight or craft tip. Stay practical and concise.', applicableContexts: ["topic"], sortOrder: 12 },
+    { id: "promo_qa_prompt",          slug: "qa-prompt",          name: "Q&A / Ask Me Anything",        description: "Invite readers to ask questions.",                       promptTemplate: 'Write a social post from {{author.displayName}} inviting readers to ask a question — about the writing, the books, or the world.', applicableContexts: ["topic"], sortOrder: 13 },
+    { id: "promo_event",              slug: "event",              name: "Event / Signing / Appearance", description: "Promote an upcoming event or appearance.",               promptTemplate: 'Write a social post promoting an upcoming event or appearance by {{author.displayName}}. Make the date, place, and what readers can expect crystal clear.', applicableContexts: ["news","topic"], sortOrder: 14 },
+  ];
+  for (const t of promoTypes) {
+    await prisma.socialPromoType.upsert({ where: { slug: t.slug }, update: {}, create: t });
+  }
+
+  console.log("✓ Social Promote seeded (5 platforms, 14 promo types, settings)");
+
   console.log("\n✅ Database seeded successfully!");
   console.log("\n📧 Login credentials:");
   console.log("   Email:    andybedford62@gmail.com");

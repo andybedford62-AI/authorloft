@@ -50,12 +50,14 @@ export async function GET(
 
     // Check link expiry
     if (item.downloadExpiry && new Date() > item.downloadExpiry) {
-      return NextResponse.json({ error: "This download link has expired." }, { status: 410 });
+      const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+      return NextResponse.redirect(`https://www.${platformDomain}/orders/expired?token=${token}`);
     }
 
     // Check download limit
     if (item.downloadCount >= item.maxDownloads) {
-      return NextResponse.json({ error: "Maximum downloads reached for this link." }, { status: 403 });
+      const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+      return NextResponse.redirect(`https://www.${platformDomain}/orders/expired?token=${token}&reason=limit`);
     }
 
     // fileKey must exist (set at checkout time from BookDirectSaleItem.fileKey)
@@ -70,7 +72,7 @@ export async function GET(
     const keyParts   = item.fileKey.split("/");
     const storedName = keyParts[keyParts.length - 1]; // "1776166192590-abc.epub"
     const ext        = storedName.split(".").pop() ?? "epub";
-    const downloadName = `${item.book.slug}.${ext}`;
+    const downloadName = `${item.book?.slug ?? "download"}.${ext}`;
 
     // Increment download count BEFORE generating the link
     await prisma.orderItem.update({

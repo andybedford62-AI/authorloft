@@ -2,9 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Plus, Loader2, Trash2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
-  Upload, FileText, X, CheckCircle, Lock,
+  Plus, Loader2, Trash2, Edit2, ToggleLeft, ToggleRight, BookOpen, Film, Package, Headphones,
+  Upload, FileText, X, CheckCircle, Check, Gift, Zap, Users,
 } from "lucide-react";
+import { HelpTip } from "@/components/admin/help-tip";
+import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
+import { showToast } from "@/lib/use-toast";
 
 // ── Format config ─────────────────────────────────────────────────────────────
 
@@ -78,10 +82,12 @@ type DirectSaleItem = {
   description: string | null;
   priceCents: number;
   isActive: boolean;
+  isReaderMagnet: boolean;
   sortOrder: number;
   fileUrl: string | null;
   fileKey: string | null;
   fileName: string | null;
+  magnetLeadCount?: number;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -168,6 +174,7 @@ function FileUploadWidget({
         setUploadError(data.error || "File uploaded but could not save. Please try again.");
       } else {
         onUpdated({ ...item, fileUrl: fileKey, fileKey, fileName: file.name });
+        showToast("success", "File uploaded");
       }
     } catch (err: any) {
       setUploadError(err?.message ?? "Unexpected error. Please try again.");
@@ -261,7 +268,17 @@ function FileUploadWidget({
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; salesEnabled: boolean }) {
+export function DirectSalesItems({
+  bookId,
+  salesEnabled,
+  planTier = "FREE",
+  stripeConnectOnboarded,
+}: {
+  bookId: string;
+  salesEnabled: boolean;
+  planTier?: "FREE" | "STANDARD" | "PREMIUM";
+  stripeConnectOnboarded: boolean;
+}) {
   const [items, setItems] = useState<DirectSaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -285,6 +302,13 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
   // Per-item pending state (toggle / delete)
   const [pending, setPending] = useState<Record<string, boolean>>({});
 
+  // Stripe Connect
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [connectError, setConnectError] = useState("");
+
+  // Toggle error (shown inline above the item list)
+  const [toggleError, setToggleError] = useState("");
+
   // ── Load ───────────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`/api/admin/books/${bookId}/direct-sales`)
@@ -298,7 +322,9 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     e.preventDefault();
     setAddError("");
 
-    const priceCents = dollarsTocents(priceInput);
+    // Free-plan authors can only offer free Reader Magnets, so force price 0 and
+    // mark the edition as a magnet up front.
+    const priceCents = salesEnabled ? dollarsTocents(priceInput) : 0;
     const label = customLabel.trim() || FORMATS[selectedFormat].defaultLabel;
 
     setSaving(true);
@@ -310,6 +336,7 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
         label,
         description: description.trim() || undefined,
         priceCents,
+        isReaderMagnet: salesEnabled ? undefined : true,
       }),
     });
 
@@ -318,7 +345,8 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
       setAddError(data.error || "Could not add item.");
     } else {
       const created = await res.json();
-      setItems((prev) => [...prev, created]);
+      setItems((prev) => [...prev, { ...created, magnetLeadCount: 0 }]);
+      showToast("success", "Format added");
       setCustomLabel("");
       setDescription("");
       setPriceInput("0.00");
@@ -327,8 +355,29 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     setSaving(false);
   }
 
+  // ── Toggle reader magnet ───────────────────────────────────────────────────
+  async function toggleMagnet(item: DirectSaleItem) {
+    setToggleError("");
+    setPending((p) => ({ ...p, [item.id]: true }));
+    const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isReaderMagnet: !item.isReaderMagnet }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setToggleError(data.error || "Could not update item. Please try again.");
+    }
+    setPending((p) => ({ ...p, [item.id]: false }));
+  }
+
   // ── Toggle active ──────────────────────────────────────────────────────────
   async function toggleActive(item: DirectSaleItem) {
+    setToggleError("");
     setPending((p) => ({ ...p, [item.id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${item.id}`, {
       method: "PATCH",
@@ -337,7 +386,11 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setToggleError(data.error || "Could not update item. Please try again.");
     }
     setPending((p) => ({ ...p, [item.id]: false }));
   }
@@ -347,7 +400,10 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     if (!confirm(`Remove "${label}"? This cannot be undone.`)) return;
     setPending((p) => ({ ...p, [id]: true }));
     const res = await fetch(`/api/admin/books/${bookId}/direct-sales/${id}`, { method: "DELETE" });
-    if (res.ok) setItems((prev) => prev.filter((i) => i.id !== id));
+    if (res.ok) {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+      showToast("success", "Removed");
+    }
     setPending((p) => ({ ...p, [id]: false }));
   }
 
@@ -373,63 +429,121 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+      setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
+      showToast("success", "Saved");
       setEditingId(null);
     }
     setEditSaving(false);
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-  if (!salesEnabled) {
-    return (
-      <section className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-1">Direct Sales</h2>
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
-          <Lock className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-amber-800">Direct Sales requires a paid plan</p>
-            <p className="text-amber-700 mt-0.5">
-              Upgrade your plan to offer direct book sales to readers.{" "}
-              <a href="/admin/settings/billing" className="underline font-medium">
-                View plans
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+  // ── Connect Stripe ────────────────────────────────────────────────────────
+  async function handleConnect() {
+    setConnectError("");
+    setConnectLoading(true);
+    try {
+      const res = await fetch("/api/admin/stripe/connect", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setConnectError(data.error || "Could not start Stripe setup. Please try again.");
+        setConnectLoading(false);
+      }
+    } catch {
+      setConnectError("Could not start Stripe setup. Please try again.");
+      setConnectLoading(false);
+    }
   }
 
+  // ── Capability flags ────────────────────────────────────────────────────────
+  // All plans can now sell eBooks (FREE = eBook only). Paid editions still
+  // need a connected Stripe account before they can go live.
+  const canSellPaid = salesEnabled;
+  const stripeReady = stripeConnectOnboarded;
+  const isPaidPlan = planTier === "STANDARD" || planTier === "PREMIUM";
+
+  const allowedFormats: FormatKey[] =
+    planTier === "PREMIUM"  ? ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] :
+    planTier === "STANDARD" ? ["EBOOK", "PRINT"] :
+                              ["EBOOK"];
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-gray-900">Direct Sales</h2>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            Direct Sales
+            <HelpTip id="direct-sales" />
+          </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Offer different editions directly to readers — eBook, Audio Book, Flip Book, or Print.
             Each can have its own price and be activated or deactivated independently.
           </p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
+          <Button type="button" size="sm" className="whitespace-nowrap" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
             Add Format
-          </button>
+          </Button>
         )}
       </div>
 
+      {/* ── Capability banners ───────────────────────────────────────────────── */}
+      {canSellPaid && !isPaidPlan && (
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 flex items-start gap-3">
+          <BookOpen className="h-5 w-5 text-indigo-500 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-indigo-900">Sell eBooks &amp; offer Reader Magnets on your free plan</p>
+            <p className="text-indigo-700 mt-0.5">
+              Set a price and sell your eBook directly to readers via Stripe, or give it away free
+              as a Reader Magnet to build your email list.
+              For Print, Audio, Flipbook formats, bundles, and shopping cart,{" "}
+              <a href="/admin/settings#billing" className="underline font-medium">upgrade to Standard</a>.
+            </p>
+          </div>
+        </div>
+      )}
+      {canSellPaid && !stripeReady && (
+        <div className="rounded-lg border border-violet-200 bg-violet-50 p-4 flex items-start gap-3">
+          <Zap className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium text-violet-900">Connect Stripe to sell paid editions</p>
+            <p className="text-violet-700 mt-1">
+              Free Reader Magnets work without it. To charge for an edition, connect your Stripe
+              account — payments land in your own account instantly and AuthorLoft retains a{" "}
+              <strong>10% platform fee</strong> per sale. A paid edition stays hidden from readers
+              until Stripe is connected.
+            </p>
+            {connectError && <p className="text-red-600 mt-2 text-xs">{connectError}</p>}
+            <button
+              type="button"
+              onClick={handleConnect}
+              disabled={connectLoading}
+              className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-60"
+            >
+              {connectLoading ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting…</>
+              ) : (
+                <><Zap className="h-4 w-4" /> Connect Stripe</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Info panel ──────────────────────────────────────────────────────── */}
-      {items.length === 0 && !loading && !adding && (
+      {canSellPaid && items.length === 0 && !loading && !adding && (
         <div className="rounded-lg bg-blue-50 border border-blue-100 p-4 text-sm text-blue-700 space-y-1">
           <p className="font-medium">How direct sales work</p>
           <p className="text-blue-600">
             Add one or more formats (eBook, Flip Book, Print). Each format shows its own buy
             button on your public book page. For digital formats, upload your file here —
             buyers receive a secure download link after payment.
+          </p>
+          <p className="text-blue-600 mt-1">
+            Payments go directly to your connected Stripe account. AuthorLoft retains a{" "}
+            <strong>10% platform fee</strong> per sale.
           </p>
           <p className="text-blue-600 font-medium mt-1">
             Make sure <em>Direct Sales</em> is enabled in the Book Details section above.
@@ -445,9 +559,9 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
         >
           <p className="text-sm font-medium text-gray-700">Add a format for direct sale</p>
 
-          {/* Format picker */}
+          {/* Format picker — filtered by plan tier */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {FORMAT_KEYS.map((key) => {
+            {FORMAT_KEYS.filter((key) => allowedFormats.includes(key)).map((key) => {
               const fmt = FORMATS[key];
               const active = selectedFormat === key;
               return (
@@ -477,7 +591,7 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Label */}
-            <div className="sm:col-span-2 space-y-1">
+            <div className={canSellPaid ? "sm:col-span-2 space-y-1" : "sm:col-span-3 space-y-1"}>
               <label className="text-xs font-medium text-gray-600">
                 Button label{" "}
                 <span className="text-gray-400 font-normal">
@@ -493,25 +607,34 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
               />
             </div>
 
-            {/* Price */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-600">
-                Price (USD) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
-                  required
-                  className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                />
+            {/* Price — only when the author can sell paid editions */}
+            {canSellPaid && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600">
+                  Price (USD) <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    required
+                    className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
+
+          {canSellPaid && !isPaidPlan && (
+            <p className="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded px-3 py-2 flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 shrink-0" />
+              Set a price to sell, or leave at $0.00 to offer as a free Reader Magnet.
+            </p>
+          )}
 
           {/* Description */}
           <div className="space-y-1">
@@ -540,23 +663,28 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-              {saving ? "Adding…" : "Add Format"}
-            </button>
-            <button
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving
+                ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</>
+                : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Format</>}
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => { setAdding(false); setAddError(""); setCustomLabel(""); setDescription(""); setPriceInput("0.00"); }}
-              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
+      )}
+
+      {/* ── Toggle error ─────────────────────────────────────────────────────── */}
+      {toggleError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {toggleError}
+        </p>
       )}
 
       {/* ── Item list ────────────────────────────────────────────────────────── */}
@@ -579,7 +707,7 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                   /* ── Inline edit form ───────────────────────────────────── */
                   <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="sm:col-span-2 space-y-1">
+                      <div className={canSellPaid ? "sm:col-span-2 space-y-1" : "sm:col-span-3 space-y-1"}>
                         <label className="text-xs font-medium text-gray-600">Button label</label>
                         <input
                           type="text"
@@ -589,20 +717,22 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                           className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                         />
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-600">Price (USD)</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={editPrice}
-                            onChange={(e) => setEditPrice(e.target.value)}
-                            className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                          />
+                      {canSellPaid && (
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-600">Price (USD)</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              className="block w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
@@ -616,22 +746,12 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                       />
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => saveEdit(item)}
-                        disabled={editSaving}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-60"
-                      >
-                        {editSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                        {editSaving ? "Saving…" : "Save"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingId(null)}
-                        className="px-3 py-1.5 text-xs rounded-md border border-gray-300 bg-white hover:bg-gray-50"
-                      >
+                      <Button type="button" size="sm" disabled={editSaving} onClick={() => saveEdit(item)}>
+                        {editSaving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save</>}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -656,9 +776,13 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                           >
                             {fmt.label}
                           </span>
-                          <span className="text-sm font-semibold text-gray-700">
-                            ${centsToDollars(item.priceCents)}
-                          </span>
+                          {canSellPaid ? (
+                            <span className="text-sm font-semibold text-gray-700">
+                              ${centsToDollars(item.priceCents)}
+                            </span>
+                          ) : (
+                            <span className="text-sm font-semibold text-emerald-700">Free</span>
+                          )}
                         </div>
                         {item.description && (
                           <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
@@ -676,51 +800,27 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        {/* Edit */}
-                        <button
-                          type="button"
+                        <IconButton
+                          icon={<Edit2 className="h-4 w-4" />}
+                          title="Edit"
+                          variant="edit"
                           disabled={isBusy}
                           onClick={() => startEdit(item)}
-                          className="px-2 py-1 rounded text-xs border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        >
-                          Edit
-                        </button>
-
-                        {/* Activate / Deactivate */}
-                        <button
-                          type="button"
-                          disabled={isBusy}
+                        />
+                        <IconButton
+                          icon={item.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                          title={item.isActive ? "Deactivate (hide from your site)" : "Activate"}
+                          variant={item.isActive ? "warning" : "add"}
+                          loading={isBusy}
                           onClick={() => toggleActive(item)}
-                          title={item.isActive ? "Deactivate (hides from public site)" : "Activate"}
-                          className={`flex items-center gap-1 px-2 py-1 rounded text-xs border transition-colors disabled:opacity-50 ${
-                            item.isActive
-                              ? "border-amber-200 text-amber-600 hover:bg-amber-50"
-                              : "border-green-200 text-green-600 hover:bg-green-50"
-                          }`}
-                        >
-                          {isBusy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : item.isActive ? (
-                            <><ToggleRight className="h-3.5 w-3.5" />Deactivate</>
-                          ) : (
-                            <><ToggleLeft className="h-3.5 w-3.5" />Activate</>
-                          )}
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => deleteItem(item.id, item.label)}
+                        />
+                        <IconButton
+                          icon={<Trash2 className="h-4 w-4" />}
                           title="Delete"
-                          className="flex items-center gap-1 px-2 py-1 rounded text-xs border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
-                        >
-                          {isBusy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
-                          )}
-                        </button>
+                          variant="delete"
+                          loading={isBusy}
+                          onClick={() => deleteItem(item.id, item.label)}
+                        />
                       </div>
                     </div>
 
@@ -735,6 +835,62 @@ export function DirectSalesItems({ bookId, salesEnabled }: { bookId: string; sal
                           setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
                         }
                       />
+                    )}
+
+                    {/* ── Reader Magnet ───────────────────────────────────── */}
+                    {fmt.needsFile && (
+                      canSellPaid ? (
+                        item.fileKey && (
+                          <div className="pl-12 mt-1">
+                            <button
+                              type="button"
+                              disabled={isBusy}
+                              onClick={() => toggleMagnet(item)}
+                              className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors group"
+                            >
+                              <span className={`relative inline-flex h-4 w-7 flex-shrink-0 rounded-full border transition-colors ${
+                                item.isReaderMagnet ? "bg-emerald-500 border-emerald-500" : "bg-gray-200 border-gray-200"
+                              }`}>
+                                <span className={`inline-block h-3 w-3 mt-0.5 rounded-full bg-white shadow transition-transform ${
+                                  item.isReaderMagnet ? "translate-x-3.5" : "translate-x-0.5"
+                                }`} />
+                              </span>
+                              <span className={item.isReaderMagnet ? "text-emerald-700 font-medium" : ""}>
+                                Give it away free (Reader Magnet)
+                              </span>
+                              {item.isReaderMagnet && (
+                                <span className="text-emerald-600 text-[10px] bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                                  Free in exchange for email
+                                </span>
+                              )}
+                            </button>
+                            <p className="text-[10px] text-gray-400 mt-0.5 ml-9">
+                              {item.isReaderMagnet
+                                ? "Readers download this free for their email. Your price is kept — turn this off to sell it again."
+                                : "Give this edition away free to build your email list. Your price is remembered."}
+                            </p>
+                            {item.isReaderMagnet && (item.magnetLeadCount ?? 0) > 0 && (
+                              <p className="text-[10px] text-emerald-600 mt-0.5 ml-9 flex items-center gap-1">
+                                <Users className="h-3 w-3" /> {item.magnetLeadCount} reader{item.magnetLeadCount === 1 ? "" : "s"} captured
+                              </p>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <div className="pl-12 mt-1 flex items-center gap-2 text-xs">
+                          <span className="inline-flex items-center gap-1 text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <Gift className="h-3 w-3" /> Free Reader Magnet
+                          </span>
+                          {!item.fileKey && (
+                            <span className="text-gray-400">Upload a file so readers can download it</span>
+                          )}
+                          {(item.magnetLeadCount ?? 0) > 0 && (
+                            <span className="inline-flex items-center gap-1 text-emerald-600">
+                              <Users className="h-3 w-3" /> {item.magnetLeadCount} captured
+                            </span>
+                          )}
+                        </div>
+                      )
                     )}
                   </>
                 )}

@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-
-function capturePostHog(distinctId: string, event: string, properties: Record<string, unknown>) {
-  const key  = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
-  if (!key) return;
-  fetch(`${host}/capture/`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ api_key: key, distinct_id: distinctId, event, properties }),
-  }).catch(() => {});
-}
+import { capturePostHog } from "@/lib/posthog";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendPurchaseConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail } from "@/lib/mailer";
+import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 
 /**
@@ -31,11 +21,12 @@ async function revertThemeOnDowngrade(authorId: string, newPlanTier: string) {
   if (isThemeAllowed(author.siteTheme, newPlanTier)) return; // already valid
 
   // Determine the revert target
+  // Note: STANDARD now allows all themes incl. genre palettes, so only FREE triggers a revert.
   let revertTo: string;
   if (newPlanTier === "FREE") {
     revertTo = "modern-minimal";
   } else {
-    // STANDARD: genre palette → revert to saved baseTheme (or Classic Literary fallback)
+    // STANDARD allows all themes — fall back to saved baseTheme just in case
     const candidateBase = author.baseTheme ?? "classic-literary";
     revertTo = BASE_THEME_IDS.includes(candidateBase as any) ? candidateBase : "classic-literary";
   }
@@ -84,6 +75,7 @@ export async function POST(req: NextRequest) {
         if (order) {
           const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
           const customerName  = session.customer_details?.name ?? undefined;
+          const hasBelowMinimumPricing = session.metadata?.hasBelowMinimumPricing === "true";
 
           // Mark order complete and record customer email + payment intent
           await prisma.order.update({
@@ -91,6 +83,7 @@ export async function POST(req: NextRequest) {
             data: {
               status: "COMPLETED",
               customerEmail,
+              customerName,
               stripePaymentIntentId: session.payment_intent,
             },
           });
@@ -103,9 +96,30 @@ export async function POST(req: NextRequest) {
             }).catch((err) => console.error("[webhook] discountCode increment error:", err));
           }
 
+          // Affiliate referral attribution — credit the referrer for this sale
+          const { affiliateBookId, affiliateRefCode } = session.metadata ?? {};
+          if (affiliateBookId && affiliateRefCode) {
+            const referredItems = order.items.filter((it) => it.bookId === affiliateBookId);
+            const itemsTotalCents = referredItems.reduce((sum, it) => sum + it.priceCents, 0);
+            if (itemsTotalCents > 0) {
+              const book = await prisma.book.findUnique({
+                where: { id: affiliateBookId },
+                select: { affiliateEnabled: true, affiliateCommissionPercent: true },
+              });
+              if (book?.affiliateEnabled) {
+                const earningsCents = Math.round(itemsTotalCents * (book.affiliateCommissionPercent / 100));
+                await prisma.affiliateReferral.upsert({
+                  where: { bookId_refCode: { bookId: affiliateBookId, refCode: affiliateRefCode } },
+                  create: { bookId: affiliateBookId, refCode: affiliateRefCode, saleCount: 1, earningsCents },
+                  update: { saleCount: { increment: 1 }, earningsCents: { increment: earningsCents } },
+                }).catch((err) => console.error("[webhook] affiliateReferral upsert error:", err));
+              }
+            }
+          }
+
           // Set download expiry and ensure fileKey is populated on each item.
           // Pre-fetch all missing sale items in one query to avoid N+1.
-          const expiry = generateDownloadExpiry(48);
+          const expiry = generateDownloadExpiry(168);
           const missingSaleItemIds = [
             ...new Set(
               order.items
@@ -154,6 +168,7 @@ export async function POST(req: NextRequest) {
                     title: true,
                     author: {
                       select: {
+                        id: true,
                         displayName: true,
                         name: true,
                         slug: true,
@@ -165,26 +180,45 @@ export async function POST(req: NextRequest) {
               },
             });
 
+            const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+
+            // 1. Single order confirmation email for buyer (all items together)
+            const orderItemsForEmail = fullItems.map((fi) => ({
+              bookTitle: fi.book?.title ?? "Your purchase",
+              itemLabel: fi.saleItem?.label ?? "eBook",
+              downloadUrl: `https://${fi.book?.author.slug ?? "unknown"}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
+              authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
+              authorSlug: fi.book?.author.slug ?? "",
+              priceCents: fi.priceCents,
+            }));
+
+            const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
+            const discountCents = order.discountCodeId ? (order.items[0]?.priceCents ?? 0) * fullItems.length - totalCents : 0; // Approximate discount
+
+            sendOrderConfirmationEmail({
+              to: customerEmail,
+              customerName,
+              items: orderItemsForEmail,
+              totalCents,
+              discountCents: Math.max(0, discountCents),
+              downloadExpiry: expiry,
+              orderId: order.id,
+            }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
+
+            // 2. Per-author sale notifications (each author gets notified of their sale immediately)
             for (const fi of fullItems) {
-              const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-              const authorSlug = fi.book.author.slug;
-              const authorName = fi.book.author.displayName || fi.book.author.name;
+              if (!fi.book) continue;
               const authorEmail = fi.book.author.email;
-              const downloadUrl = `https://${authorSlug}.${platformDomain}/api/orders/download/${fi.downloadToken}`;
+              const authorName = fi.book.author.displayName || fi.book.author.name;
 
-              // 1. Buyer confirmation email with download link
-              sendPurchaseConfirmationEmail({
-                to:             customerEmail,
-                customerName,
-                bookTitle:      fi.book.title,
-                itemLabel:      fi.saleItem?.label ?? "eBook",
-                downloadUrl,
-                downloadExpiry: expiry,
-                authorName,
-                authorSlug,
-              }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
+              // Save the buyer as a subscriber for the author's newsletter/correspondence,
+              // same as a free reader-magnet download already does.
+              prisma.subscriber.upsert({
+                where: { authorId_email: { authorId: fi.book.author.id, email: customerEmail } },
+                update: { name: customerName },
+                create: { authorId: fi.book.author.id, email: customerEmail, name: customerName, isConfirmed: true },
+              }).catch((e) => console.error("[webhook] Failed to upsert subscriber:", e));
 
-              // 2. Author sale notification email
               sendSaleNotificationEmail({
                 to:            authorEmail,
                 authorName,
@@ -195,6 +229,175 @@ export async function POST(req: NextRequest) {
                 priceCents:    fi.priceCents,
                 orderId:       order.id,
               }).catch((e) => console.error("[webhook] Failed to send author notification:", e));
+
+              // 3. If below-minimum pricing was applied, send alert to author
+              if (hasBelowMinimumPricing && fi.priceCents >= 50) {
+                // Only alert if the final charged price is actually >= $0.50 (valid sale)
+                // This indicates the original price was < $0.50 and was bumped up
+                sendBelowMinimumPricingAlert({
+                  to:                 authorEmail,
+                  authorName,
+                  bookTitle:          fi.book.title,
+                  itemLabel:          fi.saleItem?.label ?? "eBook",
+                  originalPriceCents: order.items.length > 0 ? order.items[0].priceCents : fi.priceCents,
+                  chargedCents:       fi.priceCents,
+                  orderId:            order.id,
+                }).catch((e) => console.error("[webhook] Failed to send pricing alert:", e));
+              }
+            }
+          }
+        }
+      }
+
+      if (type === "bundle_purchase") {
+        const order = await prisma.order.findFirst({
+          where: { stripeSessionId: session.id },
+          include: { items: true },
+        });
+
+        if (order) {
+          const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
+          const customerName  = session.customer_details?.name ?? undefined;
+
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
+          });
+
+          const expiry = generateDownloadExpiry(168);
+          const missingSaleItemIds = [
+            ...new Set(
+              order.items
+                .filter((item) => !item.fileKey && item.saleItemId)
+                .map((item) => item.saleItemId!)
+                .filter(Boolean)
+            ),
+          ];
+          const saleItemFileKeys = new Map<string, string | null>();
+          if (missingSaleItemIds.length > 0) {
+            const fetched = await prisma.bookDirectSaleItem.findMany({
+              where: { id: { in: missingSaleItemIds } },
+              select: { id: true, fileKey: true },
+            });
+            for (const si of fetched) saleItemFileKeys.set(si.id, si.fileKey);
+          }
+
+          await Promise.all(
+            order.items.map((item) => {
+              let fileKey = item.fileKey;
+              if (!fileKey && item.saleItemId) {
+                fileKey = saleItemFileKeys.get(item.saleItemId) ?? null;
+              }
+              return prisma.orderItem.update({
+                where: { id: item.id },
+                data: { downloadExpiry: expiry, ...(fileKey && !item.fileKey ? { fileKey } : {}) },
+              });
+            })
+          );
+
+          if (customerEmail) {
+            const fullItems = await prisma.orderItem.findMany({
+              where: { orderId: order.id },
+              select: {
+                downloadToken: true, priceCents: true,
+                saleItem: { select: { label: true } },
+                book: { select: { title: true, author: { select: { displayName: true, name: true, slug: true, email: true } } } },
+              },
+            });
+
+            const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+            const orderItemsForEmail = fullItems.map((fi) => ({
+              bookTitle: fi.book?.title ?? "Your purchase",
+              itemLabel: fi.saleItem?.label ?? "eBook",
+              downloadUrl: `https://${fi.book?.author.slug ?? "unknown"}.${platformDomain}/api/orders/download/${fi.downloadToken}`,
+              authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
+              authorSlug: fi.book?.author.slug ?? "",
+              priceCents: fi.priceCents,
+            }));
+
+            const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
+            sendOrderConfirmationEmail({
+              to: customerEmail, customerName, items: orderItemsForEmail, totalCents,
+              discountCents: 0, downloadExpiry: expiry, orderId: order.id,
+            }).catch((e) => console.error("[webhook] Failed to send bundle buyer email:", e));
+
+            for (const fi of fullItems) {
+              if (!fi.book) continue;
+              sendSaleNotificationEmail({
+                to: fi.book.author.email,
+                authorName: fi.book.author.displayName || fi.book.author.name,
+                customerEmail, customerName,
+                bookTitle: fi.book.title,
+                itemLabel: fi.saleItem?.label ?? "Bundle item",
+                priceCents: fi.priceCents,
+                orderId: order.id,
+              }).catch((e) => console.error("[webhook] Failed to send bundle author notification:", e));
+            }
+          }
+        }
+      }
+
+      if (type === "course_purchase") {
+        const order = await prisma.order.findFirst({
+          where: { stripeSessionId: session.id },
+          include: { items: true },
+        });
+
+        if (order) {
+          const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
+          const customerName  = session.customer_details?.name ?? undefined;
+          const courseId       = session.metadata?.courseId;
+
+          await prisma.order.update({
+            where: { id: order.id },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
+          });
+
+          if (courseId && customerEmail) {
+            const enrollment = await prisma.courseEnrollment.upsert({
+              where: { courseId_customerEmail: { courseId, customerEmail } },
+              create: { courseId, customerEmail, customerName, orderId: order.id },
+              update: { customerName, orderId: order.id },
+              select: { accessToken: true },
+            });
+
+            const course = await prisma.course.findUnique({
+              where: { id: courseId },
+              select: { title: true, slug: true, priceCents: true, author: { select: { id: true, slug: true, displayName: true, name: true, email: true } } },
+            });
+
+            if (course) {
+              const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+              const accessUrl = `https://${course.author.slug}.${platformDomain}/courses/${course.slug}/learn?token=${enrollment.accessToken}`;
+              const authorName = course.author.displayName || course.author.name || "Author";
+
+              sendCourseAccessEmail({
+                to: customerEmail,
+                customerName,
+                courseTitle: course.title,
+                authorName,
+                accessUrl,
+                isPaid: true,
+                priceCents: course.priceCents,
+              }).catch((e) => console.error("[webhook] Failed to send course access email:", e));
+
+              // Save the buyer as a subscriber, same as a paid book purchase now does.
+              prisma.subscriber.upsert({
+                where: { authorId_email: { authorId: course.author.id, email: customerEmail } },
+                update: { name: customerName },
+                create: { authorId: course.author.id, email: customerEmail, name: customerName, isConfirmed: true },
+              }).catch((e) => console.error("[webhook] Failed to upsert subscriber:", e));
+
+              // Notify the author someone purchased their course, same as a book sale does.
+              sendCourseSaleNotificationEmail({
+                to: course.author.email,
+                authorName,
+                customerEmail,
+                customerName,
+                courseTitle: course.title,
+                priceCents: course.priceCents,
+                orderId: order.id,
+              }).catch((e) => console.error("[webhook] Failed to send course author notification:", e));
             }
           }
         }
@@ -203,12 +406,19 @@ export async function POST(req: NextRequest) {
       if (type === "plan_subscription") {
         const { authorId } = session.metadata ?? {};
         if (authorId && session.subscription) {
+          // Fetch subscription to get customer ID (may not be in session.customer if auto-created)
+          let customerId = session.customer;
+          if (!customerId) {
+            const stripeSub = await stripe.subscriptions.retrieve(session.subscription);
+            customerId = typeof stripeSub.customer === "string" ? stripeSub.customer : stripeSub.customer?.id;
+          }
+
           // Persist the subscription ID and customer ID on the author
           await prisma.author.update({
             where: { id: authorId },
             data: {
               stripeSubscriptionId: session.subscription,
-              ...(session.customer ? { stripeCustomerId: session.customer } : {}),
+              ...(customerId ? { stripeCustomerId: customerId } : {}),
             },
           });
 

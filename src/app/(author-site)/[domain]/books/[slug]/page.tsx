@@ -4,15 +4,24 @@ import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
 import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
+import { BookExcerptModal } from "@/components/author-site/book-excerpt-modal";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
+import { BookBuySection } from "@/components/author-site/book-buy-section";
+import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
+import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-form";
+import { LaunchCountdown } from "@/components/author-site/launch-countdown";
+import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
+import { BookQRCodePublic } from "@/components/author-site/book-qr-code-public";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { AddToCartButtons } from "@/components/author-site/add-to-cart-buttons";
+import { ReaderMagnetButton } from "@/components/author-site/reader-magnet-button";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -37,9 +46,12 @@ export async function generateMetadata({
 
   if (!book) return { title: "Book Not Found" };
 
+  const base        = getAuthorBaseUrl(author);
+  const canonicalUrl = `${base}/books/${slug}`;
+  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
   const description =
-    book.shortDescription ||
-    (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 160) : null) ||
+    (book.shortDescription ? stripHtml(book.shortDescription).slice(0, 160) : null) ||
+    (book.description ? stripHtml(book.description).slice(0, 160) : null) ||
     `${book.title} by ${authorName}.`;
 
   const ogImages = book.coverImageUrl
@@ -49,6 +61,7 @@ export async function generateMetadata({
   return {
     title: book.title,
     description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       type: "book",
       title: `${book.title} by ${authorName}`,
@@ -95,7 +108,7 @@ export default async function BookDetailPage({
       },
       directSaleItems: {
         where: { isActive: true },
-        select: { id: true, format: true, label: true, description: true, priceCents: true },
+        select: { id: true, format: true, label: true, description: true, priceCents: true, isReaderMagnet: true, fileKey: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
       audioTracks: {
@@ -112,18 +125,45 @@ export default async function BookDetailPage({
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         select: { id: true, quote: true, reviewerName: true, source: true, rating: true },
       },
+      bookFeedback: {
+        where: { status: "APPROVED" },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, comment: true, reviewerName: true, rating: true },
+      },
     },
   });
 
   if (!book) notFound();
 
+  // Increment view count (fire-and-forget) so the bookstore "Trending Now"
+  // row — which sorts by Book.views — has data to populate.
+  prisma.book
+    .update({ where: { id: book.id }, data: { views: { increment: 1 } } })
+    .catch(() => {});
+
   const salesEnabled        = author.plan?.salesEnabled ?? false;
   const audioEnabled        = author.plan?.audioEnabled ?? false;
-  const hasDirectSaleItems  = salesEnabled && book.directSalesEnabled && book.directSaleItems.length > 0;
-  const showLegacyDirectBuy = !hasDirectSaleItems && salesEnabled && book.directSalesEnabled && book.priceCents > 0;
+  const stripeReady         = author.stripeConnectOnboarded ?? false;
+  // Reader Magnets are free (file in exchange for an email) → available on every
+  // plan, no Stripe, and independent of the paid "Enable Direct Sales" switch.
+  const magnetItems         = book.directSaleItems.filter((i) => i.isReaderMagnet && i.fileKey);
+  // Paid editions only appear when the author can actually take money:
+  // paid plan + the book's Direct Sales switch + a connected Stripe account.
+  const canSellPaid         = salesEnabled && book.directSalesEnabled && stripeReady;
+  const paidSaleItems       = canSellPaid
+    ? book.directSaleItems.filter((i) => !i.isReaderMagnet)
+    : [];
+  const hasDirectSaleItems  = paidSaleItems.length > 0;
+  const showLegacyDirectBuy = !hasDirectSaleItems && canSellPaid && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
-  const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks;
+  const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks || magnetItems.length > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
+
+  const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
+  const showLaunchCountdown = book.showCountdown && !!book.launchDate && book.launchDate > new Date();
+  const preOrderLaunchLabel = book.preOrderDate
+    ? new Date(book.preOrderDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    : null;
 
   const releaseDateFormatted = book.releaseDate
     ? new Date(book.releaseDate).toLocaleDateString("en-US", {
@@ -133,7 +173,64 @@ export default async function BookDetailPage({
 
   const authorName = author.displayName || author.name;
 
+  const base = getAuthorBaseUrl(author);
+  const bookUrl = `${base}/books/${book.slug}`;
+
+  const jsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type":    "Book",
+    name:       book.title,
+    url:        bookUrl,
+    author:     { "@type": "Person", name: authorName, url: `${base}/about`, sameAs: base, ...(author.profileImageUrl && { image: author.profileImageUrl }) },
+    description: book.shortDescription || (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 300) : undefined),
+    ...(book.coverImageUrl && { image: book.coverImageUrl }),
+    ...(book.isbn          && { isbn: book.isbn }),
+    ...(book.pageCount     && { numberOfPages: book.pageCount }),
+    ...(book.language      && { inLanguage: book.language }),
+    ...(book.releaseDate   && { datePublished: new Date(book.releaseDate).toISOString().split("T")[0] }),
+    ...(book.genres.length > 0 && { genre: book.genres.map((g) => g.genre.name) }),
+    ...(book.priceCents > 0 && {
+      offers: {
+        "@type":       "Offer",
+        price:         (book.priceCents / 100).toFixed(2),
+        priceCurrency: "USD",
+        availability:  "https://schema.org/InStock",
+        url:           bookUrl,
+      },
+    }),
+  };
+
+  const allRatings = [
+    ...book.reviews.filter((r) => r.rating).map((r) => r.rating!),
+    ...book.bookFeedback.map((fb) => fb.rating),
+  ];
+  if (allRatings.length > 0) {
+    const avg = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length;
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: avg.toFixed(1),
+      bestRating: 5,
+      ratingCount: allRatings.length,
+    };
+  }
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",  item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "Books", item: `${base}/books` },
+      { "@type": "ListItem", position: 3, name: book.title, item: bookUrl },
+    ],
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {book.affiliateEnabled && (
+        <AffiliateRefTracker bookId={book.id} bookSlug={book.slug} domain={domain} />
+      )}
     <div
       className="min-h-screen bg-white"
       style={{ "--accent": accentColor } as React.CSSProperties}
@@ -213,6 +310,11 @@ export default async function BookDetailPage({
                 )}
               </div>
             )}
+
+            {/* QR Code — desktop sidebar */}
+            <div className="hidden md:block w-full pt-2 border-t border-gray-100">
+              <BookQRCodePublic bookUrl={bookUrl} size={96} />
+            </div>
           </div>
 
           {/* ── Details column ────────────────────────────────────────────── */}
@@ -250,6 +352,9 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
+              {book.priceCents > 0 && (
+                <p className="mt-3 text-2xl font-bold text-gray-900">{formatCents(book.priceCents)}</p>
+              )}
             </div>
 
             {/* Short description */}
@@ -261,59 +366,99 @@ export default async function BookDetailPage({
               />
             )}
 
+            {/* Launch countdown */}
+            {showLaunchCountdown && (
+              <LaunchCountdown
+                launchDate={book.launchDate!.toISOString()}
+                accentColor={accentColor}
+              />
+            )}
+
+            {/* Pre-order / Coming Soon — replaces buy options until launch */}
+            {isPreOrderActive && (
+              <PreOrderSignupForm
+                bookSlug={book.slug}
+                domain={domain}
+                accentColor={accentColor}
+                launchLabel={preOrderLaunchLabel}
+              />
+            )}
+
             {/* Buy / Retailer buttons */}
-            {hasBuyOptions && (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
-                <div className="flex flex-wrap gap-2">
+            {!isPreOrderActive && hasBuyOptions && (
+              <BookBuySection>
+                <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>
+                  <div className="flex flex-wrap gap-2">
 
-                  {/* Retailer links — shown first */}
-                  {hasRetailerLinks && book.retailerLinks.map((link) => {
-                    const info = getRetailer(link.retailer);
-                    return (
-                      <a
-                        key={link.id}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          borderColor: info.color,
-                          color: info.color,
-                          backgroundColor: info.badgeBg,
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
-                      >
-                        {link.label}
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    );
-                  })}
+                    {/* Retailer links — shown first */}
+                    {hasRetailerLinks && book.retailerLinks.map((link) => {
+                      const info = getRetailer(link.retailer);
+                      return (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            borderColor: info.color,
+                            color: info.color,
+                            backgroundColor: info.badgeBg,
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-opacity hover:opacity-80"
+                        >
+                          {link.label}
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      );
+                    })}
 
-                  {/* Per-format direct sale items — Add to Cart */}
-                  {hasDirectSaleItems && (
-                    <AddToCartButtons
-                      items={book.directSaleItems}
-                      bookId={book.id}
-                      bookSlug={book.slug}
-                      bookTitle={book.title}
-                      coverImageUrl={book.coverImageUrl}
-                      accentColor={accentColor}
-                      formatColors={FORMAT_COLORS}
-                    />
-                  )}
+                    {/* Per-format direct sale items — Add to Cart */}
+                    {hasDirectSaleItems && (
+                      <AddToCartButtons
+                        items={paidSaleItems}
+                        bookId={book.id}
+                        bookSlug={book.slug}
+                        bookTitle={book.title}
+                        coverImageUrl={book.coverImageUrl}
+                        accentColor={accentColor}
+                        formatColors={FORMAT_COLORS}
+                      />
+                    )}
 
-                  {/* Legacy single direct-buy button */}
-                  {showLegacyDirectBuy && (
-                    <Link href={`/books/${book.slug}/buy`}>
-                      <Button variant="primary" size="sm">
-                        <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                        Buy — {formatCents(book.priceCents)}
-                      </Button>
-                    </Link>
-                  )}
+                    {/* Reader magnet items — free in exchange for email */}
+                    {magnetItems.map((item) => {
+                      const colors = FORMAT_COLORS[item.format] ?? FORMAT_COLORS.EBOOK;
+                      return (
+                        <ReaderMagnetButton
+                          key={item.id}
+                          bookId={book.id}
+                          saleItemId={item.id}
+                          authorId={author.id}
+                          bookTitle={book.title}
+                          format={item.format}
+                          label={item.label}
+                          coverImageUrl={book.coverImageUrl}
+                          accentColor={accentColor}
+                          formatColor={colors.color}
+                          formatBg={colors.bg}
+                        />
+                      );
+                    })}
 
+                    {/* Legacy single direct-buy button */}
+                    {showLegacyDirectBuy && (
+                      <Link href={`/books/${book.slug}/buy`}>
+                        <Button variant="primary" size="sm">
+                          <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+                          Buy — {formatCents(book.priceCents)}
+                        </Button>
+                      </Link>
+                    )}
+
+                  </div>
                 </div>
-              </div>
+              </BookBuySection>
             )}
 
             {/* Book Overview — collapsible */}
@@ -321,8 +466,49 @@ export default async function BookDetailPage({
               <BookOverview text={book.description} accentColor={accentColor} />
             )}
 
-            {/* Pull quotes / reviews */}
-            {book.reviews.length > 0 && (
+            {/* Read an Excerpt — modal */}
+            {book.sampleContent && (
+              <BookExcerptModal
+                sampleContent={sanitize(book.sampleContent)}
+                bookTitle={book.title}
+                bookSlug={book.slug}
+                hasBuyOptions={hasBuyOptions}
+                accentColor={accentColor}
+              />
+            )}
+
+            {/* ── Audio Previews ─────────────────────────────────────────────── */}
+            {hasAudioTracks && (
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-5">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: accentColor + "20" }}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="w-4 h-4"
+                      style={{ color: accentColor }}
+                      fill="currentColor"
+                    >
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-gray-900 text-lg">Listen to a Preview</h2>
+                    <p className="text-sm text-gray-500">
+                      {book.audioTracks.length === 1
+                        ? "Audio clip from this book"
+                        : `${book.audioTracks.length} audio clips from this book`}
+                    </p>
+                  </div>
+                </div>
+                <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
+              </div>
+            )}
+
+            {/* Pull quotes / reviews + approved reader feedback */}
+            {(book.reviews.length > 0 || book.bookFeedback.length > 0) && (
               <div className="pt-2 space-y-4">
                 <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">What Readers Are Saying</h2>
                 <div className="space-y-4">
@@ -353,9 +539,40 @@ export default async function BookDetailPage({
                       </footer>
                     </blockquote>
                   ))}
+                  {book.bookFeedback.map((fb) => (
+                    <blockquote
+                      key={fb.id}
+                      className="relative pl-5 border-l-4"
+                      style={{ borderColor: accentColor }}
+                    >
+                      <div className="flex gap-0.5 mb-1.5">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            className={`h-3.5 w-3.5 ${n <= fb.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                          />
+                        ))}
+                      </div>
+                      {fb.comment && (
+                        <p className="text-base text-gray-700 leading-relaxed italic">
+                          &ldquo;{fb.comment}&rdquo;
+                        </p>
+                      )}
+                      <footer className="mt-2 text-sm text-gray-500">
+                        — <span className="font-medium text-gray-700">{fb.reviewerName}</span>
+                      </footer>
+                    </blockquote>
+                  ))}
                 </div>
               </div>
             )}
+
+            {/* Reader feedback form — below reviews */}
+            <BookFeedbackForm
+              bookSlug={book.slug}
+              domain={domain}
+              accentColor={accentColor}
+            />
 
             {/* Genres */}
             {book.genres.length > 0 && (
@@ -396,35 +613,10 @@ export default async function BookDetailPage({
               </div>
             )}
 
-            {/* ── Audio Previews ─────────────────────────────────────────────── */}
-            {hasAudioTracks && (
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-5">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: accentColor + "20" }}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="w-4 h-4"
-                      style={{ color: accentColor }}
-                      fill="currentColor"
-                    >
-                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-gray-900 text-lg">Listen to a Preview</h2>
-                    <p className="text-sm text-gray-500">
-                      {book.audioTracks.length === 1
-                        ? "Audio clip from this book"
-                        : `${book.audioTracks.length} audio clips from this book`}
-                    </p>
-                  </div>
-                </div>
-                <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
-              </div>
-            )}
+            {/* QR Code — mobile */}
+            <div className="md:hidden pt-3 border-t border-gray-100">
+              <BookQRCodePublic bookUrl={bookUrl} size={88} />
+            </div>
           </div>
         </div>
 
@@ -439,5 +631,6 @@ export default async function BookDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }

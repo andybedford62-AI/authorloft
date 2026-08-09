@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { canUseFeature } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
 const VALID_FORMATS = ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] as const;
@@ -22,9 +21,13 @@ export async function GET(
   const items = await prisma.bookDirectSaleItem.findMany({
     where: { bookId },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { magnetLeads: true } } },
   });
 
-  return NextResponse.json(items);
+  // Surface how many readers each magnet has captured so the editor can show it.
+  return NextResponse.json(
+    items.map(({ _count, ...item }) => ({ ...item, magnetLeadCount: _count.magnetLeads }))
+  );
 }
 
 // ── POST — create a new direct sale item ──────────────────────────────────────
@@ -40,17 +43,32 @@ export async function POST(
   const book = await prisma.book.findFirst({ where: { id: bookId, authorId } });
   if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
 
-  // Plan gate: sales feature must be enabled
-  const salesCheck = await canUseFeature(authorId, "salesEnabled");
-  if (!salesCheck.allowed) {
-    return NextResponse.json({ error: salesCheck.reason }, { status: 403 });
-  }
+  // Enforce format restrictions by plan tier: FREE = EBOOK only,
+  // STANDARD = EBOOK + PRINT, PREMIUM = all formats.
+  const author = await prisma.author.findUnique({
+    where: { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const tier = author?.plan?.tier ?? "FREE";
 
   const body = await req.json();
-  const { format, label, description, priceCents } = body;
+  const { format, label, description, priceCents, isReaderMagnet } = body;
 
   if (!format || !VALID_FORMATS.includes(format as DirectSaleFormat)) {
     return NextResponse.json({ error: "Invalid format. Must be EBOOK, AUDIO, FLIPBOOK, or PRINT." }, { status: 400 });
+  }
+
+  const TIER_FORMATS: Record<string, readonly string[]> = {
+    FREE:     ["EBOOK"],
+    STANDARD: ["EBOOK", "PRINT"],
+    PREMIUM:  ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"],
+  };
+  const allowed = TIER_FORMATS[tier] ?? TIER_FORMATS.FREE;
+  if (!allowed.includes(format)) {
+    return NextResponse.json(
+      { error: `Your plan does not include the ${format} format. Upgrade to access more formats.` },
+      { status: 403 },
+    );
   }
   if (!label?.trim()) {
     return NextResponse.json({ error: "Label is required." }, { status: 400 });
@@ -68,6 +86,7 @@ export async function POST(
       label: label.trim(),
       description: description?.trim() || null,
       priceCents,
+      isReaderMagnet: isReaderMagnet === true,
       sortOrder: count,
     },
   });

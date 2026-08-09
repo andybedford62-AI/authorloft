@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle, XCircle, ExternalLink, BookOpen,
-  Mail, Pencil, Trash2, Loader2, UserCheck,
+  Mail, Pencil, Trash2, Loader2, UserCheck, Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
+import { SendAuthorEmailModal } from "./send-author-email-modal";
 
 type Author = {
   id: string;
@@ -17,16 +20,17 @@ type Author = {
   slug: string;
   isActive: boolean;
   isSuperAdmin: boolean;
+  isFoundingMember: boolean;
   createdAt: Date;
   lastLoginAt: Date | null;
   plan: { name: string; tier: string; monthlyPriceCents: number } | null;
   _count: { books: number; subscribers: number; orders: number };
 };
 
-const TIER_VARIANT: Record<string, "success" | "default" | "warning"> = {
-  PREMIUM: "success",
-  STANDARD: "default",
-  FREE: "warning",
+const TIER_VARIANT: Record<string, "plan-premium" | "plan-standard" | "warning"> = {
+  PREMIUM:  "plan-premium",
+  STANDARD: "plan-standard",
+  FREE:     "warning",
 };
 
 // Helper to format relative time (e.g., "2 days ago", "1 hour ago", "Never")
@@ -62,9 +66,11 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
   const router = useRouter();
   const [authors, setAuthors] = useState(initial);
   const [toggling,      setToggling]      = useState<string | null>(null);
+  const [togglingFounding, setTogglingFounding] = useState<string | null>(null);
   const [deleting,      setDeleting]      = useState<string | null>(null);
   const [confirmId,     setConfirmId]     = useState<string | null>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [emailTarget,   setEmailTarget]   = useState<Author | null>(null);
 
   async function toggleActive(author: Author) {
     setToggling(author.id);
@@ -82,6 +88,25 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
       }
     } finally {
       setToggling(null);
+    }
+  }
+
+  async function toggleFoundingMember(author: Author) {
+    setTogglingFounding(author.id);
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFoundingMember: !author.isFoundingMember }),
+      });
+      if (res.ok) {
+        setAuthors((prev) =>
+          prev.map((a) => (a.id === author.id ? { ...a, isFoundingMember: !author.isFoundingMember } : a))
+        );
+        router.refresh();
+      }
+    } finally {
+      setTogglingFounding(null);
     }
   }
 
@@ -117,7 +142,7 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -152,6 +177,14 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                         <p className="font-medium text-gray-900">{author.displayName || author.name}</p>
                         {author.isSuperAdmin && (
                           <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">SA</span>
+                        )}
+                        {author.isFoundingMember && (
+                          <span
+                            title="Founding Member"
+                            className="inline-flex items-center gap-0.5 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium"
+                          >
+                            <Star className="h-3 w-3 fill-amber-500 text-amber-500" /> Founding
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400">{author.email}</p>
@@ -224,51 +257,63 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 {/* Actions */}
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-end gap-1">
+                    {/* Send personal email */}
+                    <IconButton
+                      icon={<Mail className="h-4 w-4" />}
+                      title="Send email"
+                      variant="ghost"
+                      className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                      onClick={() => setEmailTarget(author)}
+                    />
+
                     {/* Impersonate */}
-                    <button
+                    <IconButton
+                      icon={<UserCheck className="h-4 w-4" />}
+                      title="Impersonate author"
+                      variant="ghost"
+                      className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
                       onClick={() => handleImpersonate(author)}
                       disabled={!!impersonating}
-                      className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors disabled:opacity-40 cursor-pointer"
-                      title="Impersonate author"
-                    >
-                      {impersonating === author.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <UserCheck className="h-4 w-4" />
-                      }
-                    </button>
+                      loading={impersonating === author.id}
+                    />
+
+                    {/* Founding member toggle */}
+                    <IconButton
+                      icon={<Star className={author.isFoundingMember ? "h-4 w-4 fill-amber-500" : "h-4 w-4"} />}
+                      title={author.isFoundingMember ? "Remove Founding Member status" : "Mark as Founding Member"}
+                      variant="ghost"
+                      className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+                      onClick={() => toggleFoundingMember(author)}
+                      disabled={!!togglingFounding}
+                      loading={togglingFounding === author.id}
+                    />
 
                     {/* View live site */}
                     <a
                       href={`https://${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                      title="View live site"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <IconButton
+                        icon={<ExternalLink className="h-4 w-4" />}
+                        title="View live site"
+                        variant="view"
+                      />
                     </a>
 
                     {/* Edit */}
-                    <Link
-                      href={`/super-admin/authors/${author.id}`}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Edit author"
-                    >
-                      <Pencil className="h-4 w-4" />
+                    <Link href={`/super-admin/authors/${author.id}`}>
+                      <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit author" variant="edit" />
                     </Link>
 
                     {/* Delete */}
-                    <button
+                    <IconButton
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title="Delete author"
+                      variant="delete"
                       onClick={() => setConfirmId(author.id)}
                       disabled={!!deleting}
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-40"
-                      title="Delete author"
-                    >
-                      {deleting === author.id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <Trash2 className="h-4 w-4" />
-                      }
-                    </button>
+                    />
                   </div>
                 </td>
               </tr>
@@ -298,24 +343,29 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                 </div>
               </div>
               <div className="flex gap-3 pt-1">
-                <button
-                  onClick={() => setConfirmId(null)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
+                <Button variant="ghost" className="flex-1" onClick={() => setConfirmId(null)}>
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
                   onClick={() => handleDelete(target)}
                   disabled={!!deleting}
-                  className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
                 >
-                  {deleting ? "Deleting…" : "Yes, delete"}
-                </button>
+                  {deleting
+                    ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Deleting…</>
+                    : <><Trash2 className="h-4 w-4 mr-1.5" />Yes, delete</>}
+                </Button>
               </div>
             </div>
           </div>
         );
       })()}
+
+      {/* Send personal email modal */}
+      {emailTarget && (
+        <SendAuthorEmailModal author={emailTarget} onClose={() => setEmailTarget(null)} />
+      )}
     </>
   );
 }

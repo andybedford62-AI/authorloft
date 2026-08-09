@@ -1,0 +1,1 @@
+ALTER TABLE "Course" ADD COLUMN "listInBookstore" BOOLEAN NOT NULL DEFAULT false;

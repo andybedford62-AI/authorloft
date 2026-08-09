@@ -11,7 +11,8 @@ export default async function SuperAdminSettingsPage() {
     planBreakdown,
     systemConfig,
     platformSettings,
-    betaCodes,
+    supportEmails,
+    testimonials,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -26,23 +27,37 @@ export default async function SuperAdminSettingsPage() {
       where:  { id: "main" },
       create: { id: "main", maintenanceMode: false, maintenanceMessage: "" },
       update: {},
+      select: { maintenanceMode: true, maintenanceMessage: true, newSignupNotifications: true, signupNotificationEmail: true, defaultAiUsageCap: true, welcomeEmailSubject: true, welcomeEmailBody: true, authorReplyToEmail: true },
     }),
     prisma.platformSettings.upsert({
       where:  { id: "singleton" },
       create: { id: "singleton" },
       update: {},
-      select: { marketingHeroImageUrl: true },
+      select: { marketingHeroImageUrl: true, heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
     }),
-    prisma.inviteCode.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.supportEmail.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+    prisma.testimonial.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
   ]);
 
   // Build env display values server-side so secrets never reach the client bundle
   const stripeKey = process.env.STRIPE_SECRET_KEY;
+
+  // Build stamp — which deploy is live (for support/debugging)
+  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
+  const buildTimeRaw = process.env.BUILD_TIME;
+  const buildTime = buildTimeRaw
+    ? new Date(buildTimeRaw).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
+    : undefined;
+
   const envValues = [
     { label: "Platform Domain", value: process.env.NEXT_PUBLIC_PLATFORM_DOMAIN },
     { label: "App URL",         value: process.env.NEXT_PUBLIC_APP_URL          },
     { label: "Stripe Mode",     value: stripeKey ? (stripeKey.startsWith("sk_live") ? "Live key configured" : "Test key configured") : undefined },
     { label: "S3 Bucket",       value: process.env.AWS_S3_BUCKET                },
+    { label: "Environment",     value: process.env.VERCEL_ENV                   },
+    { label: "Build Commit",    value: commitSha ? commitSha.slice(0, 7) : undefined },
+    { label: "Build Branch",    value: process.env.VERCEL_GIT_COMMIT_REF        },
+    { label: "Build Time",      value: buildTime                               },
   ];
 
   return (
@@ -61,14 +76,18 @@ export default async function SuperAdminSettingsPage() {
         planBreakdown={planBreakdown}
         maintenanceMode={systemConfig.maintenanceMode}
         maintenanceMessage={systemConfig.maintenanceMessage}
-        betaMode={systemConfig.betaMode}
-        betaMessage={systemConfig.betaMessage}
-        betaCodes={betaCodes.map((c) => ({
-          ...c,
-          expiresAt: c.expiresAt?.toISOString() ?? null,
-          createdAt: c.createdAt.toISOString(),
-        }))}
+        newSignupNotifications={systemConfig.newSignupNotifications}
+        signupNotificationEmail={systemConfig.signupNotificationEmail}
+        defaultAiUsageCap={systemConfig.defaultAiUsageCap}
         marketingHeroImageUrl={platformSettings.marketingHeroImageUrl ?? null}
+        heroHeadlineLine1={platformSettings.heroHeadlineLine1 ?? null}
+        heroHeadlineLine2={platformSettings.heroHeadlineLine2 ?? null}
+        heroSubheadline={platformSettings.heroSubheadline ?? null}
+        supportEmails={supportEmails}
+        testimonials={testimonials}
+        welcomeEmailSubject={systemConfig.welcomeEmailSubject}
+        welcomeEmailBody={systemConfig.welcomeEmailBody}
+        authorReplyToEmail={systemConfig.authorReplyToEmail}
         envValues={envValues}
       />
     </div>

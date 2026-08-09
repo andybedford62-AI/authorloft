@@ -1,19 +1,15 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { redirectIfRetiredSlug } from "@/lib/author-queries";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { getTheme, getThemeAccentHex, isThemeAllowed } from "@/lib/themes";
+import { getTheme, resolveAccentColor, isThemeAllowed } from "@/lib/themes";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
 import { CartProvider } from "@/context/cart-context";
 import { CartDrawer } from "@/components/author-site/cart-drawer";
+import { DemoBanner } from "@/components/demo-banner";
 import type { Metadata } from "next";
-
-// export const metadata: Metadata = {
-//   metadataBase: new URL(
-//     process.env.NEXT_PUBLIC_APP_URL ?? "https://authorloft.app"
-//   ),
-// };
 
 // Always fetch fresh data — ensures branding/content changes appear immediately
 export const dynamic = "force-dynamic";
@@ -38,6 +34,7 @@ async function resolveAuthor(domain: string) {
       facebookUrl: true,
       twitterUrl: true,
       instagramUrl: true,
+      supportUrl: true,
       contactEmail: true,
       // Nav visibility toggles
       navShowAbout: true,
@@ -46,10 +43,17 @@ async function resolveAuthor(domain: string) {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
+      navShowBookstore: true,
+      navShowBundles: true,
+      navShowCourses: true,
+      googleSiteVerification: true,
+      bingSiteVerification: true,
       siteTheme: true,
+      customAccentColor: true,
       isActive: true,
       plan: {
-        select: { flipBooksLimit: true, tier: true },
+        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true, salesEnabled: true, bundlesEnabled: true, coursesEnabled: true },
       },
     },
   });
@@ -78,6 +82,7 @@ export async function generateMetadata({
       template: `%s | ${authorName}`,
     },
     description,
+    icons: { icon: "/authorloft-logo.png" },
     openGraph: {
       type: "website",
       siteName: authorName,
@@ -95,6 +100,14 @@ export async function generateMetadata({
     alternates: {
       canonical: baseUrl,
     },
+    verification: {
+      ...(author.googleSiteVerification && {
+        google: author.googleSiteVerification,
+      }),
+      ...(author.bingSiteVerification && {
+        other: { "msvalidate.01": author.bingSiteVerification },
+      }),
+    },
   };
 }
 
@@ -107,7 +120,13 @@ export default async function AuthorSiteLayout({
 }) {
   const { domain } = await params;
   const author = await resolveAuthor(domain);
-  if (!author) notFound();
+  if (!author) {
+    // Layout renders before any child page, so this is the one place that
+    // actually needs the retired-slug check — page.tsx's own copy (in
+    // getAuthorByDomain) never gets reached if this notFound() fires first.
+    await redirectIfRetiredSlug(domain);
+    notFound();
+  }
 
   // Fetch custom pages that are published AND set to show in nav
   const customNavPages = await prisma.authorPage.findMany({
@@ -131,6 +150,10 @@ export default async function AuthorSiteLayout({
     navShowFlipBooks: author.navShowFlipBooks,
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
+    navShowMediaKit: author.navShowMediaKit,
+    navShowBookstore: author.navShowBookstore,
+    navShowBundles: author.navShowBundles,
+    navShowCourses: author.navShowCourses,
   };
 
   // Enforce plan-based theme access at render time
@@ -142,9 +165,29 @@ export default async function AuthorSiteLayout({
   const theme = getTheme(effectiveSiteTheme);
   const dataTheme = theme.dataTheme || undefined;
 
-  // Compute accent from theme — no longer from the author's stored accentColor field.
-  const accentColor = getThemeAccentHex(effectiveSiteTheme);
+  // Accent: PREMIUM authors may override with a custom colour; otherwise use theme accent.
+  const accentColor = resolveAccentColor({
+    planTier,
+    customAccentColor: author.customAccentColor,
+    siteTheme: effectiveSiteTheme,
+  });
   const authorWithAccent = { ...author, accentColor };
+
+  const baseUrl = getAuthorBaseUrl(author);
+  const authorName = author.displayName || author.name;
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: authorName,
+    url: baseUrl,
+    description: author.shortBio || `Books and stories by ${authorName}.`,
+    publisher: {
+      "@type": "Person",
+      name: authorName,
+      url: baseUrl,
+      ...(author.profileImageUrl && { image: author.profileImageUrl }),
+    },
+  };
 
   return (
     <AdminSessionProvider>
@@ -152,6 +195,8 @@ export default async function AuthorSiteLayout({
         <div
           data-theme={dataTheme}
         >
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
+          <DemoBanner />
           <AuthorNav
             author={authorWithAccent}
             navConfig={navConfig}

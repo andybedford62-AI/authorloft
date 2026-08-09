@@ -21,6 +21,7 @@ interface Book {
   directSaleItems?: DirectSaleItemPublic[];
   releaseDate?: string | Date | null;
   caption?: string | null;
+  isPreOrder?: boolean;
   saleInfo?: { discountCents: number; salePriceCents: number } | null;
 }
 

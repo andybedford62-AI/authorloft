@@ -22,6 +22,7 @@ export type PlanData = {
   newsletter: boolean;
   analyticsEnabled: boolean;
   flipBooksLimit: number;
+  mediaKitEnabled: boolean;
   isDefault: boolean;
 };
 
@@ -48,7 +49,7 @@ function formatAnnualTotal(annualCents: number) {
 function buildAutoFeatures(plan: PlanData): string[] {
   const f: string[] = [];
   f.push(plan.maxBooks === null ? "Unlimited books" : `Up to ${plan.maxBooks} book${plan.maxBooks === 1 ? "" : "s"}`);
-  if (plan.maxPosts === null && plan.tier !== "FREE") f.push("Unlimited blog posts");
+  if (plan.maxPosts === null && plan.tier !== "FREE") f.push("Unlimited news posts");
   else if (plan.maxPosts !== null) f.push(`Up to ${plan.maxPosts} published posts`);
   f.push(plan.customDomain ? "Custom domain" : "AuthorLoft subdomain");
   f.push(plan.newsletter ? "Newsletter campaigns" : "Newsletter capture");
@@ -195,8 +196,13 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
                     : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
-                {isFree ? "Get Started Free" : `Start ${plan.name}`}
+                {isFree ? "Get Started Free" : `Start Free → ${plan.name}`}
               </Link>
+              {!isFree && (
+                <p className="text-center text-xs text-gray-400 mt-2">
+                  Free account first, then upgrade — takes 2 minutes
+                </p>
+              )}
             </div>
           );
         })}

@@ -7,11 +7,15 @@ const OPEN_LIMITS = {
   maxPosts:        null as number | null,
   maxStorageMb:    null as number | null,
   customDomain:    false,
-  salesEnabled:    false,
-  newsletter:      false,
+  salesEnabled:    true,
+  newsletter:      true,
   analyticsEnabled:false,
   flipBooksLimit:  -1,  // unlimited when no plan assigned
   audioEnabled:    false,
+  mediaKitEnabled: false,
+  preOrdersEnabled: true,
+  coursesEnabled:  true,
+  maxCourses:      null as number | null,
 };
 
 // ─── Core lookup ─────────────────────────────────────────────────────────────
@@ -45,6 +49,30 @@ export async function canAddBook(
     return {
       allowed: false,
       reason: `Your plan allows up to ${limits.maxBooks} book${limits.maxBooks === 1 ? "" : "s"}. Upgrade your plan to add more.`,
+    };
+  }
+  return { allowed: true };
+}
+
+export async function canAddCourse(
+  authorId: string
+): Promise<{ allowed: boolean; reason?: string }> {
+  const limits = await getAuthorPlanLimits(authorId);
+  if (!(limits as any).coursesEnabled) {
+    return {
+      allowed: false,
+      reason: "Your current plan does not include courses. Upgrade your plan to create one.",
+    };
+  }
+
+  const maxCourses = (limits as any).maxCourses as number | null;
+  if (maxCourses === null || maxCourses === undefined) return { allowed: true };
+
+  const current = await prisma.course.count({ where: { authorId } });
+  if (current >= maxCourses) {
+    return {
+      allowed: false,
+      reason: `Your plan allows up to ${maxCourses} course${maxCourses === 1 ? "" : "s"}. Upgrade your plan to add more.`,
     };
   }
   return { allowed: true };
@@ -99,7 +127,7 @@ export async function canAddFlipBook(
 
 export async function canUseFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled" | "preOrdersEnabled"
 ): Promise<{ allowed: boolean; reason?: string }> {
   const limits = await getAuthorPlanLimits(authorId);
 
@@ -109,6 +137,8 @@ export async function canUseFeature(
     newsletter:       "newsletter",
     analyticsEnabled: "analytics",
     audioEnabled:     "audio previews",
+    mediaKitEnabled:  "media kit",
+    preOrdersEnabled: "pre-orders / coming soon",
   };
 
   if (!(limits as any)[feature]) {
@@ -120,11 +150,30 @@ export async function canUseFeature(
   return { allowed: true };
 }
 
+// ─── ARC management gate ─────────────────────────────────────────────────────
+
+export async function canUseArc(
+  authorId: string,
+): Promise<{ allowed: boolean; reason?: string }> {
+  const author = await prisma.author.findUnique({
+    where:  { id: authorId },
+    select: { plan: { select: { tier: true } } },
+  });
+  const tier = author?.plan?.tier ?? "FREE";
+  if (tier === "FREE") {
+    return {
+      allowed: false,
+      reason: "ARC management requires a Standard or Premium plan. Upgrade to start sending advance reader copies.",
+    };
+  }
+  return { allowed: true };
+}
+
 // ─── Convenience: check feature and return 403 response payload ───────────────
 
 export async function assertFeature(
   authorId: string,
-  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled"
+  feature: "customDomain" | "salesEnabled" | "newsletter" | "analyticsEnabled" | "audioEnabled" | "mediaKitEnabled" | "preOrdersEnabled"
 ) {
   const result = await canUseFeature(authorId, feature);
   return result; // Caller decides how to respond

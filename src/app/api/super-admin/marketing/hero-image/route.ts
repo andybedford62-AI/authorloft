@@ -1,24 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
 import { revalidatePath } from "next/cache";
-
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  const author = await prisma.author.findUnique({
-    where:  { id: (session.user as any).id },
-    select: { isSuperAdmin: true },
-  });
-  return author?.isSuperAdmin ? session : null;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 /** GET — returns the current hero image URL */
 export async function GET() {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const settings = await prisma.platformSettings.upsert({
     where:  { id: "singleton" },
@@ -32,8 +20,7 @@ export async function GET() {
 
 /** PATCH — update via URL string */
 export async function PATCH(req: NextRequest) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { url } = await req.json();
 
@@ -49,8 +36,7 @@ export async function PATCH(req: NextRequest) {
 
 /** POST — upload a file directly */
 export async function POST(req: NextRequest) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   let formData: FormData;
   try {

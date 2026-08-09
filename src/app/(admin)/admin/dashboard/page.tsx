@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { DashboardTracker } from "@/components/admin/dashboard-tracker";
+import { OnboardingController } from "@/components/admin/onboarding-controller";
+import { NextStepsCard } from "@/components/admin/next-steps-card";
 import {
   BookOpen, Users, ShoppingBag, TrendingUp,
   Plus, ArrowRight, Star, MailWarning,
@@ -8,6 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
+import { SitePagesCard } from "@/components/admin/site-pages-card";
+import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 async function getDashboardData(authorId: string) {
   const [
@@ -18,6 +25,7 @@ async function getDashboardData(authorId: string) {
     recentOrders,
     books,
     plan,
+    earlyBirdOffer,
   ] = await Promise.all([
     // Total published books
     prisma.book.count({ where: { authorId, isPublished: true } }),
@@ -50,19 +58,57 @@ async function getDashboardData(authorId: string) {
       take: 5,
     }),
 
-    // All books for the list
+    // All books for the list (+ the fields needed to judge whether each one is reader-ready)
     prisma.book.findMany({
       where: { authorId },
       orderBy: { sortOrder: "asc" },
-      select: { id: true, title: true, priceCents: true, isFeatured: true, isPublished: true },
+      select: {
+        id: true, title: true, priceCents: true, isFeatured: true, isPublished: true,
+        coverImageUrl: true, description: true, shortDescription: true, isPreOrder: true,
+        _count: { select: { retailerLinks: true, directSaleItems: true } },
+      },
     }),
 
     // Author plan
     prisma.author.findUnique({
       where: { id: authorId },
-      include: { plan: true },
+      select: {
+        createdAt: true,
+        plan: true,
+      },
+    }),
+
+    // Whichever founding-member offer is currently live — Super Admin → Coupons
+    prisma.earlyBirdOffer.findFirst({
+      where:  { enabled: true },
+      select: { percentOff: true, durationMonths: true, windowDays: true, headline: true, subtext: true },
     }),
   ]);
+
+  const planTier = plan?.plan?.tier ?? "FREE";
+  const daysSinceSignup = plan?.createdAt
+    ? (Date.now() - new Date(plan.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    : 999;
+  const earlyBirdWindowDays = earlyBirdOffer?.windowDays ?? 30;
+  const showEarlyBirdBanner = !!earlyBirdOffer && planTier === "FREE" && daysSinceSignup <= earlyBirdWindowDays;
+  const earlyBirdDaysLeft   = Math.max(0, Math.ceil(earlyBirdWindowDays - daysSinceSignup));
+  const earlyBirdPercentOff = earlyBirdOffer?.percentOff ?? 20;
+  const earlyBirdDurationMonths = earlyBirdOffer?.durationMonths ?? 3;
+  const earlyBirdHeadline = earlyBirdOffer?.headline?.trim()
+    || `Founding member offer — ${earlyBirdPercentOff}% off for your first ${earlyBirdDurationMonths} month${earlyBirdDurationMonths !== 1 ? "s" : ""}`;
+  const earlyBirdSubtext = earlyBirdOffer?.subtext?.trim()
+    || `Upgrade within ${earlyBirdDaysLeft} day${earlyBirdDaysLeft !== 1 ? "s" : ""} to lock in your discount. Auto-applied at checkout.`;
+
+  // How many books are missing a cover, description, or a way for a reader to actually
+  // get the book — the signal that drives the "finish your book" dashboard nudge.
+  const incompleteBookCount = books.filter((b) => !getBookCompletionSummary({
+    coverImageUrl:        b.coverImageUrl,
+    description:          b.description,
+    shortDescription:     b.shortDescription,
+    retailerLinksCount:   b._count.retailerLinks,
+    directSaleItemsCount: b._count.directSaleItems,
+    isPreOrder:           b.isPreOrder,
+  }).isComplete).length;
 
   return {
     totalBooks,
@@ -71,14 +117,22 @@ async function getDashboardData(authorId: string) {
     ordersThisMonth,
     recentOrders,
     books,
+    planTier,
     planName: plan?.plan?.name ?? "Free",
     planFeatures: plan?.plan
       ? [
           (plan.plan.maxBooks === -1 || plan.plan.maxBooks === null) ? "Unlimited books" : `Up to ${plan.plan.maxBooks} books`,
           plan.plan.customDomain ? "Custom domain" : null,
           plan.plan.salesEnabled ? "Sales enabled" : null,
-        ].filter(Boolean)
+        ].filter((x): x is string => x !== null)
       : ["Up to 5 books"],
+    showEarlyBirdBanner,
+    earlyBirdDaysLeft,
+    earlyBirdPercentOff,
+    earlyBirdDurationMonths,
+    earlyBirdHeadline,
+    earlyBirdSubtext,
+    incompleteBookCount,
   };
 }
 
@@ -129,19 +183,33 @@ function ChecklistRow({
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
 
-  const [data, authorMeta] = await Promise.all([
+  const [data, authorMeta, customPages, courseCount] = await Promise.all([
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
       select: {
         name: true,
         displayName: true,
+        slug: true,
+        customDomain: true,
         emailVerified: true,
         email: true,
         profileImageUrl: true,
         bio: true,
+        onboardingCompletedAt: true,
+        creatorType: true,
         stripeConnectOnboarded: true,
-        plan: { select: { salesEnabled: true } },
+        hideNextStepsChecklist: true,
+        navShowAbout: true,
+        navShowBooks: true,
+        navShowSpecials: true,
+        navShowFlipBooks: true,
+        navShowBlog: true,
+        navShowContact: true,
+        navShowMediaKit: true,
+        navShowCourses: true,
+        navShowBundles: true,
+        plan: { select: { salesEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, coursesEnabled: true, bundlesEnabled: true } },
         books: {
           where: { directSalesEnabled: true },
           select: {
@@ -155,11 +223,18 @@ export default async function DashboardPage() {
         },
       },
     }),
+    prisma.authorPage.findMany({
+      where: { authorId, isVisible: true, showInNav: true },
+      select: { slug: true, title: true, navTitle: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+    prisma.course.count({ where: { authorId } }),
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
-  const hasProfile     = !!(authorMeta?.profileImageUrl && authorMeta?.bio);
-  const hasBook        = data.totalBooks > 0;
+  // Bio alone satisfies "complete profile" — photo is optional since new onboarding flow
+  const hasProfile     = !!authorMeta?.bio;
+  const hasBook        = data.books.length > 0;
   const hasStripe      = !!authorMeta?.stripeConnectOnboarded;
   const hasFile        = !!(authorMeta?.books?.[0]?.directSaleItems?.length);
   const salesEnabled   = !!authorMeta?.plan?.salesEnabled;
@@ -187,10 +262,21 @@ export default async function DashboardPage() {
       optional: false,
     },
     {
+      // Trivially "done" before any book exists — the pre-first-book onboarding
+      // modal/checklist already owns that message, this one picks up after.
+      done: !hasBook || data.incompleteBookCount === 0,
+      label: hasBook && data.incompleteBookCount > 0
+        ? `Finish book details (${data.incompleteBookCount} book${data.incompleteBookCount === 1 ? "" : "s"} ${data.incompleteBookCount === 1 ? "needs" : "need"} more info)`
+        : "Book details complete",
+      hint: "Add a cover, description, and a buy link or direct-sale file — see which books need what on the Books page",
+      href: "/admin/books",
+      optional: true,
+    },
+    {
       done: hasStripe,
       label: "Connect Stripe for payouts",
-      hint: "Settings → Stripe Payouts → Connect Stripe account",
-      href: "/admin/settings",
+      hint: "Settings → Billing tab → Stripe Payouts → Connect Stripe account",
+      href: "/admin/settings?tab=billing",
       optional: true,
     },
     {
@@ -216,9 +302,54 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 max-w-6xl">
+      <DashboardTracker
+        onboardingComplete={allDone}
+        bookCount={data.totalBooks}
+        planTier={data.planTier}
+      />
+      {/* Onboarding flow — modal + fallback checklist — shown until first book created */}
+      {!authorMeta?.onboardingCompletedAt && (
+        <OnboardingController
+          authorSlug={authorMeta?.slug ?? ""}
+          hasBio={hasProfile}
+          hasBook={hasBook}
+          hasCourse={courseCount > 0}
+          creatorType={authorMeta?.creatorType}
+        />
+      )}
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
+      )}
+
+      {/* Stripe Connect nudge — shown when author has enabled direct sales on any book
+          but hasn't onboarded Stripe yet. Dismissible (localStorage). */}
+      <StripeConnectNudge
+        show={
+          !!authorMeta?.emailVerified &&
+          !hasStripe &&
+          salesEnabled &&
+          (authorMeta?.books?.length ?? 0) > 0
+        }
+      />
+
+      {/* Early bird upgrade banner */}
+      {data.showEarlyBirdBanner && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <p className="font-semibold text-amber-900 text-sm">{data.earlyBirdHeadline}</p>
+              <p className="text-xs text-amber-700 mt-0.5">{data.earlyBirdSubtext}</p>
+            </div>
+          </div>
+          <a
+            href="/admin/settings?tab=billing"
+            className="flex-shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-lg transition-colors"
+          >
+            Upgrade Now
+          </a>
+        </div>
       )}
 
       {/* Header */}
@@ -230,49 +361,30 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link href="/admin/books/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button>
             <Plus className="h-4 w-4 mr-2" /> Add Book
           </Button>
         </Link>
       </div>
 
-      {/* Getting Started checklist — hidden once all steps complete */}
-      {!allDone && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-gray-900">Getting Started</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {completedCount} of {requiredSteps.length} required steps complete
-              </p>
-            </div>
-            {/* Progress bar */}
-            <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 rounded-full transition-all"
-                style={{ width: `${(completedCount / requiredSteps.length) * 100}%` }}
-              />
-            </div>
-          </div>
+      {/* Next steps — every plan tier, dismissible, shown from the first book until complete or hidden.
+          Gated on hasBook (not onboardingCompletedAt) so it doesn't duplicate the pre-first-book modal. */}
+      {hasBook &&
+        !authorMeta?.hideNextStepsChecklist &&
+        optionalSteps.some((s) => !s.done) && (
+        <NextStepsCard
+          steps={optionalSteps}
+          subtitle="Finish these so readers see a complete, sellable book"
+        />
+      )}
 
-          <div className="divide-y divide-gray-50">
-            {requiredSteps.map((step) => (
-              <ChecklistRow key={step.label} step={step} />
-            ))}
-          </div>
-
-          {/* Optional steps */}
-          <div className="border-t border-dashed border-gray-200">
-            <p className="px-5 pt-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              Optional — for direct sales
-            </p>
-            <div className="divide-y divide-gray-50">
-              {optionalSteps.map((step) => (
-                <ChecklistRow key={step.label} step={step} optional />
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Your Site Pages — visual sitemap of the live author site */}
+      {authorMeta && (
+        <SitePagesCard
+          baseUrl={getAuthorBaseUrl({ slug: authorMeta.slug, customDomain: authorMeta.customDomain })}
+          author={authorMeta}
+          customPages={customPages}
+        />
       )}
 
       {/* Stats */}
@@ -353,7 +465,7 @@ export default async function DashboardPage() {
               <div className="px-5 py-8 text-center">
                 <p className="text-gray-400 text-sm mb-3">No books yet.</p>
                 <Link href="/admin/books/new">
-                  <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+                  <Button size="sm">
                     <Plus className="h-3.5 w-3.5 mr-1.5" /> Add your first book
                   </Button>
                 </Link>
@@ -392,9 +504,9 @@ export default async function DashboardPage() {
                   {(data.planFeatures as string[]).join(" · ")}
                 </p>
               </div>
-              <Link href="/admin/settings">
+              <Link href="/admin/settings?tab=billing">
                 <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-                  Upgrade
+                  {data.planTier === "PREMIUM" ? "Manage" : "Upgrade"}
                 </Button>
               </Link>
             </div>

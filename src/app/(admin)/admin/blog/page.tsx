@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus, Pencil, Newspaper, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/admin/icon-button";
 import { prisma } from "@/lib/db";
 import { BlogDeleteButton } from "@/components/admin/blog-delete-button";
 import { getAdminAuthorId } from "@/lib/admin-auth";
@@ -54,7 +55,7 @@ export default async function AdminBlogPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -112,12 +113,9 @@ export default async function AdminBlogPage() {
 
                   {/* Actions */}
                   <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-1">
                       <Link href={`/admin/blog/${post.id}/edit`}>
-                        <Button variant="outline" size="sm">
-                          <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                          Edit
-                        </Button>
+                        <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" />
                       </Link>
                       <BlogDeleteButton postId={post.id} postTitle={post.title} />
                     </div>

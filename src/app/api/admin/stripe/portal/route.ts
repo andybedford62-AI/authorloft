@@ -33,7 +33,9 @@ export async function POST() {
     }
 
     if (!customerId) {
-      return NextResponse.json({ error: "No billing account found." }, { status: 400 });
+      return NextResponse.json({
+        error: "Billing portal not ready yet. Please try again in a few moments."
+      }, { status: 400 });
     }
 
     const returnUrl = `https://www.${PLATFORM_DOMAIN}/admin/settings`;

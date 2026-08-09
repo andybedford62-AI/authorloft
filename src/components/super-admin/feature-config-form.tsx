@@ -4,8 +4,10 @@ import { useState } from "react";
 import {
   LayoutDashboard, BookOpen, BookMarked, Sparkles, Library,
   Tag, FileText, Newspaper, Inbox, Mail, ShoppingBag, ShoppingCart,
-  Paintbrush, Palette, Shield, Bot, Search, Settings, Save, Loader2, Globe,
+  Paintbrush, Palette, Shield, Bot, Search, Settings, Check, Loader2, Globe, Megaphone, Store, CalendarClock,
+  GraduationCap, Package, Send, Star,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 
 // ── Feature list with icons ───────────────────────────────────────────────────
@@ -13,17 +15,25 @@ import { DEFAULT_GATES, FEATURE_PLAN_MAP } from "@/lib/feature-gates";
 const FEATURES = [
   { key: "/admin/ai-assistant", label: "AI Assistant",   icon: Bot             },
   { key: "/admin/appearance",   label: "Appearance",     icon: Paintbrush      },
+  { key: "/admin/arcs",         label: "ARCs",           icon: BookOpen        },
   { key: "/admin/blog",         label: "Blog / News",    icon: Newspaper       },
   { key: "/admin/books",        label: "Books",          icon: BookOpen        },
   { key: "/admin/branding",     label: "Branding",       icon: Palette         },
+  { key: "bookstore-listing",   label: "Bookstore Listing", icon: Store        },
+  { key: "/admin/bundles",      label: "Bundles",        icon: Package         },
+  { key: "/admin/courses",      label: "Courses",        icon: GraduationCap   },
   { key: "/admin/pages",        label: "Custom Pages",   icon: FileText        },
   { key: "/admin/dashboard",    label: "Dashboard",      icon: LayoutDashboard },
   { key: "direct-sales",        label: "Direct Sales",   icon: ShoppingCart    },
+  { key: "/admin/feedback",     label: "Reader Feedback", icon: Star           },
   { key: "/admin/flip-books",   label: "Flip Books",     icon: BookMarked      },
   { key: "/admin/genres",       label: "Genres",         icon: Tag             },
+  { key: "/admin/media-kit",    label: "Media Kit",      icon: Megaphone       },
   { key: "/admin/messages",     label: "Messages",       icon: Inbox           },
   { key: "/admin/legal",        label: "My Site Legal",  icon: Shield          },
   { key: "/admin/newsletter",   label: "Newsletter",     icon: Mail            },
+  { key: "pre-orders",          label: "Pre-orders / Coming Soon", icon: CalendarClock },
+  { key: "/admin/promote",      label: "Promote",        icon: Send            },
   { key: "/admin/sales",        label: "Sales",          icon: ShoppingBag     },
   { key: "/admin/series",       label: "Series",         icon: Library         },
   { key: "/admin/seo-audit",    label: "SEO Audit",      icon: Search          },
@@ -103,14 +113,9 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
             Changes apply to all authors on next page load.
           </p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors flex-shrink-0"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save Changes
-        </button>
+        <Button onClick={handleSave} disabled={saving} className="flex-shrink-0">
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
+        </Button>
       </div>
 
       {/* Feedback */}
@@ -157,7 +162,7 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
           return (
             <div
               key={key}
-              className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-5 py-3.5"
+              className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-white border border-gray-200 rounded-xl px-5 py-3.5"
             >
               <div className="flex items-center gap-3">
                 <Icon className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -175,7 +180,7 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
                 </div>
               </div>
 
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap">
                 {TIERS.map((tier) => {
                   const isSelected = current === tier;
                   return (
@@ -198,14 +203,9 @@ export function FeatureConfigForm({ initialGates }: { initialGates: Record<strin
 
       {/* Save (bottom) */}
       <div className="flex justify-end pt-2">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save Changes
-        </button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
+        </Button>
       </div>
     </div>
   );

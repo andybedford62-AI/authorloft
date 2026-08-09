@@ -32,14 +32,28 @@ type Campaign = {
   totalTargeted: number;
 };
 
+type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null; eyebrow: string; ctaLabel: string };
+type ShelfBook = { title: string; coverImageUrl: string | null };
+type ReviewQuote = { quote: string; attribution: string };
+type ActiveSpecial = { id: string; title: string; description: string | null; ctaLabel: string | null; ctaUrl: string | null };
+type SocialLink = { label: string; url: string };
+
 interface Props {
-  subscribers:    Subscriber[];
-  genres:         Genre[];
-  genreMap:       Record<string, string>;
-  confirmedCount: number;
-  accentColor:    string;
-  authorName:     string;
-  campaigns:      Campaign[];
+  subscribers:     Subscriber[];
+  genres:          Genre[];
+  genreMap:        Record<string, string>;
+  confirmedCount:  number;
+  accentColor:     string;
+  authorName:      string;
+  tagline:         string | null;
+  logoUrl:         string | null;
+  profileImageUrl: string | null;
+  socials:         SocialLink[];
+  featuredBook:    FeaturedBook | null;
+  shelf:           ShelfBook[];
+  review:          ReviewQuote | null;
+  activeSpecials:  ActiveSpecial[];
+  campaigns:       Campaign[];
 }
 
 type SendResult = { sent: number; failed: number; total: number } | null;
@@ -52,16 +66,29 @@ export function NewsletterClient({
   confirmedCount,
   accentColor,
   authorName,
+  tagline,
+  logoUrl,
+  profileImageUrl,
+  socials,
+  featuredBook,
+  shelf,
+  review,
+  activeSpecials,
   campaigns: initialCampaigns,
 }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("subscribers");
+  const [tab, setTab] = useState<Tab>("compose");
 
   // Compose state
   const [subject,        setSubject]        = useState("");
   const [htmlBody,       setHtmlBody]       = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [includeBooks,   setIncludeBooks]   = useState(true);
+  const [includeReview,  setIncludeReview]  = useState(true);
+  const [specialId,      setSpecialId]      = useState<string>(activeSpecials[0]?.id ?? "");
   const [showPreview,    setShowPreview]    = useState(false);
+
+  const selectedSpecial = activeSpecials.find((s) => s.id === specialId) ?? null;
   const [sendState,      setSendState]      = useState<"idle" | "confirming" | "sending" | "done">("idle");
   const [sendResult,     setSendResult]     = useState<SendResult>(null);
   const [sendError,      setSendError]      = useState("");
@@ -93,7 +120,7 @@ export function NewsletterClient({
       const res = await fetch("/api/admin/newsletter/send", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ subject, htmlBody, categoryFilter }),
+        body:    JSON.stringify({ subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null }),
       });
       const data = await res.json();
 
@@ -125,6 +152,9 @@ export function NewsletterClient({
     setSubject("");
     setHtmlBody("");
     setCategoryFilter([]);
+    setIncludeBooks(true);
+    setIncludeReview(true);
+    setSpecialId(activeSpecials[0]?.id ?? "");
     setShowPreview(false);
     setSendResult(null);
     setSendState("idle");
@@ -170,7 +200,7 @@ export function NewsletterClient({
 
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
-        {(["subscribers", "compose", "history"] as const).map((t) => (
+        {(["compose", "subscribers", "history"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -189,15 +219,30 @@ export function NewsletterClient({
       {tab === "subscribers" && (
         <>
           {subscribers.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-              <Users className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-              <p className="font-medium text-gray-500">No subscribers yet</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Readers can sign up through the newsletter form on your site.
-              </p>
+            <div className="bg-white rounded-xl border border-gray-200 p-10 text-center space-y-4">
+              <Users className="h-10 w-10 text-gray-200 mx-auto" />
+              <div>
+                <p className="font-semibold text-gray-700">No subscribers yet</p>
+                <p className="text-sm text-gray-400 mt-1 max-w-sm mx-auto">
+                  Your author site already has a built-in newsletter sign-up form. Share your site link with readers and they can subscribe directly.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 items-center text-sm">
+                <div className="rounded-lg bg-gray-50 border border-gray-100 px-4 py-3 text-left max-w-sm w-full space-y-1.5 text-gray-500">
+                  <p className="font-medium text-gray-700 text-xs uppercase tracking-wide">How readers subscribe</p>
+                  <p>1. Share your public author site link</p>
+                  <p>2. Readers click the newsletter sign-up form on your site</p>
+                  <p>3. They confirm via email — and they appear here</p>
+                </div>
+                <a href="/admin/newsletter?tab=integrations" className="text-xs text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                  Connect Mailchimp, Kit, or ActiveCampaign →
+                </a>
+              </div>
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+              <div className="min-w-[560px]">
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
                 <div className="grid grid-cols-4 text-xs text-gray-500 uppercase tracking-wide font-medium">
                   <span>Subscriber</span>
@@ -210,7 +255,7 @@ export function NewsletterClient({
                 {subscribers.map((sub) => {
                   const interestNames = sub.categoryPrefs
                     .map((id) => genreMap[id])
-                    .filter(Boolean);
+                    .filter((x): x is string => x !== undefined);
                   return (
                     <div
                       key={sub.id}
@@ -242,6 +287,8 @@ export function NewsletterClient({
                     </div>
                   );
                 })}
+              </div>
+              </div>
               </div>
             </div>
           )}
@@ -333,6 +380,70 @@ export function NewsletterClient({
                     </div>
                   </div>
                 )}
+
+                {/* Smart blocks — each only appears when the data exists. */}
+                {(featuredBook || review || activeSpecials.length > 0) && (
+                  <div className="space-y-3 pt-2 border-t border-gray-100">
+                    <p className="text-sm font-medium text-gray-700">Add to this newsletter</p>
+
+                    {featuredBook && (
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={includeBooks}
+                          onChange={(e) => setIncludeBooks(e.target.checked)}
+                          disabled={sendState === "sending"}
+                          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span>
+                          <span className="block text-sm text-gray-700">Feature my books</span>
+                          <span className="block text-xs text-gray-400 mt-0.5">
+                            Showcases <span className="font-medium text-gray-500">{featuredBook.title}</span>
+                            {shelf.length > 0 && ` + ${shelf.length} more on the shelf`}.
+                          </span>
+                        </span>
+                      </label>
+                    )}
+
+                    {review && (
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={includeReview}
+                          onChange={(e) => setIncludeReview(e.target.checked)}
+                          disabled={sendState === "sending"}
+                          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span>
+                          <span className="block text-sm text-gray-700">Include a review quote</span>
+                          <span className="block text-xs text-gray-400 mt-0.5 italic truncate max-w-md">
+                            “{review.quote}” — {review.attribution}
+                          </span>
+                        </span>
+                      </label>
+                    )}
+
+                    {activeSpecials.length > 0 && (
+                      <div>
+                        <p className="text-sm text-gray-700">Feature a special</p>
+                        <p className="text-xs text-gray-400 mt-0.5 mb-1.5">
+                          Only your currently-active specials appear here.
+                        </p>
+                        <select
+                          value={specialId}
+                          onChange={(e) => setSpecialId(e.target.value)}
+                          disabled={sendState === "sending"}
+                          className="w-full max-w-md border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">No special</option>
+                          {activeSpecials.map((s) => (
+                            <option key={s.id} value={s.id}>{s.title}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Preview */}
@@ -365,17 +476,111 @@ export function NewsletterClient({
                       </div>
                       <div className="p-6">
                         <div className="rounded-xl overflow-hidden border border-gray-100" style={{ maxWidth: 560 }}>
-                          <div className="px-8 py-6" style={{ backgroundColor: accentColor }}>
-                            <p className="text-xs text-white/60 uppercase tracking-widest mb-1">Newsletter from</p>
-                            <p className="text-xl font-bold text-white">{authorName}</p>
+                          {/* Branded masthead — centered, makes it clear this is from an author */}
+                          <div className="px-8 py-8 text-center" style={{ backgroundColor: accentColor }}>
+                            {logoUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={logoUrl} alt={authorName} className="h-14 w-auto max-h-14 mx-auto" />
+                            ) : profileImageUrl ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={profileImageUrl} alt={authorName} className="h-16 w-16 rounded-full object-cover mx-auto" />
+                            ) : (
+                              <div className="h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto" style={{ backgroundColor: "#ffffff", color: accentColor }}>
+                                {authorName.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
+                              </div>
+                            )}
+                            <p className="text-[11px] uppercase tracking-[0.2em] text-white/65 mt-4 mb-1">Author newsletter</p>
+                            <p className="text-2xl font-bold text-white leading-tight">{authorName}</p>
+                            {tagline && <p className="text-xs text-white/60 mt-2">{tagline}</p>}
                           </div>
-                          <div
-                            className="bg-white px-8 py-7 prose prose-sm max-w-none text-gray-700"
-                            dangerouslySetInnerHTML={{ __html: sanitize(htmlBody) }}
-                          />
+
+                          {/* Body */}
+                          <div className="bg-white px-8 pt-7 pb-2">
+                            <p className="text-[11px] uppercase tracking-widest text-gray-400 mb-2">
+                              Newsletter · {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                            </p>
+                            <div
+                              className="prose prose-sm max-w-none text-gray-700"
+                              dangerouslySetInnerHTML={{ __html: sanitize(htmlBody) }}
+                            />
+                          </div>
+
+                          {/* CTA */}
+                          <div className="bg-white px-8 pt-4 pb-6">
+                            <span className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white" style={{ backgroundColor: accentColor }}>
+                              Read on my site →
+                            </span>
+                          </div>
+
+                          {/* Featured book showcase */}
+                          {includeBooks && featuredBook && (
+                            <div className="px-8 pb-6">
+                              <div className="flex items-center gap-5 rounded-xl p-5" style={{ backgroundColor: "#f7f4ed" }}>
+                                {featuredBook.coverImageUrl && (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
+                                  <img src={featuredBook.coverImageUrl} alt={featuredBook.title} className="w-20 rounded" />
+                                )}
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>{featuredBook.eyebrow}</p>
+                                  <p className="text-base font-bold text-gray-800">{featuredBook.title}</p>
+                                  {featuredBook.blurb && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{featuredBook.blurb}</p>}
+                                  <span className="inline-block mt-2 px-4 py-1.5 rounded-full text-xs font-semibold text-white" style={{ backgroundColor: accentColor }}>{featuredBook.ctaLabel} →</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Review quote */}
+                          {includeReview && review && (
+                            <div className="px-8 pb-6">
+                              <div className="pl-4 border-l-[3px]" style={{ borderColor: accentColor }}>
+                                <p className="italic text-gray-800 text-sm leading-relaxed">“{review.quote}”</p>
+                                <p className="text-xs text-gray-400 mt-1.5">— {review.attribution}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Shelf strip */}
+                          {includeBooks && shelf.length > 0 && (
+                            <div className="px-8 pb-6">
+                              <p className="text-[11px] uppercase tracking-widest text-gray-400 mb-3">More on the shelf</p>
+                              <div className="flex gap-3">
+                                {shelf.map((b, i) => (
+                                  <div key={i} className="flex-1 text-center">
+                                    {b.coverImageUrl && (
+                                      /* eslint-disable-next-line @next/next/no-img-element */
+                                      <img src={b.coverImageUrl} alt={b.title} className="w-[80px] h-[120px] object-cover rounded mb-1 mx-auto" />
+                                    )}
+                                    <span className="text-[11px] text-gray-500">{b.title}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Special block */}
+                          {selectedSpecial && (
+                            <div className="px-8 py-6 text-center" style={{ backgroundColor: accentColor }}>
+                              <p className="text-base font-bold text-white">{selectedSpecial.title}</p>
+                              {selectedSpecial.description && <p className="text-xs text-white/70 mt-1 mb-3">{selectedSpecial.description}</p>}
+                              {selectedSpecial.ctaUrl && (
+                                <span className="inline-block px-5 py-2 rounded-full text-xs font-semibold" style={{ backgroundColor: "#ffffff", color: accentColor }}>
+                                  {selectedSpecial.ctaLabel || "Learn more"} →
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Footer */}
                           <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
-                            <p className="text-xs text-gray-400">
-                              You&apos;re receiving this because you subscribed to updates from {authorName}.
+                            {socials.length > 0 && (
+                              <p className="text-xs text-gray-400 mb-2">
+                                {socials.map((s) => s.label).join(" · ")}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 leading-relaxed">
+                              You&apos;re receiving this because you subscribed to updates from{" "}
+                              <span className="font-semibold text-gray-500">{authorName}</span>, an author you follow on AuthorLoft.
                             </p>
                             <p className="text-xs mt-2">
                               <span className="text-gray-400 underline">Unsubscribe</span>
@@ -417,7 +622,7 @@ export function NewsletterClient({
                       <Send className="h-4 w-4 mr-2" />
                       Yes, send now
                     </Button>
-                    <Button variant="outline" onClick={() => setSendState("idle")}>Cancel</Button>
+                    <Button variant="ghost" onClick={() => setSendState("idle")}>Cancel</Button>
                   </div>
                 </div>
               ) : sendState === "sending" ? (

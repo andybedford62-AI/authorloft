@@ -1,15 +1,27 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
+
+// PostHog is now reverse-proxied through /ingest (see rewrites() below), so the
+// browser never talks to *.i.posthog.com / *-assets.i.posthog.com directly —
+// no CSP entries needed for those hosts anymore, and it's harder for ad
+// blockers to pattern-match and drop the requests.
+const POSTHOG_INGEST_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+const POSTHOG_ASSET_HOST  = POSTHOG_INGEST_HOST.replace(".i.posthog.com", "-assets.i.posthog.com");
 
 const ContentSecurityPolicy = [
   "default-src 'self'",
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+  // Google Ads (gtag.js) conversion tracking — googletagmanager.com loads gtag.js itself;
+  // googleads.g.doubleclick.net loads a separate view-through-conversion script
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
-  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com",
+  // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
+  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+  // Google Ads (gtag.js) beacon/conversion calls
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
@@ -28,13 +40,44 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Baked at build time so the super-admin build stamp can show when prod was deployed.
+  env: {
+    BUILD_TIME: new Date().toISOString(),
+  },
+  // Required alongside the /ingest/decide rewrite below — PostHog's reverse-proxy
+  // docs call this out explicitly, otherwise Next.js's own trailing-slash
+  // redirect can interfere with that specific rewrite.
+  skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [
+      // These two blog posts duplicated existing Guide articles on the exact
+      // same topic (confirmed via Search Console — Google was declining to
+      // index the blog versions). Posts unpublished in the CMS; redirect
+      // catches old links/bookmarks/cached search results.
+      {
+        source: "/blog/how-to-build-email-list-as-author",
+        destination: "/guides/building-your-first-author-email-list",
+        permanent: true,
+      },
+      {
+        source: "/blog/how-to-sell-books-directly-to-readers",
+        destination: "/guides/what-is-direct-book-selling",
+        permanent: true,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      { source: "/robots.txt",  destination: "/api/internal/robots" },
+      { source: "/sitemap.xml", destination: "/api/internal/sitemap" },
+      // PostHog reverse proxy — order matters, specific routes before the catch-all
+      { source: "/ingest/static/:path*", destination: `${POSTHOG_ASSET_HOST}/static/:path*` },
+      { source: "/ingest/decide",        destination: `${POSTHOG_INGEST_HOST}/decide` },
+      { source: "/ingest/:path*",        destination: `${POSTHOG_INGEST_HOST}/:path*` },
+    ];
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
-  },
-  typescript: {
-    // Temporarily bypass type errors so the build succeeds.
-    // Re-enable strict checking once the site is confirmed working.
-    ignoreBuildErrors: true,
   },
   images: {
     remotePatterns: [
@@ -81,4 +124,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  widenClientFileUpload: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});

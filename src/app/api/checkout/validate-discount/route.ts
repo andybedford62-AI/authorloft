@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { calcDiscount } from "@/lib/discount-queries";
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
+
+const DISCOUNT_CODE_REGEX = /^[A-Z0-9-]+$/;
 
 /**
  * POST /api/checkout/validate-discount
@@ -13,6 +16,16 @@ import { calcDiscount } from "@/lib/discount-queries";
  */
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit — discount codes could otherwise be brute-forced
+    const rateLimitKey = getRateLimitKey(req, "ip", "validate-discount");
+    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.subscribe);
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { valid: false, error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000).toString() } }
+      );
+    }
+
     const body = await req.json();
     const { code } = body;
 
@@ -26,8 +39,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ valid: false, error: "Missing code or items." }, { status: 400 });
     }
 
-    if (!code) {
-      return NextResponse.json({ valid: false, error: "Missing discount code." }, { status: 400 });
+    if (typeof code !== "string" || !code.trim() || code.length > 50 || !DISCOUNT_CODE_REGEX.test(code.trim().toUpperCase())) {
+      return NextResponse.json({ valid: false, error: "Invalid or missing discount code." }, { status: 400 });
     }
 
     // Load all sale items
@@ -53,15 +66,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (!discount || !discount.isActive) {
-      return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." });
+      return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." }, { status: 400 });
     }
 
     if (discount.expiresAt && discount.expiresAt < new Date()) {
-      return NextResponse.json({ valid: false, error: "This discount code has expired." });
+      return NextResponse.json({ valid: false, error: "This discount code has expired." }, { status: 400 });
     }
 
     if (discount.maxUses !== null && discount.usesCount >= discount.maxUses) {
-      return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." });
+      return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." }, { status: 400 });
     }
 
     // Calculate discount across all qualifying items
@@ -84,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!anyApplied) {
-      return NextResponse.json({ valid: false, error: "This code is not valid for any items in your cart." });
+      return NextResponse.json({ valid: false, error: "This code is not valid for any items in your cart." }, { status: 400 });
     }
 
     const finalTotal = Math.max(0, totalOriginalCents - totalDiscountCents);

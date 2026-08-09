@@ -16,6 +16,8 @@ export interface ShelfBook {
   salesEnabled: boolean;
   directSalesEnabled?: boolean;
   directSaleItems?: DirectSaleItemPublic[];
+  caption?: string | null;
+  isPreOrder?: boolean;
 }
 
 interface Props {
@@ -68,6 +70,14 @@ function ShelfBook({ book, accentColor }: { book: ShelfBook; accentColor: string
           >
             <BookOpen className="h-6 w-6 opacity-60" />
           </div>
+        )}
+        {(book.caption || book.isPreOrder) && (
+          <span
+            className="absolute top-1 left-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide text-white shadow"
+            style={{ backgroundColor: accentColor }}
+          >
+            {book.caption || "Coming Soon"}
+          </span>
         )}
       </div>
 

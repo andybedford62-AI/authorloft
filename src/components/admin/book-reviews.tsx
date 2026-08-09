@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Quote, Star, Plus, Trash2, Pencil, Loader2, GripVertical, X, Check } from "lucide-react";
+import { Quote, Star, Plus, Trash2, Pencil, Loader2, GripVertical, Check } from "lucide-react";
 import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 
 interface Review {
   id: string;
@@ -115,13 +116,10 @@ export function BookReviews({ bookId }: Props) {
           <h2 className="font-semibold text-gray-900">Reviews &amp; Pull Quotes</h2>
         </div>
         {editing === null && (
-          <button
-            onClick={startNew}
-            className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium"
-          >
-            <Plus className="h-4 w-4" />
+          <Button type="button" size="sm" onClick={startNew}>
+            <Plus className="h-3.5 w-3.5 mr-1" />
             Add Review
-          </button>
+          </Button>
         )}
       </div>
 
@@ -169,8 +167,8 @@ export function BookReviews({ bookId }: Props) {
                     </p>
                   </div>
                   <div className="flex items-start gap-1 flex-shrink-0">
-                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit review" variant="ghost" onClick={() => startEdit(r)} />
-                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete review" variant="ghost" onClick={() => remove(r.id)} />
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit review" variant="edit" onClick={() => startEdit(r)} />
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete review" variant="delete" onClick={() => remove(r.id)} />
                   </div>
                 </div>
               )}
@@ -286,21 +284,12 @@ function ReviewForm({
       </div>
 
       <div className="flex gap-2 pt-1">
-        <button
-          onClick={onSave}
-          disabled={saving}
-          className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-          Save Review
-        </button>
-        <button
-          onClick={onCancel}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <X className="h-3.5 w-3.5" />
+        <Button type="button" size="sm" onClick={onSave} disabled={saving}>
+          {saving ? <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />Saving…</> : <><Check className="h-3.5 w-3.5 mr-1.5" />Save Review</>}
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

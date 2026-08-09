@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { pingIndexNow } from "@/lib/indexnow";
+import { autoMetaDescription } from "@/lib/seo-utils";
 
 // GET /api/admin/blog/[id] — fetch a single post
 export async function GET(
@@ -30,7 +32,7 @@ export async function PATCH(
   if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, slug, excerpt, content, coverImageUrl, isPublished } = body;
+  const { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle, metaDescription, focusKeyword, attachmentUrl, attachmentLabel } = body;
 
   if (title !== undefined && !title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -60,6 +62,14 @@ export async function PATCH(
     : !isPublished ? null
     : post.publishedAt;
 
+  const metaDescData: Record<string, string | null> = {};
+  if (metaDescription !== undefined) {
+    const effectiveContent = content !== undefined ? content : post.content;
+    const effectiveExcerpt = excerpt !== undefined ? excerpt : post.excerpt;
+    metaDescData.metaDescription =
+      metaDescription?.trim() || effectiveExcerpt?.trim() || autoMetaDescription(effectiveContent) || null;
+  }
+
   const updated = await prisma.post.update({
     where: { id },
     data: {
@@ -67,11 +77,27 @@ export async function PATCH(
       slug: slugClean,
       ...(excerpt !== undefined && { excerpt: excerpt?.trim() || null }),
       ...(content !== undefined && { content: content?.trim() || null }),
-      ...(coverImageUrl !== undefined && { coverImageUrl: coverImageUrl?.trim() || null }),
-      ...(isPublished !== undefined && { isPublished }),
+      ...(coverImageUrl   !== undefined && { coverImageUrl:   coverImageUrl?.trim()   || null }),
+      ...(isPublished     !== undefined && { isPublished }),
+      ...(seoTitle        !== undefined && { seoTitle:        seoTitle?.trim()        || null }),
+      ...metaDescData,
+      ...(focusKeyword    !== undefined && { focusKeyword:    focusKeyword?.trim()    || null }),
+      ...(attachmentUrl   !== undefined && { attachmentUrl:   attachmentUrl?.trim()   || null }),
+      ...(attachmentLabel !== undefined && { attachmentLabel: attachmentLabel?.trim() || null }),
       publishedAt,
     },
   });
+
+  if (updated.isPublished) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { slug: true, customDomain: true },
+    });
+    if (author) {
+      const host = author.customDomain || `${author.slug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+      pingIndexNow([`https://${host}/blog/${updated.slug}`, `https://${host}/blog`]);
+    }
+  }
 
   return NextResponse.json(updated);
 }

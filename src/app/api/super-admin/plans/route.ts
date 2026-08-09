@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "@/lib/auth";
-//import { prisma } from "@/lib/prisma";
 import { prisma } from "@/lib/db";
-
-async function isSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return false;
-  const allowed = (process.env.SUPER_ADMIN_EMAIL ?? "").split(",").map((e) => e.trim().toLowerCase());
-  return allowed.includes(session.user.email.toLowerCase());
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 export async function GET() {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const plans = await prisma.plan.findMany({ orderBy: { sortOrder: "asc" }, include: { _count: { select: { subscriptions: true } } } });
   return NextResponse.json(plans);
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await isSuperAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
     if (body.isDefault) await prisma.plan.updateMany({ data: { isDefault: false } });
@@ -33,6 +24,7 @@ export async function POST(req: NextRequest) {
         customDomain: body.customDomain ?? false, salesEnabled: body.salesEnabled ?? false,
         flipBooksLimit: body.flipBooksLimit ?? 0, audioEnabled: body.audioEnabled ?? false,
         newsletter: body.newsletter ?? false, analyticsEnabled: body.analyticsEnabled ?? false,
+        coursesEnabled: body.coursesEnabled ?? false, maxCourses: body.maxCourses ?? null,
         badgeColor: body.badgeColor ?? "gray", featuredLabel: body.featuredLabel ?? null,
         sortOrder: body.sortOrder ?? 0, isActive: body.isActive ?? true, isDefault: body.isDefault ?? false,
       } as any,

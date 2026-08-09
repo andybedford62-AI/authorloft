@@ -11,11 +11,18 @@ interface NavSettings {
   navShowFlipBooks: boolean;
   navShowBlog: boolean;
   navShowContact: boolean;
+  navShowMediaKit: boolean;
+  navShowBookstore: boolean;
+  navShowBundles: boolean;
+  navShowCourses: boolean;
 }
 
 interface NavSettingsPanelProps {
   initial: NavSettings;
   flipBooksEnabled: boolean;
+  mediaKitEnabled: boolean;
+  bundlesEnabled: boolean;
+  coursesEnabled: boolean;
 }
 
 const BUILT_IN_ITEMS = [
@@ -62,9 +69,43 @@ const BUILT_IN_ITEMS = [
     description: "Contact form for readers",
     alwaysOn: false,
   },
+  {
+    key: "navShowMediaKit" as keyof NavSettings,
+    label: "Media Kit",
+    href: "/media-kit",
+    description: "Press page with biography and downloadable assets",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "mediaKit" as const,
+  },
+  {
+    key: "navShowBundles" as keyof NavSettings,
+    label: "Bundles",
+    href: "/bundles",
+    description: "Discounted book bundles",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "bundles" as const,
+  },
+  {
+    key: "navShowCourses" as keyof NavSettings,
+    label: "Courses",
+    href: "/courses",
+    description: "Author courses and workshops",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "courses" as const,
+  },
+  {
+    key: "navShowBookstore" as keyof NavSettings,
+    label: "Bookstore",
+    href: "AuthorLoft bookstore (external)",
+    description: "Cross-link to the AuthorLoft Bookstore so readers can discover more authors",
+    alwaysOn: false,
+  },
 ];
 
-export function NavSettingsPanel({ initial, flipBooksEnabled }: NavSettingsPanelProps) {
+export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, bundlesEnabled, coursesEnabled }: NavSettingsPanelProps) {
   const [settings, setSettings] = useState<NavSettings>(initial);
   const [saving, setSaving] = useState<keyof NavSettings | null>(null);
   const [saved, setSaved] = useState<keyof NavSettings | null>(null);
@@ -89,9 +130,13 @@ export function NavSettingsPanel({ initial, flipBooksEnabled }: NavSettingsPanel
     }
   }
 
-  const items = BUILT_IN_ITEMS.filter(
-    (item) => !item.planGated || flipBooksEnabled
-  );
+  const items = BUILT_IN_ITEMS.filter((item) => {
+    if (!item.planGated) return true;
+    if (item.planGateKey === "mediaKit") return mediaKitEnabled;
+    if (item.planGateKey === "bundles") return bundlesEnabled;
+    if (item.planGateKey === "courses") return coursesEnabled;
+    return flipBooksEnabled;
+  });
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">

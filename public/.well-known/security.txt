@@ -1,0 +1,18 @@
+Contact: security@authorloft.com
+Expires: 2027-05-09T00:00:00Z
+Preferred-Languages: en
+Canonical: https://www.authorloft.com/.well-known/security.txt
+Policy: https://www.authorloft.com/security-policy
+
+# AuthorLoft Security Disclosure Policy
+#
+# If you discover a security vulnerability, please email security@authorloft.com
+# with a detailed description. Please do not disclose publicly until we've had
+# time to issue a fix.
+#
+# We commit to:
+# - Acknowledging receipt within 48 hours
+# - Providing a timeline for fix and disclosure
+# - Crediting the reporter (unless they request anonymity)
+#
+# Thank you for helping us keep AuthorLoft secure.

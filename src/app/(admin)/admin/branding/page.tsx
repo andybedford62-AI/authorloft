@@ -17,12 +17,13 @@ export default async function BrandingPage() {
         heroLayout: true,
         heroFeaturedBookId: true,
         linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
-        twitterUrl: true, instagramUrl: true,
+        twitterUrl: true, instagramUrl: true, supportUrl: true,
         contactEmail: true, contactResponseTime: true, contactOpenTo: true,
         heroTitle: true, heroSubtitle: true,
         showHeroBanner: true,
         aboutStats: true,
         credentials: true,
+        pressOutlets: true,
         plan: { select: { tier: true } },
       },
     }),
@@ -49,6 +50,7 @@ export default async function BrandingPage() {
     facebookUrl:    author.facebookUrl    ?? "",
     twitterUrl:     author.twitterUrl     ?? "",
     instagramUrl:   author.instagramUrl   ?? "",
+    supportUrl:     author.supportUrl     ?? "",
     contactEmail:        author.contactEmail        ?? "",
     contactResponseTime: author.contactResponseTime ?? "",
     contactOpenTo:       author.contactOpenTo       ?? "",
@@ -62,6 +64,7 @@ export default async function BrandingPage() {
     credentials: Array.isArray(author.credentials)
       ? (author.credentials as string[]).slice(0, 3)
       : ["", "", ""],
+    pressOutlets: Array.isArray(author.pressOutlets) ? author.pressOutlets : [],
   };
 
   return (

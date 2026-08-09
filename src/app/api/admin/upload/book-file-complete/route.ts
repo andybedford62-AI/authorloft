@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { enforceRateLimit } from "@/lib/api-rate-limit";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -19,12 +20,19 @@ export async function POST(req: NextRequest) {
   try {
     const authorId = await getAdminAuthorIdForApi();
     if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const _rl = await enforceRateLimit(req, { bucket: "upload", maxRequests: 20, windowSeconds: 60, userId: authorId });
+    if (_rl) return _rl;
 
     const body = await req.json();
     const { itemId, fileKey, fileName } = body;
 
     if (!itemId || !fileKey || !fileName) {
       return NextResponse.json({ error: "itemId, fileKey, and fileName are required" }, { status: 400 });
+    }
+
+    // Ensure the fileKey is scoped to this author — prevents cross-author file association
+    if (!fileKey.startsWith(`${authorId}/`)) {
+      return NextResponse.json({ error: "Invalid file key" }, { status: 400 });
     }
 
     // Verify the sale item belongs to this author

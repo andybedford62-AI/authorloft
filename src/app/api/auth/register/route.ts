@@ -3,21 +3,12 @@ import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
-import { sendVerificationEmail } from "@/lib/mailer";
-
-// ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
-const registrationAttempts = new Map<string, number[]>();
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const RATE_MAX       = 5;
-
-function checkRateLimit(ip: string): boolean {
-  const now      = Date.now();
-  const attempts = (registrationAttempts.get(ip) ?? []).filter(t => now - t < RATE_WINDOW_MS);
-  if (attempts.length >= RATE_MAX) return false;
-  attempts.push(now);
-  registrationAttempts.set(ip, attempts);
-  return true;
-}
+import { sendVerificationEmail, sendNewSignupNotificationEmail } from "@/lib/mailer";
+import { passwordStrengthError } from "@/lib/password-validation";
+import { checkRateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { capturePostHog } from "@/lib/posthog";
+import { RESERVED_SLUGS } from "@/lib/reserved-slugs";
+import { checkSlugAvailability, slugUnavailableMessage } from "@/lib/slug-availability";
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 
@@ -25,24 +16,29 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function passwordStrengthError(pw: string): string | null {
-  if (pw.length < 8)          return "Password must be at least 8 characters.";
-  if (!/[A-Z]/.test(pw))      return "Password must contain at least one uppercase letter.";
-  if (!/[0-9]/.test(pw))      return "Password must contain at least one number.";
-  if (!/[^A-Za-z0-9]/.test(pw)) return "Password must contain at least one special character (!@#$… etc).";
-  return null;
-}
+/**
+ * Derives a usable, unique slug from a display name. The signup form no longer
+ * asks for one — people pick their real site URL later in Settings — so this
+ * has to cope with names that don't slugify cleanly (too short, empty, or
+ * colliding with a reserved word) as well as ordinary collisions.
+ */
+async function uniqueSlug(rawBase: string): Promise<string> {
+  let base = rawBase;
+  if (base.length < 3 || RESERVED_SLUGS.includes(base)) {
+    base = base ? `${base}-author` : "author";
+  }
+  base = base.slice(0, 34); // leave headroom for a numeric suffix
 
-function isValidSlug(slug: string) {
-  return /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/.test(slug);
-}
-
-// Ensure a slug is unique — appends a number if taken (e.g. janedoe → janedoe2)
-async function uniqueSlug(base: string): Promise<string> {
   let candidate = base;
   let attempt = 2;
-  while (await prisma.author.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+  // checkSlugAvailability also rejects slugs retired by a previous author,
+  // which stay claimed so their redirects keep working.
+  while ((await checkSlugAvailability(candidate)) !== null) {
     candidate = `${base}${attempt++}`;
+    if (attempt > 500) {
+      candidate = `${base}-${randomBytes(4).toString("hex")}`;
+      break;
+    }
   }
   return candidate;
 }
@@ -52,8 +48,9 @@ async function uniqueSlug(base: string): Promise<string> {
 export async function POST(req: NextRequest) {
   try {
     // ── Rate limit ──────────────────────────────────────────────────────────
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    const rlKey = getRateLimitKey(req, "ip", "register");
+    const rl = await checkRateLimit(rlKey, { maxRequests: 5, windowSeconds: 3600 });
+    if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many registration attempts. Please try again later." },
         { status: 429 }
@@ -124,22 +121,18 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Slug handling ───────────────────────────────────────────────────────
-    const slugBase = rawSlug
-      ? slugify(rawSlug)
-      : slugify(name.trim());
-
-    if (!slugBase || slugBase.length < 3) {
-      return NextResponse.json(
-        { error: "Could not generate a valid site URL from your name. Please enter one manually." },
-        { status: 400 }
-      );
-    }
-
-    if (rawSlug && !isValidSlug(slugBase)) {
-      return NextResponse.json(
-        { error: "Site URL may only contain lowercase letters, numbers, and hyphens (3–40 characters)." },
-        { status: 400 }
-      );
+    // The signup form no longer collects a slug — it's derived from the name and
+    // changed later in Settings. An explicit slug is still honoured (direct API
+    // callers) but must pass full validation, including the reserved list.
+    if (rawSlug) {
+      const reason = await checkSlugAvailability(slugify(rawSlug));
+      if (reason) {
+        const status = reason === "taken" || reason === "retired" ? 409 : 400;
+        return NextResponse.json(
+          { error: slugUnavailableMessage(reason), field: "slug" },
+          { status }
+        );
+      }
     }
 
     // ── Uniqueness checks ───────────────────────────────────────────────────
@@ -166,34 +159,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // If the user supplied a specific slug, check it's free — otherwise auto-increment
+    // An explicit slug was validated above; a derived one auto-resolves collisions.
     const finalSlug = rawSlug
-      ? slugBase
-      : await uniqueSlug(slugBase);
-
-    const existingSlug = await prisma.author.findUnique({
-      where: { slug: finalSlug },
-      select: { id: true },
-    });
-    if (existingSlug) {
-      return NextResponse.json(
-        { error: "This site URL is already taken. Please choose another.", field: "slug" },
-        { status: 409 }
-      );
-    }
+      ? slugify(rawSlug)
+      : await uniqueSlug(slugify(name.trim()));
 
     // ── Create account ──────────────────────────────────────────────────────
+    capturePostHog(email.toLowerCase().trim(), "signup_started", { signup_method: "email" });
+
     const passwordHash = await hashPassword(password);
 
-    // Look up the FREE plan (may not be seeded in all environments — that's OK)
-    const freePlan = await prisma.plan.findFirst({
-      where: { tier: "FREE" },
-      select: { id: true },
-    });
+    // Look up the FREE plan and global AI cap default in parallel
+    const [freePlan, sysDefaults] = await Promise.all([
+      prisma.plan.findFirst({ where: { tier: "FREE" }, select: { id: true } }),
+      prisma.systemConfig.findUnique({ where: { id: "main" }, select: { defaultAiUsageCap: true } }),
+    ]);
+    const aiUsageCap = sysDefaults?.defaultAiUsageCap ?? 20;
 
     // Generate an email verification token (expires in 24 hours)
     const emailVerifyToken = randomBytes(32).toString("hex");
-    const emailVerifyExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
+    const emailVerifyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const author = await prisma.author.create({
       data: {
@@ -206,14 +191,33 @@ export async function POST(req: NextRequest) {
         emailVerifyToken,
         emailVerifyExpiry,
         termsAcceptedAt: new Date(),
+        aiUsageCap: aiUsageCap,
+        contactEmail: email.toLowerCase().trim(),
         ...(freePlan && { planId: freePlan.id }),
       },
     });
+
+    capturePostHog(author.id, "signup_completed", { signup_method: "email", plan_tier: "FREE", slug: author.slug });
 
     // Send verification email (fire-and-forget — don't block the response)
     sendVerificationEmail(author.email, emailVerifyToken).catch((err) => {
       console.error("[register] Failed to send verification email:", err);
     });
+
+    // Send admin signup notification if enabled (fire-and-forget)
+    prisma.systemConfig.findUnique({ where: { id: "main" }, select: { newSignupNotifications: true, signupNotificationEmail: true } })
+      .then((cfg) => {
+        if (cfg?.newSignupNotifications && cfg.signupNotificationEmail) {
+          sendNewSignupNotificationEmail({
+            to:          cfg.signupNotificationEmail,
+            authorName:  author.name,
+            authorEmail: author.email,
+            slug:        author.slug,
+            method:      "email",
+          }).catch((err) => console.error("[register] Failed to send signup notification:", err));
+        }
+      })
+      .catch(() => {});
 
     return NextResponse.json({ ok: true, slug: finalSlug });
   } catch (err) {

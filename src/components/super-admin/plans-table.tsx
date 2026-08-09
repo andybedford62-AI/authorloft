@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2, Loader2 } from "lucide-react";
+import { IconButton } from "@/components/admin/icon-button";
+import { Button } from "@/components/ui/button";
 
 type Plan = {
   id: string;
@@ -13,10 +16,12 @@ type Plan = {
   maxBooks: number | null;
   maxPosts: number | null;
   maxStorageMb: number | null;
+  maxCourses: number | null;
   customDomain: boolean;
   salesEnabled: boolean;
   newsletter: boolean;
   analyticsEnabled: boolean;
+  coursesEnabled: boolean;
   badgeColor: string;
   featuredLabel: string | null;
   isActive: boolean;
@@ -81,10 +86,12 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
             <h3 className="font-semibold text-gray-900 mb-2">Delete this plan?</h3>
             <p className="text-sm text-gray-500 mb-6">This cannot be undone. Authors on this plan must be reassigned manually.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">Cancel</button>
-              <button onClick={() => deletePlan(confirmDelete)} disabled={deletingId === confirmDelete} className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50">
-                {deletingId === confirmDelete ? "Deleting…" : "Delete Plan"}
-              </button>
+              <Button variant="ghost" onClick={() => setConfirmDelete(null)}>Cancel</Button>
+              <Button variant="danger" onClick={() => deletePlan(confirmDelete)} disabled={deletingId === confirmDelete}>
+                {deletingId === confirmDelete
+                  ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" />Deleting…</>
+                  : <><Trash2 className="h-4 w-4 mr-1.5" />Delete Plan</>}
+              </Button>
             </div>
           </div>
         </div>
@@ -99,6 +106,7 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
               <th className="px-4 py-3 font-medium">Books</th>
               <th className="px-4 py-3 font-medium">Posts</th>
               <th className="px-4 py-3 font-medium">Storage</th>
+              <th className="px-4 py-3 font-medium">Courses</th>
               <th className="px-4 py-3 font-medium text-center">Domain</th>
               <th className="px-4 py-3 font-medium text-center">Sales</th>
               <th className="px-4 py-3 font-medium text-center">Newsletter</th>
@@ -128,6 +136,9 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
                 <td className="px-4 py-4 text-gray-700">
                   {plan.maxStorageMb === null ? "∞" : plan.maxStorageMb >= 1000 ? `${(plan.maxStorageMb / 1000).toFixed(0)} GB` : `${plan.maxStorageMb} MB`}
                 </td>
+                <td className="px-4 py-4 text-gray-700">
+                  {plan.coursesEnabled ? (plan.maxCourses === null ? "∞" : plan.maxCourses) : "—"}
+                </td>
                 <td className="px-4 py-4">{plan.customDomain ? <Check /> : <Cross />}</td>
                 <td className="px-4 py-4">{plan.salesEnabled ? <Check /> : <Cross />}</td>
                 <td className="px-4 py-4">{plan.newsletter ? <Check /> : <Cross />}</td>
@@ -140,17 +151,23 @@ export function PlansTable({ plans }: { plans: Plan[] }) {
                   </button>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="flex items-center gap-3 justify-end">
-                    <Link href={`/super-admin/plans/${plan.id}`} className="text-xs text-purple-600 hover:text-purple-500">Edit</Link>
-                    <button onClick={() => setConfirmDelete(plan.id)} disabled={plan._count.subscriptions > 0}
-                      title={plan._count.subscriptions > 0 ? "Cannot delete — authors are on this plan" : "Delete"}
-                      className="text-xs text-red-500 hover:text-red-400 disabled:opacity-30">Delete</button>
+                  <div className="flex items-center gap-1 justify-end">
+                    <Link href={`/super-admin/plans/${plan.id}`}>
+                      <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit plan" variant="edit" />
+                    </Link>
+                    <IconButton
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title={plan._count.subscriptions > 0 ? "Cannot delete — authors are on this plan" : "Delete plan"}
+                      variant="delete"
+                      onClick={() => setConfirmDelete(plan.id)}
+                      disabled={plan._count.subscriptions > 0}
+                    />
                   </div>
                 </td>
               </tr>
             ))}
             {plans.length === 0 && (
-              <tr><td colSpan={12} className="px-4 py-12 text-center text-gray-400">
+              <tr><td colSpan={13} className="px-4 py-12 text-center text-gray-400">
                 No plans yet. <Link href="/super-admin/plans/new" className="text-purple-600 hover:underline">Create your first plan →</Link>
               </td></tr>
             )}

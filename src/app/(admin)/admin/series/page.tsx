@@ -92,7 +92,12 @@ export default function SeriesPage() {
     if (!confirm(msg)) return;
 
     const res = await fetch(`/api/admin/series/${id}`, { method: "DELETE" });
-    if (res.ok) fetchSeries();
+    if (res.ok) {
+      fetchSeries();
+    } else {
+      const d = await res.json().catch(() => ({}));
+      setEditError(d.error || "Could not delete this series. Please try again.");
+    }
   }
 
   if (loading) {
@@ -214,8 +219,8 @@ export default function SeriesPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit series" variant="ghost" onClick={() => startEdit(s)} />
-                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete series" variant="ghost" onClick={() => handleDelete(s.id, s.name, s._count.books)} />
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" onClick={() => startEdit(s)} />
+                    <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete" variant="delete" onClick={() => handleDelete(s.id, s.name, s._count.books)} />
                   </div>
                 </div>
               )}

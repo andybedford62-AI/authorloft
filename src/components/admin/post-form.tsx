@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Save, Upload, X } from "lucide-react";
+import { Loader2, Check, Plus, Upload, X, Link as LinkIcon, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const RichTextEditor = dynamic(
@@ -21,6 +21,11 @@ interface PostFormProps {
     content: string | null;
     coverImageUrl: string | null;
     isPublished: boolean;
+    seoTitle: string | null;
+    metaDescription: string | null;
+    focusKeyword: string | null;
+    attachmentUrl: string | null;
+    attachmentLabel: string | null;
   };
 }
 
@@ -41,12 +46,17 @@ export function PostForm({ post }: PostFormProps) {
   const router = useRouter();
   const isEdit = !!post;
 
-  const [title,         setTitle]         = useState(post?.title         ?? "");
-  const [slug,          setSlug]          = useState(post?.slug          ?? "");
-  const [excerpt,       setExcerpt]       = useState(post?.excerpt       ?? "");
-  const [content,       setContent]       = useState(post?.content       ?? "");
-  const [coverImageUrl, setCoverImageUrl] = useState(post?.coverImageUrl ?? "");
-  const [isPublished,   setIsPublished]   = useState(post?.isPublished   ?? false);
+  const [title,           setTitle]           = useState(post?.title           ?? "");
+  const [slug,            setSlug]            = useState(post?.slug            ?? "");
+  const [excerpt,         setExcerpt]         = useState(post?.excerpt         ?? "");
+  const [content,         setContent]         = useState(post?.content         ?? "");
+  const [coverImageUrl,   setCoverImageUrl]   = useState(post?.coverImageUrl   ?? "");
+  const [isPublished,     setIsPublished]     = useState(post?.isPublished     ?? false);
+  const [seoTitle,        setSeoTitle]        = useState(post?.seoTitle        ?? "");
+  const [metaDescription, setMetaDescription] = useState(post?.metaDescription ?? "");
+  const [focusKeyword,    setFocusKeyword]    = useState(post?.focusKeyword    ?? "");
+  const [attachmentUrl,   setAttachmentUrl]   = useState(post?.attachmentUrl   ?? "");
+  const [attachmentLabel, setAttachmentLabel] = useState(post?.attachmentLabel ?? "");
 
   const [saving,         setSaving]         = useState(false);
   const [error,          setError]          = useState("");
@@ -85,7 +95,7 @@ export function PostForm({ post }: PostFormProps) {
     setSaving(true);
     setError("");
 
-    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished };
+    const payload = { title, slug, excerpt, content, coverImageUrl, isPublished, seoTitle: seoTitle || null, metaDescription: metaDescription || null, focusKeyword: focusKeyword || null, attachmentUrl: attachmentUrl || null, attachmentLabel: attachmentLabel || null };
     const url    = isEdit ? `/api/admin/blog/${post.id}` : "/api/admin/blog";
     const method = isEdit ? "PATCH" : "POST";
 
@@ -110,8 +120,36 @@ export function PostForm({ post }: PostFormProps) {
     }
   }
 
+  // Shared save/cancel bar used at both top and bottom of the form
+  function ActionBar() {
+    return (
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={saving}>
+          {saving ? (
+            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
+          ) : isEdit ? (
+            <><Check className="h-4 w-4 mr-2" />Save Changes</>
+          ) : (
+            <><Plus className="h-4 w-4 mr-2" />Create Post</>
+          )}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => router.push("/admin/blog")}
+          disabled={saving}
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+
+      {/* ── Top actions ────────────────────────────────────────────────────── */}
+      <ActionBar />
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
@@ -168,12 +206,47 @@ export function PostForm({ post }: PostFormProps) {
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
         <h2 className="font-semibold text-gray-900">Content</h2>
 
+        {/* Focus Keyword — shown here so it's top-of-mind while writing */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Focus Keyword
+            <span className="ml-1.5 text-xs font-normal text-gray-400">(the main search phrase this post targets)</span>
+          </label>
+          <input
+            type="text"
+            value={focusKeyword}
+            onChange={(e) => setFocusKeyword(e.target.value)}
+            placeholder="e.g. how to sell books online"
+            className={inputClass}
+          />
+          {/* Keyword placement checklist — always visible */}
+          <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 space-y-2">
+            <p className="text-xs font-semibold text-blue-800">💡 Where to place your focus keyword for best SEO:</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+              {[
+                { tip: "Post title",               detail: "ideally in the first 5 words" },
+                { tip: "First 100 words of body",  detail: "signals relevance early" },
+                { tip: "At least one H2 heading",  detail: "Google reads headings heavily" },
+                { tip: "URL slug",                 detail: "auto-generated from title" },
+                { tip: "SEO Title & Meta Desc",    detail: "fills in the search snippet" },
+                { tip: "2–3× in the body",         detail: "naturally — never forced" },
+              ].map(({ tip, detail }) => (
+                <li key={tip} className="flex items-start gap-1.5 text-xs text-blue-700">
+                  <span className="mt-0.5 flex-shrink-0 text-blue-400">✓</span>
+                  <span><span className="font-medium">{tip}</span> — {detail}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Post Body</label>
           <RichTextEditor
             value={content}
             onChange={setContent}
             placeholder="Write your post here…"
+            showSeoGuide
           />
           <p className="text-xs text-gray-400">Use the toolbar to add headings, bold/italic, lists, links, and more.</p>
         </div>
@@ -185,7 +258,7 @@ export function PostForm({ post }: PostFormProps) {
           <h2 className="font-semibold text-gray-900">Cover Image</h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Shown as the banner at the top of the post and as the thumbnail on the blog listing page.
-            Any size works — the image auto-crops to fit. Landscape photos look best;
+            The whole image is always shown (never cropped). Landscape photos look best;
             ideal size is <strong className="text-gray-500">1200 × 630 px</strong> (2:1 ratio).
           </p>
         </div>
@@ -194,7 +267,7 @@ export function PostForm({ post }: PostFormProps) {
         {coverImageUrl ? (
           <div className="relative w-full rounded-xl overflow-hidden bg-gray-100 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt="Cover preview" className="w-full h-52 object-cover" />
+            <img src={coverImageUrl} alt="Cover preview" className="w-full h-52 object-contain" />
             <button
               type="button"
               onClick={() => { setCoverImageUrl(""); setCoverUploadErr(""); }}
@@ -269,24 +342,123 @@ export function PostForm({ post }: PostFormProps) {
         </label>
       </section>
 
-      {/* ── Actions ────────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving}>
-          {saving ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
-          ) : (
-            <><Save className="h-4 w-4 mr-2" />{isEdit ? "Save Changes" : "Create Post"}</>
-          )}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/admin/blog")}
-          disabled={saving}
-        >
-          Cancel
-        </Button>
-      </div>
+      {/* ── Downloadable Resource ─────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <FileDown className="h-4 w-4 text-gray-400" />
+            Downloadable Resource
+            <span className="text-xs font-normal text-gray-400 ml-1">— optional</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">
+            Attach a link to a downloadable file — a PDF, Google Doc, worksheet, checklist, etc.
+            A download button will appear at the bottom of this post for readers.
+            Leave blank if not needed.
+          </p>
+        </div>
+
+        {/* URL */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Document URL
+          </label>
+          <div className="relative">
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="url"
+              value={attachmentUrl}
+              onChange={(e) => setAttachmentUrl(e.target.value)}
+              placeholder="https://docs.google.com/… or https://example.com/file.pdf"
+              className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <p className="text-xs text-gray-400">
+            Paste any public URL — Google Docs, Google Drive, Dropbox, or a direct PDF link.
+          </p>
+        </div>
+
+        {/* Button label */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">
+            Button Label
+            <span className="ml-1.5 text-xs font-normal text-gray-400">shown to readers</span>
+          </label>
+          <input
+            type="text"
+            value={attachmentLabel}
+            onChange={(e) => setAttachmentLabel(e.target.value)}
+            placeholder="e.g. Download Free Chapter  |  Get the Worksheet  |  View on Google Docs"
+            className={inputClass}
+            maxLength={80}
+          />
+          <p className="text-xs text-gray-400">
+            Defaults to &ldquo;Download Resource&rdquo; if left blank.
+          </p>
+        </div>
+
+        {/* Preview */}
+        {attachmentUrl && (
+          <div className="rounded-lg border border-dashed border-blue-200 bg-blue-50 px-4 py-3 flex items-center gap-3">
+            <FileDown className="h-5 w-5 text-blue-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-blue-800">
+                {attachmentLabel || "Download Resource"}
+              </p>
+              <p className="text-xs text-blue-500 truncate">{attachmentUrl}</p>
+            </div>
+            <span className="text-xs text-blue-400">Preview</span>
+          </div>
+        )}
+      </section>
+
+      {/* ── SEO ────────────────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900">SEO Settings</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Optional. Leave blank to use the post title and excerpt automatically.
+          </p>
+        </div>
+
+        {/* SEO Title */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">SEO Title</label>
+            <span className={`text-xs tabular-nums ${seoTitle.length > 60 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {seoTitle.length}/60
+            </span>
+          </div>
+          <input
+            type="text"
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            placeholder={title || "Overrides the post title in search results"}
+            className={inputClass}
+          />
+          <p className="text-xs text-gray-400">Ideal: 50–60 characters. Shown in Google search results instead of the post title.</p>
+        </div>
+
+        {/* Meta Description */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-gray-700">Meta Description</label>
+            <span className={`text-xs tabular-nums ${metaDescription.length > 160 ? "text-red-500 font-medium" : "text-gray-400"}`}>
+              {metaDescription.length}/160
+            </span>
+          </div>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value)}
+            rows={3}
+            placeholder={excerpt || "Overrides the excerpt in search result snippets"}
+            className={textareaClass}
+          />
+          <p className="text-xs text-gray-400">Ideal: 150–160 characters. Shown as the snippet under your title in Google search results.</p>
+        </div>
+      </section>
+
+      {/* ── Bottom actions ─────────────────────────────────────────────────── */}
+      <ActionBar />
     </form>
   );
 }

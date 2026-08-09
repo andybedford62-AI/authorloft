@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { SpecialsListClient } from "@/components/admin/specials-list-client";
 import { getAdminAuthorId } from "@/lib/admin-auth";
@@ -41,12 +42,11 @@ export default async function AdminSpecialsPage() {
             {expiredCount > 0 && `, ${expiredCount} expired`}
           </p>
         </div>
-        <Link
-          href="/admin/specials/new"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add Special
+        <Link href="/admin/specials/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Special
+          </Button>
         </Link>
       </div>
 

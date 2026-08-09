@@ -31,3 +31,10 @@ next-env.d.ts
 .DS_Store
 *.pem
 Thumbs.db
+prisma/cmd prompt.txt
+prisma/URLs.txt
+
+# Local debugging artifacts (Playwright MCP + ad-hoc screenshots)
+.playwright-mcp/
+/*.png
+/*.jpeg

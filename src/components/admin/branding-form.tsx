@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ type BrandingFormProps = {
     facebookUrl: string;
     twitterUrl: string;
     instagramUrl: string;
+    supportUrl: string;
     contactEmail: string;
     contactResponseTime: string;
     contactOpenTo: string;
@@ -32,6 +33,7 @@ type BrandingFormProps = {
     aboutStats: Stat[];
     showHeroBanner: boolean;
     credentials: string[];
+    pressOutlets: string[];
   };
   books: { id: string; title: string; coverImageUrl: string | null }[];
   planTier?: string;
@@ -49,6 +51,13 @@ const TABS: { id: Tab; label: string }[] = [
 export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingFormProps) {
   const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
+
+  // Deep-link support — ?tab=about opens the About Page tab directly (used by admin search)
+  useEffect(() => {
+    const tabParam = new URLSearchParams(window.location.search).get("tab") as Tab | null;
+    if (tabParam && TABS.some((t) => t.id === tabParam)) setActiveTab(tabParam);
+  }, []);
+
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [tagline, setTagline] = useState(initial.tagline);
   const [shortBio, setShortBio] = useState(initial.shortBio);
@@ -69,6 +78,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
   const [facebookUrl, setFacebookUrl] = useState(initial.facebookUrl);
   const [twitterUrl, setTwitterUrl] = useState(initial.twitterUrl);
   const [instagramUrl, setInstagramUrl] = useState(initial.instagramUrl);
+  const [supportUrl, setSupportUrl] = useState(initial.supportUrl);
   const [contactEmail, setContactEmail] = useState(initial.contactEmail);
   const [contactResponseTime, setContactResponseTime] = useState(initial.contactResponseTime);
   const [contactOpenTo, setContactOpenTo] = useState(initial.contactOpenTo);
@@ -80,6 +90,9 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
   // Exactly 3 slots; empty string means "don't show"
   const [credentials, setCredentials] = useState<string[]>(
     [...initial.credentials, "", "", ""].slice(0, 3)
+  );
+  const [pressOutlets, setPressOutlets] = useState<string[]>(
+    [...(initial.pressOutlets ?? []), "", "", "", "", "", ""].slice(0, 6)
   );
 
   const [saving, setSaving] = useState(false);
@@ -209,10 +222,11 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
         profileImageUrl, logoUrl, heroImageUrl, heroLayout,
-        linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl,
+        linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
         aboutStats, credentials,
+        pressOutlets: pressOutlets.map(s => s.trim()).filter(Boolean),
       }),
     });
 
@@ -425,13 +439,40 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                   <p className="text-xs text-gray-400 mb-2">Preview:</p>
                   <div className="flex flex-wrap gap-2">
                     {credentials.filter((c) => c.trim()).map((c, i) => (
-                      <span key={i} className="px-3 py-1 rounded-full text-xs font-medium border border-blue-200 text-blue-700 bg-blue-50">
+                      <span key={i} className="px-3 py-1 rounded-full text-xs font-medium border border-blue-200 text-blue-700 bg-blue-50 ">
                         {c}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
+            </section>
+
+            {/* Press Outlets */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <div>
+                <h2 className="font-semibold text-gray-900">Press Outlets</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Up to 6 publication names shown in the press strip on the Cinematic template. Leave blank to use defaults.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {pressOutlets.map((val, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={val}
+                    maxLength={30}
+                    onChange={(e) => {
+                      const next = [...pressOutlets];
+                      next[i] = e.target.value;
+                      setPressOutlets(next);
+                    }}
+                    placeholder={["THE SUNDAY TIMES","KIRKUS","PUBLISHERS WEEKLY","THE GUARDIAN","THE NEW YORKER","NPR BOOKS"][i] ?? `Outlet ${i + 1}`}
+                    className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                ))}
+              </div>
             </section>
           </>
         )}
@@ -621,6 +662,13 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
             <Input label="Facebook URL" value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} placeholder="https://facebook.com/..." />
             <Input label="X / Twitter URL" value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." />
             <Input label="Instagram URL" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." />
+
+            <div className="pt-4 border-t border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Monetization</h3>
+              <p className="text-xs text-gray-400 mb-3">Add a support link so readers can donate or become a patron. Shown on your site header and footer.</p>
+              <Input label="Support Link (Patreon, Ko-fi, Buy Me a Coffee)" value={supportUrl} onChange={(e) => setSupportUrl(e.target.value)} placeholder="https://patreon.com/..." />
+            </div>
+
             <Input label="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" placeholder="you@example.com" />
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Response Time</label>
@@ -647,12 +695,12 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">{error}</p>
         )}
         <div className="flex items-center gap-3 pb-8">
-          <Button onClick={handleSave} size="lg" disabled={saving}>
+          <Button onClick={handleSave} size="md" disabled={saving}>
             {saving
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
               : saved
               ? <><Check className="h-4 w-4 mr-2" />Saved!</>
-              : "Save Changes"}
+              : <><Check className="h-4 w-4 mr-2" />Save Changes</>}
           </Button>
           <p className="text-xs text-gray-400">Changes are reflected on your live site immediately.</p>
         </div>

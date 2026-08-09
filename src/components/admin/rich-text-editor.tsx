@@ -11,7 +11,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -29,6 +29,10 @@ interface RichTextEditorProps {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  minHeight?: string;   // e.g. "200px" — overrides the 320px default
+  resizable?: boolean;  // allow vertical resize by the user
+  showSeoGuide?: boolean; // show color-coded word count + SEO target bar
+  editable?: boolean;   // default true — set false to lock editing (e.g. while sending)
 }
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────────
@@ -738,9 +742,14 @@ export function RichTextEditor({
   onChange,
   placeholder = "Write your page content here…",
   className,
+  minHeight,
+  resizable = false,
+  showSeoGuide = false,
+  editable = true,
 }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
+    editable,
     extensions: [
       StarterKit.configure({ link: false, underline: false }),
       Underline,
@@ -771,27 +780,116 @@ export function RichTextEditor({
     },
   });
 
+  // useEditor only applies `content` on the initial mount — if the value
+  // changes from outside (e.g. loading a saved template, resetting after
+  // send), the visible editor otherwise never picks it up. Re-sync whenever
+  // the incoming value diverges from what the editor already has; skipped
+  // when they already match so this doesn't fight the user's own typing.
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.getHTML() === value) return;
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [value, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(editable);
+  }, [editable, editor]);
+
   if (!editor) return null;
 
   return (
     <div
       className={cn(
-        "tiptap-editor border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow",
+        "tiptap-editor border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-shadow",
+        resizable && "resize-y",
         className
       )}
+      style={minHeight ? { "--editor-min-height": minHeight } as React.CSSProperties : undefined}
     >
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
 
-      {/* Word count */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-t border-gray-200 text-xs text-gray-400">
-        <span>
-          {editor.storage.characterCount?.characters?.() ?? editor.getText().length} characters
-          &nbsp;·&nbsp;
-          {editor.getText().split(/\s+/).filter(Boolean).length} words
-        </span>
-        <span className="text-gray-300">HTML · TipTap</span>
-      </div>
+      {/* Word count + SEO guide */}
+      {(() => {
+        const wordCount = editor.getText().split(/\s+/).filter(Boolean).length;
+        const SEO_MIN  = 1000;
+        const SEO_GOOD = 1500;
+
+        // progress bar width capped at 100%
+        const pct = Math.min(100, Math.round((wordCount / SEO_GOOD) * 100));
+
+        const barColor =
+          wordCount >= SEO_GOOD ? "bg-green-500" :
+          wordCount >= SEO_MIN  ? "bg-amber-400" :
+          wordCount > 0         ? "bg-red-400"   :
+          "bg-gray-200";
+
+        const statusColor =
+          wordCount >= SEO_GOOD ? "text-green-700 bg-green-50 border-green-200" :
+          wordCount >= SEO_MIN  ? "text-amber-700 bg-amber-50 border-amber-200" :
+          wordCount > 0         ? "text-red-700 bg-red-50 border-red-200"       :
+          "text-gray-400 bg-gray-50 border-gray-200";
+
+        const statusText =
+          wordCount >= SEO_GOOD ? "✓ Great length for Google ranking" :
+          wordCount >= SEO_MIN  ? "Almost there — a bit more to rank well" :
+          wordCount > 0         ? "Too short — Google prefers 1,500+ words" :
+          "Start writing to see word count";
+
+        return (
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 space-y-3">
+
+            {/* Count + status badge */}
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-semibold text-gray-700">
+                {wordCount.toLocaleString()} <span className="font-normal text-gray-400">words</span>
+              </span>
+              {wordCount > 0 && showSeoGuide && (
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusColor}`}>
+                  {statusText}
+                </span>
+              )}
+            </div>
+
+            {showSeoGuide && (
+              <>
+                {/* Progress bar */}
+                <div className="space-y-1">
+                  <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${barColor}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>0</span>
+                    <span>1,000</span>
+                    <span>1,500 (target)</span>
+                  </div>
+                </div>
+
+                {/* Color legend */}
+                <div className="flex flex-wrap gap-3 pt-1 border-t border-gray-200">
+                  <span className="text-xs text-gray-500 font-medium self-center">Word count guide:</span>
+                  <span className="flex items-center gap-1.5 text-xs text-red-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-red-400 flex-shrink-0" />
+                    Under 1,000 — too short, unlikely to rank
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-amber-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-amber-400 flex-shrink-0" />
+                    1,000–1,499 — getting there, may rank for low competition
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-green-600">
+                    <span className="inline-block w-3 h-3 rounded-sm bg-green-500 flex-shrink-0" />
+                    1,500+ — good length, Google rewards comprehensive content
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

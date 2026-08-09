@@ -1,22 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, X, Mail } from "lucide-react";
 
 // ── Constants ────────────────────────────────────────────────────────────────
-
-const INTERESTS = [
-  { value: "all",          label: "All" },
-  { value: "new_releases", label: "New Releases" },
-  { value: "specials",     label: "Specials & Offers" },
-  { value: "blog",         label: "Blog Posts" },
-];
-
-const FREQUENCIES = [
-  "Weekly",
-  "Monthly",
-  "Only major announcements",
-];
 
 const REFERRAL_OPTIONS = [
   "Social media",
@@ -40,12 +27,22 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName,  setLastName]  = useState("");
   const [email,     setEmail]     = useState("");
+  const [genres,    setGenres]    = useState<{ id: string; name: string }[]>([]);
   const [interests, setInterests] = useState<string[]>(["all"]);
-  const [frequency, setFrequency] = useState("");
   const [howHeard,  setHowHeard]  = useState("");
   const [loading,   setLoading]   = useState(false);
   const [success,   setSuccess]   = useState(false);
   const [error,     setError]     = useState("");
+
+  // Load the author's genres so readers can pick the topics they care about.
+  // These genre IDs become the subscriber's categoryPrefs, which the author's
+  // newsletter compose screen targets against.
+  useEffect(() => {
+    fetch(`/api/newsletter/genres?authorId=${encodeURIComponent(authorId)}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => { if (Array.isArray(data)) setGenres(data); })
+      .catch(() => {});
+  }, [authorId]);
 
   function toggleInterest(value: string) {
     if (value === "all") {
@@ -191,69 +188,56 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
                 />
               </div>
 
-              {/* Interests */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Interests{" "}
-                  <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {INTERESTS.map((item) => {
-                    const checked = interests.includes(item.value);
-                    return (
-                      <button
-                        key={item.value}
-                        type="button"
-                        onClick={() => toggleInterest(item.value)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                          checked
-                            ? "text-white border-transparent"
-                            : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
-                        }`}
-                        style={checked ? { backgroundColor: accentColor, borderColor: accentColor } : {}}
-                      >
-                        {/* Checkbox indicator */}
-                        <span
-                          className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ${
-                            checked ? "border-white bg-white/20" : "border-gray-300"
+              {/* Interests — only shown if the author has defined genres.
+                  Picking specific genres lets the author target you with
+                  newsletters about those topics; "All" (the default) means
+                  you receive every newsletter. */}
+              {genres.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Interests{" "}
+                    <span className="text-gray-400 font-normal">(optional)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {[{ id: "all", name: "All" }, ...genres].map((item) => {
+                      const checked = interests.includes(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => toggleInterest(item.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                            checked
+                              ? "text-white border-transparent"
+                              : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
                           }`}
+                          style={checked ? { backgroundColor: accentColor, borderColor: accentColor } : {}}
                         >
-                          {checked && (
-                            <svg viewBox="0 0 10 8" fill="none" className="w-2 h-2">
-                              <path
-                                d="M1 4l3 3 5-5"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </span>
-                        {item.label}
-                      </button>
-                    );
-                  })}
+                          {/* Checkbox indicator */}
+                          <span
+                            className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ${
+                              checked ? "border-white bg-white/20" : "border-gray-300"
+                            }`}
+                          >
+                            {checked && (
+                              <svg viewBox="0 0 10 8" fill="none" className="w-2 h-2">
+                                <path
+                                  d="M1 4l3 3 5-5"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                          {item.name}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-
-              {/* Email Frequency */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Frequency{" "}
-                  <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <select
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-600 focus:outline-none focus:ring-2 focus:border-transparent"
-                >
-                  <option value="">Weekly</option>
-                  {FREQUENCIES.map((f) => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
-              </div>
+              )}
 
               {/* Where did you hear */}
               <div>
@@ -317,7 +301,7 @@ export function NewsletterModalButton({
         style={{ backgroundColor: accentColor }}
       >
         <Mail className="h-4 w-4" />
-        Subscribe to Newsletter
+        Subscribe to AuthorLoft
       </button>
 
       {open && (

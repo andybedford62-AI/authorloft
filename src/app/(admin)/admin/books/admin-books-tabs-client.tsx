@@ -1,20 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, BookMarked } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, BookMarked, Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
+import { ArcsOverview } from "./arcs-overview";
 import { cn } from "@/lib/utils";
 
-type Tab = "my-books" | "book-shelf";
+type Tab = "my-books" | "book-shelf" | "arcs";
 
 type BookRow = {
   id: string;
   title: string;
   subtitle: string | null;
   coverImageUrl: string | null;
+  description: string | null;
+  shortDescription: string | null;
   isFeatured: boolean;
   isPublished: boolean;
+  directSalesEnabled: boolean;
+  listInBookstore: boolean;
+  isPreOrder: boolean;
   caption: string | null;
   series: { name: string } | null;
   _count: { directSaleItems: number; retailerLinks: number };
@@ -32,6 +40,7 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "my-books",    label: "My Books",   icon: BookOpen   },
     { id: "book-shelf",  label: "Book Shelf",  icon: BookMarked },
+    { id: "arcs",        label: "ARC",        icon: Copy       },
   ];
 
   return (
@@ -62,11 +71,9 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
             <BookOpen className="h-10 w-10 text-gray-300 mx-auto mb-3" />
             <p className="font-medium text-gray-500">No books yet</p>
             <p className="text-sm text-gray-400 mt-1 mb-6">Add your first book to get started.</p>
-            <a href="/admin/books/new">
-              <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                Add Your First Book
-              </button>
-            </a>
+            <Link href="/admin/books/new">
+              <Button>Add Your First Book</Button>
+            </Link>
           </div>
         ) : (
           <BooksListClient initialBooks={books} />
@@ -75,6 +82,10 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
 
       {activeTab === "book-shelf" && (
         <BookShelfPicker currentLayout={booksLayout} planTier={planTier} />
+      )}
+
+      {activeTab === "arcs" && (
+        <ArcsOverview books={books} />
       )}
     </div>
   );

@@ -9,6 +9,7 @@ import {
 import { ClassicTemplate } from "@/components/author-site/templates/classic";
 import { MinimalTemplate } from "@/components/author-site/templates/minimal";
 import { BoldTemplate } from "@/components/author-site/templates/bold";
+import { CinematicTemplate } from "@/components/author-site/templates/cinematic";
 import type { HomeTemplateProps } from "@/components/author-site/templates/types";
 
 export default async function AuthorHomePage({
@@ -31,6 +32,8 @@ export default async function AuthorHomePage({
       return <MinimalTemplate {...props} />;
     case "bold":
       return <BoldTemplate {...props} />;
+    case "cinematic":
+      return <CinematicTemplate {...props} />;
     default:
       return <ClassicTemplate {...props} />;
   }

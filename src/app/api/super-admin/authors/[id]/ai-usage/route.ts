@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function assertSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as any).isSuperAdmin) return null;
-  return session;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 /** PATCH — update cap and/or reset counter for an author */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!await assertSuperAdmin()) {
+  if (!await requireSuperAdminId()) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { NavSettingsPanel } from "@/components/admin/nav-settings-panel";
 import { PagesListClient } from "@/components/admin/pages-list-client";
 import { Plus, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
 export default async function AdminPagesPage() {
@@ -19,7 +20,11 @@ export default async function AdminPagesPage() {
         navShowFlipBooks: true,
         navShowBlog: true,
         navShowContact: true,
-        plan: { select: { flipBooksLimit: true } },
+        navShowMediaKit: true,
+        navShowBookstore: true,
+        navShowBundles: true,
+        navShowCourses: true,
+        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true, bundlesEnabled: true, coursesEnabled: true } },
       },
     }),
     prisma.authorPage.findMany({
@@ -47,6 +52,10 @@ export default async function AdminPagesPage() {
     navShowFlipBooks: author.navShowFlipBooks,
     navShowBlog: author.navShowBlog,
     navShowContact: author.navShowContact,
+    navShowMediaKit: author.navShowMediaKit,
+    navShowBookstore: author.navShowBookstore,
+    navShowBundles: author.navShowBundles,
+    navShowCourses: author.navShowCourses,
   };
 
   return (
@@ -59,12 +68,11 @@ export default async function AdminPagesPage() {
             Control which menu items appear on your public site and create custom pages.
           </p>
         </div>
-        <Link
-          href="/admin/pages/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add Page
+        <Link href="/admin/pages/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Page
+          </Button>
         </Link>
       </div>
 
@@ -78,6 +86,9 @@ export default async function AdminPagesPage() {
         <NavSettingsPanel
           initial={navSettings}
           flipBooksEnabled={((author.plan as any)?.flipBooksLimit ?? 0) !== 0}
+          mediaKitEnabled={!!(author.plan as any)?.mediaKitEnabled}
+          bundlesEnabled={!!(author.plan as any)?.bundlesEnabled}
+          coursesEnabled={!!(author.plan as any)?.coursesEnabled}
         />
       </section>
 
@@ -101,12 +112,11 @@ export default async function AdminPagesPage() {
             <p className="text-xs text-gray-400 mt-1 mb-4">
               Add a page to give your readers more content — events, contact info, FAQs, and more.
             </p>
-            <Link
-              href="/admin/pages/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Create your first page
+            <Link href="/admin/pages/new">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create your first page
+              </Button>
             </Link>
           </div>
         ) : (

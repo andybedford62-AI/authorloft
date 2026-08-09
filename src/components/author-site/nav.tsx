@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, BookOpen, LogOut, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { Menu, X, BookOpen, LogOut, LayoutDashboard, ShoppingCart, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -17,6 +17,10 @@ interface NavConfig {
   navShowFlipBooks: boolean;
   navShowBlog:      boolean;
   navShowContact:   boolean;
+  navShowMediaKit:  boolean;
+  navShowBookstore: boolean;
+  navShowBundles:   boolean;
+  navShowCourses:   boolean;
 }
 
 interface CustomPage {
@@ -36,7 +40,7 @@ interface NavProps {
     linkedinUrl?: string | null;
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
-    plan?:        { flipBooksLimit: number } | null;
+    plan?:        { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
   };
   navConfig?:   NavConfig;
   customPages?: CustomPage[];
@@ -46,6 +50,7 @@ interface NavProps {
 
 function buildNavLinks(
   showFlipBooks: boolean,
+  showMediaKit: boolean,
   config?: NavConfig,
   customPages?: CustomPage[]
 ) {
@@ -54,17 +59,21 @@ function buildNavLinks(
   ];
 
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
+  if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
+  if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
-  if (config?.navShowBlog)               links.push({ label: "Blog",       href: "/blog" });
+  if (config?.navShowBlog)               links.push({ label: "News",       href: "/blog" });
 
   for (const page of customPages ?? []) {
     links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
   }
 
-  if (!config || config.navShowAbout)   links.push({ label: "About",   href: "/about" });
-  if (!config || config.navShowContact) links.push({ label: "Contact", href: "/contact" });
+  if (!config || config.navShowAbout)   links.push({ label: "About",     href: "/about" });
+  if (!config || config.navShowContact) links.push({ label: "Contact",   href: "/contact" });
+  if (showMediaKit && config?.navShowMediaKit)
+                                        links.push({ label: "Media Kit", href: "/media-kit" });
 
   return links;
 }
@@ -77,13 +86,15 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const pathname            = usePathname();
   const isOwner             = !!(session?.user && (session.user as any).id === author.id);
   const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
+  const showMediaKit        = !!(author.plan?.mediaKitEnabled);
+  const links               = buildNavLinks(showFlipBooks, showMediaKit, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
 
   const platformBase  = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
   const dashboardUrl  = `${platformBase}/admin/dashboard`;
   const signOutUrl    = `${platformBase}/login`;
+  const bookstoreUrl  = `${platformBase}/bookstore`;
 
   // Determine active link — match pathname prefix (/ is exact only)
   function isActive(href: string) {
@@ -145,6 +156,19 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               {link.label}
             </Link>
           ))}
+          {/* AuthorLoft Bookstore — cross-link to platform discovery catalog */}
+          {(!navConfig || navConfig.navShowBookstore) && (
+            <a
+              href={bookstoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 rounded-md transition-colors inline-flex items-center gap-1"
+              title="Discover more authors on the AuthorLoft Bookstore"
+            >
+              Bookstore
+              <ExternalLink className="h-3 w-3 opacity-70" />
+            </a>
+          )}
         </nav>
 
         {/* ── Desktop right side ────────────────────────────────────────── */}
@@ -161,32 +185,32 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             </button>
           )}
 
-          {/* Get Started CTA — shown to non-owners */}
-          {!isOwner && (
+          {/* Login — shown to visitors who aren't signed in (incl. the author, so they can reach their own admin) */}
+          {!session?.user && (
             <a
-              href={platformBase}
+              href={`${platformBase}/login`}
               className="text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
-              style={{ color: accentColor, borderColor: accentColor }}
+              style={{ color: "#22c55e", borderColor: "#22c55e" }}
             >
-              Get Started
+              Login
             </a>
           )}
         </div>
 
-        {/* ── Cart icon (always visible) ────────────────────────────────── */}
-        <button
-          onClick={openCart}
-          className="relative p-2 text-white/70 hover:text-white transition-colors"
-          aria-label={`Open cart${itemCount > 0 ? ` (${itemCount} item${itemCount === 1 ? "" : "s"})` : ""}`}
-        >
-          <ShoppingCart className="h-5 w-5" />
-          {itemCount > 0 && (
+        {/* ── Cart icon (only visible when items in cart) ───────────────── */}
+        {itemCount > 0 && (
+          <button
+            onClick={openCart}
+            className="relative p-2 text-white/70 hover:text-white transition-colors"
+            aria-label={`Open cart (${itemCount} item${itemCount === 1 ? "" : "s"})`}
+          >
+            <ShoppingCart className="h-5 w-5" />
             <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-white text-[10px] font-bold flex items-center justify-center leading-none"
               style={{ color: accentColor }}>
               {itemCount > 9 ? "9+" : itemCount}
             </span>
-          )}
-        </button>
+          </button>
+        )}
 
         {/* ── Mobile hamburger ──────────────────────────────────────────── */}
         <button
@@ -218,6 +242,19 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 {link.label}
               </Link>
             ))}
+            {/* AuthorLoft Bookstore — cross-link */}
+            {(!navConfig || navConfig.navShowBookstore) && (
+              <a
+                href={bookstoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 rounded-md text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors inline-flex items-center gap-1.5"
+              >
+                Bookstore
+                <ExternalLink className="h-3 w-3 opacity-70" />
+              </a>
+            )}
 
             {/* Divider */}
             <div className="border-t my-2" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
@@ -243,13 +280,14 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               </>
             )}
 
-            {!isOwner && (
+            {!session?.user && (
               <a
-                href={platformBase}
+                href={`${platformBase}/login`}
+                onClick={() => setOpen(false)}
                 className="mt-1 text-center text-sm font-semibold px-4 py-2 rounded-md border transition-colors"
-                style={{ color: accentColor, borderColor: accentColor }}
+                style={{ color: "#22c55e", borderColor: "#22c55e" }}
               >
-                Get Started
+                Login
               </a>
             )}
           </nav>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Tag, Pencil, Clock, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/admin/icon-button";
 
 interface Special {
@@ -72,11 +73,8 @@ export function SpecialsListClient({ specials: initial }: SpecialsListClientProp
           Create promotions, limited-time deals, signed copies, bundles, and exclusive offers
           that appear on your public Specials page.
         </p>
-        <Link
-          href="/admin/specials/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Create Your First Special
+        <Link href="/admin/specials/new">
+          <Button>Create Your First Special</Button>
         </Link>
       </div>
     );
@@ -216,16 +214,8 @@ export function SpecialsListClient({ specials: initial }: SpecialsListClientProp
                   )}
 
                   {/* Edit */}
-                  <Link
-                    href={`/admin/specials/${special.id}/edit`}
-                    title="Edit special"
-                    aria-label="Edit special"
-                    className="relative group/tip p-1.5 rounded text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                  >
-                    <Pencil className="h-4 w-4" />
-                    <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover/tip:opacity-100 transition-opacity z-50">
-                      Edit special
-                    </span>
+                  <Link href={`/admin/specials/${special.id}/edit`}>
+                    <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" />
                   </Link>
                 </div>
               </div>

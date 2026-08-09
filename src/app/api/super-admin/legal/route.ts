@@ -1,19 +1,10 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-
-async function requireSuperAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return null;
-  if (!(session.user as any).isSuperAdmin) return null;
-  return session;
-}
+import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
 // GET /api/superadmin/legal — fetch current platform legal settings
 export async function GET() {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const settings = await prisma.platformSettings.findUnique({ where: { id: "singleton" } });
   return NextResponse.json(settings ?? {});
@@ -21,8 +12,7 @@ export async function GET() {
 
 // PATCH /api/superadmin/legal — update privacy or terms content
 export async function PATCH(req: Request) {
-  const session = await requireSuperAdmin();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { field, content, contactEmail } = body as {

@@ -1,0 +1,223 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Search, ChevronDown, ChevronRight, HelpCircle } from "lucide-react";
+import { sanitize } from "@/lib/sanitize";
+
+interface Article  { id: string; question: string; answer: string; }
+interface Subtopic { id: string; title: string; slug: string; articles: Article[]; }
+interface Topic    { id: string; title: string; slug: string; description: string | null; icon: string | null; subtopics: Subtopic[]; articles: Article[]; }
+
+function stripHtml(html: string) {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function ArticleItem({ article, defaultOpen = false }: { article: Article; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (defaultOpen && ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [defaultOpen]);
+  return (
+    <div ref={ref} id={`article-${article.id}`} className="border-b border-gray-100 last:border-0">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-start gap-3 px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+      >
+        <span className="mt-0.5 text-gray-400 flex-shrink-0">
+          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        </span>
+        <span
+          className="flex-1 text-sm font-medium text-gray-900 [&>p]:inline"
+          dangerouslySetInnerHTML={{ __html: sanitize(article.question) }}
+        />
+      </button>
+      {open && (
+        <div
+          className="px-12 pb-5 max-w-none text-sm text-gray-700 leading-relaxed
+            [&_p]:my-3 [&_p:first-child]:mt-0
+            [&_h2]:mt-5 [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:text-gray-900
+            [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:text-gray-900
+            [&_h4]:mt-5 [&_h4]:mb-2 [&_h4]:text-sm [&_h4]:font-semibold [&_h4]:text-gray-900
+            [&_ul]:my-3 [&_ul]:pl-5 [&_ul]:list-disc [&_ul]:space-y-1.5
+            [&_ol]:my-3 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol]:space-y-1.5
+            [&_li]:pl-1
+            [&_a]:text-blue-600 [&_a:hover]:underline
+            [&_strong]:font-semibold [&_strong]:text-gray-900
+            [&_em]:italic
+            [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:rounded [&_code]:text-xs
+            [&_blockquote]:border-l-2 [&_blockquote]:border-gray-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-3
+            [&_hr]:my-4 [&_hr]:border-gray-200"
+          dangerouslySetInnerHTML={{ __html: sanitize(article.answer) }}
+        />
+      )}
+    </div>
+  );
+}
+
+export function HelpArticles() {
+  const searchParams = useSearchParams();
+  const targetArticleId = searchParams.get("article") || "";
+
+  const [topics,      setTopics]      = useState<Topic[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [fetchError,  setFetchError]  = useState("");
+  const [search,      setSearch]      = useState("");
+  const [activeTopicId, setActiveTopicId] = useState<string | "all">("all");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/help");
+        if (!r.ok) { setFetchError("Could not load help articles."); return; }
+        const data = await r.json().catch(() => ({}));
+        const loadedTopics: Topic[] = data.topics ?? [];
+        setTopics(loadedTopics);
+        if (targetArticleId) {
+          const owningTopic = loadedTopics.find((t) =>
+            t.articles.some((a) => a.id === targetArticleId) ||
+            t.subtopics.some((s) => s.articles.some((a) => a.id === targetArticleId))
+          );
+          if (owningTopic) setActiveTopicId(owningTopic.id);
+        }
+      } catch {
+        setFetchError("Could not load help articles. Please refresh the page.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [targetArticleId]);
+
+  // Flatten all articles for search
+  const allArticles: (Article & { topicTitle: string; subtopicTitle?: string })[] = topics.flatMap((t) => [
+    ...t.articles.map((a) => ({ ...a, topicTitle: t.title })),
+    ...t.subtopics.flatMap((s) => s.articles.map((a) => ({ ...a, topicTitle: t.title, subtopicTitle: s.title }))),
+  ]);
+
+  const searchActive = search.trim().length > 0;
+
+  const searchResults = searchActive
+    ? allArticles.filter((a) =>
+        stripHtml(a.question).toLowerCase().includes(search.toLowerCase()) ||
+        stripHtml(a.answer).toLowerCase().includes(search.toLowerCase())
+      )
+    : [];
+
+  const visibleTopics = activeTopicId === "all"
+    ? topics
+    : topics.filter((t) => t.id === activeTopicId);
+
+  if (fetchError) {
+    return <div className="rounded-xl bg-red-50 border border-red-200 p-6 text-red-700">{fetchError}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search help articles…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        />
+      </div>
+
+      {loading && (
+        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center text-gray-400 text-sm">
+          Loading help articles…
+        </div>
+      )}
+
+      {/* Search results */}
+      {!loading && searchActive && (
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500">{searchResults.length} result{searchResults.length !== 1 ? "s" : ""} for &ldquo;{search}&rdquo;</p>
+          {searchResults.length === 0 ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
+              <HelpCircle className="h-8 w-8 text-gray-200 mx-auto mb-3" />
+              <p className="text-sm font-medium text-gray-500">No articles found</p>
+              <p className="text-xs text-gray-400 mt-1">Try different keywords or browse by topic below.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              {searchResults.map((a) => (
+                <div key={a.id}>
+                  <div className="px-5 pt-3 pb-0">
+                    <span className="text-xs text-blue-600 font-medium">
+                      {a.topicTitle}{a.subtopicTitle ? ` › ${a.subtopicTitle}` : ""}
+                    </span>
+                  </div>
+                  <ArticleItem article={a} defaultOpen={a.id === targetArticleId} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Topic filter tabs */}
+      {!loading && !searchActive && (
+        <>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveTopicId("all")}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTopicId === "all" ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              All Topics
+            </button>
+            {topics.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setActiveTopicId(t.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  activeTopicId === t.id ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {t.title}
+              </button>
+            ))}
+          </div>
+
+          {/* Articles by topic */}
+          <div className="space-y-4">
+            {visibleTopics.map((topic) => {
+              const totalArticles = topic.articles.length + topic.subtopics.reduce((s, st) => s + st.articles.length, 0);
+              if (totalArticles === 0) return null;
+              return (
+                <div key={topic.id} className="space-y-3">
+                  <h2 className="text-base font-semibold text-gray-800">{topic.title}</h2>
+                  {topic.description && <p className="text-sm text-gray-500 -mt-1">{topic.description}</p>}
+
+                  {/* Top-level articles (no subtopic) */}
+                  {topic.articles.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                      {topic.articles.map((a) => <ArticleItem key={a.id} article={a} />)}
+                    </div>
+                  )}
+
+                  {/* Subtopics */}
+                  {topic.subtopics.map((sub) => sub.articles.length > 0 && (
+                    <div key={sub.id} className="space-y-2">
+                      <h3 className="text-sm font-semibold text-gray-600 pl-1">{sub.title}</h3>
+                      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        {sub.articles.map((a) => <ArticleItem key={a.id} article={a} />)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

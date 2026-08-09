@@ -16,6 +16,10 @@ export async function GET() {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
+      navShowBookstore: true,
+      navShowBundles: true,
+      navShowCourses: true,
     },
   });
 
@@ -36,17 +40,25 @@ export async function PUT(req: Request) {
     navShowFlipBooks,
     navShowBlog,
     navShowContact,
+    navShowMediaKit,
+    navShowBookstore,
+    navShowBundles,
+    navShowCourses,
   } = body;
 
   const updated = await prisma.author.update({
     where: { id: authorId },
     data: {
-      ...(typeof navShowAbout     === "boolean" && { navShowAbout }),
-      ...(typeof navShowBooks     === "boolean" && { navShowBooks }),
-      ...(typeof navShowSpecials  === "boolean" && { navShowSpecials }),
-      ...(typeof navShowFlipBooks === "boolean" && { navShowFlipBooks }),
-      ...(typeof navShowBlog      === "boolean" && { navShowBlog }),
-      ...(typeof navShowContact   === "boolean" && { navShowContact }),
+      ...(typeof navShowAbout      === "boolean" && { navShowAbout }),
+      ...(typeof navShowBooks      === "boolean" && { navShowBooks }),
+      ...(typeof navShowSpecials   === "boolean" && { navShowSpecials }),
+      ...(typeof navShowFlipBooks  === "boolean" && { navShowFlipBooks }),
+      ...(typeof navShowBlog       === "boolean" && { navShowBlog }),
+      ...(typeof navShowContact    === "boolean" && { navShowContact }),
+      ...(typeof navShowMediaKit   === "boolean" && { navShowMediaKit }),
+      ...(typeof navShowBookstore  === "boolean" && { navShowBookstore }),
+      ...(typeof navShowBundles    === "boolean" && { navShowBundles }),
+      ...(typeof navShowCourses    === "boolean" && { navShowCourses }),
     },
     select: {
       navShowAbout: true,
@@ -55,6 +67,10 @@ export async function PUT(req: Request) {
       navShowFlipBooks: true,
       navShowBlog: true,
       navShowContact: true,
+      navShowMediaKit: true,
+      navShowBookstore: true,
+      navShowBundles: true,
+      navShowCourses: true,
     },
   });
 
