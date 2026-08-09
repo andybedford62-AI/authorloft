@@ -12,6 +12,7 @@ import {
   Sun,
   Moon,
   Lock,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessFeature, DEFAULT_GATES } from "@/lib/feature-gates";
@@ -30,6 +31,7 @@ interface SidebarProps {
   authorName:    string;
   authorSlug:    string;
   isSuperAdmin?: boolean;
+  isFoundingMember?: boolean;
   planTier?:     string;
   featureGates?: Record<string, string>;
   adminTheme?:   "dark" | "light";
@@ -290,6 +292,7 @@ export function AdminSidebar({
   authorName,
   authorSlug,
   isSuperAdmin = false,
+  isFoundingMember = false,
   planTier = "FREE",
   featureGates = {},
   adminTheme = "light",
@@ -332,6 +335,12 @@ export function AdminSidebar({
       <div className={cn("px-5 py-4 border-b", t.authorBorder)}>
         <p className={cn("text-xs uppercase tracking-widest mb-1", t.authorLabel)}>Your Site</p>
         <p className={cn("text-sm font-medium truncate", t.authorName)}>{authorName}</p>
+        {isFoundingMember && (
+          <span className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800">
+            <Star className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+            Founding Member
+          </span>
+        )}
         <a
           href={`https://${authorSlug}.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`}
           target="_blank"

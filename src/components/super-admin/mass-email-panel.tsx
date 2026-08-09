@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, Loader2, History, Users, Reply, Check } from "lucide-react";
+import { Send, Loader2, History, Users, Reply, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmailComposer } from "./email-composer";
 import { useActiveSupportEmails } from "./use-active-support-emails";
@@ -15,6 +15,14 @@ interface Broadcast {
   recipientCount:    number;
   recipientEmail:    string | null;
   sentAt:            string;
+}
+
+interface BroadcastTemplate {
+  id:       string;
+  name:     string;
+  subject:  string;
+  body:     string;
+  category: string;
 }
 
 const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
@@ -34,6 +42,10 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
   const [error,        setError]        = useState("");
   const [history,        setHistory]        = useState<Broadcast[]>([]);
   const [loadingHistory, setLoadingHistory]  = useState(true);
+
+  const [templates,     setTemplates]    = useState<BroadcastTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
 
   const { emails: supportEmails, loading: loadingSupportEmails } = useActiveSupportEmails();
   const [replyToEmail,   setReplyToEmail]   = useState(initialReplyToEmail ?? "");
@@ -63,6 +75,33 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
     loadHistory();
     setLoadingHistory(false);
   }, []);
+
+  useEffect(() => {
+    fetch("/api/super-admin/broadcast-templates")
+      .then(r => r.json())
+      .then(setTemplates)
+      .catch(() => {})
+      .finally(() => setLoadingTemplates(false));
+  }, []);
+
+  function handleSelectTemplate(templateId: string) {
+    if (!templateId) {
+      setSelectedTemplate("");
+      return;
+    }
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      setSelectedTemplate(templateId);
+      setSubject(template.subject);
+      setBody(template.body);
+    }
+  }
+
+  function handleClearTemplate() {
+    setSelectedTemplate("");
+    setSubject("");
+    setBody("");
+  }
 
   // Live recipient count when audience changes
   useEffect(() => {
@@ -147,6 +186,47 @@ export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: s
           </p>
         )}
       </div>
+
+      {/* Predetermined Templates */}
+      {!loadingTemplates && templates.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Send className="h-4 w-4 text-gray-400" />
+            Predetermined Emails
+          </h2>
+          <p className="text-sm text-gray-500 -mt-2">
+            Use a pre-written template for common scenarios, or compose a custom message below.
+          </p>
+          <div className="space-y-3">
+            <select
+              value={selectedTemplate}
+              onChange={e => handleSelectTemplate(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">— Select a template —</option>
+              {templates.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            {selectedTemplate && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center justify-between">
+                <p className="text-sm text-blue-800">
+                  Template loaded. You can edit subject and body below, or{" "}
+                  <button
+                    onClick={handleClearTemplate}
+                    className="font-semibold underline text-blue-700 hover:text-blue-800"
+                  >
+                    clear template
+                  </button>
+                  .
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Compose */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

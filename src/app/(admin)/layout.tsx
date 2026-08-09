@@ -40,6 +40,7 @@ export default async function AdminLayout({
         slug:             true,
         adminTheme:       true,
         termsAcceptedAt:  true,
+        isFoundingMember: true,
         plan:             { select: { tier: true } },
         trialEndsAt:      true,
         trialPlan:        { select: { name: true } },
@@ -99,6 +100,7 @@ export default async function AdminLayout({
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={isSuperAdmin}
+          isFoundingMember={authorRecord.isFoundingMember}
           planTier={planTier}
           featureGates={featureGates}
           adminTheme={adminTheme}

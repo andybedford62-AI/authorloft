@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Check, Loader2, CheckCircle, AlertTriangle,
-  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X, Tag,
+  Globe, Mail, User, Shield, ToggleLeft, CreditCard, Bot, RotateCcw, Gift, X, Tag, Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -30,6 +30,8 @@ type Author = {
   isActive: boolean;
   isSuperAdmin: boolean;
   hideNextStepsChecklist: boolean;
+  isFoundingMember: boolean;
+  foundingMemberSince: Date | null;
   planId: string | null;
 };
 
@@ -98,12 +100,16 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
     isActive:               author.isActive,
     isSuperAdmin:           author.isSuperAdmin,
     hideNextStepsChecklist: author.hideNextStepsChecklist,
+    isFoundingMember:       author.isFoundingMember,
     planId:                 author.planId ?? "",
   });
 
   const [saving,  setSaving]  = useState(false);
   const [status,  setStatus]  = useState<"idle" | "success" | "error">("idle");
   const [errMsg,  setErrMsg]  = useState("");
+
+  // Founding member — instant PATCH toggle, tracked outside `form` so we can show the "since" date
+  const [foundingMemberSince, setFoundingMemberSince] = useState<Date | null>(author.foundingMemberSince);
 
   // Trial section state
   const [currentTrialPlanId,  setCurrentTrialPlanId]  = useState<string | null>(trialPlanId);
@@ -635,6 +641,45 @@ export function AuthorEditForm({ author, plans, aiUsageCount, aiUsageCap, aiUsag
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                   form.hideNextStepsChecklist ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Founding member — instant PATCH, no Save needed */}
+          <div className="flex items-center justify-between py-2 border-t border-gray-100 pt-3">
+            <div>
+              <p className="text-sm font-medium text-gray-800 flex items-center gap-1.5">
+                <Star className={`h-3.5 w-3.5 ${form.isFoundingMember ? "fill-amber-500 text-amber-500" : "text-gray-300"}`} />
+                Founding Member
+              </p>
+              <p className="text-xs text-gray-400">
+                {form.isFoundingMember && foundingMemberSince
+                  ? `Awarded ${new Date(foundingMemberSince).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}. Shows a public badge on their author site and a badge on their dashboard.`
+                  : "Manually award founding member status — shows a public badge on their author site and a badge on their dashboard."}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.isFoundingMember}
+              onClick={async () => {
+                const next = !form.isFoundingMember;
+                set("isFoundingMember", next);
+                setFoundingMemberSince(next ? new Date() : null);
+                await fetch(`/api/super-admin/authors/${author.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ isFoundingMember: next }),
+                });
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+                form.isFoundingMember ? "bg-amber-500" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  form.isFoundingMember ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>

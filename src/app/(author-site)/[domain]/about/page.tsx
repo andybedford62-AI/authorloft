@@ -8,6 +8,7 @@ import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getAuthorBadges } from "@/lib/badges";
 import { AuthorBadges } from "@/components/marketing/author-badges";
+import { FoundingMemberBadge } from "@/components/marketing/founding-member-badge";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -162,6 +163,11 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
               <p className="mt-1 text-base font-semibold" style={{ color: accentColor }}>
                 {author.tagline}
               </p>
+            )}
+            {(author as any).isFoundingMember && (
+              <div className="mt-3">
+                <FoundingMemberBadge since={(author as any).foundingMemberSince} />
+              </div>
             )}
 
             <hr className="my-5 border-gray-200" />

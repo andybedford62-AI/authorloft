@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## August 9, 2026 — Founding Member designation
+
+Manual (non-metric) status for early authors, distinct from the existing achievement-badge system (`BadgeDefinition`, auto-calculated from books/revenue/reviews thresholds) — this is Super-Admin-awarded, not earned.
+
+- Schema: `Author.isFoundingMember` (boolean) + `Author.foundingMemberSince` (timestamp, set/cleared automatically when the flag toggles).
+- **Super Admin → All Authors** — star icon in the row actions toggles status instantly; a gold "Founding" pill shows next to the author's name when active.
+- **Super Admin → author detail → Account Flags** — same toggle, instant PATCH (no Save needed), matching the existing `hideNextStepsChecklist` pattern.
+- **Public badge** — gold "Founding Member" pill on the author's own About page (`/about`), shown near their name/tagline, separate from the achievements row.
+- **Dashboard badge** — small gold pill under "Your Site" in the author's own admin sidebar.
+- Also added the 6-email onboarding sequence (Day 0/1/3A/3B/7/14) as `BroadcastTemplate` rows, selectable from Super Admin → Mass Email.
+- Showcase/directory page for founding members held for later — this ships the flag + both badges only.
+
 ## August 8, 2026 — Self-serve custom domains (bring your own)
 
 Repo audit found `Author.customDomain` and hostname-based routing already existed, but the only way to actually set it was a super-admin manually editing the field *and* separately adding the domain in the Vercel dashboard by hand — no author-facing UI, no Vercel API integration, no verification flow. Built the missing half:

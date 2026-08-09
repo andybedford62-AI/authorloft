@@ -204,6 +204,8 @@ model Author {
   showInShowcase                Boolean               @default(false) // author has opted in to being shown on the marketing page showcase
   showcaseStyle                 String                @default("photo") // "photo" | "book" | "text" — controls what the showcase card displays
   showBadges                    Boolean               @default(true) // author opt-out for public achievement badges (bookstore + author site)
+  isFoundingMember               Boolean              @default(false) // manually awarded by Super Admin — shows public badge + dashboard badge
+  foundingMemberSince            DateTime? // set when isFoundingMember is turned on; cleared when turned off
   trialPlanId                   String? // plan ID for admin-assigned free trial
   trialPlan                     Plan?                 @relation("AuthorTrialPlan", fields: [trialPlanId], references: [id])
   trialStartsAt                 DateTime? // when the trial began
