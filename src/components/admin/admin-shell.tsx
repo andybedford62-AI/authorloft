@@ -11,6 +11,7 @@ interface AdminShellProps {
   authorName:    string;
   authorSlug:    string;
   isSuperAdmin?: boolean;
+  isFoundingMember?: boolean;
   planTier?:     string;
   featureGates?: Record<string, string>;
   adminTheme:    "dark" | "light";
@@ -23,6 +24,7 @@ export function AdminShell({
   authorName,
   authorSlug,
   isSuperAdmin,
+  isFoundingMember,
   planTier,
   featureGates,
   adminTheme,
@@ -58,6 +60,7 @@ export function AdminShell({
           authorName={authorName}
           authorSlug={authorSlug}
           isSuperAdmin={isSuperAdmin}
+          isFoundingMember={isFoundingMember}
           planTier={planTier}
           featureGates={featureGates}
           adminTheme={adminTheme}

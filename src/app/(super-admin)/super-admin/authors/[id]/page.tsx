@@ -33,6 +33,8 @@ export default async function AuthorDetailPage({
         isActive: true,
         isSuperAdmin: true,
         hideNextStepsChecklist: true,
+        isFoundingMember: true,
+        foundingMemberSince: true,
         planId: true,
         trialPlanId: true,
         trialStartsAt: true,

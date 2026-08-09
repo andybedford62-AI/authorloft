@@ -114,6 +114,15 @@ Self-serve "bring your own domain" shipped Aug 8, 2026 (Admin → Settings → C
 
 ---
 
+## Founding Members
+
+Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember`, Super Admin toggle, public badge on the author's About page, dashboard badge in the admin sidebar. See `docs/CHANGELOG.md` (Aug 9, 2026) for the full list of what shipped. Deliberately held back from that build:
+
+- [ ] **Public "Founding Members" showcase page** — a wall-of-fame directory on authorloft.com linking out to each founding author's site. Doubles as social proof for new visitors and extra visibility/backlinks for the founders. Note: `Author.showInShowcase` already exists for a *different* marketing-page showcase (photo/book/text card) — decide whether to extend that mechanism or build a dedicated founding-members page before starting. *(medium)*
+- [ ] **Automated eligibility (optional)** — today the flag is 100% manual (by design, per Aug 9 2026 decision); if a hard cutoff by signup date/order is ever wanted instead of admin discretion, that's a separate enforcement layer, not a change to the existing flag. *(small, only if requested)*
+
+---
+
 ## Auth / Account
 
 - [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*

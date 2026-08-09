@@ -47,15 +47,22 @@ export async function PATCH(
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
-  const { isActive, hideNextStepsChecklist } = await req.json();
+  const { isActive, hideNextStepsChecklist, isFoundingMember } = await req.json();
 
   const author = await prisma.author.update({
     where: { id },
     data: {
       ...(typeof isActive               === "boolean" && { isActive }),
       ...(typeof hideNextStepsChecklist === "boolean" && { hideNextStepsChecklist }),
+      ...(typeof isFoundingMember       === "boolean" && {
+        isFoundingMember,
+        foundingMemberSince: isFoundingMember ? new Date() : null,
+      }),
     },
-    select: { id: true, name: true, slug: true, isActive: true, hideNextStepsChecklist: true },
+    select: {
+      id: true, name: true, slug: true, isActive: true, hideNextStepsChecklist: true,
+      isFoundingMember: true, foundingMemberSince: true,
+    },
   });
 
   return NextResponse.json(author);

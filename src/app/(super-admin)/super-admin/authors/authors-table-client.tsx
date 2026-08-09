@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle, XCircle, ExternalLink, BookOpen,
-  Mail, Pencil, Trash2, Loader2, UserCheck,
+  Mail, Pencil, Trash2, Loader2, UserCheck, Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ type Author = {
   slug: string;
   isActive: boolean;
   isSuperAdmin: boolean;
+  isFoundingMember: boolean;
   createdAt: Date;
   lastLoginAt: Date | null;
   plan: { name: string; tier: string; monthlyPriceCents: number } | null;
@@ -65,6 +66,7 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
   const router = useRouter();
   const [authors, setAuthors] = useState(initial);
   const [toggling,      setToggling]      = useState<string | null>(null);
+  const [togglingFounding, setTogglingFounding] = useState<string | null>(null);
   const [deleting,      setDeleting]      = useState<string | null>(null);
   const [confirmId,     setConfirmId]     = useState<string | null>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
@@ -86,6 +88,25 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
       }
     } finally {
       setToggling(null);
+    }
+  }
+
+  async function toggleFoundingMember(author: Author) {
+    setTogglingFounding(author.id);
+    try {
+      const res = await fetch(`/api/super-admin/authors/${author.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFoundingMember: !author.isFoundingMember }),
+      });
+      if (res.ok) {
+        setAuthors((prev) =>
+          prev.map((a) => (a.id === author.id ? { ...a, isFoundingMember: !author.isFoundingMember } : a))
+        );
+        router.refresh();
+      }
+    } finally {
+      setTogglingFounding(null);
     }
   }
 
@@ -156,6 +177,14 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                         <p className="font-medium text-gray-900">{author.displayName || author.name}</p>
                         {author.isSuperAdmin && (
                           <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">SA</span>
+                        )}
+                        {author.isFoundingMember && (
+                          <span
+                            title="Founding Member"
+                            className="inline-flex items-center gap-0.5 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium"
+                          >
+                            <Star className="h-3 w-3 fill-amber-500 text-amber-500" /> Founding
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400">{author.email}</p>
@@ -246,6 +275,17 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                       onClick={() => handleImpersonate(author)}
                       disabled={!!impersonating}
                       loading={impersonating === author.id}
+                    />
+
+                    {/* Founding member toggle */}
+                    <IconButton
+                      icon={<Star className={author.isFoundingMember ? "h-4 w-4 fill-amber-500" : "h-4 w-4"} />}
+                      title={author.isFoundingMember ? "Remove Founding Member status" : "Mark as Founding Member"}
+                      variant="ghost"
+                      className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+                      onClick={() => toggleFoundingMember(author)}
+                      disabled={!!togglingFounding}
+                      loading={togglingFounding === author.id}
                     />
 
                     {/* View live site */}

@@ -13,6 +13,7 @@ export default async function SuperAdminAuthorsPage() {
       slug: true,
       isActive: true,
       isSuperAdmin: true,
+      isFoundingMember: true,
       createdAt: true,
       lastLoginAt: true,
       plan: { select: { name: true, tier: true, monthlyPriceCents: true } },
