@@ -4,7 +4,7 @@ Running list of ideas and enhancements to consider for future builds. Not commit
 
 **How to use:** add new ideas under the right area with a one-line rationale and a rough effort/impact note. Keep it scannable.
 
-_Last cleaned: June 27, 2026._
+_Last cleaned: August 9, 2026 — full verification pass against actual codebase state, not just doc cross-checks._
 
 ---
 
@@ -22,8 +22,8 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [x] **Unify genre-page headers** — shipped June 15, 2026; `/bookstore/genre/[slug]` now uses the shared `MarketingPageHeader` brand band (same banner as the main Bookstore page) with an "All books" breadcrumb. *(done)*
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
 - [x] **Courses in the Bookstore** — shipped Aug 6, 2026; `Course.listInBookstore` opt-in toggle (mirrors Book), separate "Courses from Independent Creators" section on `/bookstore` with a simple card (no genres/ratings — Course has neither yet). *(done)*
-- [ ] **Course categories / taxonomy** — Course has no genre-equivalent field today. Before courses can share genre browsing or unified filter tabs with books, need to decide: reuse the existing `Genre` model (would need a `CourseGenre` join table, or a shared polymorphic tagging approach), or a separate `CourseCategory` model with its own taxonomy (writing craft, business, tech, creative, etc. — likely a different shape than book genres). Plan this before building unified filtering. *(medium — design first)*
-- [ ] **Unified Books/Courses filter tabs on `/bookstore`** — deferred from the Aug 6 2026 pass; currently books and courses are two separate sections/grids, not a merged filterable catalog. Depends on course categories above (a meaningful "browse by category" needs the taxonomy decided first). *(medium, blocked on course categories)*
+- [x] **Course categories / taxonomy** — shipped Aug 7, 2026 as `CourseCategory`/`CourseCategoryAssignment` (self-referential tree, mirrors `Genre`). Admin CRUD at `/admin/course-categories`, chip picker on the course editor, category-chip filter bar on the Bookstore's Courses section. *(done — see full entry under Bundles & Courses below; this line was a stale duplicate, corrected Aug 9 2026)*
+- [ ] **Unified Books/Courses filter tabs on `/bookstore`** — deferred from the Aug 6 2026 pass; currently books and courses are two separate sections/grids, not a merged filterable catalog. Course categories now exist (see above), so this is no longer blocked on taxonomy — just needs the actual unification build. *(medium)*
 - [ ] **Course ratings on the Bookstore** — Course has no feedback/rating table yet (Book has `BookFeedback`). Needed before course cards can show stars like book cards do. *(medium)*
 - [ ] **Course entries in Bookstore structured data (JSON-LD)** — the `/bookstore` `CollectionPage`/`ItemList` schema only lists `@type: Book` items today; courses aren't included in search-engine structured data yet. *(small)*
 
@@ -50,8 +50,8 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 
 Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture, search/filter). Deferred — see `docs/NEWSLETTER_PHASE2_PLAN.md`:
 
-- [ ] **Email a news issue to subscribers** — compose + send to `PlatformSubscriber`s, reusing the broadcast/mass-email infra. *(medium)*
-- [ ] **Double opt-in confirmation emails** + public unsubscribe page (`unsubscribeToken` already stored). *(small–medium)*
+- [x] **Email a news issue to subscribers** — this was a stale duplicate (corrected Aug 9, 2026): `POST /api/super-admin/blog/posts/[id]/email` already sends to confirmed `PlatformSubscriber`s via Resend batch send with the `newsEmailedAt` guard — same mechanism as the June 15 line below, just independently reachable, not a separate feature. *(done — see June 15 entry above)*
+- [ ] **Double opt-in confirmation emails** + public unsubscribe page — PARTIALLY BUILT (checked Aug 9, 2026): `PlatformSubscriber` has `confirmToken`/`isConfirmed` fields and unsubscribe works, but `POST /api/news/subscribe` is explicitly "Phase 1: capture only (no confirmation email sent yet)" — the confirmation email itself was never wired up. *(small–medium)*
 - [x] **"Publish News post → also email subscribers"** — shipped June 15, 2026; a checkbox on published News posts emails the issue (headline, excerpt, cover, read link) to confirmed `PlatformSubscriber`s once, with a new platform unsubscribe route + `PlatformPost.newsEmailedAt` double-send guard. *(done)*
 - [x] **RSS feed** for the news archive — shipped June 14, 2026 (`/news/rss.xml`, advertised via alternate link on `/news`). *(done)*
 - [ ] **"New books this week" digest** — reader newsletter from the bookstore catalog; reuses the same email infra once Phase 2 lands. *(medium)*
@@ -100,6 +100,7 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 - [ ] **Course discount codes** — extend DiscountCode to optionally apply to courses. *(small–medium)*
 - [ ] **Bundle marketing page** — `/book-bundles` solution landing page. *(small)*
 - [ ] **Course marketing page** — `/author-courses` solution landing page. *(small)*
+- [ ] **Admin dashboard doesn't surface Courses or Bundles like it does Books** — verified Aug 9, 2026 in `src/app/(admin)/admin/dashboard/page.tsx`: Books get a "Total Books" stat card (line ~297) and a full "Your Books" list panel (line ~454) with title/published/featured/price. Courses only fetch a boolean (`courseCount > 0` → `hasCourse`, used solely for onboarding-checklist gating) — no stat card, no list. Bundles have no query on this page at all — not even a count. A course-creator or bundle-seller signing in sees a dashboard that looks entirely book-oriented regardless of what they actually sell. *(medium — add stat cards + list panels for both, gated the same way the Books panel already is)*
 
 ---
 
@@ -124,7 +125,7 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 
 ## Auth / Account
 
-- [ ] **"Remember me" / login persistence** — login is a persistent ~30-day cookie, so closing the browser doesn't sign out (standard, not a security bug). Add a "Remember me" checkbox (checked = ~30d persistent; unchecked = session cookie). Optionally shorten default 30d → 7d. *(small–medium, touches NextAuth session/cookie config)*
+- [ ] **"Remember me" / login persistence** — corrected Aug 9, 2026: actual session is `maxAge: 8h` in `src/lib/auth.ts`, refreshed on activity — not the ~30-day cookie this item originally described. Feature (a "Remember me" checkbox to opt into a longer persistent session) is still genuinely unbuilt; only the rationale text was wrong. *(small–medium, touches NextAuth session/cookie config)*
 - [ ] **Captcha on public forms — add before exiting beta** — register, /api/contact, and /api/marketing/contact are currently protected by IP rate-limiting + (for register) the beta invite code. Once beta mode is off, /register becomes a realistic target for bot floods (Resend verification quota burn, fake author subdomains as link farms). Use **Cloudflare Turnstile** (free, no PII, invisible mode possible) — NOT reCAPTCHA. Implementation ~1 hr: `@marsidev/react-turnstile` widget client-side, verify token server-side in the API route. Trigger: flip on the same week beta mode is turned off. *(small)*
 
 ---
@@ -139,10 +140,10 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 - [x] **User blog SEO readiness** — IndexNow on author blog publish, auto-generate metaDescription, CollectionPage JSON-LD on author blog listing, guides RSS feed, news RSS enrichment, guides in sitemap, robots.txt/sitemap.xml rewrites. *(done June 25, 2026)*
 - [x] **Search engine submission tools** — `/admin/search-engines` page with step-by-step Google/Bing guides, site verification meta tag injection, sitemap URL copy, and IndexNow info. *(done June 25, 2026)*
 - [ ] **Marketing blog** content build-out — CMS exists; expand published content. *(~16 hrs content)*
-- [ ] **Book schema on author site book pages** — add schema.org/Book structured data to `/[domain]/books/[slug]` for richer search results. *(small)*
+- [x] **Book schema on author site book pages** — already built (corrected Aug 9, 2026): `/[domain]/books/[slug]/page.tsx` emits full `@type: "Book"` JSON-LD. Stale entry — the line here predates it or was never checked off. *(done)*
 - [ ] **OG image optimization** — resize/crop uploaded OG images to recommended 1200×630 via CDN transform or build-time processing. *(medium)*
-- [ ] **Author expertise/credentials schema** — add Person schema with author bios, credentials, and expertise fields for stronger E-E-A-T signals. *(small–medium)*
-- [ ] **Bing URL Submission API** — one-click sitemap submission to Bing via their API (platform-level key or author's own key). *(small)*
+- [ ] **Author expertise/credentials schema** — PARTIALLY BUILT (checked Aug 9, 2026): Person schema already exists on author about pages (`about/page.tsx`), but `knowsAbout` is a hardcoded generic string ("Writing, Publishing, Independent Author") rather than real per-author credentials/expertise fields. Remaining work is the data model + UI to make it per-author, not the schema itself. *(small–medium)*
+- [ ] **Bing URL Submission API** — note (Aug 9, 2026): `src/lib/indexnow.ts` already auto-pushes blog/guide URLs to Bing/Yandex via IndexNow on publish — a narrower, different automation than what this item describes (one-click full-sitemap submission via Bing's own API from `/admin/search-engines`, which today only shows manual instructions). Still open as literally scoped. *(small)*
 - [ ] **SEO setup checklist** — trackable onboarding checklist for search engine verification + sitemap submission with persistent completion state. *(small–medium)*
 
 ---
