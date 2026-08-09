@@ -131,7 +131,8 @@
       "Bash(git push *)",
       "Bash(gh auth *)",
       "Bash(gh pr create --base main --head sync-main-with-dev --title 'Sync main with dev to restore main as deploy source of truth' --body ' *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(gh pr create --base main --head sync-main-with-dev-2 --title 'Sync main with dev \\(skill + doc corrections\\)' --body ' *)"
     ]
   }
 }
