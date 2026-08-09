@@ -127,7 +127,11 @@
       "Bash(mv \"src/app/\\(marketing\\)/homepage-rebrand/page.tsx\" \"src/app/\\(marketing\\)/page.tsx\")",
       "Bash(rm -rf \"src/app/\\(marketing\\)/homepage-rebrand\")",
       "mcp__plugin_playwright_playwright__browser_run_code_unsafe",
-      "Bash(mkdir -p \"C:\\\\Users\\\\andyb\\\\Downloads\\\\bookstage\\\\src\\\\app\\\\api\\\\admin\\\\messages\\\\[id]\\\\reply\")"
+      "Bash(mkdir -p \"C:\\\\Users\\\\andyb\\\\Downloads\\\\bookstage\\\\src\\\\app\\\\api\\\\admin\\\\messages\\\\[id]\\\\reply\")",
+      "Bash(git push *)",
+      "Bash(gh auth *)",
+      "Bash(gh pr create --base main --head sync-main-with-dev --title 'Sync main with dev to restore main as deploy source of truth' --body ' *)",
+      "Bash(git add *)"
     ]
   }
 }
