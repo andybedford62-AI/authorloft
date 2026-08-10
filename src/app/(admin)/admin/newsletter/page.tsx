@@ -12,7 +12,7 @@ export default async function NewsletterPage() {
 
   const now = new Date();
 
-  const [subscribers, genres, author, campaigns, books, activeSpecials] = await Promise.all([
+  const [subscribers, genres, author, campaigns, books, activeSpecials, openedCounts, clickedCounts] = await Promise.all([
     prisma.subscriber.findMany({
       where:   { authorId },
       orderBy: { subscribedAt: "desc" },
@@ -72,7 +72,24 @@ export default async function NewsletterPage() {
       orderBy: { createdAt: "desc" },
       select:  { id: true, title: true, description: true, ctaLabel: true, ctaUrl: true },
     }),
+
+    // Per-campaign opened/clicked counts for the History tab. Two separate
+    // groupBy calls (not one) because Prisma's _count can't apply two
+    // different filters to the same relation in a single query.
+    prisma.campaignSendLog.groupBy({
+      by:    ["campaignId"],
+      where: { campaign: { authorId }, openedAt: { not: null } },
+      _count: { _all: true },
+    }),
+    prisma.campaignSendLog.groupBy({
+      by:    ["campaignId"],
+      where: { campaign: { authorId }, clickCount: { gt: 0 } },
+      _count: { _all: true },
+    }),
   ]);
+
+  const openedByCampaign  = new Map(openedCounts.map((r) => [r.campaignId, r._count._all]));
+  const clickedByCampaign = new Map(clickedCounts.map((r) => [r.campaignId, r._count._all]));
 
   const genreMap      = Object.fromEntries(genres.map((g) => [g.id, g.name]));
   const confirmedCount = subscribers.filter((s) => s.isConfirmed).length;
@@ -144,6 +161,8 @@ export default async function NewsletterPage() {
           campaigns={campaigns.map((c) => ({
             ...c,
             sentAt: c.sentAt.toISOString(),
+            totalOpened:  openedByCampaign.get(c.id) ?? 0,
+            totalClicked: clickedByCampaign.get(c.id) ?? 0,
           }))}
         />
       }

@@ -400,6 +400,18 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Campaign row is created up front (not after sending) so each batch's
+  // CampaignSendLog rows have a campaignId to attach to as they go out.
+  const campaign = await prisma.campaign.create({
+    data: {
+      authorId,
+      subject: subject.trim(),
+      totalSent:     0,
+      totalFailed:   0,
+      totalTargeted: subscribers.length,
+    },
+  });
+
   let sent   = 0;
   let failed = 0;
 
@@ -440,11 +452,27 @@ export async function POST(req: NextRequest) {
         console.error("[newsletter] Resend batch error:", result.error);
         failed += batch.length;
       } else {
-        // result.data is { data: Array<{ id: string }> }
+        // result.data is { data: Array<{ id: string }> }, same order as `emails`
         const emailResults: any[] = (result.data as any)?.data ?? [];
         const successCount = emailResults.filter((r) => r?.id).length;
         sent   += successCount;
         failed += batch.length - successCount;
+
+        // One CampaignSendLog row per successfully-sent recipient, keyed by
+        // Resend's email id -- open/click webhook events reference this id
+        // to find their way back to the right campaign + subscriber.
+        const logRows = batch
+          .map((sub, idx) => ({ sub, resendId: emailResults[idx]?.id as string | undefined }))
+          .filter((r): r is { sub: typeof batch[number]; resendId: string } => !!r.resendId)
+          .map((r) => ({
+            campaignId:      campaign.id,
+            subscriberEmail: r.sub.email,
+            resendEmailId:   r.resendId,
+          }));
+        if (logRows.length > 0) {
+          await prisma.campaignSendLog.createMany({ data: logRows, skipDuplicates: true })
+            .catch((e) => console.error("[newsletter] Failed to write CampaignSendLog rows:", e));
+        }
       }
     } catch (err) {
       console.error("[newsletter] Batch send failed:", err);
@@ -457,15 +485,10 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Persist campaign record
-  await prisma.campaign.create({
-    data: {
-      authorId,
-      subject: subject.trim(),
-      totalSent:     sent,
-      totalFailed:   failed,
-      totalTargeted: subscribers.length,
-    },
+  // Finalize campaign counts now that every batch has been attempted
+  await prisma.campaign.update({
+    where: { id: campaign.id },
+    data:  { totalSent: sent, totalFailed: failed },
   });
 
   return NextResponse.json({ sent, failed, total: subscribers.length });

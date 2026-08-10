@@ -711,16 +711,35 @@ model Subscriber {
 // ─── Newsletter Campaigns ─────────────────────────────────────────────────────
 
 model Campaign {
-  id            String   @id @default(cuid())
+  id            String            @id @default(cuid())
   authorId      String
   subject       String
-  sentAt        DateTime @default(now())
+  sentAt        DateTime          @default(now())
   totalSent     Int
   totalFailed   Int
   totalTargeted Int
-  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        Author            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  sendLogs      CampaignSendLog[]
 
   @@index([authorId])
+}
+
+// Per-recipient send record for a Campaign, used to compute open/click
+// analytics from Resend's email.opened/email.clicked webhook events
+// (resendEmailId is the id Resend returns from batch.send, correlated back
+// via the webhook payload's email_id field).
+model CampaignSendLog {
+  id              String    @id @default(cuid())
+  campaignId      String
+  subscriberEmail String
+  resendEmailId   String    @unique
+  openedAt        DateTime?
+  clickCount      Int       @default(0)
+  firstClickedAt  DateTime?
+  createdAt       DateTime  @default(now())
+  campaign        Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
 }
 
 model PlatformBroadcast {

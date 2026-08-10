@@ -30,6 +30,8 @@ type Campaign = {
   totalSent:     number;
   totalFailed:   number;
   totalTargeted: number;
+  totalOpened?:  number;
+  totalClicked?: number;
 };
 
 type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null; eyebrow: string; ctaLabel: string };
@@ -679,10 +681,12 @@ export function NewsletterClient({
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
-                <div className="grid grid-cols-4 text-xs text-gray-500 uppercase tracking-wide font-medium">
+                <div className="grid grid-cols-6 text-xs text-gray-500 uppercase tracking-wide font-medium">
                   <span className="col-span-2">Subject</span>
                   <span>Date Sent</span>
                   <span>Results</span>
+                  <span>Opened</span>
+                  <span>Clicked</span>
                 </div>
               </div>
               <div className="divide-y divide-gray-50">
@@ -691,8 +695,14 @@ export function NewsletterClient({
                   const deliveryRate = c.totalTargeted > 0
                     ? Math.round((c.totalSent / c.totalTargeted) * 100)
                     : 0;
+                  const openRate = c.totalSent > 0 && c.totalOpened !== undefined
+                    ? Math.round((c.totalOpened / c.totalSent) * 100)
+                    : null;
+                  const clickRate = c.totalSent > 0 && c.totalClicked !== undefined
+                    ? Math.round((c.totalClicked / c.totalSent) * 100)
+                    : null;
                   return (
-                    <div key={c.id} className="grid grid-cols-4 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
+                    <div key={c.id} className="grid grid-cols-6 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
                       <div className="col-span-2 pr-4">
                         <p className="text-sm font-medium text-gray-900 truncate">{c.subject}</p>
                       </div>
@@ -713,6 +723,26 @@ export function NewsletterClient({
                           </p>
                           <p className="text-xs text-gray-400">{deliveryRate}% delivered</p>
                         </div>
+                      </div>
+                      <div>
+                        {openRate === null ? (
+                          <span className="text-xs text-gray-300">—</span>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">{openRate}%</p>
+                            <p className="text-xs text-gray-400">{c.totalOpened} opened</p>
+                          </>
+                        )}
+                      </div>
+                      <div>
+                        {clickRate === null ? (
+                          <span className="text-xs text-gray-300">—</span>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-gray-900">{clickRate}%</p>
+                            <p className="text-xs text-gray-400">{c.totalClicked} clicked</p>
+                          </>
+                        )}
                       </div>
                     </div>
                   );

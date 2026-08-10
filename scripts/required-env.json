@@ -60,6 +60,8 @@
 
     { "name": "VERCEL_API_TOKEN", "purpose": "Vercel API token — self-serve custom domain linking (Admin > Settings). Without it, linking a domain fails cleanly with an error; nothing else degrades." },
     { "name": "VERCEL_PROJECT_ID", "purpose": "Vercel project ID that custom domains get registered against" },
-    { "name": "VERCEL_TEAM_ID", "purpose": "Vercel team ID, only needed if the project lives under a team scope" }
+    { "name": "VERCEL_TEAM_ID", "purpose": "Vercel team ID, only needed if the project lives under a team scope" },
+
+    { "name": "RESEND_WEBHOOK_SECRET", "purpose": "Resend webhook signing secret (starts 'whsec_') for /api/webhooks/resend — powers newsletter open/click analytics. Also requires Open+Click Tracking enabled on the sending domain and a webhook subscribed to email.opened/email.clicked in the Resend dashboard. Without it, sending still works, opens/clicks just aren't recorded." }
   ]
 }
