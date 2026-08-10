@@ -81,8 +81,8 @@ const BUILT_IN_ITEMS = [
   {
     key: "navShowBundles" as keyof NavSettings,
     label: "Bundles",
-    href: "/bundles",
-    description: "Discounted book bundles",
+    href: "/books",
+    description: "Discounted book bundles — shown as a tab on your Books page",
     alwaysOn: false,
     planGated: true,
     planGateKey: "bundles" as const,

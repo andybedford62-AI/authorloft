@@ -1,6 +1,7 @@
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
 import { getActiveSaleDiscounts } from "@/lib/discount-queries";
-import { BooksClient } from "./books-client";
+import { prisma } from "@/lib/db";
+import { BooksBundlesTabs } from "@/components/author-site/books-bundles-tabs";
 import { PageBanner } from "@/components/author-site/page-banner";
 import type { Metadata } from "next";
 
@@ -22,13 +23,41 @@ export async function generateMetadata({
   };
 }
 
-export default async function BooksPage({ params }: { params: Promise<{ domain: string }> }) {
+export default async function BooksPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ domain: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { domain } = await params;
+  const { tab } = await searchParams;
   const author = await getAuthorByDomain(domain);
-  const [books, series, genreTree] = await Promise.all([
+
+  // Bundles tab: opt-in (navShowBundles defaults false, same as the old nav
+  // link did), plan-gated, and only queried at all if both are true.
+  const bundlesEligible = !!author.plan?.bundlesEnabled && !!author.navShowBundles;
+
+  const [books, series, genreTree, bundles] = await Promise.all([
     getAuthorBooks(author.id),
     getAuthorSeries(author.id),
     getAuthorGenres(author.id),
+    bundlesEligible
+      ? prisma.bundle.findMany({
+          where: { authorId: author.id, isPublished: true },
+          include: {
+            items: {
+              include: {
+                saleItem: {
+                  include: { book: { select: { title: true, coverImageUrl: true } } },
+                },
+              },
+              orderBy: { sortOrder: "asc" },
+            },
+          },
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+        })
+      : Promise.resolve([]),
   ]);
 
   const flatGenres = genreTree.flatMap((g) => [g, ...g.children]);
@@ -66,6 +95,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
   const clientGenres = flatGenres.map((g) => ({ id: g.id, name: g.name }));
 
   const authorName = author.displayName || author.name;
+  const showBundlesTab = bundlesEligible && bundles.length > 0;
 
   return (
     <div>
@@ -77,7 +107,7 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
         accentColor={author.accentColor}
       />
 
-      <BooksClient
+      <BooksBundlesTabs
         books={clientBooks}
         series={clientSeries}
         genres={clientGenres}
@@ -85,7 +115,9 @@ export default async function BooksPage({ params }: { params: Promise<{ domain: 
         authorSlug={author.slug}
         accentColor={author.accentColor}
         layout={author.booksLayout ?? "list"}
-        hideHeader
+        bundles={bundles}
+        showBundlesTab={showBundlesTab}
+        initialTab={tab === "bundles" ? "bundles" : "books"}
       />
     </div>
   );

@@ -58,8 +58,11 @@ function buildNavLinks(
     { label: "Home", href: "/" },
   ];
 
+  // Bundles no longer gets its own nav link -- it's a tab on the Books page
+  // (see books-bundles-tabs.tsx) now, still gated by navShowBundles there.
+  // Courses stays fully independent of Books/Bundles so a course-only
+  // creator who turns Books off entirely still has Courses reachable.
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
-  if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
   if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))

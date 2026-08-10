@@ -33,7 +33,9 @@ export function getAuthorSitePages(
 
   if (author.navShowBooks) pages.push({ label: "Books", path: "/books" });
   if (author.plan?.bundlesEnabled && author.navShowBundles) {
-    pages.push({ label: "Bundles", path: "/bundles" });
+    // Bundles is now a tab on /books (see books-bundles-tabs.tsx), not its
+    // own page -- link straight there instead of through the /bundles redirect.
+    pages.push({ label: "Bundles", path: "/books?tab=bundles" });
   }
   if (author.plan?.coursesEnabled && author.navShowCourses) {
     pages.push({ label: "Courses", path: "/courses" });
