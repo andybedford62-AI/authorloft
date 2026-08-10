@@ -16,6 +16,7 @@ export interface EmailTemplate {
 }
 
 export const TEMPLATE_CATEGORY_LABELS: Record<string, string> = {
+  onboarding:     "Onboarding",
   welcome:        "Welcome",
   support:        "Offer Help",
   promotion:      "Promotion",
@@ -144,20 +145,26 @@ export function EmailComposer({ subject, body, onSubjectChange, onBodyChange, bo
             <p className="text-sm text-gray-400 px-4 py-3">No saved templates yet.</p>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {templates.map(t => (
-                <li key={t.id} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50">
-                  <button onClick={() => loadTemplate(t)} className="flex-1 text-left">
-                    <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                      {t.name}
-                      <span className="text-[10px] uppercase tracking-wide bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded-full font-semibold">
+              {templates.map((t, i) => {
+                const prevCategory = i > 0 ? templates[i - 1].category : null;
+                const showHeader = t.category !== prevCategory;
+                return (
+                  <li key={t.id}>
+                    {showHeader && (
+                      <p className="px-4 pt-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400 bg-gray-50">
                         {TEMPLATE_CATEGORY_LABELS[t.category] ?? t.category}
-                      </span>
-                    </p>
-                    <p className="text-xs text-gray-400 truncate">{t.subject}</p>
-                  </button>
-                  <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete template" variant="delete" onClick={() => deleteTemplate(t.id)} />
-                </li>
-              ))}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50">
+                      <button onClick={() => loadTemplate(t)} className="flex-1 text-left">
+                        <p className="text-sm font-medium text-gray-900">{t.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{t.subject}</p>
+                      </button>
+                      <IconButton icon={<Trash2 className="h-4 w-4" />} title="Delete template" variant="delete" onClick={() => deleteTemplate(t.id)} />
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

@@ -741,7 +741,8 @@ model BroadcastTemplate {
   name      String
   subject   String
   body      String
-  category  String   @default("general") // "welcome" | "support" | "promotion" | "re-engagement" | "general"
+  category  String   @default("general") // "onboarding" | "welcome" | "support" | "promotion" | "re-engagement" | "general"
+  sortOrder Int      @default(0) // display order in the Load Template list — not updatedAt, which reshuffles on every edit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
