@@ -142,6 +142,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
               </p>
               <NewsletterModalButton
                 authorId={author.id}
+                authorName={author.displayName || author.name}
                 accentColor={author.accentColor}
               />
             </div>

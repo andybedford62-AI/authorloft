@@ -294,9 +294,11 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
 
 export function NewsletterModalButton({
   authorId,
+  authorName,
   accentColor,
 }: {
   authorId: string;
+  authorName: string;
   accentColor: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -309,7 +311,7 @@ export function NewsletterModalButton({
         style={{ backgroundColor: accentColor }}
       >
         <Mail className="h-4 w-4" />
-        Subscribe to AuthorLoft
+        Subscribe to {authorName}
       </button>
 
       {open && (
