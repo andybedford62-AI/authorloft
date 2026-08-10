@@ -409,6 +409,13 @@ export async function POST(req: NextRequest) {
       totalSent:     0,
       totalFailed:   0,
       totalTargeted: subscribers.length,
+      // Persisted so this send can be duplicated back into the composer
+      // later instead of rebuilding a newsletter from scratch every time.
+      body:           safeHtmlBody,
+      categoryFilter: Array.isArray(categoryFilter) ? categoryFilter : [],
+      includeBooks:   !!includeBooks,
+      includeReview:  !!includeReview,
+      specialId:      specialId || null,
     },
   });
 

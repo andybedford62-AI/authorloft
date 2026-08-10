@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 10, 2026 — Reuse a prior newsletter instead of rebuilding from scratch
+
+Andy asked whether authors have to fully regenerate a newsletter every time — checked the composer and confirmed yes: `subject`/`htmlBody`/category targeting/block toggles all start blank every session, and `Campaign` only ever persisted the subject and delivery counts, not the actual content. Added `Campaign.body`/`categoryFilter`/`includeBooks`/`includeReview`/`specialId` (persisted on send) and a **Reuse** button on each History tab row that loads that exact past campaign back into the composer as an editable starting point. Campaigns sent before this shipped show `—` instead of a broken Reuse link, since they have nothing saved to load. Chose this over a separate named-template system since most authors reusing a newsletter are really just tweaking last month's version, not switching between distinct saved layouts.
+
 ## August 10, 2026 — Codebase-wide email-bombing audit, 3 more routes fixed
 
 Andy asked for a full review of every email-sending path for DoS/email-bombing risk after the newsletter cooldown fix. Traced all 22 exported `mailer.ts` functions to their callers. Cron- and Stripe-webhook-triggered emails aren't attacker-triggerable (webhook requires a valid signature, cron isn't request-driven). Several public routes already rate-limited correctly **by email** (`orders/resend`, `courses/resend-access`, `auth/resend-verification-public`) — bypass-proof against IP rotation by design.

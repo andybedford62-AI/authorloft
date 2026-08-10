@@ -50,6 +50,11 @@ export default async function NewsletterPage() {
         totalSent:     true,
         totalFailed:   true,
         totalTargeted: true,
+        body:           true,
+        categoryFilter: true,
+        includeBooks:   true,
+        includeReview:  true,
+        specialId:      true,
       },
     }),
     prisma.book.findMany({

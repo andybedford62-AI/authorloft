@@ -736,6 +736,13 @@ model Campaign {
   totalSent     Int
   totalFailed   Int
   totalTargeted Int
+  // Compose config, persisted so a past send can be duplicated back into the
+  // composer instead of rebuilding a newsletter from scratch every time.
+  body            String?  @db.Text
+  categoryFilter  String[] @default([])
+  includeBooks    Boolean  @default(true)
+  includeReview   Boolean  @default(true)
+  specialId       String? // no FK -- historical snapshot, shouldn't break if the Special is later deleted
   author        Author            @relation(fields: [authorId], references: [id], onDelete: Cascade)
   sendLogs      CampaignSendLog[]
 

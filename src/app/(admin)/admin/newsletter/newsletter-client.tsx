@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Download, Users, Mail, Tag, Send, Eye, EyeOff,
-  CheckCircle, XCircle, Loader2, History, AlertTriangle,
+  CheckCircle, XCircle, Loader2, History, AlertTriangle, Copy,
 } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,11 @@ type Campaign = {
   totalTargeted: number;
   totalOpened?:  number;
   totalClicked?: number;
+  body?:            string | null;
+  categoryFilter?:  string[];
+  includeBooks?:    boolean;
+  includeReview?:   boolean;
+  specialId?:       string | null;
 };
 
 type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null; eyebrow: string; ctaLabel: string };
@@ -112,6 +117,22 @@ export function NewsletterClient({
     setCategoryFilter((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
     );
+  }
+
+  // "Reuse a prior newsletter" — loads a past send's exact config back into
+  // the composer as an editable starting point instead of building from
+  // scratch. Older campaigns sent before this shipped won't have a saved
+  // body, so duplicate is only offered when one exists.
+  function duplicateCampaign(c: Campaign) {
+    setSubject(c.subject);
+    setHtmlBody(c.body ?? "");
+    setCategoryFilter(c.categoryFilter ?? []);
+    setIncludeBooks(c.includeBooks ?? true);
+    setIncludeReview(c.includeReview ?? true);
+    setSpecialId(c.specialId ?? "");
+    setSendState("idle");
+    setSendError("");
+    setTab("compose");
   }
 
   async function handleSend() {
@@ -681,12 +702,13 @@ export function NewsletterClient({
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
-                <div className="grid grid-cols-6 text-xs text-gray-500 uppercase tracking-wide font-medium">
+                <div className="grid grid-cols-7 text-xs text-gray-500 uppercase tracking-wide font-medium">
                   <span className="col-span-2">Subject</span>
                   <span>Date Sent</span>
                   <span>Results</span>
                   <span>Opened</span>
                   <span>Clicked</span>
+                  <span></span>
                 </div>
               </div>
               <div className="divide-y divide-gray-50">
@@ -702,7 +724,7 @@ export function NewsletterClient({
                     ? Math.round((c.totalClicked / c.totalSent) * 100)
                     : null;
                   return (
-                    <div key={c.id} className="grid grid-cols-6 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
+                    <div key={c.id} className="grid grid-cols-7 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
                       <div className="col-span-2 pr-4">
                         <p className="text-sm font-medium text-gray-900 truncate">{c.subject}</p>
                       </div>
@@ -742,6 +764,20 @@ export function NewsletterClient({
                             <p className="text-sm font-medium text-gray-900">{clickRate}%</p>
                             <p className="text-xs text-gray-400">{c.totalClicked} clicked</p>
                           </>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        {c.body ? (
+                          <button
+                            type="button"
+                            onClick={() => duplicateCampaign(c)}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                            title="Load this newsletter into the composer to reuse and edit"
+                          >
+                            <Copy className="h-3.5 w-3.5" /> Reuse
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-300" title="Sent before this feature shipped — no saved content to reuse">—</span>
                         )}
                       </div>
                     </div>

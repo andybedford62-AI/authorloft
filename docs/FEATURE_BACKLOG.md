@@ -41,7 +41,7 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 - [x] **Open/click analytics** — shipped Aug 10, 2026; new `CampaignSendLog` table + `/api/webhooks/resend` consuming Resend's native email.opened/email.clicked events (not a custom pixel/redirect system); History tab shows Opened/Clicked rate + count. Requires manual Resend dashboard setup (enable Open+Click Tracking on the domain, add the webhook, set `RESEND_WEBHOOK_SECRET`) before it actually records anything. *(done — pending dashboard config)*
 - [ ] **Scheduled / recurring sends** — "send later" + optional auto-digest cadence. *(medium–large)*
 - [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
-- [ ] **Reuse a prior newsletter** — "Duplicate" a past `Campaign` from the History tab to pre-fill the composer (subject, body, block selections) as a starting point for a new send. Requires storing the body/block config on `Campaign` (currently only subject + send stats are persisted). *(small–medium)*
+- [x] **Reuse a prior newsletter** — shipped Aug 10, 2026; a "Reuse" button on each History tab row loads that campaign's exact subject/body/block config back into the composer. `Campaign` now persists this on send. *(done)*
 - [ ] **AI-assisted newsletter drafting** *(investigate — may not build)* — explore an "AI assist" button in the composer (reuse the existing Gemini/`GEMINI_API_KEY` + AI-usage-cap infra from other admin AI tools) to draft or polish newsletter copy from a short prompt or from the author's latest book/blog/special. Evaluate value vs. abuse/cost (counts against AI usage cap) before committing. *(medium — spike first)*
 
 ---
