@@ -246,6 +246,7 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
           },
         },
         categories: { select: { category: { select: { name: true } } } },
+        feedback: { where: { status: "APPROVED" }, select: { rating: true } },
       },
     })
     .catch(() => []);
@@ -263,6 +264,13 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
       else categoryCounts.set(slug, { name: trimmed, count: 1 });
     }
 
+    const ratings = c.feedback.map((f) => f.rating).filter((r) => r >= 1 && r <= 5);
+    const ratingCount = ratings.length;
+    const averageRating =
+      ratingCount > 0
+        ? Math.round((ratings.reduce((a, r) => a + r, 0) / ratingCount) * 10) / 10
+        : null;
+
     return {
       id: c.id,
       title: c.title,
@@ -274,6 +282,8 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
       priceCents: c.priceCents > 0 ? c.priceCents : null,
       categories: categoryNames,
       sortTimestamp: new Date(c.createdAt).getTime(),
+      averageRating,
+      ratingCount,
     };
   });
 

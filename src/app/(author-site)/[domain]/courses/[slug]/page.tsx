@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download } from "lucide-react";
+import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { formatCents } from "@/lib/utils";
 import { CourseBuyButton } from "./course-buy-button";
+import { CourseFeedbackForm } from "@/components/author-site/course-feedback-form";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -48,6 +49,11 @@ export default async function CourseDetailPage({
         orderBy: { sortOrder: "asc" },
       },
       _count: { select: { enrollments: true } },
+      feedback: {
+        where: { status: "APPROVED" },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, comment: true, reviewerName: true, rating: true },
+      },
     },
   });
 
@@ -153,6 +159,48 @@ export default async function CourseDetailPage({
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Approved reader feedback */}
+          {course.feedback.length > 0 && (
+            <div className="pt-8 space-y-4">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">What Students Are Saying</h2>
+              <div className="space-y-4">
+                {course.feedback.map((fb) => (
+                  <blockquote
+                    key={fb.id}
+                    className="relative pl-5 border-l-4"
+                    style={{ borderColor: accentColor }}
+                  >
+                    <div className="flex gap-0.5 mb-1.5">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <Star
+                          key={n}
+                          className={`h-3.5 w-3.5 ${n <= fb.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                        />
+                      ))}
+                    </div>
+                    {fb.comment && (
+                      <p className="text-base text-gray-700 leading-relaxed italic">
+                        &ldquo;{fb.comment}&rdquo;
+                      </p>
+                    )}
+                    <footer className="mt-2 text-sm text-gray-500">
+                      — <span className="font-medium text-gray-700">{fb.reviewerName}</span>
+                    </footer>
+                  </blockquote>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reader feedback form */}
+          <div className="pt-6">
+            <CourseFeedbackForm
+              courseSlug={course.slug}
+              domain={domain}
+              accentColor={accentColor}
+            />
           </div>
         </div>
 

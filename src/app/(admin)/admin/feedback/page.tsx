@@ -7,13 +7,45 @@ export const dynamic = "force-dynamic";
 export default async function FeedbackPage() {
   const authorId = await getAdminAuthorId();
 
-  const feedback = await prisma.bookFeedback.findMany({
-    where: { book: { authorId } },
-    include: {
-      book: { select: { id: true, title: true, slug: true, coverImageUrl: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [bookFeedback, courseFeedback] = await Promise.all([
+    prisma.bookFeedback.findMany({
+      where: { book: { authorId } },
+      include: { book: { select: { id: true, title: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.courseFeedback.findMany({
+      where: { course: { authorId } },
+      include: { course: { select: { id: true, title: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const feedback = [
+    ...bookFeedback.map((f) => ({
+      id: f.id,
+      itemType: "book" as const,
+      itemId: f.book.id,
+      itemTitle: f.book.title,
+      reviewerName: f.reviewerName,
+      reviewerEmail: f.reviewerEmail,
+      rating: f.rating,
+      comment: f.comment,
+      status: f.status,
+      createdAt: f.createdAt.toISOString(),
+    })),
+    ...courseFeedback.map((f) => ({
+      id: f.id,
+      itemType: "course" as const,
+      itemId: f.course.id,
+      itemTitle: f.course.title,
+      reviewerName: f.reviewerName,
+      reviewerEmail: f.reviewerEmail,
+      rating: f.rating,
+      comment: f.comment,
+      status: f.status,
+      createdAt: f.createdAt.toISOString(),
+    })),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const pendingCount = feedback.filter((f) => f.status === "PENDING").length;
 
@@ -23,7 +55,7 @@ export default async function FeedbackPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Reader Feedback</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Ratings and comments submitted by readers across your books
+            Ratings and comments submitted by readers across your books and courses
             {pendingCount > 0 && (
               <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
                 {pendingCount} pending
@@ -33,13 +65,7 @@ export default async function FeedbackPage() {
         </div>
       </div>
 
-      <FeedbackModeration
-        initialFeedback={feedback.map((f) => ({
-          ...f,
-          createdAt: f.createdAt.toISOString(),
-          updatedAt: f.updatedAt.toISOString(),
-        }))}
-      />
+      <FeedbackModeration initialFeedback={feedback} />
     </div>
   );
 }

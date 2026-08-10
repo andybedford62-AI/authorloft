@@ -4,22 +4,19 @@ import { useState } from "react";
 import { Star, Check, X, Trash2, RotateCcw } from "lucide-react";
 
 type FeedbackStatus = "PENDING" | "APPROVED" | "REJECTED";
+type ItemType = "book" | "course";
 
 interface FeedbackItem {
   id: string;
-  bookId: string;
+  itemType: ItemType;
+  itemId: string; // bookId or courseId, depending on itemType
   reviewerName: string;
   reviewerEmail: string;
   rating: number;
   comment: string | null;
   status: FeedbackStatus;
   createdAt: string;
-  book: {
-    id: string;
-    title: string;
-    slug: string;
-    coverImageUrl: string | null;
-  };
+  itemTitle: string;
 }
 
 interface Props {
@@ -37,10 +34,15 @@ export function FeedbackModeration({ initialFeedback }: Props) {
     REJECTED: feedback.filter((f) => f.status === "REJECTED"),
   };
 
+  function apiPath(item: FeedbackItem) {
+    const segment = item.itemType === "book" ? "books" : "courses";
+    return `/api/admin/${segment}/${item.itemId}/feedback/${item.id}`;
+  }
+
   async function updateStatus(item: FeedbackItem, status: FeedbackStatus) {
     setLoading(item.id);
     try {
-      const res = await fetch(`/api/admin/books/${item.bookId}/feedback/${item.id}`, {
+      const res = await fetch(apiPath(item), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -59,9 +61,7 @@ export function FeedbackModeration({ initialFeedback }: Props) {
     if (!confirm(`Delete feedback from "${item.reviewerName}"? This cannot be undone.`)) return;
     setLoading(item.id);
     try {
-      const res = await fetch(`/api/admin/books/${item.bookId}/feedback/${item.id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(apiPath(item), { method: "DELETE" });
       if (res.ok) {
         setFeedback((prev) => prev.filter((f) => f.id !== item.id));
       }
@@ -122,9 +122,14 @@ export function FeedbackModeration({ initialFeedback }: Props) {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  {/* Book label */}
+                  {/* Item label */}
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
-                    {item.book.title}
+                    {item.itemTitle}
+                    <span className={`ml-2 normal-case font-medium px-1.5 py-0.5 rounded-full text-[10px] ${
+                      item.itemType === "book" ? "bg-blue-50 text-blue-600" : "bg-violet-50 text-violet-600"
+                    }`}>
+                      {item.itemType === "book" ? "Book" : "Course"}
+                    </span>
                   </p>
                   {/* Reviewer + stars */}
                   <div className="flex items-center gap-3 flex-wrap">

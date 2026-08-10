@@ -1,4 +1,4 @@
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Star } from "lucide-react";
 
 export type BookstoreCourse = {
   id: string;
@@ -11,6 +11,8 @@ export type BookstoreCourse = {
   priceCents: number | null;
   categories: string[];
   sortTimestamp: number; // for "Newest" sort (createdAt)
+  averageRating: number | null;
+  ratingCount: number;
 };
 
 function formatPrice(cents: number | null): string | null {
@@ -62,6 +64,24 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
             {course.authorName}
           </a>
         </p>
+
+        {course.ratingCount > 0 && course.averageRating !== null && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Star
+                  key={n}
+                  className={`h-3 w-3 ${
+                    n <= Math.round(course.averageRating!)
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] text-[#9b8e7e]">{course.averageRating.toFixed(1)}</span>
+          </div>
+        )}
 
         {price && (
           <p className={`text-sm font-semibold mt-2 ${isFree ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>{price}</p>

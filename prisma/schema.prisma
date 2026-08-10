@@ -572,6 +572,22 @@ model BookFeedback {
   @@index([status])
 }
 
+model CourseFeedback {
+  id            String             @id @default(cuid())
+  courseId      String
+  course        Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  reviewerName  String
+  reviewerEmail String
+  rating        Int // 1–5 required
+  comment       String?            @db.Text
+  status        BookFeedbackStatus @default(PENDING) // reuses BookFeedback's enum — same 3 states, no need for a duplicate
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([courseId])
+  @@index([status])
+}
+
 // ─── Flip Books ───────────────────────────────────────────────────────────────
 
 model FlipBook {
@@ -1545,6 +1561,7 @@ model Course {
   enrollments   CourseEnrollment[]
   orderItems    OrderItem[]
   categories    CourseCategoryAssignment[]
+  feedback      CourseFeedback[]
 
   @@unique([authorId, slug])
   @@index([authorId])
