@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 9, 2026 — Bundle purchases now capture the buyer as a subscriber
+
+`bundle_purchase` Stripe webhook block never upserted a `Subscriber` for the buyer, unlike `book_purchase` and `course_purchase` — flagged during today's backlog verification pass. Fixed by mirroring the existing pattern (`src/app/api/stripe/webhook/route.ts`); also had to add `author.id` to the `fullItems` select, which the existing bundle query was missing.
+
 ## August 9, 2026 — `main`/`dev` sync (PR #138) confirms months of backlog already live in prod
 
 Audit triggered by "did Course Creator actually make it to prod?" turned up a much bigger finding: `main` had drifted 26 commits behind `dev` (stale scaffolding, one real fix already present in `dev`), so `main` no longer reflected reality. Vercel's **Production** environment tracks `main` (confirmed in Settings → Environments), while `dev`-branch builds have been getting to production the whole time via manual **Promote to Production** in the Vercel dashboard — a legitimate, intentional part of the documented dev → staging → prod workflow, not a misconfiguration. The result: production has actually been current with `dev` all along, but `main` itself (and this changelog) didn't reflect it.
