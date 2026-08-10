@@ -14,6 +14,7 @@ interface NewsSubscribeFormProps {
 
 export function NewsSubscribeForm({ source, variant = "box", darkMode = false }: NewsSubscribeFormProps) {
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,6 +29,8 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
         body: JSON.stringify({ email, source }),
       });
       if (!res.ok) throw new Error();
+      const data = await res.json();
+      setAlreadyConfirmed(!!data.alreadyConfirmed);
       setState("success");
     } catch {
       setState("error");
@@ -39,7 +42,8 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
     if (state === "success") {
       return (
         <div className="flex items-center gap-2 text-sm text-[#5C6E89]">
-          <CheckCircle className="h-4 w-4 text-green-600" /> You&apos;re subscribed — thanks!
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          {alreadyConfirmed ? "You're already subscribed — thanks!" : "Check your email to confirm!"}
         </div>
       );
     }
@@ -78,9 +82,11 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
       {success ? (
         <div className="flex flex-col items-center text-center gap-2 py-2">
           <CheckCircle className={`h-8 w-8 ${onDark ? "text-[#D4AE6A]" : "text-green-600"}`} />
-          <p className="font-serif text-xl">You&apos;re on the list!</p>
+          <p className="font-serif text-xl">{alreadyConfirmed ? "You're already on the list!" : "Almost there!"}</p>
           <p className={`text-sm ${onDark ? "text-[#D4DDEB]" : "text-[#5C6E89]"}`}>
-            Thanks for subscribing to AuthorLoft News. We&apos;ll keep you posted.
+            {alreadyConfirmed
+              ? "Thanks for subscribing to AuthorLoft News. We'll keep you posted."
+              : "Check your inbox and click the confirmation link to start receiving AuthorLoft News."}
           </p>
         </div>
       ) : (

@@ -20,6 +20,11 @@ export function buildUnsubscribeLink(token: string): string {
   return `${base}/api/unsubscribe/platform?token=${token}`;
 }
 
+export function buildNewsConfirmLink(token: string): string {
+  const base = (process.env.NEXTAUTH_URL ?? "https://www.authorloft.com").replace(/\/$/, "");
+  return `${base}/api/news/confirm?token=${token}`;
+}
+
 export function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -474,6 +479,41 @@ export async function sendVerificationEmail(to: string, token: string) {
       <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">If the button above doesn't work, paste this link into your browser:</p>
       <p style="margin:0 0 20px;font-size:13px;word-break:break-all;"><a href="${verifyUrl}" style="color:#2563eb;">${verifyUrl}</a></p>
       <p style="margin:0;font-size:13px;color:#6b7280;">If you didn't create an AuthorLoft account, you can safely ignore this email.</p>
+    `),
+  });
+}
+
+// ── AuthorLoft News double opt-in confirmation ────────────────────────────────
+
+export async function sendNewsSubscriptionConfirmationEmail({
+  to,
+  name,
+  confirmUrl,
+}: {
+  to: string;
+  name?: string | null;
+  confirmUrl: string;
+}) {
+  const greeting = name ? `Hi ${esc(name)},` : "Hi there,";
+  return sendMail({
+    to,
+    subject: "Confirm your AuthorLoft News subscription",
+    text: `${greeting}\n\nPlease confirm your subscription to AuthorLoft News: ${confirmUrl}\n\nIf you didn't sign up, ignore this email — you won't be subscribed unless you click the link.`,
+    html: wrapHtml("Confirm your subscription", `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 24px;">One more step — confirm your email to start receiving AuthorLoft News.</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:8px 0 28px;">
+            <a href="${confirmUrl}" style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              Confirm Subscription
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0 0 12px;font-size:13px;color:#6b7280;">If the button above doesn't work, paste this link into your browser:</p>
+      <p style="margin:0 0 20px;font-size:13px;word-break:break-all;"><a href="${confirmUrl}" style="color:#2563eb;">${confirmUrl}</a></p>
+      <p style="margin:0;font-size:13px;color:#6b7280;">If you didn't sign up for AuthorLoft News, you can safely ignore this email — you won't be subscribed unless you click the link above.</p>
     `),
   });
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { sendNewsSubscriptionConfirmationEmail, buildNewsConfirmLink } from "@/lib/mailer";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const attempts = new Map<string, number[]>();
@@ -23,7 +25,10 @@ const schema = z.object({
 });
 
 // POST /api/news/subscribe — public AuthorLoft News signup.
-// Phase 1: capture only (no confirmation email sent yet). Idempotent by email.
+// Double opt-in: captures the row immediately (idempotent by email) but only
+// counts as confirmed once the subscriber clicks the link in the email this
+// sends. Already-confirmed subscribers who submit again are just upserted
+// silently — no repeat confirmation email.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -36,12 +41,35 @@ export async function POST(req: NextRequest) {
 
     const email = data.email.trim().toLowerCase();
 
+    const existing = await prisma.platformSubscriber.findUnique({
+      where: { email },
+      select: { id: true, isConfirmed: true },
+    });
+
+    if (existing?.isConfirmed) {
+      await prisma.platformSubscriber.update({
+        where: { id: existing.id },
+        data: { name: data.name, source: data.source ?? undefined },
+      });
+      return NextResponse.json({ success: true, id: existing.id, alreadyConfirmed: true });
+    }
+
+    // New signup, or an existing-but-unconfirmed row re-submitting — issue a
+    // fresh token either way so an old, possibly-shared link can't be reused.
+    const confirmToken = randomBytes(32).toString("hex");
+
     const subscriber = await prisma.platformSubscriber.upsert({
       where: { email },
-      update: { name: data.name, source: data.source ?? undefined },
-      create: { email, name: data.name, source: data.source ?? "news" },
+      update: { name: data.name, source: data.source ?? undefined, confirmToken },
+      create: { email, name: data.name, source: data.source ?? "news", confirmToken },
       select: { id: true },
     });
+
+    sendNewsSubscriptionConfirmationEmail({
+      to: email,
+      name: data.name,
+      confirmUrl: buildNewsConfirmLink(confirmToken),
+    }).catch((e) => console.error("[news/subscribe] Failed to send confirmation email:", e));
 
     return NextResponse.json({ success: true, id: subscriber.id });
   } catch (err) {
