@@ -2,6 +2,7 @@
 // Fails the build if any environment variable listed as "required" in
 // scripts/required-env.json is missing. Warns (does not fail) on missing
 // "optional" entries.
+// (RESEND_WEBHOOK_SECRET added Aug 10, 2026 — optional, newsletter analytics.)
 //
 // This catches the silent-failure class of bug where a feature ships but
 // its env var was never configured in Vercel: the symptom is usually a
