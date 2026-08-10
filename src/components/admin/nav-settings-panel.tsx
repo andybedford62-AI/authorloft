@@ -72,8 +72,8 @@ const BUILT_IN_ITEMS = [
   {
     key: "navShowMediaKit" as keyof NavSettings,
     label: "Media Kit",
-    href: "/media-kit",
-    description: "Press page with biography and downloadable assets",
+    href: "/about",
+    description: "Press biography and downloadable assets — shown as a tab on your About page",
     alwaysOn: false,
     planGated: true,
     planGateKey: "mediaKit" as const,

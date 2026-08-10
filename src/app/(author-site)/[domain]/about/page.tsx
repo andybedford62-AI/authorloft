@@ -9,6 +9,8 @@ import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getAuthorBadges } from "@/lib/badges";
 import { AuthorBadges } from "@/components/marketing/author-badges";
 import { FoundingMemberBadge } from "@/components/marketing/founding-member-badge";
+import { AboutMediaKitTabs } from "@/components/author-site/about-media-kit-tabs";
+import { MediaKitContent } from "@/components/author-site/media-kit-content";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -41,11 +43,22 @@ export async function generateMetadata({
   };
 }
 
-export default async function AboutPage({ params }: { params: Promise<{ domain: string }> }) {
+export default async function AboutPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ domain: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { domain } = await params;
+  const { tab } = await searchParams;
   const author = await getAuthorByDomain(domain);
   const books = await getAuthorBooks(author.id);
   const badges = author.showBadges ? await getAuthorBadges(author.id) : [];
+
+  // Media Kit tab: opt-in (navShowMediaKit), plan-gated (mediaKitEnabled) --
+  // same double-gate the standalone /media-kit page used to enforce itself.
+  const showMediaKitTab = !!author.plan?.mediaKitEnabled && !!author.navShowMediaKit;
 
   const authorName = author.displayName || author.name;
   const firstName = authorName.split(" ")[0];
@@ -106,6 +119,19 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
     }),
   };
 
+  // Media Kit tab data -- mirrors the exact fallback chains the standalone
+  // /media-kit page used (distinct from the About-tab equivalents above).
+  const pressBio = (author as any).pressBio || (author as any).bio || (author as any).shortBio || "";
+  const pressTitle = (author as any).pressTitle || null;
+  const pressContact = (author as any).pressContact || author.contactEmail || null;
+  const mediaKitSocialLinks = [
+    { href: author.linkedinUrl,  icon: "linkedin",  label: "LinkedIn"    },
+    { href: author.twitterUrl,   icon: "twitter",   label: "Twitter / X" },
+    { href: author.instagramUrl, icon: "instagram", label: "Instagram"   },
+    { href: author.facebookUrl,  icon: "facebook",  label: "Facebook"    },
+    { href: author.youtubeUrl,   icon: "youtube",   label: "YouTube"     },
+  ].filter((s): s is { href: string; icon: string; label: string } => !!s.href);
+
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -122,7 +148,28 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
 
       <PageBanner label="Biography" title="About the Author" accentColor={accentColor} />
 
-      {/* ── Main content ─────────────────────────────────────────────────────── */}
+      <AboutMediaKitTabs
+        accentColor={accentColor}
+        showMediaKitTab={showMediaKitTab}
+        initialTab={tab === "media-kit" ? "media-kit" : "about"}
+        mediaKit={
+          showMediaKitTab ? (
+            <MediaKitContent
+              domain={domain}
+              authorName={authorName}
+              accentColor={accentColor}
+              profileImageUrl={author.profileImageUrl}
+              bio={pressBio}
+              pressTitle={pressTitle}
+              pressContact={pressContact}
+              credentials={customCredentials}
+              socialLinks={mediaKitSocialLinks}
+              books={books.map((b) => ({ id: b.id, title: b.title, slug: b.slug, coverImageUrl: b.coverImageUrl }))}
+            />
+          ) : null
+        }
+        about={
+      /* ── Main content ─────────────────────────────────────────────────────── */
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
@@ -237,6 +284,8 @@ export default async function AboutPage({ params }: { params: Promise<{ domain: 
           </div>
         </div>
       </section>
+        }
+      />
 
     </div>
   );

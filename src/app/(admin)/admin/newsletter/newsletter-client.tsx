@@ -155,7 +155,10 @@ export function NewsletterClient({
         setSendState("done");
         // Refresh campaign history from server
         router.refresh();
-        // Also add optimistically to local state so History tab shows it immediately
+        // Also add optimistically to local state so History tab shows it immediately.
+        // Local `campaigns` state never resyncs from router.refresh()'s fresh props
+        // (seeded once via useState), so this entry must carry everything the Reuse
+        // button needs itself, not just the delivery counts.
         setCampaigns((prev) => [{
           id:            crypto.randomUUID(),
           subject,
@@ -163,6 +166,11 @@ export function NewsletterClient({
           totalSent:     data.sent,
           totalFailed:   data.failed,
           totalTargeted: data.total,
+          body:           sanitize(htmlBody),
+          categoryFilter,
+          includeBooks,
+          includeReview,
+          specialId:      specialId || null,
         }, ...prev]);
       }
     } catch {

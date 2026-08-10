@@ -13,9 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## August 10, 2026 — Media Kit merged into the About page as a tab
+
+Andy asked to move Media Kit off its own nav item and onto the About page as a tab, following the same pattern as the earlier Books/Bundles merge. `MediaKitContent` extracted from the old standalone `/media-kit` page (unchanged markup, just parameterized instead of reading `author` directly); `AboutMediaKitTabs` is a new client tab switcher (mirrors `BooksBundlesTabs`) that renders About plainly with no tab UI when Media Kit isn't available — same "no dead tab" rule as Bundles. `/about` now accepts `?tab=media-kit` for deep-linking; `/media-kit` redirects there instead of rendering its own page. Gating unchanged: still requires `mediaKitEnabled` (plan) *and* `navShowMediaKit` (owner's toggle), just gating a tab now instead of a nav link. Updated the admin nav-settings description, the "Your Site Pages" card (`site-pages.ts`), and the admin Media Kit editor's "View public page" link to point at the new location.
+
+**Also fixed while in the area:** the footer's "Bundles" quick link was never cleaned up when Bundles moved into Books tabs during the earlier merge — `nav.tsx` (main nav) had the link fully removed, but `footer.tsx` still pushed a `Bundles` entry pointing at the old `/bundles` URL (harmless since that still redirects, but inconsistent with the main nav). Removed it from the footer too, and made sure Media Kit's footer entry was removed the same way from the start rather than repeating the gap.
+
 ## August 10, 2026 — Reuse a prior newsletter instead of rebuilding from scratch
 
 Andy asked whether authors have to fully regenerate a newsletter every time — checked the composer and confirmed yes: `subject`/`htmlBody`/category targeting/block toggles all start blank every session, and `Campaign` only ever persisted the subject and delivery counts, not the actual content. Added `Campaign.body`/`categoryFilter`/`includeBooks`/`includeReview`/`specialId` (persisted on send) and a **Reuse** button on each History tab row that loads that exact past campaign back into the composer as an editable starting point. Campaigns sent before this shipped show `—` instead of a broken Reuse link, since they have nothing saved to load. Chose this over a separate named-template system since most authors reusing a newsletter are really just tweaking last month's version, not switching between distinct saved layouts.
+
+**Follow-up fix (same day):** Andy verified on staging and reported the newest send still showed `—` instead of Reuse. Root cause: the History tab's local `campaigns` state is seeded once via `useState(initialCampaigns)` and never resyncs when `router.refresh()` re-fetches the server component, so the post-send optimistic row — which only carried `subject`/`sentAt`/delivery counts — stuck around all session with no `body`, even though the DB row was saved correctly. Fixed by including `body`/`categoryFilter`/`includeBooks`/`includeReview`/`specialId` in the optimistic entry too, sourced from the same compose-form state that was just sent.
 
 ## August 10, 2026 — Codebase-wide email-bombing audit, 3 more routes fixed
 

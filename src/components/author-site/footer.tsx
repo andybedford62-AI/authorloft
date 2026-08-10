@@ -38,7 +38,7 @@ interface FooterProps {
     instagramUrl?:  string | null;
     supportUrl?:    string | null;
     accentColor:    string;
-    plan?:          { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
+    plan?:          { flipBooksLimit: number } | null;
   };
   navConfig?:    NavConfig;
   customPages?:  CustomPage[];
@@ -50,12 +50,13 @@ function buildQuickLinks(
   config?: NavConfig,
   customPages?: CustomPage[],
   showFlipBooks?: boolean,
-  showMediaKit?: boolean,
 ): { label: string; href: string }[] {
   const links: { label: string; href: string }[] = [];
 
+  // Bundles and Media Kit don't get their own quick links -- they're tabs
+  // on Books and About respectively now (see books-bundles-tabs.tsx and
+  // about-media-kit-tabs.tsx), matching the main nav (nav.tsx).
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
-  if (config?.navShowBundles)            links.push({ label: "Bundles",    href: "/bundles" });
   if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
@@ -68,8 +69,6 @@ function buildQuickLinks(
 
   if (!config || config.navShowAbout)    links.push({ label: "About",     href: "/about" });
   if (!config || config.navShowContact)  links.push({ label: "Contact",   href: "/contact" });
-  if (showMediaKit && config?.navShowMediaKit)
-                                         links.push({ label: "Media Kit", href: "/media-kit" });
 
   return links;
 }
@@ -80,8 +79,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const year         = new Date().getFullYear();
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const showMediaKit  = !!(author.plan?.mediaKitEnabled);
-  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks, showMediaKit);
+  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
   const siteUrl      = getAuthorBaseUrl(author);
 
   const socialLinks = [

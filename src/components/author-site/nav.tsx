@@ -40,7 +40,7 @@ interface NavProps {
     linkedinUrl?: string | null;
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
-    plan?:        { flipBooksLimit: number; mediaKitEnabled: boolean } | null;
+    plan?:        { flipBooksLimit: number } | null;
   };
   navConfig?:   NavConfig;
   customPages?: CustomPage[];
@@ -50,7 +50,6 @@ interface NavProps {
 
 function buildNavLinks(
   showFlipBooks: boolean,
-  showMediaKit: boolean,
   config?: NavConfig,
   customPages?: CustomPage[]
 ) {
@@ -75,8 +74,9 @@ function buildNavLinks(
 
   if (!config || config.navShowAbout)   links.push({ label: "About",     href: "/about" });
   if (!config || config.navShowContact) links.push({ label: "Contact",   href: "/contact" });
-  if (showMediaKit && config?.navShowMediaKit)
-                                        links.push({ label: "Media Kit", href: "/media-kit" });
+  // Media Kit no longer gets its own nav link either -- it's a tab on the
+  // About page (see about-media-kit-tabs.tsx) now, still gated by
+  // mediaKitEnabled + navShowMediaKit there.
 
   return links;
 }
@@ -89,8 +89,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const pathname            = usePathname();
   const isOwner             = !!(session?.user && (session.user as any).id === author.id);
   const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const showMediaKit        = !!(author.plan?.mediaKitEnabled);
-  const links               = buildNavLinks(showFlipBooks, showMediaKit, navConfig, customPages);
+  const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
 

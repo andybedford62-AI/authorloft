@@ -52,7 +52,7 @@ export default async function AdminMediaKitPage() {
   }
 
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-  const publicUrl = `https://${author.slug}.${platformDomain}/media-kit`;
+  const publicUrl = `https://${author.slug}.${platformDomain}/about?tab=media-kit`;
 
   return (
     <div className="space-y-6">

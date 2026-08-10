@@ -53,7 +53,9 @@ export function getAuthorSitePages(
   if (author.navShowAbout) pages.push({ label: "About", path: "/about" });
   if (author.navShowContact) pages.push({ label: "Contact", path: "/contact" });
   if (author.plan?.mediaKitEnabled && author.navShowMediaKit) {
-    pages.push({ label: "Media Kit", path: "/media-kit" });
+    // Media Kit is now a tab on /about (see about-media-kit-tabs.tsx), not
+    // its own page -- link straight there instead of through the redirect.
+    pages.push({ label: "Media Kit", path: "/about?tab=media-kit" });
   }
 
   return pages;
