@@ -10,7 +10,6 @@ import {
   Store,
   Library,
   Tag,
-  GraduationCap,
   Sparkles,
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
@@ -18,7 +17,7 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
-import { BookstoreCourseGrid } from "@/components/marketing/bookstore-course-grid";
+import { BookstoreCatalogTabs } from "@/components/marketing/bookstore-catalog-tabs";
 import { getBookstoreData, getBookstoreCourses } from "@/lib/bookstore";
 
 export const revalidate = 1800;
@@ -264,27 +263,29 @@ export default async function BookstorePage() {
         {/* ── Full catalog ─── colored panel (same blue as the "Support authors"
              hero band above — saturated enough to actually contrast against
              the white search bar and book cards inside it, not a near-white
-             tint that would wash out). Genre chips live inside the filter
-             bar now, so the separate "Browse by Genre" list was pure
-             duplication and has been removed. ──────────────────────────── */}
+             tint that would wash out). Books and Courses share one Type tab
+             switcher instead of two always-visible sections — each keeps its
+             own facet filters (genre chips for books, category chips for
+             courses) since the two catalogs don't share a taxonomy. Courses
+             tab only shows once there's at least one to browse. ─────────── */}
         <section className="mb-12 rounded-2xl border border-[#A9BDD6] bg-[#C5D3E6] p-4 sm:p-6">
-          <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
-            <Library className="h-5 w-5 text-[#C26A4A]" />
-            Browse All Books
-          </h2>
-          <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
+          {courses.length > 0 ? (
+            <BookstoreCatalogTabs
+              books={books}
+              allGenres={genres.map((g) => g.name)}
+              courses={courses}
+              allCategories={courseCategories.map((c) => c.name)}
+            />
+          ) : (
+            <>
+              <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
+                <Library className="h-5 w-5 text-[#C26A4A]" />
+                Browse All Books
+              </h2>
+              <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
+            </>
+          )}
         </section>
-
-        {/* ── Courses ───────────────────────────────────────────────────── */}
-        {courses.length > 0 && (
-          <section>
-            <h2 className="flex items-center gap-2 font-serif text-2xl text-[#1B2B47] mb-5">
-              <GraduationCap className="h-5 w-5 text-[#C26A4A]" />
-              Courses from Independent Creators
-            </h2>
-            <BookstoreCourseGrid courses={courses} allCategories={courseCategories.map((c) => c.name)} />
-          </section>
-        )}
       </div>
 
       {/* ── How it works (author signup nudge) ───────────────────────────── */}
