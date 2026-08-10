@@ -301,7 +301,7 @@ export async function POST(req: NextRequest) {
               select: {
                 downloadToken: true, priceCents: true,
                 saleItem: { select: { label: true } },
-                book: { select: { title: true, author: { select: { displayName: true, name: true, slug: true, email: true } } } },
+                book: { select: { title: true, author: { select: { id: true, displayName: true, name: true, slug: true, email: true } } } },
               },
             });
 
@@ -323,6 +323,15 @@ export async function POST(req: NextRequest) {
 
             for (const fi of fullItems) {
               if (!fi.book) continue;
+
+              // Save the buyer as a subscriber for the author's newsletter/correspondence,
+              // same as book_purchase and course_purchase already do.
+              prisma.subscriber.upsert({
+                where: { authorId_email: { authorId: fi.book.author.id, email: customerEmail } },
+                update: { name: customerName },
+                create: { authorId: fi.book.author.id, email: customerEmail, name: customerName, isConfirmed: true },
+              }).catch((e) => console.error("[webhook] Failed to upsert subscriber:", e));
+
               sendSaleNotificationEmail({
                 to: fi.book.author.email,
                 authorName: fi.book.author.displayName || fi.book.author.name,
