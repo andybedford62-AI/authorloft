@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## August 10, 2026 — Codebase-wide email-bombing audit, 3 more routes fixed
+
+Andy asked for a full review of every email-sending path for DoS/email-bombing risk after the newsletter cooldown fix. Traced all 22 exported `mailer.ts` functions to their callers. Cron- and Stripe-webhook-triggered emails aren't attacker-triggerable (webhook requires a valid signature, cron isn't request-driven). Several public routes already rate-limited correctly **by email** (`orders/resend`, `courses/resend-access`, `auth/resend-verification-public`) — bypass-proof against IP rotation by design.
+
+Found and fixed 3 that weren't: **`auth/forgot-password`** (rate-limited by IP only — a rotating-IP attacker could bomb one victim's inbox with password-reset emails, the most sensitive case since it's alarming and phishing-adjacent), **`downloads/unlock`** (same IP-only gap), and **`author/reader-magnet`** (keyed by `${ip}:${email}`, which looks per-email but isn't — a new IP resets the counter for the same target). All three now have an email-keyed cooldown (5 min) independent of IP: `Author.passwordResetLastSentAt` (new column) for forgot-password, and the existing `DownloadLead`/`BookMagnetLead` tables (already logging every attempt) reused for the other two rather than adding new columns. `forgot-password`'s response stays identical either way, preserving the existing anti-enumeration behavior.
+
 ## August 10, 2026 — Resend cooldown on both double opt-in confirmation emails
 
 Andy flagged a real gap: confirmed subscribers already got "already subscribed" silently (no repeat email), but an *unconfirmed* email had no such protection — every resubmission (the same person retrying, or someone else entering that address maliciously) regenerated a token and fired a fresh confirmation email, with only a coarse 10-req/hour-per-IP rate limiter behind it. Added `PlatformSubscriber.lastConfirmationSentAt` / `Subscriber.lastConfirmationSentAt` and a 5-minute resend cooldown to both `/api/news/subscribe` and `/api/newsletter/subscribe` — within the cooldown window, the record still updates (name/prefs) but no email goes out.

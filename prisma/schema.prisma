@@ -191,6 +191,7 @@ model Author {
   emailVerifyExpiry             DateTime?
   passwordResetToken            String?               @unique
   passwordResetExpiry           DateTime?
+  passwordResetLastSentAt       DateTime? // email-keyed resend cooldown -- the IP rate limit alone doesn't stop a rotating-IP attacker from bombing one victim's inbox
   emailProvider                 String? // "KIT" | "MAILCHIMP" | "ACTIVECAMPAIGN"
   emailProviderKey              String? // API key for the connected email service
   emailProviderExtra            String? // Provider-specific extra: Mailchimp audience ID or ActiveCampaign account URL

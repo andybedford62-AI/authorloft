@@ -12,7 +12,10 @@ const schema = z.object({
   name:      z.string().optional(),
 });
 
-// Best-effort in-memory rate limit: 5 magnet requests per email per hour
+// Best-effort in-memory rate limit: 5 magnet requests per IP+email per hour.
+// This alone doesn't stop a rotating-IP attacker from bombing one victim's
+// inbox with "here's your free download" emails -- the BookMagnetLead-based
+// cooldown below (RESEND_COOLDOWN_MS) is the real per-inbox guard.
 const attempts = new Map<string, number[]>();
 function checkRateLimit(key: string): boolean {
   const now  = Date.now();
@@ -22,6 +25,8 @@ function checkRateLimit(key: string): boolean {
   attempts.set(key, hits);
   return true;
 }
+
+const RESEND_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,6 +81,25 @@ export async function POST(req: NextRequest) {
       ).catch((err) => console.error("[reader-magnet] External sync failed:", err));
     }
 
+    // Email-keyed cooldown: if this email already claimed this magnet in the
+    // last 5 minutes, reuse that lead's existing download link instead of
+    // creating a new one and sending another email -- independent of which
+    // IP this request came from.
+    const recentLead = await prisma.bookMagnetLead.findFirst({
+      where: {
+        email: data.email,
+        saleItemId: data.saleItemId,
+        createdAt: { gte: new Date(Date.now() - RESEND_COOLDOWN_MS) },
+      },
+      select: { id: true },
+    });
+
+    void subscriber; // suppress unused var lint
+
+    if (recentLead) {
+      return NextResponse.json({ success: true });
+    }
+
     // Create download lead
     const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     const lead = await prisma.bookMagnetLead.create({
@@ -102,8 +126,6 @@ export async function POST(req: NextRequest) {
       downloadUrl,
       downloadExpiry: expiry,
     });
-
-    void subscriber; // suppress unused var lint
 
     return NextResponse.json({ success: true });
   } catch (err) {

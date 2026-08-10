@@ -4,9 +4,13 @@ import { prisma } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/mailer";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 
+const RESEND_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function POST(req: NextRequest) {
   try {
-    // Rate limit: 5 attempts per 15 minutes per IP to prevent abuse
+    // IP rate limit: 5 attempts per 15 minutes. This alone doesn't stop a
+    // rotating-IP attacker from bombing one victim's inbox -- the
+    // passwordResetLastSentAt cooldown below is the real per-inbox guard.
     const rateLimitKey = getRateLimitKey(req, "ip", "forgot-password");
     const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.auth);
 
@@ -36,10 +40,16 @@ export async function POST(req: NextRequest) {
     // to prevent email enumeration attacks
     const author = await prisma.author.findUnique({
       where: { email: normalised },
-      select: { id: true, email: true },
+      select: { id: true, email: true, passwordResetLastSentAt: true },
     });
 
-    if (author) {
+    // Email-keyed cooldown: skip the send (but keep the response identical)
+    // if we sent a reset email to this address in the last 5 minutes,
+    // regardless of which IP this request came from.
+    const inCooldown = author?.passwordResetLastSentAt
+      && Date.now() - author.passwordResetLastSentAt.getTime() < RESEND_COOLDOWN_MS;
+
+    if (author && !inCooldown) {
       // Generate a secure random token and store it (expires in 1 hour)
       const token = randomBytes(32).toString("hex");
       const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
@@ -49,6 +59,7 @@ export async function POST(req: NextRequest) {
         data: {
           passwordResetToken: token,
           passwordResetExpiry: expiry,
+          passwordResetLastSentAt: new Date(),
         },
       });
 
