@@ -13,6 +13,7 @@ import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
 import { SitePagesCard } from "@/components/admin/site-pages-card";
 import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
+import { SocialPromoteNudge } from "@/components/admin/social-promote-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
 
@@ -26,6 +27,7 @@ async function getDashboardData(authorId: string) {
     books,
     plan,
     earlyBirdOffer,
+    socialPromoteUsedCount,
   ] = await Promise.all([
     // Total published books
     prisma.book.count({ where: { authorId, isPublished: true } }),
@@ -83,6 +85,9 @@ async function getDashboardData(authorId: string) {
       where:  { enabled: true },
       select: { percentOff: true, durationMonths: true, windowDays: true, headline: true, subtext: true },
     }),
+
+    // Has this author ever generated a Social Promote post? Drives the discovery nudge below.
+    prisma.generatedSocialPost.count({ where: { authorId } }),
   ]);
 
   const planTier = plan?.plan?.tier ?? "FREE";
@@ -133,6 +138,7 @@ async function getDashboardData(authorId: string) {
     earlyBirdHeadline,
     earlyBirdSubtext,
     incompleteBookCount,
+    hasUsedSocialPromote: socialPromoteUsedCount > 0,
   };
 }
 
@@ -330,6 +336,16 @@ export default async function DashboardPage() {
           !hasStripe &&
           salesEnabled &&
           (authorMeta?.books?.length ?? 0) > 0
+        }
+      />
+
+      {/* Social Promote discovery nudge — shown to Standard/Premium authors who've
+          never generated a post. Dismissible (localStorage). */}
+      <SocialPromoteNudge
+        show={
+          !!authorMeta?.emailVerified &&
+          data.planTier !== "FREE" &&
+          !data.hasUsedSocialPromote
         }
       />
 
