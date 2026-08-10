@@ -32,6 +32,7 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
   const [howHeard,  setHowHeard]  = useState("");
   const [loading,   setLoading]   = useState(false);
   const [success,   setSuccess]   = useState(false);
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
   const [error,     setError]     = useState("");
 
   // Load the author's genres so readers can pick the topics they care about.
@@ -75,6 +76,7 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
         setError(typeof data.error === "string" ? data.error : "Something went wrong. Please try again.");
         return;
       }
+      setAlreadyConfirmed(!!data.alreadyConfirmed);
       setSuccess(true);
     } catch {
       setError("Network error. Please try again.");
@@ -129,8 +131,14 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
               >
                 <Mail className="h-7 w-7" style={{ color: accentColor }} />
               </div>
-              <h3 className="font-bold text-gray-900 text-lg mb-1">You&apos;re subscribed!</h3>
-              <p className="text-gray-500 text-sm mb-5">Thanks for joining the newsletter.</p>
+              <h3 className="font-bold text-gray-900 text-lg mb-1">
+                {alreadyConfirmed ? "You're already subscribed!" : "Almost there!"}
+              </h3>
+              <p className="text-gray-500 text-sm mb-5">
+                {alreadyConfirmed
+                  ? "Thanks for joining the newsletter."
+                  : "Check your inbox and click the confirmation link to complete your subscription."}
+              </p>
               <button
                 onClick={onClose}
                 className="text-sm font-semibold hover:underline"

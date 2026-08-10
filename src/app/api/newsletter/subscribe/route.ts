@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { syncSubscriberToProvider, type EmailProvider } from "@/lib/email-integrations";
+import { sendAuthorNewsletterConfirmationEmail, buildAuthorNewsletterConfirmLink } from "@/lib/mailer";
 
 // ── Rate limiting (in-memory, best-effort for serverless) ─────────────────────
 const attempts = new Map<string, number[]>();
@@ -24,6 +26,14 @@ const schema = z.object({
   categoryPrefs: z.array(z.string().max(100)).max(50).optional(),
 });
 
+// Double opt-in: direct signups (this modal) are unverified until the reader
+// clicks the confirmation email. Purchase-triggered and reader-magnet
+// Subscriber captures are NOT routed through here -- those already carry an
+// implicit verification (a paid transaction, or a click-to-download link),
+// so they stay auto-confirmed. Every author's sends share the same
+// noreply@authorloft.com address, so an unconfirmed/dirty list from one
+// author's direct-signup form risks deliverability for everyone on the
+// platform, not just that author.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -34,26 +44,55 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
-    const [subscriber, author] = await Promise.all([
-      prisma.subscriber.upsert({
-        where: { authorId_email: { authorId: data.authorId, email: data.email } },
-        update: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
-        create: {
-          authorId: data.authorId,
-          name: data.name,
-          email: data.email,
-          categoryPrefs: data.categoryPrefs || [],
-          isConfirmed: true,
-        },
-      }),
-      prisma.author.findUnique({
-        where: { id: data.authorId },
-        select: { emailProvider: true, emailProviderKey: true, emailProviderExtra: true },
-      }),
-    ]);
+    const author = await prisma.author.findUnique({
+      where: { id: data.authorId },
+      select: {
+        displayName: true, name: true,
+        emailProvider: true, emailProviderKey: true, emailProviderExtra: true,
+      },
+    });
+    if (!author) return NextResponse.json({ error: "Author not found." }, { status: 404 });
 
-    // Fire-and-forget sync to external email provider if configured
-    if (author?.emailProvider && author.emailProviderKey) {
+    const existing = await prisma.subscriber.findUnique({
+      where: { authorId_email: { authorId: data.authorId, email: data.email } },
+      select: { id: true, isConfirmed: true },
+    });
+
+    if (existing?.isConfirmed) {
+      await prisma.subscriber.update({
+        where: { id: existing.id },
+        data: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
+      });
+      return NextResponse.json({ success: true, id: existing.id, alreadyConfirmed: true });
+    }
+
+    const confirmToken = randomBytes(32).toString("hex");
+
+    const subscriber = await prisma.subscriber.upsert({
+      where: { authorId_email: { authorId: data.authorId, email: data.email } },
+      update: { name: data.name, categoryPrefs: data.categoryPrefs || [], confirmToken },
+      create: {
+        authorId: data.authorId,
+        name: data.name,
+        email: data.email,
+        categoryPrefs: data.categoryPrefs || [],
+        confirmToken,
+      },
+    });
+
+    const authorName = author.displayName || author.name;
+    sendAuthorNewsletterConfirmationEmail({
+      to: data.email,
+      name: data.name,
+      authorName,
+      confirmUrl: buildAuthorNewsletterConfirmLink(confirmToken),
+    }).catch((e) => console.error("[newsletter/subscribe] Failed to send confirmation email:", e));
+
+    // Fire-and-forget sync to external email provider if configured. Synced
+    // immediately rather than waiting for confirmation -- the provider is the
+    // author's own separate list/tool, not the shared AuthorLoft sending
+    // pipeline this double opt-in is protecting.
+    if (author.emailProvider && author.emailProviderKey) {
       syncSubscriberToProvider(
         author.emailProvider as EmailProvider,
         author.emailProviderKey,
