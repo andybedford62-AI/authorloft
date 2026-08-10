@@ -709,16 +709,17 @@ model Post {
 // ─── Newsletter Subscribers ───────────────────────────────────────────────────
 
 model Subscriber {
-  id               String   @id @default(cuid())
-  authorId         String
-  name             String?
-  email            String
-  categoryPrefs    String[]
-  isConfirmed      Boolean  @default(false)
-  confirmToken     String?  @unique
-  unsubscribeToken String   @default(cuid())
-  subscribedAt     DateTime @default(now())
-  author           Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id                     String    @id @default(cuid())
+  authorId               String
+  name                   String?
+  email                  String
+  categoryPrefs          String[]
+  isConfirmed            Boolean   @default(false)
+  confirmToken           String?   @unique
+  unsubscribeToken       String    @default(cuid())
+  lastConfirmationSentAt DateTime? // resend cooldown -- prevents an unconfirmed email being spammed with repeat confirmation emails
+  subscribedAt           DateTime  @default(now())
+  author                 Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, email])
   @@index([authorId])
@@ -1329,14 +1330,15 @@ model PlatformPost {
 // the audience. Mirrors the GDPR token pattern of the author-scoped Subscriber.
 
 model PlatformSubscriber {
-  id               String   @id @default(cuid())
-  email            String   @unique
-  name             String?
-  isConfirmed      Boolean  @default(false)
-  confirmToken     String?  @unique
-  unsubscribeToken String   @default(cuid())
-  source           String? // where they signed up: "news" | "footer" | "home"
-  createdAt        DateTime @default(now())
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  name                   String?
+  isConfirmed            Boolean   @default(false)
+  confirmToken           String?   @unique
+  unsubscribeToken       String    @default(cuid())
+  source                 String? // where they signed up: "news" | "footer" | "home"
+  lastConfirmationSentAt DateTime? // resend cooldown -- prevents an unconfirmed email being spammed with repeat confirmation emails
+  createdAt              DateTime  @default(now())
 
   @@index([createdAt])
 }

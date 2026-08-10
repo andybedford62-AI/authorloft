@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 10, 2026 — Resend cooldown on both double opt-in confirmation emails
+
+Andy flagged a real gap: confirmed subscribers already got "already subscribed" silently (no repeat email), but an *unconfirmed* email had no such protection — every resubmission (the same person retrying, or someone else entering that address maliciously) regenerated a token and fired a fresh confirmation email, with only a coarse 10-req/hour-per-IP rate limiter behind it. Added `PlatformSubscriber.lastConfirmationSentAt` / `Subscriber.lastConfirmationSentAt` and a 5-minute resend cooldown to both `/api/news/subscribe` and `/api/newsletter/subscribe` — within the cooldown window, the record still updates (name/prefs) but no email goes out.
+
 ## August 10, 2026 — Author-site newsletter signups now double opt-in too
 
 Follow-up to the same-day AuthorLoft News double opt-in: Andy asked whether author-level newsletter signups (each author's own `Subscriber` list, via the `NewsletterModal` on author sites) needed the same treatment. Checked first — every author's newsletter send goes out from the same shared `noreply@authorloft.com` address (just a different display name per author), so an unconfirmed/dirty list on one author's site risks deliverability for every other author on the platform, not just that one. `POST /api/newsletter/subscribe` now issues a `confirmToken` and sends an author-branded confirmation email (`sendAuthorNewsletterConfirmationEmail`, from `"${authorName} via AuthorLoft"` to match what the real newsletter will look like later) instead of auto-setting `isConfirmed: true`; new `GET /api/newsletter/confirm` flips it and links back to the author's own site. The newsletter send route already filtered `isConfirmed: true` before this — it was just always true, so this is a real behavioral change, not cosmetic. Deliberately scoped to the direct opt-in modal only: purchase-triggered and reader-magnet `Subscriber` captures stay auto-confirmed since those already carry implicit verification (a paid transaction, or a click-to-download link).

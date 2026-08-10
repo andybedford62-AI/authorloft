@@ -19,6 +19,8 @@ function checkRateLimit(key: string): boolean {
   return true;
 }
 
+const RESEND_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
 const schema = z.object({
   authorId: z.string(),
   name: z.string().max(200).optional(),
@@ -34,6 +36,11 @@ const schema = z.object({
 // noreply@authorloft.com address, so an unconfirmed/dirty list from one
 // author's direct-signup form risks deliverability for everyone on the
 // platform, not just that author.
+//
+// Unconfirmed resubmissions are throttled by lastConfirmationSentAt (5 min
+// cooldown) so an inbox can't be spammed with repeat confirmation emails --
+// the per-IP rate limiter below doesn't stop a targeted resubmission of
+// someone else's email address on its own.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -55,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.subscriber.findUnique({
       where: { authorId_email: { authorId: data.authorId, email: data.email } },
-      select: { id: true, isConfirmed: true },
+      select: { id: true, isConfirmed: true, lastConfirmationSentAt: true },
     });
 
     if (existing?.isConfirmed) {
@@ -66,17 +73,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, id: existing.id, alreadyConfirmed: true });
     }
 
+    if (existing?.lastConfirmationSentAt && Date.now() - existing.lastConfirmationSentAt.getTime() < RESEND_COOLDOWN_MS) {
+      await prisma.subscriber.update({
+        where: { id: existing.id },
+        data: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
+      });
+      return NextResponse.json({ success: true, id: existing.id });
+    }
+
     const confirmToken = randomBytes(32).toString("hex");
+    const now = new Date();
 
     const subscriber = await prisma.subscriber.upsert({
       where: { authorId_email: { authorId: data.authorId, email: data.email } },
-      update: { name: data.name, categoryPrefs: data.categoryPrefs || [], confirmToken },
+      update: { name: data.name, categoryPrefs: data.categoryPrefs || [], confirmToken, lastConfirmationSentAt: now },
       create: {
         authorId: data.authorId,
         name: data.name,
         email: data.email,
         categoryPrefs: data.categoryPrefs || [],
         confirmToken,
+        lastConfirmationSentAt: now,
       },
     });
 

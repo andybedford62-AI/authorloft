@@ -18,6 +18,8 @@ function checkRateLimit(key: string): boolean {
   return true;
 }
 
+const RESEND_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
 const schema = z.object({
   email: z.string().email(),
   name: z.string().optional(),
@@ -28,7 +30,11 @@ const schema = z.object({
 // Double opt-in: captures the row immediately (idempotent by email) but only
 // counts as confirmed once the subscriber clicks the link in the email this
 // sends. Already-confirmed subscribers who submit again are just upserted
-// silently — no repeat confirmation email.
+// silently — no repeat confirmation email. Unconfirmed resubmissions are
+// throttled by lastConfirmationSentAt (5 min cooldown) so an inbox can't be
+// spammed with repeat confirmation emails, whether that's the same person
+// retrying or someone else entering that email address maliciously — the
+// per-IP rate limiter below doesn't stop either of those on its own.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -43,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.platformSubscriber.findUnique({
       where: { email },
-      select: { id: true, isConfirmed: true },
+      select: { id: true, isConfirmed: true, lastConfirmationSentAt: true },
     });
 
     if (existing?.isConfirmed) {
@@ -54,14 +60,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, id: existing.id, alreadyConfirmed: true });
     }
 
-    // New signup, or an existing-but-unconfirmed row re-submitting — issue a
-    // fresh token either way so an old, possibly-shared link can't be reused.
+    // Unconfirmed and a confirmation email went out recently — update the
+    // row (name/source may have changed) but don't send another one.
+    if (existing?.lastConfirmationSentAt && Date.now() - existing.lastConfirmationSentAt.getTime() < RESEND_COOLDOWN_MS) {
+      await prisma.platformSubscriber.update({
+        where: { id: existing.id },
+        data: { name: data.name, source: data.source ?? undefined },
+      });
+      return NextResponse.json({ success: true, id: existing.id });
+    }
+
+    // New signup, or an existing-but-unconfirmed row past the cooldown —
+    // issue a fresh token either way so an old, possibly-shared link can't
+    // be reused.
     const confirmToken = randomBytes(32).toString("hex");
+    const now = new Date();
 
     const subscriber = await prisma.platformSubscriber.upsert({
       where: { email },
-      update: { name: data.name, source: data.source ?? undefined, confirmToken },
-      create: { email, name: data.name, source: data.source ?? "news", confirmToken },
+      update: { name: data.name, source: data.source ?? undefined, confirmToken, lastConfirmationSentAt: now },
+      create: { email, name: data.name, source: data.source ?? "news", confirmToken, lastConfirmationSentAt: now },
       select: { id: true },
     });
 
