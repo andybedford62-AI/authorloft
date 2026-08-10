@@ -5,10 +5,10 @@ import { DashboardTracker } from "@/components/admin/dashboard-tracker";
 import { OnboardingController } from "@/components/admin/onboarding-controller";
 import { NextStepsCard } from "@/components/admin/next-steps-card";
 import {
-  BookOpen, Users, ShoppingBag, TrendingUp,
-  Plus, ArrowRight, Star, MailWarning,
-  GraduationCap, Package,
+  Users, ShoppingBag, TrendingUp,
+  Plus, ArrowRight, MailWarning,
 } from "lucide-react";
+import { CatalogTabsCard } from "@/components/admin/catalog-tabs-card";
 import { Button } from "@/components/ui/button";
 import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
@@ -29,9 +29,7 @@ async function getDashboardData(authorId: string) {
     plan,
     earlyBirdOffer,
     socialPromoteUsedCount,
-    totalCourses,
     courses,
-    totalBundles,
     bundles,
   ] = await Promise.all([
     // Total published books
@@ -94,20 +92,14 @@ async function getDashboardData(authorId: string) {
     // Has this author ever generated a Social Promote post? Drives the discovery nudge below.
     prisma.generatedSocialPost.count({ where: { authorId } }),
 
-    // Total published courses (mirrors totalBooks above)
-    prisma.course.count({ where: { authorId, isPublished: true } }),
-
-    // All courses for the "Your Courses" list panel
+    // All courses for the catalog tabs card
     prisma.course.findMany({
       where: { authorId },
       orderBy: { displayOrder: "asc" },
       select: { id: true, title: true, priceCents: true, isPublished: true },
     }),
 
-    // Total published bundles (mirrors totalBooks above)
-    prisma.bundle.count({ where: { authorId, isPublished: true } }),
-
-    // All bundles for the "Your Bundles" list panel
+    // All bundles for the catalog tabs card
     prisma.bundle.findMany({
       where: { authorId },
       orderBy: { displayOrder: "asc" },
@@ -164,9 +156,7 @@ async function getDashboardData(authorId: string) {
     earlyBirdSubtext,
     incompleteBookCount,
     hasUsedSocialPromote: socialPromoteUsedCount > 0,
-    totalCourses,
     courses,
-    totalBundles,
     bundles,
   };
 }
@@ -331,14 +321,14 @@ export default async function DashboardPage() {
   const coursesEnabled = !!authorMeta?.plan?.coursesEnabled;
   const bundlesEnabled = !!authorMeta?.plan?.bundlesEnabled;
 
+  // Books/Courses/Bundles counts live inside the tabbed CatalogTabsCard below,
+  // not as separate top-level stat cards — these three stay cross-cutting
+  // metrics that aren't specific to one content type.
   const statCards = [
-    { label: "Total Books",            value: data.totalBooks,                     icon: BookOpen,      color: "blue",   href: "/admin/books" },
-    { label: "Newsletter Subscribers", value: data.totalSubscribers,               icon: Users,         color: "green",  href: "/admin/newsletter" },
-    { label: "Revenue (All Time)",     value: formatCents(data.totalRevenueCents), icon: TrendingUp,    color: "purple", href: "/admin/sales" },
-    { label: "Orders This Month",      value: data.ordersThisMonth,                icon: ShoppingBag,   color: "amber",  href: "/admin/sales" },
-    coursesEnabled ? { label: "Total Courses", value: data.totalCourses, icon: GraduationCap, color: "blue",   href: "/admin/courses" } : null,
-    bundlesEnabled ? { label: "Total Bundles", value: data.totalBundles, icon: Package,       color: "purple", href: "/admin/bundles" } : null,
-  ].filter((c): c is NonNullable<typeof c> => c !== null);
+    { label: "Newsletter Subscribers", value: data.totalSubscribers,               icon: Users,       color: "green",  href: "/admin/newsletter" },
+    { label: "Revenue (All Time)",     value: formatCents(data.totalRevenueCents), icon: TrendingUp,  color: "purple", href: "/admin/sales" },
+    { label: "Orders This Month",      value: data.ordersThisMonth,                icon: ShoppingBag, color: "amber",  href: "/admin/sales" },
+  ];
 
   return (
     <div className="space-y-8 max-w-6xl">
@@ -438,7 +428,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {statCards.map(({ label, value, icon: Icon, color, href }) => (
           <Link
             key={label}
@@ -501,127 +491,15 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Books + Plan */}
+        {/* Catalog (Books / Courses / Bundles) + Plan */}
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">Your Books</h2>
-              <Link href="/admin/books" className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                Manage <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-
-            {data.books.length === 0 ? (
-              <div className="px-5 py-8 text-center">
-                <p className="text-gray-400 text-sm mb-3">No books yet.</p>
-                <Link href="/admin/books/new">
-                  <Button size="sm">
-                    <Plus className="h-3.5 w-3.5 mr-1.5" /> Add your first book
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-50">
-                {data.books.map((book) => (
-                  <div key={book.id} className="flex items-center gap-3 px-5 py-3">
-                    <BookOpen className="h-4 w-4 text-gray-300 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 truncate">{book.title}</p>
-                      {!book.isPublished && (
-                        <span className="text-xs text-amber-500">Draft</span>
-                      )}
-                    </div>
-                    {book.isFeatured && (
-                      <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
-                    )}
-                    <p className="text-xs text-gray-400 flex-shrink-0">
-                      {formatCents(book.priceCents)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Your Courses — same treatment as Books, only shown when the plan allows it */}
-          {coursesEnabled && (
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h2 className="font-semibold text-gray-900">Your Courses</h2>
-                <Link href="/admin/courses" className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                  Manage <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-
-              {data.courses.length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <p className="text-gray-400 text-sm mb-3">No courses yet.</p>
-                  <Link href="/admin/courses/new">
-                    <Button size="sm">
-                      <Plus className="h-3.5 w-3.5 mr-1.5" /> Add your first course
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-50">
-                  {data.courses.map((course) => (
-                    <div key={course.id} className="flex items-center gap-3 px-5 py-3">
-                      <GraduationCap className="h-4 w-4 text-gray-300 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 truncate">{course.title}</p>
-                        {!course.isPublished && (
-                          <span className="text-xs text-amber-500">Draft</span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-400 flex-shrink-0">
-                        {formatCents(course.priceCents)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Your Bundles — same treatment as Books, only shown when the plan allows it */}
-          {bundlesEnabled && (
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h2 className="font-semibold text-gray-900">Your Bundles</h2>
-                <Link href="/admin/bundles" className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                  Manage <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-
-              {data.bundles.length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <p className="text-gray-400 text-sm mb-3">No bundles yet.</p>
-                  <Link href="/admin/bundles/new">
-                    <Button size="sm">
-                      <Plus className="h-3.5 w-3.5 mr-1.5" /> Add your first bundle
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-50">
-                  {data.bundles.map((bundle) => (
-                    <div key={bundle.id} className="flex items-center gap-3 px-5 py-3">
-                      <Package className="h-4 w-4 text-gray-300 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 truncate">{bundle.title}</p>
-                        {!bundle.isPublished && (
-                          <span className="text-xs text-amber-500">Draft</span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-400 flex-shrink-0">
-                        {formatCents(bundle.priceCents)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <CatalogTabsCard
+            books={data.books}
+            courses={data.courses}
+            bundles={data.bundles}
+            coursesEnabled={coursesEnabled}
+            bundlesEnabled={bundlesEnabled}
+          />
 
           {/* Plan info */}
           <div className="bg-blue-50 rounded-xl border border-blue-100 p-5">
