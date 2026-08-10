@@ -23,8 +23,8 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 - [ ] **Post-launch QA pass** — log in as a FREE author (confirm locked toggle) and approve a reader rating (confirm stars render on a card). *(verify)*
 - [x] **Courses in the Bookstore** — shipped Aug 6, 2026; `Course.listInBookstore` opt-in toggle (mirrors Book), separate "Courses from Independent Creators" section on `/bookstore` with a simple card (no genres/ratings — Course has neither yet). *(done)*
 - [x] **Course categories / taxonomy** — shipped Aug 7, 2026 as `CourseCategory`/`CourseCategoryAssignment` (self-referential tree, mirrors `Genre`). Admin CRUD at `/admin/course-categories`, chip picker on the course editor, category-chip filter bar on the Bookstore's Courses section. *(done — see full entry under Bundles & Courses below; this line was a stale duplicate, corrected Aug 9 2026)*
-- [ ] **Unified Books/Courses filter tabs on `/bookstore`** — deferred from the Aug 6 2026 pass; currently books and courses are two separate sections/grids, not a merged filterable catalog. Course categories now exist (see above), so this is no longer blocked on taxonomy — just needs the actual unification build. *(medium)*
-- [ ] **Course ratings on the Bookstore** — Course has no feedback/rating table yet (Book has `BookFeedback`). Needed before course cards can show stars like book cards do. *(medium)*
+- [x] **Unified Books/Courses filter tabs on `/bookstore`** — shipped Aug 10, 2026; `BookstoreCatalogTabs` wraps the existing grids under a Books | Courses type switcher, each keeping its own facet filters. *(done)*
+- [x] **Course ratings on the Bookstore** — shipped Aug 10, 2026; new `CourseFeedback` model mirrors `BookFeedback`, course cards show stars once a course has at least one approved rating. *(done)*
 - [ ] **Course entries in Bookstore structured data (JSON-LD)** — the `/bookstore` `CollectionPage`/`ItemList` schema only lists `@type: Book` items today; courses aren't included in search-engine structured data yet. *(small)*
 
 ---
@@ -38,7 +38,7 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 - [ ] **Multiple featured books / pick the featured title** — currently auto-picks newest published; let the author choose which book headlines, and optionally feature 2–3. *(small–medium)*
 - [ ] **Per-send saved layouts / templates** — save a block configuration ("monthly update", "launch announcement") to reuse. *(medium)*
 - [ ] **Subscriber preference center** — a real "update preferences" page (re-pick genres, pause) so the footer link is more than unsubscribe. Unlocks the "Update preferences" footer link we deferred. *(medium)*
-- [ ] **Open/click analytics** — track opens + CTA clicks per campaign (Resend events or tracking pixel + redirect links); show on the History tab. *(medium)*
+- [x] **Open/click analytics** — shipped Aug 10, 2026; new `CampaignSendLog` table + `/api/webhooks/resend` consuming Resend's native email.opened/email.clicked events (not a custom pixel/redirect system); History tab shows Opened/Clicked rate + count. Requires manual Resend dashboard setup (enable Open+Click Tracking on the domain, add the webhook, set `RESEND_WEBHOOK_SECRET`) before it actually records anything. *(done — pending dashboard config)*
 - [ ] **Scheduled / recurring sends** — "send later" + optional auto-digest cadence. *(medium–large)*
 - [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
 - [ ] **Reuse a prior newsletter** — "Duplicate" a past `Campaign` from the History tab to pre-fill the composer (subject, body, block selections) as a starting point for a new send. Requires storing the body/block config on `Campaign` (currently only subject + send stats are persisted). *(small–medium)*
@@ -51,7 +51,7 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 Shipped Phase 1 June 8, 2026 (public news archive, Blog/News CMS toggle, subscriber capture, search/filter). Deferred — see `docs/NEWSLETTER_PHASE2_PLAN.md`:
 
 - [x] **Email a news issue to subscribers** — this was a stale duplicate (corrected Aug 9, 2026): `POST /api/super-admin/blog/posts/[id]/email` already sends to confirmed `PlatformSubscriber`s via Resend batch send with the `newsEmailedAt` guard — same mechanism as the June 15 line below, just independently reachable, not a separate feature. *(done — see June 15 entry above)*
-- [ ] **Double opt-in confirmation emails** + public unsubscribe page — PARTIALLY BUILT (checked Aug 9, 2026): `PlatformSubscriber` has `confirmToken`/`isConfirmed` fields and unsubscribe works, but `POST /api/news/subscribe` is explicitly "Phase 1: capture only (no confirmation email sent yet)" — the confirmation email itself was never wired up. *(small–medium)*
+- [x] **Double opt-in confirmation emails** + public unsubscribe page — shipped Aug 10, 2026; `POST /api/news/subscribe` now sends a confirmation email, `GET /api/news/confirm` flips `isConfirmed`. Also unblocks the existing "email subscribers on News post publish" feature, which filters `isConfirmed: true` and had nothing to send to before this. *(done)*
 - [x] **"Publish News post → also email subscribers"** — shipped June 15, 2026; a checkbox on published News posts emails the issue (headline, excerpt, cover, read link) to confirmed `PlatformSubscriber`s once, with a new platform unsubscribe route + `PlatformPost.newsEmailedAt` double-send guard. *(done)*
 - [x] **RSS feed** for the news archive — shipped June 14, 2026 (`/news/rss.xml`, advertised via alternate link on `/news`). *(done)*
 - [ ] **"New books this week" digest** — reader newsletter from the bookstore catalog; reuses the same email infra once Phase 2 lands. *(medium)*
@@ -100,7 +100,7 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 - [ ] **Course discount codes** — extend DiscountCode to optionally apply to courses. *(small–medium)*
 - [ ] **Bundle marketing page** — `/book-bundles` solution landing page. *(small)*
 - [ ] **Course marketing page** — `/author-courses` solution landing page. *(small)*
-- [ ] **Admin dashboard doesn't surface Courses or Bundles like it does Books** — verified Aug 9, 2026 in `src/app/(admin)/admin/dashboard/page.tsx`: Books get a "Total Books" stat card (line ~297) and a full "Your Books" list panel (line ~454) with title/published/featured/price. Courses only fetch a boolean (`courseCount > 0` → `hasCourse`, used solely for onboarding-checklist gating) — no stat card, no list. Bundles have no query on this page at all — not even a count. A course-creator or bundle-seller signing in sees a dashboard that looks entirely book-oriented regardless of what they actually sell. *(medium — add stat cards + list panels for both, gated the same way the Books panel already is)*
+- [x] **Admin dashboard doesn't surface Courses or Bundles like it does Books** — shipped Aug 10, 2026 as `CatalogTabsCard`: a Books | Courses | Bundles tab switcher (not three stacked panels — Andy's explicit feedback was that stacking read as "mixed together, not distinct") controls the whole content area, gated on `plan.coursesEnabled`/`bundlesEnabled`. *(done)*
 
 ---
 

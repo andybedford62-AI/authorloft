@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 10, 2026 — Backlog Tier 2 batch: dashboard catalog tabs, double opt-in, unified bookstore, newsletter analytics, course ratings
+
+Five items from the ranked backlog pass, done in order, staged together (not pushed to prod individually):
+
+- **Admin dashboard: Courses/Bundles alongside Books** — `CatalogTabsCard` (`src/components/admin/catalog-tabs-card.tsx`), a Books | Courses | Bundles tab switcher controlling the whole content area (stat count in the tab label + list below), replacing an earlier same-day attempt that stacked three separate panels — reworked after feedback that stacking read as mixed together rather than distinct. Courses/Bundles tabs only appear when the plan enables them.
+- **AuthorLoft News double opt-in** — `POST /api/news/subscribe` now sends a confirmation email (`sendNewsSubscriptionConfirmationEmail`); new `GET /api/news/confirm` flips `PlatformSubscriber.isConfirmed`. Also unblocks the existing "email subscribers on News post publish" feature, which filters `isConfirmed: true` and had nothing to send to since it shipped.
+- **Bookstore: unified Books/Courses tabs** — `BookstoreCatalogTabs` wraps the existing `BookstoreGrid`/`BookstoreCourseGrid` under one Books | Courses type switcher; each keeps its own facet filters (genre/format/price for books, category for courses).
+- **Newsletter open/click analytics** — new `CampaignSendLog` table (one row per successfully-sent recipient, keyed by Resend's email id) populated via a new `POST /api/webhooks/resend` consuming Resend's native `email.opened`/`email.clicked` webhooks (Svix-signed, verified manually via `crypto` rather than adding the `svix` package). History tab gained Opened/Clicked columns. Requires manual Resend dashboard setup — enable Open+Click Tracking on the sending domain, subscribe a webhook to those two events, set `RESEND_WEBHOOK_SECRET` — before it records anything; sending itself is unaffected either way.
+- **Course ratings** — new `CourseFeedback` model (reuses `BookFeedbackStatus`), public submission route, admin moderation merged into the existing `/admin/feedback` page (now shows books and courses in one queue), "What Students Are Saying" + a rating form on the course detail page, and star display on bookstore course cards once a course has at least one approved rating.
+
 ## August 9, 2026 — Bundle purchases now capture the buyer as a subscriber
 
 `bundle_purchase` Stripe webhook block never upserted a `Subscriber` for the buyer, unlike `book_purchase` and `course_purchase` — flagged during today's backlog verification pass. Fixed by mirroring the existing pattern (`src/app/api/stripe/webhook/route.ts`); also had to add `author.id` to the `fullItems` select, which the existing bundle query was missing.
