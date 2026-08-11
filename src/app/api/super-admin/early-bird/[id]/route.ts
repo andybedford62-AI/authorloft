@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
+
+// Public pages cache the live offer's copy for up to 60s (ISR) — bust that
+// immediately after any save so terms changes show up on the next load.
+function revalidateFoundingOfferPages() {
+  revalidatePath("/");
+  revalidatePath("/pricing");
+}
 
 function validateTerms(body: any) {
   if (body.percentOff !== undefined) {
@@ -52,6 +60,7 @@ export async function PATCH(
       }
       return tx.earlyBirdOffer.update({ where: { id }, data });
     });
+    revalidateFoundingOfferPages();
     return NextResponse.json(offer);
   } catch {
     return NextResponse.json({ error: "Offer not found." }, { status: 404 });
@@ -67,6 +76,7 @@ export async function DELETE(
   const { id } = await params;
   try {
     await prisma.earlyBirdOffer.delete({ where: { id } });
+    revalidateFoundingOfferPages();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Offer not found." }, { status: 404 });

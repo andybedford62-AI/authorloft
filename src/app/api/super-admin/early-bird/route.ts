@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
@@ -55,5 +56,9 @@ export async function POST(req: NextRequest) {
     return tx.earlyBirdOffer.create({ data: { ...data, enabled } });
   });
 
+  if (enabled) {
+    revalidatePath("/");
+    revalidatePath("/pricing");
+  }
   return NextResponse.json(offer, { status: 201 });
 }
