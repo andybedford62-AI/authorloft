@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import {
   Tag, Plus, Trash2, ToggleLeft, ToggleRight,
-  Loader2, Copy, Check, Pencil, X,
+  Loader2, Copy, Check, Pencil, X, ArrowRight, ArrowLeft,
 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { IconButton } from "@/components/admin/icon-button";
 import { HelpTip } from "@/components/admin/help-tip";
+import { WizardSteps } from "@/components/admin/wizard-steps";
+import { DiscountScopePicker } from "@/components/admin/discount-scope-picker";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -46,12 +49,25 @@ function usageLabel(code: DiscountCode) {
   return `${code.usesCount} / ${code.maxUses} uses`;
 }
 
-function appliesToLabel(code: DiscountCode) {
-  const parts: string[] = [];
-  parts.push(code.books.length === 0 ? "All books" : `${code.books.length} book${code.books.length !== 1 ? "s" : ""}`);
-  parts.push(code.bundles.length === 0 ? "all bundles" : `${code.bundles.length} bundle${code.bundles.length !== 1 ? "s" : ""}`);
-  parts.push(code.courses.length === 0 ? "all courses" : `${code.courses.length} course${code.courses.length !== 1 ? "s" : ""}`);
-  return parts.join(", ");
+function AppliesToCell({ code }: { code: DiscountCode }) {
+  const parts = [
+    { label: `${code.books.length} book${code.books.length !== 1 ? "s" : ""}`, restricted: code.books.length > 0 },
+    { label: `${code.bundles.length} bundle${code.bundles.length !== 1 ? "s" : ""}`, restricted: code.bundles.length > 0 },
+    { label: `${code.courses.length} course${code.courses.length !== 1 ? "s" : ""}`, restricted: code.courses.length > 0 },
+  ];
+  const anyRestricted = parts.some((p) => p.restricted);
+  return (
+    <div className="flex flex-wrap gap-1">
+      {anyRestricted
+        ? parts.filter((p) => p.restricted).map((p) => (
+            <Badge key={p.label} variant="outline" className="text-[10px] py-0">{p.label}</Badge>
+          ))
+        : <Badge variant="success" className="text-[10px] py-0">Everything</Badge>}
+      {code.showAsSalePrice && (
+        <Badge variant="warning" className="text-[10px] py-0">Sale price shown</Badge>
+      )}
+    </div>
+  );
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -94,6 +110,15 @@ export default function DiscountCodesPage() {
     showAsSalePrice: false,
   });
 
+  type CreateStep = "basics" | "appliesTo" | "review";
+  const CREATE_STEPS: { id: CreateStep; label: string }[] = [
+    { id: "basics",    label: "Basics" },
+    { id: "appliesTo", label: "Applies to" },
+    { id: "review",    label: "Review & create" },
+  ];
+  const [createStep, setCreateStep] = useState<CreateStep>("basics");
+  const [stepError,  setStepError]  = useState("");
+
   useEffect(() => {
     Promise.all([
       fetch("/api/admin/discount-codes").then((r) => r.json()),
@@ -126,31 +151,13 @@ export default function DiscountCodesPage() {
     }).finally(() => setLoading(false));
   }, []);
 
-  function toggleBookId(bookId: string, checked: boolean) {
-    setForm((prev) => ({
-      ...prev,
-      bookIds: checked
-        ? [...prev.bookIds, bookId]
-        : prev.bookIds.filter((id) => id !== bookId),
-    }));
-  }
-
-  function toggleBundleId(bundleId: string, checked: boolean) {
-    setForm((prev) => ({
-      ...prev,
-      bundleIds: checked
-        ? [...prev.bundleIds, bundleId]
-        : prev.bundleIds.filter((id) => id !== bundleId),
-    }));
-  }
-
-  function toggleCourseId(courseId: string, checked: boolean) {
-    setForm((prev) => ({
-      ...prev,
-      courseIds: checked
-        ? [...prev.courseIds, courseId]
-        : prev.courseIds.filter((id) => id !== courseId),
-    }));
+  function goToAppliesTo() {
+    if (!form.code.trim() || !form.value.trim()) {
+      setStepError("Enter a code and a value before continuing.");
+      return;
+    }
+    setStepError("");
+    setCreateStep("appliesTo");
   }
 
   async function createCode(e: React.FormEvent) {
@@ -184,6 +191,7 @@ export default function DiscountCodesPage() {
         maxUses: "", expiresAt: "", bookIds: [], bundleIds: [], courseIds: [],
         showAsSalePrice: false,
       });
+      setCreateStep("basics");
     } finally {
       setSaving(false);
     }
@@ -254,33 +262,6 @@ export default function DiscountCodesPage() {
     });
   }
 
-  function toggleEditBookId(bookId: string, checked: boolean) {
-    setEditForm((prev) => ({
-      ...prev,
-      bookIds: checked
-        ? [...prev.bookIds, bookId]
-        : prev.bookIds.filter((id) => id !== bookId),
-    }));
-  }
-
-  function toggleEditBundleId(bundleId: string, checked: boolean) {
-    setEditForm((prev) => ({
-      ...prev,
-      bundleIds: checked
-        ? [...prev.bundleIds, bundleId]
-        : prev.bundleIds.filter((id) => id !== bundleId),
-    }));
-  }
-
-  function toggleEditCourseId(courseId: string, checked: boolean) {
-    setEditForm((prev) => ({
-      ...prev,
-      courseIds: checked
-        ? [...prev.courseIds, courseId]
-        : prev.courseIds.filter((id) => id !== courseId),
-    }));
-  }
-
   async function saveEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editingCode) return;
@@ -330,221 +311,224 @@ export default function DiscountCodesPage() {
           <HelpTip id="discount-codes" />
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print),
-          bundles, or courses. Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.
+          A discount code gives readers a percentage or fixed amount off at checkout. By default, a new code
+          applies to everything you sell — books, bundles, and courses. Use the &ldquo;Applies to&rdquo; step
+          below to restrict a code to specific items only if you want a narrower promo. Codes do not apply to
+          retail links (Amazon, etc.) — those prices are set by the retailer.
         </p>
       </div>
 
       {/* ── Create form ─────────────────────────────────────────────────── */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-base font-semibold text-gray-900 mb-5">New Discount Code</h2>
+        <WizardSteps
+          steps={CREATE_STEPS}
+          currentIndex={CREATE_STEPS.findIndex((s) => s.id === createStep)}
+          className="mb-6"
+        />
         <form onSubmit={createCode} className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
 
-            {/* Code */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Code <span className="text-red-500">*</span></label>
-              <input
-                required
-                value={form.code}
-                onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase().replace(/\s/g, "") })}
-                placeholder="e.g. LAUNCH20"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {/* Step 1: Basics */}
+          {createStep === "basics" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-semibold text-gray-900">Basics</h3>
+                <HelpTip id="discount-codes-basics" />
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+
+                {/* Code */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Code <span className="text-red-500">*</span></label>
+                  <input
+                    required
+                    value={form.code}
+                    onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase().replace(/\s/g, "") })}
+                    placeholder="e.g. LAUNCH20"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Internal note <span className="text-gray-400">(optional)</span></label>
+                  <input
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="e.g. Newsletter launch promo"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Type */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Discount type <span className="text-red-500">*</span></label>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value as "PERCENT" | "FIXED" })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="PERCENT">Percentage (e.g. 20%)</option>
+                    <option value="FIXED">Fixed amount (e.g. $5.00)</option>
+                  </select>
+                </div>
+
+                {/* Value */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">
+                    {form.type === "PERCENT" ? "Percent off (1–100)" : "Amount off (dollars)"} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    {form.type === "FIXED" && (
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                    )}
+                    <input
+                      required
+                      type="number"
+                      min={1}
+                      max={form.type === "PERCENT" ? 100 : undefined}
+                      step={form.type === "FIXED" ? "0.01" : "1"}
+                      value={form.value}
+                      onChange={(e) => setForm({ ...form, value: e.target.value })}
+                      placeholder={form.type === "PERCENT" ? "20" : "5.00"}
+                      className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${form.type === "FIXED" ? "pl-6" : ""}`}
+                    />
+                    {form.type === "PERCENT" && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Max uses */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Usage limit <span className="text-gray-400">(blank = unlimited)</span></label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={form.maxUses}
+                    onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
+                    placeholder="e.g. 100"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Expiry */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">Expiry date <span className="text-gray-400">(optional)</span></label>
+                  <input
+                    type="date"
+                    value={form.expiresAt}
+                    onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {stepError && <p className="text-sm text-red-600">{stepError}</p>}
+
+              <div className="flex justify-end pt-1">
+                <Button type="button" onClick={goToAppliesTo}>
+                  Next <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Applies to */}
+          {createStep === "appliesTo" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-semibold text-gray-900">Applies to</h3>
+                <HelpTip id="discount-codes-applies-to" />
+              </div>
+              <DiscountScopePicker
+                books={books}
+                bundles={bundles}
+                courses={courses}
+                bookIds={form.bookIds}
+                bundleIds={form.bundleIds}
+                courseIds={form.courseIds}
+                onChange={(next) => setForm((prev) => ({ ...prev, ...next }))}
               />
+              <div className="flex justify-between pt-1">
+                <Button type="button" variant="ghost" onClick={() => setCreateStep("basics")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                </Button>
+                <Button type="button" onClick={() => setCreateStep("review")}>
+                  Next <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
             </div>
+          )}
 
-            {/* Description */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Internal note <span className="text-gray-400">(optional)</span></label>
-              <input
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="e.g. Newsletter launch promo"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          {/* Step 3: Review & create */}
+          {createStep === "review" && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900">Review &amp; create</h3>
 
-            {/* Type */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Discount type <span className="text-red-500">*</span></label>
-              <select
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value as "PERCENT" | "FIXED" })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="PERCENT">Percentage (e.g. 20%)</option>
-                <option value="FIXED">Fixed amount (e.g. $5.00)</option>
-              </select>
-            </div>
+              <div className="rounded-lg border border-gray-200 divide-y divide-gray-100 text-sm">
+                <div className="flex justify-between px-4 py-2.5">
+                  <span className="text-gray-500">Code</span>
+                  <span className="font-mono font-semibold text-gray-900">{form.code || "—"}</span>
+                </div>
+                <div className="flex justify-between px-4 py-2.5">
+                  <span className="text-gray-500">Discount</span>
+                  <span className="font-medium text-gray-900">
+                    {form.value ? (form.type === "PERCENT" ? `${form.value}% off` : `$${form.value} off`) : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between px-4 py-2.5">
+                  <span className="text-gray-500">Usage limit</span>
+                  <span className="text-gray-900">{form.maxUses || "Unlimited"}</span>
+                </div>
+                <div className="flex justify-between px-4 py-2.5">
+                  <span className="text-gray-500">Expires</span>
+                  <span className="text-gray-900">{form.expiresAt || "Never"}</span>
+                </div>
+                <div className="flex justify-between px-4 py-2.5">
+                  <span className="text-gray-500">Applies to</span>
+                  <span className="text-gray-900 text-right">
+                    {form.bookIds.length + form.bundleIds.length + form.courseIds.length === 0
+                      ? "Everything"
+                      : [
+                          form.bookIds.length > 0 ? `${form.bookIds.length} book${form.bookIds.length !== 1 ? "s" : ""}` : null,
+                          form.bundleIds.length > 0 ? `${form.bundleIds.length} bundle${form.bundleIds.length !== 1 ? "s" : ""}` : null,
+                          form.courseIds.length > 0 ? `${form.courseIds.length} course${form.courseIds.length !== 1 ? "s" : ""}` : null,
+                        ].filter(Boolean).join(", ")}
+                  </span>
+                </div>
+              </div>
 
-            {/* Value */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">
-                {form.type === "PERCENT" ? "Percent off (1–100)" : "Amount off (dollars)"} <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                {form.type === "FIXED" && (
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
-                )}
+              {/* Show as sale price toggle */}
+              <div className="flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
                 <input
-                  required
-                  type="number"
-                  min={1}
-                  max={form.type === "PERCENT" ? 100 : undefined}
-                  step={form.type === "FIXED" ? "0.01" : "1"}
-                  value={form.value}
-                  onChange={(e) => setForm({ ...form, value: e.target.value })}
-                  placeholder={form.type === "PERCENT" ? "20" : "5.00"}
-                  className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${form.type === "FIXED" ? "pl-6" : ""}`}
+                  id="showAsSalePrice"
+                  type="checkbox"
+                  checked={form.showAsSalePrice}
+                  onChange={(e) => setForm({ ...form, showAsSalePrice: e.target.checked })}
+                  className="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                 />
-                {form.type === "PERCENT" && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
-                )}
-              </div>
-            </div>
-
-            {/* Max uses */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Usage limit <span className="text-gray-400">(blank = unlimited)</span></label>
-              <input
-                type="number"
-                min={1}
-                value={form.maxUses}
-                onChange={(e) => setForm({ ...form, maxUses: e.target.value })}
-                placeholder="e.g. 100"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Expiry */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Expiry date <span className="text-gray-400">(optional)</span></label>
-              <input
-                type="date"
-                value={form.expiresAt}
-                onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Book restriction — multi-select checkboxes */}
-            {books.length > 0 && (
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-xs font-medium text-gray-700">
-                  Restrict to specific books <span className="text-gray-400">(none selected = applies to all direct-sale books)</span>
+                <label htmlFor="showAsSalePrice" className="text-sm text-gray-800 cursor-pointer leading-snug">
+                  <span className="font-medium">Show discounted price publicly on book pages</span>
+                  <span className="block text-xs text-gray-500 mt-0.5 font-normal">
+                    Readers will see a crossed-out original price, the discounted sale price, and a SALE badge — before they reach checkout.
+                  </span>
                 </label>
-                <p className="text-xs text-gray-400">Only books with direct sales enabled are shown here.</p>
-                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                  {books.map((b) => (
-                    <label
-                      key={b.id}
-                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={form.bookIds.includes(b.id)}
-                        onChange={(e) => toggleBookId(b.id, e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700">{b.title}</span>
-                    </label>
-                  ))}
-                </div>
-                {form.bookIds.length > 0 && (
-                  <p className="text-xs text-blue-600">
-                    {form.bookIds.length} book{form.bookIds.length !== 1 ? "s" : ""} selected
-                  </p>
-                )}
               </div>
-            )}
 
-            {/* Bundle restriction — multi-select checkboxes */}
-            {bundles.length > 0 && (
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-xs font-medium text-gray-700">
-                  Restrict to specific bundles <span className="text-gray-400">(none selected = applies to all bundles)</span>
-                </label>
-                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                  {bundles.map((b) => (
-                    <label
-                      key={b.id}
-                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={form.bundleIds.includes(b.id)}
-                        onChange={(e) => toggleBundleId(b.id, e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700">{b.title}</span>
-                    </label>
-                  ))}
-                </div>
-                {form.bundleIds.length > 0 && (
-                  <p className="text-xs text-blue-600">
-                    {form.bundleIds.length} bundle{form.bundleIds.length !== 1 ? "s" : ""} selected
-                  </p>
-                )}
+              {error && <p className="text-sm text-red-600">{error}</p>}
+
+              <div className="flex justify-between pt-1">
+                <Button type="button" variant="ghost" onClick={() => setCreateStep("appliesTo")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                </Button>
+                <Button type="submit" disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                  Create Code
+                </Button>
               </div>
-            )}
-
-            {/* Course restriction — multi-select checkboxes */}
-            {courses.length > 0 && (
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-xs font-medium text-gray-700">
-                  Restrict to specific courses <span className="text-gray-400">(none selected = applies to all courses)</span>
-                </label>
-                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                  {courses.map((c) => (
-                    <label
-                      key={c.id}
-                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={form.courseIds.includes(c.id)}
-                        onChange={(e) => toggleCourseId(c.id, e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700">{c.title}</span>
-                    </label>
-                  ))}
-                </div>
-                {form.courseIds.length > 0 && (
-                  <p className="text-xs text-blue-600">
-                    {form.courseIds.length} course{form.courseIds.length !== 1 ? "s" : ""} selected
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Show as sale price toggle */}
-            <div className="sm:col-span-2 flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
-              <input
-                id="showAsSalePrice"
-                type="checkbox"
-                checked={form.showAsSalePrice}
-                onChange={(e) => setForm({ ...form, showAsSalePrice: e.target.checked })}
-                className="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-              />
-              <label htmlFor="showAsSalePrice" className="text-sm text-gray-800 cursor-pointer leading-snug">
-                <span className="font-medium">Show discounted price publicly on book pages</span>
-                <span className="block text-xs text-gray-500 mt-0.5 font-normal">
-                  Readers will see a crossed-out original price, the discounted sale price, and a SALE badge — before they reach checkout.
-                </span>
-              </label>
             </div>
-
-          </div>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div className="flex justify-end pt-1">
-            <Button type="submit" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-              Create Code
-            </Button>
-          </div>
+          )}
         </form>
       </div>
 
@@ -621,10 +605,7 @@ export default function DiscountCodesPage() {
 
                   {/* Applies to */}
                   <td className="px-5 py-4 hidden lg:table-cell">
-                    <span className="text-xs text-gray-500">{appliesToLabel(code)}</span>
-                    {code.showAsSalePrice && (
-                      <span className="block text-xs text-amber-600 font-medium mt-0.5">Shows as sale price</span>
-                    )}
+                    <AppliesToCell code={code} />
                   </td>
 
                   {/* Actions */}
@@ -763,80 +744,23 @@ export default function DiscountCodesPage() {
                   />
                 </div>
 
-                {/* Book restriction */}
-                {books.length > 0 && (
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs font-medium text-gray-700">
-                      Restrict to specific books <span className="text-gray-400">(none = all direct-sale books)</span>
-                    </label>
-                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                      {books.map((b) => (
-                        <label key={b.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={editForm.bookIds.includes(b.id)}
-                            onChange={(e) => toggleEditBookId(b.id, e.target.checked)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-gray-700">{b.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                    {editForm.bookIds.length > 0 && (
-                      <p className="text-xs text-blue-600">{editForm.bookIds.length} book{editForm.bookIds.length !== 1 ? "s" : ""} selected</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Bundle restriction */}
-                {bundles.length > 0 && (
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs font-medium text-gray-700">
-                      Restrict to specific bundles <span className="text-gray-400">(none = all bundles)</span>
-                    </label>
-                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                      {bundles.map((b) => (
-                        <label key={b.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={editForm.bundleIds.includes(b.id)}
-                            onChange={(e) => toggleEditBundleId(b.id, e.target.checked)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-gray-700">{b.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                    {editForm.bundleIds.length > 0 && (
-                      <p className="text-xs text-blue-600">{editForm.bundleIds.length} bundle{editForm.bundleIds.length !== 1 ? "s" : ""} selected</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Course restriction */}
-                {courses.length > 0 && (
-                  <div className="space-y-1 sm:col-span-2">
-                    <label className="text-xs font-medium text-gray-700">
-                      Restrict to specific courses <span className="text-gray-400">(none = all courses)</span>
-                    </label>
-                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
-                      {courses.map((c) => (
-                        <label key={c.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
-                          <input
-                            type="checkbox"
-                            checked={editForm.courseIds.includes(c.id)}
-                            onChange={(e) => toggleEditCourseId(c.id, e.target.checked)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-gray-700">{c.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                    {editForm.courseIds.length > 0 && (
-                      <p className="text-xs text-blue-600">{editForm.courseIds.length} course{editForm.courseIds.length !== 1 ? "s" : ""} selected</p>
-                    )}
-                  </div>
-                )}
+                {/* Applies to */}
+                <div className="sm:col-span-2 space-y-1">
+                  <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
+                    Applies to
+                    <HelpTip id="discount-codes-applies-to" />
+                  </label>
+                  <DiscountScopePicker
+                    key={editingCode?.id}
+                    books={books}
+                    bundles={bundles}
+                    courses={courses}
+                    bookIds={editForm.bookIds}
+                    bundleIds={editForm.bundleIds}
+                    courseIds={editForm.courseIds}
+                    onChange={(next) => setEditForm((prev) => ({ ...prev, ...next }))}
+                  />
+                </div>
 
                 {/* Show as sale price */}
                 <div className="sm:col-span-2 flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
