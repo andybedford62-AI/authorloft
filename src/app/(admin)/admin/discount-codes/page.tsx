@@ -24,10 +24,14 @@ type DiscountCode = {
   isActive: boolean;
   showAsSalePrice: boolean;
   books: { book: { id: string; title: string } }[];
+  bundles: { bundle: { id: string; title: string } }[];
+  courses: { course: { id: string; title: string } }[];
   createdAt: string;
 };
 
 type BookOption = { id: string; title: string };
+type BundleOption = { id: string; title: string };
+type CourseOption = { id: string; title: string };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -42,11 +46,21 @@ function usageLabel(code: DiscountCode) {
   return `${code.usesCount} / ${code.maxUses} uses`;
 }
 
+function appliesToLabel(code: DiscountCode) {
+  const parts: string[] = [];
+  parts.push(code.books.length === 0 ? "All books" : `${code.books.length} book${code.books.length !== 1 ? "s" : ""}`);
+  parts.push(code.bundles.length === 0 ? "all bundles" : `${code.bundles.length} bundle${code.bundles.length !== 1 ? "s" : ""}`);
+  parts.push(code.courses.length === 0 ? "all courses" : `${code.courses.length} course${code.courses.length !== 1 ? "s" : ""}`);
+  return parts.join(", ");
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DiscountCodesPage() {
   const [codes,      setCodes]      = useState<DiscountCode[]>([]);
   const [books,      setBooks]      = useState<BookOption[]>([]);
+  const [bundles,    setBundles]    = useState<BundleOption[]>([]);
+  const [courses,    setCourses]    = useState<CourseOption[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [saving,     setSaving]     = useState(false);
   const [error,      setError]      = useState("");
@@ -60,6 +74,7 @@ export default function DiscountCodesPage() {
   const [editForm, setEditForm] = useState({
     code: "", description: "", type: "PERCENT" as "PERCENT" | "FIXED",
     value: "", maxUses: "", expiresAt: "", bookIds: [] as string[],
+    bundleIds: [] as string[], courseIds: [] as string[],
     showAsSalePrice: false,
   });
   const [editSaving, setEditSaving] = useState(false);
@@ -74,6 +89,8 @@ export default function DiscountCodesPage() {
     maxUses:         "",
     expiresAt:       "",
     bookIds:         [] as string[],
+    bundleIds:       [] as string[],
+    courseIds:       [] as string[],
     showAsSalePrice: false,
   });
 
@@ -81,13 +98,29 @@ export default function DiscountCodesPage() {
     Promise.all([
       fetch("/api/admin/discount-codes").then((r) => r.json()),
       fetch("/api/admin/books").then((r) => r.json()),
-    ]).then(([codesData, booksData]) => {
+      fetch("/api/admin/bundles").then((r) => r.json()),
+      fetch("/api/admin/courses").then((r) => r.json()),
+    ]).then(([codesData, booksData, bundlesData, coursesData]) => {
       setCodes(Array.isArray(codesData) ? codesData : []);
       setBooks(
         Array.isArray(booksData)
           ? booksData
               .filter((b: any) => b.directSalesEnabled)
               .map((b: any) => ({ id: b.id, title: b.title }))
+          : [],
+      );
+      setBundles(
+        Array.isArray(bundlesData?.bundles)
+          ? bundlesData.bundles
+              .filter((b: any) => b.isPublished)
+              .map((b: any) => ({ id: b.id, title: b.title }))
+          : [],
+      );
+      setCourses(
+        Array.isArray(coursesData?.courses)
+          ? coursesData.courses
+              .filter((c: any) => c.isPublished)
+              .map((c: any) => ({ id: c.id, title: c.title }))
           : [],
       );
     }).finally(() => setLoading(false));
@@ -99,6 +132,24 @@ export default function DiscountCodesPage() {
       bookIds: checked
         ? [...prev.bookIds, bookId]
         : prev.bookIds.filter((id) => id !== bookId),
+    }));
+  }
+
+  function toggleBundleId(bundleId: string, checked: boolean) {
+    setForm((prev) => ({
+      ...prev,
+      bundleIds: checked
+        ? [...prev.bundleIds, bundleId]
+        : prev.bundleIds.filter((id) => id !== bundleId),
+    }));
+  }
+
+  function toggleCourseId(courseId: string, checked: boolean) {
+    setForm((prev) => ({
+      ...prev,
+      courseIds: checked
+        ? [...prev.courseIds, courseId]
+        : prev.courseIds.filter((id) => id !== courseId),
     }));
   }
 
@@ -120,6 +171,8 @@ export default function DiscountCodesPage() {
           maxUses:         form.maxUses ? Number(form.maxUses) : undefined,
           expiresAt:       form.expiresAt || undefined,
           bookIds:         form.bookIds,
+          bundleIds:       form.bundleIds,
+          courseIds:       form.courseIds,
           showAsSalePrice: form.showAsSalePrice,
         }),
       });
@@ -128,7 +181,8 @@ export default function DiscountCodesPage() {
       setCodes((prev) => [data, ...prev]);
       setForm({
         code: "", description: "", type: "PERCENT", value: "",
-        maxUses: "", expiresAt: "", bookIds: [], showAsSalePrice: false,
+        maxUses: "", expiresAt: "", bookIds: [], bundleIds: [], courseIds: [],
+        showAsSalePrice: false,
       });
     } finally {
       setSaving(false);
@@ -194,6 +248,8 @@ export default function DiscountCodesPage() {
                          ? new Date(code.expiresAt).toISOString().slice(0, 10)
                          : "",
       bookIds:         code.books.map((b) => b.book.id),
+      bundleIds:       code.bundles.map((b) => b.bundle.id),
+      courseIds:       code.courses.map((c) => c.course.id),
       showAsSalePrice: code.showAsSalePrice,
     });
   }
@@ -204,6 +260,24 @@ export default function DiscountCodesPage() {
       bookIds: checked
         ? [...prev.bookIds, bookId]
         : prev.bookIds.filter((id) => id !== bookId),
+    }));
+  }
+
+  function toggleEditBundleId(bundleId: string, checked: boolean) {
+    setEditForm((prev) => ({
+      ...prev,
+      bundleIds: checked
+        ? [...prev.bundleIds, bundleId]
+        : prev.bundleIds.filter((id) => id !== bundleId),
+    }));
+  }
+
+  function toggleEditCourseId(courseId: string, checked: boolean) {
+    setEditForm((prev) => ({
+      ...prev,
+      courseIds: checked
+        ? [...prev.courseIds, courseId]
+        : prev.courseIds.filter((id) => id !== courseId),
     }));
   }
 
@@ -226,6 +300,8 @@ export default function DiscountCodesPage() {
           maxUses:         editForm.maxUses ? Number(editForm.maxUses) : null,
           expiresAt:       editForm.expiresAt || null,
           bookIds:         editForm.bookIds,
+          bundleIds:       editForm.bundleIds,
+          courseIds:       editForm.courseIds,
           showAsSalePrice: editForm.showAsSalePrice,
         }),
       });
@@ -254,8 +330,8 @@ export default function DiscountCodesPage() {
           <HelpTip id="discount-codes" />
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print).
-          Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.
+          Create codes your readers can enter at checkout to get a discount on direct-sale items (eBook, Audio, Flipbook, Print),
+          bundles, or courses. Codes do not apply to retail links (Amazon, etc.) — those prices are set by the retailer.
         </p>
       </div>
 
@@ -382,6 +458,66 @@ export default function DiscountCodesPage() {
               </div>
             )}
 
+            {/* Bundle restriction — multi-select checkboxes */}
+            {bundles.length > 0 && (
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs font-medium text-gray-700">
+                  Restrict to specific bundles <span className="text-gray-400">(none selected = applies to all bundles)</span>
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                  {bundles.map((b) => (
+                    <label
+                      key={b.id}
+                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.bundleIds.includes(b.id)}
+                        onChange={(e) => toggleBundleId(b.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">{b.title}</span>
+                    </label>
+                  ))}
+                </div>
+                {form.bundleIds.length > 0 && (
+                  <p className="text-xs text-blue-600">
+                    {form.bundleIds.length} bundle{form.bundleIds.length !== 1 ? "s" : ""} selected
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Course restriction — multi-select checkboxes */}
+            {courses.length > 0 && (
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs font-medium text-gray-700">
+                  Restrict to specific courses <span className="text-gray-400">(none selected = applies to all courses)</span>
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                  {courses.map((c) => (
+                    <label
+                      key={c.id}
+                      className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.courseIds.includes(c.id)}
+                        onChange={(e) => toggleCourseId(c.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">{c.title}</span>
+                    </label>
+                  ))}
+                </div>
+                {form.courseIds.length > 0 && (
+                  <p className="text-xs text-blue-600">
+                    {form.courseIds.length} course{form.courseIds.length !== 1 ? "s" : ""} selected
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Show as sale price toggle */}
             <div className="sm:col-span-2 flex items-start gap-3 pt-1 p-3 rounded-lg border border-gray-200 bg-amber-50">
               <input
@@ -434,7 +570,7 @@ export default function DiscountCodesPage() {
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:table-cell">Discount</th>
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden md:table-cell">Usage</th>
                 <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Expires</th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Books</th>
+                <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Applies to</th>
                 <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
@@ -483,13 +619,9 @@ export default function DiscountCodesPage() {
                     </span>
                   </td>
 
-                  {/* Books */}
+                  {/* Applies to */}
                   <td className="px-5 py-4 hidden lg:table-cell">
-                    <span className="text-xs text-gray-500">
-                      {code.books.length === 0
-                        ? "All direct-sale books"
-                        : code.books.map((b) => b.book.title).join(", ")}
-                    </span>
+                    <span className="text-xs text-gray-500">{appliesToLabel(code)}</span>
                     {code.showAsSalePrice && (
                       <span className="block text-xs text-amber-600 font-medium mt-0.5">Shows as sale price</span>
                     )}
@@ -652,6 +784,56 @@ export default function DiscountCodesPage() {
                     </div>
                     {editForm.bookIds.length > 0 && (
                       <p className="text-xs text-blue-600">{editForm.bookIds.length} book{editForm.bookIds.length !== 1 ? "s" : ""} selected</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Bundle restriction */}
+                {bundles.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="text-xs font-medium text-gray-700">
+                      Restrict to specific bundles <span className="text-gray-400">(none = all bundles)</span>
+                    </label>
+                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                      {bundles.map((b) => (
+                        <label key={b.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={editForm.bundleIds.includes(b.id)}
+                            onChange={(e) => toggleEditBundleId(b.id, e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-gray-700">{b.title}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {editForm.bundleIds.length > 0 && (
+                      <p className="text-xs text-blue-600">{editForm.bundleIds.length} bundle{editForm.bundleIds.length !== 1 ? "s" : ""} selected</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Course restriction */}
+                {courses.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <label className="text-xs font-medium text-gray-700">
+                      Restrict to specific courses <span className="text-gray-400">(none = all courses)</span>
+                    </label>
+                    <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-0.5 bg-gray-50">
+                      {courses.map((c) => (
+                        <label key={c.id} className="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={editForm.courseIds.includes(c.id)}
+                            onChange={(e) => toggleEditCourseId(c.id, e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-gray-700">{c.title}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {editForm.courseIds.length > 0 && (
+                      <p className="text-xs text-blue-600">{editForm.courseIds.length} course{editForm.courseIds.length !== 1 ? "s" : ""} selected</p>
                     )}
                   </div>
                 )}

@@ -833,23 +833,45 @@ model DiscountCodeBook {
   @@index([bookId])
 }
 
+model DiscountCodeBundle {
+  discountCodeId String
+  bundleId       String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  bundle         Bundle       @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+
+  @@id([discountCodeId, bundleId])
+  @@index([bundleId])
+}
+
+model DiscountCodeCourse {
+  discountCodeId String
+  courseId       String
+  discountCode   DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([discountCodeId, courseId])
+  @@index([courseId])
+}
+
 model DiscountCode {
-  id              String             @id @default(cuid())
+  id              String               @id @default(cuid())
   authorId        String
-  author          Author             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author          Author               @relation(fields: [authorId], references: [id], onDelete: Cascade)
   code            String // stored uppercase, e.g. "LAUNCH20"
   description     String? // internal note for the author
   type            String // "PERCENT" | "FIXED"
   value           Int // percent 1-100, or fixed cents (e.g. 500 = $5.00)
   maxUses         Int? // null = unlimited
-  usesCount       Int                @default(0)
+  usesCount       Int                  @default(0)
   expiresAt       DateTime? // null = no expiry
-  isActive        Boolean            @default(true)
-  showAsSalePrice Boolean            @default(false) // when true, show discounted price publicly on book pages
+  isActive        Boolean              @default(true)
+  showAsSalePrice Boolean              @default(false) // when true, show discounted price publicly on book pages
   books           DiscountCodeBook[]
+  bundles         DiscountCodeBundle[]
+  courses         DiscountCodeCourse[]
   specials        Special[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
   orders          Order[]
 
   @@unique([authorId, code])
@@ -1534,6 +1556,7 @@ model Bundle {
   author        Author       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   items         BundleItem[]
   orderItems    OrderItem[]
+  discountCodes DiscountCodeBundle[]
 
   @@unique([authorId, slug])
   @@index([authorId])
@@ -1572,6 +1595,7 @@ model Course {
   orderItems    OrderItem[]
   categories    CourseCategoryAssignment[]
   feedback      CourseFeedback[]
+  discountCodes DiscountCodeCourse[]
 
   @@unique([authorId, slug])
   @@index([authorId])

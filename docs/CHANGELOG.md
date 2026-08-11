@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 11, 2026 — Discount codes now work on Bundles and Courses (and a real bundle-checkout bug fix)
+
+Extended `DiscountCode` past books: new `DiscountCodeBundle`/`DiscountCodeCourse` join tables mirror the existing `DiscountCodeBook` pattern (empty list = applies to all of that type — same semantics as books, so every existing code now also applies to all of an author's bundles/courses by default). `/admin/discount-codes` gained bundle/course checkbox sections alongside the book one, and the list table's "Books" column became a single "Applies to" summary across all three.
+
+**Bug fix in the same pass:** bundle checkout already accepted a `discountCode` and resolved it, but then silently discarded the result — `itemDiscount` was hardcoded to `0` and the charged total came straight from the bundle's list price, so a discount code could be "applied" with zero effect and no error. Fixed in `src/app/api/checkout/route.ts`. Course checkout had no discount-code handling at all before this (net-new). Both webhook blocks (`bundle_purchase`, `course_purchase`) now increment `DiscountCode.usesCount` on completion, matching `book_purchase`; the bundle buyer-confirmation email now shows the real discount instead of a hardcoded `$0`, and the course purchase emails (buyer + author) now reflect the actual charged price instead of always showing the course's sticker price.
+
+New shared `DiscountCodeInput` component (`src/components/author-site/discount-code-input.tsx`) replaces duplicated code-entry logic in `buy-section.tsx`/`cart-drawer.tsx` and is now also wired into the bundle and course buy buttons.
+
 ## August 10, 2026 — Media Kit merged into the About page as a tab
 
 Andy asked to move Media Kit off its own nav item and onto the About page as a tab, following the same pattern as the earlier Books/Bundles merge. `MediaKitContent` extracted from the old standalone `/media-kit` page (unchanged markup, just parameterized instead of reading `author` directly); `AboutMediaKitTabs` is a new client tab switcher (mirrors `BooksBundlesTabs`) that renders About plainly with no tab UI when Media Kit isn't available — same "no dead tab" rule as Bundles. `/about` now accepts `?tab=media-kit` for deep-linking; `/media-kit` redirects there instead of rendering its own page. Gating unchanged: still requires `mediaKitEnabled` (plan) *and* `navShowMediaKit` (owner's toggle), just gating a tab now instead of a nav link. Updated the admin nav-settings description, the "Your Site Pages" card (`site-pages.ts`), and the admin Media Kit editor's "View public page" link to point at the new location.

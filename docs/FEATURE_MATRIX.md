@@ -43,7 +43,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | Up to 5 | Up to 25 | Unlimited |
 | **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
-| **Discount Codes** (per-book or sitewide) | ✅ | ✅ | ✅ |
+| **Discount Codes** (per-book, per-bundle, per-course, or sitewide) | ✅ | ✅ | ✅ |
 | **Reader Feedback & Ratings** (per book, author-moderated) | ✅ | ✅ | ✅ |
 | **Coupon Manager** (create/manage discounts) | ❌ | ✅ | ✅ |
 | **Audio Format** (upload & sell audio books) | ❌ | ❌ | ✅ |

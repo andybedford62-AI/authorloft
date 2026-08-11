@@ -95,7 +95,39 @@ export async function POST(req: NextRequest) {
       }
 
       const author = course.author;
-      const totalCents = Math.max(50, course.priceCents);
+
+      // ── Resolve discount code ─────────────────────────────────────────
+      let courseDiscountId: string | null = null;
+      let courseDiscountCents = 0;
+
+      if (validatedBody.discountCode && typeof validatedBody.discountCode === "string") {
+        const foundDiscount = await prisma.discountCode.findUnique({
+          where: {
+            authorId_code: {
+              authorId: author.id,
+              code: validatedBody.discountCode.trim().toUpperCase(),
+            },
+          },
+          include: { courses: { select: { courseId: true } } },
+        });
+
+        const isValidDiscount =
+          foundDiscount &&
+          foundDiscount.isActive &&
+          (!foundDiscount.expiresAt || foundDiscount.expiresAt >= new Date()) &&
+          (foundDiscount.maxUses === null || foundDiscount.usesCount < foundDiscount.maxUses);
+
+        if (isValidDiscount && foundDiscount) {
+          const restrictedCourseIds = foundDiscount.courses.map((c) => c.courseId);
+          const courseAllowed = restrictedCourseIds.length === 0 || restrictedCourseIds.includes(course.id);
+          if (courseAllowed) {
+            courseDiscountId = foundDiscount.id;
+            courseDiscountCents = calcDiscount(course.priceCents, foundDiscount.type, foundDiscount.value).discountCents;
+          }
+        }
+      }
+
+      const totalCents = Math.max(50, course.priceCents - courseDiscountCents);
       const baseUrl = `https://${author.slug}.${PLATFORM_DOMAIN}`;
       const successUrl = `${baseUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${baseUrl}/courses/${course.slug}`;
@@ -140,7 +172,8 @@ export async function POST(req: NextRequest) {
           authorId: author.id,
           customerEmail: "",
           totalCents,
-          discountCents: 0,
+          discountCents: courseDiscountCents,
+          ...(courseDiscountId && { discountCodeId: courseDiscountId }),
           stripeSessionId: session.id,
           status: "PENDING",
           items: {
@@ -283,6 +316,7 @@ export async function POST(req: NextRequest) {
       maxUses: number | null;
       usesCount: number;
       books: { bookId: string }[];
+      bundles: { bundleId: string }[];
     };
 
     let discount: DiscountWithBooks | null = null;
@@ -295,7 +329,10 @@ export async function POST(req: NextRequest) {
             code: discountCode.trim().toUpperCase(),
           },
         },
-        include: { books: { select: { bookId: true } } },
+        include: {
+          books: { select: { bookId: true } },
+          bundles: { select: { bundleId: true } },
+        },
       });
 
       const isValid =
@@ -311,13 +348,25 @@ export async function POST(req: NextRequest) {
     let hasBelowMinimumPricing = false;
 
     let lineItems: { item: typeof saleItems[0]; itemPrice: number; itemDiscount: number; originalPrice: number }[];
+    let discountedBundleTotal = bundleRecord ? bundleRecord.priceCents : 0;
 
     if (bundleRecord) {
-      const perItemPrice = Math.max(50, Math.round(bundleRecord.priceCents / saleItems.length));
+      let bundleDiscountCents = 0;
+      if (discount) {
+        const restrictedBundleIds = discount.bundles.map((b) => b.bundleId);
+        const bundleAllowed = restrictedBundleIds.length === 0 || restrictedBundleIds.includes(bundleRecord.id);
+        if (bundleAllowed) {
+          bundleDiscountCents = calcDiscount(bundleRecord.priceCents, discount.type, discount.value).discountCents;
+        }
+      }
+      discountedBundleTotal = Math.max(50, bundleRecord.priceCents - bundleDiscountCents);
+
+      const perItemPrice = Math.max(1, Math.round(discountedBundleTotal / saleItems.length));
+      const perItemDiscount = Math.round(bundleDiscountCents / saleItems.length);
       lineItems = saleItems.map((item) => ({
         item,
         itemPrice: perItemPrice,
-        itemDiscount: 0,
+        itemDiscount: perItemDiscount,
         originalPrice: item.priceCents,
       }));
     } else {
@@ -346,8 +395,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const totalCents    = bundleRecord ? Math.max(50, bundleRecord.priceCents) : lineItems.reduce((s, l) => s + l.itemPrice, 0);
-    const discountCents = lineItems.reduce((s, l) => s + l.itemDiscount, 0);
+    const totalCents    = bundleRecord ? discountedBundleTotal : lineItems.reduce((s, l) => s + l.itemPrice, 0);
+    const discountCents = bundleRecord
+      ? bundleRecord.priceCents - discountedBundleTotal
+      : lineItems.reduce((s, l) => s + l.itemDiscount, 0);
     const discountCodeId = discount ? discount.id : null;
 
     // Build redirect URLs from the first item's book (or use author slug directly)

@@ -8,9 +8,12 @@ const DISCOUNT_CODE_REGEX = /^[A-Z0-9-]+$/;
 /**
  * POST /api/checkout/validate-discount
  *
- * Validates a discount code for one or more sale items (cart).
+ * Validates a discount code for one or more sale items (cart), or for a
+ * single bundle or course purchase.
  * Body: { code: string; saleItemIds: string[] }
  *   or legacy: { code: string; saleItemId: string }
+ *   or: { code: string; bundleId: string }
+ *   or: { code: string; courseId: string }
  * Returns: { valid: true; type; value; discountCents; finalTotal; description? }
  *       or { valid: false; error: string }
  */
@@ -27,8 +30,102 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { code } = body;
+    const { code, bundleId, courseId } = body;
 
+    if (typeof code !== "string" || !code.trim() || code.length > 50 || !DISCOUNT_CODE_REGEX.test(code.trim().toUpperCase())) {
+      return NextResponse.json({ valid: false, error: "Invalid or missing discount code." }, { status: 400 });
+    }
+    const normalizedCode = code.trim().toUpperCase();
+
+    // ── Bundle path ──────────────────────────────────────────────────────
+    if (typeof bundleId === "string" && bundleId) {
+      const bundle = await prisma.bundle.findUnique({
+        where: { id: bundleId },
+        select: { id: true, priceCents: true, authorId: true, isPublished: true },
+      });
+      if (!bundle || !bundle.isPublished) {
+        return NextResponse.json({ valid: false, error: "Bundle not found." }, { status: 404 });
+      }
+
+      const discount = await prisma.discountCode.findUnique({
+        where: { authorId_code: { authorId: bundle.authorId, code: normalizedCode } },
+        include: { bundles: { select: { bundleId: true } } },
+      });
+
+      if (!discount || !discount.isActive) {
+        return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." }, { status: 400 });
+      }
+      if (discount.expiresAt && discount.expiresAt < new Date()) {
+        return NextResponse.json({ valid: false, error: "This discount code has expired." }, { status: 400 });
+      }
+      if (discount.maxUses !== null && discount.usesCount >= discount.maxUses) {
+        return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." }, { status: 400 });
+      }
+
+      const restrictedBundleIds = discount.bundles.map((b) => b.bundleId);
+      const bundleAllowed = restrictedBundleIds.length === 0 || restrictedBundleIds.includes(bundle.id);
+      if (!bundleAllowed) {
+        return NextResponse.json({ valid: false, error: "This code is not valid for this bundle." }, { status: 400 });
+      }
+
+      const { discountCents, finalPriceCents } = calcDiscount(bundle.priceCents, discount.type, discount.value);
+      return NextResponse.json({
+        valid: true,
+        discountId: discount.id,
+        type: discount.type,
+        value: discount.value,
+        discountCents,
+        finalTotal: finalPriceCents,
+        finalPriceCents,
+        description: discount.description ?? null,
+      });
+    }
+
+    // ── Course path ──────────────────────────────────────────────────────
+    if (typeof courseId === "string" && courseId) {
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        select: { id: true, priceCents: true, authorId: true, isPublished: true },
+      });
+      if (!course || !course.isPublished) {
+        return NextResponse.json({ valid: false, error: "Course not found." }, { status: 404 });
+      }
+
+      const discount = await prisma.discountCode.findUnique({
+        where: { authorId_code: { authorId: course.authorId, code: normalizedCode } },
+        include: { courses: { select: { courseId: true } } },
+      });
+
+      if (!discount || !discount.isActive) {
+        return NextResponse.json({ valid: false, error: "Invalid or inactive discount code." }, { status: 400 });
+      }
+      if (discount.expiresAt && discount.expiresAt < new Date()) {
+        return NextResponse.json({ valid: false, error: "This discount code has expired." }, { status: 400 });
+      }
+      if (discount.maxUses !== null && discount.usesCount >= discount.maxUses) {
+        return NextResponse.json({ valid: false, error: "This discount code has reached its usage limit." }, { status: 400 });
+      }
+
+      const restrictedCourseIds = discount.courses.map((c) => c.courseId);
+      const courseAllowed = restrictedCourseIds.length === 0 || restrictedCourseIds.includes(course.id);
+      if (!courseAllowed) {
+        return NextResponse.json({ valid: false, error: "This code is not valid for this course." }, { status: 400 });
+      }
+
+      const { discountCents, finalPriceCents } = calcDiscount(course.priceCents, discount.type, discount.value);
+      return NextResponse.json({
+        valid: true,
+        discountId: discount.id,
+        type: discount.type,
+        value: discount.value,
+        discountCents,
+        finalTotal: finalPriceCents,
+        finalPriceCents,
+        description: discount.description ?? null,
+      });
+    }
+
+    // ── Book / cart path (saleItemIds) ──────────────────────────────────
     // Support both new array format and legacy single-item format
     let saleItemIds: string[];
     if (Array.isArray(body.saleItemIds) && body.saleItemIds.length > 0) {
@@ -37,10 +134,6 @@ export async function POST(req: NextRequest) {
       saleItemIds = [body.saleItemId];
     } else {
       return NextResponse.json({ valid: false, error: "Missing code or items." }, { status: 400 });
-    }
-
-    if (typeof code !== "string" || !code.trim() || code.length > 50 || !DISCOUNT_CODE_REGEX.test(code.trim().toUpperCase())) {
-      return NextResponse.json({ valid: false, error: "Invalid or missing discount code." }, { status: 400 });
     }
 
     // Load all sale items

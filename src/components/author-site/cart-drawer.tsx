@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Trash2, ShoppingCart, Loader2, Tag, Headphones, Tablet, BookOpen, Music } from "lucide-react";
+import { X, Trash2, ShoppingCart, Loader2, Headphones, Tablet, BookOpen, Music } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { formatCents } from "@/lib/utils";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
+import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
 import Image from "next/image";
 
 // ── Format icon helper ────────────────────────────────────────────────────────
@@ -41,23 +42,7 @@ export function CartDrawer() {
   const csrfToken = useCSRFToken();
   const [loading,       setLoading]       = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-
-  // Discount state
-  const [codeInput,     setCodeInput]     = useState("");
-  const [validating,    setValidating]    = useState(false);
-  const [discountError, setDiscountError] = useState("");
-  const [applied, setApplied] = useState<{
-    code:           string;
-    discountCents:  number;
-    label:          string;
-  } | null>(null);
-
-  // Reset discount when items change
-  useEffect(() => {
-    setApplied(null);
-    setDiscountError("");
-    setCodeInput("");
-  }, [items.length]);
+  const [applied, setApplied] = useState<AppliedDiscount | null>(null);
 
   // Close on Escape
   useEffect(() => {
@@ -67,47 +52,6 @@ export function CartDrawer() {
     if (isOpen) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, closeCart]);
-
-  async function applyCode() {
-    const code = codeInput.trim();
-    if (!code || items.length === 0) return;
-    setDiscountError("");
-    setValidating(true);
-    try {
-      const res = await fetch("/api/checkout/validate-discount", {
-        method:  "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(csrfToken && { "X-CSRF-Token": csrfToken }),
-        },
-        body:    JSON.stringify({ code, saleItemIds: items.map((i) => i.saleItemId) }),
-      });
-      const data = await res.json();
-      if (!data.valid) {
-        setDiscountError(data.error || "Invalid code.");
-        setApplied(null);
-        return;
-      }
-      setApplied({
-        code,
-        discountCents: data.discountCents,
-        label:
-          data.type === "PERCENT"
-            ? `${data.value}% off`
-            : `${formatCents(data.discountCents)} off`,
-      });
-    } catch {
-      setDiscountError("Could not validate code. Try again.");
-    } finally {
-      setValidating(false);
-    }
-  }
-
-  function removeCode() {
-    setApplied(null);
-    setCodeInput("");
-    setDiscountError("");
-  }
 
   async function handleCheckout() {
     if (items.length === 0) return;
@@ -138,7 +82,7 @@ export function CartDrawer() {
     }
   }
 
-  const finalTotal = Math.max(0, totalCents - (applied?.discountCents ?? 0));
+  const finalTotal = applied ? applied.finalPriceCents : totalCents;
 
   return (
     <>
@@ -245,44 +189,11 @@ export function CartDrawer() {
           <div className="border-t border-gray-100 px-5 py-4 space-y-4">
 
             {/* Discount code */}
-            {!applied ? (
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-gray-500">Discount code</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={codeInput}
-                    onChange={(e) => {
-                      setCodeInput(e.target.value.toUpperCase());
-                      setDiscountError("");
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && applyCode()}
-                    placeholder="Enter code"
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-0"
-                  />
-                  <button
-                    type="button"
-                    onClick={applyCode}
-                    disabled={validating || !codeInput.trim()}
-                    className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors whitespace-nowrap"
-                  >
-                    {validating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
-                  </button>
-                </div>
-                {discountError && <p className="text-xs text-red-600">{discountError}</p>}
-              </div>
-            ) : (
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-green-200 bg-green-50">
-                <div className="flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-mono font-semibold text-green-800">{applied.code}</span>
-                  <span className="text-sm text-green-700">— {applied.label}</span>
-                </div>
-                <button onClick={removeCode} className="text-green-600 hover:text-green-800 transition-colors">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            )}
+            <DiscountCodeInput
+              target={{ saleItemIds: items.map((i) => i.saleItemId) }}
+              resetSignal={items.length}
+              onApplied={setApplied}
+            />
 
             {/* Price summary */}
             <div className="space-y-1.5">

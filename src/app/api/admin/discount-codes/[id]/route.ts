@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
-const BOOKS_INCLUDE = {
-  books: { include: { book: { select: { id: true, title: true } } } },
+const DISCOUNT_CODE_INCLUDE = {
+  books:   { include: { book:   { select: { id: true, title: true } } } },
+  bundles: { include: { bundle: { select: { id: true, title: true } } } },
+  courses: { include: { course: { select: { id: true, title: true } } } },
 } as const;
 
 // PATCH /api/admin/discount-codes/[id] — full edit or toggle isActive/showAsSalePrice/bookIds
@@ -32,12 +34,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
-    // Build book update if bookIds provided
+    // Build book/bundle/course updates if their ID lists were provided
     const booksUpdate =
       body.bookIds !== undefined
         ? {
             deleteMany: {},
             create: (body.bookIds as string[]).map((bid) => ({ bookId: bid })),
+          }
+        : undefined;
+
+    const bundlesUpdate =
+      body.bundleIds !== undefined
+        ? {
+            deleteMany: {},
+            create: (body.bundleIds as string[]).map((bid) => ({ bundleId: bid })),
+          }
+        : undefined;
+
+    const coursesUpdate =
+      body.courseIds !== undefined
+        ? {
+            deleteMany: {},
+            create: (body.courseIds as string[]).map((cid) => ({ courseId: cid })),
           }
         : undefined;
 
@@ -53,8 +71,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(body.isActive        !== undefined && { isActive: body.isActive }),
         ...(body.showAsSalePrice !== undefined && { showAsSalePrice: body.showAsSalePrice }),
         ...(booksUpdate                        && { books: booksUpdate }),
+        ...(bundlesUpdate                      && { bundles: bundlesUpdate }),
+        ...(coursesUpdate                      && { courses: coursesUpdate }),
       },
-      include: BOOKS_INCLUDE,
+      include: DISCOUNT_CODE_INCLUDE,
     });
 
     return NextResponse.json(updated);

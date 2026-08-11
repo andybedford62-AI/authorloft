@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
+import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
 
 interface CourseBuyButtonProps {
   courseId: string;
@@ -17,6 +18,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [applied, setApplied] = useState<AppliedDiscount | null>(null);
 
   async function handleBuy() {
     setLoading(true);
@@ -29,7 +31,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
           "Content-Type": "application/json",
           ...(csrfToken && { "X-CSRF-Token": csrfToken }),
         },
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({ courseId, ...(applied && { discountCode: applied.code }) }),
       });
       const data = await res.json();
 
@@ -127,8 +129,15 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
     );
   }
 
+  const finalPriceCents = applied ? applied.finalPriceCents : priceCents;
+
   return (
-    <div>
+    <div className="space-y-3">
+      <DiscountCodeInput
+        target={{ courseId }}
+        accentColor={accentColor}
+        onApplied={setApplied}
+      />
       <Button
         onClick={handleBuy}
         disabled={loading}
@@ -140,7 +149,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
         ) : (
           <GraduationCap className="h-5 w-5 mr-2" />
         )}
-        Enroll — ${(priceCents / 100).toFixed(2)}
+        Enroll — ${(finalPriceCents / 100).toFixed(2)}
       </Button>
       {error && (
         <p className="text-sm text-red-600 mt-2 text-center">{error}</p>

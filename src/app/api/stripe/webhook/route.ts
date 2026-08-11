@@ -264,6 +264,14 @@ export async function POST(req: NextRequest) {
             data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
           });
 
+          // Increment discount code usage count if one was applied
+          if (order.discountCodeId) {
+            await prisma.discountCode.update({
+              where: { id: order.discountCodeId },
+              data: { usesCount: { increment: 1 } },
+            }).catch((err) => console.error("[webhook] discountCode increment error:", err));
+          }
+
           const expiry = generateDownloadExpiry(168);
           const missingSaleItemIds = [
             ...new Set(
@@ -318,7 +326,7 @@ export async function POST(req: NextRequest) {
             const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
             sendOrderConfirmationEmail({
               to: customerEmail, customerName, items: orderItemsForEmail, totalCents,
-              discountCents: 0, downloadExpiry: expiry, orderId: order.id,
+              discountCents: order.discountCents, downloadExpiry: expiry, orderId: order.id,
             }).catch((e) => console.error("[webhook] Failed to send bundle buyer email:", e));
 
             for (const fi of fullItems) {
@@ -362,6 +370,14 @@ export async function POST(req: NextRequest) {
             data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
           });
 
+          // Increment discount code usage count if one was applied
+          if (order.discountCodeId) {
+            await prisma.discountCode.update({
+              where: { id: order.discountCodeId },
+              data: { usesCount: { increment: 1 } },
+            }).catch((err) => console.error("[webhook] discountCode increment error:", err));
+          }
+
           if (courseId && customerEmail) {
             const enrollment = await prisma.courseEnrollment.upsert({
               where: { courseId_customerEmail: { courseId, customerEmail } },
@@ -387,7 +403,7 @@ export async function POST(req: NextRequest) {
                 authorName,
                 accessUrl,
                 isPaid: true,
-                priceCents: course.priceCents,
+                priceCents: order.totalCents,
               }).catch((e) => console.error("[webhook] Failed to send course access email:", e));
 
               // Save the buyer as a subscriber, same as a paid book purchase now does.
@@ -404,7 +420,7 @@ export async function POST(req: NextRequest) {
                 customerEmail,
                 customerName,
                 courseTitle: course.title,
-                priceCents: course.priceCents,
+                priceCents: order.totalCents,
                 orderId: order.id,
               }).catch((e) => console.error("[webhook] Failed to send course author notification:", e));
             }

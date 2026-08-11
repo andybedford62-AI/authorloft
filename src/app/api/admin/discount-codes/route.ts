@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 
-const BOOKS_INCLUDE = {
-  books: { include: { book: { select: { id: true, title: true } } } },
+const DISCOUNT_CODE_INCLUDE = {
+  books:   { include: { book:   { select: { id: true, title: true } } } },
+  bundles: { include: { bundle: { select: { id: true, title: true } } } },
+  courses: { include: { course: { select: { id: true, title: true } } } },
 } as const;
 
 // GET /api/admin/discount-codes — list all codes for the author
@@ -12,7 +14,7 @@ export async function GET() {
     const authorId = await getAdminAuthorId();
     const codes = await prisma.discountCode.findMany({
       where: { authorId },
-      include: BOOKS_INCLUDE,
+      include: DISCOUNT_CODE_INCLUDE,
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(codes);
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
       maxUses,
       expiresAt,
       bookIds,
+      bundleIds,
+      courseIds,
       showAsSalePrice,
     } = body;
 
@@ -56,6 +60,8 @@ export async function POST(req: NextRequest) {
 
     const upperCode = code.trim().toUpperCase().replace(/\s+/g, "");
     const safeBookIds: string[] = Array.isArray(bookIds) ? bookIds : [];
+    const safeBundleIds: string[] = Array.isArray(bundleIds) ? bundleIds : [];
+    const safeCourseIds: string[] = Array.isArray(courseIds) ? courseIds : [];
 
     // Validate that any restricted book IDs belong to this author and have direct sales enabled
     if (safeBookIds.length > 0) {
@@ -66,6 +72,34 @@ export async function POST(req: NextRequest) {
       if (validBooks.length !== safeBookIds.length) {
         return NextResponse.json(
           { error: "One or more selected books do not have direct sales enabled." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate that any restricted bundle IDs belong to this author and are published
+    if (safeBundleIds.length > 0) {
+      const validBundles = await prisma.bundle.findMany({
+        where: { id: { in: safeBundleIds }, authorId, isPublished: true },
+        select: { id: true },
+      });
+      if (validBundles.length !== safeBundleIds.length) {
+        return NextResponse.json(
+          { error: "One or more selected bundles are not published." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate that any restricted course IDs belong to this author and are published
+    if (safeCourseIds.length > 0) {
+      const validCourses = await prisma.course.findMany({
+        where: { id: { in: safeCourseIds }, authorId, isPublished: true },
+        select: { id: true },
+      });
+      if (validCourses.length !== safeCourseIds.length) {
+        return NextResponse.json(
+          { error: "One or more selected courses are not published." },
           { status: 400 }
         );
       }
@@ -84,8 +118,14 @@ export async function POST(req: NextRequest) {
         books: safeBookIds.length > 0
           ? { create: safeBookIds.map((bid: string) => ({ bookId: bid })) }
           : undefined,
+        bundles: safeBundleIds.length > 0
+          ? { create: safeBundleIds.map((bid: string) => ({ bundleId: bid })) }
+          : undefined,
+        courses: safeCourseIds.length > 0
+          ? { create: safeCourseIds.map((cid: string) => ({ courseId: cid })) }
+          : undefined,
       },
-      include: BOOKS_INCLUDE,
+      include: DISCOUNT_CODE_INCLUDE,
     });
 
     return NextResponse.json(newCode, { status: 201 });

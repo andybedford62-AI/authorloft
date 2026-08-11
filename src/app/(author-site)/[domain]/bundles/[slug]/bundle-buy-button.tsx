@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
+import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
 
 interface BundleBuyButtonProps {
   bundleId: string;
@@ -15,6 +16,7 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
   const csrfToken = useCSRFToken();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [applied, setApplied] = useState<AppliedDiscount | null>(null);
 
   async function handleBuy() {
     setLoading(true);
@@ -27,7 +29,7 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
           "Content-Type": "application/json",
           ...(csrfToken && { "X-CSRF-Token": csrfToken }),
         },
-        body: JSON.stringify({ bundleId }),
+        body: JSON.stringify({ bundleId, ...(applied && { discountCode: applied.code }) }),
       });
       const data = await res.json();
 
@@ -46,8 +48,15 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
     }
   }
 
+  const finalPriceCents = applied ? applied.finalPriceCents : priceCents;
+
   return (
-    <div>
+    <div className="space-y-3">
+      <DiscountCodeInput
+        target={{ bundleId }}
+        accentColor={accentColor}
+        onApplied={setApplied}
+      />
       <Button
         onClick={handleBuy}
         disabled={loading}
@@ -59,7 +68,7 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
         ) : (
           <ShoppingCart className="h-5 w-5 mr-2" />
         )}
-        Buy Bundle — ${(priceCents / 100).toFixed(2)}
+        Buy Bundle — ${(finalPriceCents / 100).toFixed(2)}
       </Button>
       {error && (
         <p className="text-sm text-red-600 mt-2 text-center">{error}</p>
