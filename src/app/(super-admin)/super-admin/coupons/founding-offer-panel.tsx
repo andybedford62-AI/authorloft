@@ -306,11 +306,11 @@ export function FoundingOfferPanel({ coupons }: { coupons: StripeCoupon[] }) {
             </div>
           </div>
 
-          <details className="text-sm">
-            <summary className="cursor-pointer text-gray-500 hover:text-gray-700 text-xs font-medium">
+          <div>
+            <p className="text-xs font-medium text-gray-500 mb-2">
               Custom banner wording (optional — auto-generated from the terms above if left blank)
-            </summary>
-            <div className="grid grid-cols-1 gap-3 mt-3">
+            </p>
+            <div className="grid grid-cols-1 gap-3">
               <div>
                 <label className={label}>Headline override</label>
                 <input value={form.headline} onChange={e => setField("headline", e.target.value)}
@@ -322,7 +322,7 @@ export function FoundingOfferPanel({ coupons }: { coupons: StripeCoupon[] }) {
                   placeholder={previewSubtext} className={input} />
               </div>
             </div>
-          </details>
+          </div>
 
           <div className="rounded-lg bg-amber-50 border border-amber-100 px-4 py-3">
             <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-1">Dashboard preview</p>
