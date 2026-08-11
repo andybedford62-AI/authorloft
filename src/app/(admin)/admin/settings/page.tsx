@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe, Award } from "lucide-react";
+import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe, Award, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
@@ -27,6 +27,7 @@ type BillingData = {
   isOnTrial:   boolean;
   trialEndsAt: string | null;
   plans: BillingPlan[];
+  foundingOffer: { percentOff: number; headline: string; subtext: string; daysLeft: number } | null;
 };
 
 function SubscriptionSection() {
@@ -188,6 +189,20 @@ function SubscriptionSection() {
           {/* Upgrade options — shown to free users and trial users */}
           {(isFree || isOnTrial) && data.plans.length > 0 && (
             <>
+              {/* Founding-offer eligibility — same offer as the dashboard banner, shown
+                  right where the upgrade decision actually happens */}
+              {data.foundingOffer && (
+                <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                  <PartyPopper className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-900">{data.foundingOffer.headline}</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      {data.foundingOffer.subtext} Automatically applied on the Stripe checkout page below — no code to enter.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Monthly / Annual toggle */}
               <div className="flex items-center gap-2">
                 <button
