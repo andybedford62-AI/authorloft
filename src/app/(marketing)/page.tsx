@@ -10,6 +10,8 @@ import { MidnightTestimonialsSection } from "@/components/marketing/midnight-tes
 import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
+import { getFoundingOfferCopy } from "@/lib/founding-offer";
+import { PartyPopper } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -180,13 +182,14 @@ const howToLd = {
 
 export default async function HomePage() {
   await cookies();
-  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings] = await Promise.all([
+  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings, foundingOffer] = await Promise.all([
     getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
     getServerSession(authOptions),
     prisma.platformSettings.findUnique({
       where: { id: "singleton" },
       select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
     }).catch(() => null),
+    getFoundingOfferCopy().catch(() => null),
   ]);
 
   let isAuthor = false;
@@ -257,6 +260,19 @@ export default async function HomePage() {
             Start free. Scale when you&apos;re ready.
           </h2>
           <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
+          {foundingOffer && (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: 12, textAlign: 'left',
+              maxWidth: 560, margin: '0 auto 40px', padding: '16px 20px',
+              borderRadius: 12, border: `1px solid ${C.accent}66`, background: C.surface,
+            }}>
+              <PartyPopper style={{ width: 20, height: 20, flexShrink: 0, marginTop: 2, color: C.accent }} />
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: C.text, margin: 0 }}>{foundingOffer.headline}</p>
+                <p style={{ fontSize: '0.75rem', color: C.muted, margin: '2px 0 0' }}>{foundingOffer.subtext}</p>
+              </div>
+            </div>
+          )}
           <MidnightPricingSection plans={plans} />
           <p style={{ fontSize: '0.8125rem', color: C.muted, marginTop: 24 }}>
             Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     const [author, earlyBirdOffer] = await Promise.all([
       prisma.author.findUnique({
         where:  { id: authorId },
-        select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, trialEndsAt: true, assignedCouponId: true },
+        select: { email: true, stripeSubscriptionId: true, stripeCustomerId: true, createdAt: true, assignedCouponId: true },
       }),
       prisma.earlyBirdOffer.findFirst({
         where:  { enabled: true },
@@ -107,13 +107,12 @@ export async function POST(req: NextRequest) {
     // Assigned coupon takes priority — set by super-admin on this author's profile
     const assignedCouponId = author.assignedCouponId ?? undefined;
 
-    // Early bird discount — within the configured window of account creation, FREE users only
-    // (not trial conversions). Only applies when no assigned coupon is present. Terms and which
-    // coupon gets applied are controlled from Super Admin → Coupons (falls back to env vars).
+    // Early bird discount — within the configured window of account creation.
+    // Only applies when no assigned coupon is present. Terms and which coupon
+    // gets applied are controlled from Super Admin → Coupons (falls back to env vars).
     const daysSinceSignup = (Date.now() - new Date(author.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-    const isOnTrial = !!author.trialEndsAt && author.trialEndsAt > new Date();
     const earlyBirdWindowDays = earlyBirdOffer?.windowDays ?? 30;
-    const isEarlyBird = !!earlyBirdOffer && !assignedCouponId && daysSinceSignup <= earlyBirdWindowDays && !isOnTrial;
+    const isEarlyBird = !!earlyBirdOffer && !assignedCouponId && daysSinceSignup <= earlyBirdWindowDays;
 
     const isMonthly = plan.stripePriceIdMonthly === priceId;
 

@@ -6,6 +6,8 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
+import { getFoundingOfferCopy } from "@/lib/founding-offer";
+import { PartyPopper } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -149,7 +151,10 @@ const breadcrumbLd = {
 };
 
 export default async function PricingPage() {
-  const plans = await getActivePlans().catch(() => []);
+  const [plans, foundingOffer] = await Promise.all([
+    getActivePlans().catch(() => []),
+    getFoundingOfferCopy().catch(() => null),
+  ]);
   const comparisonRows = buildComparisonRows(plans);
 
   return (
@@ -169,6 +174,15 @@ export default async function PricingPage() {
 
       {/* Pricing cards — live from DB */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">
+        {foundingOffer && (
+          <div className="max-w-2xl mx-auto mb-10 flex items-start gap-3 rounded-xl border border-[#D4AE6A]/40 bg-[#F0EDE4] px-5 py-4">
+            <PartyPopper className="h-5 w-5 flex-shrink-0 mt-0.5 text-[#B8893D]" />
+            <div>
+              <p className="text-sm font-semibold text-[#1B2B47]">{foundingOffer.headline}</p>
+              <p className="text-xs text-[#5C6E89] mt-0.5">{foundingOffer.subtext}</p>
+            </div>
+          </div>
+        )}
         {plans.length > 0 ? (
           <PricingSection plans={plans} fullPage />
         ) : (
