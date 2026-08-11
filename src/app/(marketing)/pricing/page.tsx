@@ -7,7 +7,6 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
-import { PartyPopper } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -175,11 +174,15 @@ export default async function PricingPage() {
       {/* Pricing cards — live from DB */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">
         {foundingOffer && (
-          <div className="max-w-2xl mx-auto mb-10 flex items-start gap-3 rounded-xl border border-[#D4AE6A]/40 bg-[#F0EDE4] px-5 py-4">
-            <PartyPopper className="h-5 w-5 flex-shrink-0 mt-0.5 text-[#B8893D]" />
-            <div>
-              <p className="text-sm font-semibold text-[#1B2B47]">{foundingOffer.headline}</p>
-              <p className="text-xs text-[#5C6E89] mt-0.5">{foundingOffer.subtext}</p>
+          <div className="max-w-2xl mx-auto mb-10 flex items-center gap-5 rounded-2xl border border-[#D4AE6A]/60 bg-[#1B2B47] px-6 py-5 shadow-xl shadow-[#1B2B47]/25">
+            <div className="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[#D4AE6A] to-[#B8893D] text-[#1B2B47] shadow-md">
+              <span className="text-2xl font-extrabold leading-none">{foundingOffer.percentOff}%</span>
+              <span className="text-[10px] font-bold uppercase tracking-wide">off</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#D4AE6A] mb-1">🎉 Founding Member Offer</p>
+              <p className="text-base sm:text-lg font-bold text-white leading-snug">{foundingOffer.headline}</p>
+              <p className="text-sm text-[#B8C2D9] mt-1">{foundingOffer.subtext}</p>
             </div>
           </div>
         )}

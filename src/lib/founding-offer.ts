@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 export type FoundingOfferCopy = {
   headline: string;
   subtext: string;
+  percentOff: number;
 };
 
 // Whichever founding-member offer is currently live — Super Admin → Coupons.
@@ -20,5 +21,5 @@ export async function getFoundingOfferCopy(): Promise<FoundingOfferCopy | null> 
   const subtext = offer.subtext?.trim()
     || "Sign up free, then upgrade within your first 30 days to lock it in — applied automatically at checkout.";
 
-  return { headline, subtext };
+  return { headline, subtext, percentOff: offer.percentOff };
 }

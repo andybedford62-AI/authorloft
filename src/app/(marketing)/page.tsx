@@ -11,7 +11,6 @@ import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-se
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
-import { PartyPopper } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -262,14 +261,23 @@ export default async function HomePage() {
           <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
           {foundingOffer && (
             <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: 12, textAlign: 'left',
-              maxWidth: 560, margin: '0 auto 40px', padding: '16px 20px',
-              borderRadius: 12, border: `1px solid ${C.accent}66`, background: C.surface,
+              display: 'flex', alignItems: 'center', gap: 20, textAlign: 'left',
+              maxWidth: 620, margin: '0 auto 40px', padding: '20px 24px',
+              borderRadius: 16, border: `1.5px solid ${C.accent}`, background: C.surface,
+              boxShadow: `0 8px 28px ${C.bg}99`,
             }}>
-              <PartyPopper style={{ width: 20, height: 20, flexShrink: 0, marginTop: 2, color: C.accent }} />
+              <div style={{
+                flexShrink: 0, width: 72, height: 72, borderRadius: '50%',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                background: `linear-gradient(135deg, ${C.accentLight}, ${C.accent})`, color: C.bg,
+              }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: 800, lineHeight: 1 }}>{foundingOffer.percentOff}%</span>
+                <span style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>off</span>
+              </div>
               <div>
-                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: C.text, margin: 0 }}>{foundingOffer.headline}</p>
-                <p style={{ fontSize: '0.75rem', color: C.muted, margin: '2px 0 0' }}>{foundingOffer.subtext}</p>
+                <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, margin: '0 0 4px' }}>🎉 Founding Member Offer</p>
+                <p style={{ fontSize: '1rem', fontWeight: 700, color: C.text, margin: 0 }}>{foundingOffer.headline}</p>
+                <p style={{ fontSize: '0.8rem', color: C.muted, margin: '4px 0 0' }}>{foundingOffer.subtext}</p>
               </div>
             </div>
           )}
