@@ -296,6 +296,12 @@ export function FoundingOfferPanel({ coupons }: { coupons: StripeCoupon[] }) {
                 <option value="">— use STRIPE_EARLY_BIRD_COUPON_MONTHLY env var —</option>
                 {coupons.map(c => <option key={c.id} value={c.id}>{formatCoupon(c)}</option>)}
               </select>
+              {!form.couponIdMonthly && (
+                <p className="text-xs text-amber-700 mt-1">
+                  ⚠ No coupon selected — checkout will silently fall back to whatever STRIPE_EARLY_BIRD_COUPON_MONTHLY
+                  is set to in Vercel, which may not match this offer's terms above.
+                </p>
+              )}
             </div>
             <div>
               <label className={label}>Coupon applied — Annual plans</label>
@@ -303,6 +309,12 @@ export function FoundingOfferPanel({ coupons }: { coupons: StripeCoupon[] }) {
                 <option value="">— use STRIPE_EARLY_BIRD_COUPON_ANNUAL env var —</option>
                 {coupons.map(c => <option key={c.id} value={c.id}>{formatCoupon(c)}</option>)}
               </select>
+              {!form.couponIdAnnual && (
+                <p className="text-xs text-amber-700 mt-1">
+                  ⚠ No coupon selected — checkout will silently fall back to whatever STRIPE_EARLY_BIRD_COUPON_ANNUAL
+                  is set to in Vercel, which may not match this offer's terms above.
+                </p>
+              )}
             </div>
           </div>
 
