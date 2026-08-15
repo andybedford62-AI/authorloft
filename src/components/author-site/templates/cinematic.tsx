@@ -229,7 +229,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
                 {featuredBook.shortDescription && (
                   <div
-                    className="text-[17px] leading-relaxed text-[#FBF6E9]/65 rich-content"
+                    className="text-[17px] leading-relaxed text-[#FBF6E9]/65 rich-content rich-content-invert"
                     dangerouslySetInnerHTML={{ __html: sanitize(featuredBook.shortDescription) }}
                   />
                 )}
@@ -417,7 +417,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               </div>
               {author.shortBio ? (
                 <div
-                  className="text-[17px] leading-[1.75] text-[#FBF6E9]/65 rich-content"
+                  className="text-[17px] leading-[1.75] text-[#FBF6E9]/65 rich-content rich-content-invert"
                   dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio) }}
                 />
               ) : (

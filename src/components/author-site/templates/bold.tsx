@@ -46,7 +46,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="space-y-1.5 text-center sm:text-left flex-1">
             <p className="text-xs text-gray-400 uppercase tracking-widest">About the Author</p>
             <div
-              className="text-gray-300 leading-relaxed text-sm rich-content max-w-2xl"
+              className="text-gray-300 leading-relaxed text-sm rich-content rich-content-invert max-w-2xl"
               dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-1">
@@ -120,7 +120,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
                 {/* Description excerpt */}
                 {spotlightBook.shortDescription && (
                   <div
-                    className="text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0 line-clamp-4 rich-content"
+                    className="text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0 line-clamp-4 rich-content rich-content-invert"
                     dangerouslySetInnerHTML={{ __html: sanitize(spotlightBook.shortDescription) }}
                   />
                 )}

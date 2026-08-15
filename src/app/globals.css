@@ -278,6 +278,30 @@ body {
 }
 .rich-content pre code { background: none; padding: 0; color: inherit; }
 
+/* Dark-background variant — pair with `rich-content` when rendered on a dark
+   section (author-site templates use dark navy/near-black hero/about blocks).
+   Headings/paragraphs/list items inherit the parent's light text color
+   instead of the light-theme defaults above. */
+.rich-content-invert h1,
+.rich-content-invert h2,
+.rich-content-invert h3,
+.rich-content-invert h4,
+.rich-content-invert p,
+.rich-content-invert li {
+  color: inherit;
+}
+.rich-content-invert blockquote {
+  color: inherit;
+  border-left-color: rgba(255, 255, 255, 0.25);
+}
+.rich-content-invert hr {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+.rich-content-invert code {
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
 /* Text alignment (output by TipTap TextAlign extension) */
 .rich-content [style*="text-align: center"] { text-align: center; }
 .rich-content [style*="text-align: right"]  { text-align: right; }
