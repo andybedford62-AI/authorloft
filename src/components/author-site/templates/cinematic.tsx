@@ -228,9 +228,10 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 </div>
 
                 {featuredBook.shortDescription && (
-                  <p className="text-[17px] leading-relaxed text-[#FBF6E9]/65">
-                    {featuredBook.shortDescription}
-                  </p>
+                  <div
+                    className="text-[17px] leading-relaxed text-[#FBF6E9]/65 rich-content"
+                    dangerouslySetInnerHTML={{ __html: sanitize(featuredBook.shortDescription) }}
+                  />
                 )}
 
                 {/* Pull quote (caption used as pull quote if set) */}

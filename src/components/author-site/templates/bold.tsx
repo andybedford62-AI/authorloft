@@ -119,9 +119,10 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
 
                 {/* Description excerpt */}
                 {spotlightBook.shortDescription && (
-                  <p className="text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0 line-clamp-4">
-                    {spotlightBook.shortDescription}
-                  </p>
+                  <div
+                    className="text-gray-400 leading-relaxed max-w-lg mx-auto md:mx-0 line-clamp-4 rich-content"
+                    dangerouslySetInnerHTML={{ __html: sanitize(spotlightBook.shortDescription) }}
+                  />
                 )}
 
                 {/* CTAs */}
