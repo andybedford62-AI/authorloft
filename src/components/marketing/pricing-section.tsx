@@ -108,26 +108,26 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
       {/* Annual / Monthly toggle */}
       {hasAnnual && (
         <div className="flex items-center justify-center gap-3">
-          <span className={`text-sm font-medium ${!annual ? "text-gray-900" : "text-gray-400"}`}>Monthly</span>
+          <span className={`text-sm font-medium ${!annual ? "text-[#f3ecdb]" : "text-[#93a0bc]"}`}>Monthly</span>
           <button
             type="button"
             role="switch"
             aria-checked={annual}
             onClick={() => setAnnual((v) => !v)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-blue-600" : "bg-gray-200"}`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-[#d6a94a]" : "bg-[#243756]"}`}
           >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-[#f3ecdb] shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
           </button>
-          <span className={`text-sm font-medium ${annual ? "text-gray-900" : "text-gray-400"}`}>Annual</span>
+          <span className={`text-sm font-medium ${annual ? "text-[#f3ecdb]" : "text-[#93a0bc]"}`}>Annual</span>
           {annual && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#5fbf8a] bg-[rgba(95,191,138,0.14)] px-2.5 py-0.5 rounded-full">
               <Zap className="h-3 w-3" /> Save up to 20%
             </span>
           )}
         </div>
       )}
 
-      {/* Plan cards — all white, equal styling */}
+      {/* Plan cards — all dark, equal styling */}
       <div className={`grid gap-6 ${plans.length === 3 ? "md:grid-cols-3" : plans.length === 2 ? "md:grid-cols-2 max-w-2xl mx-auto" : "max-w-sm mx-auto"}`}>
         {plans.map((plan) => {
           const hasFeatured = !!plan.featuredLabel;
@@ -144,8 +144,8 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
           return (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border bg-white flex flex-col gap-6 p-8 transition-all hover:shadow-lg ${
-                hasFeatured ? `ring-2 ${ringClass} shadow-lg` : "border-gray-200"
+              className={`relative rounded-2xl border bg-[#1e2f4d] flex flex-col gap-6 p-8 transition-all hover:shadow-lg ${
+                hasFeatured ? `ring-2 ${ringClass} shadow-lg` : "border-[rgba(243,236,219,0.12)]"
               }`}
             >
               {/* Featured badge */}
@@ -159,18 +159,18 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
 
               {/* Name + price */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{plan.name}</h3>
+                <h3 className="text-lg font-bold text-[#f3ecdb] mb-3">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-gray-900">{displayPrice}</span>
-                  <span className="text-sm text-gray-400">{isFree ? "/forever" : "/mo"}</span>
+                  <span className="text-4xl font-extrabold text-[#f3ecdb]">{displayPrice}</span>
+                  <span className="text-sm text-[#93a0bc]">{isFree ? "/forever" : "/mo"}</span>
                 </div>
                 {annual && plan.annualPriceCents > 0 && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-[#93a0bc] mt-1">
                     Billed {formatAnnualTotal(plan.annualPriceCents)}/year
                   </p>
                 )}
                 {plan.description && (
-                  <p className="text-sm text-gray-500 mt-2 leading-relaxed">{plan.description}</p>
+                  <p className="text-sm text-[#93a0bc] mt-2 leading-relaxed">{plan.description}</p>
                 )}
               </div>
 
@@ -178,8 +178,8 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
               <ul className="space-y-2.5 flex-1">
                 {features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-green-500" />
-                    <span className="text-gray-700">{f}</span>
+                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-[#d6a94a]" />
+                    <span className="text-[#c7cede]">{f}</span>
                   </li>
                 ))}
               </ul>
@@ -190,16 +190,16 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
                   ? "/register"
                   : `/register?plan=${plan.tier.toLowerCase()}${annual ? "&billing=annual" : ""}`
                 }
-                className={`block w-full text-center py-3 px-6 rounded-xl font-semibold text-sm transition-colors ${
+                className={`block w-full text-center py-3 px-6 rounded-[6px] font-semibold text-sm transition-colors ${
                   hasFeatured
                     ? `${badgeClass.split(" ")[0]} text-white hover:opacity-90`
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-[#d6a94a] text-[#16233d] hover:bg-[#e2bc6e]"
                 }`}
               >
                 {isFree ? "Get Started Free" : `Start Free → ${plan.name}`}
               </Link>
               {!isFree && (
-                <p className="text-center text-xs text-gray-400 mt-2">
+                <p className="text-center text-xs text-[#93a0bc] mt-2">
                   Free account first, then upgrade — takes 2 minutes
                 </p>
               )}
@@ -209,14 +209,14 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
       </div>
 
       {/* Footer note */}
-      <p className="text-center text-sm text-gray-400">
+      <p className="text-center text-sm text-[#93a0bc]">
         No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee
       </p>
 
       {/* Full-page FAQ */}
       {fullPage && (
-        <div className="max-w-2xl mx-auto pt-8 border-t border-gray-100 space-y-6">
-          <h3 className="text-lg font-bold text-gray-900 text-center">Common questions</h3>
+        <div className="max-w-2xl mx-auto pt-8 border-t border-[rgba(243,236,219,0.12)] space-y-6">
+          <h3 className="text-lg font-bold text-[#f3ecdb] text-center">Common questions</h3>
           {[
             { q: "Can I switch plans later?", a: "Yes — upgrade or downgrade at any time. Changes take effect immediately. If you upgrade mid-cycle you're charged a prorated amount." },
             { q: "What happens if I exceed my book limit?", a: "You can still view and edit existing books, but you won't be able to add new ones until you upgrade or remove a book." },
@@ -225,8 +225,8 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
             { q: "Is there a contract or lock-in?", a: "No contract, no lock-in. Monthly plans can be cancelled anytime. Annual plans are billed yearly and include a 30-day money-back window." },
           ].map(({ q, a }) => (
             <div key={q} className="space-y-1">
-              <p className="font-semibold text-gray-900">{q}</p>
-              <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
+              <p className="font-semibold text-[#f3ecdb]">{q}</p>
+              <p className="text-sm text-[#93a0bc] leading-relaxed">{a}</p>
             </div>
           ))}
         </div>

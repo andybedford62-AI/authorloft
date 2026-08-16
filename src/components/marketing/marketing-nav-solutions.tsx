@@ -50,24 +50,24 @@ export function MarketingNavSolutions() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-1 text-sm text-[#93a0bc] hover:text-[#f3ecdb] transition-colors"
       >
         Solutions
-        <ChevronDown className={`h-3.5 w-3.5 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3.5 w-3.5 text-[#93a0bc] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50">
-          <div className="min-w-[460px] bg-white border border-gray-100 rounded-xl shadow-lg p-4 grid grid-cols-2 gap-4">
+          <div className="min-w-[460px] bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-xl shadow-lg p-4 grid grid-cols-2 gap-4">
             {GROUPS.map((group) => (
               <div key={group.label}>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 mb-1.5 px-2">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-[#93a0bc] mb-1.5 px-2">
                   {group.label}
                 </p>
                 {group.items.map(([href, label]) => (
                   <Link
                     key={href}
                     href={href}
-                    className="block px-2 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                    className="block px-2 py-1.5 text-sm text-[#93a0bc] hover:text-[#f3ecdb] hover:bg-[rgba(243,236,219,0.06)] rounded-md transition-colors"
                   >
                     {label}
                   </Link>
