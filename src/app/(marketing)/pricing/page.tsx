@@ -222,22 +222,22 @@ export default async function PricingPage() {
           <p className="text-[#93a0bc] text-sm text-center max-w-xl mx-auto mb-10">
             See what&apos;s included at every level — from free to premium.
           </p>
-          <div className="bg-[#16233d] rounded-2xl border border-[rgba(243,236,219,0.12)] overflow-hidden shadow-lg">
+          <div className="bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.2)] overflow-hidden shadow-lg">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[rgba(243,236,219,0.12)]">
+                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
                   <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-1/2">Feature</th>
                   <th className="text-center px-6 py-4 font-semibold text-[#f3ecdb]">Free</th>
-                  <th className="text-center px-6 py-4 font-semibold text-[#d6a94a] bg-[#243756]">Standard</th>
+                  <th className="text-center px-6 py-4 font-semibold text-[#d6a94a]">Standard</th>
                   <th className="text-center px-6 py-4 font-semibold text-[#e2bc6e]">Premium</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.12)]">
+              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
                 {comparisonRows.map(({ label, free, standard, premium }) => (
-                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.04)] transition-colors">
+                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
                     <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{label}</td>
                     <td className="px-6 py-3.5 text-center text-[#93a0bc]">{free}</td>
-                    <td className="px-6 py-3.5 text-center text-[#f3ecdb] bg-[#243756]">{standard}</td>
+                    <td className="px-6 py-3.5 text-center text-[#f3ecdb] bg-[#d6a94a]/[0.07]">{standard}</td>
                     <td className="px-6 py-3.5 text-center text-[#f3ecdb]">{premium}</td>
                   </tr>
                 ))}
@@ -283,10 +283,10 @@ export default async function PricingPage() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-[rgba(243,236,219,0.12)]">
+          <div className="overflow-x-auto rounded-2xl border border-[rgba(243,236,219,0.2)] bg-[#1e2f4d] shadow-lg">
             <table className="w-full text-sm min-w-[720px]">
               <thead>
-                <tr className="border-b border-[rgba(243,236,219,0.12)] bg-[#243756]">
+                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
                   <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-[30%]">Feature</th>
                   <th className="text-center px-4 py-4 font-bold text-[#d6a94a] bg-[#243756] border-x border-[rgba(243,236,219,0.12)]">
                     AuthorLoft
@@ -310,9 +310,9 @@ export default async function PricingPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.12)]">
+              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
                 {COMPETITOR_ROWS.map(({ label, authorloft, tertulia, quilltips, storyorigin, bookfunnel }) => (
-                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.04)] transition-colors">
+                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
                     <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{label}</td>
                     <td className={`px-4 py-3.5 text-center bg-[#243756] border-x border-[rgba(243,236,219,0.12)] ${cellCls(authorloft.type)}`}>{authorloft.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(tertulia.type)}`}>{tertulia.val}</td>

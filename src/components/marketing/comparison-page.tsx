@@ -78,10 +78,10 @@ export function ComparisonPage({ data }: { data: ComparisonData }) {
         {/* Comparison table */}
         <section className="mb-14">
           <h2 className="font-serif italic text-2xl text-[#f3ecdb] mb-5">Feature comparison</h2>
-          <div className="overflow-x-auto rounded-2xl border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d]">
+          <div className="overflow-x-auto rounded-2xl border border-[rgba(243,236,219,0.2)] bg-[#1e2f4d] shadow-lg">
             <table className="w-full text-sm min-w-[460px]">
               <thead>
-                <tr className="border-b border-[rgba(243,236,219,0.12)] bg-[#243756]">
+                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
                   <th className="text-left font-semibold text-[#f3ecdb] px-4 py-3">Feature</th>
                   <th className="font-semibold text-[#f3ecdb] px-4 py-3 text-center">AuthorLoft</th>
                   <th className="font-semibold text-[#f3ecdb] px-4 py-3 text-center">{data.name}</th>
@@ -89,7 +89,7 @@ export function ComparisonPage({ data }: { data: ComparisonData }) {
               </thead>
               <tbody>
                 {data.rows.map((r) => (
-                  <tr key={r.label} className="border-b border-[rgba(243,236,219,0.08)] last:border-0 align-top">
+                  <tr key={r.label} className="border-b border-[rgba(243,236,219,0.15)] last:border-0 align-top">
                     <td className="px-4 py-3 text-[#f3ecdb]">
                       {r.label}
                       {r.note && <span className="block text-xs text-[#93a0bc] mt-0.5">{r.note}</span>}

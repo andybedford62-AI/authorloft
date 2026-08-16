@@ -373,11 +373,11 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
               {section.description}
             </p>
           )}
-          <div className="bg-[#1e2f4d] rounded-lg border border-[rgba(243,236,219,0.12)] overflow-hidden">
+          <div className="bg-[#1e2f4d] rounded-lg border border-[rgba(243,236,219,0.2)] shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
-                <tr className="border-b border-[rgba(243,236,219,0.12)] bg-[#16233d]">
+                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
                   <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-2/5">Feature</th>
                   {tiers.map((tier) => (
                     <th
@@ -386,7 +386,7 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
                         tier === "FREE"
                           ? "text-[#93a0bc]"
                           : tier === "STANDARD"
-                            ? "text-[#d6a94a] bg-[#243756]"
+                            ? "text-[#d6a94a]"
                             : "text-[#e2bc6e]"
                       }`}
                     >
@@ -395,15 +395,15 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.08)]">
+              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
                 {section.features.map((feature) => (
-                  <tr key={feature.name} className="hover:bg-[rgba(243,236,219,0.04)] transition-colors">
+                  <tr key={feature.name} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
                     <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{feature.name}</td>
                     {tiers.map((tier) => (
                       <td
                         key={`${feature.name}-${tier}`}
                         className={`px-6 py-3.5 text-center text-[#93a0bc] ${
-                          tier === "STANDARD" ? "bg-[#243756]/50" : ""
+                          tier === "STANDARD" ? "bg-[#d6a94a]/[0.07]" : ""
                         }`}
                       >
                         {feature.tiers[tier]}
