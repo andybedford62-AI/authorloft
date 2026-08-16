@@ -39,6 +39,10 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
   const pressNames   = author.pressOutlets?.length ? author.pressOutlets : DEFAULT_PRESS_NAMES;
+  // Hero portrait: an explicit Hero Image wins (matches HeroBanner's own
+  // author.heroImageUrl || author.profileImageUrl precedent used by Classic/Bold);
+  // falls back to the profile photo so authors who haven't set one still see something.
+  const heroPhotoSrc = author.heroImageUrl || author.profileImageUrl;
   // heroEyebrow: minimal type, used only for eyebrow label in the hero section
   const heroEyebrow = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
   // featuredBook: full BookForTemplate, used for the Featured Release section
@@ -63,7 +67,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
         }}
       >
         {/* Author portrait — right side with left-fade mask */}
-        {author.profileImageUrl && (
+        {heroPhotoSrc && (
           <div
             className="absolute inset-y-0 right-0 hidden md:block"
             style={{
@@ -73,7 +77,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
             }}
           >
             <Image
-              src={author.profileImageUrl}
+              src={heroPhotoSrc}
               alt={authorName}
               fill
               className="object-cover object-top"
