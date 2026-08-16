@@ -206,7 +206,7 @@ export function RebelHero({
 }) {
   const line1 = headlineLine1 || "You wrote the book. They keep the reader.";
   const line2 = headlineLine2 || "Take it back.";
-  const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again — no name, no email, no way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. Free to start, live in fifteen minutes.";
+  const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. It's free to start and takes about fifteen minutes to launch.";
 
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>

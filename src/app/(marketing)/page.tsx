@@ -19,18 +19,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Your Books. Your Readers. Your Business. | AuthorLoft",
     description:
-      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders — everything authors need to run their business, all in one place. Free to start.",
+      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders: everything authors need to run their business, all in one place. Free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft — your books, your readers, your business" }],
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders, all in one platform, free to start.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your readers, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders — all in one platform, free to start.",
+      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders, all in one platform, free to start.",
       images:      [ogImage],
     },
   };
@@ -112,10 +112,10 @@ const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "
 const webPageLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "AuthorLoft — Your Books. Your Readers. Your Business.",
+  name: "AuthorLoft: Your Books. Your Readers. Your Business.",
   url: PLATFORM_URL,
   description:
-    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow — all on one platform, free to start.",
+    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow, all on one platform, free to start.",
   isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: PLATFORM_URL },
   speakable: {
     "@type": "SpeakableSpecification",
@@ -130,7 +130,7 @@ const webPageLd = {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
-      description: "Free to start — no credit card required",
+      description: "Free to start, no credit card required",
     },
     featureList: [
       "Author Website Builder",
@@ -166,7 +166,7 @@ const howToLd = {
       "@type": "HowToStep",
       position: 2,
       name: "Your Sales",
-      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. Zero platform fees — every dollar from every sale goes straight to you.",
+      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. There's no platform fee, so every dollar from every sale goes straight to you.",
     },
     {
       "@type": "HowToStep",
@@ -253,9 +253,9 @@ export default async function HomePage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
           <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
-            Start free. Scale when you&apos;re ready.
+            Start for free, and scale up when you&apos;re ready.
           </h2>
-          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card. Upgrade when you want direct sales or a custom domain.</p>
+          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card required. Upgrade when you&apos;re ready for direct sales or a custom domain.</p>
           {foundingOffer && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 20, textAlign: 'left',
@@ -302,21 +302,21 @@ function WhatChangesSection() {
   const rows = [
     {
       label: 'Who gets paid',
-      old: 'Retailers keep 30–70% of every sale. You get a payout and a mystery — no idea who bought, or why.',
+      old: 'Retailers keep 30 to 70% of every sale. You get a payout and a mystery: no idea who bought, or why.',
       newVal: 'You keep 100% of what you earn.',
-      newSuffix: " Stripe's standard card fee is the only other cost — same as everywhere else online.",
+      newSuffix: " The only other cost is Stripe's standard card fee, the same one every online business pays.",
     },
     {
       label: 'Who owns your readers',
-      old: "Their platform, their rules. Followers can vanish overnight — an algorithm change, a banned account, a dead app.",
-      newVal: 'Your email list, always yours.',
-      newSuffix: ' Export it anytime, take it anywhere. Nobody can rent it back to you.',
+      old: "Their platform, their rules. Followers can vanish overnight if an algorithm changes, an account gets banned, or the app just dies.",
+      newVal: 'Your email list belongs to you, not a platform.',
+      newSuffix: ' Export it anytime and take it anywhere; no one can rent it back to you.',
     },
     {
       label: 'How many tabs you need open',
-      old: "A website here, an email tool there, checkout somewhere else — five logins that don't talk to each other.",
-      newVal: 'One dashboard.',
-      newSuffix: ' Your site, your store, your list, your numbers — in one place, for one price.',
+      old: "A website here, an email tool there, checkout somewhere else: five logins that don't talk to each other.",
+      newVal: 'One dashboard',
+      newSuffix: ' runs your site, your store, your list, and your numbers, all for one price.',
     },
   ];
   return (
@@ -335,7 +335,7 @@ function WhatChangesSection() {
             Here&apos;s exactly what you get back.
           </h2>
           <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto', lineHeight: 1.72 }}>
-            Not vague promises — three concrete things that are different the moment you switch.
+            Here's what's actually different from the moment you switch, without the vague promises.
           </p>
         </div>
         <div className="rdh-cmp-table">
@@ -401,10 +401,10 @@ function ProductPreviewSection() {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLD, margin: '0 0 14px' }}>See it for yourself</p>
           <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
-            Not a mockup. This is the actual product.
+            See the actual product.
           </h2>
           <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 540, margin: '0 auto', lineHeight: 1.72 }}>
-            Real screenshots from a real AuthorLoft site — no stock photos, no Photoshop.
+            These are real screenshots from a live AuthorLoft site. Nothing here is a mockup or a stock photo.
           </p>
         </div>
         <div className="rdh-preview-grid">
@@ -416,7 +416,7 @@ function ProductPreviewSection() {
               chrome={false}
             />
             <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
-              <strong style={{ color: '#e8e8e0' }}>Live right now.</strong> This is an actual author&apos;s AuthorLoft site — not a template preview, the real thing.
+              This is an author&apos;s actual AuthorLoft site, <strong style={{ color: '#e8e8e0' }}>live right now</strong>, not a template preview.
             </p>
           </div>
           <div className="rdh-preview-stack">
@@ -427,7 +427,7 @@ function ProductPreviewSection() {
                 aspectRatio="4 / 3.4"
               />
               <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
-                <strong style={{ color: '#e8e8e0' }}>Your dashboard.</strong> Books, subscribers, sales — one screen, not five tabs.
+                <strong style={{ color: '#e8e8e0' }}>Your dashboard</strong> shows books, subscribers, and sales on one screen instead of five different tabs.
               </p>
             </div>
             <div>
@@ -437,7 +437,7 @@ function ProductPreviewSection() {
                 aspectRatio="16 / 10.5"
               />
               <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
-                <strong style={{ color: '#e8e8e0' }}>Pick a theme built for your genre.</strong> Change it anytime — no developer required.
+                <strong style={{ color: '#e8e8e0' }}>Pick a theme built for your genre</strong>, and change it anytime without a developer.
               </p>
             </div>
           </div>
@@ -495,10 +495,10 @@ function NewsletterMidSection() {
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
         <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
-          Grow your readership.<br />Keep every reader.
+          Grow your readership without losing the readers you already have.
         </h2>
         <p style={{ color: '#5a4a38', fontSize: '1.0625rem', marginBottom: 36, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.68 }}>
-          One tactic a week — direct sales, email strategy, and reader growth for independent authors. No fluff. Unsubscribe anytime.
+          One practical tactic a week on direct sales, email, and reader growth for independent authors. Unsubscribe anytime.
         </p>
         <div style={{ maxWidth: 460, margin: '0 auto' }}>
           <NewsSubscribeForm source="home" variant="box" />
@@ -518,11 +518,11 @@ function FooterCTA() {
           Your audience<br />is waiting.
         </h2>
         <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
-          Every sale through a middleman is someone you&apos;ll never reach again. Start free today and own every book, every reader, every dollar.
+          Every sale through a middleman is a reader you&apos;ll never reach again. Start free today and keep what you build.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
           <Link href="/register" className="rdh-btn-primary" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, background: '#c9a84c', color: '#000', padding: '15px 32px' }}>
-            Start your business — free →
+            Start your business, free →
           </Link>
           <Link href="/bookstore" className="rdh-btn-ghost" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, color: '#e8e8e0', border: '1px solid #2a4268', padding: '14px 28px', background: 'transparent' }}>
             Browse the bookstore
