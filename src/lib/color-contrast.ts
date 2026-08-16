@@ -96,6 +96,38 @@ function hslToHex(h: number, s: number, l: number): string {
 }
 
 /**
+ * Nudge `color`'s lightness — away from `against` — until the pair clears
+ * `minRatio`, preserving hue and saturation so the result still reads as the
+ * author's colour rather than a generic grey. A colour that already clears the
+ * ratio is returned untouched.
+ *
+ * Contrast is symmetric, so this serves both directions: making a colour
+ * readable AS text on a background, and deepening a colour so it can BE a
+ * background that white text sits on. The two named wrappers below express
+ * which one a caller means.
+ */
+function adjustForContrast(color: string, against: string, minRatio: number): string {
+  if (contrastRatio(color, against) >= minRatio) return color;
+
+  const hsl = toHsl(color);
+  if (!hsl) return readableTextOn(against);
+
+  // Light counterpart → darken this colour; dark counterpart → lighten it.
+  const step = relativeLuminance(against) > 0.18 ? -0.02 : 0.02;
+
+  let { l } = hsl;
+  for (let i = 0; i < 50; i++) {
+    l += step;
+    if (l <= 0 || l >= 1) break;
+    const candidate = hslToHex(hsl.h, hsl.s, l);
+    if (contrastRatio(candidate, against) >= minRatio) return candidate;
+  }
+  // Nothing in this hue could pass (very low-saturation colours on mid
+  // grounds) — fall back to plain readable text rather than ship illegible.
+  return readableTextOn(against);
+}
+
+/**
  * An author's accent, adjusted only as far as it must be to stay readable as
  * TEXT on `background`.
  *
@@ -103,34 +135,25 @@ function hslToHex(h: number, s: number, l: number): string {
  * templates paint it directly as text on near-white surfaces (section eyebrows,
  * series links, "About the Author" labels). A pale accent there fails WCAG AA
  * outright.
- *
- * Hue and saturation are preserved and only lightness moves — away from the
- * background — so the result still reads as the author's colour rather than a
- * generic grey. An accent that already passes is returned untouched, so most
- * authors see no change at all.
  */
-export function accentAsTextOn(
-  accent: string,
-  background = "#fff",
-  minRatio = 4.5
-): string {
-  if (contrastRatio(accent, background) >= minRatio) return accent;
+export function accentAsTextOn(accent: string, background = "#fff", minRatio = 4.5): string {
+  return adjustForContrast(accent, background, minRatio);
+}
 
-  const hsl = toHsl(accent);
-  if (!hsl) return readableTextOn(background);
-
-  // Light background → darken the accent; dark background → lighten it.
-  const darken = relativeLuminance(background) > 0.18;
-  const step = darken ? -0.02 : 0.02;
-
-  let { l } = hsl;
-  for (let i = 0; i < 50; i++) {
-    l += step;
-    if (l <= 0 || l >= 1) break;
-    const candidate = hslToHex(hsl.h, hsl.s, l);
-    if (contrastRatio(candidate, background) >= minRatio) return candidate;
-  }
-  // Nothing in the hue passed (very low-saturation accents on mid grounds) —
-  // fall back to plain readable text rather than shipping something illegible.
-  return readableTextOn(background);
+/**
+ * An author's accent deepened enough to serve as a SURFACE with white text on
+ * it — the page-header banner.
+ *
+ * That banner used to paint white text straight onto the raw accent, which
+ * failed for every live theme: brass `#c89b3c` gave 2.56:1 and its 60%-opacity
+ * label 1.81:1, effectively invisible. Deepening the accent instead of
+ * recolouring the text keeps each author's hue while giving every banner the
+ * same dark, high-contrast treatment.
+ *
+ * Defaults to AAA (7:1) rather than AA — the banner is a large solid field, the
+ * extra depth is what makes it read as deliberate rather than washed out, and
+ * it leaves headroom for the reduced-opacity label and subtitle sitting on it.
+ */
+export function accentAsSurface(accent: string, minRatio = 7): string {
+  return adjustForContrast(accent, "#ffffff", minRatio);
 }

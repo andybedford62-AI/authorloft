@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Page header bar: dark, high-contrast, still the author's colour
+
+Andy flagged the header/title bar on the author sub-pages as washed out — light grey ground with white lettering, identical on every page. Measuring it showed the look was a genuine contrast failure rather than a taste question: `PageBanner` painted white text straight onto the author's raw accent, and **every live theme failed**. Brass `#c89b3c` gave 2.56:1 on the title and 1.81:1 on its 60%-opacity label; the PREMIUM grey `#b0b0b0` gave 2.17:1 and 1.63:1 — effectively invisible. That's 11 authors × 7 pages (About, Books, Contact, Blog, Courses, Flip Books, Specials).
+
+The two options he raised — "darker palette" vs "standardise across themes" — turned out not to be in tension. A single rule, *deepen the accent until white text clears AAA*, applies uniformly to every theme while each author keeps their own hue, so the treatment is standard and the branding survives. Chosen over the alternative of flipping the text colour per accent (which left the brass bar bright gold, still washed out, and left indigo failing at 4.47:1), and over one fixed dark bar for everyone (which would have thrown away the author's colour on seven pages, cutting against the rest of the day's work).
+
+Implementation: `adjustForContrast()` in `lib/color-contrast.ts` — the lightness-stepping core already backing `accentAsTextOn` — now also backs a new `accentAsSurface()`, since contrast is symmetric and making a colour readable *as* text is the same operation as deepening it to *carry* white text. `PageBanner` computes it internally, so all seven pages inherit the change without touching a single call site. Label opacity lifted `white/60` → `white/75` and subtitle `/65` → `/80`, which the darker ground now affords. Results: brass → `#6b531e` (title 7.29, label 4.94, subtitle 5.37), indigo → `#3438ed` (7.16 / 4.67 / 5.10), grey → `#595959` (7.00 / 4.82 / 5.21) — AAA on every title, AA on every secondary line.
+
 ## August 16, 2026 — Accent stays readable as text; ratings shown to readers, not just Google
 
 Two more items off the author-public-pages audit.
