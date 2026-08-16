@@ -249,13 +249,13 @@ export default async function HomePage() {
       <NewsletterMidSection />
 
       {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
-      <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '88px 28px', textAlign: 'center' }}>
+      <section style={{ background: C.surface, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '64px 28px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.accent, marginBottom: 14 }}>Pricing</p>
           <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: C.text, marginBottom: 12, letterSpacing: '-0.01em' }}>
             Start for free, and scale up when you&apos;re ready.
           </h2>
-          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 48 }}>No credit card required. Upgrade when you&apos;re ready for direct sales or a custom domain.</p>
+          <p style={{ color: C.muted, fontSize: '1.0625rem', marginBottom: 32 }}>No credit card required. Upgrade when you&apos;re ready for direct sales or a custom domain.</p>
           {foundingOffer && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 20, textAlign: 'left',
@@ -320,7 +320,7 @@ function WhatChangesSection() {
     },
   ];
   return (
-    <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+    <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '64px 0' }}>
       <style>{`
         .rdh-cmp-table { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #3a5580; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
         @media (max-width: 820px) {
@@ -329,7 +329,7 @@ function WhatChangesSection() {
         }
       `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 44 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', margin: '0 0 14px' }}>What actually changes</p>
           <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
             Here&apos;s exactly what you get back.
@@ -389,7 +389,7 @@ function ProductPreviewSection() {
   }
 
   return (
-    <section style={{ background: '#111c2c', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+    <section style={{ background: '#111c2c', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '64px 0' }}>
       <style>{`
         .rdh-preview-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; }
         .rdh-preview-stack { display: grid; gap: 24px; }
@@ -398,7 +398,7 @@ function ProductPreviewSection() {
         }
       `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLD, margin: '0 0 14px' }}>See it for yourself</p>
           <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
             See the actual product.
@@ -461,7 +461,7 @@ function FounderNoteSection({
     ? (author.customDomain ? `https://${author.customDomain}` : `https://${author.slug}.${platformDomain}`)
     : null;
   return (
-    <section style={{ background: '#27406B', padding: '96px 28px' }}>
+    <section style={{ background: '#27406B', padding: '72px 28px' }}>
       <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
         <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D4AE6A', marginBottom: 24 }}>
           From the founder
@@ -491,7 +491,7 @@ function FounderNoteSection({
 
 function NewsletterMidSection() {
   return (
-    <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '88px 0' }}>
+    <section style={{ textAlign: 'center', background: '#f5f0e8', borderTop: '1px solid #d8ceb8', borderBottom: '1px solid #d8ceb8', padding: '64px 0' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px' }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a7030', marginBottom: 14 }}>The Indie Author Playbook</p>
         <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#1a1008', marginBottom: 14, letterSpacing: '-0.01em' }}>
@@ -510,14 +510,14 @@ function NewsletterMidSection() {
 
 function FooterCTA() {
   return (
-    <section style={{ textAlign: 'center', padding: '112px 0', position: 'relative', overflow: 'hidden', background: '#0d1520' }}>
+    <section style={{ textAlign: 'center', padding: '80px 0', position: 'relative', overflow: 'hidden', background: '#0d1520' }}>
       {/* Glow */}
       <div style={{ position: 'absolute', bottom: -80, left: '50%', transform: 'translateX(-50%)', width: 640, height: 380, background: 'radial-gradient(ellipse at center, rgba(201,168,76,0.08) 0%, transparent 68%)', pointerEvents: 'none' }} />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 28px', position: 'relative' }}>
         <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontWeight: 600, lineHeight: 1.08, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 18, letterSpacing: '-0.01em' }}>
           Your audience<br />is waiting.
         </h2>
-        <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
+        <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 32, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
           Every sale through a middleman is a reader you&apos;ll never reach again. Start free today and keep what you build.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>

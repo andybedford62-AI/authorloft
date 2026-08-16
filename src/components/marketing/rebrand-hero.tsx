@@ -209,7 +209,7 @@ export function RebelHero({
   const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. It's free to start and takes about fifteen minutes to launch.";
 
   return (
-    <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
+    <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '56vh' }}>
       <style>{`
         @keyframes rbFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         .rb-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(184,137,61,0.65) !important; }
@@ -276,7 +276,7 @@ export function RebelHero({
       </nav>
 
       {/* Content grid */}
-      <div className="rb-grid" style={{ position: 'relative', zIndex: 2, padding: '40px 60px 64px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
+      <div className="rb-grid" style={{ position: 'relative', zIndex: 2, padding: '28px 60px 44px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center', maxWidth: 1280, margin: '0 auto' }}>
 
         {/* Left: copy */}
         <div style={{ color: ML.bone }}>
