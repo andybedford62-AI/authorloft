@@ -85,12 +85,12 @@ export default async function FaqPage() {
   } : null;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F0EDE4" }}>
+    <div style={{ minHeight: "100vh", background: "#16233d" }}>
       <MarketingNav />
 
       <MarketingPageHeader
         eyebrow="FAQ"
-        title={<>Frequently asked, <span className="italic text-[#D4AE6A]">plainly answered</span></>}
+        title={<>Frequently asked, <span className="italic text-[#d6a94a]">plainly answered</span></>}
         subtitle="Everything you need to know about AuthorLoft — plans, publishing, selling direct, and getting set up."
         backgroundImage="/faq-header.png"
       />
@@ -99,14 +99,14 @@ export default async function FaqPage() {
         <FaqPageList groups={groups} />
 
         {/* Still need help */}
-        <div style={{ marginTop: 64, background: "#1B2B47", borderRadius: 20, padding: "40px 32px", textAlign: "center" }}>
-          <p style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#D4AE6A", margin: "0 0 12px" }}>· Still have a question? ·</p>
-          <h2 style={{ fontFamily: "var(--font-heading, serif)", fontSize: 26, fontWeight: 400, color: "#E8E5DD", margin: "0 0 16px" }}>We&apos;re happy to help</h2>
-          <a href="mailto:hello@authorloft.com" style={{ display: "inline-block", fontFamily: "var(--font-geist-mono, monospace)", fontSize: 14, color: "#1B2B47", background: "#B8893D", padding: "12px 28px", borderRadius: 999, textDecoration: "none", fontWeight: 700 }}>
+        <div style={{ marginTop: 64, background: "#243756", borderRadius: 20, padding: "40px 32px", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#d6a94a", margin: "0 0 12px" }}>· Still have a question? ·</p>
+          <h2 style={{ fontFamily: "var(--font-heading, serif)", fontStyle: "italic", fontSize: 26, fontWeight: 400, color: "#f3ecdb", margin: "0 0 16px" }}>We&apos;re happy to help</h2>
+          <a href="mailto:hello@authorloft.com" style={{ display: "inline-block", fontFamily: "var(--font-geist-mono, monospace)", fontSize: 14, color: "#16233d", background: "#d6a94a", padding: "12px 28px", borderRadius: 6, textDecoration: "none", fontWeight: 700 }}>
             hello@authorloft.com
           </a>
-          <p style={{ marginTop: 20, fontFamily: "Georgia, serif", fontSize: 13, color: "rgba(232,229,221,0.5)" }}>
-            <Link href="/" style={{ color: "#D4AE6A", textDecoration: "none" }}>← Back to AuthorLoft</Link>
+          <p style={{ marginTop: 20, fontFamily: "Georgia, serif", fontSize: 13, color: "rgba(243,236,219,0.5)" }}>
+            <Link href="/" style={{ color: "#d6a94a", textDecoration: "none" }}>← Back to AuthorLoft</Link>
           </p>
         </div>
       </section>

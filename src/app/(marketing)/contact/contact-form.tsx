@@ -56,56 +56,56 @@ export function ContactForm() {
   }
 
   const inputClass =
-    "w-full border border-[#DCDBD3] rounded-lg px-3 py-2.5 text-sm text-[#1B2B47] placeholder-[#8993A4] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8893D] focus:border-transparent";
+    "w-full border border-[rgba(243,236,219,0.15)] rounded-[6px] px-3 py-2.5 text-sm text-[#f3ecdb] placeholder-[#93a0bc] bg-[#16233d] focus:outline-none focus:ring-2 focus:ring-[#d6a94a] focus:border-transparent";
 
   return (
-    <div className="min-h-screen bg-[#E8E5DD]">
+    <div className="min-h-screen bg-[#16233d]">
       <MarketingPageHeader
         eyebrow="Get in touch"
-        title={<>Contact <span className="italic text-[#D4AE6A]">AuthorLoft</span></>}
+        title={<>Contact <span className="italic text-[#d6a94a]">AuthorLoft</span></>}
         subtitle="Have a question about our plans, need help with your account, or just want to say hello? Fill out the form and we'll get back to you within one business day."
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         {sent ? (
-          <div className="bg-[#F0EDE4] border border-[#DCDBD3] rounded-2xl p-10 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#E8E5DD] flex items-center justify-center mx-auto mb-4">
-              <Check className="h-6 w-6 text-[#B8893D]" />
+          <div className="bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-2xl p-10 text-center">
+            <div className="w-12 h-12 rounded-full bg-[#243756] flex items-center justify-center mx-auto mb-4">
+              <Check className="h-6 w-6 text-[#d6a94a]" />
             </div>
-            <h2 className="text-xl font-bold text-[#1B2B47] mb-2">Message sent!</h2>
-            <p className="text-[#5C6E89] mb-2">
+            <h2 className="text-xl font-bold text-[#f3ecdb] mb-2">Message sent!</h2>
+            <p className="text-[#93a0bc] mb-2">
               Thanks for reaching out. We&apos;ll get back to you at <strong>{email}</strong> within one business day.
             </p>
             {selectedEmail && (
-              <p className="text-sm text-[#8993A4] mb-6">
+              <p className="text-sm text-[#93a0bc] mb-6">
                 Your message was routed to <strong>{selectedEmail.label}</strong> ({selectedEmail.email}).
               </p>
             )}
-            <p className="text-sm text-[#8993A4] mb-5">While you wait, explore what AuthorLoft can do for your author career:</p>
+            <p className="text-sm text-[#93a0bc] mb-5">While you wait, explore what AuthorLoft can do for your author career:</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-              <Link href="/features" className="px-4 py-2 rounded-lg bg-[#1B2B47] text-white text-sm font-semibold hover:bg-[#2a3f63] transition-colors">
+              <Link href="/features" className="px-4 py-2 rounded-[6px] bg-[#d6a94a] text-[#16233d] text-sm font-semibold hover:bg-[#e2bc6e] transition-colors">
                 Explore features →
               </Link>
-              <Link href="/pricing" className="px-4 py-2 rounded-lg border border-[#DCDBD3] text-[#1B2B47] text-sm font-semibold hover:bg-[#DCDBD3] transition-colors">
+              <Link href="/pricing" className="px-4 py-2 rounded-[6px] border border-[rgba(243,236,219,0.15)] text-[#f3ecdb] text-sm font-semibold hover:bg-[rgba(243,236,219,0.06)] transition-colors">
                 View pricing plans
               </Link>
             </div>
-            <Link href="/" className="text-sm text-[#8993A4] hover:text-[#1B2B47] transition-colors">
+            <Link href="/" className="text-sm text-[#93a0bc] hover:text-[#f3ecdb] transition-colors">
               ← Back to AuthorLoft home
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5 bg-[#F0EDE4] border border-[#DCDBD3] rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-5 bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-2xl p-8">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-sm rounded-lg px-4 py-3">
                 {error}
               </div>
             )}
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#1B2B47]">
-                  Your name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#f3ecdb]">
+                  Your name <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -117,8 +117,8 @@ export function ContactForm() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#1B2B47]">
-                  Email address <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#f3ecdb]">
+                  Email address <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="email"
@@ -133,8 +133,8 @@ export function ContactForm() {
 
             {supportEmails.length > 0 && (
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#1B2B47]">
-                  Inquiry type <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-[#f3ecdb]">
+                  Inquiry type <span className="text-red-400">*</span>
                 </label>
                 <select
                   value={supportEmailId}
@@ -146,9 +146,9 @@ export function ContactForm() {
                   ))}
                 </select>
                 {selectedEmail && (
-                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                  <p className="text-xs text-[#93a0bc] flex items-center gap-1 mt-1">
                     <Mail className="h-3 w-3" />
-                    Will be routed to <span className="font-medium text-gray-500">{selectedEmail.email}</span>
+                    Will be routed to <span className="font-medium text-[#c7cede]">{selectedEmail.email}</span>
                     {selectedEmail.description && <> — {selectedEmail.description}</>}
                   </p>
                 )}
@@ -156,7 +156,7 @@ export function ContactForm() {
             )}
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-[#1B2B47]">Subject</label>
+              <label className="block text-sm font-medium text-[#f3ecdb]">Subject</label>
               <input
                 type="text"
                 value={subject}
@@ -167,8 +167,8 @@ export function ContactForm() {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-[#1B2B47]">
-                Message <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-[#f3ecdb]">
+                Message <span className="text-red-400">*</span>
               </label>
               <textarea
                 value={message}
@@ -183,16 +183,16 @@ export function ContactForm() {
             <button
               type="submit"
               disabled={sending}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] bg-[#d6a94a] hover:bg-[#e2bc6e] text-[#16233d] text-sm font-semibold transition-colors disabled:opacity-60"
             >
               {sending ? "Sending…" : <><Send className="h-4 w-4" /> Send Message</>}
             </button>
           </form>
         )}
 
-        <div className="mt-10 text-sm text-gray-400 flex gap-6">
-          <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
-          <Link href="/terms"   className="hover:text-gray-600 transition-colors">Terms of Service</Link>
+        <div className="mt-10 text-sm text-[#93a0bc] flex gap-6">
+          <Link href="/privacy" className="hover:text-[#f3ecdb] transition-colors">Privacy Policy</Link>
+          <Link href="/terms"   className="hover:text-[#f3ecdb] transition-colors">Terms of Service</Link>
         </div>
       </div>
     </div>

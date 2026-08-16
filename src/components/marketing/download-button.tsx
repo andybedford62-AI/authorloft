@@ -63,14 +63,14 @@ export function DownloadButton({
 
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => !busy && setOpen(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="font-serif text-lg text-[#1B2B47]">Get your free download</h3>
-              <button onClick={() => !busy && setOpen(false)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
+          <div className="bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-2xl shadow-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(243,236,219,0.12)]">
+              <h3 className="font-serif italic text-lg text-[#f3ecdb]">Get your free download</h3>
+              <button onClick={() => !busy && setOpen(false)} className="text-[#93a0bc] hover:text-[#f3ecdb]"><X className="h-5 w-5" /></button>
             </div>
             <div className="px-6 py-5 space-y-4">
-              <p className="text-sm text-[#5C6E89]">
-                Enter your email to unlock <strong className="text-[#1B2B47]">{title}</strong>.
+              <p className="text-sm text-[#93a0bc]">
+                Enter your email to unlock <strong className="text-[#f3ecdb]">{title}</strong>.
                 You&apos;ll only need to do this once — future downloads are instant.
               </p>
               <div>
@@ -81,18 +81,18 @@ export function DownloadButton({
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") submitEmail(); }}
                   placeholder="you@example.com"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C26A4A]"
+                  className="w-full border border-[rgba(243,236,219,0.15)] rounded-[6px] px-3 py-2.5 text-sm text-[#f3ecdb] bg-[#16233d] placeholder-[#93a0bc] focus:outline-none focus:ring-2 focus:ring-[#d6a94a]"
                 />
-                {error && <p className="text-xs text-red-600 bg-red-50 rounded px-3 py-2 mt-2">{error}</p>}
+                {error && <p className="text-xs text-red-300 bg-red-500/10 rounded px-3 py-2 mt-2">{error}</p>}
               </div>
               <button
                 onClick={submitEmail}
                 disabled={busy}
-                className="w-full flex items-center justify-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-5 py-2.5 rounded-full hover:bg-[#D4AE6A] transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-5 py-2.5 rounded-[6px] hover:bg-[#e2bc6e] transition-colors disabled:opacity-50"
               >
                 {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Unlocking…</> : <>Unlock &amp; download →</>}
               </button>
-              <p className="text-[11px] text-[#9b8e7e] text-center">
+              <p className="text-[11px] text-[#93a0bc] text-center">
                 We&apos;ll occasionally email you helpful resources. Unsubscribe anytime.
               </p>
             </div>

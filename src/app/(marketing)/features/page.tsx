@@ -123,7 +123,7 @@ export default async function FeaturesPage() {
   const { plans, defaultAiUsageCap } = await getActivePlans().catch(() => ({ plans: [], defaultAiUsageCap: 20 }));
 
   return (
-    <div className="min-h-screen bg-[#E8E5DD]">
+    <div className="min-h-screen bg-[#16233d]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Nav */}
@@ -132,15 +132,15 @@ export default async function FeaturesPage() {
       {/* Hero */}
       <MarketingPageHeader
         eyebrow="Features"
-        title={<>Everything you need to <span className="italic text-[#D4AE6A]">own your business</span></>}
+        title={<>Everything you need to <span className="italic text-[#d6a94a]">own your business</span></>}
         subtitle="Every tool an independent author needs to publish, sell, and grow — compared across Free, Standard, and Premium."
         backgroundImage="/features-header.png"
       />
-      <div className="bg-[#E8E5DD] border-b border-[#DCDBD3] px-4">
+      <div className="bg-[#16233d] border-b border-[rgba(243,236,219,0.12)] px-4">
         <div className="max-w-5xl mx-auto py-3">
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 text-sm text-[#C26A4A] hover:text-[#1B2B47] font-medium"
+            className="inline-flex items-center gap-2 text-sm text-[#d6a94a] hover:text-[#f3ecdb] font-medium"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to pricing
@@ -153,7 +153,7 @@ export default async function FeaturesPage() {
         {plans.length > 0 ? (
           <FeatureMatrix plans={plans} defaultAiUsageCap={defaultAiUsageCap} />
         ) : (
-          <div className="text-center py-20 text-[#8993A4]">
+          <div className="text-center py-20 text-[#93a0bc]">
             <p>Feature data is being loaded. Check back soon.</p>
           </div>
         )}
@@ -163,7 +163,7 @@ export default async function FeaturesPage() {
       <section className="px-4 pb-12 max-w-5xl mx-auto text-center">
         <Link
           href="/pricing#comparison"
-          className="inline-flex items-center gap-2 text-sm text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors"
         >
           See how AuthorLoft compares to the competition →
         </Link>
@@ -171,10 +171,10 @@ export default async function FeaturesPage() {
 
       {/* Feature deep dives */}
       <section className="px-4 pb-16 max-w-5xl mx-auto">
-        <h2 className="text-2xl font-bold text-[#1B2B47] mb-2 text-center" style={{ fontFamily: "Georgia, serif" }}>
+        <h2 className="text-2xl font-bold text-[#f3ecdb] mb-2 text-center italic" style={{ fontFamily: "Georgia, serif" }}>
           Explore each feature in depth
         </h2>
-        <p className="text-sm text-[#5C6E89] text-center mb-8">
+        <p className="text-sm text-[#93a0bc] text-center mb-8">
           Learn how each AuthorLoft capability helps you build your author business.
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -184,15 +184,15 @@ export default async function FeaturesPage() {
               <Link
                 key={slug}
                 href={`/${slug}`}
-                className="group bg-white rounded-xl border border-gray-200 p-5 hover:border-[#B8893D] hover:shadow-md transition-all"
+                className="group bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-5 hover:border-[#d6a94a] hover:shadow-md transition-all"
               >
-                <p className="text-[11px] font-mono uppercase tracking-wider text-[#B8893D] mb-1">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-[#d6a94a] mb-1">
                   {page.eyebrow}
                 </p>
-                <p className="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">
+                <p className="text-sm text-[#93a0bc] leading-relaxed mb-3 line-clamp-2">
                   {page.metaDescription}
                 </p>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-[#C26A4A] group-hover:gap-2 transition-all">
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-[#d6a94a] group-hover:gap-2 transition-all">
                   Learn more <ArrowRight className="h-3 w-3" />
                 </span>
               </Link>
@@ -202,22 +202,22 @@ export default async function FeaturesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-[#1B2B47] py-16 px-4">
+      <section className="bg-[#243756] py-16 px-4">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h2 className="text-2xl font-bold text-[#E8E5DD]">Ready to get started?</h2>
-          <p className="text-[#5C6E89]">
+          <h2 className="text-2xl font-bold text-[#f3ecdb]">Ready to get started?</h2>
+          <p className="text-[#93a0bc]">
             All plans start with a free account. Upgrade anytime from your dashboard.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
             <Link
               href="/register"
-              className="bg-[#B8893D] text-[#0F1A2D] font-semibold px-6 py-3 rounded-lg hover:bg-[#D4AE6A] transition-colors"
+              className="bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
             >
               Get Started Free
             </Link>
             <Link
               href="/pricing"
-              className="border border-[#E8E5DD] text-[#E8E5DD] font-semibold px-6 py-3 rounded-lg hover:bg-[#E8E5DD] hover:text-[#1B2B47] transition-colors"
+              className="border border-[#f3ecdb] text-[#f3ecdb] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#f3ecdb] hover:text-[#16233d] transition-colors"
             >
               View Pricing
             </Link>
@@ -226,10 +226,10 @@ export default async function FeaturesPage() {
       </section>
 
       {/* Have questions CTA */}
-      <section className="py-8 px-4 text-center bg-[#E8E5DD]">
-        <p className="text-sm text-[#8993A4]">
+      <section className="py-8 px-4 text-center bg-[#16233d]">
+        <p className="text-sm text-[#93a0bc]">
           Have questions about AuthorLoft?{" "}
-          <Link href="/contact" className="text-[#C26A4A] hover:text-[#1B2B47] font-medium transition-colors">
+          <Link href="/contact" className="text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors">
             Contact us →
           </Link>
         </p>

@@ -32,10 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const ML = {
-  midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
-  pearl:    '#F0EDE4', brass: '#B8893D', brass2: '#D4AE6A',
-  copper:   '#C26A4A', slate: '#5C6E89',
+const VAULT = {
+  bg: "#16233d", surf: "#1e2f4d", surf2: "#243756",
+  ink: "#f3ecdb", mute: "#93a0bc", gold: "#d6a94a",
 };
 
 export default async function ResourcesPage() {
@@ -73,26 +72,26 @@ export default async function ResourcesPage() {
     .filter((g) => g.items.length > 0);
 
   return (
-    <div style={{ minHeight: '100vh', background: ML.midnight }}>
+    <div style={{ minHeight: '100vh', background: VAULT.bg }}>
       <MarketingNav />
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <MarketingPageHeader
         eyebrow="Curated Resources"
-        title={<>Tools &amp; communities <span className="italic text-[#D4AE6A]">every author should know</span></>}
+        title={<>Tools &amp; communities <span className="italic text-[#d6a94a]">every author should know</span></>}
         subtitle="A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers."
         backgroundImage="/resources-header.png"
       />
-      <div style={{ background: ML.midnight, padding: '20px 24px 0' }}>
+      <div style={{ background: VAULT.bg, padding: '20px 24px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{ display: 'inline-flex', gap: 32, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 999, padding: '12px 32px' }}>
-            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass2 }}>{resources.length} resources</span>
+            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: VAULT.gold }}>{resources.length} resources</span>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
-            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass2 }}>{categories.length} categories</span>
+            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: VAULT.gold }}>{categories.length} categories</span>
             {partnerCount > 0 && (
               <>
                 <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
-                <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: ML.brass2 }}>
+                <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, color: VAULT.gold }}>
                   {partnerCount} featured {partnerCount === 1 ? 'partner' : 'partners'}
                 </span>
               </>
@@ -103,41 +102,41 @@ export default async function ResourcesPage() {
 
       {/* ── Free Downloads (email-gated) ──────────────────────────────── */}
       {downloadGroups.length > 0 && (
-        <section style={{ background: ML.midnight, padding: '64px 60px 0' }}>
+        <section style={{ background: VAULT.bg, padding: '64px 60px 0' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Free Downloads ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: ML.bone, margin: 0 }}>
-                Checklists, guides &amp; templates<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>to grow your author business</span>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 12 }}>· Free Downloads ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
+                Checklists, guides &amp; templates<br /><span style={{ fontStyle: 'italic', color: VAULT.gold }}>to grow your author business</span>
               </h2>
             </div>
 
             {downloadGroups.map((group) => (
               <div key={group.slug} style={{ marginBottom: 56 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-                  <h3 style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, margin: 0 }}>{group.name}</h3>
+                  <h3 style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, margin: 0 }}>{group.name}</h3>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
                   <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{group.items.length}</span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))', gap: 16 }}>
                   {group.items.map((d) => (
-                    <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: ML.pearl, border: '1px solid #DCDBD3', borderRadius: 18, overflow: 'hidden' }}>
+                    <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: VAULT.surf2, border: '1px solid rgba(243,236,219,0.12)', borderRadius: 18, overflow: 'hidden' }}>
                       <Link href={`/resources/${d.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                         {d.coverImageUrl ? (
-                          <div style={{ width: '100%', height: 160, background: '#E8E2D5' }}>
+                          <div style={{ width: '100%', height: 160, background: VAULT.surf }}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={d.coverImageUrl} alt={d.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                           </div>
                         ) : (
-                          <div style={{ width: '100%', height: 84, background: `${ML.copper}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <FileDown style={{ width: 26, height: 26, color: ML.copper }} />
+                          <div style={{ width: '100%', height: 84, background: `${VAULT.gold}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <FileDown style={{ width: 26, height: 26, color: VAULT.gold }} />
                           </div>
                         )}
                         <div style={{ padding: '18px 20px 12px' }}>
-                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 17, fontWeight: 400, color: ML.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
+                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 17, fontWeight: 400, color: VAULT.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
                           {d.description && (
-                            <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: ML.slate, margin: 0 }}>{d.description}</p>
+                            <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: VAULT.mute, margin: 0 }}>{d.description}</p>
                           )}
                         </div>
                       </Link>
@@ -146,7 +145,7 @@ export default async function ResourcesPage() {
                           id={d.id}
                           title={d.title}
                           requiresEmail={d.requiresEmail}
-                          className="w-full inline-flex items-center justify-center gap-2 bg-[#1B2B47] text-[#E8E5DD] text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#27406B] transition-colors"
+                          className="w-full inline-flex items-center justify-center gap-2 bg-[#d6a94a] text-[#16233d] text-sm font-semibold px-4 py-2.5 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
                         />
                       </div>
                     </div>
@@ -160,13 +159,13 @@ export default async function ResourcesPage() {
       )}
 
       {/* ── Resources by category ─────────────────────────────────────── */}
-      <section style={{ background: ML.midnight, padding: '72px 60px' }}>
+      <section style={{ background: VAULT.bg, padding: '72px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {downloadGroups.length > 0 && (
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
-              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 12 }}>· Tools &amp; Communities ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: ML.bone, margin: 0 }}>
-                Trusted partners &amp; <span style={{ fontStyle: 'italic', color: ML.brass2 }}>where to go next</span>
+              <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 12 }}>· Tools &amp; Communities ·</p>
+              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
+                Trusted partners &amp; <span style={{ fontStyle: 'italic', color: VAULT.gold }}>where to go next</span>
               </h2>
             </div>
           )}
@@ -175,21 +174,21 @@ export default async function ResourcesPage() {
       </section>
 
       {/* ── Become a partner CTA ──────────────────────────────────────── */}
-      <section style={{ margin: '0 60px 80px', borderRadius: 24, background: `linear-gradient(135deg, #1B2B47 0%, #27406B 100%)`, border: '1px solid rgba(212,174,106,0.2)', padding: '72px 60px', textAlign: 'center' }}>
+      <section style={{ margin: '0 60px 80px', borderRadius: 24, background: `linear-gradient(135deg, ${VAULT.surf} 0%, ${VAULT.surf2} 100%)`, border: '1px solid rgba(214,169,74,0.2)', padding: '72px 60px', textAlign: 'center' }}>
         <div style={{ maxWidth: 620, margin: '0 auto' }}>
-          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ML.brass2, marginBottom: 16 }}>· Work with us ·</p>
-          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: ML.bone, margin: '0 0 20px' }}>
-            Serve independent authors?<br /><span style={{ fontStyle: 'italic', color: ML.brass2 }}>Let&apos;s work together.</span>
+          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 16 }}>· Work with us ·</p>
+          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: VAULT.ink, margin: '0 0 20px' }}>
+            Serve independent authors?<br /><span style={{ fontStyle: 'italic', color: VAULT.gold }}>Let&apos;s work together.</span>
           </h2>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, lineHeight: 1.7, color: `${ML.bone}cc`, margin: '0 0 32px' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, lineHeight: 1.7, color: `${VAULT.ink}cc`, margin: '0 0 32px' }}>
             We are open to cross-promotional partnerships with organisations and tools that genuinely help indie authors. Featured partners are listed here with their logo, promoted to our growing author community, and highlighted across our platform.
           </p>
           <a href="mailto:hello@authorloft.com?subject=Partnership%20inquiry%20%E2%80%94%20AuthorLoft%20Resources"
             className="partner-cta"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 36px', background: ML.brass, color: ML.midnight, fontFamily: 'inherit', fontSize: 15, fontWeight: 700, borderRadius: 999, textDecoration: 'none', boxShadow: '0 10px 30px -8px rgba(184,137,61,0.7)' }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 36px', background: VAULT.gold, color: VAULT.bg, fontFamily: 'inherit', fontSize: 15, fontWeight: 700, borderRadius: 6, textDecoration: 'none', boxShadow: '0 10px 30px -8px rgba(214,169,74,0.7)' }}>
             Get in touch →
           </a>
-          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: `${ML.bone}44`, marginTop: 16, letterSpacing: '0.06em' }}>hello@authorloft.com</p>
+          <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, color: `${VAULT.ink}44`, marginTop: 16, letterSpacing: '0.06em' }}>hello@authorloft.com</p>
         </div>
       </section>
 
@@ -197,13 +196,13 @@ export default async function ResourcesPage() {
         <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
           Resources listed here are editorially selected. AuthorLoft is not compensated for standard listings.
           &nbsp;·&nbsp;
-          <Link href="/" style={{ color: ML.brass2, textDecoration: 'none' }}>Back to AuthorLoft →</Link>
+          <Link href="/" style={{ color: VAULT.gold, textDecoration: 'none' }}>Back to AuthorLoft →</Link>
         </p>
       </div>
 
       <style>{`
-        .resource-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.35); border-color: #C26A4A88 !important; }
-        .partner-cta:hover   { transform: translateY(-2px); box-shadow: 0 14px 36px -8px rgba(184,137,61,0.8) !important; }
+        .resource-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.35); border-color: #d6a94a88 !important; }
+        .partner-cta:hover   { transform: translateY(-2px); box-shadow: 0 14px 36px -8px rgba(214,169,74,0.8) !important; }
       `}</style>
     </div>
   );
