@@ -199,17 +199,26 @@ export default async function BookDetailPage({
     }),
   };
 
+  // Aggregate rating across editorial pull-quotes (optional star) and approved
+  // reader feedback (star required). This was already being computed for the
+  // JSON-LD below -- i.e. handed to search engines -- but never shown to the
+  // reader on the page itself. Rounded to one decimal to match the same
+  // aggregation in lib/bookstore.ts, which drives the catalogue cards.
   const allRatings = [
     ...book.reviews.filter((r) => r.rating).map((r) => r.rating!),
     ...book.bookFeedback.map((fb) => fb.rating),
   ];
-  if (allRatings.length > 0) {
-    const avg = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length;
+  const ratingCount = allRatings.length;
+  const averageRating =
+    ratingCount > 0
+      ? Math.round((allRatings.reduce((sum, r) => sum + r, 0) / ratingCount) * 10) / 10
+      : null;
+  if (averageRating !== null) {
     jsonLd.aggregateRating = {
       "@type": "AggregateRating",
-      ratingValue: avg.toFixed(1),
+      ratingValue: averageRating.toFixed(1),
       bestRating: 5,
-      ratingCount: allRatings.length,
+      ratingCount,
     };
   }
 
@@ -351,6 +360,35 @@ export default async function BookDetailPage({
                 <p className="mt-2 text-xl text-gray-500 leading-snug">{book.subtitle}</p>
               )}
               <p className="mt-2 text-sm text-gray-400">by {authorName}</p>
+
+              {/* Aggregate rating — only rendered once real ratings exist, so a
+                  book with none shows nothing rather than an empty five stars. */}
+              {averageRating !== null && (
+                <div
+                  className="mt-3 flex items-center gap-2"
+                  aria-label={`Rated ${averageRating.toFixed(1)} out of 5 from ${ratingCount} ${ratingCount === 1 ? "rating" : "ratings"}`}
+                >
+                  <div className="flex" aria-hidden="true">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        className={`h-4 w-4 ${
+                          n <= Math.round(averageRating)
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-gray-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900 tabular-nums">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-gray-400">
+                    ({ratingCount} {ratingCount === 1 ? "rating" : "ratings"})
+                  </span>
+                </div>
+              )}
+
               {book.priceCents > 0 && (
                 <p className="mt-3 text-2xl font-bold text-gray-900">{formatCents(book.priceCents)}</p>
               )}

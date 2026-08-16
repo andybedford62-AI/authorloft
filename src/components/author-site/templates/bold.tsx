@@ -9,6 +9,7 @@ import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
+import { accentAsTextOn } from "@/lib/color-contrast";
 import type { HomeTemplateProps } from "./types";
 
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
@@ -16,6 +17,11 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
+  // This template alternates dark and white sections, so accent-as-text needs a
+  // contrast floor against each. gray-900 is the reference for the dark bands
+  // (the harder of the two darks — gray-950 only has more contrast).
+  const accentOnDark  = accentAsTextOn(accentColor, "#111827");
+  const accentOnLight = accentAsTextOn(accentColor, "#ffffff");
 
   // Spotlight book: resolve through books[] so we get the full BookForTemplate type
   const spotlightBook: typeof books[0] | null = author.heroFeaturedBook
@@ -51,10 +57,10 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
               dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>More about this author coming soon.</p>") }}
             />
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-1">
-              <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentColor }}>
+              <Link href="/about" className="inline-flex items-center gap-1 text-sm font-medium hover:underline" style={{ color: accentOnDark }}>
                 Full biography <ChevronRight className="h-3.5 w-3.5" />
               </Link>
-              <Link href="/contact" className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline" style={{ color: accentColor }}>
+              <Link href="/contact" className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline" style={{ color: accentOnDark }}>
                 <Mail className="h-3.5 w-3.5" /> Email {firstName}
               </Link>
             </div>
@@ -68,7 +74,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
             {/* Section label */}
-            <p className="text-xs font-semibold uppercase tracking-widest mb-10 text-center" style={{ color: accentColor }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-10 text-center" style={{ color: accentOnDark }}>
               Featured Release
             </p>
 
@@ -103,7 +109,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
 
                 {/* Series label */}
                 {spotlightBook.series && (
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentOnDark }}>
                     {spotlightBook.series.name}
                   </p>
                 )}
@@ -163,7 +169,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
               <Link
                 href="/books"
                 className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity"
-                style={{ color: accentColor }}
+                style={{ color: accentOnLight }}
               >
                 View All <ChevronRight className="h-3.5 w-3.5" />
               </Link>
@@ -202,7 +208,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
                     {book.title}
                   </p>
                   {book.series && (
-                    <p className="text-xs" style={{ color: accentColor }}>{book.series.name}</p>
+                    <p className="text-xs" style={{ color: accentOnLight }}>{book.series.name}</p>
                   )}
                 </Link>
               ))}
@@ -242,7 +248,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: accentColor }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: accentOnDark }}>
                 {firstName}&rsquo;s Newsletter
               </p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-heading leading-tight">

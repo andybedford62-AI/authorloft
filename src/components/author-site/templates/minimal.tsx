@@ -8,12 +8,16 @@ import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
+import { accentAsTextOn } from "@/lib/color-contrast";
 import type { HomeTemplateProps } from "./types";
 
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
   const accentColor = author.accentColor;
   const authorName  = author.displayName || author.name;
   const firstName   = authorName.split(" ")[0];
+  // Accent painted as TEXT needs a contrast floor -- this template's surfaces
+  // are white or a near-white accent tint. Unchanged when it already passes.
+  const accentText  = accentAsTextOn(accentColor, "#ffffff");
 
   // Show up to 6 books in the catalog grid
   const displayBooks = books.slice(0, 6);
@@ -70,7 +74,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
 
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentColor }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
                 The Collection
               </p>
               <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
@@ -79,7 +83,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
               <Link
                 href="/books"
                 className="text-sm font-semibold flex items-center gap-1 hover:opacity-75 transition-opacity"
-                style={{ color: accentColor }}
+                style={{ color: accentText }}
               >
                 View all {books.length} <ChevronRight className="h-3.5 w-3.5" />
               </Link>
@@ -117,7 +121,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
                     {book.title}
                   </p>
                   {book.series && (
-                    <p className="text-xs mt-0.5 font-medium" style={{ color: accentColor }}>
+                    <p className="text-xs mt-0.5 font-medium" style={{ color: accentText }}>
                       {book.series.name}
                     </p>
                   )}
@@ -174,14 +178,14 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
             <Link
               href="/about"
               className="inline-flex items-center gap-1 text-sm font-semibold hover:underline"
-              style={{ color: accentColor }}
+              style={{ color: accentText }}
             >
               Full biography <ChevronRight className="h-3.5 w-3.5" />
             </Link>
             <Link
               href="/contact"
               className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
-              style={{ color: accentColor }}
+              style={{ color: accentText }}
             >
               <Mail className="h-3.5 w-3.5" /> Email {firstName}
             </Link>

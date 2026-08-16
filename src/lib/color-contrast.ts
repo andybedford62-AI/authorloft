@@ -63,3 +63,74 @@ export function isLightColor(hex: string): boolean {
 export function readableTextOn(background: string, dark = "#111", light = "#fff"): string {
   return contrastRatio(background, dark) >= contrastRatio(background, light) ? dark : light;
 }
+
+// ── Accent-as-text ───────────────────────────────────────────────────────────
+
+function toHsl(hex: string): { h: number; s: number; l: number } | null {
+  const n = normalize(hex);
+  if (!n) return null;
+  const r = parseInt(n.slice(0, 2), 16) / 255;
+  const g = parseInt(n.slice(2, 4), 16) / 255;
+  const b = parseInt(n.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l };
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h: number;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return { h, s, l };
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const f = (n: number) => {
+    const k = (n + h * 12) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(v * 255).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+/**
+ * An author's accent, adjusted only as far as it must be to stay readable as
+ * TEXT on `background`.
+ *
+ * Authors pick their own accent with no contrast warning in the picker, and
+ * templates paint it directly as text on near-white surfaces (section eyebrows,
+ * series links, "About the Author" labels). A pale accent there fails WCAG AA
+ * outright.
+ *
+ * Hue and saturation are preserved and only lightness moves — away from the
+ * background — so the result still reads as the author's colour rather than a
+ * generic grey. An accent that already passes is returned untouched, so most
+ * authors see no change at all.
+ */
+export function accentAsTextOn(
+  accent: string,
+  background = "#fff",
+  minRatio = 4.5
+): string {
+  if (contrastRatio(accent, background) >= minRatio) return accent;
+
+  const hsl = toHsl(accent);
+  if (!hsl) return readableTextOn(background);
+
+  // Light background → darken the accent; dark background → lighten it.
+  const darken = relativeLuminance(background) > 0.18;
+  const step = darken ? -0.02 : 0.02;
+
+  let { l } = hsl;
+  for (let i = 0; i < 50; i++) {
+    l += step;
+    if (l <= 0 || l >= 1) break;
+    const candidate = hslToHex(hsl.h, hsl.s, l);
+    if (contrastRatio(candidate, background) >= minRatio) return candidate;
+  }
+  // Nothing in the hue passed (very low-saturation accents on mid grounds) —
+  // fall back to plain readable text rather than shipping something illegible.
+  return readableTextOn(background);
+}

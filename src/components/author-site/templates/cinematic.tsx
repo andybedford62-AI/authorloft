@@ -51,6 +51,9 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
   const headline    = author.heroTitle    || author.tagline || authorName;
   const subhead     = author.heroSubtitle || (author.shortBio ? stripHtml(author.shortBio).slice(0, 140) : "");
   const location    = author.credentials?.[0] ?? "";
+  // credentials[0] is rendered as `location` above, so the hero meta strip
+  // shows the remainder.
+  const metaCredentials = author.credentials?.slice(1) ?? [];
 
   return (
     <div style={{ "--accent": accent } as React.CSSProperties}>
@@ -138,16 +141,25 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               </Link>
             </div>
 
-            {/* Meta strip */}
-            <div className="flex flex-wrap items-center gap-3 pt-4 border-t" style={{ borderColor: accent + "22" }}>
-              <span className="text-[11px] font-medium" style={{ color: accent }}>★★★★★</span>
-              {author.credentials?.slice(1).map((c, i) => (
-                <span key={i} className="text-[11px] text-[#FBF6E9]/50">
-                  <span className="mx-2" style={{ color: accent + "66" }}>|</span>
-                  {c}
-                </span>
-              ))}
-            </div>
+            {/* Meta strip — credentials only.
+                A hardcoded ★★★★★ used to lead this row, sourced from nothing:
+                every Cinematic author displayed five gold stars regardless of
+                whether a single reader had ever rated them. Removed rather than
+                left as a fabricated trust signal. Real aggregate ratings are on
+                the book pages, where the data actually exists; wiring one up
+                here would need getAuthorBooks to carry feedback (see
+                FEATURE_BACKLOG.md). The separator is now index-guarded so the
+                first credential doesn't start with a stray divider. */}
+            {metaCredentials.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t" style={{ borderColor: accent + "22" }}>
+                {metaCredentials.map((c, i) => (
+                  <span key={i} className="text-[11px] text-[#FBF6E9]/50">
+                    {i > 0 && <span className="mx-2" style={{ color: accent + "66" }}>|</span>}
+                    {c}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

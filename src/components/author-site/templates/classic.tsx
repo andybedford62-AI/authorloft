@@ -8,6 +8,7 @@ import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
+import { accentAsTextOn } from "@/lib/color-contrast";
 import type { HomeTemplateProps } from "./types";
 
 // ── Gradient palette for series cards (cycles by index) ──────────────────────
@@ -25,6 +26,10 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
+  // Accent painted as TEXT needs a contrast floor -- every surface in this
+  // template is white or a near-white accent tint, and a pale accent fails AA
+  // against those. Returns the accent untouched when it already passes.
+  const accentText   = accentAsTextOn(accentColor, "#ffffff");
 
   // Credential pills — filter out blanks, only render if at least one has text
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
@@ -48,7 +53,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
           {/* Text + credentials */}
           <div className="flex-1 space-y-5">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>
                 About the Author
               </p>
               <h2 className="text-2xl font-bold text-gray-900 font-heading">{authorName}</h2>
@@ -66,7 +71,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
                   <span
                     key={cred}
                     className="px-3 py-1 rounded-full text-xs font-medium border"
-                    style={{ borderColor: accentColor + "55", color: accentColor, backgroundColor: accentColor + "10" }}
+                    style={{ borderColor: accentColor + "55", color: accentText, backgroundColor: accentColor + "10" }}
                   >
                     {cred}
                   </span>
@@ -81,7 +86,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-                style={{ color: accentColor }}
+                style={{ color: accentText }}
               >
                 <Mail className="h-3.5 w-3.5" />
                 Email {firstName}
@@ -116,7 +121,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
             <Link
               href="/books"
               className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
-              style={{ color: accentColor }}
+              style={{ color: accentText }}
             >
               View All <ChevronRight className="h-4 w-4" />
             </Link>
@@ -250,7 +255,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentColor }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
                 {firstName}&rsquo;s Newsletter
               </p>
               <h2 className="text-2xl font-bold text-gray-900 font-heading">

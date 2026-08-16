@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Accent stays readable as text; ratings shown to readers, not just Google
+
+Two more items off the author-public-pages audit.
+
+**Accent-as-text now has a contrast floor.** Templates painted the author's raw accent directly as text on near-white surfaces (section eyebrows, series links, "About the Author" labels, credential pills) with no guard. Both *default* theme accents fail WCAG AA there: `classic-literary`'s brass `#c89b3c` at **2.56:1** and `modern-minimal`'s indigo `#6366f1` at **4.47:1** — so this was every live author, not an edge case. New `accentAsTextOn()` in `lib/color-contrast.ts` moves only lightness (hue and saturation preserved, so it still reads as the author's colour rather than a generic grey) and returns the accent untouched when it already passes. Applied via a single derived value per template rather than at 17 call sites, so future code can't quietly regress it: Classic and Minimal get one white-surface variant; Bold alternates dark and white sections so it carries `accentOnDark`/`accentOnLight`, referenced against `gray-900` (the harder of its two darks). Measured across all 11 live authors before shipping — 11 of 11 shift, brass → `#937129` at 4.53:1 being the most visible. Note the same accent remains fine as a *button surface* (that brass scores 7.38:1 with dark text via `readableTextOn`); it was only ever unusable as text, which is why a separate text variant is the right shape rather than changing the palettes.
+
+**Book pages show their aggregate rating.** `/books/[slug]` was already computing an aggregate across editorial pull-quotes and approved reader feedback — and handing it to the JSON-LD `aggregateRating` for search engines, while showing the reader nothing. The number is now rendered under the byline (stars, the average to one decimal, and the count), rounded consistently with the same aggregation in `lib/bookstore.ts` that drives the catalogue cards. Only renders when real ratings exist, so a book with none shows nothing rather than an empty five stars. Corrects an audit finding that was itself wrong: the per-review stars were reported missing, but they were already there — the audit read the page through text extraction, which can't see SVG icons.
+
+**Removed a fabricated trust signal.** The Cinematic hero's meta strip opened with a hardcoded `★★★★★` sourced from nothing — every author on that template displayed five gold stars whether or not a single reader had ever rated them. Deleted rather than left standing; the credential separator is now index-guarded so the first entry no longer starts with a stray divider, and the strip hides entirely when there are no credentials to show. Wiring a *real* aggregate into the homepage hero would need `getAuthorBooks` to carry feedback and `BookForTemplate` to expose it — logged in `FEATURE_BACKLOG.md` rather than bolted on here.
+
 ## August 16, 2026 — Hero honours the author's own accent colour
 
 The audit batch below was promoted to prod and verified live; this fix followed immediately after, from something the promotion itself exposed.
