@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { CinematicBooksFilter } from "./cinematic-books-filter";
-import { CinematicNewsletterForm } from "./cinematic-newsletter-form";
+import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import type { HomeTemplateProps } from "./types";
 
 const NAVY_DEEP   = "#050D1C";
@@ -472,7 +472,14 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               </p>
             </div>
 
-            <CinematicNewsletterForm authorId={author.id} accent={accent} />
+            <NewsletterInlineForm
+              authorId={author.id}
+              accentColor={accent}
+              tone="dark"
+              rounded="full"
+              inputBg={NAVY_DEEP}
+              buttonTextColor={NAVY_DEEP}
+            />
           </div>
         </div>
       </section>

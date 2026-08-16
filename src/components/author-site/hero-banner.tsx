@@ -3,6 +3,7 @@ import Image from "next/image";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { getTheme } from "@/lib/themes";
 import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
+import { isLightColor } from "@/lib/color-contrast";
 import type { AuthorForTemplate } from "./templates/types";
 
 interface HeroBannerProps {
@@ -26,16 +27,6 @@ function getHeroColors(siteTheme: string) {
     theme.defaultHeroImageUrl ??
     (THEME_HERO_IDS.includes(theme.id) ? `/images/themes/${theme.id}-hero.jpg` : undefined);
   return { bg, accent: theme.preview.accent, defaultHeroImageUrl: heroImage };
-}
-
-/** Rough luminance check — returns true if color is light (use dark text on it). */
-function isLightColor(hex: string): boolean {
-  const h = hex.replace("#", "");
-  if (h.length !== 6) return false;
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return (r * 299 + g * 587 + b * 114) / 1000 > 160;
 }
 
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {

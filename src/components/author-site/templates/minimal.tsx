@@ -1,5 +1,5 @@
 // Minimal Template — "Books First" layout.
-// Slim author header → full books catalog → compact bio → series → contact
+// Slim author header → full books catalog → series → compact bio → newsletter → contact
 // No hero banner — the catalog leads, the author follows.
 
 import Image from "next/image";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
+import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import type { HomeTemplateProps } from "./types";
 
 export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
@@ -188,7 +189,30 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
         </div>
       </section>
 
-      {/* ── 5. Contact CTA ───────────────────────────────────────────────── */}
+      {/* ── 5. Newsletter ────────────────────────────────────────────────── */}
+      {/* Deliberately the most restrained of the four -- single column at the
+          bio's width, reusing the accent-bar heading motif, since this
+          template's whole premise is restraint. */}
+      <section className="py-12 bg-white border-t border-gray-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
+            <h2 className="text-lg font-bold text-gray-900 font-heading">
+              Letters from {firstName}
+            </h2>
+          </div>
+          <p className="text-gray-500 text-sm mb-5 leading-relaxed">
+            New releases and reading recommendations, straight to your inbox.
+          </p>
+          <NewsletterInlineForm
+            authorId={author.id}
+            accentColor={accentColor}
+            tone="light"
+          />
+        </div>
+      </section>
+
+      {/* ── 6. Contact CTA ───────────────────────────────────────────────── */}
       <section className="py-10 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>

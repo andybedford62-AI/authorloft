@@ -1,5 +1,5 @@
 // Classic Template — AuthorLoft homepage layout.
-// Hero → About → Book Carousel → Series → Newsletter → Contact CTA
+// Hero → About → Featured Books → Series → Newsletter → Contact CTA
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { ChevronRight, BookOpen, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
+import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import type { HomeTemplateProps } from "./types";
 
 // ── Gradient palette for series cards (cycles by index) ──────────────────────
@@ -243,6 +244,31 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
           </div>
         </section>
       )}
+
+      {/* ── Newsletter ───────────────────────────────────────────────────────── */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentColor }}>
+                {firstName}&rsquo;s Newsletter
+              </p>
+              <h2 className="text-2xl font-bold text-gray-900 font-heading">
+                Letters from {firstName}
+              </h2>
+              <p className="text-gray-500 mt-2 leading-relaxed">
+                New releases, behind-the-scenes notes, and reading recommendations —
+                straight to your inbox.
+              </p>
+            </div>
+            <NewsletterInlineForm
+              authorId={author.id}
+              accentColor={accentColor}
+              tone="light"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* ── Contact CTA ──────────────────────────────────────────────────────── */}
       <section className="py-12" style={{ backgroundColor: accentColor + "15" }}>

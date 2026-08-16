@@ -1,5 +1,5 @@
 // Bold Template — "Spotlight" layout.
-// Hero → Author Strip → ONE Featured Book spotlight → remaining books grid → Series → Contact
+// Hero → Author Strip → ONE Featured Book spotlight → remaining books grid → Series → Newsletter → Contact
 // Designed for authors who want one book to lead everything.
 
 import Image from "next/image";
@@ -8,6 +8,7 @@ import { ChevronRight, BookOpen, ShoppingCart, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
+import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import type { HomeTemplateProps } from "./types";
 
 export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
@@ -236,7 +237,32 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         </section>
       )}
 
-      {/* ── 6. Contact CTA ───────────────────────────────────────────────── */}
+      {/* ── 6. Newsletter ────────────────────────────────────────────────── */}
+      <section className="py-16 bg-gray-900 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: accentColor }}>
+                {firstName}&rsquo;s Newsletter
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-heading leading-tight">
+                Letters from {firstName}
+              </h2>
+              <p className="text-gray-400 mt-2 leading-relaxed">
+                New releases, behind-the-scenes notes, and reading recommendations —
+                straight to your inbox.
+              </p>
+            </div>
+            <NewsletterInlineForm
+              authorId={author.id}
+              accentColor={accentColor}
+              tone="dark"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── 7. Contact CTA ───────────────────────────────────────────────── */}
       <section className="py-10 bg-gray-950 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
