@@ -36,7 +36,7 @@ export function LandingPage({ data }: { data: LandingPageData }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0EDE4]">
+    <div className="min-h-screen bg-[#16233d]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
       <MarketingNav />
@@ -49,30 +49,30 @@ export function LandingPage({ data }: { data: LandingPageData }) {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Breadcrumbs */}
-        <nav aria-label="Breadcrumb" className="text-sm text-[#5C6E89] mb-8">
+        <nav aria-label="Breadcrumb" className="text-sm text-[#93a0bc] mb-8">
           <ol className="flex items-center gap-1.5">
-            <li><Link href="/" className="hover:text-[#C26A4A] transition-colors">Home</Link></li>
+            <li><Link href="/" className="hover:text-[#d6a94a] transition-colors">Home</Link></li>
             <li aria-hidden>/</li>
-            <li><Link href="/features" className="hover:text-[#C26A4A] transition-colors">Features</Link></li>
+            <li><Link href="/features" className="hover:text-[#d6a94a] transition-colors">Features</Link></li>
             <li aria-hidden>/</li>
-            <li className="text-[#3d3328] font-medium">{data.eyebrow}</li>
+            <li className="text-[#f3ecdb] font-medium">{data.eyebrow}</li>
           </ol>
         </nav>
 
         {/* Intro */}
         <section className="mb-14">
-          <p className="text-lg text-[#3d3328] leading-relaxed">{data.intro}</p>
+          <p className="text-lg text-[#f3ecdb] leading-relaxed">{data.intro}</p>
         </section>
 
         {/* Feature sections */}
         {data.sections.map((section) => (
           <section key={section.title} className="mb-14">
-            <h2 className="font-serif text-2xl text-[#1B2B47] mb-3">{section.title}</h2>
-            <p className="text-[#4d4337] leading-relaxed mb-5">{section.description}</p>
+            <h2 className="font-serif italic text-2xl text-[#f3ecdb] mb-3">{section.title}</h2>
+            <p className="text-[#c7cede] leading-relaxed mb-5">{section.description}</p>
             <ul className="space-y-3">
               {section.bullets.map((bullet) => (
-                <li key={bullet} className="flex items-start gap-3 text-[#3d3328]">
-                  <Check className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <li key={bullet} className="flex items-start gap-3 text-[#f3ecdb]">
+                  <Check className="h-5 w-5 text-[#d6a94a] flex-shrink-0 mt-0.5" />
                   <span>{bullet}</span>
                 </li>
               ))}
@@ -82,11 +82,11 @@ export function LandingPage({ data }: { data: LandingPageData }) {
 
         {/* Related guide link */}
         {data.relatedGuideSlug && (
-          <section className="mb-14 bg-white rounded-2xl border border-[#DCDBD3] p-6">
-            <p className="text-sm text-[#5C6E89] mb-1">Want to learn more?</p>
+          <section className="mb-14 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] p-6">
+            <p className="text-sm text-[#93a0bc] mb-1">Want to learn more?</p>
             <Link
               href={`/guides/${data.relatedGuideSlug}`}
-              className="text-[#C26A4A] font-medium hover:underline"
+              className="text-[#d6a94a] font-medium hover:underline"
             >
               Read our in-depth guide &rarr;
             </Link>
@@ -95,36 +95,36 @@ export function LandingPage({ data }: { data: LandingPageData }) {
 
         {/* FAQ */}
         <section className="mb-14">
-          <h2 className="font-serif text-2xl text-[#1B2B47] mb-5">Frequently asked questions</h2>
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] mb-5">Frequently asked questions</h2>
           <div className="space-y-4">
             {data.faqs.map((f) => (
-              <div key={f.q} className="bg-white rounded-2xl border border-[#DCDBD3] p-6">
-                <h3 className="font-semibold text-[#1B2B47] mb-2">{f.q}</h3>
-                <p className="text-sm text-[#4d4337] leading-relaxed">{f.a}</p>
+              <div key={f.q} className="bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] p-6">
+                <h3 className="font-semibold text-[#f3ecdb] mb-2">{f.q}</h3>
+                <p className="text-sm text-[#c7cede] leading-relaxed">{f.a}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* CTA */}
-        <section className="bg-[#1B2B47] rounded-2xl px-6 py-10 text-center">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#D4AE6A] mb-3">· Start free ·</p>
-          <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
+        <section className="bg-[#243756] rounded-2xl px-6 py-10 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#d6a94a] mb-3">· Start free ·</p>
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
             Ready to take control of your author career?
           </h2>
-          <p className="text-sm text-[#D4DDEB] max-w-md mx-auto mb-6">
+          <p className="text-sm text-[#93a0bc] max-w-md mx-auto mb-6">
             Join thousands of indie authors building their platform on AuthorLoft — free to start, upgrade when you&apos;re ready.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+              className="inline-flex items-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
             >
               Get Started Free
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 text-[#D4AE6A] font-medium px-6 py-3 rounded-full border border-[#3a4a66] hover:border-[#D4AE6A] transition-colors"
+              className="inline-flex items-center gap-2 text-[#d6a94a] font-medium px-6 py-3 rounded-[6px] border border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a] transition-colors"
             >
               See pricing
             </Link>
