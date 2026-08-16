@@ -29,6 +29,22 @@ Shipped June 6, 2026 (discovery catalog, opt-in per book, STANDARD+). Hero/heade
 
 ---
 
+## Author Public Sites — design & UX
+
+From the August 16, 2026 audit of the pages the platform generates for authors (all four templates + `/books`, `/books/[slug]`, `/about`, `/contact`). The quick wins from that audit shipped same-day — see `docs/CHANGELOG.md`. What's left:
+
+- [ ] **Bring Classic and Minimal up to Cinematic's bar** — the four templates aren't the same product. Cinematic reads like a current editorial site (personalized copy, tilt covers, scenic hero backdrops); Classic and Minimal read like the platform's 2016-era design (gray-900 headings, `ChevronRight` breadcrumbs everywhere, sections tinted by stacking accent colour at low opacity over white). An author picking Classic for genre fit is silently getting an older design era, not a style choice. Not a rebuild — spacing, one confident type scale, and personalized microcopy, reusing patterns already proven in Cinematic. *(medium)*
+- [ ] **Contrast-guard `accentColor` when it's used as text** — Classic and Minimal apply the author's accent directly as text colour on white (section eyebrows, "About the Author" labels, series links) with no luminance check. `hero-banner.tsx` already solved the inverse case (text *on* accent) with `isLightColor()`; there's no equivalent guard for accent-as-text. An author picking a pale accent — nothing in the colour picker warns them — gets body text failing WCAG AA. Extend the existing helper to clamp lightness, or fall back to a darkened shade for text-only contexts. *(small)*
+- [ ] **Let the nav background follow the template** — `AuthorNav` always renders on a fixed dark `--nav-bg`, including above Classic and Minimal's white page bodies, so the chrome visibly doesn't belong to the page it's introducing. Should vary per template/theme the way the page body already does. *(small)*
+- [ ] **Fewer competing CTAs per book card** — Cinematic's card gets this right (cover → title → price → one click). Classic stacks a caption badge, series label, title, and a separate "Read More" beneath a cover that's *also* a link — two controls doing one job. Restraint applied consistently, not a new pattern. *(small)*
+- [ ] **Real aggregate rating on book pages** — `/books/[slug]` renders review quotes with no star attached, and the hero's ★★★★★ is static markup not sourced from anything, while the page simultaneously collects Name/Email/**Rating** right below. Readers in 2026 are calibrated to distrust exactly that. Surface the star per review and roll an aggregate up near the buy button — the data is already being collected, this is display + rollup. *(medium)*
+- [ ] **Author intro video/audio in the hero** — a static portrait is table stakes now. The strongest current author sites lead with a 10–20s clip (even just the author reading the book's opening line). The hero's photo slot in `hero-banner.tsx` is the natural home. Highest-leverage hero addition available, but a real build: new upload surface + player. *(large)*
+- [ ] **Trim the contact form's Subject dropdown** — nine options (Reader Question, Newsletter, Blog Information, Media/Press, Speaking, Collaboration, Rights, Technical Issue, Other) sit between the reader and the message box. For the actual traffic mix on an author site — overwhelmingly "reader wants to say hi" — that's friction in front of the common case to serve the rare one. Default to a short visible set, fold specialists under "Other". *(small)*
+
+Related: the deferred **native PDF flip-book viewer** (see `memory/project_flipbook_native_spec.md`) doubles as the "try before you buy" first-chapter preview that's become close to expected on author storefronts — worth weighing that framing when it's next prioritized.
+
+---
+
 ## Author Newsletter — rich email (WOW v2)
 
 Shipped June 25, 2026: branded email + smart content blocks (featured book showcase, "more on the shelf" strip, smart review quote from `BookReview`/approved `BookFeedback`, smart special block from active `Special`, genre targeting, compose preview that mirrors the send). Next "WOW" ideas:

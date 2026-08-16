@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Author public-pages audit: platform branding stops talking over the author
+
+Design/UX audit of every page the platform generates on an author's behalf (home across all four templates, `/books`, `/books/[slug]`, `/about`, `/contact`), reviewed live against the Cinematic demo plus source. Two themes came out of it: the four templates aren't realized at the same level (Cinematic reads current, Classic/Minimal read like the platform's earlier design era), and the platform's own chrome kept outranking the author it exists to showcase. This entry covers the fixes shipped; the deferred items are in `docs/FEATURE_BACKLOG.md`.
+
+- **Homepage CTA said "live," linked to a demo.** The marketing hero's "See a live author site" pointed at `demo.authorloft.com`, which announces itself with a "70% Demo" banner the moment it loads — the destination contradicted the button within a second of clicking. Relabeled to "See a demo author site."
+- **Cinematic's newsletter form never subscribed anyone.** It submitted `GET /contact` — a redirect to the contact page dressed up as a signup. Wired it to the real per-author double opt-in (`/api/newsletter/subscribe`, the same endpoint the footer's `NewsletterModalButton` already used correctly) via a new `CinematicNewsletterForm` client component with proper loading/success/error states. Its copy was also hardcoded to `The Dispatch` / "Letters from the loft" — a pun on *AuthorLoft*, rendering on every author's own site regardless of who they were, right next to a correctly-personalized "Email {firstName}" button. Now reads "{firstName}'s Dispatch" / "Letters from {firstName}."
+- **About page showed two contradictory stats.** "4 Books Published" and "12 Novels Published" rendered side by side on the page readers visit specifically to decide whether to trust an author: the auto book count was prepended unconditionally on top of the author's own `aboutStats` entries. Custom stats now fully replace the auto count — matching the precedence the `credentials` block six lines above already used. Also stops a "0 Books Published" tile rendering for an author with an empty catalog.
+- **Hardcoded green overrode the author's accent colour.** `Login` (nav) and `Join AuthorLoft` (footer) rendered in a fixed `#22c55e` regardless of the author's chosen `accentColor`, putting a stray green control on every page of a site they'd deliberately branded. All three instances removed.
+- **The footer led with an exit.** Column one — first in reading order, the only bordered button in the block — was "Join AuthorLoft," pointed at the platform's marketing site, sitting *above* the author's own newsletter signup. A reader who scrolled to the bottom of an author's site was invited first to go start a competing one. The author's newsletter now leads; AuthorLoft keeps the bottom-bar "Powered by" it already had on FREE plans.
+- **`Login` left primary nav.** It rendered for every anonymous visitor — in practice almost entirely readers with no account and no reason to make one, competing with Books/About/Contact for attention. Moved to a small footer "Author login" link, deliberately built on `NEXT_PUBLIC_PLATFORM_DOMAIN` rather than a hardcoded `authorloft.com` (which the rest of the footer uses) so an author signing in from staging isn't bounced to the production login.
+
 ## August 16, 2026 — Direct Sales safety net, docx→epub image fix, clickable dashboard catalog
 
 Three small fixes from live usage feedback:
