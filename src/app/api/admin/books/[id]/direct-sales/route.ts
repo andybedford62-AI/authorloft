@@ -88,6 +88,9 @@ export async function POST(
       priceCents,
       isReaderMagnet: isReaderMagnet === true,
       sortOrder: count,
+      // Every format except PRINT needs an uploaded file before it can be sold —
+      // start inactive so there's never a live buy button with nothing behind it.
+      isActive: format === "PRINT",
     },
   });
 

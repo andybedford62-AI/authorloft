@@ -43,6 +43,24 @@ export async function PATCH(
     }
   }
 
+  // Every format except PRINT ships as a file download — an active item with no
+  // file would show a working buy button that fails at checkout.
+  const needsFile = existing.format !== "PRINT";
+  const nextFileKey = clearFile ? null : existing.fileKey;
+  const requestedActive = isActive !== undefined ? isActive : existing.isActive;
+
+  if (needsFile && !nextFileKey && requestedActive) {
+    if (isActive === true) {
+      return NextResponse.json(
+        { error: "Upload a file for this format before activating it." },
+        { status: 400 }
+      );
+    }
+    // Reaching here means the file was just cleared while the item was already
+    // active — auto-deactivate instead of leaving a broken buy button live.
+  }
+  const forceInactive = needsFile && !nextFileKey && requestedActive && isActive === undefined;
+
   // If clearFile is requested, delete file from Supabase storage
   if (clearFile && existing.fileKey) {
     try {
@@ -60,6 +78,7 @@ export async function PATCH(
       ...(description !== undefined && { description: description?.trim() || null }),
       ...(priceCents !== undefined && { priceCents }),
       ...(isActive !== undefined && { isActive }),
+      ...(forceInactive && { isActive: false }),
       ...(isReaderMagnet !== undefined && { isReaderMagnet }),
       ...(clearFile && { fileUrl: null, fileKey: null, fileName: null }),
     },

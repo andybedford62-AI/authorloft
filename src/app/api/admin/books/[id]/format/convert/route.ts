@@ -4,7 +4,7 @@ import mammoth from "mammoth";
 import epub from "epub-gen-memory";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
-import { getSupabaseSignedUrl, uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import { getSupabaseSignedUrl, uploadToSupabaseStorage, deleteFromSupabaseStorage } from "@/lib/supabase-storage";
 
 /**
  * POST /api/admin/books/[id]/format/convert
@@ -82,6 +82,11 @@ export async function POST(
     data: { bookId, authorId, sourceFileKey: fileKey, sourceName: fileName, status: "CONVERTING" },
   });
 
+  // Images embedded in the manuscript get uploaded here as they're extracted (see
+  // convertImage below) purely so epub-gen-memory has a real URL to fetch — they're
+  // baked into the epub itself, so we delete them again once generation is done.
+  const tempImageKeys: string[] = [];
+
   try {
     // Download the uploaded manuscript from Supabase Storage
     const signedUrl = await getSupabaseSignedUrl("book-files", fileKey, 300);
@@ -89,8 +94,23 @@ export async function POST(
     if (!docxRes.ok) throw new Error(`Could not read uploaded file (${docxRes.status})`);
     const docxBuffer = Buffer.from(await docxRes.arrayBuffer());
 
-    // DOCX -> HTML
-    const { value: html } = await mammoth.convertToHtml({ buffer: docxBuffer });
+    // DOCX -> HTML. mammoth's default image handling inlines each embedded image as a
+    // base64 data: URI — but epub-gen-memory downloads every <img src> over HTTP to
+    // bundle it into the epub, and its bundled node-fetch rejects non-http(s) schemes
+    // ("Only HTTP(S) protocols are supported"), which crashed the whole conversion on
+    // any manuscript with images. Instead, upload each image to Supabase Storage and
+    // point src at a short-lived signed URL so it's actually fetchable.
+    const convertImage = mammoth.images.imgElement(async (image) => {
+      const buffer = await image.read();
+      const ext = image.contentType?.split("/")[1]?.split("+")[0] || "png";
+      const imageKey = `${authorId}/manuscripts/${bookId}/${job.id}/img-${tempImageKeys.length}-${Date.now()}.${ext}`;
+      await uploadToSupabaseStorage("book-files", imageKey, buffer, image.contentType || "image/png");
+      tempImageKeys.push(imageKey);
+      const imageSignedUrl = await getSupabaseSignedUrl("book-files", imageKey, 300);
+      return { src: imageSignedUrl };
+    });
+
+    const { value: html } = await mammoth.convertToHtml({ buffer: docxBuffer }, { convertImage });
     if (!html.replace(/<[^>]+>/g, "").trim()) {
       throw new Error("Couldn't find any readable text in that file. Make sure it's a valid .docx export.");
     }
@@ -133,5 +153,12 @@ export async function POST(
       data: { status: "FAILED", errorMessage: msg },
     });
     return NextResponse.json({ error: msg, job: failed }, { status: 500 });
+  } finally {
+    // Best-effort cleanup — these were only ever a fetch source for epub-gen-memory.
+    for (const imageKey of tempImageKeys) {
+      deleteFromSupabaseStorage("book-files", imageKey).catch((e) =>
+        console.error("[format/convert] Failed to delete temp image:", e)
+      );
+    }
   }
 }

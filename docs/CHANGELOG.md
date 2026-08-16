@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Direct Sales safety net, docx→epub image fix, clickable dashboard catalog
+
+Three small fixes from live usage feedback:
+
+- **Direct Sales can no longer go live without a file.** Every format except Print requires an uploaded file to actually be sellable, but the API let an item be marked Active with no file attached — buyers would hit a working buy button that failed at checkout. `PATCH /api/admin/books/[id]/direct-sales/[itemId]` now rejects activating a file-needing format with no file, and auto-deactivates an item if its file is removed while active. New items default to inactive until a file exists, and uploading a first file now auto-activates the item (respecting the existing paid-plan + Stripe-connected rules) so authors don't need a separate "now activate it" step. UI: the "no file yet" upload button switched from neutral gray to amber, and a "Missing file" badge shows on the item row itself so it's visible without opening the upload widget.
+- **Fixed docx→epub Auto-Formatter crashing on manuscripts with embedded images.** Root cause: mammoth inlines embedded images as base64 `data:` URIs, but `epub-gen-memory` downloads every `<img src>` over HTTP to bundle it into the epub, and its bundled `node-fetch` throws `Only HTTP(S) protocols are supported` on a `data:` URI — failing the whole conversion job for any manuscript containing a photo/illustration. Fixed by supplying mammoth a custom `convertImage` that uploads each extracted image to Supabase Storage and points `src` at a short-lived signed URL instead of a data URI; the temporary per-image objects are deleted again once the epub is generated (success or failure) since they're only ever a fetch source, not a persisted asset. PDF upload was considered and deliberately not added — no page-break/heading signal to detect chapters from, so it would produce an unreliable single-blob epub.
+- **Dashboard catalog rows are now clickable.** The Books/Courses/Bundles list on the admin Dashboard (`CatalogTabsCard`) rendered each row as a plain, unclickable div — had to go to the list page and find the item again to edit it. Rows now link straight to `/admin/{books,courses,bundles}/[id]/edit`.
+
 ## August 16, 2026 — Homepage copy + structure pass: consolidated redundant sections, honest founder-note treatment
 
 Follow-up to the marketing-site audit below: reviewed the homepage as a UX/conversion pass and made two structural changes plus a copy rewrite.

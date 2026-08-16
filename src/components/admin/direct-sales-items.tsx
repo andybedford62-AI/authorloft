@@ -237,18 +237,18 @@ function FileUploadWidget({
           </button>
         </div>
       ) : (
-        /* ── No file yet ───────────────────────────────────────────────────── */
+        /* ── No file yet — amber, so a missing file is obvious at a glance ──── */
         <label className="relative cursor-pointer inline-flex">
           <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-colors
             ${uploading
               ? "border-blue-200 bg-blue-50 text-blue-600"
-              : "border-dashed border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50"
+              : "border-dashed border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400 hover:bg-amber-100"
             }`}
           >
             {uploading ? (
               <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</>
             ) : (
-              <><FileText className="h-3.5 w-3.5" /> Upload file ({fileHint})</>
+              <><FileText className="h-3.5 w-3.5" /> Upload file ({fileHint}) — required</>
             )}
           </span>
           <input
@@ -788,6 +788,16 @@ export function DirectSalesItems({
                           <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
                         )}
                       </div>
+
+                      {/* Missing-file badge — only for formats that need one */}
+                      {fmt.needsFile && !item.fileKey && (
+                        <span
+                          className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 text-amber-700"
+                          title="Buyers can't check out for this format until a file is uploaded"
+                        >
+                          Missing file
+                        </span>
+                      )}
 
                       {/* Status badge */}
                       <span

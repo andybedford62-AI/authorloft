@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { deleteFromSupabaseStorage } from "@/lib/supabase-storage";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
+import { canUseFeature } from "@/lib/plan-limits";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Verify the sale item belongs to this author
     const saleItem = await prisma.bookDirectSaleItem.findFirst({
       where: { id: itemId, book: { authorId } },
-      select: { id: true, fileKey: true },
+      select: { id: true, fileKey: true, isActive: true, isReaderMagnet: true },
     });
     if (!saleItem) {
       return NextResponse.json({ error: "Sale item not found" }, { status: 404 });
@@ -54,9 +55,22 @@ export async function POST(req: NextRequest) {
     // The file is in a private bucket — we store the key; signed URLs are generated at download time
     const fileUrl = `${SUPABASE_URL}/storage/v1/object/book-files/${fileKey}`;
 
+    // First file on an item that was sitting inactive (waiting on exactly this)
+    // gets switched live automatically — no separate "now activate it" step.
+    // Same eligibility rules as manually activating: free Reader Magnets go
+    // live immediately, paid editions still need a paid plan + connected Stripe.
+    let autoActivate = !saleItem.fileKey && !saleItem.isActive;
+    if (autoActivate && !saleItem.isReaderMagnet) {
+      const salesCheck = await canUseFeature(authorId, "salesEnabled");
+      const author = salesCheck.allowed
+        ? await prisma.author.findUnique({ where: { id: authorId }, select: { stripeConnectOnboarded: true } })
+        : null;
+      autoActivate = salesCheck.allowed && !!author?.stripeConnectOnboarded;
+    }
+
     await prisma.bookDirectSaleItem.update({
       where: { id: itemId },
-      data: { fileUrl, fileKey, fileName },
+      data: { fileUrl, fileKey, fileName, ...(autoActivate && { isActive: true }) },
     });
 
     return NextResponse.json({ ok: true, fileUrl, fileKey, fileName });

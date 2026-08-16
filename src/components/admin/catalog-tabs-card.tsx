@@ -77,7 +77,11 @@ export function CatalogTabsCard({ books, courses, bundles, coursesEnabled, bundl
       ) : (
         <div className="divide-y divide-gray-50">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 px-5 py-3">
+            <Link
+              key={item.id}
+              href={`${activeTab.href}/${item.id}/edit`}
+              className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors"
+            >
               <Icon className="h-4 w-4 text-gray-300 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-gray-900 truncate">{item.title}</p>
@@ -91,7 +95,7 @@ export function CatalogTabsCard({ books, courses, bundles, coursesEnabled, bundl
               <p className="text-xs text-gray-400 flex-shrink-0">
                 {formatCents(item.priceCents)}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       )}
