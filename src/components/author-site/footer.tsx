@@ -38,7 +38,7 @@ interface FooterProps {
     instagramUrl?:  string | null;
     supportUrl?:    string | null;
     accentColor:    string;
-    plan?:          { flipBooksLimit: number } | null;
+    plan?:          { flipBooksLimit: number; tier?: string } | null;
   };
   navConfig?:    NavConfig;
   customPages?:  CustomPage[];
@@ -79,6 +79,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const year         = new Date().getFullYear();
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
+  const showPoweredBy = (author.plan?.tier ?? "FREE") === "FREE";
   const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
   const siteUrl      = getAuthorBaseUrl(author);
 
@@ -219,17 +220,19 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
               >
                 Terms
               </a>
-              <p className="text-xs text-gray-600">
-                Powered by{" "}
-                <a
-                  href="https://www.authorloft.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[var(--accent)] transition-colors"
-                >
-                  AuthorLoft
-                </a>
-              </p>
+              {showPoweredBy && (
+                <p className="text-xs text-gray-600">
+                  Powered by{" "}
+                  <a
+                    href="https://www.authorloft.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[var(--accent)] transition-colors"
+                  >
+                    AuthorLoft
+                  </a>
+                </p>
+              )}
             </div>
           </div>
         </div>

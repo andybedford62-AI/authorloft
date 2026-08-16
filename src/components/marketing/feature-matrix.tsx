@@ -169,7 +169,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
     },
     {
       category: "Site & Branding",
-      description: "Your name on the domain, your colors on the page. No 'powered by' badges, no shared templates — a site that looks like yours.",
+      description: "Your name on the domain, your colors on the page, no shared templates. Standard and Premium also drop the 'powered by AuthorLoft' footer badge — a site that looks entirely like yours.",
       features: [
         {
           name: "Site URL",
@@ -210,6 +210,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         {
           name: "Legal / Disclaimer Page",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
+          name: "\"Powered by AuthorLoft\" Footer Badge",
+          tiers: { FREE: "Shown", STANDARD: "Removed", PREMIUM: "Removed" },
         },
       ],
     },
