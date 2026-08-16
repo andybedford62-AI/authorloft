@@ -55,7 +55,7 @@ export function BookstoreBookCard({
     : null;
 
   return (
-    <div className="group relative flex flex-col h-full bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+    <div className="group relative flex flex-col h-full bg-[#243756] rounded-2xl border border-[rgba(243,236,219,0.22)] shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all duration-200">
       {/* Cover (portrait 2:3) */}
       <div className="relative w-full aspect-[2/3] bg-[#16233d] overflow-hidden">
         {book.coverImageUrl ? (

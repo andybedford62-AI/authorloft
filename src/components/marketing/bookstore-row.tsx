@@ -10,8 +10,8 @@ import { BookstoreBookCard, type BookstoreBook } from "@/components/marketing/bo
  * - compact: simplified cards (cover + title + author + View Book only).
  */
 const BANDS: Record<string, { wrapper: string; subtitle: string }> = {
-  gold:  { wrapper: "border-[#d6a94a]/30 bg-gradient-to-br from-[#243756] to-[#1e2f4d]", subtitle: "text-[#d6a94a]" },
-  slate: { wrapper: "border-[rgba(243,236,219,0.12)] bg-[#1e2f4d]",                       subtitle: "text-[#93a0bc]" },
+  gold:  { wrapper: "border-[#d6a94a]/30 bg-gradient-to-br from-[#1e2f4d] to-[#16233d]", subtitle: "text-[#d6a94a]" },
+  slate: { wrapper: "border-[rgba(243,236,219,0.12)] bg-[#16233d]",                       subtitle: "text-[#93a0bc]" },
 };
 
 export function BookstoreRow({

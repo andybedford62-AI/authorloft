@@ -33,7 +33,7 @@ export function BookstoreListCard({
   const price = formatPrice(book.priceCents);
 
   return (
-    <div className="group relative flex gap-3.5 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-3 hover:border-[#d6a94a] hover:shadow-sm transition-all">
+    <div className="group relative flex gap-3.5 bg-[#243756] rounded-xl border border-[rgba(243,236,219,0.22)] shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-3 hover:border-[#d6a94a] hover:shadow-[0_4px_14px_rgba(0,0,0,0.4)] transition-all">
       {/* Cover */}
       <div className="relative w-[88px] sm:w-24 flex-shrink-0 aspect-[2/3] rounded-md bg-[#16233d] overflow-hidden">
         {book.coverImageUrl ? (

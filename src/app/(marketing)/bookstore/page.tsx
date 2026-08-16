@@ -268,7 +268,7 @@ export default async function BookstorePage() {
              (genre chips for books, category chips for courses) since the
              two catalogs don't share a taxonomy. Courses tab only shows once
              there's at least one to browse. ─────────────────────────────── */}
-        <section className="mb-12 rounded-2xl border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] p-4 sm:p-6">
+        <section className="mb-12 rounded-2xl border border-[rgba(243,236,219,0.12)] bg-[#16233d] p-4 sm:p-6">
           {courses.length > 0 ? (
             <BookstoreCatalogTabs
               books={books}
