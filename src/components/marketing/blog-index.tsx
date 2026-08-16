@@ -41,7 +41,7 @@ function BlogCard({ post }: { post: FilterablePost }) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="group flex flex-col gap-4">
-      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-br-[36px] shadow-[8px_12px_26px_rgba(10,25,47,0.14)] bg-[#1B2B47]">
+      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-br-[36px] shadow-[8px_12px_26px_rgba(0,0,0,0.35)] bg-[#16233d]">
         {post.coverImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -54,34 +54,34 @@ function BlogCard({ post }: { post: FilterablePost }) {
             className="absolute inset-0 flex items-center justify-center"
             style={{
               background:
-                "radial-gradient(ellipse 80% 70% at 50% 12%, rgba(212,174,106,0.26) 0%, rgba(212,174,106,0.05) 38%, rgba(27,43,71,0) 72%), linear-gradient(160deg, #24395C 0%, #1B2B47 70%)",
+                "radial-gradient(ellipse 80% 70% at 50% 12%, rgba(214,169,74,0.22) 0%, rgba(214,169,74,0.05) 38%, rgba(22,35,61,0) 72%), linear-gradient(160deg, #243756 0%, #16233d 70%)",
             }}
           >
-            <Icon className="h-[88px] w-[88px] text-[#D4AE6A]/60" strokeWidth={1.2} />
-            <span className="absolute left-4 bottom-3 text-[0.62rem] tracking-[0.22em] uppercase font-bold text-[#F5EBD3]/45">
+            <Icon className="h-[88px] w-[88px] text-[#d6a94a]/60" strokeWidth={1.2} />
+            <span className="absolute left-4 bottom-3 text-[0.62rem] tracking-[0.22em] uppercase font-bold text-[#f3ecdb]/45">
               AuthorLoft
             </span>
-            <div className="absolute inset-3 rounded border border-[#D4AE6A]/20 pointer-events-none" />
+            <div className="absolute inset-3 rounded border border-[#d6a94a]/20 pointer-events-none" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(27,43,71,0.32)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(22,35,61,0.4)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
       <div className="flex items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.14em]">
-        {post.category && <span className="text-[#B8893D]">{post.category}</span>}
-        {post.category && <span className="w-1 h-1 rounded-full bg-[#D4AE6A]/40 flex-none" />}
-        <span className="text-[#5C6E89] font-semibold whitespace-nowrap">{post.readTimeMinutes} min</span>
+        {post.category && <span className="text-[#d6a94a]">{post.category}</span>}
+        {post.category && <span className="w-1 h-1 rounded-full bg-[#d6a94a]/40 flex-none" />}
+        <span className="text-[#93a0bc] font-semibold whitespace-nowrap">{post.readTimeMinutes} min</span>
       </div>
 
-      <h3 className="font-serif text-2xl leading-tight text-[#1B2B47] font-semibold tracking-tight transition-colors group-hover:text-[#B8893D]">
+      <h3 className="font-serif text-2xl leading-tight text-[#f3ecdb] font-semibold tracking-tight transition-colors group-hover:text-[#d6a94a]">
         {post.title}
       </h3>
 
       {post.excerpt && (
-        <p className="text-sm leading-relaxed text-[#5C6E89] line-clamp-2">{post.excerpt}</p>
+        <p className="text-sm leading-relaxed text-[#93a0bc] line-clamp-2">{post.excerpt}</p>
       )}
 
-      <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.1em] text-[#B8893D]">
+      <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.1em] text-[#d6a94a]">
         Read article
         <ArrowRight className="h-[15px] w-[15px] transition-transform duration-200 ease-out group-hover:translate-x-1" />
       </span>
@@ -142,19 +142,20 @@ export function BlogIndex({ posts }: { posts: FilterablePost[] }) {
         resultCount={filtered.length}
         totalCount={posts.length}
         itemLabel="articles"
+        variant="dark"
       />
 
       {/* Card grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-9 gap-y-11 mt-8">
         {filtered.length === 0 ? (
           <div className="col-span-full text-center py-18">
-            <Search className="h-10 w-10 text-[#D4AE6A]/40 mx-auto mb-4" />
-            <h3 className="font-serif text-2xl text-[#1B2B47] mb-2">No articles found</h3>
-            <p className="text-sm text-[#5C6E89] mb-4">Try a different category or clear your search.</p>
+            <Search className="h-10 w-10 text-[#d6a94a]/40 mx-auto mb-4" />
+            <h3 className="font-serif text-2xl text-[#f3ecdb] mb-2">No articles found</h3>
+            <p className="text-sm text-[#93a0bc] mb-4">Try a different category or clear your search.</p>
             <button
               type="button"
               onClick={reset}
-              className="border border-[#D4AE6A] text-[#B8893D] text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#D4AE6A]/10 transition-colors"
+              className="border border-[#d6a94a] text-[#d6a94a] text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#d6a94a]/10 transition-colors"
             >
               Clear filters
             </button>

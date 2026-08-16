@@ -82,36 +82,36 @@ export default async function GuidesIndexPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F0EDE4" }}>
+    <div style={{ minHeight: "100vh", background: "#16233d" }}>
       <MarketingNav />
 
       <MarketingPageHeader
         eyebrow="Learn"
-        title={<>Learn to own <span className="italic text-[#D4AE6A]">your author business</span></>}
+        title={<>Learn to own <span className="italic text-[#d6a94a]">your author business</span></>}
         subtitle="In-depth guides covering everything independent authors need — from building your website to selling direct and growing your audience."
       />
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 20px 96px" }}>
         {guides.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-[#9b8e7e]">Guides coming soon. Check back shortly!</p>
+            <p className="text-lg text-[#93a0bc]">Guides coming soon. Check back shortly!</p>
           </div>
         ) : (
           <GuidesIndexClient guides={guides} pillars={pillars} />
         )}
 
         {/* CTA */}
-        <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">
-          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">&middot; Ready to start your business? &middot;</p>
-          <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
-            Own your author business <span className="italic text-[#D4AE6A]">starting today</span>
+        <div className="mt-16 bg-[#243756] rounded-2xl p-8 text-center">
+          <p className="text-sm font-mono uppercase tracking-widest text-[#d6a94a] mb-3">&middot; Ready to start your business? &middot;</p>
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
+            Own your author business <span className="italic text-[#d6a94a]">starting today</span>
           </h2>
-          <p className="text-sm text-[#D4DDEB] mb-6 max-w-sm mx-auto">
+          <p className="text-sm text-[#93a0bc] mb-6 max-w-sm mx-auto">
             Keep 100 % of every sale and own every reader relationship — no middleman.
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+            className="inline-flex items-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
           >
             Get Started Free <ArrowRight className="h-4 w-4" />
           </Link>

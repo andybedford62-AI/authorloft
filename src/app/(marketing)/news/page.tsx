@@ -55,12 +55,12 @@ export default async function NewsIndexPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0EDE4]">
+    <div className="min-h-screen bg-[#16233d]">
       <MarketingNav />
 
       <MarketingPageHeader
         eyebrow="From the team"
-        title={<>AuthorLoft <span className="italic text-[#D4AE6A]">News</span></>}
+        title={<>AuthorLoft <span className="italic text-[#d6a94a]">News</span></>}
         subtitle="Product updates, new features, specials, and events — everything happening at AuthorLoft."
         backgroundImage="/news-header.png"
       />
@@ -72,8 +72,8 @@ export default async function NewsIndexPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-2xl border border-[#DCDBD3]">
-            <p className="text-[#5C6E89]">No news yet — check back soon for updates.</p>
+          <div className="text-center py-24 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)]">
+            <p className="text-[#93a0bc]">No news yet — check back soon for updates.</p>
           </div>
         ) : (
           <NewsList posts={posts} />

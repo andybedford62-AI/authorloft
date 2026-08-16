@@ -87,40 +87,40 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
   };
 
   return (
-    <div className="min-h-screen bg-[#F0EDE4]">
+    <div className="min-h-screen bg-[#16233d]">
       <MarketingNav />
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         {/* Breadcrumb */}
-        <Link href="/news" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
+        <Link href="/news" className="inline-flex items-center gap-1.5 text-sm text-[#93a0bc] hover:text-[#d6a94a] transition-colors mb-8">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to News
         </Link>
 
         {/* Meta */}
         <div className="flex flex-wrap items-center gap-3 mb-5">
           {post.category && (
-            <span className="text-xs font-mono uppercase tracking-wider text-[#C26A4A] bg-[#C26A4A]/10 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-mono uppercase tracking-wider text-[#d6a94a] bg-[#d6a94a]/10 px-2.5 py-1 rounded-full">
               {post.category}
             </span>
           )}
           {post.publishedAt && (
-            <span className="text-xs text-[#9b8e7e]">
+            <span className="text-xs text-[#93a0bc]">
               {new Date(post.publishedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </span>
           )}
-          <span className="flex items-center gap-1 text-xs text-[#9b8e7e]">
+          <span className="flex items-center gap-1 text-xs text-[#93a0bc]">
             <Clock className="h-3 w-3" /> {post.readTimeMinutes} min read
           </span>
         </div>
 
         {/* Title */}
-        <h1 className="font-serif text-4xl sm:text-5xl font-normal text-[#1B2B47] leading-tight mb-6">
+        <h1 className="font-serif italic text-4xl sm:text-5xl font-normal text-[#f3ecdb] leading-tight mb-6">
           {post.title}
         </h1>
 
         {/* Excerpt */}
         {post.excerpt && (
-          <p className="text-lg text-[#5C6E89] leading-relaxed mb-8 border-l-4 border-[#C26A4A]/30 pl-4 italic">
+          <p className="text-lg text-[#c7cede] leading-relaxed mb-8 border-l-4 border-[#d6a94a]/30 pl-4 italic">
             {post.excerpt}
           </p>
         )}
@@ -131,16 +131,16 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
           <img
             src={post.coverImageUrl}
             alt={post.title}
-            className="w-full rounded-2xl object-cover h-64 sm:h-80 mb-10 border border-[#DCDBD3]"
+            className="w-full rounded-2xl object-cover h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)]"
           />
         )}
 
         {/* Byline */}
-        <div className="flex items-center gap-3 mb-10 pb-6 border-b border-[#DCDBD3]">
-          <div className="w-8 h-8 rounded-full bg-[#1B2B47] flex items-center justify-center text-white text-sm font-serif font-normal">
+        <div className="flex items-center gap-3 mb-10 pb-6 border-b border-[rgba(243,236,219,0.12)]">
+          <div className="w-8 h-8 rounded-full bg-[#d6a94a] flex items-center justify-center text-[#16233d] text-sm font-serif font-normal">
             {post.authorName[0]}
           </div>
-          <span className="text-sm text-[#5C6E89]">by <strong className="text-[#1B2B47] font-medium">{post.authorName}</strong></span>
+          <span className="text-sm text-[#93a0bc]">by <strong className="text-[#f3ecdb] font-medium">{post.authorName}</strong></span>
         </div>
 
         {/* Content */}
@@ -148,23 +148,23 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
 
         {/* Downloadable resource — only shown if a URL was set */}
         {post.attachmentUrl && (
-          <div className="mt-12 pt-8 border-t border-[#DCDBD3]">
+          <div className="mt-12 pt-8 border-t border-[rgba(243,236,219,0.12)]">
             <a
               href={post.attachmentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 rounded-xl border-2 border-[#C26A4A]/20 hover:border-[#C26A4A]/60 bg-[#FBF8F4] hover:bg-[#F5EDE4] transition-colors group"
+              className="flex items-center gap-4 p-4 rounded-xl border-2 border-[#d6a94a]/20 hover:border-[#d6a94a]/60 bg-[#1e2f4d] hover:bg-[#243756] transition-colors group"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#C26A4A]/10 flex items-center justify-center">
-                <FileDown className="h-5 w-5 text-[#C26A4A]" />
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#d6a94a]/10 flex items-center justify-center">
+                <FileDown className="h-5 w-5 text-[#d6a94a]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors">
+                <p className="text-sm font-semibold text-[#f3ecdb] group-hover:text-[#d6a94a] transition-colors">
                   {post.attachmentLabel || "Download Resource"}
                 </p>
-                <p className="text-xs text-[#9b8e7e] mt-0.5">Free download — opens in a new tab</p>
+                <p className="text-xs text-[#93a0bc] mt-0.5">Free download — opens in a new tab</p>
               </div>
-              <ArrowRight className="h-4 w-4 text-[#9b8e7e] group-hover:text-[#C26A4A] transition-colors flex-shrink-0" />
+              <ArrowRight className="h-4 w-4 text-[#93a0bc] group-hover:text-[#d6a94a] transition-colors flex-shrink-0" />
             </a>
           </div>
         )}
@@ -175,17 +175,17 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* CTA */}
-        <div className="mt-12 bg-[#1B2B47] rounded-2xl p-8 text-center">
-          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">· Ready to start your business? ·</p>
-          <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
-            Own your author business <span className="italic text-[#D4AE6A]">starting today</span>
+        <div className="mt-12 bg-[#243756] rounded-2xl p-8 text-center">
+          <p className="text-sm font-mono uppercase tracking-widest text-[#d6a94a] mb-3">· Ready to start your business? ·</p>
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
+            Own your author business <span className="italic text-[#d6a94a]">starting today</span>
           </h2>
-          <p className="text-sm text-[#D4DDEB] mb-6 max-w-sm mx-auto">
+          <p className="text-sm text-[#93a0bc] mb-6 max-w-sm mx-auto">
             Keep 100% of every sale and own every reader relationship — no middleman.
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+            className="inline-flex items-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
           >
             Get Started Free <ArrowRight className="h-4 w-4" />
           </Link>

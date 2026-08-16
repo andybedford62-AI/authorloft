@@ -116,37 +116,37 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   } : null;
 
   return (
-    <div className="min-h-screen bg-[#F0EDE4]">
+    <div className="min-h-screen bg-[#16233d]">
       <MarketingNav />
 
       <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
         {/* Breadcrumb */}
-        <Link href="/guides" className="inline-flex items-center gap-1.5 text-sm text-[#9b8e7e] hover:text-[#C26A4A] transition-colors mb-8">
+        <Link href="/guides" className="inline-flex items-center gap-1.5 text-sm text-[#93a0bc] hover:text-[#d6a94a] transition-colors mb-8">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Learn
         </Link>
 
         {/* Category */}
         {guide.category && (
-          <span className="text-xs font-mono uppercase tracking-wider text-[#C26A4A] bg-[#C26A4A]/10 px-2.5 py-1 rounded-full mb-5 inline-block">
+          <span className="text-xs font-mono uppercase tracking-wider text-[#d6a94a] bg-[#d6a94a]/10 px-2.5 py-1 rounded-full mb-5 inline-block">
             {guide.category}
           </span>
         )}
 
         {/* Title */}
-        <h1 className="font-serif text-4xl sm:text-5xl font-normal text-[#1B2B47] leading-tight mb-6">
+        <h1 className="font-serif italic text-4xl sm:text-5xl font-normal text-[#f3ecdb] leading-tight mb-6">
           {guide.title}
         </h1>
 
         {/* Excerpt */}
         {guide.excerpt && (
-          <p className="text-lg text-[#5C6E89] leading-relaxed mb-8 border-l-4 border-[#C26A4A]/30 pl-4 italic">
+          <p className="text-lg text-[#c7cede] leading-relaxed mb-8 border-l-4 border-[#d6a94a]/30 pl-4 italic">
             {guide.excerpt}
           </p>
         )}
 
         {/* Cover Image */}
         {guide.coverImageUrl && (
-          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[#DCDBD3] bg-[#F0EDE4] overflow-hidden">
+          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={guide.coverImageUrl}
@@ -164,13 +164,13 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
         {/* FAQs */}
         {faqs.length > 0 && (
-          <div className="mt-16 pt-10 border-t border-[#DCDBD3]">
-            <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-8">Frequently Asked Questions</h2>
+          <div className="mt-16 pt-10 border-t border-[rgba(243,236,219,0.12)]">
+            <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-8">Frequently Asked Questions</h2>
             <div className="space-y-6">
               {faqs.map((faq, i) => (
-                <div key={i} className="bg-white rounded-xl border border-[#DCDBD3] p-5">
-                  <h3 className="font-semibold text-[#1B2B47] mb-2">{faq.question}</h3>
-                  <p className="text-sm text-[#5C6E89] leading-relaxed">{faq.answer}</p>
+                <div key={i} className="bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-5">
+                  <h3 className="font-semibold text-[#f3ecdb] mb-2">{faq.question}</h3>
+                  <p className="text-sm text-[#93a0bc] leading-relaxed">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -179,29 +179,29 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
         {/* Related Blog Posts */}
         {relatedPosts.length > 0 && (
-          <div className="mt-16 pt-10 border-t border-[#DCDBD3]">
-            <h2 className="font-serif text-2xl text-[#1B2B47] font-normal mb-6">Related Articles</h2>
+          <div className="mt-16 pt-10 border-t border-[rgba(243,236,219,0.12)]">
+            <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-6">Related Articles</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {relatedPosts.map((post) => (
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="group flex gap-3 bg-white rounded-xl border border-[#DCDBD3] p-4 hover:border-[#C26A4A]/40 hover:shadow-md transition-all"
+                  className="group flex gap-3 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-4 hover:border-[#d6a94a]/40 hover:shadow-md transition-all"
                 >
                   {post.coverImageUrl ? (
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#F0EDE4]">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#16233d]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-[#F0EDE4] flex items-center justify-center">
-                      <BookOpen className="h-6 w-6 text-[#DCDBD3]" />
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-[#16233d] flex items-center justify-center">
+                      <BookOpen className="h-6 w-6 text-[#93a0bc]" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-[#1B2B47] group-hover:text-[#C26A4A] transition-colors line-clamp-2">{post.title}</h3>
+                    <h3 className="text-sm font-semibold text-[#f3ecdb] group-hover:text-[#d6a94a] transition-colors line-clamp-2">{post.title}</h3>
                     {post.category && (
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#9b8e7e] mt-1 block">{post.category}</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#93a0bc] mt-1 block">{post.category}</span>
                     )}
                   </div>
                 </Link>
@@ -211,19 +211,19 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         )}
 
         {/* CTA */}
-        <div className="mt-16 bg-[#1B2B47] rounded-2xl p-8 text-center">
-          <p className="text-sm font-mono uppercase tracking-widest text-[#D4AE6A] mb-3">
+        <div className="mt-16 bg-[#243756] rounded-2xl p-8 text-center">
+          <p className="text-sm font-mono uppercase tracking-widest text-[#d6a94a] mb-3">
             &middot; {guide.ctaTitle || "Ready to start your business?"} &middot;
           </p>
-          <h2 className="font-serif text-2xl text-[#E8E5DD] font-normal mb-4">
-            {guide.ctaDescription || <>Own your author business <span className="italic text-[#D4AE6A]">starting today</span></>}
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
+            {guide.ctaDescription || <>Own your author business <span className="italic text-[#d6a94a]">starting today</span></>}
           </h2>
-          <p className="text-sm text-[#D4DDEB] mb-6 max-w-sm mx-auto">
+          <p className="text-sm text-[#93a0bc] mb-6 max-w-sm mx-auto">
             Keep 100 % of every sale and own every reader relationship — no middleman.
           </p>
           <Link
             href={guide.ctaButtonUrl || "/register"}
-            className="inline-flex items-center gap-2 bg-[#B8893D] text-[#1B2B47] font-semibold px-6 py-3 rounded-full hover:bg-[#D4AE6A] transition-colors"
+            className="inline-flex items-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
           >
             {guide.ctaButtonText || "Get Started Free"} <ArrowRight className="h-4 w-4" />
           </Link>

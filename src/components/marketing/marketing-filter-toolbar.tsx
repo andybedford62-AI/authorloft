@@ -57,8 +57,8 @@ export function MarketingFilterToolbar({
             onClick={() => onCategoryChange("")}
             className={`text-xs font-mono uppercase tracking-wider px-3 py-1.5 rounded-full border transition-colors ${
               activeCategory === ""
-                ? dark ? "bg-[#D4AE6A] text-[#1B2B47] border-[#D4AE6A]" : "bg-[#1B2B47] text-[#E8E5DD] border-[#1B2B47]"
-                : dark ? "bg-white/5 text-white/60 border-white/15 hover:border-[#D4AE6A]/60 hover:text-[#D4AE6A]" : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]/50 hover:text-[#C26A4A]"
+                ? dark ? "bg-[#d6a94a] text-[#16233d] border-[#d6a94a]" : "bg-[#1e2f4d] text-[#f3ecdb] border-[#1e2f4d]"
+                : dark ? "bg-white/5 text-white/60 border-white/15 hover:border-[#d6a94a]/60 hover:text-[#d6a94a]" : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]/50 hover:text-[#C26A4A]"
             }`}
           >
             All
@@ -70,8 +70,8 @@ export function MarketingFilterToolbar({
               onClick={() => onCategoryChange(c)}
               className={`text-xs font-mono uppercase tracking-wider px-3 py-1.5 rounded-full border transition-colors ${
                 activeCategory === c
-                  ? dark ? "bg-[#D4AE6A] text-[#1B2B47] border-[#D4AE6A]" : "bg-[#1B2B47] text-[#E8E5DD] border-[#1B2B47]"
-                  : dark ? "bg-white/5 text-white/60 border-white/15 hover:border-[#D4AE6A]/60 hover:text-[#D4AE6A]" : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]/50 hover:text-[#C26A4A]"
+                  ? dark ? "bg-[#d6a94a] text-[#16233d] border-[#d6a94a]" : "bg-[#1e2f4d] text-[#f3ecdb] border-[#1e2f4d]"
+                  : dark ? "bg-white/5 text-white/60 border-white/15 hover:border-[#d6a94a]/60 hover:text-[#d6a94a]" : "bg-white text-[#5C6E89] border-[#DCDBD3] hover:border-[#C26A4A]/50 hover:text-[#C26A4A]"
               }`}
             >
               {c}
@@ -88,7 +88,7 @@ export function MarketingFilterToolbar({
         </p>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <label className={`flex items-center gap-2 border-b-[1.5px] py-1.5 min-w-[220px] transition-colors ${dark ? "border-white/15 focus-within:border-[#D4AE6A]" : "border-[#DCDBD3] focus-within:border-[#D4AE6A]"}`}>
+          <label className={`flex items-center gap-2 border-b-[1.5px] py-1.5 min-w-[220px] transition-colors ${dark ? "border-white/15 focus-within:border-[#d6a94a]" : "border-[#DCDBD3] focus-within:border-[#d6a94a]"}`}>
             <SearchIcon className={`h-4 w-4 ${dark ? "text-white/50" : "text-[#5C6E89]"}`} />
             <input
               value={search}
@@ -106,7 +106,7 @@ export function MarketingFilterToolbar({
                 onChange={(e) => onSortChange(e.target.value)}
                 aria-label="Sort"
                 className={`appearance-none text-sm font-medium rounded-full pl-4 pr-9 py-2 cursor-pointer transition-colors ${
-                  dark ? "text-white bg-white/5 border border-white/15 hover:border-[#D4AE6A]" : "text-[#1B2B47] bg-white border border-[#DCDBD3] hover:border-[#D4AE6A]"
+                  dark ? "text-white bg-white/5 border border-white/15 hover:border-[#d6a94a]" : "text-[#1B2B47] bg-white border border-[#DCDBD3] hover:border-[#d6a94a]"
                 }`}
               >
                 {sortOptions.map((o) => (
@@ -121,7 +121,7 @@ export function MarketingFilterToolbar({
             <button
               type="button"
               onClick={clearAll}
-              className={`inline-flex items-center gap-1 text-xs font-semibold transition-colors ${dark ? "text-[#D4AE6A] hover:text-white" : "text-[#B8893D] hover:text-[#C26A4A]"}`}
+              className={`inline-flex items-center gap-1 text-xs font-semibold transition-colors ${dark ? "text-[#d6a94a] hover:text-white" : "text-[#B8893D] hover:text-[#C26A4A]"}`}
             >
               <X className="h-3.5 w-3.5" /> Clear filters
             </button>
