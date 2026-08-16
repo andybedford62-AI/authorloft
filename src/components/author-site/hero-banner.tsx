@@ -3,7 +3,7 @@ import Image from "next/image";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { getTheme } from "@/lib/themes";
 import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
-import { isLightColor } from "@/lib/color-contrast";
+import { readableTextOn } from "@/lib/color-contrast";
 import type { AuthorForTemplate } from "./templates/types";
 
 interface HeroBannerProps {
@@ -261,7 +261,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             <Link
               href={buyHref}
               className="w-full py-3 px-6 text-sm font-bold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
-              style={{ background: accent, color: isLightColor(accent) ? "#111" : "#fff", boxShadow: `0 4px 24px ${accent}55` }}
+              style={{ background: accent, color: readableTextOn(accent), boxShadow: `0 4px 24px ${accent}55` }}
             >
               Buy Now
             </Link>
@@ -311,7 +311,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               className="w-full py-3 px-4 text-sm font-bold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
               style={{
                 background: accent,
-                color: isLightColor(accent) ? "#111" : "#fff",
+                color: readableTextOn(accent),
                 boxShadow: `0 4px 24px ${accent}55`,
               }}
             >
