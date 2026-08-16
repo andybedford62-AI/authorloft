@@ -26,9 +26,9 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
   const isFree = course.priceCents === 0;
 
   return (
-    <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+    <div className="group relative flex flex-col h-full bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
       {/* Cover (16:9 — course covers are landscape, unlike portrait book covers) */}
-      <div className="relative w-full aspect-video bg-[#E8E2D5] overflow-hidden">
+      <div className="relative w-full aspect-video bg-[#16233d] overflow-hidden">
         {course.coverImageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -38,7 +38,7 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
             className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
           />
         ) : (
-          <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-[#B6A88F]">
+          <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-[#93a0bc]">
             <GraduationCap className="h-10 w-10" />
             <span className="text-xs font-serif italic px-4 text-center line-clamp-3">{course.title}</span>
           </div>
@@ -47,19 +47,19 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
 
       {/* Body */}
       <div className="flex flex-col flex-1 p-4">
-        <h3 className="font-serif text-base text-[#1B2B47] leading-snug line-clamp-2">
+        <h3 className="font-serif text-base text-[#f3ecdb] leading-snug line-clamp-2">
           <a
             href={course.courseUrl}
-            className="group-hover:text-[#C26A4A] transition-colors after:absolute after:inset-0 after:z-0"
+            className="group-hover:text-[#d6a94a] transition-colors after:absolute after:inset-0 after:z-0"
           >
             {course.title}
           </a>
         </h3>
-        <p className="text-xs text-[#9b8e7e] mt-1">
+        <p className="text-xs text-[#93a0bc] mt-1">
           by{" "}
           <a
             href={course.authorUrl}
-            className="relative z-10 text-[#5C6E89] hover:text-[#C26A4A] hover:underline"
+            className="relative z-10 text-[#93a0bc] hover:text-[#d6a94a] hover:underline"
           >
             {course.authorName}
           </a>
@@ -74,17 +74,17 @@ export function BookstoreCourseCard({ course }: { course: BookstoreCourse }) {
                   className={`h-3 w-3 ${
                     n <= Math.round(course.averageRating!)
                       ? "fill-amber-400 text-amber-400"
-                      : "text-gray-300"
+                      : "text-[rgba(243,236,219,0.2)]"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-[11px] text-[#9b8e7e]">{course.averageRating.toFixed(1)}</span>
+            <span className="text-[11px] text-[#93a0bc]">{course.averageRating.toFixed(1)}</span>
           </div>
         )}
 
         {price && (
-          <p className={`text-sm font-semibold mt-2 ${isFree ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>{price}</p>
+          <p className={`text-sm font-semibold mt-2 ${isFree ? "text-[#5fbf8a]" : "text-[#f3ecdb]"}`}>{price}</p>
         )}
       </div>
     </div>

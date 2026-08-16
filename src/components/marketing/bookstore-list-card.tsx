@@ -25,17 +25,17 @@ export function BookstoreListCard({
   // tier) deliberately omitted here — this grid is the plain catalog listing,
   // not a promotional row, so every book shows on equal footing.
   const badge = book.isNew
-    ? { label: "New", cls: "text-[#1B2B47] bg-[#F0D9B5]" }
+    ? { label: "New", cls: "text-[#16233d] bg-[#e2bc6e]" }
     : book.isPreOrder
-    ? { label: "Soon", cls: "text-white bg-[#5C6E89]" }
+    ? { label: "Soon", cls: "text-[#f3ecdb] bg-[#243756]" }
     : null;
 
   const price = formatPrice(book.priceCents);
 
   return (
-    <div className="group relative flex gap-3.5 bg-white rounded-xl border border-[#DCDBD3] p-3 hover:border-[#C26A4A] hover:shadow-sm transition-all">
+    <div className="group relative flex gap-3.5 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-3 hover:border-[#d6a94a] hover:shadow-sm transition-all">
       {/* Cover */}
-      <div className="relative w-[88px] sm:w-24 flex-shrink-0 aspect-[2/3] rounded-md bg-[#E8E2D5] overflow-hidden">
+      <div className="relative w-[88px] sm:w-24 flex-shrink-0 aspect-[2/3] rounded-md bg-[#16233d] overflow-hidden">
         {book.coverImageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -45,7 +45,7 @@ export function BookstoreListCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center text-[#B6A88F]">
+          <div className="h-full w-full flex items-center justify-center text-[#93a0bc]">
             <BookOpen className="h-8 w-8" />
           </div>
         )}
@@ -59,26 +59,26 @@ export function BookstoreListCard({
 
       {/* Details */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <h3 className="font-serif text-sm text-[#1B2B47] leading-snug line-clamp-2">
+        <h3 className="font-serif text-sm text-[#f3ecdb] leading-snug line-clamp-2">
           <a
             href={book.bookUrl}
-            className="group-hover:text-[#C26A4A] transition-colors after:absolute after:inset-0 after:z-0"
+            className="group-hover:text-[#d6a94a] transition-colors after:absolute after:inset-0 after:z-0"
           >
             {book.title}
           </a>
         </h3>
         <div className="flex items-baseline justify-between gap-2 mt-0.5">
-          <p className="text-xs text-[#9b8e7e] truncate">
+          <p className="text-xs text-[#93a0bc] truncate">
             by{" "}
             <a
               href={book.authorUrl}
-              className="relative z-10 text-[#5C6E89] hover:text-[#C26A4A] hover:underline"
+              className="relative z-10 text-[#93a0bc] hover:text-[#d6a94a] hover:underline"
             >
               {book.authorName}
             </a>
           </p>
           {price && (
-            <span className={`text-xs font-semibold flex-shrink-0 ${book.priceCents === 0 ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>
+            <span className={`text-xs font-semibold flex-shrink-0 ${book.priceCents === 0 ? "text-[#5fbf8a]" : "text-[#f3ecdb]"}`}>
               {price}
             </span>
           )}
@@ -93,19 +93,19 @@ export function BookstoreListCard({
                   className={`h-3 w-3 ${
                     n <= Math.round(book.averageRating!)
                       ? "fill-amber-400 text-amber-400"
-                      : "text-gray-300"
+                      : "text-[rgba(243,236,219,0.2)]"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-[11px] text-[#9b8e7e]">{book.averageRating.toFixed(1)}</span>
+            <span className="text-[11px] text-[#93a0bc]">{book.averageRating.toFixed(1)}</span>
           </div>
         )}
 
         {book.genres.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {book.genres.slice(0, 2).map((g) => (
-              <span key={g} className="text-[10px] text-[#5C6E89] bg-[#F0EDE4] rounded-full px-2 py-0.5">
+              <span key={g} className="text-[10px] text-[#93a0bc] bg-[#243756] rounded-full px-2 py-0.5">
                 {g}
               </span>
             ))}
@@ -117,7 +117,7 @@ export function BookstoreListCard({
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(book); }}
-            className="relative z-10 mt-auto pt-2 self-start inline-flex items-center gap-1 text-xs font-medium text-[#5C6E89] hover:text-[#C26A4A] transition-colors"
+            className="relative z-10 mt-auto pt-2 self-start inline-flex items-center gap-1 text-xs font-medium text-[#93a0bc] hover:text-[#d6a94a] transition-colors"
             aria-label={`Quick view: ${book.title}`}
           >
             <Eye className="h-3.5 w-3.5" /> Quick view

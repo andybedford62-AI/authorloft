@@ -47,17 +47,17 @@ export function BookstoreBookCard({
 
   // One priority badge keeps the cover clean.
   const badge = book.featured
-    ? { label: "Featured", icon: true, cls: "text-[#3a2417] bg-gradient-to-r from-[#E8B04B] to-[#D4AE6A]" }
+    ? { label: "Featured", icon: true, cls: "text-[#16233d] bg-gradient-to-r from-[#e2bc6e] to-[#d6a94a]" }
     : book.isNew
-    ? { label: "New", icon: false, cls: "text-[#1B2B47] bg-[#F0D9B5]" }
+    ? { label: "New", icon: false, cls: "text-[#16233d] bg-[#e2bc6e]" }
     : book.isPreOrder
-    ? { label: "Coming Soon", icon: false, cls: "text-white bg-[#5C6E89]" }
+    ? { label: "Coming Soon", icon: false, cls: "text-[#f3ecdb] bg-[#243756]" }
     : null;
 
   return (
-    <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-[#DCDBD3] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+    <div className="group relative flex flex-col h-full bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
       {/* Cover (portrait 2:3) */}
-      <div className="relative w-full aspect-[2/3] bg-[#E8E2D5] overflow-hidden">
+      <div className="relative w-full aspect-[2/3] bg-[#16233d] overflow-hidden">
         {book.coverImageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -67,7 +67,7 @@ export function BookstoreBookCard({
             className="h-full w-full object-contain group-hover:scale-[1.03] transition-transform duration-300"
           />
         ) : (
-          <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-[#B6A88F]">
+          <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-[#93a0bc]">
             <BookOpen className="h-10 w-10" />
             <span className="text-xs font-serif italic px-4 text-center line-clamp-3">{book.title}</span>
           </div>
@@ -84,31 +84,31 @@ export function BookstoreBookCard({
 
       {/* Body */}
       <div className={`flex flex-col flex-1 ${compact ? "p-2.5" : "p-4"}`}>
-        <h3 className={`font-serif text-[#1B2B47] leading-snug line-clamp-2 ${compact ? "text-sm" : "text-base"}`}>
+        <h3 className={`font-serif text-[#f3ecdb] leading-snug line-clamp-2 ${compact ? "text-sm" : "text-base"}`}>
           <a
             href={book.bookUrl}
-            className="group-hover:text-[#C26A4A] transition-colors after:absolute after:inset-0 after:z-0"
+            className="group-hover:text-[#d6a94a] transition-colors after:absolute after:inset-0 after:z-0"
           >
             {book.title}
           </a>
         </h3>
-        <p className="text-xs text-[#9b8e7e] mt-1">
+        <p className="text-xs text-[#93a0bc] mt-1">
           by{" "}
           <a
             href={book.authorUrl}
-            className="relative z-10 text-[#5C6E89] hover:text-[#C26A4A] hover:underline"
+            className="relative z-10 text-[#93a0bc] hover:text-[#d6a94a] hover:underline"
           >
             {book.authorName}
           </a>
           {!compact && book.authorBookCount > 1 && (
-            <span className="text-[#b6a88f]"> · {book.authorBookCount} books</span>
+            <span className="text-[#93a0bc]/70"> · {book.authorBookCount} books</span>
           )}
         </p>
 
         {/* Rating + price — price now lives in the body alongside the book data */}
         {compact ? (
           price && (
-            <p className={`text-xs font-semibold mt-1 ${isFree ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>{price}</p>
+            <p className={`text-xs font-semibold mt-1 ${isFree ? "text-[#5fbf8a]" : "text-[#f3ecdb]"}`}>{price}</p>
           )
         ) : (
           (book.ratingCount > 0 || price) && (
@@ -122,18 +122,18 @@ export function BookstoreBookCard({
                         className={`h-3.5 w-3.5 ${
                           n <= Math.round(book.averageRating!)
                             ? "fill-amber-400 text-amber-400"
-                            : "text-gray-300"
+                            : "text-[rgba(243,236,219,0.2)]"
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-[#9b8e7e]">{book.averageRating.toFixed(1)}</span>
+                  <span className="text-xs text-[#93a0bc]">{book.averageRating.toFixed(1)}</span>
                 </div>
               ) : (
                 <span />
               )}
               {price && (
-                <span className={`text-sm font-semibold ${isFree ? "text-[#3B6D11]" : "text-[#1B2B47]"}`}>{price}</span>
+                <span className={`text-sm font-semibold ${isFree ? "text-[#5fbf8a]" : "text-[#f3ecdb]"}`}>{price}</span>
               )}
             </div>
           )
@@ -144,7 +144,7 @@ export function BookstoreBookCard({
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQvOpen(true); }}
-            className="relative z-10 mt-auto pt-3 border-t border-[#F0EDE4] self-start inline-flex items-center gap-1 text-xs font-medium text-[#5C6E89] hover:text-[#C26A4A] transition-colors"
+            className="relative z-10 mt-auto pt-3 border-t border-[rgba(243,236,219,0.12)] self-start inline-flex items-center gap-1 text-xs font-medium text-[#93a0bc] hover:text-[#d6a94a] transition-colors"
             aria-label={`Quick view: ${book.title}`}
           >
             <Eye className="h-3.5 w-3.5" /> Quick view

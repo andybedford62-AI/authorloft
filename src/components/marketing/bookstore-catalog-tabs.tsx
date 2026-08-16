@@ -9,7 +9,7 @@ import { type BookstoreCourse } from "@/components/marketing/bookstore-course-ca
 
 // Books and Courses each keep their own grid/filter UI (different facets —
 // genre/format/price for books, category only for courses) but now live
-// under one shared type tab instead of two separate always-visible sections.
+// under one shared type tab instead of two always-visible sections.
 export function BookstoreCatalogTabs({
   books,
   allGenres,
@@ -31,8 +31,8 @@ export function BookstoreCatalogTabs({
           onClick={() => setActive("books")}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-serif text-lg transition-colors ${
             active === "books"
-              ? "bg-[#1B2B47] text-white"
-              : "bg-white text-[#5C6E89] border border-[#DCDBD3] hover:border-[#1B2B47]"
+              ? "bg-[#d6a94a] text-[#16233d]"
+              : "bg-[#16233d] text-[#93a0bc] border border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
           }`}
         >
           <Library className="h-4 w-4" /> Books ({books.length})
@@ -42,8 +42,8 @@ export function BookstoreCatalogTabs({
           onClick={() => setActive("courses")}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-serif text-lg transition-colors ${
             active === "courses"
-              ? "bg-[#1B2B47] text-white"
-              : "bg-white text-[#5C6E89] border border-[#DCDBD3] hover:border-[#1B2B47]"
+              ? "bg-[#d6a94a] text-[#16233d]"
+              : "bg-[#16233d] text-[#93a0bc] border border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
           }`}
         >
           <GraduationCap className="h-4 w-4" /> Courses ({courses.length})
