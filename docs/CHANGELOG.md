@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Homepage copy + structure pass: consolidated redundant sections, honest founder-note treatment
+
+Follow-up to the marketing-site audit below: reviewed the homepage as a UX/conversion pass and made two structural changes plus a copy rewrite.
+
+- **Consolidated three sections making the same point into one.** Problem Strip (3 pain-point cards), Pillars ("One platform. Everything you own."), and the old-vs-new Comparison table were three separate sections in a row all restating the same "you don't own your readers/revenue today, you will with us" claim before any proof appeared. Merged into one `WhatChangesSection` — a single before/after table with three concrete rows (who gets paid, who owns your readers, how many tabs you need open) that folds in the strongest lines from all three.
+- **Replaced the showcase/testimonial grid with a founder-note treatment.** After the audit removed the two seed-account testimonials, the "Real sites. Real authors." showcase grid and testimonial carousel were both rendering exactly one card in a layout built for several (the showcase eyebrow literally read "1 live author site"). Built a new `FounderNoteSection` — a single intentional block, sourced from Anthony's existing (unedited) DB testimonial and showcase entry, so it's honest about being early instead of a sparse-looking grid. Left `AuthorShowcaseSection`/`MidnightTestimonialsSection` components untouched (only unused on the homepage now) with a code comment to swap back once there are 2+ real independent customer testimonials.
+- **Copy pass for a warmer, more direct voice**: hero headline/subheadline (`PlatformSettings`), hero primary CTA ("Start your business" → "Start free"), and the footer CTA. Also fixed a leftover "own everything you build — books, courses, or both" line in the footer CTA that had survived the earlier author-only positioning decision.
+
 ## August 16, 2026 — Marketing-site audit: fixed pricing/feature contradictions, ToS typo, founder testimonial disclosure
 
 Ran a manual audit of the homepage, pricing, features, and bookstore pages and fixed the confirmed issues:

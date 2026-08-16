@@ -204,9 +204,9 @@ export function RebelHero({
   headlineLine2?: string | null;
   subheadline?: string | null;
 }) {
-  const line1 = headlineLine1 || "They sell your books. They keep your readers.";
-  const line2 = headlineLine2 || "Take both back.";
-  const sub    = subheadline || "Every sale through someone else's platform is a person you'll never know, never email, never reach again. AuthorLoft gives you your own storefront, your own list — and you keep 100% of what you earn.";
+  const line1 = headlineLine1 || "You wrote the book. They keep the reader.";
+  const line2 = headlineLine2 || "Take it back.";
+  const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again — no name, no email, no way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. Free to start, live in fifteen minutes.";
 
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>
@@ -301,7 +301,7 @@ export function RebelHero({
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 28, animation: 'rbFadeUp 0.7s 0.35s ease both', opacity: 0 }}>
             <Link href="/register" className="rb-cta-primary" style={{ padding: '15px 28px', fontSize: 15, fontWeight: 500, background: ML.brass, color: ML.midnight, border: 'none', borderRadius: 999, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, boxShadow: `0 12px 24px -10px ${ML.brass}80`, transition: 'transform 0.2s, box-shadow 0.2s' }}>
-              Start your business →
+              Start free →
             </Link>
             <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer" className="rb-cta-secondary" style={{ padding: '15px 24px', fontSize: 15, fontWeight: 500, background: 'transparent', color: ML.bone, border: '1px solid rgba(232,229,221,0.35)', borderRadius: 999, cursor: 'pointer', textDecoration: 'none', transition: 'background 0.2s' }}>
               See a live author site →

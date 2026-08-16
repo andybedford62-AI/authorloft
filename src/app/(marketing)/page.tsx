@@ -6,11 +6,10 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
-import { MidnightTestimonialsSection } from "@/components/marketing/midnight-testimonials-section";
-import { AuthorShowcaseSection } from "@/components/marketing/author-showcase-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
+import { sanitize } from "@/lib/sanitize";
 
 export const revalidate = 60;
 
@@ -230,23 +229,17 @@ export default async function HomePage() {
       {/* ── Divider ───────────────────────────────────────────────────── */}
       <hr style={{ border: 'none', borderTop: `1px solid ${C.border}` }} />
 
-      {/* ── Problem Strip ─────────────────────────────────────────────── */}
-      <ProblemStrip />
+      {/* ── What actually changes (consolidated problem/solution) ─────── */}
+      <WhatChangesSection />
 
-      {/* ── What Is AuthorLoft — 3 Pillars ────────────────────────────── */}
-      <PillarsSection />
-
-      {/* ── Comparison Table ──────────────────────────────────────────── */}
-      <ComparisonSection />
-
-      {/* ── Author Showcase (dynamic from DB) ─────────────────────────── */}
-      <AuthorShowcaseSection
-        authors={showcaseAuthors}
+      {/* ── Founder note (dynamic from DB — swap back to
+          AuthorShowcaseSection + MidnightTestimonialsSection once
+          there are 2+ real, independent customer testimonials) ────── */}
+      <FounderNoteSection
+        testimonial={testimonials[0]}
+        author={showcaseAuthors[0]}
         platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
       />
-
-      {/* ── Testimonials (dynamic from DB) ────────────────────────────── */}
-      <MidnightTestimonialsSection testimonials={testimonials} />
 
       {/* ── Newsletter mid-page ───────────────────────────────────────── */}
       <NewsletterMidSection />
@@ -300,66 +293,27 @@ export default async function HomePage() {
 // Inline section components (specific to this redesign)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ProblemStrip() {
-  const items = [
-    { icon: '📦', title: 'Retailers own your buyers', desc: "The platform keeps the relationship. You get a payout — with no idea who bought, enrolled, or is reading." },
-    { icon: '✉️', title: "Your list isn't yours", desc: "Build thousands of followers on a platform you don't control, and they can be gone overnight. Email lists built on their terms aren't yours." },
-    { icon: '🧩', title: "Five tools that don't talk", desc: "Website. Email. Storefront. Analytics. Payments. You're paying for five things and still gluing them together by hand." },
-  ];
-  return (
-    <div style={{ background: '#111c2c', borderTop: `1px solid #2a4268`, borderBottom: `1px solid #2a4268`, padding: '52px 0' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 0 }}>
-          {items.map((item, i) => (
-            <div key={i} style={{ textAlign: 'center', padding: '24px 32px', borderRight: i < items.length - 1 ? '1px solid #2a4268' : 'none' }}>
-              <span style={{ fontSize: '1.75rem', marginBottom: 14, display: 'block' }}>{item.icon}</span>
-              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.25rem', fontWeight: 600, marginBottom: 8, color: '#e8e8e0', lineHeight: 1.12 }}>{item.title}</h3>
-              <p style={{ fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.65 }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-      <style>{`@media (max-width: 820px) { .problem-strip-grid > div { border-right: none !important; border-bottom: 1px solid #2a4268; } .problem-strip-grid > div:last-child { border-bottom: none; } }`}</style>
-    </div>
-  );
-}
-
-function PillarsSection() {
-  const pillars = [
-    { num: '01', title: 'Your storefront', desc: 'A beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand — not theirs.' },
-    { num: '02', title: 'Your sales', desc: 'Sell eBooks, audiobooks, and courses direct to your audience via Stripe. Zero platform fees — every dollar from every sale goes straight to you.' },
-    { num: '03', title: 'Your list', desc: 'Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.' },
-  ];
-  return (
-    <section style={{ padding: '88px 0', textAlign: 'center', background: '#0d1520' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14 }}>The solution</p>
-        <h2 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', marginBottom: 16, letterSpacing: '-0.01em' }}>
-          One platform.<br />Everything you own.
-        </h2>
-        <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto 52px', lineHeight: 1.72 }}>
-          AuthorLoft replaces your website, email service, payment processor, and analytics —
-          and puts you in control of every reader relationship you earn.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 2, background: '#2a4268', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}>
-          {pillars.map((p) => (
-            <div key={p.num} style={{ background: '#1c2e48', padding: '40px 32px' }}>
-              <div style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '3.5rem', fontWeight: 700, color: 'rgba(201,168,76,0.18)', lineHeight: 1, marginBottom: 18 }}>{p.num}</div>
-              <h3 style={{ fontFamily: "var(--font-heading, 'Playfair Display', Georgia, serif)", fontSize: '1.35rem', fontWeight: 600, lineHeight: 1.12, color: '#e8e8e0', marginBottom: 10 }}>{p.title}</h3>
-              <p style={{ color: '#9a9080', fontSize: '0.9375rem', lineHeight: 1.65 }}>{p.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ComparisonSection() {
+function WhatChangesSection() {
   const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
   const rows = [
-    { label: 'Your revenue', old: 'Retailers take their cut — you see 30–70%', newVal: 'You keep 100%', newSuffix: ' of every direct sale' },
-    { label: 'Your readers', old: 'Their platform, their email list, their rules', newVal: 'Your list, always.', newSuffix: ' Nobody can take it from you.' },
+    {
+      label: 'Who gets paid',
+      old: 'Retailers keep 30–70% of every sale. You get a payout and a mystery — no idea who bought, or why.',
+      newVal: 'You keep 100% of what you earn.',
+      newSuffix: " Stripe's standard card fee is the only other cost — same as everywhere else online.",
+    },
+    {
+      label: 'Who owns your readers',
+      old: "Their platform, their rules. Followers can vanish overnight — an algorithm change, a banned account, a dead app.",
+      newVal: 'Your email list, always yours.',
+      newSuffix: ' Export it anytime, take it anywhere. Nobody can rent it back to you.',
+    },
+    {
+      label: 'How many tabs you need open',
+      old: "A website here, an email tool there, checkout somewhere else — five logins that don't talk to each other.",
+      newVal: 'One dashboard.',
+      newSuffix: ' Your site, your store, your list, your numbers — in one place, for one price.',
+    },
   ];
   return (
     <section style={{ background: '#0d1520', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
@@ -372,14 +326,17 @@ function ComparisonSection() {
       `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
-          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 14, margin: '0 0 14px' }}>The difference</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(1.85rem, 3vw, 2.6rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: 0 }}>
-            What changes when you own it.
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', margin: '0 0 14px' }}>What actually changes</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
+            Here&apos;s exactly what you get back.
           </h2>
+          <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 560, margin: '0 auto', lineHeight: 1.72 }}>
+            Not vague promises — three concrete things that are different the moment you switch.
+          </p>
         </div>
         <div className="rdh-cmp-table">
           {/* Column headers */}
-          <div className="rdh-cmp-old-head" style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#15233a', textAlign: 'center', color: '#6b7a90', borderBottom: '2px solid #3a5580' }}>The old way</div>
+          <div className="rdh-cmp-old-head" style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#15233a', textAlign: 'center', color: '#6b7a90', borderBottom: '2px solid #3a5580' }}>Right now</div>
           <div style={{ padding: '18px 32px', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#1a3050', textAlign: 'center', color: '#c9a84c', borderBottom: '2px solid #3a5580', borderLeft: '2px solid #3a5580' }}>With AuthorLoft</div>
 
           {rows.map((row, i) => (
@@ -387,18 +344,60 @@ function ComparisonSection() {
               {/* Old way cell */}
               <div className="rdh-cmp-old-cell" style={{ background: '#0f1a2d', padding: '32px 36px', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
                 <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5c6e89', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
-                <div style={{ fontFamily: SERIF, fontSize: '1.35rem', lineHeight: 1.4, color: '#3d4f66', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.5)', fontStyle: 'italic' }}>{row.old}</div>
+                <div style={{ fontFamily: SERIF, fontSize: '1.2rem', lineHeight: 1.45, color: '#3d4f66', textDecoration: 'line-through', textDecorationColor: 'rgba(255,80,80,0.5)', fontStyle: 'italic' }}>{row.old}</div>
               </div>
               {/* New way cell */}
               <div style={{ background: '#1c3358', padding: '32px 36px', borderLeft: '2px solid #3a5580', borderBottom: i < rows.length - 1 ? '1px solid #2a4268' : 'none' }}>
                 <div style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a9bb5', marginBottom: 10, fontWeight: 700 }}>{row.label}</div>
-                <div style={{ fontFamily: SERIF, fontSize: '1.5rem', lineHeight: 1.4, color: '#f0ede4' }}>
+                <div style={{ fontFamily: SERIF, fontSize: '1.25rem', lineHeight: 1.45, color: '#f0ede4' }}>
                   <strong style={{ color: '#d4ae6a', fontWeight: 700 }}>{row.newVal}</strong>{row.newSuffix}
                 </div>
               </div>
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function FounderNoteSection({
+  testimonial,
+  author,
+  platformDomain,
+}: {
+  testimonial?: { authorName: string; authorRole: string | null; quote: string };
+  author?: { slug: string; customDomain: string | null };
+  platformDomain: string;
+}) {
+  if (!testimonial) return null;
+  const siteUrl = author
+    ? (author.customDomain ? `https://${author.customDomain}` : `https://${author.slug}.${platformDomain}`)
+    : null;
+  return (
+    <section style={{ background: '#27406B', padding: '96px 28px' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D4AE6A', marginBottom: 24 }}>
+          From the founder
+        </p>
+        <div
+          style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 'clamp(21px, 2.4vw, 28px)', lineHeight: 1.5, color: '#F0EDE4', margin: '0 0 32px' }}
+          dangerouslySetInnerHTML={{ __html: `“${sanitize(testimonial.quote)}”` }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+          <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#D4AE6A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0F1A2D', fontWeight: 700, fontSize: 17, flexShrink: 0 }}>
+            {testimonial.authorName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ fontWeight: 600, fontSize: 15, margin: 0, color: '#F0EDE4' }}>{testimonial.authorName}</p>
+            {testimonial.authorRole && <p style={{ fontSize: 13, margin: 0, color: '#B8C2D9' }}>{testimonial.authorRole}</p>}
+          </div>
+        </div>
+        {siteUrl && (
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#D4AE6A', textDecoration: 'none' }}>
+            See my site →
+          </a>
+        )}
       </div>
     </section>
   );
@@ -433,7 +432,7 @@ function FooterCTA() {
           Your audience<br />is waiting.
         </h2>
         <p style={{ fontSize: '1.125rem', color: '#9a9080', marginBottom: 44, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.7 }}>
-          Every sale through a middleman is someone you&apos;ll never reach again. Start free today and own everything you build — books, courses, or both.
+          Every sale through a middleman is someone you&apos;ll never reach again. Start free today and own every book, every reader, every dollar.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
           <Link href="/register" className="rdh-btn-primary" style={{ display: 'inline-block', textDecoration: 'none', borderRadius: 8, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1, background: '#c9a84c', color: '#000', padding: '15px 32px' }}>
