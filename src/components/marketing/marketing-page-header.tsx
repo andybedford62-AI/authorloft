@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { VAULT } from "@/components/marketing/vault-theme";
 
 interface MarketingPageHeaderProps {
   /** Small mono uppercase label above the title, e.g. "From the team". */
@@ -20,17 +21,21 @@ interface MarketingPageHeaderProps {
 
 /**
  * Shared "brand band" hero for secondary marketing pages (Bookstore, Blog, News,
- * Pricing, Features, Resources, Contact). Full-bleed navy gradient with a brass
- * hairline, an eyebrow label, a serif title, an optional subtitle, and an optional
- * square logo in a white card. Gives every page a consistent, branded header.
+ * Pricing, Features, Resources, Contact). Full-bleed Vault-indigo gradient with a
+ * gold hairline, an eyebrow label, an italic serif title, an optional subtitle,
+ * and an optional square logo in a white card. Gives every page a consistent,
+ * branded header. Colors mirror src/components/marketing/vault-theme.ts — the
+ * gradient/glow use the VAULT tokens directly (inline styles); the eyebrow/title/
+ * subtitle/hairline use static Tailwind arbitrary-value classes with the same hex
+ * values (Tailwind can't statically analyze an interpolated class name).
  *
- * Accent a word in the title with: <span className="italic text-[#D4AE6A]">Word</span>
+ * Accent a word in the title with: <span className="italic text-[#d6a94a]">Word</span>
  */
 export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage }: MarketingPageHeaderProps) {
   const hasBanner = !!backgroundImage;
 
   return (
-    <section className="relative overflow-hidden bg-[#1B2B47]">
+    <section className="relative overflow-hidden bg-[#1e2f4d]">
       {hasBanner ? (
         <>
           {/* Banner image — subject weighted right, calm space left. object-contain
@@ -45,7 +50,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, #0F1A2D 0%, rgba(15,26,45,0.96) 35%, rgba(15,26,45,0.82) 55%, rgba(15,26,45,0.45) 75%, rgba(15,26,45,0.08) 100%)",
+                `linear-gradient(90deg, ${VAULT.bg} 0%, rgba(22,35,61,0.96) 35%, rgba(22,35,61,0.82) 55%, rgba(22,35,61,0.45) 75%, rgba(22,35,61,0.08) 100%)`,
             }}
           />
         </>
@@ -55,7 +60,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
           <div
             aria-hidden
             className="absolute inset-0"
-            style={{ background: "linear-gradient(120deg, #0F1A2D 0%, #1B2B47 55%, #27406B 100%)" }}
+            style={{ background: `linear-gradient(120deg, ${VAULT.bg} 0%, ${VAULT.surf} 55%, ${VAULT.surf2} 100%)` }}
           />
           {/* Fine vertical threadlines for subtle texture */}
           <div
@@ -66,11 +71,11 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
                 "repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 22px)",
             }}
           />
-          {/* Soft brass glow, top-right */}
+          {/* Soft gold glow, top-right */}
           <div
             aria-hidden
             className="absolute -top-24 -right-24 w-96 h-96 rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(212,174,106,0.18), transparent 70%)" }}
+            style={{ background: `radial-gradient(circle, ${VAULT.gold}2e, transparent 70%)` }}
           />
         </>
       )}
@@ -78,10 +83,10 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
       <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
         <div className="min-w-0 max-w-xl">
           {eyebrow && (
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AE6A] mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">· {eyebrow} ·</p>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#d6a94a] mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">· {eyebrow} ·</p>
           )}
-          <h1 className="font-serif text-4xl sm:text-5xl text-white font-normal leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]">{title}</h1>
-          {subtitle && <p className="mt-4 text-base text-[#D4DDEB] max-w-xl leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">{subtitle}</p>}
+          <h1 className="font-serif italic text-4xl sm:text-5xl text-[#f3ecdb] font-normal leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]">{title}</h1>
+          {subtitle && <p className="mt-4 text-base text-[#93a0bc] max-w-xl leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">{subtitle}</p>}
         </div>
 
         {imageSrc && !hasBanner && (
@@ -94,8 +99,8 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         )}
       </div>
 
-      {/* Brass hairline */}
-      <div aria-hidden className="relative h-[3px] bg-gradient-to-r from-transparent via-[#B8893D] to-transparent" />
+      {/* Gold hairline */}
+      <div aria-hidden className="relative h-[3px] bg-gradient-to-r from-transparent via-[#d6a94a] to-transparent" />
     </section>
   );
 }
