@@ -81,7 +81,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               src={heroPhotoSrc}
               alt={authorName}
               fill
-              className="object-cover object-top"
+              className="object-cover object-center"
               style={{ filter: "brightness(0.75) contrast(1.05)" }}
               priority
             />
