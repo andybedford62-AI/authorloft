@@ -88,7 +88,6 @@ const PAIN_CARDS = [
   { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.png", title: "Your Platform" },
   { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.png", title: "Your Brand" },
   { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.png", title: "For Authors" },
-  { pain: "Udemy owns your students",               solution: "Sell direct, own your students", image: "/hero-card-4.png", title: "For Course Creators" },
 ];
 
 function PainSolutionCards() {
@@ -205,9 +204,9 @@ export function RebelHero({
   headlineLine2?: string | null;
   subheadline?: string | null;
 }) {
-  const line1 = headlineLine1 || "They sell your work. They keep your audience.";
+  const line1 = headlineLine1 || "They sell your books. They keep your readers.";
   const line2 = headlineLine2 || "Take both back.";
-  const sub    = subheadline || "Every sale through someone else's platform is a person you'll never know, never email, never reach again. AuthorLoft gives you your own storefront, your own list — and you own your career. For your books, your courses, or both.";
+  const sub    = subheadline || "Every sale through someone else's platform is a person you'll never know, never email, never reach again. AuthorLoft gives you your own storefront, your own list — and you keep 100% of what you earn.";
 
   return (
     <section style={{ position: 'relative', background: ML.midnight, overflow: 'hidden', minHeight: '72vh' }}>

@@ -15,18 +15,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Pricing — Free Author Career Platform",
     description:
-      "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
     alternates: { canonical: "/pricing" },
     openGraph: {
       type:        "website",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
       images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft pricing plans" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($79.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
       images:      [ogImage],
     },
   };
@@ -118,7 +118,7 @@ function buildComparisonRows(plans: Awaited<ReturnType<typeof getActivePlans>>) 
   const premium = planByTier(plans, "PREMIUM");
 
   return [
-    { label: "Books",              free: formatLimit(free?.maxBooks, 5), standard: formatLimit(standard?.maxBooks, 25), premium: formatLimit(premium?.maxBooks, 0) },
+    { label: "Books",              free: formatLimit(free?.maxBooks, 5), standard: formatLimit(standard?.maxBooks, 20), premium: formatLimit(premium?.maxBooks, 0) },
     { label: "News posts",         free: formatLimit(free?.maxPosts, 5), standard: formatLimit(standard?.maxPosts, 0),  premium: formatLimit(premium?.maxPosts, 0) },
     { label: "AuthorLoft subdomain",free: "✓",         standard: "✓",          premium: "✓"          },
     { label: "Custom domain",      free: "—",         standard: "✓",          premium: "✓"          },

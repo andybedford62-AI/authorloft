@@ -325,7 +325,11 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         },
         {
           name: "Reader Analytics (page views, trends, referrers)",
-          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+          tiers: {
+            FREE: free?.analyticsEnabled ? "✓" : "—",
+            STANDARD: standard?.analyticsEnabled ? "✓" : "—",
+            PREMIUM: premium?.analyticsEnabled ? "✓" : "—",
+          },
         },
         {
           name: "Media Kit Page",

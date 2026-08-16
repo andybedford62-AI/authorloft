@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Marketing-site audit: fixed pricing/feature contradictions, ToS typo, founder testimonial disclosure
+
+Ran a manual audit of the homepage, pricing, features, and bookstore pages and fixed the confirmed issues:
+
+- **Stale $79.99 Premium price** — the real price is $59.99/mo (confirmed against the live `Plan` table), but `$79.99` was still hardcoded in the pricing page's meta/OG/Twitter descriptions, the features page's JSON-LD `Offer`, four FAQ answers in `landing-page-data.tsx`, `llms-full.txt`, and the welcome-email default template (`welcome-email-panel.tsx` + `mailer.ts`, which also wrongly said "Unlimited books" under the Standard plan instead of Premium). All now read $59.99 for Premium, and the welcome-email template correctly attributes unlimited books to Premium and "up to 20" to Standard.
+- **Standard book-limit fallback mismatch** — `pricing/page.tsx`'s comparison table used a dormant fallback of 25 vs. the features page's 20; corrected to 20 to match the live plan limit and the features page.
+- **Reader Analytics row always showed ✓ for every tier**, contradicting the FAQ ("Standard and Premium only, not Free"). Traced this to the underlying `Plan.analyticsEnabled` flag being inverted in the DB (FREE=true, STANDARD=false) — corrected to FREE=false/STANDARD=true/PREMIUM=true, and made the Features page row conditional on it like every other differentiated row.
+- **Terms of Service misspelled "ArthorLoft"** (10 occurrences) in the DB-stored `PlatformSettings.termsContent` — corrected via direct update.
+- **Founder testimonial not visually disclosed** — Anthony Bedford's testimonial ("I am the Owner of AuthorLoft") discloses this in the quote body but sat identically styled to two other "real author" testimonials. His `authorRole` byline (rendered directly under his name in the carousel) now reads "Thriller Author · AuthorLoft Founder" so it's visible without reading the full quote.
+- **Split books/courses positioning** — the homepage H1 and hero subheadline (DB-stored in `PlatformSettings`) pitched "Your Books. Your Courses. Your Career." while every other page (title/meta, footer, testimonials, bookstore) was 100% author-focused with no course-creator proof. Per decision, committed the whole homepage to the author-only framing: updated the hero headline/subheadline to match, and removed the unsupported "For Course Creators" pain/solution card from the rotating hero carousel (`rebrand-hero.tsx`).
+
 ## August 11, 2026 — Discount codes now work on Bundles and Courses (and a real bundle-checkout bug fix)
 
 Extended `DiscountCode` past books: new `DiscountCodeBundle`/`DiscountCodeCourse` join tables mirror the existing `DiscountCodeBook` pattern (empty list = applies to all of that type — same semantics as books, so every existing code now also applies to all of an author's bundles/courses by default). `/admin/discount-codes` gained bundle/course checkbox sections alongside the book one, and the list table's "Books" column became a single "Applies to" summary across all three.

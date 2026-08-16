@@ -51,7 +51,7 @@ export async function GET() {
     "",
     "## Features & Pricing",
     "",
-    `- [Features](${BASE}/features): Full feature list across Free, Standard ($19.99/mo), and Premium ($79.99/mo) plans — book catalog, direct sales, custom domain, flip book previews, AI writing tools, and reader analytics.`,
+    `- [Features](${BASE}/features): Full feature list across Free, Standard ($19.99/mo), and Premium ($59.99/mo) plans — book catalog, direct sales, custom domain, flip book previews, AI writing tools, and reader analytics.`,
     `- [Pricing](${BASE}/pricing): Plan comparison with full pricing details and side-by-side comparison against competitors (Tertulia, StoryOrigin, BookFunnel).`,
     "",
   ];
