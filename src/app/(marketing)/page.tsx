@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
@@ -232,6 +233,9 @@ export default async function HomePage() {
       {/* ── What actually changes (consolidated problem/solution) ─────── */}
       <WhatChangesSection />
 
+      {/* ── Product preview (real screenshots, not mockups) ───────────── */}
+      <ProductPreviewSection />
+
       {/* ── Founder note (dynamic from DB — swap back to
           AuthorShowcaseSection + MidnightTestimonialsSection once
           there are 2+ real, independent customer testimonials) ────── */}
@@ -355,6 +359,88 @@ function WhatChangesSection() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProductPreviewSection() {
+  const SERIF = "var(--font-heading, 'Playfair Display', Georgia, serif)";
+  const GOLD = '#c9a84c';
+
+  function BrowserFrame({
+    src, alt, aspectRatio, chrome = true,
+  }: { src: string; alt: string; aspectRatio: string; chrome?: boolean }) {
+    return (
+      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #2a4268', boxShadow: '0 20px 50px -20px rgba(0,0,0,0.55)', background: '#111c2c' }}>
+        {chrome && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: '#0f1a2d', borderBottom: '1px solid #2a4268' }}>
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#e0605a' }} />
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#e0b45a' }} />
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#5ac97a' }} />
+          </div>
+        )}
+        <div style={{ position: 'relative', width: '100%', aspectRatio, background: '#fff' }}>
+          <Image src={src} alt={alt} fill sizes="(max-width: 820px) 100vw, 50vw" style={{ objectFit: 'cover', objectPosition: 'top' }} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section style={{ background: '#111c2c', borderTop: '1px solid #2a4268', borderBottom: '1px solid #2a4268', padding: '88px 0' }}>
+      <style>{`
+        .rdh-preview-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; }
+        .rdh-preview-stack { display: grid; gap: 24px; }
+        @media (max-width: 900px) {
+          .rdh-preview-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLD, margin: '0 0 14px' }}>See it for yourself</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(2.1rem, 4vw, 3.4rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: '#e8e8e0', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
+            Not a mockup. This is the actual product.
+          </h2>
+          <p style={{ fontSize: '1.0625rem', color: '#9a9080', maxWidth: 540, margin: '0 auto', lineHeight: 1.72 }}>
+            Real screenshots from a real AuthorLoft site — no stock photos, no Photoshop.
+          </p>
+        </div>
+        <div className="rdh-preview-grid">
+          <div>
+            <BrowserFrame
+              src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845641135.png"
+              alt="A live AuthorLoft author site"
+              aspectRatio="823 / 942"
+              chrome={false}
+            />
+            <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
+              <strong style={{ color: '#e8e8e0' }}>Live right now.</strong> This is an actual author&apos;s AuthorLoft site — not a template preview, the real thing.
+            </p>
+          </div>
+          <div className="rdh-preview-stack">
+            <div>
+              <BrowserFrame
+                src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845582294.png"
+                alt="The AuthorLoft dashboard"
+                aspectRatio="4 / 3.4"
+              />
+              <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
+                <strong style={{ color: '#e8e8e0' }}>Your dashboard.</strong> Books, subscribers, sales — one screen, not five tabs.
+              </p>
+            </div>
+            <div>
+              <BrowserFrame
+                src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845608667.png"
+                alt="AuthorLoft theme picker with genre palettes"
+                aspectRatio="16 / 10.5"
+              />
+              <p style={{ marginTop: 14, fontSize: '0.9rem', color: '#9a9080', lineHeight: 1.6 }}>
+                <strong style={{ color: '#e8e8e0' }}>Pick a theme built for your genre.</strong> Change it anytime — no developer required.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
