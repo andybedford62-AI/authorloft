@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { CinematicBooksFilter } from "./cinematic-books-filter";
+import { CinematicNewsletterForm } from "./cinematic-newsletter-form";
 import type { HomeTemplateProps } from "./types";
 
 const NAVY_DEEP   = "#050D1C";
@@ -461,38 +462,17 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
-                The Dispatch · Monthly
+                {firstName}'s Dispatch · Monthly
               </p>
               <h2 className="font-heading text-[clamp(28px,3.5vw,44px)] leading-tight text-[#FBF6E9] mb-3">
-                Letters from the loft.
+                Letters from {firstName}.
               </h2>
               <p className="text-base text-[#FBF6E9]/55">
                 New releases, behind-the-scenes notes, and reading recommendations delivered monthly.
               </p>
             </div>
 
-            <form
-              action="/contact"
-              method="get"
-              className="flex flex-col sm:flex-row gap-3"
-            >
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 px-5 py-3 rounded-full text-sm text-[#FBF6E9] placeholder-[#FBF6E9]/30 border outline-none focus:border-opacity-80 transition-colors"
-                style={{
-                  background: NAVY_DEEP,
-                  borderColor: accent + "44",
-                }}
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
-                style={{ background: accent, color: NAVY_DEEP }}
-              >
-                Subscribe →
-              </button>
-            </form>
+            <CinematicNewsletterForm authorId={author.id} accent={accent} />
           </div>
         </div>
       </section>

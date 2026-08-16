@@ -299,7 +299,7 @@ export function RebelHero({
               Start free →
             </Link>
             <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer" className="rb-cta-secondary" style={{ padding: '15px 24px', fontSize: 15, fontWeight: 500, background: 'transparent', color: VAULT.ink, border: `1px solid ${VAULT.hair}`, borderRadius: VAULT.radius, cursor: 'pointer', textDecoration: 'none', transition: 'background 0.2s' }}>
-              See a live author site →
+              See a demo author site →
             </a>
           </div>
 
