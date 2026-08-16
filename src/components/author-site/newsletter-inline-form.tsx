@@ -77,10 +77,13 @@ export function NewsletterInlineForm({
   }
 
   if (status === "success") {
+    // On a dark surface the accent reads fine; on a light one it can't be
+    // trusted -- authors pick their own accent and a pale one fails contrast
+    // against white, so light surfaces get a fixed readable grey instead.
     return (
       <p
         className="text-sm font-medium"
-        style={{ color: isDark ? accentColor : accentColor }}
+        style={{ color: isDark ? accentColor : "#1F2937" }}
       >
         {message}
       </p>
