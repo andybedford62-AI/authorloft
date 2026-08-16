@@ -122,9 +122,6 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
   // Per-format direct sale items (new system)
   const hasDirectSaleItems  = book.salesEnabled && book.directSalesEnabled &&
                               book.directSaleItems && book.directSaleItems.length > 0;
-  // Legacy single-price direct buy button (shown only if no items exist)
-  const showDirectBuyButton = !hasDirectSaleItems &&
-                              book.salesEnabled && book.directSalesEnabled && book.priceCents > 0;
 
   // Smart price display: prefer cheapest direct-sale item, fall back to book-level price
   const activeSaleItems = hasDirectSaleItems ? book.directSaleItems! : [];
@@ -218,20 +215,10 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
               <DirectBuyButtons items={book.directSaleItems!} slug={book.slug} size="sm" />
             )}
 
-            {/* Legacy single direct-buy button */}
-            {showDirectBuyButton && (
-              <Link href={`/books/${book.slug}/buy`}>
-                <Button size="sm" variant="primary">
-                  <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                  Buy — {formatCents(book.priceCents)}
-                </Button>
-              </Link>
-            )}
-
             {/* Retailer links */}
             {hasRetailerLinks ? (
               <RetailerButtons links={book.retailerLinks!} size="sm" />
-            ) : !hasDirectSaleItems && !showDirectBuyButton && book.externalBuyUrl ? (
+            ) : !hasDirectSaleItems && book.externalBuyUrl ? (
               <a href={book.externalBuyUrl} target="_blank" rel="noopener noreferrer">
                 <Button size="sm" variant="primary">
                   <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />

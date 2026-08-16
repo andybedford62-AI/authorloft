@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
-import { ArrowLeft, BookOpen, ExternalLink, ShoppingCart, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
 import { BookExcerptModal } from "@/components/author-site/book-excerpt-modal";
 import { FormatBadges } from "@/components/author-site/format-badges";
@@ -154,9 +154,8 @@ export default async function BookDetailPage({
     ? book.directSaleItems.filter((i) => !i.isReaderMagnet)
     : [];
   const hasDirectSaleItems  = paidSaleItems.length > 0;
-  const showLegacyDirectBuy = !hasDirectSaleItems && canSellPaid && book.priceCents > 0;
   const hasRetailerLinks    = book.retailerLinks.length > 0;
-  const hasBuyOptions       = hasDirectSaleItems || showLegacyDirectBuy || hasRetailerLinks || magnetItems.length > 0;
+  const hasBuyOptions       = hasDirectSaleItems || hasRetailerLinks || magnetItems.length > 0;
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
@@ -445,16 +444,6 @@ export default async function BookDetailPage({
                         />
                       );
                     })}
-
-                    {/* Legacy single direct-buy button */}
-                    {showLegacyDirectBuy && (
-                      <Link href={`/books/${book.slug}/buy`}>
-                        <Button variant="primary" size="sm">
-                          <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                          Buy — {formatCents(book.priceCents)}
-                        </Button>
-                      </Link>
-                    )}
 
                   </div>
                 </div>

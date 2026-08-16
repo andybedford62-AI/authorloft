@@ -9,9 +9,6 @@ import { BuySection } from "@/components/author-site/buy-section";
 
 // ── Format display helpers ────────────────────────────────────────────────────
 
-const VALID_FORMATS = ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] as const;
-type DirectSaleFormat = (typeof VALID_FORMATS)[number];
-
 const FORMAT_META: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
   EBOOK:    { label: "eBook",          icon: <BookOpen className="h-4 w-4" />, color: "#2563eb", bg: "#eff6ff" },
   FLIPBOOK: { label: "Flip Book",      icon: <Film     className="h-4 w-4" />, color: "#7c3aed", bg: "#f5f3ff" },
@@ -44,9 +41,7 @@ export default async function BuyPage({ params, searchParams }: Props) {
       subtitle: true,
       coverImageUrl: true,
       shortDescription: true,
-      priceCents: true,
       directSalesEnabled: true,
-      availableFormats: true,
       directSaleItems: {
         where: { isActive: true },
         select: { id: true, format: true, label: true, description: true, priceCents: true, fileKey: true },
@@ -57,31 +52,14 @@ export default async function BuyPage({ params, searchParams }: Props) {
   if (!book) notFound();
   if (!book.directSalesEnabled) notFound();
 
-  // Find the specific sale item (from ?item= query param)
-  let saleItem = saleItemId
+  // Find the specific sale item (from ?item= query param) — only items the author
+  // actually created and activated in Direct Sales are ever sellable here. This page
+  // used to silently create a new BookDirectSaleItem from the book's display-only
+  // "Retail / Display Price" whenever none existed, which resurrected a buy link the
+  // author had deliberately deactivated (or never set up) as a side effect of a GET.
+  const saleItem = saleItemId
     ? book.directSaleItems.find((i) => i.id === saleItemId)
     : book.directSaleItems[0];
-
-  // Legacy books (priced before the per-format Direct Sales Items system
-  // existed) have directSalesEnabled + a priceCents but no BookDirectSaleItem
-  // row — the book page's "Buy" button still links here for them. Provision
-  // the missing item from the book's own price so the link keeps working
-  // instead of 404ing, and so checkout (which reads BookDirectSaleItem) has
-  // a real row to sell.
-  if (!saleItem && !saleItemId && book.directSaleItems.length === 0 && book.directSalesEnabled && book.priceCents > 0) {
-    const format: DirectSaleFormat = VALID_FORMATS.includes(book.availableFormats[0] as DirectSaleFormat)
-      ? (book.availableFormats[0] as DirectSaleFormat)
-      : "EBOOK";
-    saleItem = await prisma.bookDirectSaleItem.create({
-      data: {
-        bookId: book.id,
-        format,
-        label: book.title,
-        priceCents: book.priceCents,
-      },
-      select: { id: true, format: true, label: true, description: true, priceCents: true, fileKey: true },
-    });
-  }
 
   if (!saleItem) notFound();
 
