@@ -55,6 +55,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
     <div style={{ "--accent": accent } as React.CSSProperties}>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {author.showHeroBanner !== false && (
       <section
         className="relative overflow-hidden flex items-center"
         style={{
@@ -149,6 +150,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Press Strip — only shown when author has real press outlets set ── */}
       {author.pressOutlets?.length > 0 && (

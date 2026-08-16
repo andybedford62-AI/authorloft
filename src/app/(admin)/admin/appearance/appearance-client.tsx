@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Loader2, Lock, Sparkles, CheckCircle2, Palette, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { Check, Loader2, Lock, Sparkles, CheckCircle2, Palette, RotateCcw, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BASE_THEMES, STYLE_PALETTES } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -440,6 +441,21 @@ export function AppearanceClient({
             <strong>Page Structure</strong> controls which sections appear and their order.{" "}
             <strong>Colour Theme</strong> below controls how they look. Mix any combination freely.
           </p>
+        </div>
+
+        {/* Hero content lives on a different page — link authors straight there */}
+        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
+          <p className="text-xs text-blue-800">
+            <strong>Hero photo, title, subtitle, and which book it features</strong> aren&apos;t set here —
+            they come from your <strong>Branding → Hero</strong> settings and apply to whichever
+            structure is active above.
+          </p>
+          <Link
+            href="/admin/branding?tab=hero"
+            className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900 whitespace-nowrap"
+          >
+            Edit Hero content <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
       </section>
 
