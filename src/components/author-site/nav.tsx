@@ -173,10 +173,12 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
           )}
         </nav>
 
-        {/* ── Desktop right side ────────────────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-          {/* Sign out — only shown to owner */}
-          {isOwner && (
+        {/* ── Desktop right side — owner-only ───────────────────────────── */}
+        {/* Login deliberately isn't here: primary nav is reader real estate,
+            and readers have no account. The author's own way back in is the
+            footer's "Author login" link. */}
+        {isOwner && (
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
             <button
               onClick={() => signOut({ callbackUrl: signOutUrl })}
               className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/80 transition-colors"
@@ -185,19 +187,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               <LogOut className="h-3.5 w-3.5" />
               <span>Sign out</span>
             </button>
-          )}
-
-          {/* Login — shown to visitors who aren't signed in (incl. the author, so they can reach their own admin) */}
-          {!session?.user && (
-            <a
-              href={`${platformBase}/login`}
-              className="text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
-              style={{ color: "#22c55e", borderColor: "#22c55e" }}
-            >
-              Login
-            </a>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* ── Cart icon (only visible when items in cart) ───────────────── */}
         {itemCount > 0 && (
@@ -258,11 +249,11 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               </a>
             )}
 
-            {/* Divider */}
-            <div className="border-t my-2" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
-
+            {/* Owner-only controls, behind a divider. Visitors see nothing
+                here -- Login lives in the footer, not the reader's menu. */}
             {isOwner && (
               <>
+                <div className="border-t my-2" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
                 <a
                   href={dashboardUrl}
                   onClick={() => setOpen(false)}
@@ -280,17 +271,6 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                   Sign out
                 </button>
               </>
-            )}
-
-            {!session?.user && (
-              <a
-                href={`${platformBase}/login`}
-                onClick={() => setOpen(false)}
-                className="mt-1 text-center text-sm font-semibold px-4 py-2 rounded-md border transition-colors"
-                style={{ color: "#22c55e", borderColor: "#22c55e" }}
-              >
-                Login
-              </a>
             )}
           </nav>
         </div>

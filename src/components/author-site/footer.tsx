@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
 import { NewsletterModalButton } from "./newsletter-modal";
 import { SiteQrCode } from "./site-qr-code";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -77,11 +76,15 @@ function buildQuickLinks(
 
 export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
   const displayName  = author.displayName || author.name;
+  const firstName    = displayName.split(" ")[0];
   const year         = new Date().getFullYear();
   const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
   const showPoweredBy = (author.plan?.tier ?? "FREE") === "FREE";
   const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
   const siteUrl      = getAuthorBaseUrl(author);
+  // Env-var based, matching nav.tsx -- a hardcoded authorloft.com here would
+  // send an author signing in from staging to the production login instead.
+  const platformBase = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
 
   const socialLinks = [
     { href: author.linkedinUrl,  label: "LinkedIn" },
@@ -100,53 +103,28 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
       {/* ── Dark panel ─────────────────────────────────────────────────────── */}
       <div className="bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          {/* QR takes only the width it needs; the three text columns share the rest */}
-          <div className="grid gap-8 sm:gap-12 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
+          {/* QR takes only the width it needs; the two text columns share the rest.
+              The author's newsletter leads -- this footer belongs to them, so the
+              first and loudest thing in it is their own call to action, not the
+              platform's. AuthorLoft attribution lives in the bottom bar below. */}
+          <div className="grid gap-8 sm:gap-12 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
 
-            {/* Col 1 — Brand */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" style={{ color: author.accentColor }} />
-                <a
-                  href="https://www.authorloft.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-bold text-white text-sm hover:text-[var(--accent)] transition-colors"
-                >
-                  AuthorLoft.com
-                </a>
-              </div>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                A platform for authors to establish their web presence, showcase their work,
-                and connect with readers worldwide.
-              </p>
-              <a
-                href="https://www.authorloft.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-xs font-semibold px-4 py-2 rounded-md border transition-colors hover:opacity-90"
-                style={{ color: "#22c55e", borderColor: "#22c55e" }}
-              >
-                Join AuthorLoft
-              </a>
-            </div>
-
-            {/* Col 2 — Stay Updated */}
+            {/* Col 1 — Stay Updated */}
             <div className="space-y-3">
               <p className="text-xs font-bold uppercase tracking-widest" style={{ color: author.accentColor }}>
                 Stay Updated
               </p>
               <p className="text-gray-400 text-xs leading-relaxed">
-                Subscribe to get news and updates from the author.
+                New releases and news, straight from {firstName}.
               </p>
               <NewsletterModalButton
                 authorId={author.id}
-                authorName={author.displayName || author.name}
+                authorName={displayName}
                 accentColor={author.accentColor}
               />
             </div>
 
-            {/* Col 3 — Quick Links */}
+            {/* Col 2 — Quick Links */}
             {quickLinks.length > 0 && (
               <div className="space-y-3">
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
@@ -166,7 +144,7 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
               </div>
             )}
 
-            {/* Col 4 — Scan to open on a phone */}
+            {/* Col 3 — Scan to open on a phone */}
             <SiteQrCode url={siteUrl} authorName={displayName} />
           </div>
         </div>
@@ -233,6 +211,14 @@ export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
                   </a>
                 </p>
               )}
+              {/* Relocated out of primary nav -- the author's own way back in,
+                  without spending reader-facing nav space on it. */}
+              <a
+                href={`${platformBase}/login`}
+                className="text-xs text-gray-600 hover:text-[var(--accent)] transition-colors"
+              >
+                Author login
+              </a>
             </div>
           </div>
         </div>

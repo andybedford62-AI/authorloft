@@ -85,14 +85,20 @@ export default async function AboutPage({
     ? customCredentials
     : ["Author", ...(books.length > 0 ? [`${books.length} ${books.length === 1 ? "Book" : "Books"} Published`] : [])];
 
-  // About page stats from branding
-  const rawStats = Array.isArray((author as any).aboutStats)
+  // About page stats from branding. Custom stats fully replace the auto book
+  // count rather than stacking on top of it -- same precedence as credentials
+  // above. Prepending the auto count unconditionally meant an author who
+  // entered their own "12 Novels Published" got it shown next to the auto
+  // "4 Books Published", two contradictory answers to the same question.
+  const customStats = (Array.isArray((author as any).aboutStats)
     ? (author as any).aboutStats as { value: string; label: string }[]
-    : [];
-  const aboutStats = [
-    { value: String(books.length), label: books.length === 1 ? "Book Published" : "Books Published" },
-    ...rawStats.filter((s) => s.value?.trim() && s.label?.trim()),
-  ];
+    : []
+  ).filter((s) => s.value?.trim() && s.label?.trim());
+  const aboutStats = customStats.length > 0
+    ? customStats
+    : (books.length > 0
+        ? [{ value: String(books.length), label: books.length === 1 ? "Book Published" : "Books Published" }]
+        : []);
 
   const base = getAuthorBaseUrl(author);
   const sameAs = [
