@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 16, 2026 — Hero honours the author's own accent colour
+
+The audit batch below was promoted to prod and verified live; this fix followed immediately after, from something the promotion itself exposed.
+
+`hero-banner.tsx` re-derived its accent from `getHeroColors(author.siteTheme)` — the *theme's* accent — while every template takes it from `author.accentColor`, which `(author-site)/[domain]/layout.tsx` resolves once via `resolveAccentColor()` and hands down. `resolveAccentColor()` is documented in `lib/themes.ts` as the effective accent "across the public site," with PREMIUM authors able to override the theme accent with a custom hex. The hero bypassing it meant **a PREMIUM author paying for a custom accent got a hero that ignored it**, while every section below honoured it — two different colours on one screen. Visible on `apbedford`: a coral hero "Buy Now" (nautical theme accent `#FF6F5E`) directly above a grey "Subscribe" button (his custom `#B0B0B0`).
+
+The hero now reads `author.accentColor`; `bg` and the scenic backdrop stay theme-derived, which is correct — those belong to the theme. Blast radius checked against the DB before shipping rather than guessed: of 11 active authors, exactly one (apbedford) is PREMIUM *with* a custom accent set, so the other ten heroes render byte-identically — `resolveAccentColor()` already falls back to the theme accent for everyone else. Contrast checked in both roles too, and it improves rather than regresses: as text on the nautical background 4.51:1 → 5.67:1, and as a button surface 6.91:1 → 8.71:1 (both still auto-picking their label colour through `readableTextOn`).
+
 ## August 16, 2026 — Author public-pages audit: platform branding stops talking over the author
 
 Design/UX audit of every page the platform generates on an author's behalf (home across all four templates, `/books`, `/books/[slug]`, `/about`, `/contact`), reviewed live against the Cinematic demo plus source. Two themes came out of it: the four templates aren't realized at the same level (Cinematic reads current, Classic/Minimal read like the platform's earlier design era), and the platform's own chrome kept outranking the author it exists to showcase. This entry covers the fixes shipped; the deferred items are in `docs/FEATURE_BACKLOG.md`.

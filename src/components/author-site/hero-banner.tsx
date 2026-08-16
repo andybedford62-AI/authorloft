@@ -16,6 +16,8 @@ interface HeroBannerProps {
   } | null;
 }
 
+// Background and scenic image stay theme-derived. The accent deliberately does
+// NOT come from here -- see the accent resolution in HeroBanner below.
 function getHeroColors(siteTheme: string) {
   const theme = getTheme(siteTheme);
   const darkBgThemes = ["dark-elegant", "scifi"];
@@ -26,12 +28,21 @@ function getHeroColors(siteTheme: string) {
   const heroImage =
     theme.defaultHeroImageUrl ??
     (THEME_HERO_IDS.includes(theme.id) ? `/images/themes/${theme.id}-hero.jpg` : undefined);
-  return { bg, accent: theme.preview.accent, defaultHeroImageUrl: heroImage };
+  return { bg, defaultHeroImageUrl: heroImage };
 }
 
 export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
-  const { bg, accent, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
+  const { bg, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
+  // Accent comes from the author, not the theme. resolveAccentColor() (see
+  // lib/themes.ts) is documented as the effective accent "across the public
+  // site" and already falls back to the theme accent for anyone without a
+  // PREMIUM custom colour -- the layout resolves it once and hands it down as
+  // author.accentColor, which every template uses. This hero used to re-derive
+  // it straight from the theme instead, so a PREMIUM author who paid for a
+  // custom accent got a hero that ignored it while the sections below honoured
+  // it: two different colours on one screen.
+  const accent = author.accentColor;
   // PREMIUM two-tone override — falls back to accent-only styling when not set.
   const secondary = author.secondaryColor || accent;
   const hasSecondary = !!author.secondaryColor;
