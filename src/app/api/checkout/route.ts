@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       const baseUrl = `https://${author.slug}.${PLATFORM_DOMAIN}`;
       const successUrl = `${baseUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${baseUrl}/courses/${course.slug}`;
-      const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
+      const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "0") / 100;
       const platformFeeCents = Math.round(totalCents * feePct);
       const useConnect = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
 
@@ -406,7 +406,7 @@ export async function POST(req: NextRequest) {
     const successUrl = `${baseUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl  = `${baseUrl}/books`;
 
-    const feePct           = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "10") / 100;
+    const feePct           = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "0") / 100;
     const platformFeeCents = Math.round(totalCents * feePct);
     const useConnect       = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
 

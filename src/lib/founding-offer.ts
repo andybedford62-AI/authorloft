@@ -17,9 +17,9 @@ export async function getFoundingOfferCopy(): Promise<FoundingOfferCopy | null> 
   if (!offer) return null;
 
   const headline = offer.headline?.trim()
-    || `Founding member offer — ${offer.percentOff}% off for your first ${offer.durationMonths} month${offer.durationMonths === 1 ? "" : "s"}`;
+    || `Founding member offer: ${offer.percentOff}% off your first ${offer.durationMonths} month${offer.durationMonths === 1 ? "" : "s"}`;
   const subtext = offer.subtext?.trim()
-    || `Sign up free, then upgrade within your first ${offer.windowDays} day${offer.windowDays === 1 ? "" : "s"} to lock it in — applied automatically at checkout.`;
+    || `Sign up free, then upgrade within your first ${offer.windowDays} day${offer.windowDays === 1 ? "" : "s"} to lock it in. It applies automatically at checkout.`;
 
   return { headline, subtext, percentOff: offer.percentOff };
 }

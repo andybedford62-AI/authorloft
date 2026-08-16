@@ -44,7 +44,7 @@
 
     { "name": "STRIPE_EARLY_BIRD_COUPON_MONTHLY", "purpose": "Founding-member coupon ID (monthly plans)" },
     { "name": "STRIPE_EARLY_BIRD_COUPON_ANNUAL", "purpose": "Founding-member coupon ID (annual plans)" },
-    { "name": "PLATFORM_FEE_PERCENT", "purpose": "Override default Stripe Connect platform fee %" },
+    { "name": "PLATFORM_FEE_PERCENT", "purpose": "Override default Stripe Connect platform fee % (defaults to 0 — AuthorLoft takes no cut, matching the \"zero platform fees\" claim across the site)" },
 
     { "name": "POSTHOG_PERSONAL_API_KEY", "purpose": "PostHog server-side API key — analytics queries" },
     { "name": "POSTHOG_PROJECT_ID", "purpose": "PostHog project ID — analytics queries" },

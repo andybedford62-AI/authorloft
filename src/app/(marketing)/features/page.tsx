@@ -101,7 +101,7 @@ const softwareAppLd = {
     {
       "@type": "Offer",
       name: "Premium",
-      price: "79.99",
+      price: "59.99",
       priceCurrency: "USD",
       billingIncrement: "P1M",
       description: "Full analytics, media kit, audio previews, premium themes, and unlimited books.",
