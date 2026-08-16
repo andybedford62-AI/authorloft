@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { VAULT } from "@/components/marketing/vault-theme";
 
 type ShowcaseAuthor = {
   id:              string;
@@ -13,12 +14,6 @@ type ShowcaseAuthor = {
   customDomain:    string | null;
   showcaseStyle:   string;
   books: { coverImageUrl: string | null; title: string }[];
-};
-
-const ML = {
-  midnight: '#0F1A2D', ink: '#1B2B47', bone: '#E8E5DD',
-  pearl: '#F0EDE4', brass: '#B8893D', brass2: '#D4AE6A',
-  copper: '#C26A4A', slate: '#5C6E89', mist: '#D4DDEB',
 };
 
 function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; platformDomain: string }) {
@@ -45,8 +40,8 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
         display:        'flex',
         flexDirection:  'row',
         alignItems:     'stretch',
-        background:     '#0d1829',
-        border:         '1px solid rgba(255,255,255,0.09)',
+        background:     VAULT.bg,
+        border:         `1px solid ${VAULT.hair}`,
         borderRadius:   18,
         overflow:       'hidden',
         textDecoration: 'none',
@@ -59,7 +54,7 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
         <div style={{
           flexShrink:      0,
           width:           isBook ? 110 : 148,
-          background:      isBook ? '#080e1a' : '#0a1320',
+          background:      VAULT.bg,
           position:        'relative',
           overflow:        'hidden',
         }}>
@@ -80,7 +75,7 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
               width: '100%', height: '100%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 52, color: ML.brass2, opacity: 0.4 }}>
+              <span style={{ fontFamily: VAULT.fontDisplay, fontStyle: 'italic', fontSize: 52, color: VAULT.gold, opacity: 0.4 }}>
                 {displayName[0]}
               </span>
             </div>
@@ -89,7 +84,7 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
           {!isBook && (
             <div style={{
               position: 'absolute', top: 0, right: 0, width: 32, height: '100%',
-              background: 'linear-gradient(to right, transparent, #0d1829)',
+              background: `linear-gradient(to right, transparent, ${VAULT.bg})`,
               pointerEvents: 'none',
             }} />
           )}
@@ -108,10 +103,11 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
         {/* Top: name + tagline */}
         <div>
           <p style={{
-            fontFamily: 'var(--font-heading, serif)',
+            fontFamily: VAULT.fontDisplay,
+            fontStyle:  'italic',
             fontSize:   19,
             fontWeight: 400,
-            color:      ML.bone,
+            color:      VAULT.ink,
             margin:     '0 0 6px',
             lineHeight: 1.25,
             whiteSpace: 'nowrap',
@@ -122,10 +118,9 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
           </p>
           {author.tagline && (
             <p style={{
-              fontFamily:      'Georgia, serif',
-              fontStyle:       'italic',
+              fontFamily:      VAULT.fontBody,
               fontSize:        13,
-              color:           ML.slate,
+              color:           VAULT.mute,
               margin:          0,
               lineHeight:      1.55,
               overflow:        'hidden',
@@ -148,7 +143,7 @@ function ShowcaseCard({ author, platformDomain }: { author: ShowcaseAuthor; plat
             fontSize:       11,
             letterSpacing:  '0.1em',
             textTransform:  'uppercase',
-            color:          ML.brass2,
+            color:          VAULT.gold,
           }}>
             Visit site
             <span style={{ fontSize: 13, transition: 'transform 0.2s' }} className="showcase-arrow">→</span>
@@ -174,47 +169,47 @@ export function AuthorShowcaseSection({
         .showcase-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-          border-color: rgba(212,174,106,0.4) !important;
+          border-color: rgba(214,169,74,0.4) !important;
         }
         .showcase-card:hover .showcase-arrow {
           transform: translateX(3px);
         }
       `}</style>
 
-      <section style={{ background: '#27406B', padding: '100px 60px' }}>
+      <section style={{ background: VAULT.surf, padding: '100px 60px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
           {/* ── Header ─────────────────────────────────────── */}
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ marginBottom: 56, maxWidth: 640 }}>
             <p style={{
               fontFamily:    'var(--font-geist-mono, monospace)',
               fontSize:      11,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color:         ML.brass2,
+              color:         VAULT.gold,
               marginBottom:  16,
             }}>
               · {authors.length} live author {authors.length === 1 ? 'site' : 'sites'} ·
             </p>
             <h2 style={{
-              fontFamily:    'var(--font-heading, serif)',
+              fontFamily:    VAULT.fontDisplay,
               fontSize:      'clamp(38px, 5vw, 72px)',
               fontWeight:    400,
               lineHeight:    0.95,
               letterSpacing: '-0.025em',
-              color:         ML.bone,
+              color:         VAULT.ink,
               margin:        '0 0 20px',
             }}>
               Real sites.<br />
-              <span style={{ fontStyle: 'italic', color: ML.brass2 }}>Real authors.</span>
+              <span style={{ fontStyle: 'italic', color: VAULT.gold }}>Real authors.</span>
             </h2>
             <p style={{
-              fontFamily: 'Georgia, serif',
+              fontFamily: VAULT.fontBody,
               fontSize:   17,
               lineHeight: 1.65,
-              color:      `${ML.bone}bb`,
+              color:      `${VAULT.ink}bb`,
               maxWidth:   500,
-              margin:     '0 auto',
+              margin:     0,
             }}>
               Every site below was built by an independent author using AuthorLoft — no designers, no developers, no waiting.
             </p>
@@ -232,12 +227,12 @@ export function AuthorShowcaseSection({
           </div>
 
           {/* ── CTA ────────────────────────────────────────── */}
-          <div style={{ textAlign: 'center', marginTop: 52 }}>
+          <div style={{ marginTop: 52 }}>
             <p style={{
-              fontFamily:    'Georgia, serif',
+              fontFamily:    VAULT.fontDisplay,
               fontStyle:     'italic',
               fontSize:      16,
-              color:         `${ML.bone}77`,
+              color:         `${VAULT.ink}77`,
               marginBottom:  24,
             }}>
               Yours could be next.
@@ -249,14 +244,14 @@ export function AuthorShowcaseSection({
                 alignItems:     'center',
                 gap:            10,
                 padding:        '14px 32px',
-                background:     ML.brass,
-                color:          ML.midnight,
+                background:     VAULT.gold,
+                color:          VAULT.bg,
                 fontFamily:     'inherit',
                 fontSize:       15,
                 fontWeight:     600,
-                borderRadius:   999,
+                borderRadius:   VAULT.radius,
                 textDecoration: 'none',
-                boxShadow:      '0 8px 24px -8px rgba(184,137,61,0.6)',
+                boxShadow:      '0 8px 24px -8px rgba(214,169,74,0.6)',
               }}
             >
               Start your business — free
