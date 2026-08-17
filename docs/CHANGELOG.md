@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Hero secondary CTA relabeled "Meet the Author"
+
+Andy asked whether the hero's second button ("Learn More," linking to `/about`) was even needed on Classic, since the homepage already has an "About the Author" section right below it — felt redundant. Checked `/about` before answering rather than guessing: it's not the same content. The homepage teaser uses `shortBio`; `/about` uses the full `bio` field plus stats, credentials, achievement badges, and an optional Media Kit tab — real depth that isn't surfaced on the homepage at all. So the button stays, but the label was the actual problem: "Learn More" directly above a section titled "About the Author" reads like a duplicate promise. Relabeled to "Meet the Author" across all three `hero-banner.tsx` layouts (portrait, mobile, desktop) — which costs nothing new to invent, since it's already the eyebrow label sitting above the author's name in the same component's photo column.
+
 ## August 17, 2026 — Author-site design parity: nav background, book-card CTAs, heading scale
 
 First three items off the Aug 16 design audit backlog. Nav-background clash traced to `homeTemplate`, not colour theme — every one of the 13 site themes already deliberately uses a dark `--nav-bg`, but Cinematic/Bold open on a dark hero so the sticky dark nav reads as one surface, while Classic/Minimal run light page bodies through nearly the whole scroll, so the same dark bar looks bolted onto the page once you scroll past the hero. Confirmed live on a Classic author before touching code: nav and hero both dark, everything after that white or a light accent tint. `nav.tsx` gained a `navTokens(dark)` helper (same pattern as the admin sidebar's dark-mode tokens), branching on `author.homeTemplate` (newly fetched in the author-site layout) — Cinematic/Bold unchanged, Classic/Minimal get a white nav with the same literal grays those templates already use elsewhere. Cart-badge circle switched from white (invisible on a white nav) to the author's accent colour, which reads on both variants.

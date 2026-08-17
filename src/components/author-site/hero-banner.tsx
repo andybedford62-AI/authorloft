@@ -110,7 +110,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
                 style={{ border: hasSecondary ? `1px solid ${secondary}80` : "1px solid rgba(255,255,255,0.4)" }}
               >
-                Learn More
+                Meet the Author
               </Link>
             </div>
           </div>
@@ -281,7 +281,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               className="w-full py-3 px-6 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
               style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
-              Learn More
+              Meet the Author
             </Link>
           </div>
         </div>
@@ -333,7 +333,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               className="w-full py-3 px-4 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
               style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
-              Learn More
+              Meet the Author
             </Link>
           </div>
           {featuredBook && (
