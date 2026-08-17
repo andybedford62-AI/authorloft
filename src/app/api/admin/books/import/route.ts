@@ -47,9 +47,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ imported: 0, skippedForPlanLimit, warnings });
   }
 
-  // Pre-fetch existing genres/series/book slugs for case-insensitive matching + slug uniqueness
+  // Pre-fetch existing genres/series/book slugs for case-insensitive matching + slug uniqueness.
+  // Genres are one shared, platform-wide list (see docs/CHANGELOG.md Aug 17 2026), so matching
+  // is unscoped — a CSV row's "Cozy Mystery" should match the shared genre even if a different
+  // author added it. An unmatched name still auto-creates (tagged with this author's id only
+  // because the schema requires an owner), joining the shared list for everyone from then on.
   const [existingGenres, existingSeries, existingBooks] = await Promise.all([
-    prisma.genre.findMany({ where: { authorId }, select: { id: true, name: true, slug: true } }),
+    prisma.genre.findMany({ select: { id: true, name: true, slug: true } }),
     prisma.series.findMany({ where: { authorId }, select: { id: true, name: true, slug: true } }),
     prisma.book.findMany({ where: { authorId }, select: { slug: true } }),
   ]);

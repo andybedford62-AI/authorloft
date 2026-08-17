@@ -7,8 +7,11 @@ import { CourseForm } from "@/components/admin/course-form";
 export default async function NewCoursePage() {
   const authorId = await getAdminAuthorId();
 
+  // Course Categories are one shared, platform-wide list (Super Admin-curated)
+  // — every author picks from the same tree, so this is deliberately NOT
+  // filtered by authorId. See docs/CHANGELOG.md Aug 17 2026.
   const categoryTree = await prisma.courseCategory.findMany({
-    where: { authorId, parentId: null },
+    where: { parentId: null },
     include: { children: { orderBy: { sortOrder: "asc" } } },
     orderBy: { sortOrder: "asc" },
   });

@@ -11,7 +11,8 @@ export default async function BookImportPage() {
   const authorId = await getAdminAuthorId();
 
   const [genres, series, bookCount, author] = await Promise.all([
-    prisma.genre.findMany({ where: { authorId }, select: { name: true } }),
+    // Genres are one shared, platform-wide list — see docs/CHANGELOG.md Aug 17 2026.
+    prisma.genre.findMany({ select: { name: true } }),
     prisma.series.findMany({ where: { authorId }, select: { name: true } }),
     prisma.book.count({ where: { authorId } }),
     prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),

@@ -15,8 +15,8 @@ export async function GET() {
       where: { authorId },
       orderBy: { subscribedAt: "desc" },
     }),
+    // Genres are one shared, platform-wide list — see docs/CHANGELOG.md Aug 17 2026.
     prisma.genre.findMany({
-      where: { authorId },
       select: { id: true, name: true },
     }),
   ]);

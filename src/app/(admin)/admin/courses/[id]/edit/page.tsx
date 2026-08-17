@@ -23,8 +23,11 @@ export default async function EditCoursePage({ params }: Props) {
       },
     }),
     prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+    // Course Categories are one shared, platform-wide list (Super Admin-curated)
+    // — every author picks from the same tree, so this is deliberately NOT
+    // filtered by authorId. See docs/CHANGELOG.md Aug 17 2026.
     prisma.courseCategory.findMany({
-      where: { authorId, parentId: null },
+      where: { parentId: null },
       include: { children: { orderBy: { sortOrder: "asc" } } },
       orderBy: { sortOrder: "asc" },
     }),

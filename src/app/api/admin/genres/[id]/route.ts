@@ -1,24 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 
+// See route.ts in this folder — Genres are one shared, Super Admin-curated list.
+
+function isSuperAdmin(session: any) {
+  return !!(session?.user as any)?.isSuperAdmin;
+}
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const authorId = await getAdminAuthorIdForApi();
-  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const { name } = await req.json();
   if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
   const existing = await prisma.genre.findUnique({ where: { id } });
-  if (!existing || existing.authorId !== authorId) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const newSlug = slugify(name.trim());
 
   // Check slug uniqueness (excluding self)
   const conflict = await prisma.genre.findFirst({
-    where: { authorId: existing.authorId, slug: newSlug, parentId: existing.parentId, id: { not: id } },
+    where: { slug: newSlug, parentId: existing.parentId, id: { not: id } },
   });
   const slug = conflict ? `${newSlug}-2` : newSlug;
 
@@ -32,8 +39,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const authorId = await getAdminAuthorIdForApi();
-  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   const genre = await prisma.genre.findUnique({
@@ -41,7 +48,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     include: { _count: { select: { children: true, books: true } } },
   });
 
-  if (!genre || genre.authorId !== authorId) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!genre) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (genre._count.children > 0)
     return NextResponse.json({ error: "Remove all sub-genres first before deleting this genre." }, { status: 409 });

@@ -35,15 +35,15 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
   const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
   const [error,     setError]     = useState("");
 
-  // Load the author's genres so readers can pick the topics they care about.
+  // Load the shared genre list so readers can pick the topics they care about.
   // These genre IDs become the subscriber's categoryPrefs, which the author's
   // newsletter compose screen targets against.
   useEffect(() => {
-    fetch(`/api/newsletter/genres?authorId=${encodeURIComponent(authorId)}`)
+    fetch("/api/newsletter/genres")
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => { if (Array.isArray(data)) setGenres(data); })
       .catch(() => {});
-  }, [authorId]);
+  }, []);
 
   function toggleInterest(value: string) {
     if (value === "all") {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ChevronRight, Plus, Pencil, Trash2, Tag, FolderOpen, Loader2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -190,12 +192,23 @@ function AddGenreForm({
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
+// Genres are ONE shared, platform-wide list every author's book picker reads
+// from (curated centrally, not per-author) — see docs/CHANGELOG.md Aug 17 2026.
+// Management therefore stays Super Admin-only.
 export default function GenresPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [genres, setGenres]           = useState<Genre[]>([]);
   const [loading, setLoading]         = useState(true);
   const [addParentId, setAddParentId] = useState<string | null>(null);
   const [addParentName, setAddParentName] = useState<string | null>(null);
   const [showTopAdd, setShowTopAdd]   = useState(false);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!(session?.user as any)?.isSuperAdmin) router.replace("/admin/dashboard");
+  }, [session, status, router]);
 
   const loadGenres = useCallback(async () => {
     setLoading(true);
@@ -206,6 +219,8 @@ export default function GenresPage() {
   }, []);
 
   useEffect(() => { loadGenres(); }, [loadGenres]);
+
+  if (status === "loading" || !(session?.user as any)?.isSuperAdmin) return null;
 
   function handleAddChild(parentId: string, parentName: string) {
     setShowTopAdd(false);
