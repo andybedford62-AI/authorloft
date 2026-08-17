@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Admin dark mode: text is actually readable
+
+Andy reported that authors using dark mode in the admin see content "barely visible" in text areas and data-entry fields — dark grey on black. Tracing it found three distinct causes rather than one, all in the `[data-admin-theme="dark"]` block in `globals.css`, which works as a hand-maintained allowlist of Tailwind utilities.
+
+**Nothing set a base text colour.** `body` declares `color: #111827` (near-black), so any admin element *without* an explicit `text-gray-*` class inherited it — every `<table className="w-full text-sm">` cell, every bare `<p className="font-medium">`, `<span>` and `<label>` — rendering near-black on the `#1f2937` card. This was the widest failure by far and no per-class override could have caught it. Fixed by setting `color: #e5e7eb` on the theme wrapper itself, which repairs every unclassed element at once while explicitly-classed elements still win through the existing `!important` rules. Audited the light-background elements first to confirm none rely on inherited dark text: `bg-gray-300`/`bg-gray-400` are toggle-switch tracks, skeleton bars, chart bars and colour swatches, all textless.
+
+**The rich text editor was hardcoded to the light theme.** `.tiptap-editor .ProseMirror` set `color: #111827` and `.rich-content` set headings to `#111827` and `p`/`li` to `#374151`. The editor shell carries no background of its own, so it sat directly on the dark card — this was literally the dark-grey-on-black in the "text areas" of the report. Re-pointed under the dark scope, including two that would have broken the *other* way once the base colour landed: inline `code` sits on a light `#f3f4f6` chip (would have gone light-on-light) and `mark` keeps its yellow highlight (text pinned dark).
+
+**Two mapped greys never met contrast.** `text-gray-400` → `#6b7280` measured **3.04:1** against the card, and it is the most-used class in the admin at 560 occurrences; `text-gray-300` → `#4b5563` was **1.94:1**; input placeholders **3.67:1**. Re-picked as a deliberate ramp rather than a straight inversion, keeping the 500 > 400 > 300 hierarchy visible while every step clears AA: `#b4bcc8` (7.67), `#9ca3af` (5.78), `#8b95a5` (4.85), placeholders `#9ca3af` (6.99).
+
+Also added the utilities the allowlist had drifted past but admin actually uses — `emerald`, `violet`, `indigo`, `teal`, `rose` text/background/border, `divide-gray-50`, `text-yellow-700` — and fixed the newsletter preview's cream `#f7f4ed` featured-book block, whose title and blurb were already invisible in dark mode because the theme lightens the `text-gray-*` utilities they used; that block keeps a fixed light ground in both themes, so its two lines are now set inline instead. All ratios verified by computation, not by eye.
+
 ## August 16, 2026 — Page header bar: dark, high-contrast, still the author's colour
 
 Andy flagged the header/title bar on the author sub-pages as washed out — light grey ground with white lettering, identical on every page. Measuring it showed the look was a genuine contrast failure rather than a taste question: `PageBanner` painted white text straight onto the author's raw accent, and **every live theme failed**. Brass `#c89b3c` gave 2.56:1 on the title and 1.81:1 on its 60%-opacity label; the PREMIUM grey `#b0b0b0` gave 2.17:1 and 1.63:1 — effectively invisible. That's 11 authors × 7 pages (About, Books, Contact, Blog, Courses, Flip Books, Specials).

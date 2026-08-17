@@ -460,6 +460,13 @@ input[type="file"] {
 
 [data-admin-theme="dark"] {
   color-scheme: dark;
+
+  /* Base inherited text colour. `body` sets #111827 (near-black), which any
+     admin element without an explicit text-gray-* class would otherwise
+     inherit — table cells, bare <p>/<span>/<label> — rendering near-black on
+     the dark card. Setting it here fixes every unclassed element at once;
+     elements that DO carry a text-* utility still win via the rules below. */
+  color: #e5e7eb;
 }
 
 /* — Backgrounds — */
@@ -478,9 +485,13 @@ input[type="file"] {
 [data-admin-theme="dark"] .text-gray-800  { color: #f3f4f6 !important; }
 [data-admin-theme="dark"] .text-gray-700  { color: #e5e7eb !important; }
 [data-admin-theme="dark"] .text-gray-600  { color: #d1d5db !important; }
-[data-admin-theme="dark"] .text-gray-500  { color: #9ca3af !important; }
-[data-admin-theme="dark"] .text-gray-400  { color: #6b7280 !important; }
-[data-admin-theme="dark"] .text-gray-300  { color: #4b5563 !important; }
+/* Secondary/muted text. These are NOT straight inversions of the light ramp —
+   they're picked to clear 4.5:1 against the card (#1f2937) while keeping the
+   500 > 400 > 300 hierarchy visible. text-gray-400 alone is used 560× in
+   admin, so its old #6b7280 (3.04:1) was the bulk of the "barely visible". */
+[data-admin-theme="dark"] .text-gray-500  { color: #b4bcc8 !important; }  /* 7.67:1 */
+[data-admin-theme="dark"] .text-gray-400  { color: #9ca3af !important; }  /* 5.78:1 */
+[data-admin-theme="dark"] .text-gray-300  { color: #8b95a5 !important; }  /* 4.85:1 (was 1.94) */
 
 /* — Status / alert backgrounds — */
 [data-admin-theme="dark"] .bg-blue-50     { background-color: rgba(37,  99, 235, 0.18) !important; }
@@ -528,7 +539,7 @@ input[type="file"] {
 }
 [data-admin-theme="dark"] input::placeholder,
 [data-admin-theme="dark"] textarea::placeholder {
-  color: #6b7280 !important;
+  color: #9ca3af !important;  /* 6.99:1 on the #111827 input background (was 3.67) */
 }
 [data-admin-theme="dark"] input:focus,
 [data-admin-theme="dark"] textarea:focus,
@@ -575,11 +586,68 @@ input[type="file"] {
 [data-admin-theme="dark"] .hover\:bg-purple-50:hover { background-color: rgba(147, 51, 234, 0.18) !important; }
 
 /* — Dividers — */
+[data-admin-theme="dark"] .divide-gray-50 > * + *,
 [data-admin-theme="dark"] .divide-gray-100 > * + *,
 [data-admin-theme="dark"] .divide-gray-200 > * + * { border-color: #374151 !important; }
 
 /* — Disabled / read-only input style (account info display fields) — */
 [data-admin-theme="dark"] .bg-gray-50.border-gray-200 { background-color: #1a2234 !important; }
+
+/* — Rich text editor (TipTap) —
+   The shared .rich-content / .tiptap-editor rules hardcode near-black text
+   (#111827 / #374151) for the light theme. The editor shell has no background
+   of its own, so it sits directly on the dark card — that combination was the
+   dark-gray-on-black reported in the editors. Re-point the colours here. */
+[data-admin-theme="dark"] .tiptap-editor .ProseMirror { color: #e5e7eb !important; }
+[data-admin-theme="dark"] .rich-content h1,
+[data-admin-theme="dark"] .rich-content h2,
+[data-admin-theme="dark"] .rich-content h3,
+[data-admin-theme="dark"] .rich-content h4 { color: #f9fafb !important; }
+[data-admin-theme="dark"] .rich-content p,
+[data-admin-theme="dark"] .rich-content li { color: #d1d5db !important; }
+[data-admin-theme="dark"] .rich-content blockquote {
+  color: #b4bcc8 !important;
+  border-left-color: #374151 !important;
+}
+[data-admin-theme="dark"] .rich-content hr { border-top-color: #374151 !important; }
+/* Inline code sits on a light #f3f4f6 chip and inherits its colour — without
+   this it would flip to light-on-light once the base colour above applies. */
+[data-admin-theme="dark"] .rich-content code {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #e5e7eb !important;
+}
+/* Highlight keeps its yellow chip, so its text must stay dark. */
+[data-admin-theme="dark"] .rich-content mark { color: #111827 !important; }
+
+/* — Palettes the allowlist above didn't cover but admin actually uses — */
+[data-admin-theme="dark"] .bg-emerald-50  { background-color: rgba(5, 150, 105, 0.18) !important; }
+[data-admin-theme="dark"] .bg-emerald-100 { background-color: rgba(5, 150, 105, 0.25) !important; }
+[data-admin-theme="dark"] .bg-indigo-50   { background-color: rgba(79,  70, 229, 0.18) !important; }
+[data-admin-theme="dark"] .bg-violet-50   { background-color: rgba(124, 58, 237, 0.18) !important; }
+[data-admin-theme="dark"] .bg-teal-50     { background-color: rgba(13, 148, 136, 0.18) !important; }
+
+[data-admin-theme="dark"] .border-emerald-100 { border-color: rgba(5, 150, 105, 0.30) !important; }
+[data-admin-theme="dark"] .border-emerald-200 { border-color: rgba(5, 150, 105, 0.45) !important; }
+[data-admin-theme="dark"] .border-indigo-200  { border-color: rgba(79,  70, 229, 0.45) !important; }
+[data-admin-theme="dark"] .border-violet-100  { border-color: rgba(124, 58, 237, 0.30) !important; }
+[data-admin-theme="dark"] .border-violet-200  { border-color: rgba(124, 58, 237, 0.45) !important; }
+
+[data-admin-theme="dark"] .text-emerald-600 { color: #6ee7b7 !important; }
+[data-admin-theme="dark"] .text-emerald-700 { color: #6ee7b7 !important; }
+[data-admin-theme="dark"] .text-emerald-800 { color: #a7f3d0 !important; }
+[data-admin-theme="dark"] .text-emerald-900 { color: #d1fae5 !important; }
+[data-admin-theme="dark"] .text-violet-400  { color: #c4b5fd !important; }
+[data-admin-theme="dark"] .text-violet-500  { color: #c4b5fd !important; }
+[data-admin-theme="dark"] .text-violet-600  { color: #c4b5fd !important; }
+[data-admin-theme="dark"] .text-violet-700  { color: #ddd6fe !important; }
+[data-admin-theme="dark"] .text-violet-900  { color: #ede9fe !important; }
+[data-admin-theme="dark"] .text-indigo-500  { color: #a5b4fc !important; }
+[data-admin-theme="dark"] .text-indigo-600  { color: #a5b4fc !important; }
+[data-admin-theme="dark"] .text-indigo-700  { color: #c7d2fe !important; }
+[data-admin-theme="dark"] .text-indigo-900  { color: #e0e7ff !important; }
+[data-admin-theme="dark"] .text-teal-600    { color: #5eead4 !important; }
+[data-admin-theme="dark"] .text-rose-500    { color: #fda4af !important; }
+[data-admin-theme="dark"] .text-yellow-700  { color: #fde047 !important; }
 
 /* Images inside the editor and on the public blog */
 .rich-content img,

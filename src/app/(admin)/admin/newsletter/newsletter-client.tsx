@@ -553,8 +553,12 @@ export function NewsletterClient({
                                 )}
                                 <div>
                                   <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>{featuredBook.eyebrow}</p>
-                                  <p className="text-base font-bold text-gray-800">{featuredBook.title}</p>
-                                  {featuredBook.blurb && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{featuredBook.blurb}</p>}
+                                  {/* This block keeps a fixed cream background in both themes, so
+                                      its text is set inline rather than via text-gray-* — the admin
+                                      dark theme lightens those utilities and would leave the title
+                                      and blurb invisible on the cream. */}
+                                  <p className="text-base font-bold" style={{ color: "#1f2937" }}>{featuredBook.title}</p>
+                                  {featuredBook.blurb && <p className="text-xs mt-1 line-clamp-2" style={{ color: "#6b7280" }}>{featuredBook.blurb}</p>}
                                   <span className="inline-block mt-2 px-4 py-1.5 rounded-full text-xs font-semibold text-white" style={{ backgroundColor: accentColor }}>{featuredBook.ctaLabel} →</span>
                                 </div>
                               </div>
