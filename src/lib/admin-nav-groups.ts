@@ -58,8 +58,9 @@ export interface NavGroup {
 }
 
 export const ADMIN_PINNED_ITEMS: NavItem[] = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/analytics", label: "Analytics",  icon: BarChart2      },
+  { href: "/admin/dashboard",       label: "Dashboard",        icon: LayoutDashboard },
+  { href: "/admin/getting-started", label: "Getting Started",  icon: ListChecks      },
+  { href: "/admin/analytics",       label: "Analytics",        icon: BarChart2       },
 ];
 
 export const NAV_GROUPS: NavGroup[] = [

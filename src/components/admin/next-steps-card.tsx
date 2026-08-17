@@ -77,6 +77,14 @@ export function NextStepsCard({
           </div>
         ))}
       </div>
+      <div className="px-5 py-3 border-t border-gray-100">
+        <Link
+          href="/admin/getting-started"
+          className="text-xs font-medium text-gray-400 hover:text-gray-600"
+        >
+          View the full setup checklist →
+        </Link>
+      </div>
     </div>
   );
 }

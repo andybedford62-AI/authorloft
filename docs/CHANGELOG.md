@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Getting Started: one page listing everything a new author can set up
+
+The pre-first-book onboarding modal and the dashboard's "Next Steps" card each track a handful of setup items (bio, first book, Stripe, direct-sale file) — useful as timed nudges, but neither is a place an author can go back to and see the *whole* picture of what's fillable on their site. Requested as a standalone reference: a full checklist covering every optional field, not just the ones the existing nudges already gate on.
+
+New page at `/admin/getting-started`, pinned in the sidebar (and therefore in the command palette, which reads from the same nav data) right under Dashboard. Eight sections — Account, Profile & Branding, Your First Book/Course, Contact & Social, Get Paid, Site Address, Press & Media Kit, Search Engines — each item checked live against the author's actual data (bio, socials, Stripe Connect, custom domain, press fields, SEO verification codes, and per-book completeness via the existing `getBookCompletionSummary`), with an overall progress bar and a "Go" link straight to the admin page that owns each field. Creator-type aware: shows "Your First Book," "Your First Course," or both depending on what the author chose at signup, matching how the existing onboarding modal already branches.
+
+Kept deliberately separate from the existing modal/Next Steps system rather than replacing it — those stay as timed, dismissible nudges; this is the durable reference they both now link to (`NextStepsCard` gained a footer link to it). No new fields, no schema changes — purely a read composed from `Author` and `Book` columns that already existed but had no single page surfacing all of them together.
+
 ## August 17, 2026 — Admin dark mode: text is actually readable
 
 Andy reported that authors using dark mode in the admin see content "barely visible" in text areas and data-entry fields — dark grey on black. Tracing it found three distinct causes rather than one, all in the `[data-admin-theme="dark"]` block in `globals.css`, which works as a hand-maintained allowlist of Tailwind utilities.
