@@ -69,7 +69,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── 2. Books Catalog (leads the page) ────────────────────────────── */}
-      <section className="py-14" style={{ backgroundColor: accentColor + "1f" }}>
+      <section className="py-14 md:py-16" style={{ backgroundColor: accentColor + "1f" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           <div className="flex items-center justify-between mb-8">
@@ -134,7 +134,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
 
       {/* ── 3. Series ────────────────────────────────────────────────────── */}
       {series.length > 0 && (
-        <section className="py-12 bg-white border-t border-gray-100">
+        <section className="py-12 md:py-16 bg-white border-t border-gray-100">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center gap-3 mb-7">
               <div className="w-1 h-7 rounded-full" style={{ backgroundColor: accentColor }} />
@@ -164,7 +164,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── 4. Compact Author Bio ─────────────────────────────────────────── */}
-      <section className="py-12 border-t border-gray-100" style={{ backgroundColor: accentColor + "14" }}>
+      <section className="py-12 md:py-16 border-t border-gray-100" style={{ backgroundColor: accentColor + "14" }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
@@ -197,7 +197,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       {/* Deliberately the most restrained of the four -- single column at the
           bio's width, reusing the accent-bar heading motif, since this
           template's whole premise is restraint. */}
-      <section className="py-12 bg-white border-t border-gray-100">
+      <section className="py-12 md:py-16 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
@@ -217,7 +217,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── 6. Contact CTA ───────────────────────────────────────────────── */}
-      <section className="py-10 bg-white border-t border-gray-100">
+      <section className="py-10 md:py-12 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-gray-900 font-semibold">Get in Touch</p>

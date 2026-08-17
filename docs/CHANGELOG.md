@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Classic/Minimal parity: spacing and one microcopy gap
+
+Continuing the same backlog item as the earlier heading-scale fix, same day. Found the identical "no responsive scaling" pattern in section padding: every Cinematic section pairs a base value with an `md:` step (`py-20 md:py-24`), while Classic and Minimal were flat (`py-16`, `py-12`, `py-10`) at every breakpoint — confirmed by grepping all three templates side by side rather than eyeballing it. Bumped each Classic/Minimal section one step, keeping the deliberately-quietest "Contact CTA" band on both templates the smallest bump on the page, preserving its place at the bottom of the existing hierarchy rather than flattening it.
+
+Scoped microcopy narrowly rather than attempting a full copy pass in the same sitting: Classic's "Featured Books" section was the one place with neither the small eyebrow label every other Classic section has (About, Series, Newsletter all lead with one) nor any personalization, while the Newsletter section right below it already does both well ("Letters from {firstName}"). Added "{firstName}'s Latest" above it — same eyebrow+heading structure Minimal's own "Books" section already uses, so no new layout pattern, just reused one already proven in this codebase.
+
+Broader microcopy across both templates, beyond this one gap, is still open — real per-template copy judgment, not something to rush through mechanically alongside a spacing pass.
+
 ## August 17, 2026 — Hero secondary CTA relabeled "Meet the Author"
 
 Andy asked whether the hero's second button ("Learn More," linking to `/about`) was even needed on Classic, since the homepage already has an "About the Author" section right below it — felt redundant. Checked `/about` before answering rather than guessing: it's not the same content. The homepage teaser uses `shortBio`; `/about` uses the full `bio` field plus stats, credentials, achievement badges, and an optional Media Kit tab — real depth that isn't surfaced on the homepage at all. So the button stays, but the label was the actual problem: "Learn More" directly above a section titled "About the Author" reads like a duplicate promise. Relabeled to "Meet the Author" across all three `hero-banner.tsx` layouts (portrait, mobile, desktop) — which costs nothing new to invent, since it's already the eyebrow label sitting above the author's name in the same component's photo column.

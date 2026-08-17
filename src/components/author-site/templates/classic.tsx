@@ -46,7 +46,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16" style={{ backgroundColor: accentColor + "1f" }}>
+      <section className="px-4 sm:px-6 py-16 md:py-20" style={{ backgroundColor: accentColor + "1f" }}>
         <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-10 items-start">
 
@@ -115,9 +115,18 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
 
       {/* ── Featured Books (top 3) ──────────────────────────────────────────── */}
       {books.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 md:pb-20">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">Featured Books</h2>
+            <div>
+              {/* Every other Classic section (About, Series, Newsletter) leads with
+                  a small eyebrow above its heading -- this one didn't, and unlike
+                  those it also wasn't personalized. Matches the pattern already
+                  proven by the Newsletter section below. */}
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
+                {firstName}&rsquo;s Latest
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">Featured Books</h2>
+            </div>
             <Link
               href="/books"
               className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
@@ -172,7 +181,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
 
       {/* ── Browse by Series ────────────────────────────────────────────────── */}
       {series.length > 0 && (
-        <section className="py-16" style={{ backgroundColor: accentColor + "1f" }}>
+        <section className="py-16 md:py-20" style={{ backgroundColor: accentColor + "1f" }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Explore</p>
@@ -251,7 +260,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       )}
 
       {/* ── Newsletter ───────────────────────────────────────────────────────── */}
-      <section className="py-16 bg-white border-t border-gray-100">
+      <section className="py-16 md:py-20 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
@@ -276,7 +285,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       </section>
 
       {/* ── Contact CTA ──────────────────────────────────────────────────────── */}
-      <section className="py-12" style={{ backgroundColor: accentColor + "15" }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: accentColor + "15" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Get in Touch</h2>
