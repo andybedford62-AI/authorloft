@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Menu, Zap } from "lucide-react";
 import Link from "next/link";
 import { AdminSidebar } from "@/components/admin/sidebar";
@@ -34,9 +34,13 @@ export function AdminShell({
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Close drawer whenever the route changes
-  useEffect(() => { setOpen(false); }, [pathname]);
+  // Close drawer whenever the route changes. Query string is included because
+  // some sidebar links only change the tab (e.g. /admin/settings?tab=appearance),
+  // which leaves the pathname untouched and would otherwise strand the drawer
+  // open over the page the user just navigated to.
+  useEffect(() => { setOpen(false); }, [pathname, searchParams]);
 
   return (
     <div className="flex flex-1 min-h-0">

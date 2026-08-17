@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Loader2, CheckCircle, Check, KeyRound, User, Mail, Banknote, AlertCircle, ExternalLink, Bot, Eye, EyeOff, Trash2, Sun, Moon, CreditCard, Zap, Bell, Globe, Award, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -1582,16 +1583,19 @@ function AccountTab() {
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
+  const searchParams = useSearchParams();
 
+  // Keyed on searchParams rather than running once on mount: the sidebar links
+  // to ?tab=appearance, and a user already sitting on Settings would otherwise
+  // stay on whatever tab they were on — client-side nav doesn't remount this.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get("tab") as SettingsTab | null;
+    const tabParam = searchParams.get("tab") as SettingsTab | null;
     if (tabParam && TABS.some((t) => t.id === tabParam)) {
       setActiveTab(tabParam);
     } else if (window.location.hash === "#billing") {
       setActiveTab("billing");
     }
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="space-y-0 max-w-2xl">
