@@ -56,7 +56,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>
                 About the Author
               </p>
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">{authorName}</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">{authorName}</h2>
             </div>
 
             <div
@@ -117,7 +117,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       {books.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 font-heading">Featured Books</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">Featured Books</h2>
             <Link
               href="/books"
               className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
@@ -176,7 +176,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Explore</p>
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">Browse by Series</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">Browse by Series</h2>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -258,7 +258,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
               <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
                 {firstName}&rsquo;s Newsletter
               </p>
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading tracking-tight">
                 Letters from {firstName}
               </h2>
               <p className="text-gray-500 mt-2 leading-relaxed">

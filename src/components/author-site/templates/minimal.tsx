@@ -77,7 +77,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
               <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
                 The Collection
               </p>
-              <h2 className="text-2xl font-bold text-gray-900 font-heading">Books</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-heading tracking-tight">Books</h2>
             </div>
             {books.length > 6 && (
               <Link
@@ -138,7 +138,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center gap-3 mb-7">
               <div className="w-1 h-7 rounded-full" style={{ backgroundColor: accentColor }} />
-              <h2 className="text-xl font-bold text-gray-900 font-heading">Series</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 font-heading">Series</h2>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -168,7 +168,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-1 h-6 rounded-full" style={{ backgroundColor: accentColor }} />
-            <h2 className="text-lg font-bold text-gray-900 font-heading">About {authorName}</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 font-heading">About {authorName}</h2>
           </div>
           <div
             className="text-gray-600 leading-relaxed text-sm rich-content"

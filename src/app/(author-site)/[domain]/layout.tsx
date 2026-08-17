@@ -50,6 +50,7 @@ async function resolveAuthor(domain: string) {
       googleSiteVerification: true,
       bingSiteVerification: true,
       siteTheme: true,
+      homeTemplate: true,
       customAccentColor: true,
       isActive: true,
       plan: {

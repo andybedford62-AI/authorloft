@@ -41,9 +41,44 @@ interface NavProps {
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
     plan?:        { flipBooksLimit: number } | null;
+    homeTemplate?: string | null;
   };
   navConfig?:   NavConfig;
   customPages?: CustomPage[];
+}
+
+// ── Template → nav variant ───────────────────────────────────────────────────
+// Cinematic and Bold both open on a dark hero/strip, so the fixed dark
+// --nav-bg reads as one continuous surface. Classic and Minimal (and any
+// unknown/future template) run light page bodies almost everywhere below
+// the hero, so the same dark bar reads as chrome bolted onto the wrong page
+// once the reader scrolls past the top. Light-nav is the default/fallback.
+function isDarkTemplate(homeTemplate?: string | null) {
+  return homeTemplate === "cinematic" || homeTemplate === "bold";
+}
+
+function navTokens(dark: boolean) {
+  return {
+    header:       dark ? "bg-[var(--nav-bg)] shadow-lg" : "bg-white border-b border-gray-100 shadow-sm",
+    logoText:     dark ? "text-white" : "text-gray-900",
+    logoIcon:     dark ? "text-white/70" : "text-gray-400",
+    dashboardBadge: dark
+      ? "border-white/20 text-white/60 hover:text-white hover:border-white/40"
+      : "border-gray-300 text-gray-500 hover:text-gray-900 hover:border-gray-400",
+    linkActive:   dark ? "text-white" : "text-gray-900",
+    linkInactive: dark
+      ? "text-white/60 hover:text-white hover:bg-white/10"
+      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100",
+    signOut:      dark ? "text-white/40 hover:text-white/80" : "text-gray-400 hover:text-gray-700",
+    cartIcon:     dark ? "text-white/70 hover:text-white" : "text-gray-500 hover:text-gray-900",
+    hamburger:    dark ? "text-white/60 hover:text-white" : "text-gray-500 hover:text-gray-900",
+    mobileBorder: dark ? "border-white/[0.08]" : "border-gray-100",
+    mobilePanel:  dark ? "bg-[var(--nav-bg)]" : "bg-white",
+    mobileLinkActive:   dark ? "text-white bg-white/10" : "text-gray-900 bg-gray-100",
+    mobileLinkInactive: dark
+      ? "text-white/60 hover:text-white hover:bg-white/10"
+      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100",
+  };
 }
 
 // ── Nav link builder ─────────────────────────────────────────────────────────
@@ -92,6 +127,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
+  const dark                = isDarkTemplate(author.homeTemplate);
+  const t                   = navTokens(dark);
 
   const platformBase  = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com"}`;
   const dashboardUrl  = `${platformBase}/admin/dashboard`;
@@ -105,7 +142,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--nav-bg)] shadow-lg">
+    <header className={cn("sticky top-0 z-50", t.header)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
         {/* ── Logo ─────────────────────────────────────────────────────── */}
@@ -120,8 +157,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               />
             ) : (
               <>
-                <BookOpen className="h-5 w-5 flex-shrink-0 text-white/70 transition-opacity group-hover:opacity-80" />
-                <span className="font-heading font-semibold text-white text-sm group-hover:opacity-80 transition-opacity">
+                <BookOpen className={cn("h-5 w-5 flex-shrink-0 transition-opacity group-hover:opacity-80", t.logoIcon)} />
+                <span className={cn("font-heading font-semibold text-sm group-hover:opacity-80 transition-opacity", t.logoText)}>
                   {author.displayName || author.name}
                 </span>
               </>
@@ -132,7 +169,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
           {isOwner && (
             <a
               href={dashboardUrl}
-              className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-colors"
+              className={cn("hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border transition-colors", t.dashboardBadge)}
               title="Go to your admin dashboard"
             >
               <LayoutDashboard className="h-3 w-3" />
@@ -150,10 +187,9 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               className={cn(
                 "px-3 py-1.5 text-sm font-body font-medium transition-colors relative",
                 isActive(link.href)
-                  ? "text-white after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-current"
-                  : "text-white/60 hover:text-white hover:bg-white/10 rounded-md"
+                  ? cn(t.linkActive, "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-current")
+                  : cn(t.linkInactive, "rounded-md")
               )}
-              style={isActive(link.href) ? { color: "white" } : {}}
             >
               {link.label}
             </Link>
@@ -164,7 +200,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               href={bookstoreUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 rounded-md transition-colors inline-flex items-center gap-1"
+              className={cn("px-3 py-1.5 text-sm font-body font-medium rounded-md transition-colors inline-flex items-center gap-1", t.linkInactive)}
               title="Discover more authors on the AuthorLoft Bookstore"
             >
               Bookstore
@@ -181,7 +217,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
           <div className="hidden md:flex items-center gap-3 flex-shrink-0">
             <button
               onClick={() => signOut({ callbackUrl: signOutUrl })}
-              className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/80 transition-colors"
+              className={cn("flex items-center gap-1.5 text-xs transition-colors", t.signOut)}
               title="Sign out"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -194,12 +230,14 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
         {itemCount > 0 && (
           <button
             onClick={openCart}
-            className="relative p-2 text-white/70 hover:text-white transition-colors"
+            className={cn("relative p-2 transition-colors", t.cartIcon)}
             aria-label={`Open cart (${itemCount} item${itemCount === 1 ? "" : "s"})`}
           >
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-white text-[10px] font-bold flex items-center justify-center leading-none"
-              style={{ color: accentColor }}>
+            {/* Accent-coloured badge (not white) so it reads on both the dark
+                and light nav variants without a separate light/dark swap. */}
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full text-white text-[10px] font-bold flex items-center justify-center leading-none"
+              style={{ backgroundColor: accentColor }}>
               {itemCount > 9 ? "9+" : itemCount}
             </span>
           </button>
@@ -208,7 +246,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
         {/* ── Mobile hamburger ──────────────────────────────────────────── */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
+          className={cn("md:hidden p-2 transition-colors", t.hamburger)}
           aria-label="Toggle menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -217,7 +255,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
 
       {/* ── Mobile menu ───────────────────────────────────────────────────── */}
       {open && (
-        <div className="md:hidden border-t bg-[var(--nav-bg)]" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+        <div className={cn("md:hidden border-t", t.mobilePanel, t.mobileBorder)}>
           <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
             {links.map((link) => (
               <Link
@@ -226,11 +264,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "px-3 py-2 rounded-md text-sm font-body font-medium transition-colors",
-                  isActive(link.href)
-                    ? "text-white bg-white/10"
-                    : "text-white/60 hover:text-white hover:bg-white/10"
+                  isActive(link.href) ? t.mobileLinkActive : t.mobileLinkInactive
                 )}
-                style={{}}
               >
                 {link.label}
               </Link>
@@ -242,7 +277,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 rounded-md text-sm font-body font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors inline-flex items-center gap-1.5"
+                className={cn("px-3 py-2 rounded-md text-sm font-body font-medium transition-colors inline-flex items-center gap-1.5", t.mobileLinkInactive)}
               >
                 Bookstore
                 <ExternalLink className="h-3 w-3 opacity-70" />
@@ -253,7 +288,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 here -- Login lives in the footer, not the reader's menu. */}
             {isOwner && (
               <>
-                <div className="border-t my-2" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+                <div className={cn("border-t my-2", t.mobileBorder)} />
                 <a
                   href={dashboardUrl}
                   onClick={() => setOpen(false)}
@@ -265,7 +300,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 </a>
                 <button
                   onClick={() => { setOpen(false); signOut({ callbackUrl: signOutUrl }); }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-white/40 hover:text-white/80 transition-colors text-left"
+                  className={cn("flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors text-left", t.signOut)}
                 >
                   <LogOut className="h-4 w-4" />
                   Sign out

@@ -180,8 +180,14 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
             </p>
           )}
 
+          {/* Title is its own link (alongside the cover above) rather than
+              adding a separate "Learn More" button below — cover + title is
+              the standard identity affordance; a third control pointing at
+              the same destination is restated, not restraint. */}
           <h3 className="text-lg font-bold text-gray-900 leading-tight">
-            {book.title}
+            <Link href={`/books/${book.slug}`} className="hover:text-[var(--accent)] transition-colors">
+              {book.title}
+            </Link>
             {book.subtitle && (
               <span className="font-normal text-gray-600">: {book.subtitle}</span>
             )}
@@ -208,32 +214,29 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
             </p>
           ) : null}
 
-          {/* Buy buttons */}
-          <div className="flex flex-wrap gap-2 items-center">
-            {/* Per-format direct sale items */}
-            {hasDirectSaleItems && (
-              <DirectBuyButtons items={book.directSaleItems!} slug={book.slug} size="sm" />
-            )}
+          {/* Buy buttons — omitted entirely when there's nothing to buy yet
+              (cover + title link to the detail page either way) */}
+          {(hasDirectSaleItems || hasRetailerLinks || book.externalBuyUrl) && (
+            <div className="flex flex-wrap gap-2 items-center">
+              {/* Per-format direct sale items */}
+              {hasDirectSaleItems && (
+                <DirectBuyButtons items={book.directSaleItems!} slug={book.slug} size="sm" />
+              )}
 
-            {/* Retailer links */}
-            {hasRetailerLinks ? (
-              <RetailerButtons links={book.retailerLinks!} size="sm" />
-            ) : !hasDirectSaleItems && book.externalBuyUrl ? (
-              <a href={book.externalBuyUrl} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" variant="primary">
-                  <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-                  Buy Now
-                  <ExternalLink className="h-3 w-3 ml-1.5" />
-                </Button>
-              </a>
-            ) : null}
-
-            <Link href={`/books/${book.slug}`}>
-              <Button size="sm" variant="outline">
-                Learn More
-              </Button>
-            </Link>
-          </div>
+              {/* Retailer links */}
+              {hasRetailerLinks ? (
+                <RetailerButtons links={book.retailerLinks!} size="sm" />
+              ) : !hasDirectSaleItems && book.externalBuyUrl ? (
+                <a href={book.externalBuyUrl} target="_blank" rel="noopener noreferrer">
+                  <Button size="sm" variant="primary">
+                    <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+                    Buy Now
+                    <ExternalLink className="h-3 w-3 ml-1.5" />
+                  </Button>
+                </a>
+              ) : null}
+            </div>
+          )}
 
           {/* Description */}
           {book.shortDescription && (
