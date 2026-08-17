@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 
-function isSuperAdmin(session: any) {
-  return !!(session?.user as any)?.isSuperAdmin;
-}
-
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
   const { name } = await req.json();
   if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
   const existing = await prisma.courseCategory.findUnique({ where: { id } });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!existing || existing.authorId !== authorId) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const newSlug = slugify(name.trim());
 
@@ -37,8 +32,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
   const category = await prisma.courseCategory.findUnique({
@@ -46,7 +41,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     include: { _count: { select: { children: true, courses: true } } },
   });
 
-  if (!category) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!category || category.authorId !== authorId) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (category._count.children > 0)
     return NextResponse.json({ error: "Remove all sub-categories first before deleting this category." }, { status: 409 });

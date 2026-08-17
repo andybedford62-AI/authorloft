@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 
-function isSuperAdmin(session: any) {
-  return !!(session?.user as any)?.isSuperAdmin;
-}
-
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Fetch all genres flat, then build tree in JS to avoid nested _count issues
+  // Fetch this author's genres flat, then build tree in JS to avoid nested _count issues
   const all = await prisma.genre.findMany({
+    where: { authorId },
     include: { _count: { select: { books: true } } },
     orderBy: { sortOrder: "asc" },
   });
@@ -35,13 +31,21 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isSuperAdmin(session)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const authorId = await getAdminAuthorIdForApi();
+  if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const authorId = (session!.user as any).id as string;
   const { name, parentId } = await req.json();
 
   if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
+
+  // A parent genre id must belong to this author too — otherwise an author
+  // could nest a new genre under another author's genre by guessing its id.
+  if (parentId) {
+    const parent = await prisma.genre.findUnique({ where: { id: parentId }, select: { authorId: true } });
+    if (!parent || parent.authorId !== authorId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+  }
 
   const baseSlug = slugify(name.trim());
 

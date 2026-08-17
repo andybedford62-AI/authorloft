@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Genre & Course Category management restored — was dead for every author
+
+Andy asked where to set a book's genre and, testing in incognito as a regular author, couldn't find it. Tracing it found the admin genre picker on the book form was never reachable by any real author — `docs/FEATURE_MATRIX.md` had "Genre Management (tag books)" marked ✅ on every tier, and `feature-gates.ts` already had `/admin/genres` set to `FREE`, but the actual page and API were hard-gated to `isSuperAdmin` (`genres/page.tsx` redirected any non-super-admin straight to the dashboard; the API returned 403). The sidebar link only existed inside the Super Admin "Platform" group, never in the regular author nav.
+
+`Genre` is an `authorId`-scoped model — same shape as `Series` — so this wasn't a "restrict to super admin" design choice, it contradicted the rest of the implementation: `prisma.genre.findMany({ where: { authorId } })` on the book form has always filtered to the current author's own rows, and no author could ever create one. Worse, even a super admin using the page wrote genres under their *own* `authorId` (`session.user.id`) rather than managing any other author's list, so it didn't function as a platform-wide tool either — and the GET handler had no `authorId` filter at all, returning every author's genres unscoped (latent, since the page was never populated with real multi-author data, but a real cross-tenant leak in the query as written).
+
+`CourseCategory` had the identical bug, byte-for-byte — same `isSuperAdmin` gate, same missing `where: { authorId }`, same super-admin-writes-to-own-account flaw, also unreachable from the sidebar, feeding the equally-live category picker on the course form.
+
+Fixed both: page components dropped the client-side `isSuperAdmin` redirect (the `(admin)` layout already enforces auth for every route, same as `/admin/series`); API routes swapped the `isSuperAdmin` check for `getAdminAuthorIdForApi()` — the same impersonation-aware helper every other admin API already uses — added a `where: { authorId }` filter to the list endpoints, and added an ownership check on update/delete-by-id (an author could otherwise edit or delete another author's genre by guessing its id) and on the parent-id supplied at create time. Moved both nav entries from the Super Admin "Platform" group into the regular Catalog group, next to Series and Courses respectively — visible to every author, and still visible to a super admin managing their own account or an impersonated author's, matching how every other admin page already behaves under impersonation.
+
 ## August 17, 2026 — Getting Started: one page listing everything a new author can set up
 
 The pre-first-book onboarding modal and the dashboard's "Next Steps" card each track a handful of setup items (bio, first book, Stripe, direct-sale file) — useful as timed nudges, but neither is a place an author can go back to and see the *whole* picture of what's fillable on their site. Requested as a standalone reference: a full checklist covering every optional field, not just the ones the existing nudges already gate on.

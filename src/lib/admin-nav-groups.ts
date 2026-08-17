@@ -67,12 +67,14 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "catalog", label: "Catalog", defaultOpen: true,
     items: [
-      { href: "/admin/books",      label: "Books",      icon: BookOpen      },
-      { href: "/admin/series",     label: "Series",     icon: Library       },
-      { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked    },
-      { href: "/admin/bundles",    label: "Bundles",    icon: Package       },
-      { href: "/admin/courses",    label: "Courses",    icon: GraduationCap },
-      { href: "/admin/specials",   label: "Specials",   icon: Sparkles      },
+      { href: "/admin/books",              label: "Books",             icon: BookOpen      },
+      { href: "/admin/series",             label: "Series",            icon: Library       },
+      { href: "/admin/genres",             label: "Genres",            icon: Tag           },
+      { href: "/admin/flip-books",         label: "Flip Books",        icon: BookMarked    },
+      { href: "/admin/bundles",            label: "Bundles",           icon: Package       },
+      { href: "/admin/courses",            label: "Courses",           icon: GraduationCap },
+      { href: "/admin/course-categories",  label: "Course Categories", icon: FolderTree    },
+      { href: "/admin/specials",           label: "Specials",          icon: Sparkles      },
     ],
   },
   {
@@ -168,8 +170,9 @@ export const SUPER_ADMIN_GROUPS: NavGroup[] = [
   {
     key: "sa-platform", label: "Platform", defaultOpen: false,
     items: [
-      { href: "/admin/genres",           label: "Genres",             icon: Tag        },
-      { href: "/admin/course-categories",label: "Course Categories",  icon: GraduationCap },
+      // Genres and Course Categories moved to the regular author Catalog group —
+      // both are per-author data (Genre/CourseCategory are authorId-scoped), not
+      // platform-wide config, so they don't belong in this super-admin-only block.
       { href: "/super-admin/help",       label: "Help Articles",      icon: HelpCircle },
       { href: "/super-admin/legal",      label: "Platform Legal",     icon: Shield     },
       { href: "/super-admin/settings",   label: "Platform Settings",  icon: Settings   },
