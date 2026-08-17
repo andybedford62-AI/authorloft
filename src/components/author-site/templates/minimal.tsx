@@ -220,7 +220,7 @@ export function MinimalTemplate({ author, books, series }: HomeTemplateProps) {
       <section className="py-10 md:py-12 bg-white border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <p className="text-gray-900 font-semibold">Get in Touch</p>
+            <p className="text-gray-900 font-semibold">Get in Touch with {firstName}</p>
             <p className="text-gray-500 text-sm mt-0.5">Inquiries, collaborations, and media welcome.</p>
           </div>
           <Link href="/contact">

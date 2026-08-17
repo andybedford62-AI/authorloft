@@ -288,7 +288,7 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
       <section className="py-12 md:py-16" style={{ backgroundColor: accentColor + "15" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Get in Touch</h2>
+            <h2 className="text-xl font-bold text-gray-900">Get in Touch with {firstName}</h2>
             <p className="text-gray-500 text-sm mt-1">Inquiries, collaborations, and media welcome.</p>
           </div>
           <Link href="/contact">

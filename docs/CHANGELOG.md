@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## August 17, 2026 — Classic/Minimal parity closed out: last microcopy gap
+
+Final piece of the same backlog item as today's earlier heading-scale and spacing fixes. Rather than guess at a broader copy rewrite, audited every remaining static string in both templates first. Most of it turned out fine: every section already personalizes with the author's name or first name (hero CTAs, newsletter, and now Featured Books), and a couple of things that read as "generic" on first glance — Classic's "About the Author" eyebrow, for instance — aren't actually behind Cinematic, which uses an equally plain "About" for the same spot. The one real gap, present in *both* templates identically, was the closing "Contact CTA" band: "Get in Touch" / "Inquiries, collaborations, and media welcome." was the only section in either template that never referenced the author by name. Retitled to "Get in Touch with {firstName}" in both; left the body line alone since nothing about it was actually dated.
+
+This closes the type-scale/spacing/microcopy item from the Aug 16 audit. What's left from that day's backlog: the two aggregate-rating display gaps (homepage hero, book-page reviews) and the contact-form Subject dropdown trim — none blocking, none touched today.
+
 ## August 17, 2026 — Classic/Minimal parity: spacing and one microcopy gap
 
 Continuing the same backlog item as the earlier heading-scale fix, same day. Found the identical "no responsive scaling" pattern in section padding: every Cinematic section pairs a base value with an `md:` step (`py-20 md:py-24`), while Classic and Minimal were flat (`py-16`, `py-12`, `py-10`) at every breakpoint — confirmed by grepping all three templates side by side rather than eyeballing it. Bumped each Classic/Minimal section one step, keeping the deliberately-quietest "Contact CTA" band on both templates the smallest bump on the page, preserving its place at the bottom of the existing hierarchy rather than flattening it.
