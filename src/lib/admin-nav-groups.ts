@@ -176,3 +176,7 @@ export const SUPER_ADMIN_GROUPS: NavGroup[] = [
     ],
   },
 ];
+
+// Deploy trigger: verifying Vercel's GitHub deployment hook after two
+// consecutive pushes (a788be20, 0420c1f5) produced no deployment at all.
+// Safe to remove once confirmed.
