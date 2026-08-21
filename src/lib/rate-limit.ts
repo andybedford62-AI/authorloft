@@ -1,8 +1,14 @@
-import { NextRequest } from "next/server";
-import { createClient } from "redis";
+import type { NextRequest } from "next/server";
+import type { createClient } from "redis";
 
 // ── Redis client (module-level singleton, reused across warm invocations) ──────
-let _redisClient: ReturnType<typeof createClient> | null = null;
+// Both imports above are type-only on purpose: `NextRequest` is just an
+// annotation, and the `redis` client is pulled in lazily below. Importing
+// either eagerly drags Next's server runtime and the whole redis package into
+// every module that touches rate limiting — needless work when REDIS_URL is
+// unset (tests, local runs) and the in-memory fallback is all that's used.
+type RedisClient = ReturnType<typeof createClient>;
+let _redisClient: RedisClient | null = null;
 
 // Skip Redis entirely for a cooldown after a failed connect. Without this,
 // every request re-pays the full connect-and-retry cost while Redis is down —
@@ -21,12 +27,13 @@ const REDIS_SOCKET_OPTIONS = {
     retries >= 2 ? new Error("Redis unreachable") : Math.min((retries + 1) * 100, 500),
 };
 
-async function getRedisClient(): Promise<ReturnType<typeof createClient> | null> {
+async function getRedisClient(): Promise<RedisClient | null> {
   if (!process.env.REDIS_URL) return null;
   if (_redisClient && _redisClient.isOpen) return _redisClient;
   if (Date.now() < _redisUnavailableUntil) return null;
   try {
-    _redisClient = createClient({ url: process.env.REDIS_URL, socket: REDIS_SOCKET_OPTIONS });
+    const { createClient: create } = await import("redis");
+    _redisClient = create({ url: process.env.REDIS_URL, socket: REDIS_SOCKET_OPTIONS });
     _redisClient.on("error", () => { _redisClient = null; });
     await _redisClient.connect();
     return _redisClient;

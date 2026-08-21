@@ -13,6 +13,19 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — `npx vitest run` is reliable again (flaky login-rate-limit test)
+
+`src/__tests__/login-rate-limit.test.ts` passed in isolation but timed out under a full-suite run, with the number of failures varying between runs — 1 in one run, 4 in another. Two independent causes, both fixed:
+
+- **Worktree duplication.** Vitest's default globs were picking up `.claude/worktrees/*/src/__tests__/*`. Every Claude Code worktree is a full checkout, so each one contributed a second parallel copy of the entire suite — 9 test files where there should be 5. That contention is what pushed import-heavy tests past the 5s timeout, and why the failure count moved around depending on how many worktrees happened to exist. Excluded via `**/.claude/**` in `vitest.config.ts`.
+- **Per-test module re-resolution.** `beforeEach(vi.resetModules())` plus a per-test `await import()` re-resolved a dependency graph that transitively pulled in `next/server` and the whole `redis` package — ~216ms of import cost wrapped around ~13ms of actual logic. The tests now import the limiter once at the top and isolate by using a distinct email per case (the limiter keys its buckets by email, so that's sufficient and far cheaper). First test went from ~250ms to 1–4ms. The fake-timer case also gained a `try/finally` so timers can't leak into whatever runs next in the worker.
+
+Supporting change in `src/lib/rate-limit.ts`: `NextRequest` and `createClient` are now type-only imports and the `redis` client is loaded lazily inside `getRedisClient()`, so nothing that merely touches rate limiting drags Next's server runtime and all of redis into its graph. This composes with the same day's Redis hang fix — the lazy `import("redis")` still passes the bounded `socket` options.
+
+No timeout was raised and nothing was skipped — the suite is genuinely faster, not more tolerant. Verified with 5 consecutive clean full-suite runs (5 files, 26 tests, green every time).
+
+Diagnosed and fixed in a separate session working in its own worktree; merged here on top of the Redis fix.
+
 ## August 21, 2026 — Rate limiter hung forever when Redis was unreachable
 
 Found by the session fixing the flaky rate-limit test, and independently reproduced here before acting on it — this one is a genuine production availability risk, not a test artifact.
