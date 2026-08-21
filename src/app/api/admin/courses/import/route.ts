@@ -64,6 +64,14 @@ export async function POST(req: NextRequest) {
   const usedTitles = new Set(existingCourses.map((c) => c.title.toLowerCase()));
   const usedSlugs  = new Set(existingCourses.map((c) => c.slug));
 
+  // Course Categories are ONE shared, Super Admin-curated taxonomy (read
+  // unscoped by authorId — see api/admin/course-categories/route.ts). So a CSV
+  // category is matched against the existing list, never auto-created: letting
+  // importers mint categories would fragment the curated taxonomy.
+  const existingCategories = await prisma.courseCategory.findMany({ select: { id: true, name: true } });
+  const categoryByName = new Map(existingCategories.map((c) => [c.name.trim().toLowerCase(), c.id]));
+  const unmatchedCategories = new Set<string>();
+
   let imported = 0;
 
   await prisma.$transaction(async (tx) => {
@@ -71,12 +79,27 @@ export async function POST(req: NextRequest) {
       const title = uniqueTitle(course.title.trim(), usedTitles);
       const slug = uniqueSlug(slugify(title) || "course", usedSlugs);
 
+      const categoryIds: string[] = [];
+      for (const rawName of course.categoryNames ?? []) {
+        const name = rawName.trim();
+        if (!name) continue;
+        const id = categoryByName.get(name.toLowerCase());
+        if (id) {
+          if (!categoryIds.includes(id)) categoryIds.push(id);
+        } else {
+          unmatchedCategories.add(name);
+        }
+      }
+
       await tx.course.create({
         data: {
           authorId,
           title,
           slug,
           description: course.description || null,
+          ...(categoryIds.length > 0
+            ? { categories: { create: categoryIds.map((categoryId) => ({ categoryId })) } }
+            : {}),
           modules: {
             create: (course.modules ?? []).map((mod, mi) => ({
               title: mod.title?.trim() || `Module ${mi + 1}`,
@@ -100,6 +123,15 @@ export async function POST(req: NextRequest) {
       imported++;
     }
   });
+
+  if (unmatchedCategories.size > 0) {
+    const names = Array.from(unmatchedCategories).sort();
+    const shown = names.slice(0, 5).join(", ");
+    const rest = names.length > 5 ? `, and ${names.length - 5} more` : "";
+    warnings.push(
+      `${names.length} categor${names.length === 1 ? "y" : "ies"} in your file didn't match an existing course category and were skipped: ${shown}${rest}. Ask an administrator to add them, then set them on the course.`
+    );
+  }
 
   // Mirror the side effects from POST /api/admin/courses — a course creator
   // may onboard entirely through an import, so their first course(s) still

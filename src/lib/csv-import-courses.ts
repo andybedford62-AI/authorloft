@@ -3,13 +3,14 @@
 // one row per lesson, with Course Title / Module Title repeated across rows
 // to signal grouping. See src/lib/csv-import.ts for the (flat) Books version.
 
-import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE_BYTES } from "@/lib/csv-import";
+import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE_BYTES, splitList } from "@/lib/csv-import";
 
 export { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE_BYTES };
 
 export type CourseLessonFieldKey =
   | "courseTitle"
   | "courseDescription"
+  | "categoryNames"
   | "moduleTitle"
   | "moduleOrder"
   | "lessonTitle"
@@ -20,6 +21,7 @@ export type CourseLessonFieldKey =
 export const COURSE_LESSON_FIELDS: { key: CourseLessonFieldKey; label: string; required?: boolean; hint?: string }[] = [
   { key: "courseTitle",       label: "Course Title",       required: true },
   { key: "courseDescription", label: "Course Description" },
+  { key: "categoryNames",     label: "Category",           hint: "Must match an existing course category; unknown names are skipped" },
   { key: "moduleTitle",       label: "Module Title",       hint: "Defaults to \"Module 1\", \"Module 2\"… if blank" },
   { key: "moduleOrder",       label: "Module Order" },
   { key: "lessonTitle",       label: "Lesson Title",       required: true },
@@ -36,6 +38,7 @@ export type CourseColumnMapping = Partial<Record<CourseLessonFieldKey, string>>;
 const FIELD_ALIASES: Record<CourseLessonFieldKey, string[]> = {
   courseTitle:       ["course title", "course name", "course"],
   courseDescription: ["course description", "description"],
+  categoryNames:     ["category", "categories", "course category", "course categories", "topic", "subject"],
   moduleTitle:       ["module title", "module name", "module", "section", "section title", "chapter"],
   moduleOrder:       ["module order", "module #", "section order", "order"],
   lessonTitle:       ["lesson title", "lesson name", "lesson", "lecture", "lecture title"],
@@ -68,6 +71,7 @@ export function detectMapping(headers: string[]): CourseColumnMapping {
 export type MappedLessonRow = {
   courseTitle: string;
   courseDescription: string | null;
+  categoryNames: string[];
   moduleTitle: string | null;
   moduleOrder: number | null;
   lessonTitle: string;
@@ -91,6 +95,7 @@ export function mapLessonRow(row: Record<string, string>, mapping: CourseColumnM
   return {
     courseTitle:       get("courseTitle"),
     courseDescription: get("courseDescription") || null,
+    categoryNames:     get("categoryNames") ? splitList(get("categoryNames")) : [],
     moduleTitle:       get("moduleTitle") || null,
     moduleOrder:       moduleOrderRaw ? (parseInt(moduleOrderRaw, 10) || null) : null,
     lessonTitle:       get("lessonTitle"),
@@ -118,6 +123,7 @@ export type MappedCourseImportModule = {
 export type MappedCourseImport = {
   title: string;
   description: string | null;
+  categoryNames: string[];
   modules: MappedCourseImportModule[];
 };
 
@@ -130,7 +136,7 @@ export function groupRowsIntoCourses(rows: MappedLessonRow[]): MappedCourseImpor
   const validRows = rows.filter((r) => r.courseTitle.trim() !== "" && r.lessonTitle.trim() !== "");
 
   type ModuleAcc = { title: string; order: number | null; firstSeen: number; lessons: MappedCourseImportLesson[] };
-  type CourseAcc = { title: string; description: string | null; firstSeen: number; modules: Map<string, ModuleAcc> };
+  type CourseAcc = { title: string; description: string | null; categoryNames: Map<string, string>; firstSeen: number; modules: Map<string, ModuleAcc> };
 
   const courses = new Map<string, CourseAcc>();
   let seenIndex = 0;
@@ -139,10 +145,19 @@ export function groupRowsIntoCourses(rows: MappedLessonRow[]): MappedCourseImpor
     const courseKey = row.courseTitle.trim().toLowerCase();
     let course = courses.get(courseKey);
     if (!course) {
-      course = { title: row.courseTitle.trim(), description: row.courseDescription, firstSeen: seenIndex++, modules: new Map() };
+      course = { title: row.courseTitle.trim(), description: row.courseDescription, categoryNames: new Map(), firstSeen: seenIndex++, modules: new Map() };
       courses.set(courseKey, course);
     } else if (!course.description && row.courseDescription) {
       course.description = row.courseDescription;
+    }
+
+    // Categories are course-level; union them across every row of the course,
+    // de-duped case-insensitively but keeping the first-seen spelling.
+    for (const name of row.categoryNames) {
+      const trimmed = name.trim();
+      if (trimmed && !course.categoryNames.has(trimmed.toLowerCase())) {
+        course.categoryNames.set(trimmed.toLowerCase(), trimmed);
+      }
     }
 
     const moduleTitle = row.moduleTitle?.trim() || `Module ${course.modules.size + 1}`;
@@ -168,6 +183,7 @@ export function groupRowsIntoCourses(rows: MappedLessonRow[]): MappedCourseImpor
     .map((course) => ({
       title: course.title,
       description: course.description,
+      categoryNames: Array.from(course.categoryNames.values()),
       modules: Array.from(course.modules.values())
         .sort((a, b) => (a.order ?? a.firstSeen) - (b.order ?? b.firstSeen))
         .map((m, i) => ({ title: m.title, order: i, lessons: m.lessons })),

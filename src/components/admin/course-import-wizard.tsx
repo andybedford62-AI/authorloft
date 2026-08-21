@@ -388,6 +388,13 @@ export function CourseImportWizard({ remainingSlots, maxCourses, planTier }: Pro
                   </button>
                   {!isCollapsed && (
                     <div className="pb-2 pl-9 pr-3 space-y-2">
+                      {course.categoryNames.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {course.categoryNames.map((name) => (
+                            <Badge key={name} variant="outline" className="text-[10px] py-0">{name}</Badge>
+                          ))}
+                        </div>
+                      )}
                       {course.modules.map((module, mi) => (
                         <div key={mi}>
                           <p className="text-xs font-semibold text-gray-500 mb-1">{module.title}</p>

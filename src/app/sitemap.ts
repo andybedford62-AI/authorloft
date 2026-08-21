@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "author-media-kit",
     "ai-tools-for-authors",
     "indie-author-bookstore",
+    "author-courses",
     "book-pre-orders",
     "author-affiliate-program",
     "reader-analytics-for-authors",

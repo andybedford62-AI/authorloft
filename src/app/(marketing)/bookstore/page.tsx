@@ -86,38 +86,67 @@ export default async function BookstorePage() {
   };
 
   // Structured data
+  const bookListItems = books.slice(0, 100).map((b, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Book",
+      name: b.title,
+      url: b.bookUrl,
+      author: { "@type": "Person", name: b.authorName },
+      ...(b.coverImageUrl ? { image: b.coverImageUrl } : {}),
+      ...(b.averageRating !== null && b.ratingCount > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: b.averageRating,
+              ratingCount: b.ratingCount,
+              bestRating: 5,
+              worstRating: 1,
+            },
+          }
+        : {}),
+    },
+  }));
+
+  // Courses continue the same ItemList numbering after the books.
+  // schema.org Course requires name/description/provider, so description falls
+  // back rather than emitting an incomplete entity.
+  const courseListItems = courses.slice(0, 100).map((c, i) => ({
+    "@type": "ListItem",
+    position: bookListItems.length + i + 1,
+    item: {
+      "@type": "Course",
+      name: c.title,
+      url: c.courseUrl,
+      description: c.description || `An online course by ${c.authorName}.`,
+      provider: { "@type": "Person", name: c.authorName, url: c.authorUrl },
+      ...(c.coverImageUrl ? { image: c.coverImageUrl } : {}),
+      ...(c.averageRating !== null && c.ratingCount > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: c.averageRating,
+              ratingCount: c.ratingCount,
+              bestRating: 5,
+              worstRating: 1,
+            },
+          }
+        : {}),
+    },
+  }));
+
   const collectionLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "AuthorLoft Bookstore",
-    description: "Browse books from independent authors on AuthorLoft across every genre.",
+    description: "Browse books and courses from independent authors on AuthorLoft across every genre.",
     url: `${BASE}/bookstore`,
     isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: BASE },
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: books.length,
-      itemListElement: books.slice(0, 100).map((b, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        item: {
-          "@type": "Book",
-          name: b.title,
-          url: b.bookUrl,
-          author: { "@type": "Person", name: b.authorName },
-          ...(b.coverImageUrl ? { image: b.coverImageUrl } : {}),
-          ...(b.averageRating !== null && b.ratingCount > 0
-            ? {
-                aggregateRating: {
-                  "@type": "AggregateRating",
-                  ratingValue: b.averageRating,
-                  ratingCount: b.ratingCount,
-                  bestRating: 5,
-                  worstRating: 1,
-                },
-              }
-            : {}),
-        },
-      })),
+      numberOfItems: bookListItems.length + courseListItems.length,
+      itemListElement: [...bookListItems, ...courseListItems],
     },
   };
 

@@ -13,6 +13,19 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — Course-creator quick wins: marketing page, course JSON-LD, CSV categories
+
+Three small, independent course-creator backlog items in one pass, picked for ROI-per-effort:
+
+- **`/author-courses` marketing landing page.** Courses have shipped incrementally since June but had no page pitching them as a reason to sign up — the Solutions menu listed ten other capabilities and not this one. Built on the existing `LANDING_PAGES`/`LandingPage` pattern, so it's data not new components. Copy is written against what the feature actually does (module/lesson tree, external video embeds, per-lesson attachments, free-or-paid, discount codes, print export, Bookstore listing) rather than generic course-platform claims; the plan-tier FAQ answer was checked against the live `Plan` table (FREE 5 / STANDARD 20 / PREMIUM unlimited) instead of the marketing page's copy. Registered in all five nav/SEO registries plus the sitemap — the page is only as discoverable as the registry it's missing from.
+- **Fixed the same double-suffix `<title>` bug on all 11 existing solution pages.** Found while adding the twelfth: every one rendered as "… | AuthorLoft | AuthorLoft", same root cause as the homepage fix earlier today (the root layout's `%s | AuthorLoft` template stacking on a `metaTitle` that already carried the suffix). Stripped the suffix from all 11 `metaTitle` values and moved it to the explicit `openGraph`/`twitter` titles, which don't run through the template. All 12 page files are now byte-identical boilerplate, verified by diff.
+- **Courses in the Bookstore's structured data.** `/bookstore`'s `ItemList` only described `@type: Book`, so every listed course was invisible to search-engine rich results. Courses now continue the same list's position numbering with `provider`, `image`, and `aggregateRating`. `description` falls back to "An online course by {author}." rather than emitting an entity missing a field Google requires.
+- **`Category` column in the course CSV importer.** Migrating creators previously had to hand-tag every imported course. Now auto-detected by header alias, split on `,`/`;`/`|`, unioned across a course's rows, de-duped case-insensitively, shown as chips in the wizard preview, and written as `CourseCategoryAssignment` rows. **Implemented as match-only, deliberately diverging from the backlog's "match-or-create like the Books importer"**: course categories are one shared, Super Admin-curated taxonomy (per the Aug 17 fix), so an importer minting new ones would re-fragment precisely what that fix consolidated. Unmatched names are skipped and named back to the author in the import warnings. The shipped CSV template gained the column, using real category names so it imports cleanly out of the box.
+
+Added `src/__tests__/csv-import-courses.test.ts` (4 tests) covering header auto-detect, the full template's course tree, multi-value splitting with case-insensitive de-dupe, and the no-column case.
+
+**Unrelated pre-existing issue found:** `src/__tests__/login-rate-limit.test.ts` is flaky under a full-suite run (passes alone; fails 1–4 tests with 5s timeouts when run alongside the others, count varying by run). Confirmed pre-existing by stashing all of today's work and reproducing it on a clean tree. Not touched here — flagged for its own fix.
+
 ## August 21, 2026 — Conversion audit fixes: hero image weight, broken title tag, unlabeled forms
 
 Ran a live conversion/UX audit against production (DOM, network, console, and a11y-tree inspection — not a synthetic scan) and fixed everything actionable in one pass:

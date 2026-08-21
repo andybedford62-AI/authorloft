@@ -27,7 +27,7 @@ export interface LandingPageData {
 export const LANDING_PAGES: Record<string, LandingPageData> = {
   "author-website-builder": {
     slug: "author-website-builder",
-    metaTitle: "Author Website Builder — Create Your Author Site in Minutes | AuthorLoft",
+    metaTitle: "Author Website Builder — Create Your Author Site in Minutes",
     metaDescription: "Build a professional author website with book pages, blog, custom domain, and direct sales — no coding required. Free to start.",
     eyebrow: "Author Website Builder",
     heroTitle: <>Build a professional author website <span className="italic text-[#D4AE6A]">without code</span></>,
@@ -81,7 +81,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "sell-books-directly": {
     slug: "sell-books-directly",
-    metaTitle: "Sell Books Directly to Readers — Keep 100% of Revenue | AuthorLoft",
+    metaTitle: "Sell Books Directly to Readers — Keep 100% of Revenue",
     metaDescription: "Sell ebooks, print books, and audiobooks directly to readers. Keep 100% of your revenue with AuthorLoft's built-in direct sales platform.",
     eyebrow: "Direct Book Sales",
     heroTitle: <>Sell books directly and <span className="italic text-[#D4AE6A]">keep every dollar</span></>,
@@ -134,7 +134,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "book-marketing-platform": {
     slug: "book-marketing-platform",
-    metaTitle: "Book Marketing Platform for Independent Authors | AuthorLoft",
+    metaTitle: "Book Marketing Platform for Independent Authors",
     metaDescription: "Market your books with AI-powered social media posts, SEO tools, pre-order campaigns, affiliate programs, and bookstore discovery — all in one platform.",
     eyebrow: "Book Marketing",
     heroTitle: <>Market your books <span className="italic text-[#D4AE6A]">like a publishing house</span></>,
@@ -187,7 +187,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-newsletter-platform": {
     slug: "author-newsletter-platform",
-    metaTitle: "Author Newsletter & Email List Platform | AuthorLoft",
+    metaTitle: "Author Newsletter & Email List Platform",
     metaDescription: "Build your author email list with built-in subscriber forms, reader magnets, and Mailchimp integration. Own your audience — no middleman.",
     eyebrow: "Author Newsletter",
     heroTitle: <>Build an email list that <span className="italic text-[#D4AE6A]">you own</span></>,
@@ -240,7 +240,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "arc-management": {
     slug: "arc-management",
-    metaTitle: "ARC Management for Authors — Collect Reviews & Build Your ARC Team | AuthorLoft",
+    metaTitle: "ARC Management for Authors — Collect Reviews & Build Your ARC Team",
     metaDescription: "Manage advance reader copies, collect reader reviews, and display approved feedback on your book pages — all built into your author platform.",
     eyebrow: "ARC Management",
     heroTitle: <>Build your ARC team and <span className="italic text-[#D4AE6A]">collect reviews</span></>,
@@ -293,7 +293,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-media-kit": {
     slug: "author-media-kit",
-    metaTitle: "Author Media Kit Generator — Professional Press Kit | AuthorLoft",
+    metaTitle: "Author Media Kit Generator — Professional Press Kit",
     metaDescription: "Auto-generate a professional author media kit with bio, headshots, book covers, and press-ready assets. Perfect for interviews, podcasts, and events.",
     eyebrow: "Author Media Kit",
     heroTitle: <>A professional press kit, <span className="italic text-[#D4AE6A]">always ready</span></>,
@@ -346,7 +346,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "ai-tools-for-authors": {
     slug: "ai-tools-for-authors",
-    metaTitle: "AI Tools for Authors — Social Posts, SEO Audit & Writing Assistant | AuthorLoft",
+    metaTitle: "AI Tools for Authors — Social Posts, SEO Audit & Writing Assistant",
     metaDescription: "AI-powered tools for independent authors: social media post generator, SEO auditor, writing assistant, and reader feedback analysis. Built for authors, not marketers.",
     eyebrow: "AI Tools for Authors",
     heroTitle: <>AI tools built for <span className="italic text-[#D4AE6A]">authors, not marketers</span></>,
@@ -399,7 +399,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "indie-author-bookstore": {
     slug: "indie-author-bookstore",
-    metaTitle: "Indie Author Bookstore — Discover & Sell Independent Books | AuthorLoft",
+    metaTitle: "Indie Author Bookstore — Discover & Sell Independent Books",
     metaDescription: "A curated bookstore for independent authors. List your books, get discovered by genre, and reach new readers through AuthorLoft's shared catalog.",
     eyebrow: "Indie Bookstore",
     heroTitle: <>A bookstore where <span className="italic text-[#D4AE6A]">indie authors are the stars</span></>,
@@ -451,7 +451,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "book-pre-orders": {
     slug: "book-pre-orders",
-    metaTitle: "Book Pre-Order Pages for Authors — Countdown, Signups & Launch | AuthorLoft",
+    metaTitle: "Book Pre-Order Pages for Authors — Countdown, Signups & Launch",
     metaDescription: "Create pre-order pages with launch countdowns, email signups, and automatic notifications. Build anticipation and capture readers before your book drops.",
     eyebrow: "Book Pre-Orders",
     heroTitle: <>Build anticipation <span className="italic text-[#D4AE6A]">before launch day</span></>,
@@ -504,7 +504,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-affiliate-program": {
     slug: "author-affiliate-program",
-    metaTitle: "Author Affiliate Program — Let Fans Sell Your Books | AuthorLoft",
+    metaTitle: "Author Affiliate Program — Let Fans Sell Your Books",
     metaDescription: "Built-in affiliate program for authors. Let book bloggers, fans, and influencers earn commission promoting your books with tracked referral links.",
     eyebrow: "Affiliate Program",
     heroTitle: <>Let your biggest fans <span className="italic text-[#D4AE6A]">sell for you</span></>,
@@ -557,7 +557,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "reader-analytics-for-authors": {
     slug: "reader-analytics-for-authors",
-    metaTitle: "Reader Analytics for Authors — Understand Your Audience | AuthorLoft",
+    metaTitle: "Reader Analytics for Authors — Understand Your Audience",
     metaDescription: "PostHog-powered analytics for independent authors. Track page views, book popularity, reader behavior, and audience growth — all from your dashboard.",
     eyebrow: "Reader Analytics",
     heroTitle: <>Understand your readers <span className="italic text-[#D4AE6A]">like never before</span></>,
@@ -606,6 +606,58 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Do I need to install any tracking code?", a: "No. Analytics are built into your AuthorLoft site automatically. No code snippets, no pixel setup, no third-party accounts to configure." },
     ],
     relatedGuideSlug: "what-is-reader-analytics-for-authors",
+  },
+
+  "author-courses": {
+    slug: "author-courses",
+    metaTitle: "Sell Online Courses — Teach What You Know",
+    metaDescription: "Build and sell online courses from your own site. Modules, lessons, video, worksheets, and Stripe checkout — you keep 100% of every sale.",
+    eyebrow: "Author Courses",
+    heroTitle: <>Your expertise is worth more than <span className="italic text-[#D4AE6A]">one more book sale</span></>,
+    heroSubtitle: "Build a course from the knowledge you already have, host it on your own site, and sell it direct — no course-platform cut, no separate login for your students.",
+    intro: "Every author knows something worth teaching, whether it's the craft itself or the subject matter behind the books. A course turns that knowledge into income that doesn't depend on your next release. AuthorLoft courses live on your own site, next to your books, sold through your own Stripe account — so a reader who trusts your writing can buy your teaching without ever leaving your world.",
+    sections: [
+      {
+        title: "Structure a real course, not a PDF",
+        description: "Organize your material into modules and lessons, with the media each lesson actually needs.",
+        bullets: [
+          "Course → module → lesson structure, reorderable as you build",
+          "Rich text lessons with headings, lists, images, and links",
+          "Embed video from YouTube, Vimeo, or any external host",
+          "Attach a downloadable worksheet, slide deck, or cheat sheet per lesson",
+          "Save as a draft and publish only when the whole thing is ready",
+        ],
+      },
+      {
+        title: "Sell it your way",
+        description: "Free, paid, or discounted — with the money going straight to your account.",
+        bullets: [
+          "One-time purchase through your own Stripe account, no platform fee",
+          "Offer a course free to grow your email list instead of your revenue",
+          "Discount codes for launches, bundles, and newsletter subscribers",
+          "Every student is captured as a subscriber you own and can email",
+          "You're notified on every enrollment, free or paid",
+        ],
+      },
+      {
+        title: "A student experience you control",
+        description: "Enrolled students get a real learning environment, not a folder of links.",
+        bullets: [
+          "Dedicated lesson viewer with module-by-module progress",
+          "Access tied to enrollment — no shared links, no leaked content",
+          "Students can print or save the full course for offline reference",
+          "Optional listing in the AuthorLoft Bookstore to reach new students",
+          "Course categories and star ratings help the right students find you",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "How is this different from Teachable or Thinkific?", a: "Your course lives on your own author site, at your own domain, alongside your books — and payment goes directly to your Stripe account with no platform commission. Students don't create an account on someone else's platform to reach your material." },
+      { q: "Can I import a course I've already built?", a: "Yes. The bulk course importer accepts a CSV with one row per lesson and builds the full module and lesson structure for you, landing as an unpublished draft you can review before going live." },
+      { q: "Can I host video lessons?", a: "Courses embed video from external hosts like YouTube and Vimeo, including unlisted videos. AuthorLoft doesn't host video files directly, which keeps your storage free for the downloadable resources that accompany your lessons." },
+      { q: "Can I give a course away for free?", a: "Yes. A free course is one of the strongest email-list builders available — students enroll with their email address and are added to your subscriber list the same way a paid buyer is." },
+      { q: "Which plan includes courses?", a: "Courses are available on Standard (up to 20 courses) and Premium (unlimited). The Free plan includes up to 5 courses." },
+    ],
   },
 };
 

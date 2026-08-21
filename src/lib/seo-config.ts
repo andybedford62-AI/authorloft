@@ -15,6 +15,7 @@ export const SEO_PAGES = [
   { id: "author-media-kit",             label: "Author Media Kit",       path: "/author-media-kit" },
   { id: "ai-tools-for-authors",         label: "AI Tools for Authors",   path: "/ai-tools-for-authors" },
   { id: "indie-author-bookstore",       label: "Indie Author Bookstore", path: "/indie-author-bookstore" },
+  { id: "author-courses",               label: "Sell Online Courses",    path: "/author-courses" },
   { id: "book-pre-orders",              label: "Book Pre-Orders",        path: "/book-pre-orders" },
   { id: "author-affiliate-program",     label: "Affiliate Program",      path: "/author-affiliate-program" },
   { id: "reader-analytics-for-authors", label: "Reader Analytics",       path: "/reader-analytics-for-authors" },

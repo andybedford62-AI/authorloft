@@ -19,6 +19,7 @@ const SOLUTIONS: [string, string][] = [
   ["/author-media-kit", "Author Media Kit"],
   ["/ai-tools-for-authors", "AI Tools for Authors"],
   ["/indie-author-bookstore", "Indie Author Bookstore"],
+  ["/author-courses", "Sell Online Courses"],
   ["/book-pre-orders", "Book Pre-Orders"],
   ["/author-affiliate-program", "Affiliate Program"],
   ["/reader-analytics-for-authors", "Reader Analytics"],

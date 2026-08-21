@@ -3,7 +3,7 @@ import { LANDING_PAGES } from "@/lib/landing-page-data";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo-config";
 
-const data = LANDING_PAGES["book-marketing-platform"];
+const data = LANDING_PAGES["author-courses"];
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
 export const metadata: Metadata = {

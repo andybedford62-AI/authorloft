@@ -16,6 +16,7 @@ const GROUPS: { label: string; items: [string, string][] }[] = [
     label: "Sell & Grow",
     items: [
       ["/sell-books-directly", "Sell Books Directly"],
+      ["/author-courses", "Sell Online Courses"],
       ["/book-pre-orders", "Book Pre-Orders"],
       ["/author-affiliate-program", "Affiliate Program"],
     ],
