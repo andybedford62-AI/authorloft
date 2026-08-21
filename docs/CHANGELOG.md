@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — Solutions dropdown: section headers were indistinguishable from links
+
+Andy flagged that in the desktop Solutions mega-menu you can't tell the section headings ("Sell & Grow") from the actual links under them. Cause was literal: the group label and the links were set to the *same* color, `#93a0bc` — the only difference was 11px/uppercase/tracking, which isn't enough separation when both sit in the same muted tone.
+
+The mobile menu already had the correct convention (`marketing-mobile-menu.tsx`: muted `#93a0bc` headers, bone `#f3ecdb` links hovering to gold) — the desktop dropdown was the outlier, so this is a consistency fix rather than a new visual idea. Links are now bone hovering to gold, headers stay muted and gain a hairline rule beneath them. Applied the same link treatment to the adjacent Resources dropdown, which had the same muted links (no header confusion there, being a flat list, but leaving it would have made the two neighbouring menus disagree).
+
 ## August 21, 2026 — Course-creator quick wins: marketing page, course JSON-LD, CSV categories
 
 Three small, independent course-creator backlog items in one pass, picked for ROI-per-effort:

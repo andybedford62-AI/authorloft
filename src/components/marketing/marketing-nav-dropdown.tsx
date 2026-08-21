@@ -36,7 +36,7 @@ export function MarketingNavDropdown() {
               <Link
                 key={href}
                 href={href}
-                className="block px-4 py-2 text-sm text-[#93a0bc] hover:text-[#f3ecdb] hover:bg-[rgba(243,236,219,0.06)] transition-colors"
+                className="block px-4 py-2 text-sm text-[#f3ecdb] hover:text-[#d6a94a] hover:bg-[rgba(243,236,219,0.06)] transition-colors"
               >
                 {label}
               </Link>

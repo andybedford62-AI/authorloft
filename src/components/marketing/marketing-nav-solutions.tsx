@@ -61,14 +61,14 @@ export function MarketingNavSolutions() {
           <div className="min-w-[460px] bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-xl shadow-lg p-4 grid grid-cols-2 gap-4">
             {GROUPS.map((group) => (
               <div key={group.label}>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-[#93a0bc] mb-1.5 px-2">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-[#93a0bc] mb-1.5 px-2 pb-1.5 border-b border-[rgba(243,236,219,0.08)]">
                   {group.label}
                 </p>
                 {group.items.map(([href, label]) => (
                   <Link
                     key={href}
                     href={href}
-                    className="block px-2 py-1.5 text-sm text-[#93a0bc] hover:text-[#f3ecdb] hover:bg-[rgba(243,236,219,0.06)] rounded-md transition-colors"
+                    className="block px-2 py-1.5 text-sm text-[#f3ecdb] hover:text-[#d6a94a] hover:bg-[rgba(243,236,219,0.06)] rounded-md transition-colors"
                   >
                     {label}
                   </Link>
