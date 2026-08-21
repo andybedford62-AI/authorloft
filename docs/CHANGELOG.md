@@ -13,6 +13,29 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — Rate limiter hung forever when Redis was unreachable
+
+Found by the session fixing the flaky rate-limit test, and independently reproduced here before acting on it — this one is a genuine production availability risk, not a test artifact.
+
+`src/lib/rate-limit.ts` built its client with `createClient({ url })` and no socket options. node-redis retries indefinitely by default, so against an unreachable host **`await connect()` never settles**: the surrounding `catch` is unreachable, and the fallback the file's own comment promises ("falls back to in-memory") never runs. The request just hangs.
+
+Measured rather than reasoned about — a probe test against the unmodified file times out at 8s; with the fix it passes:
+
+```
+UNFIXED  → Test timed out in 8000ms
+FIXED    → passed
+```
+
+That mattered because `checkRateLimit` is not niche — **checkout, registration, forgot-password, Stripe subscribe, discount validation, and downloads** all route through it. A Redis outage would have hung revenue paths rather than degrading them.
+
+Two changes, both in `getRedisClient()`:
+- **Bounded connect**: `connectTimeout: 2000` plus a `reconnectStrategy` that returns an `Error` after 2 retries, so `connect()` rejects (~140ms) instead of retrying forever and the existing catch finally does its job.
+- **Circuit breaker**: after a failed connect, Redis is skipped entirely for 30s. Without it every request re-pays the connect-and-retry cost while Redis is down, which on checkout is worse than just using the in-memory fallback the moment we know Redis is gone.
+
+Deliberate tradeoff: a *transient* blip now falls back to in-memory after ~140ms rather than waiting out a reconnect. That's the correct trade for these routes — in-memory limiting is per-lambda and therefore looser, but looser rate limiting beats a hung checkout.
+
+Covered by `src/__tests__/rate-limit-redis-fallback.test.ts` (3 tests: doesn't hang, still enforces the limit while degraded, breaker prevents repeated connect cost). Verified the tests genuinely fail without the fix, not just pass with it.
+
 ## August 21, 2026 — All 12 solution landing pages were missing from the real sitemap
 
 Found during a post-promotion prod verification pass, not from a report — checking that `/author-courses` had reached the sitemap revealed that *none* of the solution landing pages were in it, and never had been.
