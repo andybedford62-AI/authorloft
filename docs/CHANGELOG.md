@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — All 12 solution landing pages were missing from the real sitemap
+
+Found during a post-promotion prod verification pass, not from a report — checking that `/author-courses` had reached the sitemap revealed that *none* of the solution landing pages were in it, and never had been.
+
+**Cause: two sitemaps, and the maintained one was dead code.** `/sitemap.xml` is a rewrite to `src/app/api/internal/sitemap/route.ts` (`next.config.ts` `rewrites()`), so Next's conventional `src/app/sitemap.ts` never served a byte. The two had drifted into near-duplicates, and the dead one was the one that listed the solution pages — so every check of "is this page in the sitemap?" looked correct in the source while Google was served a sitemap without them. These are the pages built specifically to win search traffic, which made this the most expensive place for the gap to hide.
+
+**Fix:** the live route now emits solution pages derived from `Object.keys(LANDING_PAGES)` rather than a hand-maintained list, so adding a landing page puts it in the sitemap automatically — the drift can't recur. Deleted `src/app/sitemap.ts` outright rather than syncing it, since a plausible-looking file that does nothing is what caused this. Updated `CLAUDE.md`, whose "update `src/app/sitemap.ts`" instruction was itself pointing at the dead file and had been quietly steering every past change into the wrong place.
+
+Also verified in the same pass, all clean: prod build guardrails (23/23 required env vars set, no schema drift, all table grants present), the `PlatformSettings.demoAuthorId` column and its `ON DELETE SET NULL` FK present in the prod DB, 1800×200 with zero 5xx over three hours, and the only two runtime error groups both benign and pre-dating today (a next-auth `url.parse()` deprecation warning first seen June 17, one transient Resend blip).
+
 ## August 21, 2026 — Solutions dropdown: section headers were indistinguishable from links
 
 Andy flagged that in the desktop Solutions mega-menu you can't tell the section headings ("Sell & Grow") from the actual links under them. Cause was literal: the group label and the links were set to the *same* color, `#93a0bc` — the only difference was 11px/uppercase/tracking, which isn't enough separation when both sit in the same muted tone.

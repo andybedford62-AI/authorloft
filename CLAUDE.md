@@ -91,7 +91,13 @@ host). Run locally with `npm run check:all`.
 - Read existing files/patterns before writing; match surrounding style.
 
 ## Finishing a task — always keep in sync (not a later step)
-- Sitemap: update `src/app/sitemap.ts` for any new/removed/renamed public route.
+- Sitemap: update **`src/app/api/internal/sitemap/route.ts`** for any new/removed/renamed
+  public route. `/sitemap.xml` is a **rewrite** to that route (see `next.config.ts`
+  `rewrites()`), so Next's conventional `src/app/sitemap.ts` never serves anything —
+  it existed as a stale duplicate and was deleted Aug 21 2026 after all 12 solution
+  landing pages ended up missing from the real sitemap. Solution pages and
+  `/compare/*` now derive from `LANDING_PAGES` / `COMPARISON_SLUGS`, so those two
+  families need no sitemap edit at all.
 - Accomplished: log shipped work in `docs/CHANGELOG.md` (newest first, by date).
 - TODO/backlog: add future/deferred ideas to `docs/FEATURE_BACKLOG.md`; move
   shipped items to its "Shipped (for reference)" list.

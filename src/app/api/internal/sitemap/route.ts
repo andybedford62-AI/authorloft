@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getBookstoreData } from "@/lib/bookstore";
 import { COMPARISON_SLUGS } from "@/lib/comparison-data";
+import { LANDING_PAGES } from "@/lib/landing-page-data";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -82,6 +83,13 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
 
   for (const g of bookstore.genres) {
     entries.push({ loc: `${base}/bookstore/genre/${g.slug}`, lastmod: now, changefreq: "weekly", priority: 0.6 });
+  }
+
+  // Solution landing pages — driven off LANDING_PAGES so adding one to that
+  // record is enough; a hand-maintained list here is what let all 12 of these
+  // sit outside the sitemap unnoticed (see docs/CHANGELOG.md Aug 21 2026).
+  for (const slug of Object.keys(LANDING_PAGES)) {
+    entries.push({ loc: `${base}/${slug}`, lastmod: now, changefreq: "monthly", priority: 0.8 });
   }
 
   for (const slug of COMPARISON_SLUGS) {
