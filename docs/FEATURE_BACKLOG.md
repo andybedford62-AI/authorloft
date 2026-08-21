@@ -148,6 +148,19 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 - [x] **Bundle purchase — subscriber capture** — `bundle_purchase` Stripe webhook block now upserts a `Subscriber` for the buyer, mirroring `book_purchase`/`course_purchase`. *(done Aug 9, 2026)*
 - [x] **Bundle discount codes** — shipped Aug 11, 2026; `DiscountCodeBundle` join table (mirrors `DiscountCodeBook`); also fixed a real bug where bundle checkout accepted a `discountCode` but silently discarded it. *(done — see full entry under Shipped below)*
 - [x] **Course discount codes** — shipped Aug 11, 2026; `DiscountCodeCourse` join table, net-new discount handling in course checkout (previously had none). *(done — see full entry under Shipped below)*
+- [ ] **Solution-page hero art (12 pages) — PARKED Aug 21 2026, needs a different approach** — the 12 `/solutions` landing pages pass no `backgroundImage` to `MarketingPageHeader`, so they render the plain gradient while 7 other marketing pages have banners. Wiring is trivial (one prop per page); **getting the art is the blocker**.
+
+  Tried: a full prompt pack (kept at `C:\Users\andyb\Downloads\authorloft-headers\PROMPTS.md`) — first as 12 desk-scenes varying only a laptop screen (Andy: "basically the same image"), then rewritten as 12 distinct locations. Still didn't yield visually distinct results in practice. Gamma's image tool is out of credits; Andy tried Gemini/Nano Banana and Grok.
+
+  **Root cause, so we don't repeat the loop:** the constraints that make the set cohere (fixed palette, fixed lighting, fixed medium, left 45% empty for the headline overlay) remove nearly every axis a generator differentiates on. "12 unique but identical" is close to self-contradictory — more prompt engineering is the wrong lever.
+
+  **Better options when we return, roughly in order of how much they actually solve:**
+  - **Abstract/geometric SVG art, generated in-repo.** Deterministic, exactly on-brand, tiny filesize, no AI-image dependency, no garbled text, no style drift — and 12 distinguishable variants is easy when you control composition directly. Claude can build these; no user asset-generation needed.
+  - **Typographic banners** — the page's key phrase in the brand serif over subtle texture. Unique by definition (different words per page), same zero-dependency advantage.
+  - **One shared banner across all 12**, differentiated by the headline text that already differs. Sidesteps the problem entirely; common and respectable on SaaS sites.
+  - **Keep the plain gradient.** The pages aren't broken, just plain. A legitimate choice.
+
+  Already decided and still valid: `/indie-author-bookstore` should reuse the existing `public/bookstore-header.png` (already a bookshop interior) rather than get its own art. Also worth knowing: the existing banners are 815KB–1.85MB PNGs (~8.6MB total) and should be converted to WebP whenever this is next touched. *(medium — pick an approach before generating anything)*
 - [ ] **Bundle marketing page** — `/book-bundles` solution landing page. *(small)*
 - [x] **Course marketing page** — shipped Aug 21, 2026 as `/author-courses` ("Sell Online Courses"), using the shared `LANDING_PAGES`/`LandingPage` pattern. Registered in all five nav/SEO registries (hero nav dropdown, `marketing-nav-solutions` under "Sell & Grow", both mobile menus, `seo-config`) and `sitemap.ts`. No `relatedGuideSlug` — no course guide exists yet, and the field is optional. *(done)*
 - [x] **Admin dashboard doesn't surface Courses or Bundles like it does Books** — shipped Aug 10, 2026 as `CatalogTabsCard`: a Books | Courses | Bundles tab switcher (not three stacked panels — Andy's explicit feedback was that stacking read as "mixed together, not distinct") controls the whole content area, gated on `plan.coursesEnabled`/`bundlesEnabled`. *(done)*
