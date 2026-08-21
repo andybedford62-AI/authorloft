@@ -93,10 +93,11 @@ export function ContactForm({ domain, accentColor }: Props) {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="author-contact-name" className="block text-sm font-medium text-gray-700">
               Name <span className="text-red-400">*</span>
             </label>
             <input
+              id="author-contact-name"
               name="name"
               placeholder="Your name"
               required
@@ -106,10 +107,11 @@ export function ContactForm({ domain, accentColor }: Props) {
             />
           </div>
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="author-contact-email" className="block text-sm font-medium text-gray-700">
               Email <span className="text-red-400">*</span>
             </label>
             <input
+              id="author-contact-email"
               name="email"
               type="email"
               placeholder="your@email.com"
@@ -122,8 +124,9 @@ export function ContactForm({ domain, accentColor }: Props) {
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Subject</label>
+          <label htmlFor="author-contact-subject" className="block text-sm font-medium text-gray-700">Subject</label>
           <select
+            id="author-contact-subject"
             name="subject"
             defaultValue={CONTACT_REASONS[0]}
             disabled={status === "loading"}
@@ -137,10 +140,11 @@ export function ContactForm({ domain, accentColor }: Props) {
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="author-contact-message" className="block text-sm font-medium text-gray-700">
             Message <span className="text-red-400">*</span>
           </label>
           <textarea
+            id="author-contact-message"
             name="message"
             rows={5}
             required
@@ -152,10 +156,11 @@ export function ContactForm({ domain, accentColor }: Props) {
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="author-contact-website" className="block text-sm font-medium text-gray-700">
             Website <span className="text-gray-400 text-xs font-normal">(optional)</span>
           </label>
           <input
+            id="author-contact-website"
             name="website"
             type="url"
             placeholder="https://yoursite.com"

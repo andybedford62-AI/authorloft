@@ -20,8 +20,9 @@ const ContentSecurityPolicy = [
   "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
-  // Google Ads (gtag.js) beacon/conversion calls
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net",
+  // Google Ads (gtag.js) beacon/conversion calls, incl. ad.doubleclick.net which
+  // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host)
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net",
   // Stripe 3D Secure and payment frames
   "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",

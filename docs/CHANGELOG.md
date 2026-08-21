@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — Conversion audit fixes: hero image weight, broken title tag, unlabeled forms
+
+Ran a live conversion/UX audit against production (DOM, network, console, and a11y-tree inspection — not a synthetic scan) and fixed everything actionable in one pass:
+
+- **Homepage page weight cut from 8.7MB to ~1.1MB.** The five cycling hero background images (`public/hero-card-*.png`) were raw, uncompressed PNGs at 1–1.9MB each, all five downloaded on every load regardless of which was visible. Re-exported via `sharp` to WebP (1100px wide, quality 78) — same five images now total 259KB, a 96.6% reduction with no visible quality loss (they sit behind a dark scrim overlay in the hero). Old PNGs deleted; `rebrand-hero.tsx`'s `PAIN_CARDS` array now points at the `.webp` files.
+- **Fixed the homepage `<title>` tag**, which was shipping as `"…| AuthorLoft | AuthorLoft"` in every browser tab and Google result — the root layout's `%s | AuthorLoft` template was double-appending onto a title that already had the suffix baked in. Also trimmed the meta description from 258 to 99 characters so it stops truncating mid-sentence in search results.
+- **Every input/select/textarea across 9 form components now has a real `<label for>`/`id` pairing** — previously several forms (marketing contact, per-author contact form, newsletter signup modal, reader-magnet modal, admin support-request form, admin book-reviews editor) relied on placeholder text as the only "label," which screen readers announce instead of the real field name. Highest-impact ones: the newsletter signup modal and both contact forms, since those are the platform's core lead-capture points.
+- **Fixed the contact form's "Inquiry type" dropdown**, which showed "Hello" and "AuthorLoft" as options — real inboxes, bad labels. Relabeled to "Say Hello" and "Other" directly in the `SupportEmail` table; also fixed "SignUp Inquiries" → "Sign-Up Inquiries" casing.
+- **Google Ads conversion tracking was silently CSP-blocked** — the beacon domain `ad.doubleclick.net` wasn't in `connect-src` (only the script-host `googleads.g.doubleclick.net` was), so every conversion ping was failing with no visible error to anyone but the browser console. Added the missing domain to `next.config.ts`.
+
+Not fixed, needs real content rather than a code change: the homepage's testimonials section renders correctly but has zero active entries, so it doesn't show at all. Adding 2–3 real author quotes via Super Admin → Settings → Testimonials is a five-minute follow-up whenever quotes are ready.
+
 ## August 21, 2026 — Homepage "See Demo" link is now super-admin configurable
 
 The homepage hero's "See a demo author site" button and the footer's "Demo" link were hardcoded to `https://demo.authorloft.com`. Added a **Demo Site Link** picker (Super Admin → Settings → Marketing) that lets the super admin choose any existing author from a dropdown; both links resolve to that author's live URL (custom domain if set, otherwise their `slug.authorloft.com` subdomain) via the same `getAuthorBaseUrl()` helper used elsewhere. New `PlatformSettings.demoAuthorId` column (nullable FK to `Author`, `ON DELETE SET NULL` so a deleted author can't leave a dangling pointer) — migration applied directly to Supabase. Leaving the picker on "Default" preserves the original `demo.authorloft.com` behavior, so nothing changes until a super admin makes a selection.

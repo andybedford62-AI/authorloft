@@ -88,21 +88,22 @@ export function ContactSupportForm({ authorName, authorEmail, supportEmails }: P
       {/* Read-only author info */}
       <div className="grid sm:grid-cols-2 gap-5">
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Your name</label>
-          <input value={authorName} disabled className={`${inputCls} bg-gray-50 text-gray-500 cursor-not-allowed`} />
+          <label htmlFor="support-name" className="block text-sm font-medium text-gray-700">Your name</label>
+          <input id="support-name" value={authorName} disabled className={`${inputCls} bg-gray-50 text-gray-500 cursor-not-allowed`} />
         </div>
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Your email</label>
-          <input value={authorEmail} disabled className={`${inputCls} bg-gray-50 text-gray-500 cursor-not-allowed`} />
+          <label htmlFor="support-email" className="block text-sm font-medium text-gray-700">Your email</label>
+          <input id="support-email" value={authorEmail} disabled className={`${inputCls} bg-gray-50 text-gray-500 cursor-not-allowed`} />
         </div>
       </div>
 
       {supportEmails.length > 0 && (
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="support-inquiry" className="block text-sm font-medium text-gray-700">
             Inquiry type <span className="text-red-500">*</span>
           </label>
           <select
+            id="support-inquiry"
             value={supportEmailId}
             onChange={(e) => setSupportEmailId(e.target.value)}
             className={inputCls}
@@ -124,10 +125,11 @@ export function ContactSupportForm({ authorName, authorEmail, supportEmails }: P
       )}
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor="support-subject" className="block text-sm font-medium text-gray-700">
           Subject <span className="text-red-500">*</span>
         </label>
         <input
+          id="support-subject"
           type="text"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
@@ -138,10 +140,11 @@ export function ContactSupportForm({ authorName, authorEmail, supportEmails }: P
       </div>
 
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor="support-message" className="block text-sm font-medium text-gray-700">
           Message <span className="text-red-500">*</span>
         </label>
         <textarea
+          id="support-message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={7}

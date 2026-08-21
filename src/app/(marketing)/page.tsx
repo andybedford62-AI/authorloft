@@ -19,9 +19,9 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Your Books. Your Readers. Your Business. | AuthorLoft",
+    title: "Your Books. Your Readers. Your Business.",
     description:
-      "AuthorLoft gives authors their own storefront, their own email list, and 100% of every sale. Website, direct book sales, newsletter, reader analytics, media kits, and pre-orders: everything authors need to run their business, all in one place. Free to start.",
+      "Your own storefront, your own reader list, 100% of every sale. Free to start, live in 15 minutes.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",

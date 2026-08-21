@@ -104,10 +104,11 @@ export function ContactForm() {
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#f3ecdb]">
+                <label htmlFor="contact-name" className="block text-sm font-medium text-[#f3ecdb]">
                   Your name <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -117,10 +118,11 @@ export function ContactForm() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#f3ecdb]">
+                <label htmlFor="contact-email" className="block text-sm font-medium text-[#f3ecdb]">
                   Email address <span className="text-red-400">*</span>
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -133,10 +135,11 @@ export function ContactForm() {
 
             {supportEmails.length > 0 && (
               <div className="space-y-1">
-                <label className="block text-sm font-medium text-[#f3ecdb]">
+                <label htmlFor="contact-inquiry" className="block text-sm font-medium text-[#f3ecdb]">
                   Inquiry type <span className="text-red-400">*</span>
                 </label>
                 <select
+                  id="contact-inquiry"
                   value={supportEmailId}
                   onChange={(e) => setSupportEmailId(e.target.value)}
                   className={inputClass}
@@ -156,8 +159,9 @@ export function ContactForm() {
             )}
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-[#f3ecdb]">Subject</label>
+              <label htmlFor="contact-subject" className="block text-sm font-medium text-[#f3ecdb]">Subject</label>
               <input
+                id="contact-subject"
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -167,10 +171,11 @@ export function ContactForm() {
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-medium text-[#f3ecdb]">
+              <label htmlFor="contact-message" className="block text-sm font-medium text-[#f3ecdb]">
                 Message <span className="text-red-400">*</span>
               </label>
               <textarea
+                id="contact-message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={6}

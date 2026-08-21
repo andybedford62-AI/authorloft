@@ -230,8 +230,9 @@ function ReviewForm({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Quote *</label>
+        <label htmlFor="review-quote" className="block text-xs font-medium text-gray-600 mb-1">Quote *</label>
         <textarea
+          id="review-quote"
           rows={3}
           value={form.quote}
           onChange={(e) => setForm((p) => ({ ...p, quote: e.target.value }))}
@@ -242,8 +243,9 @@ function ReviewForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Reviewer Name *</label>
+          <label htmlFor="review-name" className="block text-xs font-medium text-gray-600 mb-1">Reviewer Name *</label>
           <input
+            id="review-name"
             type="text"
             value={form.reviewerName}
             onChange={(e) => setForm((p) => ({ ...p, reviewerName: e.target.value }))}
@@ -252,8 +254,9 @@ function ReviewForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Source</label>
+          <label htmlFor="review-source" className="block text-xs font-medium text-gray-600 mb-1">Source</label>
           <input
+            id="review-source"
             type="text"
             value={form.source ?? ""}
             onChange={(e) => setForm((p) => ({ ...p, source: e.target.value }))}

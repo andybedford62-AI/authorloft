@@ -77,12 +77,12 @@ function StarField() {
 }
 
 const PAIN_CARDS = [
-  { pain: "Retail publishers take most of your profit", solution: "You keep 100%", image: "/hero-card-1.png", title: "Your Profit" },
-  { pain: "Their email list, their rules",        solution: "Your list, nobody can take it", image: "/hero-card-2.png", title: "Your Readers" },
-  { pain: "No idea who your audience is",         solution: "Full audience analytics, always", image: "/hero-card-3.png", title: "Your Analytics" },
-  { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.png", title: "Your Platform" },
-  { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.png", title: "Your Brand" },
-  { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.png", title: "For Authors" },
+  { pain: "Retail publishers take most of your profit", solution: "You keep 100%", image: "/hero-card-1.webp", title: "Your Profit" },
+  { pain: "Their email list, their rules",        solution: "Your list, nobody can take it", image: "/hero-card-2.webp", title: "Your Readers" },
+  { pain: "No idea who your audience is",         solution: "Full audience analytics, always", image: "/hero-card-3.webp", title: "Your Analytics" },
+  { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.webp", title: "Your Platform" },
+  { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.webp", title: "Your Brand" },
+  { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.webp", title: "For Authors" },
 ];
 
 function PainSolutionCards() {

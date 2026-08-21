@@ -153,10 +153,11 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
               {/* First + Last Name */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="newsletter-first-name" className="block text-sm font-medium text-gray-700 mb-1">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="newsletter-first-name"
                     type="text"
                     placeholder="Jane"
                     value={firstName}
@@ -167,10 +168,11 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="newsletter-last-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="newsletter-last-name"
                     type="text"
                     placeholder="Smith"
                     value={lastName}
@@ -183,10 +185,11 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="newsletter-email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="newsletter-email"
                   type="email"
                   placeholder="jane@example.com"
                   value={email}
@@ -249,11 +252,12 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
 
               {/* Where did you hear */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="newsletter-how-heard" className="block text-sm font-medium text-gray-700 mb-1">
                   Where did you hear about us?{" "}
                   <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
                 <select
+                  id="newsletter-how-heard"
                   value={howHeard}
                   onChange={(e) => setHowHeard(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-600 focus:outline-none focus:ring-2 focus:border-transparent"

@@ -111,8 +111,9 @@ export function ReaderMagnetModal({
               </p>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="sr-only">Your name (optional)</label>
+                  <label htmlFor="reader-magnet-name" className="sr-only">Your name (optional)</label>
                   <input
+                    id="reader-magnet-name"
                     type="text"
                     placeholder="Your name (optional)"
                     value={name}
@@ -122,8 +123,9 @@ export function ReaderMagnetModal({
                   />
                 </div>
                 <div>
-                  <label className="sr-only">Email address</label>
+                  <label htmlFor="reader-magnet-email" className="sr-only">Email address</label>
                   <input
+                    id="reader-magnet-email"
                     type="email"
                     placeholder="Your email address"
                     value={email}
