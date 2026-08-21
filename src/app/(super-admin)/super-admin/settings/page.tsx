@@ -13,6 +13,7 @@ export default async function SuperAdminSettingsPage() {
     platformSettings,
     supportEmails,
     testimonials,
+    demoAuthorOptions,
   ] = await Promise.all([
     prisma.author.count(),
     prisma.book.count(),
@@ -33,10 +34,14 @@ export default async function SuperAdminSettingsPage() {
       where:  { id: "singleton" },
       create: { id: "singleton" },
       update: {},
-      select: { marketingHeroImageUrl: true, heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
+      select: { marketingHeroImageUrl: true, heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true, demoAuthorId: true },
     }),
     prisma.supportEmail.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
     prisma.testimonial.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
+    prisma.author.findMany({
+      select: { id: true, name: true, slug: true, customDomain: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   // Build env display values server-side so secrets never reach the client bundle
@@ -83,6 +88,8 @@ export default async function SuperAdminSettingsPage() {
         heroHeadlineLine1={platformSettings.heroHeadlineLine1 ?? null}
         heroHeadlineLine2={platformSettings.heroHeadlineLine2 ?? null}
         heroSubheadline={platformSettings.heroSubheadline ?? null}
+        demoAuthorId={platformSettings.demoAuthorId ?? null}
+        demoAuthorOptions={demoAuthorOptions}
         supportEmails={supportEmails}
         testimonials={testimonials}
         welcomeEmailSubject={systemConfig.welcomeEmailSubject}

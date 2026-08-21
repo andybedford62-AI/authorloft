@@ -193,14 +193,17 @@ export function RebelHero({
   headlineLine1,
   headlineLine2,
   subheadline,
+  demoUrl,
 }: {
   isAuthor?: boolean;
   headlineLine1?: string | null;
   headlineLine2?: string | null;
   subheadline?: string | null;
+  demoUrl?: string | null;
 }) {
   const line1 = headlineLine1 || "You wrote the book. They keep the reader.";
   const line2 = headlineLine2 || "Take it back.";
+  const demoHref = demoUrl || "https://demo.authorloft.com";
   const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. It's free to start and takes about fifteen minutes to launch.";
 
   return (
@@ -298,7 +301,7 @@ export function RebelHero({
             <Link href="/register" className="rb-cta-primary" style={{ padding: '15px 28px', fontSize: 15, fontWeight: 500, background: VAULT.gold, color: VAULT.bg, border: 'none', borderRadius: VAULT.radius, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, boxShadow: `0 12px 24px -10px ${VAULT.gold}80`, transition: 'transform 0.2s, box-shadow 0.2s' }}>
               Start free →
             </Link>
-            <a href="https://demo.authorloft.com" target="_blank" rel="noopener noreferrer" className="rb-cta-secondary" style={{ padding: '15px 24px', fontSize: 15, fontWeight: 500, background: 'transparent', color: VAULT.ink, border: `1px solid ${VAULT.hair}`, borderRadius: VAULT.radius, cursor: 'pointer', textDecoration: 'none', transition: 'background 0.2s' }}>
+            <a href={demoHref} target="_blank" rel="noopener noreferrer" className="rb-cta-secondary" style={{ padding: '15px 24px', fontSize: 15, fontWeight: 500, background: 'transparent', color: VAULT.ink, border: `1px solid ${VAULT.hair}`, borderRadius: VAULT.radius, cursor: 'pointer', textDecoration: 'none', transition: 'background 0.2s' }}>
               See a demo author site →
             </a>
           </div>

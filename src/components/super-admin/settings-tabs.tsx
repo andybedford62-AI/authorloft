@@ -23,6 +23,7 @@ import { SignupNotificationsToggle } from "./signup-notifications-toggle";
 import { AiCapControl } from "./ai-cap-control";
 import { MarketingHeroImage } from "./marketing-hero-image";
 import { HeroCopyEditor } from "./hero-copy-editor";
+import { DemoSitePicker, type DemoSiteAuthorOption } from "./demo-site-picker";
 import { GhostUsersPanel } from "./ghost-users-panel";
 import { SupportEmailsPanel } from "./support-emails-panel";
 import { TestimonialsPanel } from "./testimonials-panel";
@@ -75,6 +76,8 @@ export interface SettingsTabsProps {
   heroHeadlineLine1: string | null;
   heroHeadlineLine2: string | null;
   heroSubheadline: string | null;
+  demoAuthorId: string | null;
+  demoAuthorOptions: DemoSiteAuthorOption[];
   supportEmails: SupportEmailRow[];
   testimonials: TestimonialRow[];
   welcomeEmailSubject: string | null;
@@ -330,7 +333,7 @@ function MaintenanceTab({ maintenanceMode, maintenanceMessage, newSignupNotifica
 
 // ── Marketing ──────────────────────────────────────────────────────────────────
 
-function MarketingTab({ marketingHeroImageUrl, heroHeadlineLine1, heroHeadlineLine2, heroSubheadline }: SettingsTabsProps) {
+function MarketingTab({ marketingHeroImageUrl, heroHeadlineLine1, heroHeadlineLine2, heroSubheadline, demoAuthorId, demoAuthorOptions }: SettingsTabsProps) {
   return (
     <div className="space-y-6">
       <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
@@ -361,6 +364,19 @@ function MarketingTab({ marketingHeroImageUrl, heroHeadlineLine1, heroHeadlineLi
           </p>
         </div>
         <MarketingHeroImage initialUrl={marketingHeroImageUrl} />
+      </section>
+
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Globe className="h-4 w-4 text-gray-400" />
+            Demo Site Link
+          </h2>
+          <p className="text-xs text-gray-500 mt-1">
+            Which author's live site the "See Demo" button and footer link send visitors to.
+          </p>
+        </div>
+        <DemoSitePicker authors={demoAuthorOptions} initialDemoAuthorId={demoAuthorId} />
       </section>
     </div>
   );

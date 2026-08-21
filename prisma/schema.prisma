@@ -242,6 +242,7 @@ model Author {
   bundles                       Bundle[]
   courses                       Course[]
   courseCategories              CourseCategory[]
+  demoSitePlatformSettings      PlatformSettings[]   @relation("DemoSiteAuthor")
 
   @@index([slug])
   @@index([customDomain])
@@ -1071,6 +1072,8 @@ model PlatformSettings {
   heroHeadlineLine2     String?   @db.Text
   heroSubheadline       String?   @db.Text
   socialLinks           Json      @default("[]")
+  demoAuthorId          String?
+  demoAuthor            Author?   @relation("DemoSiteAuthor", fields: [demoAuthorId], references: [id], onDelete: SetNull)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Linkedin, Facebook, Twitter, Instagram, Youtube, Globe, type LucideIcon } from "lucide-react";
 import { getSocialLinks } from "@/lib/social-links";
+import { getDemoSiteUrl } from "@/lib/demo-site";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 
 const NAV_LINKS: [string, string][] = [
@@ -16,7 +17,6 @@ const NAV_LINKS: [string, string][] = [
   ["Privacy", "/privacy"],
   ["Terms", "/terms"],
   ["GDPR", "/gdpr"],
-  ["Demo", "https://demo.authorloft.com"],
 ];
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -28,7 +28,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export async function MarketingFooter() {
-  const socialLinks = await getSocialLinks();
+  const [socialLinks, demoSiteUrl] = await Promise.all([getSocialLinks(), getDemoSiteUrl()]);
+  const navLinks: [string, string][] = [...NAV_LINKS, ["Demo", demoSiteUrl]];
 
   return (
     <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3]" style={{ padding: "28px 24px" }}>
@@ -54,7 +55,7 @@ export async function MarketingFooter() {
             AuthorLoft
           </Link>
           <div className="flex flex-wrap items-center gap-y-1.5">
-            {NAV_LINKS.map(([label, href], i) => (
+            {navLinks.map(([label, href], i) => (
               <span key={label} className="inline-flex items-center">
                 <Link
                   href={href}
@@ -64,7 +65,7 @@ export async function MarketingFooter() {
                 >
                   {label}
                 </Link>
-                {i < NAV_LINKS.length - 1 && <span className="text-[#DCDBD3]">·</span>}
+                {i < navLinks.length - 1 && <span className="text-[#DCDBD3]">·</span>}
               </span>
             ))}
           </div>

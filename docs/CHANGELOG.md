@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## August 21, 2026 — Homepage "See Demo" link is now super-admin configurable
+
+The homepage hero's "See a demo author site" button and the footer's "Demo" link were hardcoded to `https://demo.authorloft.com`. Added a **Demo Site Link** picker (Super Admin → Settings → Marketing) that lets the super admin choose any existing author from a dropdown; both links resolve to that author's live URL (custom domain if set, otherwise their `slug.authorloft.com` subdomain) via the same `getAuthorBaseUrl()` helper used elsewhere. New `PlatformSettings.demoAuthorId` column (nullable FK to `Author`, `ON DELETE SET NULL` so a deleted author can't leave a dangling pointer) — migration applied directly to Supabase. Leaving the picker on "Default" preserves the original `demo.authorloft.com` behavior, so nothing changes until a super admin makes a selection.
+
 ## August 17, 2026 — Classic/Minimal parity closed out: last microcopy gap
 
 Final piece of the same backlog item as today's earlier heading-scale and spacing fixes. Rather than guess at a broader copy rewrite, audited every remaining static string in both templates first. Most of it turned out fine: every section already personalizes with the author's name or first name (hero CTAs, newsletter, and now Featured Books), and a couple of things that read as "generic" on first glance — Classic's "About the Author" eyebrow, for instance — aren't actually behind Cinematic, which uses an equally plain "About" for the same spot. The one real gap, present in *both* templates identically, was the closing "Contact CTA" band: "Get in Touch" / "Inquiries, collaborations, and media welcome." was the only section in either template that never referenced the author by name. Retitled to "Get in Touch with {firstName}" in both; left the body line alone since nothing about it was actually dated.

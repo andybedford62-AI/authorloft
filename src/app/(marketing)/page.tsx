@@ -10,6 +10,7 @@ import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
+import { getDemoSiteUrl } from "@/lib/demo-site";
 import { sanitize } from "@/lib/sanitize";
 import { VAULT } from "@/components/marketing/vault-theme";
 
@@ -170,7 +171,7 @@ const howToLd = {
 
 export default async function HomePage() {
   await cookies();
-  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings, foundingOffer] = await Promise.all([
+  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings, foundingOffer, demoSiteUrl] = await Promise.all([
     getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
     getServerSession(authOptions),
     prisma.platformSettings.findUnique({
@@ -178,6 +179,7 @@ export default async function HomePage() {
       select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
     }).catch(() => null),
     getFoundingOfferCopy().catch(() => null),
+    getDemoSiteUrl(),
   ]);
 
   let isAuthor = false;
@@ -214,6 +216,7 @@ export default async function HomePage() {
         headlineLine1={heroSettings?.heroHeadlineLine1}
         headlineLine2={heroSettings?.heroHeadlineLine2}
         subheadline={heroSettings?.heroSubheadline}
+        demoUrl={demoSiteUrl}
       />
 
       {/* ── Divider ───────────────────────────────────────────────────── */}
