@@ -13,6 +13,20 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Bulk paste for music links, and tabs on the music admin
+
+Adding an album a link at a time was the obvious friction. `/admin/music` now takes a pasted block: one link per line, with an optional title and note after it separated by a **Tab**, a **comma**, or a **|**.
+
+Tab is checked first on purpose. Copying cells out of Excel or Google Sheets produces tab-separated text, so **pasting a spreadsheet selection just works** — link / title / note columns land in the right fields with no CSV export, no file upload, and no column-mapping wizard. That was the deciding argument against building a CSV importer here: the backlog already records (line 132) that the course CSV importer failed its users because "nobody's existing course lives in that shape", and nobody keeps a spreadsheet of their music links either. A CSV importer would have asked authors to do manual work in Excel *before* they could do the import meant to save them manual work. XLSX would also have meant a new dependency — the repo only carries Papa Parse, which is CSV-only.
+
+Parsing runs live in the browser as you type, so the rules are demonstrated rather than only described: recognised tracks are listed with their provider as you paste, and unusable lines are named rather than silently dropped. Splitting stops after three fields, so a comma inside a note survives. Blank lines and `#` comments are ignored.
+
+Both bulk methods now sit behind tabs (**YouTube playlist** / **Paste links**) in one card, so the page shows one at a time instead of stacking panels. The author's own lists stay visible below rather than being hidden behind a tab — tabbing the input methods declutters without burying their content. Tab styling matches `branding-form.tsx`.
+
+Pasted lists land as drafts, like the playlist importer, and go through the same `POST /api/admin/music`, so plan caps, metadata and slug checks are unchanged.
+
+8 new tests pinning the format contract (bare links, tab/comma/pipe separators, spreadsheet paste, commas inside notes, canonical URL normalisation, invalid-line reporting, CRLF, empty input). Suite green at 118; `next build` clean.
+
 ## August 24, 2026 — YouTube playlist import for music lists
 
 The same importer the courses page got earlier today, now on `/admin/music`: paste a public playlist, every video becomes a track with its title, notes and artwork, saved as a draft list to review before publishing.

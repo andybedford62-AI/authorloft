@@ -5,7 +5,7 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { YouTubeMusicImportPanel } from "@/components/admin/youtube-music-import-panel";
+import { MusicAddTabs } from "@/components/admin/music-add-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,7 @@ export default async function MusicListsPage() {
 
   const limits = await getAuthorPlanLimits(authorId);
   const max = (limits as any).maxMusicLists as number | null;
+  const trackCap = (limits as any).maxTracksPerList as number | null;
   const atCap = max !== null && lists.length >= max;
 
   return (
@@ -40,19 +41,15 @@ export default async function MusicListsPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-900 mb-4">Import from a YouTube playlist</h2>
-        <YouTubeMusicImportPanel atListLimit={atCap} />
-      </div>
+      <MusicAddTabs atListLimit={atCap} trackCap={trackCap} />
 
       {lists.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Music className="h-10 w-10 text-gray-200 mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-gray-700">No music lists yet</h2>
           <p className="text-sm text-gray-500 mt-2 mb-6 max-w-sm mx-auto">
-            Import a YouTube playlist above, or build one by hand from links you already have
-            &mdash; YouTube and Spotify play inline, Suno and other sites open in a new tab.
-            Nothing is uploaded.
+            Import a YouTube playlist or paste your links above &mdash; YouTube and Spotify
+            play inline, Suno and other sites open in a new tab. Nothing is uploaded.
           </p>
           <Link href="/admin/music/new">
             <Button><Plus className="h-4 w-4 mr-2" />New Music List</Button>

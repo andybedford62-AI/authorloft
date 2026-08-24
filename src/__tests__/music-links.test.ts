@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from "vitest";
-import { resolveTrackLink, parseOpenGraph, providerLabel } from "@/lib/music-links";
+import { resolveTrackLink, parseOpenGraph, providerLabel, parsePastedTracks } from "@/lib/music-links";
 
 describe("resolveTrackLink — YouTube", () => {
   it("embeds every single-video URL shape via the no-cookie host", () => {
@@ -115,5 +115,71 @@ describe("parseOpenGraph", () => {
       title: null,
       thumbnailUrl: null,
     });
+  });
+});
+
+describe("parsePastedTracks", () => {
+  it("takes one bare link per line and ignores blanks and comments", () => {
+    const { tracks, invalidLines } = parsePastedTracks(
+      "https://youtu.be/mL9GwACO8hY\n\n# a comment\n   \nhttps://suno.com/s/3lAosk9lDWkrUvDr"
+    );
+    expect(tracks.map((t) => t.url)).toEqual([
+      "https://www.youtube.com/watch?v=mL9GwACO8hY",
+      "https://suno.com/s/3lAosk9lDWkrUvDr",
+    ]);
+    expect(invalidLines).toEqual([]);
+  });
+
+  it("accepts a spreadsheet paste, which arrives tab-separated", () => {
+    // Copying cells out of Excel or Google Sheets produces exactly this, so a
+    // spreadsheet works with no CSV export and no column mapping.
+    const { tracks } = parsePastedTracks(
+      "https://suno.com/s/abc123defg\tAlabama Autumn\tWritten after the storm"
+    );
+    expect(tracks[0].title).toBe("Alabama Autumn");
+    expect(tracks[0].description).toBe("Written after the storm");
+  });
+
+  it("accepts comma and pipe separators too", () => {
+    const { tracks } = parsePastedTracks(
+      "https://youtu.be/mL9GwACO8hY, Home to You, Closing track\n" +
+      "https://youtu.be/OxfoI2OslBY | Looking For You | County fair"
+    );
+    expect(tracks[0]).toMatchObject({ title: "Home to You", description: "Closing track" });
+    expect(tracks[1]).toMatchObject({ title: "Looking For You", description: "County fair" });
+  });
+
+  it("keeps commas inside the note by splitting only three fields", () => {
+    const { tracks } = parsePastedTracks(
+      "https://youtu.be/mL9GwACO8hY, Home to You, Recorded live, mixed later"
+    );
+    expect(tracks[0].description).toBe("Recorded live, mixed later");
+  });
+
+  it("normalises each link to its canonical form", () => {
+    const { tracks } = parsePastedTracks(
+      "https://open.spotify.com/intl-de/track/4cOdK2wGLETKBW3PvgPWqT?si=xyz"
+    );
+    expect(tracks[0].url).toBe("https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT");
+  });
+
+  it("reports unusable lines instead of dropping them silently", () => {
+    const { tracks, invalidLines } = parsePastedTracks(
+      "https://youtu.be/mL9GwACO8hY\njust some text\nhttp://insecure.example/x"
+    );
+    expect(tracks).toHaveLength(1);
+    expect(invalidLines).toEqual(["just some text", "http://insecure.example/x"]);
+  });
+
+  it("handles Windows line endings", () => {
+    const { tracks } = parsePastedTracks(
+      "https://youtu.be/mL9GwACO8hY\r\nhttps://youtu.be/OxfoI2OslBY"
+    );
+    expect(tracks).toHaveLength(2);
+  });
+
+  it("returns nothing for empty input", () => {
+    expect(parsePastedTracks("").tracks).toEqual([]);
+    expect(parsePastedTracks("   ").tracks).toEqual([]);
   });
 });

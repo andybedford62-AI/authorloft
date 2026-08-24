@@ -197,3 +197,66 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata> {
       : empty;
   }
 }
+
+// ── Bulk paste ───────────────────────────────────────────────────────────────
+
+export type PastedTrack = { url: string; title: string; description: string };
+
+export type PasteParseResult = {
+  tracks: PastedTrack[];
+  /** Lines that held something but no usable https link, for honest feedback. */
+  invalidLines: string[];
+};
+
+/**
+ * Parses a pasted block into track rows. One entry per line; a title and note
+ * may follow the link, separated by a TAB, a vertical bar, or a comma.
+ *
+ * TAB is checked first deliberately: selecting cells in Excel or Google Sheets
+ * and copying produces tab-separated text, so a spreadsheet paste just works
+ * without anyone exporting a CSV or mapping columns.
+ *
+ * Splitting stops after three fields, so commas inside a note survive.
+ */
+export function parsePastedTracks(input: string): PasteParseResult {
+  const tracks: PastedTrack[] = [];
+  const invalidLines: string[] = [];
+
+  for (const rawLine of (input ?? "").split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;      // blank and comment lines
+
+    // First delimiter present wins, so a note containing a comma still parses
+    // correctly when the row came from a spreadsheet.
+    const delimiter = line.includes("\t") ? "\t" : line.includes("|") ? "|" : ",";
+    const parts = splitAtMost(line, delimiter, 3).map((p) => p.trim());
+
+    const link = resolveTrackLink(parts[0] ?? "");
+    if (!link) {
+      invalidLines.push(line);
+      continue;
+    }
+
+    tracks.push({
+      url: link.canonicalUrl,
+      title: parts[1] ?? "",
+      description: parts[2] ?? "",
+    });
+  }
+
+  return { tracks, invalidLines };
+}
+
+/** split() with a cap that keeps the remainder in the final field. */
+function splitAtMost(value: string, delimiter: string, max: number): string[] {
+  const out: string[] = [];
+  let rest = value;
+  while (out.length < max - 1) {
+    const i = rest.indexOf(delimiter);
+    if (i === -1) break;
+    out.push(rest.slice(0, i));
+    rest = rest.slice(i + delimiter.length);
+  }
+  out.push(rest);
+  return out;
+}
