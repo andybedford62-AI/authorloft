@@ -15,6 +15,7 @@ interface NavSettings {
   navShowBookstore: boolean;
   navShowBundles: boolean;
   navShowCourses: boolean;
+  navShowMusic: boolean;
 }
 
 interface NavSettingsPanelProps {
@@ -23,6 +24,7 @@ interface NavSettingsPanelProps {
   mediaKitEnabled: boolean;
   bundlesEnabled: boolean;
   coursesEnabled: boolean;
+  musicEnabled: boolean;
 }
 
 const BUILT_IN_ITEMS = [
@@ -97,6 +99,15 @@ const BUILT_IN_ITEMS = [
     planGateKey: "courses" as const,
   },
   {
+    key: "navShowMusic" as keyof NavSettings,
+    label: "Music",
+    href: "/music",
+    description: "Playlists of tracks hosted on YouTube, Spotify and elsewhere",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "music" as const,
+  },
+  {
     key: "navShowBookstore" as keyof NavSettings,
     label: "Bookstore",
     href: "AuthorLoft bookstore (external)",
@@ -105,7 +116,7 @@ const BUILT_IN_ITEMS = [
   },
 ];
 
-export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, bundlesEnabled, coursesEnabled }: NavSettingsPanelProps) {
+export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, bundlesEnabled, coursesEnabled, musicEnabled }: NavSettingsPanelProps) {
   const [settings, setSettings] = useState<NavSettings>(initial);
   const [saving, setSaving] = useState<keyof NavSettings | null>(null);
   const [saved, setSaved] = useState<keyof NavSettings | null>(null);
@@ -135,6 +146,7 @@ export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, b
     if (item.planGateKey === "mediaKit") return mediaKitEnabled;
     if (item.planGateKey === "bundles") return bundlesEnabled;
     if (item.planGateKey === "courses") return coursesEnabled;
+    if (item.planGateKey === "music") return musicEnabled;
     return flipBooksEnabled;
   });
 

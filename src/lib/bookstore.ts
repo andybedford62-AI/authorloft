@@ -221,6 +221,7 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
   const rows = await prisma.course
     .findMany({
       where: {
+        kind: "COURSE",
         listInBookstore: true,
         isPublished: true,
         author: {

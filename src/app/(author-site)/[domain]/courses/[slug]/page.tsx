@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { domain, slug } = await params;
   const author = await getAuthorByDomain(domain);
   const course = await prisma.course.findFirst({
-    where: { authorId: author.id, slug, isPublished: true },
+    where: { authorId: author.id, slug, kind: "COURSE", isPublished: true },
     select: { title: true, description: true, coverImageUrl: true },
   });
   if (!course) return {};
@@ -44,7 +44,7 @@ export default async function CourseDetailPage({
   const accentColor = author.accentColor;
 
   const course = await prisma.course.findFirst({
-    where: { authorId: author.id, slug, isPublished: true },
+    where: { authorId: author.id, slug, kind: "COURSE", isPublished: true },
     include: {
       modules: {
         include: { lessons: { orderBy: { sortOrder: "asc" } } },

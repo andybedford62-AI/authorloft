@@ -18,8 +18,10 @@ export async function POST(req: NextRequest) {
 
   const { courseId, email, name } = parsed.data;
 
-  const course = await prisma.course.findUnique({
-    where: { id: courseId },
+  // findFirst + kind, not findUnique by id: a music list must never be
+  // enrollable, and the id comes from the caller.
+  const course = await prisma.course.findFirst({
+    where: { id: courseId, kind: "COURSE" },
     select: { id: true, title: true, slug: true, isPublished: true, priceCents: true, authorId: true, author: { select: { slug: true, displayName: true, name: true, email: true } } },
   });
 

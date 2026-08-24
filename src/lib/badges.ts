@@ -44,7 +44,7 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     prisma.affiliateReferral.aggregate({ where: { book: { authorId } }, _sum: { saleCount: true } }),
     prisma.book.findMany({ where: { authorId }, select: { availableFormats: true } }),
     prisma.bundle.count({ where: { authorId, isPublished: true } }),
-    prisma.course.count({ where: { authorId, isPublished: true } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE", isPublished: true } }),
     prisma.preOrderSignup.count({ where: { authorId } }),
   ]);
 

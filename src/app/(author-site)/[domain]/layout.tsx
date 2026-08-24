@@ -47,6 +47,7 @@ async function resolveAuthor(domain: string) {
       navShowBookstore: true,
       navShowBundles: true,
       navShowCourses: true,
+      navShowMusic: true,
       googleSiteVerification: true,
       bingSiteVerification: true,
       siteTheme: true,
@@ -160,6 +161,7 @@ export default async function AuthorSiteLayout({
     navShowBookstore: author.navShowBookstore,
     navShowBundles: author.navShowBundles,
     navShowCourses: author.navShowCourses,
+    navShowMusic: author.navShowMusic,
   };
 
   // Enforce plan-based theme access at render time

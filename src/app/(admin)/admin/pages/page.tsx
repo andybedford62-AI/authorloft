@@ -24,6 +24,7 @@ export default async function AdminPagesPage() {
         navShowBookstore: true,
         navShowBundles: true,
         navShowCourses: true,
+        navShowMusic: true,
         plan: { select: { flipBooksLimit: true, mediaKitEnabled: true, bundlesEnabled: true, coursesEnabled: true } },
       },
     }),
@@ -56,6 +57,7 @@ export default async function AdminPagesPage() {
     navShowBookstore: author.navShowBookstore,
     navShowBundles: author.navShowBundles,
     navShowCourses: author.navShowCourses,
+    navShowMusic: author.navShowMusic,
   };
 
   return (
@@ -89,6 +91,7 @@ export default async function AdminPagesPage() {
           mediaKitEnabled={!!(author.plan as any)?.mediaKitEnabled}
           bundlesEnabled={!!(author.plan as any)?.bundlesEnabled}
           coursesEnabled={!!(author.plan as any)?.coursesEnabled}
+          musicEnabled={!!(author.plan as any)?.musicEnabled}
         />
       </section>
 

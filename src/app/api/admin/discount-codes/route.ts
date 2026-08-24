@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     // Validate that any restricted course IDs belong to this author and are published
     if (safeCourseIds.length > 0) {
       const validCourses = await prisma.course.findMany({
-        where: { id: { in: safeCourseIds }, authorId, isPublished: true },
+        where: { id: { in: safeCourseIds }, authorId, kind: "COURSE", isPublished: true },
         select: { id: true },
       });
       if (validCourses.length !== safeCourseIds.length) {

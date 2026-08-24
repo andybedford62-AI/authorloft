@@ -141,7 +141,7 @@ async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
     select: {
       id: true, updatedAt: true,
       navShowAbout: true, navShowBooks: true, navShowContact: true,
-      navShowBlog: true, navShowFlipBooks: true,
+      navShowBlog: true, navShowFlipBooks: true, navShowMusic: true,
     },
   }).catch(() => null);
 
@@ -192,6 +192,19 @@ async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
       entries.push({ loc: `${base}/flip-books`, lastmod: now, changefreq: "monthly", priority: 0.6 });
       for (const fb of flipBooks) {
         entries.push({ loc: `${base}/flip-books/${fb.slug}`, lastmod: fb.updatedAt, changefreq: "monthly", priority: 0.5 });
+      }
+    }
+  }
+
+  if (author.navShowMusic) {
+    const lists = await prisma.course.findMany({
+      where:  { authorId: author.id, kind: "MUSIC", isPublished: true },
+      select: { slug: true, updatedAt: true },
+    }).catch(() => []);
+    if (lists.length > 0) {
+      entries.push({ loc: `${base}/music`, lastmod: now, changefreq: "monthly", priority: 0.6 });
+      for (const l of lists) {
+        entries.push({ loc: `${base}/music/${l.slug}`, lastmod: l.updatedAt, changefreq: "monthly", priority: 0.5 });
       }
     }
   }

@@ -37,6 +37,7 @@ import {
   ListChecks,
   Package,
   GraduationCap,
+  Music,
 } from "lucide-react";
 
 // Nav data shared between the sidebar and the command-palette search — a
@@ -72,6 +73,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/flip-books", label: "Flip Books", icon: BookMarked    },
       { href: "/admin/bundles",    label: "Bundles",    icon: Package       },
       { href: "/admin/courses",    label: "Courses",    icon: GraduationCap },
+      { href: "/admin/music",      label: "Music",      icon: Music         },
       { href: "/admin/specials",   label: "Specials",   icon: Sparkles      },
     ],
   },

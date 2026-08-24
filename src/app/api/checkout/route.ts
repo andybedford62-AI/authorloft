@@ -69,8 +69,9 @@ export async function POST(req: NextRequest) {
 
     // ── Course checkout path ─────────────────────────────────────────────
     if (validatedBody.courseId) {
-      const course = await prisma.course.findUnique({
-        where: { id: validatedBody.courseId },
+      // Music lists are not purchasable — guard the caller-supplied id.
+      const course = await prisma.course.findFirst({
+        where: { id: validatedBody.courseId, kind: "COURSE" },
         include: {
           author: {
             select: {

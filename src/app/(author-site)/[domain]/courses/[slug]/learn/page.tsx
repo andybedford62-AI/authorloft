@@ -14,7 +14,7 @@ export async function generateMetadata({
   const { domain, slug } = await params;
   const author = await getAuthorByDomain(domain);
   const course = await prisma.course.findFirst({
-    where: { authorId: author.id, slug, isPublished: true },
+    where: { authorId: author.id, slug, kind: "COURSE", isPublished: true },
     select: { title: true },
   });
   return {
@@ -50,7 +50,7 @@ export default async function CourseLearnPage({
   const author = await getAuthorByDomain(domain);
 
   const course = await prisma.course.findFirst({
-    where: { authorId: author.id, slug, isPublished: true },
+    where: { authorId: author.id, slug, kind: "COURSE", isPublished: true },
     include: {
       modules: {
         include: { lessons: { orderBy: { sortOrder: "asc" } } },

@@ -10,7 +10,7 @@ export default async function AdminCoursesPage() {
   const authorId = await getAdminAuthorId();
 
   const courses = await prisma.course.findMany({
-    where: { authorId },
+    where: { authorId, kind: "COURSE" },
     include: {
       modules: {
         include: { lessons: { select: { id: true } } },

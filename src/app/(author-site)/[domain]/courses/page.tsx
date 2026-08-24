@@ -33,7 +33,7 @@ export default async function CoursesPage({
   const accentColor = author.accentColor;
 
   const courses = await prisma.course.findMany({
-    where: { authorId: author.id, isPublished: true },
+    where: { authorId: author.id, kind: "COURSE", isPublished: true },
     include: {
       modules: {
         include: { lessons: { select: { id: true } } },

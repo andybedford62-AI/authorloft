@@ -21,6 +21,7 @@ interface NavConfig {
   navShowBookstore: boolean;
   navShowBundles:   boolean;
   navShowCourses:   boolean;
+  navShowMusic:     boolean;
 }
 
 interface CustomPage {
@@ -40,7 +41,7 @@ interface NavProps {
     linkedinUrl?: string | null;
     youtubeUrl?:  string | null;
     facebookUrl?: string | null;
-    plan?:        { flipBooksLimit: number } | null;
+    plan?:        { flipBooksLimit: number; musicEnabled?: boolean } | null;
     homeTemplate?: string | null;
   };
   navConfig?:   NavConfig;
@@ -85,6 +86,7 @@ function navTokens(dark: boolean) {
 
 function buildNavLinks(
   showFlipBooks: boolean,
+  showMusic: boolean,
   config?: NavConfig,
   customPages?: CustomPage[]
 ) {
@@ -98,6 +100,7 @@ function buildNavLinks(
   // creator who turns Books off entirely still has Courses reachable.
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
   if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
+  if (showMusic && config?.navShowMusic) links.push({ label: "Music",      href: "/music" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });
@@ -124,7 +127,8 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
   const pathname            = usePathname();
   const isOwner             = !!(session?.user && (session.user as any).id === author.id);
   const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const links               = buildNavLinks(showFlipBooks, navConfig, customPages);
+  const showMusic           = author.plan?.musicEnabled ?? false;
+  const links               = buildNavLinks(showFlipBooks, showMusic, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
   const dark                = isDarkTemplate(author.homeTemplate);

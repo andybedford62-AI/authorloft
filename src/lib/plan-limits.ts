@@ -68,7 +68,7 @@ export async function canAddCourse(
   const maxCourses = (limits as any).maxCourses as number | null;
   if (maxCourses === null || maxCourses === undefined) return { allowed: true };
 
-  const current = await prisma.course.count({ where: { authorId } });
+  const current = await prisma.course.count({ where: { authorId, kind: "COURSE" } });
   if (current >= maxCourses) {
     return {
       allowed: false,
@@ -76,6 +76,37 @@ export async function canAddCourse(
     };
   }
   return { allowed: true };
+}
+
+export async function canAddMusicList(
+  authorId: string
+): Promise<{ allowed: boolean; reason?: string }> {
+  const limits = await getAuthorPlanLimits(authorId);
+  if (!(limits as any).musicEnabled) {
+    return {
+      allowed: false,
+      reason: "Your current plan does not include music lists. Upgrade your plan to create one.",
+    };
+  }
+
+  const max = (limits as any).maxMusicLists as number | null;
+  if (max === null || max === undefined) return { allowed: true };
+
+  const current = await prisma.course.count({ where: { authorId, kind: "MUSIC" } });
+  if (current >= max) {
+    return {
+      allowed: false,
+      reason: `Your plan allows up to ${max} music list${max === 1 ? "" : "s"}. Upgrade your plan to add more.`,
+    };
+  }
+  return { allowed: true };
+}
+
+/** Tracks-per-list cap. Null on the plan means unlimited. */
+export async function maxTracksPerList(authorId: string): Promise<number | null> {
+  const limits = await getAuthorPlanLimits(authorId);
+  const max = (limits as any).maxTracksPerList as number | null | undefined;
+  return max ?? null;
 }
 
 export async function canPublishPost(

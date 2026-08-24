@@ -64,6 +64,15 @@ model InviteCode {
 
 // ─── Plans & Billing ─────────────────────────────────────────────────────────
 
+/// Courses and music lists share one model tree (Course -> CourseModule ->
+/// CourseLesson): a track is a lesson whose videoUrl points at YouTube/Spotify/
+/// Suno. `kind` keeps them apart. EVERY list-style course query must filter on
+/// it, or music leaks into course lists and vice versa.
+enum CourseKind {
+  COURSE
+  MUSIC
+}
+
 enum PlanTier {
   FREE
   STANDARD
@@ -97,6 +106,9 @@ model Plan {
   bundlesEnabled          Boolean              @default(false)
   coursesEnabled          Boolean              @default(false)
   maxCourses              Int?
+  musicEnabled            Boolean              @default(false)
+  maxMusicLists           Int?                 // null = unlimited (matches maxCourses/maxBooks)
+  maxTracksPerList        Int?                 // null = unlimited
   socialDailyLimit        Int                  @default(0) // Social Promote: 0 = feature disabled for this plan
   socialMonthlyLimit      Int                  @default(0)
   featuresJson            String?
@@ -173,6 +185,7 @@ model Author {
   navShowBookstore              Boolean               @default(true)
   navShowBundles                Boolean               @default(false)
   navShowCourses                Boolean               @default(false)
+  navShowMusic                  Boolean               @default(false)
   pressTitle                    String?
   pressBio                      String?               @db.Text
   pressContact                  String?
@@ -1581,6 +1594,7 @@ model BundleItem {
 model Course {
   id            String             @id @default(cuid())
   authorId      String
+  kind          CourseKind         @default(COURSE)
   title         String
   slug          String
   description   String?            @db.Text
@@ -1602,6 +1616,7 @@ model Course {
 
   @@unique([authorId, slug])
   @@index([authorId])
+  @@index([authorId, kind])
 }
 
 // Author-scoped course taxonomy, structurally identical to Genre (self-
@@ -1656,6 +1671,9 @@ model CourseLesson {
   title       String
   contentHtml String?      @db.Text
   videoUrl    String?
+  /// Cached from the track URL's Open Graph tags at save time, so public pages
+  /// never fetch third-party sites per view. Music tracks only.
+  thumbnailUrl String?
   fileKey     String?
   fileName    String?
   sortOrder   Int          @default(0)

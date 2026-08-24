@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   const maxCourses = (limits as any).maxCourses as number | null;
-  const currentCount = await prisma.course.count({ where: { authorId } });
+  const currentCount = await prisma.course.count({ where: { authorId, kind: "COURSE" } });
   const remaining = maxCourses === null ? validCourses.length : Math.max(0, maxCourses - currentCount);
 
   const toImport = validCourses.slice(0, remaining);
@@ -60,6 +60,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ imported: 0, skippedForPlanLimit, warnings });
   }
 
+  // Deliberately NOT filtered by kind: the slug uniqueness constraint is
+  // @@unique([authorId, slug]) across courses AND music lists, so dedup has
+  // to see both or an import can generate a colliding slug.
   const existingCourses = await prisma.course.findMany({ where: { authorId }, select: { title: true, slug: true } });
   const usedTitles = new Set(existingCourses.map((c) => c.title.toLowerCase()));
   const usedSlugs  = new Set(existingCourses.map((c) => c.slug));
@@ -136,7 +139,7 @@ export async function POST(req: NextRequest) {
   // Mirror the side effects from POST /api/admin/courses — a course creator
   // may onboard entirely through an import, so their first course(s) still
   // need to flip on the nav link and clear the onboarding modal.
-  const totalCourses = await prisma.course.count({ where: { authorId } });
+  const totalCourses = await prisma.course.count({ where: { authorId, kind: "COURSE" } });
   if (totalCourses === imported) {
     await prisma.author.updateMany({
       where: { id: authorId, navShowCourses: false },

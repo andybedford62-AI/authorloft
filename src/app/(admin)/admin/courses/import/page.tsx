@@ -12,7 +12,7 @@ export default async function CourseImportPage() {
   const authorId = await getAdminAuthorId();
 
   const [courseCount, author] = await Promise.all([
-    prisma.course.count({ where: { authorId } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE" } }),
     prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
   ]);
 

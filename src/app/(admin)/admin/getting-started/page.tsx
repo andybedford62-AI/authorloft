@@ -46,7 +46,7 @@ async function getData(authorId: string) {
         _count: { select: { retailerLinks: true, directSaleItems: true } },
       },
     }),
-    prisma.course.count({ where: { authorId } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE" } }),
   ]);
 
   return { author, books, courseCount };

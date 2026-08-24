@@ -13,6 +13,26 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Music pages for author sites (link-only, no hosting)
+
+Authors can publish playlists of music they already host elsewhere. Nothing is uploaded or stored — a track is a link to a public streaming page — so the feature carries no storage or bandwidth cost, which was the explicit constraint.
+
+**Courses and music share one model.** `Course.kind` (`COURSE` | `MUSIC`) discriminates; a music list is a Course with one module whose lessons are tracks, each lesson's `videoUrl` holding the streaming link. That reuses the whole tree rather than duplicating it — but it means **every list-style Course query must filter on `kind`**, or music leaks into course surfaces. All 36 call sites were audited: the public and admin course lists, the bookstore section, the discount-code picker, `/courses/[slug]` (detail, learn and print — otherwise a music list renders at a courses URL), plan-limit and badge counts, and the checkout/enrol paths (a music list must not be purchasable). Two queries are deliberately **left unfiltered and commented** to say so: slug uniqueness is `@@unique([authorId, slug])` across both kinds, so dedup that filtered by kind could mint a colliding slug.
+
+**Two render modes, because embeddability isn't ours to decide.** Suno serves `frame-ancestors 'none'` and `X-Frame-Options: SAMEORIGIN` — verified against a live share URL, not assumed — so no site anywhere may iframe it. YouTube and Spotify embed; Suno and everything else render as a link card with artwork and title, opening in a new tab. An unknown host degrades to a card rather than failing, so a provider we've never seen works the day it's pasted, and adding a provider later is an upgrade rather than a fix. Treating a non-embeddable host as embeddable is exactly what produced the blank grey box in the course-video bug earlier the same day.
+
+**Click-to-play, reusing the `book-preview-gallery` pattern:** only the opened track mounts an iframe, so a 50-track list costs one embed rather than fifty. That's what makes the track cap a product decision instead of a performance ceiling.
+
+**Metadata is fetched once, at save time** (`og:title` / `og:image`), so public pages never call a third-party site per view. That fetch takes an author-supplied URL, so it is HTTPS-only, refuses loopback/private/link-local/metadata addresses, times out at 6s, and caps the read at 256KB. YouTube artwork is derived from the video id without any fetch at all. Thumbnails render through `next/image`, which proxies via our own origin — so arbitrary artwork hosts need no `img-src` entry.
+
+Plan limits, mirroring books and courses: **5 / 20 / unlimited lists**, **15 / 50 / unlimited tracks** per list. Applied to the live `Plan` rows in the same migration. The `navShowMusic` toggle sits alongside the other nav switches, and an author's first music list flips it on so the page they just made is reachable.
+
+Schema applied to Supabase via MCP before any code shipped, per the migration workflow: `Course.kind` (+ `(authorId, kind)` index), `CourseLesson.thumbnailUrl`, three `Plan` columns, `Author.navShowMusic`. No new tables, so no new GRANTs. Both migrations recorded under `prisma/migrations/`.
+
+Sitemap, canonicals and `/features` updated in the same change. 20 new tests (URL resolution across providers, Open Graph parsing against tags Suno actually serves, and the row builder's cap/skip/title-fallback behaviour); full suite green at 97, `next build` clean.
+
+**Not built, deliberately:** uploads and hosted audio (cost), and selling music (checkout is revenue-critical and stays course-only — the guards are in place).
+
 ## August 24, 2026 — Editor images had no way to remove them; unsupported video hosts rendered nothing
 
 Two reports from the same course-lesson screen.

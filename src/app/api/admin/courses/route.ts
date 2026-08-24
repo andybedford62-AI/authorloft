@@ -10,7 +10,7 @@ export async function GET() {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const courses = await prisma.course.findMany({
-    where: { authorId },
+    where: { authorId, kind: "COURSE" },
     include: {
       modules: {
         include: { lessons: { select: { id: true } } },
@@ -41,6 +41,8 @@ export async function POST(req: NextRequest) {
   }
 
   const slug = slugify(title);
+  // Not filtered by kind on purpose — slugs are unique per author across
+  // courses and music lists alike.
   const existing = await prisma.course.findUnique({ where: { authorId_slug: { authorId, slug } } });
   if (existing) {
     return NextResponse.json({ error: "A course with this slug already exists" }, { status: 400 });
@@ -90,7 +92,7 @@ export async function POST(req: NextRequest) {
   // actually reachable from the live site. Off by default (existing authors who
   // never touch courses shouldn't get an empty nav item); gated on count === 1
   // so it never re-enables a nav item someone deliberately turned back off later.
-  const totalCourses = await prisma.course.count({ where: { authorId } });
+  const totalCourses = await prisma.course.count({ where: { authorId, kind: "COURSE" } });
   if (totalCourses === 1) {
     await prisma.author.updateMany({
       where: { id: authorId, navShowCourses: false },

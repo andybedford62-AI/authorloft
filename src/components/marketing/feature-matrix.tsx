@@ -9,6 +9,9 @@ export type FeatureMatrixPlanData = PlanData & {
   bundlesEnabled: boolean;
   coursesEnabled: boolean;
   maxCourses: number | null;
+  musicEnabled: boolean;
+  maxMusicLists: number | null;
+  maxTracksPerList: number | null;
 };
 
 type FeatureRow = {
@@ -147,6 +150,22 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
             FREE: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—",
             STANDARD: standard?.coursesEnabled ? formatLimit(standard?.maxCourses, 25) : "—",
             PREMIUM: premium?.coursesEnabled ? formatLimit(premium?.maxCourses, 0) : "—",
+          },
+        },
+        {
+          name: "Music Lists",
+          tiers: {
+            FREE: free?.musicEnabled ? formatLimit(free?.maxMusicLists, 5) : "—",
+            STANDARD: standard?.musicEnabled ? formatLimit(standard?.maxMusicLists, 20) : "—",
+            PREMIUM: premium?.musicEnabled ? formatLimit(premium?.maxMusicLists, 0) : "—",
+          },
+        },
+        {
+          name: "Tracks per Music List",
+          tiers: {
+            FREE: free?.musicEnabled ? formatLimit(free?.maxTracksPerList, 15) : "—",
+            STANDARD: standard?.musicEnabled ? formatLimit(standard?.maxTracksPerList, 50) : "—",
+            PREMIUM: premium?.musicEnabled ? formatLimit(premium?.maxTracksPerList, 0) : "—",
           },
         },
         {

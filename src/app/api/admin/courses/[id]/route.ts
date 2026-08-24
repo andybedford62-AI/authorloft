@@ -56,7 +56,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     });
     const limit = author?.plan?.bookstoreListingLimit ?? -1;
     if (limit !== -1) {
-      const currentCount = await prisma.course.count({ where: { authorId, listInBookstore: true, id: { not: id } } });
+      const currentCount = await prisma.course.count({ where: { authorId, kind: "COURSE", listInBookstore: true, id: { not: id } } });
       if (currentCount >= limit) {
         return NextResponse.json(
           { error: `Your plan allows up to ${limit} bookstore listing${limit === 1 ? "" : "s"}. Upgrade to list more.` },

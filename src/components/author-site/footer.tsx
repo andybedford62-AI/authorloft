@@ -15,6 +15,7 @@ interface NavConfig {
   navShowMediaKit:  boolean;
   navShowBundles?:  boolean;
   navShowCourses?:  boolean;
+  navShowMusic?:    boolean;
 }
 
 interface CustomPage {
@@ -57,6 +58,7 @@ function buildQuickLinks(
   // about-media-kit-tabs.tsx), matching the main nav (nav.tsx).
   if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
   if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
+  if (config?.navShowMusic)             links.push({ label: "Music",      href: "/music" });
   if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
   if (showFlipBooks && (!config || config.navShowFlipBooks))
                                          links.push({ label: "Flip Books", href: "/flip-books" });

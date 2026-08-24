@@ -20,6 +20,7 @@ export async function GET() {
       navShowBookstore: true,
       navShowBundles: true,
       navShowCourses: true,
+      navShowMusic: true,
     },
   });
 
@@ -44,6 +45,7 @@ export async function PUT(req: Request) {
     navShowBookstore,
     navShowBundles,
     navShowCourses,
+    navShowMusic,
   } = body;
 
   const updated = await prisma.author.update({
@@ -59,6 +61,7 @@ export async function PUT(req: Request) {
       ...(typeof navShowBookstore  === "boolean" && { navShowBookstore }),
       ...(typeof navShowBundles    === "boolean" && { navShowBundles }),
       ...(typeof navShowCourses    === "boolean" && { navShowCourses }),
+      ...(typeof navShowMusic      === "boolean" && { navShowMusic }),
     },
     select: {
       navShowAbout: true,
@@ -71,6 +74,7 @@ export async function PUT(req: Request) {
       navShowBookstore: true,
       navShowBundles: true,
       navShowCourses: true,
+      navShowMusic: true,
     },
   });
 

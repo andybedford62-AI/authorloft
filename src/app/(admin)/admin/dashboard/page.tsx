@@ -94,7 +94,7 @@ async function getDashboardData(authorId: string) {
 
     // All courses for the catalog tabs card
     prisma.course.findMany({
-      where: { authorId },
+      where: { authorId, kind: "COURSE" },
       orderBy: { displayOrder: "asc" },
       select: { id: true, title: true, priceCents: true, isPublished: true },
     }),
@@ -233,6 +233,7 @@ export default async function DashboardPage() {
         navShowContact: true,
         navShowMediaKit: true,
         navShowCourses: true,
+        navShowMusic: true,
         navShowBundles: true,
         plan: { select: { salesEnabled: true, flipBooksLimit: true, mediaKitEnabled: true, coursesEnabled: true, bundlesEnabled: true } },
         books: {
@@ -253,7 +254,7 @@ export default async function DashboardPage() {
       select: { slug: true, title: true, navTitle: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
-    prisma.course.count({ where: { authorId } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE" } }),
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
