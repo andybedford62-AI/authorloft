@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — YouTube playlist import for music lists
+
+The same importer the courses page got earlier today, now on `/admin/music`: paste a public playlist, every video becomes a track with its title, notes and artwork, saved as a draft list to review before publishing.
+
+The playlist fetching is shared outright — `lib/youtube-playlist.ts` (URL parsing, Data API v3 with pagination when `YOUTUBE_API_KEY` is set, RSS fallback otherwise) is untouched. Only the mapping is new, because a music track is a link row rather than a lesson. Creation goes through the ordinary `POST /api/admin/music`, so list limits, slug collision, per-track metadata and the track cap all behave identically to a hand-built list.
+
+The plan's tracks-per-list cap is applied at preview time and reported ("the first 15 of 40 are shown"), and the list-count limit is checked *before* the playlist is fetched, so an author who is already at their limit is told immediately rather than after reviewing forty tracks.
+
+Also moved: **"Music Videos" from a course to a music list.** Fourteen YouTube lessons with notes, built as a course before music lists existed. Targeted by id, nothing deleted, reversible with a single UPDATE recorded in the migration. Two fixes had to land first, because the move would otherwise have destroyed content: the public music page didn't render per-track notes (eight of the fourteen have them), and the music admin replaces every track row on save, which would have flattened them — including one containing an image. Tracks now carry an editable note, and original markup survives a save that didn't change the wording.
+
+6 new tests. Suite green at 110; `next build` clean.
+
 ## August 24, 2026 — Music pages for author sites (link-only, no hosting)
 
 Authors can publish playlists of music they already host elsewhere. Nothing is uploaded or stored — a track is a link to a public streaming page — so the feature carries no storage or bandwidth cost, which was the explicit constraint.

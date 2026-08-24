@@ -161,6 +161,14 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Music Import (YouTube playlist)",
+          tiers: {
+            FREE: free?.musicEnabled ? "✓" : "—",
+            STANDARD: standard?.musicEnabled ? "✓" : "—",
+            PREMIUM: premium?.musicEnabled ? "✓" : "—",
+          },
+        },
+        {
           name: "Tracks per Music List",
           tiers: {
             FREE: free?.musicEnabled ? formatLimit(free?.maxTracksPerList, 15) : "—",

@@ -43,6 +43,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | Up to 5 | Up to 25 | Unlimited |
 | **Courses Import** (YouTube playlist → draft course, or one-row-per-lesson CSV; lands as drafts) | ✅ | ✅ | ✅ |
 | **Music Lists** (playlists of links to YouTube/Spotify/Suno etc; nothing uploaded) | Up to 5 | Up to 20 | Unlimited |
+| **Music Import** (YouTube playlist → draft music list) | ✅ | ✅ | ✅ |
 | **Tracks per Music List** | Up to 15 | Up to 50 | Unlimited |
 | **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
