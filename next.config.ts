@@ -23,8 +23,12 @@ const ContentSecurityPolicy = [
   // Google Ads (gtag.js) beacon/conversion calls, incl. ad.doubleclick.net which
   // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host)
   "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net",
-  // Stripe 3D Secure and payment frames
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+  // Stripe 3D Secure and payment frames.
+  // Plus the two video hosts extractVideoEmbed() in courses/[slug]/learn
+  // rewrites author-supplied watch URLs to. Without them the lesson <iframe>
+  // is blocked outright and the video area renders as an empty grey box —
+  // which is what every YouTube course lesson did until Aug 24 2026.
+  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
   "object-src 'none'",
   "base-uri 'self'",

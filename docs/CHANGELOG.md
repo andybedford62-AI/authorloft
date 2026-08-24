@@ -13,6 +13,22 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Course lesson videos were blocked by our own CSP
+
+Reported as "why is the public page showing 2 different image placeholders?" on a course lesson. It wasn't two images. The lower one was a real cover image loading fine from Supabase; the upper grey box with a broken-content icon was the lesson's **video `<iframe>` being blocked by our Content-Security-Policy**.
+
+`extractVideoEmbed()` in `courses/[slug]/learn/page.tsx` rewrites an author's watch URL to `https://www.youtube-nocookie.com/embed/…` (or `player.vimeo.com`), but `frame-src` in `next.config.ts` listed only the three Stripe hosts. The browser refused to load the frame, and a blocked iframe paints as an empty box — so the lesson looked like it had a broken image.
+
+This had been true since courses shipped June 27, 2026: **no course lesson video has ever played in production.** Checked against the live DB — 19 lessons carry a `videoUrl`, 14 of them YouTube (the other 5 are `example.com` seed rows), so 14 real lessons were rendering a dead grey box. It also silently undercut the YouTube playlist importer shipped earlier the same day, whose whole output is lessons with YouTube `videoUrl`s.
+
+`frame-src` now also allows `www.youtube-nocookie.com`, `www.youtube.com` and `player.vimeo.com` — the exact hosts `extractVideoEmbed` can emit, nothing wider.
+
+Guarded by `src/__tests__/csp-video-embeds.test.ts`, which asserts frame-src covers every host the embed helper produces, that Stripe's frames still work, that the directive never becomes a wildcard (which would make the test vacuous), and that the learn page still targets the hosts the test pins — so retargeting the helper can't quietly break the link again. Confirmed the guard fails when the hosts are removed.
+
+Two related things found and deliberately **not** changed:
+- **The flip-book admin preview iframe** (`flip-book-form.tsx`) is blocked by the same policy. Its URL is arbitrary author-supplied (Heyzine/Issuu/FlipHTML5/…), so allowlisting it means either naming every provider or weakening `frame-src` platform-wide — a real decision, not a drive-by fix. The public flip-book page is unaffected: it uses a `target="_blank"` link, not an embed.
+- **Lessons whose `videoUrl` is neither YouTube nor Vimeo** render nothing at all — `extractVideoEmbed` returns null and the block is skipped silently, with no "unsupported video host" message. Only seed data hits this today.
+
 ## August 24, 2026 — Course import from a YouTube playlist
 
 First concrete piece of the ⭐ course-import strategy item (backlog, flagged Aug 21): accept a course in a form creators actually already have. A playlist URL pasted on `/admin/courses/import` becomes a reviewable draft course — one lesson per video, titles and descriptions pre-filled, each video embedded — without retyping a single lesson title, which is exactly the success test that item defined.
