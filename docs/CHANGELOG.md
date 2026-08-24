@@ -15,15 +15,24 @@ line rather than listing every commit.
 
 ## August 24, 2026 — Search Console indexing failures: retired subdomains were blocking their own redirects
 
-Investigated a batch of "pages not indexed" reports in Search Console. Every reported URL turned out to be a Next.js build artifact under `/_next/static/` — JS chunks, one CSS file, woff2 fonts — not a page at all. The Page Indexing report lists every URL Google has crawled, including subresources fetched while rendering, so build assets land in the failure bucket as a matter of course. Three groups, only one of them an actual defect:
+Investigated two batches of Search Console failures, reported a few hours apart and with different causes.
 
-- **Stale chunks on `www` (404).** Every Vercel deploy emits new content-hashed filenames and a new `?dpl=` deployment id; old chunks are purged once their deployment is superseded. Google crawled these while rendering a page in early August and 404'd on recrawl. Expected, and explicitly not a ranking signal.
-- **A font that still returns 200.** A woff2 binary has nothing indexable in it. Benign.
-- **`apbedford2.authorloft.com` — 8 of the reported URLs, and a genuine bug.** See below.
+The **first batch ("not indexed")** was entirely Next.js build artifacts under `/_next/static/` — JS chunks, one CSS file, woff2 fonts, no pages at all. The Page Indexing report lists every URL Google has crawled, including subresources fetched while rendering, so build assets land in the failure bucket as a matter of course. Two harmless groups:
+
+- **Stale chunks on `www` (404).** Every Vercel deploy emits new content-hashed filenames and a new `?dpl=` deployment id; old chunks are purged once their deployment is superseded. Google crawled these while rendering a page and 404'd on recrawl. Expected, and explicitly not a ranking signal. New ones will keep appearing after every deploy.
+- **Fonts that still return 200.** A woff2 binary has nothing indexable in it. Benign.
+
+The **second batch ("blocked by robots.txt")** is where the real defect surfaced: alongside more `_next` assets it listed four genuine pages on `apbedford2.authorloft.com` — the site root, a blog post, a book detail page, and `/contact`.
 
 **The bug.** `apbedford2` is a retired slug: `redirectIfRetiredSlug` in `src/lib/author-queries.ts` 308s every path on it to the author's current address, and that function's own comment states the intent — "accumulated search ranking transfers rather than being lost". But `src/app/api/internal/robots/route.ts` resolved hosts by `Author.slug` / `Author.customDomain` only and never consulted `AuthorSlugHistory`, so a retired slug found no live author and fell through to the blanket `Disallow: /` branch meant for unknown hosts. Googlebot was therefore forbidden from crawling the very host whose redirects were supposed to carry the ranking across — the 308s could never be seen, and the transfer was stranded. Search Console reported the whole subdomain as blocked.
 
 The robots handler now checks `AuthorSlugHistory` when no live author matches and serves `Allow: /` for a retired slug whose author is still active. No `Sitemap:` line on that host — its `/sitemap.xml` 404s, and the author's live subdomain advertises the real one. A deactivated author, or a genuinely unknown host, still gets `Disallow: /`.
+
+**Root cause confirmed against the live data**, not inferred. `AuthorSlugHistory` holds exactly one row platform-wide — `apbedford2` to `apbedford`, author active, created **2026-08-01 03:18:55**. The four blocked pages are dated Aug 1, 3, 9 and 18: every one on or after that timestamp. Before Aug 1 `apbedford2` was the live slug and served `Allow: /`; the moment it was retired it stopped matching a live author and started serving `Disallow: /`. One retired slug exists, so the blast radius was exactly this subdomain.
+
+Verified on production after promotion: `apbedford2` robots serves `Allow: /` plus `Disallow: /api/` with no sitemap line, and all four URLs 308 to the same path on `apbedford.authorloft.com` with the final response returning 200 — no dead redirect targets.
+
+**The `www` assets in the blocked batch are a separate, historical matter.** Nothing in the current platform robots.txt matches `/_next/` (the only Disallow rules are `/admin`, `/api/`, `/arc/`, `/auth/`, `/maintenance`, `/orders/`, `/super-admin`), and 20 consecutive fetches returned identical 200s with no variation — no precedence race is happening now. Those reports are dated Jun 26 to Jul 8, which brackets the robots instability recorded below on Jun 23: `cdd20d69` fixed intermittent robots 404s and warned the handler would otherwise start returning `Disallow: /`, and `30941cad` then reintroduced the duplicate `app/robots.ts` four days later. Google marks everything it crawls for roughly a day after reading a `Disallow: /` (or a 5xx) as blocked, and the label persists until recrawl. Which failure mode Google hit on each date cannot be reconstructed without June-era logs; what is verifiable is that the current state is correct and stable, and that the duplicate file that made the ambiguity possible is gone as of this change.
 
 **What was deliberately not done:** blocking `/_next/` in robots.txt. It is the obvious-looking fix for the 404 noise and it would be actively harmful — Googlebot needs the JS and CSS to render pages, and the 404s themselves are harmless.
 
