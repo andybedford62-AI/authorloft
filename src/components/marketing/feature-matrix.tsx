@@ -150,6 +150,16 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          // Follows Author Courses' gating: import is part of courses, plan
+          // limits slice the import itself.
+          name: "Courses Import (YouTube playlist or CSV)",
+          tiers: {
+            FREE: free?.coursesEnabled ? "✓" : "—",
+            STANDARD: standard?.coursesEnabled ? "✓" : "—",
+            PREMIUM: premium?.coursesEnabled ? "✓" : "—",
+          },
+        },
+        {
           name: "Audio Format",
           tiers: {
             FREE: "—",

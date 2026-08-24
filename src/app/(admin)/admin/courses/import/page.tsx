@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { CourseImportWizard } from "@/components/admin/course-import-wizard";
+import { YouTubeImportPanel } from "@/components/admin/youtube-import-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +29,18 @@ export default async function CourseImportPage() {
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">Import Courses</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Bulk-add your curriculum from a CSV file — one row per lesson. Imported courses are saved as drafts so you can
-          review them before publishing.
+          Bring an existing curriculum in from a YouTube playlist or a CSV file. Imported courses are saved as drafts so
+          you can review them before publishing.
         </p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-sm font-semibold text-gray-900 mb-4">From a YouTube playlist</h2>
+        <YouTubeImportPanel remainingSlots={remainingSlots} planTier={planTier} />
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-sm font-semibold text-gray-900 mb-4">From a CSV file — one row per lesson</h2>
         <CourseImportWizard
           remainingSlots={remainingSlots}
           maxCourses={maxCourses}

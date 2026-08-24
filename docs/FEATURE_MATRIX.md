@@ -41,6 +41,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |
 | **Author Courses** (teach writing craft / subject expertise, module+lesson structure, video embeds) | Up to 5 | Up to 25 | Unlimited |
+| **Courses Import** (YouTube playlist → draft course, or one-row-per-lesson CSV; lands as drafts) | ✅ | ✅ | ✅ |
 | **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book, per-bundle, per-course, or sitewide) | ✅ | ✅ | ✅ |

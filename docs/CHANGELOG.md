@@ -13,6 +13,25 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Course import from a YouTube playlist
+
+First concrete piece of the ⭐ course-import strategy item (backlog, flagged Aug 21): accept a course in a form creators actually already have. A playlist URL pasted on `/admin/courses/import` becomes a reviewable draft course — one lesson per video, titles and descriptions pre-filled, each video embedded — without retyping a single lesson title, which is exactly the success test that item defined.
+
+How it's built, and what it deliberately reuses:
+
+- **`src/lib/youtube-playlist.ts`** — URL parsing (playlist links, watch-URLs with `&list=`, bare IDs; rejects Watch Later/Liked/auto-mixes, which no server can fetch), fetching, and mapping into `MappedCourseImport`, the exact shape the existing import endpoint takes.
+- **Two data paths**: with `YOUTUBE_API_KEY` set (new optional env var in `required-env.json`), the Data API v3 pages through the whole playlist (capped at the importer's 500-row limit, private/deleted placeholder entries skipped). Without a key it falls back to the public playlist RSS feed — YouTube caps that at the 15 most recent videos, so the preview warns and imports what it can rather than failing. **The RSS parser was verified against a real downloaded YouTube feed, not just synthetic fixtures** — worth stating because the first synthetic test passed while a scratch copy of the regex silently failed on the real thing.
+- **Preview route** `/api/admin/courses/import-youtube` returns the mapped course for review (editable title, per-lesson list); **creation then goes through the existing `POST /api/admin/courses/import` unchanged**, so plan-limit slicing, title dedup, draft-only status, `navShowCourses`, and the onboarding/PostHog side effects all live in exactly one place still.
+- **Lesson content safety**: video descriptions are plain text but lesson `contentHtml` is rendered HTML — descriptions are escaped and paragraph-wrapped so nothing in a description can ever be parsed as markup.
+- **`videoUrl` stores the plain watch URL**, which the `/learn` viewer's `extractVideoEmbed` already converts to a `youtube-nocookie` embed; a test pins that round-trip.
+- **UI**: `YouTubeImportPanel` sits above the CSV wizard on the import page, styled to match it (URL → preview with editable course title → draft import → results with "Go to My Courses").
+
+Also: added a **Courses Import** row to `/features` (`feature-matrix.tsx`) and `docs/FEATURE_MATRIX.md` — the Aug 7 CSV importer had shipped without one, exactly the gap the "check /features on any feature change" rule exists for; the new row covers both paths under the same `coursesEnabled` gating.
+
+Tests: `src/__tests__/youtube-playlist-import.test.ts` (10 cases — URL shapes, RSS parsing incl. empty descriptions, HTML escaping, the import-shape mapping, the embed round-trip). Full suite green at 69; `next build` clean.
+
+**To lift the 15-video RSS cap:** create a YouTube Data API v3 key (free tier is ample — ~1 unit per 50 videos) and set `YOUTUBE_API_KEY` in Vercel (Production + Preview + Development, no branch scoping). Everything works without it; long playlists just truncate with a warning until it's set.
+
 ## August 24, 2026 — Author-site pages all canonicalised to the author's homepage
 
 Found while chasing a Search Console "Alternate page with proper canonical tag" report. That status is informational — Google saw a canonical and honoured it — but one of the four URLs led somewhere worse.
