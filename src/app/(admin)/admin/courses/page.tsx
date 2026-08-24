@@ -36,7 +36,7 @@ export default async function AdminCoursesPage() {
           <Link href="/admin/courses/import">
             <Button variant="outline">
               <Upload className="h-4 w-4 mr-2" />
-              Import CSV
+              Import Courses
             </Button>
           </Link>
           <Link href="/admin/courses/new">
