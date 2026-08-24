@@ -7,6 +7,7 @@ import {
   Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CoverUpload } from "@/components/admin/cover-upload";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
@@ -119,10 +120,14 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
           <label className="block text-xs font-semibold text-gray-500 mb-1">Description</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputClass} />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Cover image URL</label>
-          <input value={coverImageUrl} onChange={(e) => setCoverImageUrl(e.target.value)} className={inputClass} placeholder="https://…" />
-        </div>
+        {/* Same uploader the course editor uses: drag-and-drop or file picker,
+            with a paste-a-URL option behind the link button. Shown on the music
+            index card and at the top of the list's public page. */}
+        <CoverUpload
+          value={coverImageUrl}
+          onChange={setCoverImageUrl}
+          label="Cover / Banner Image"
+        />
         <label className="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="rounded border-gray-300" />
           Published (visible on your public Music page)

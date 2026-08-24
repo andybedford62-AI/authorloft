@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Upload a banner image for a music list
+
+The music form only accepted a cover as a pasted URL. It now uses `CoverUpload` — the same component the course editor uses — so a banner can be dragged in or picked from disk, with the paste-a-URL option still there behind the link button. Uploads go to the existing `/api/admin/upload/cover` route (jpeg/png/webp/gif, 5MB), so no new endpoint or storage path. Works on both the new and edit forms, since they share one component.
+
+Fixed alongside it: the same image was being rendered **16:9 on the music index card but cropped to a 160px square on the list's own page**, so one upload looked wrong in one of the two places — and "banner" is the shape people will actually upload. The detail page now leads with a 3:1 banner, falling back to the placeholder tile only when a list has no image at all.
+
 ## August 24, 2026 — Bulk paste for music links, and tabs on the music admin
 
 Adding an album a link at a time was the obvious friction. `/admin/music` now takes a pasted block: one link per line, with an optional title and note after it separated by a **Tab**, a **comma**, or a **|**.
