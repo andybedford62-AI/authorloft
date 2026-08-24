@@ -13,6 +13,24 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Search Console indexing failures: retired subdomains were blocking their own redirects
+
+Investigated a batch of "pages not indexed" reports in Search Console. Every reported URL turned out to be a Next.js build artifact under `/_next/static/` — JS chunks, one CSS file, woff2 fonts — not a page at all. The Page Indexing report lists every URL Google has crawled, including subresources fetched while rendering, so build assets land in the failure bucket as a matter of course. Three groups, only one of them an actual defect:
+
+- **Stale chunks on `www` (404).** Every Vercel deploy emits new content-hashed filenames and a new `?dpl=` deployment id; old chunks are purged once their deployment is superseded. Google crawled these while rendering a page in early August and 404'd on recrawl. Expected, and explicitly not a ranking signal.
+- **A font that still returns 200.** A woff2 binary has nothing indexable in it. Benign.
+- **`apbedford2.authorloft.com` — 8 of the reported URLs, and a genuine bug.** See below.
+
+**The bug.** `apbedford2` is a retired slug: `redirectIfRetiredSlug` in `src/lib/author-queries.ts` 308s every path on it to the author's current address, and that function's own comment states the intent — "accumulated search ranking transfers rather than being lost". But `src/app/api/internal/robots/route.ts` resolved hosts by `Author.slug` / `Author.customDomain` only and never consulted `AuthorSlugHistory`, so a retired slug found no live author and fell through to the blanket `Disallow: /` branch meant for unknown hosts. Googlebot was therefore forbidden from crawling the very host whose redirects were supposed to carry the ranking across — the 308s could never be seen, and the transfer was stranded. Search Console reported the whole subdomain as blocked.
+
+The robots handler now checks `AuthorSlugHistory` when no live author matches and serves `Allow: /` for a retired slug whose author is still active. No `Sitemap:` line on that host — its `/sitemap.xml` 404s, and the author's live subdomain advertises the real one. A deactivated author, or a genuinely unknown host, still gets `Disallow: /`.
+
+**What was deliberately not done:** blocking `/_next/` in robots.txt. It is the obvious-looking fix for the 404 noise and it would be actively harmful — Googlebot needs the JS and CSS to render pages, and the 404s themselves are harmless.
+
+**Also removed: `src/app/robots.ts`.** Same stale-duplicate trap as `src/app/sitemap.ts` (deleted Aug 21). `/robots.txt` is a rewrite to `/api/internal/robots` in both `next.config.ts` and `proxy.ts`, so the App Router metadata route never served anything — confirmed against production, where the live body matches the internal handler and not `robots.ts`. Note this file had **already been deleted once**, in `cdd20d69`, and was silently reintroduced by `30941cad`; it drifted out of sync in the meantime, still listing `/login`, `/register` and friends that the real handler does not.
+
+Covered by `src/__tests__/robots-retired-slug.test.ts` (6 cases: live author, retired slug, retired-but-deactivated, unknown subdomain, platform host, and the absent sitemap line). Pinned to the `node` test environment via a `@vitest-environment` docblock — as a jsdom file it cost ~30s of environment setup and starved the shared transform pipeline, which pushed the timing-sensitive Redis-fallback test past its timeout in the full run. Full suite green at 32 tests.
+
 ## August 21, 2026 — `npx vitest run` is reliable again (flaky login-rate-limit test)
 
 `src/__tests__/login-rate-limit.test.ts` passed in isolation but timed out under a full-suite run, with the number of failures varying between runs — 1 in one run, 4 in another. Two independent causes, both fixed:

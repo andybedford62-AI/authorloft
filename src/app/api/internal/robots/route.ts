@@ -76,9 +76,24 @@ export async function GET() {
     select: { id: true },
   }).catch(() => null);
 
+  // A retired slug has no live author but still 308s every path to the author's
+  // current address (redirectIfRetiredSlug in lib/author-queries.ts). Falling
+  // through to the Disallow-everything branch would stop Googlebot ever
+  // fetching those redirects, stranding the exact ranking transfer the 308
+  // exists to perform. No Sitemap line: a retired host has no sitemap of its
+  // own (that path 404s) — the author's live subdomain advertises the real one.
+  const retired = !author && slug
+    ? await prisma.authorSlugHistory.findUnique({
+        where: { slug },
+        select: { author: { select: { isActive: true } } },
+      }).catch(() => null)
+    : null;
+
   const body = author
     ? `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: https://${host}/sitemap.xml\n`
-    : `User-agent: *\nDisallow: /\n`;
+    : retired?.author?.isActive
+      ? `User-agent: *\nAllow: /\nDisallow: /api/\n`
+      : `User-agent: *\nDisallow: /\n`;
 
   return new NextResponse(body, {
     headers: {
