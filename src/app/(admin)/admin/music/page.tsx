@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, ListMusic, Music } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ export default async function MusicListsPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <NavVisibilityBanner authorId={authorId} navKey="music" />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Music</h1>

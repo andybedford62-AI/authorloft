@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { SpecialsListClient } from "@/components/admin/specials-list-client";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 
 export default async function AdminSpecialsPage() {
   const authorId = await getAdminAuthorId();
@@ -32,6 +33,7 @@ export default async function AdminSpecialsPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <NavVisibilityBanner authorId={authorId} navKey="specials" />
 
       {/* Header */}
       <div className="flex items-center justify-between">

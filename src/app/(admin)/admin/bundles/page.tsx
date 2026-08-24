@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { formatCents } from "@/lib/utils";
 
 export default async function AdminBundlesPage() {
@@ -27,6 +28,7 @@ export default async function AdminBundlesPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <NavVisibilityBanner authorId={authorId} navKey="bundles" />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

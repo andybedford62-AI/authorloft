@@ -3,6 +3,7 @@ import { Plus, BookOpen, ArrowRight, Upload, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
@@ -51,6 +52,7 @@ export default async function AdminBooksPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      <NavVisibilityBanner authorId={authorId} navKey="books" />
 
       {/* Header */}
       <div className="flex items-center justify-between">

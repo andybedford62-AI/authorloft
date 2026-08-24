@@ -13,6 +13,19 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Warn on the admin screen when a public page is hidden
+
+The show/hide toggles live on `/admin/pages`, but the work happens on the catalog screens — so an author could spend an afternoon adding courses that no visitor can reach and get no hint why. Each catalog screen now carries a banner at the top when its public page is switched off: Books, Flip Books, Bundles, Courses, Music, Specials and Blog.
+
+It distinguishes two different problems, because they have different fixes and conflating them sends the author in a circle:
+
+- **Toggle off** — amber: the page is hidden from the menu, with a link straight to Pages → Navigation Menu, and a note that the URL still works if linked directly.
+- **Plan doesn't include it** — grey: no switch would help, so it points at the plan instead.
+
+The rules live in `getNavPageVisibility()` in `src/lib/site-pages.ts`, deliberately next to `getAuthorSitePages()` whose conditions it mirrors, and 22 tests assert the two **agree** — for every page, on toggle-off and on plan-blocked. A banner whose logic has drifted from the nav is worse than no banner, since it would confidently state the opposite of what visitors see. That is the same drift that hid the Music toggle earlier today, when a gate read a Plan column its query never selected.
+
+Suite green at 140; `next build` clean.
+
 ## August 24, 2026 — Upload a banner image for a music list
 
 The music form only accepted a cover as a pasted URL. It now uses `CoverUpload` — the same component the course editor uses — so a banner can be dragged in or picked from disk, with the paste-a-URL option still there behind the link button. Uploads go to the existing `/api/admin/upload/cover` route (jpeg/png/webp/gif, 5MB), so no new endpoint or storage path. Works on both the new and edit forms, since they share one component.

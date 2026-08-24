@@ -5,6 +5,7 @@ import { IconButton } from "@/components/admin/icon-button";
 import { prisma } from "@/lib/db";
 import { BlogDeleteButton } from "@/components/admin/blog-delete-button";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 
 export default async function AdminBlogPage() {
   const authorId = await getAdminAuthorId();
@@ -26,6 +27,7 @@ export default async function AdminBlogPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <NavVisibilityBanner authorId={authorId} navKey="blog" />
 
       {/* Header */}
       <div className="flex items-center justify-between">

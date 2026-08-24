@@ -64,3 +64,62 @@ export function getAuthorSitePages(
 
   return pages;
 }
+
+// ── Visibility, for the admin side ───────────────────────────────────────────
+
+/** Public pages that have both an admin screen and a nav show/hide toggle. */
+export type NavPageKey =
+  | "books" | "bundles" | "courses" | "music" | "specials" | "flipBooks" | "blog";
+
+export type NavPageVisibility = {
+  visible: boolean;
+  /** True when the plan itself excludes the feature — a different problem from
+   *  the author having switched the menu item off, and a different fix. */
+  planBlocked: boolean;
+  label: string;
+  path: string;
+};
+
+/**
+ * Mirrors the conditions in getAuthorSitePages above so an admin screen can
+ * tell the author their page is hidden. Kept in this file, next to the rules it
+ * mirrors, because the two drifting apart is exactly how a gate ends up lying.
+ */
+export function getNavPageVisibility(
+  author: AuthorNavFlags,
+  key: NavPageKey
+): NavPageVisibility {
+  const plan = author.plan;
+  switch (key) {
+    case "books":
+      return { visible: author.navShowBooks, planBlocked: false, label: "Books", path: "/books" };
+    case "bundles":
+      return {
+        visible: !!plan?.bundlesEnabled && author.navShowBundles,
+        planBlocked: !plan?.bundlesEnabled,
+        label: "Bundles", path: "/books?tab=bundles",
+      };
+    case "courses":
+      return {
+        visible: !!plan?.coursesEnabled && author.navShowCourses,
+        planBlocked: !plan?.coursesEnabled,
+        label: "Courses", path: "/courses",
+      };
+    case "music":
+      return {
+        visible: !!plan?.musicEnabled && author.navShowMusic,
+        planBlocked: !plan?.musicEnabled,
+        label: "Music", path: "/music",
+      };
+    case "specials":
+      return { visible: author.navShowSpecials, planBlocked: false, label: "Specials", path: "/specials" };
+    case "flipBooks":
+      return {
+        visible: (plan?.flipBooksLimit ?? 0) !== 0 && author.navShowFlipBooks,
+        planBlocked: (plan?.flipBooksLimit ?? 0) === 0,
+        label: "Flip Books", path: "/flip-books",
+      };
+    case "blog":
+      return { visible: author.navShowBlog, planBlocked: false, label: "News", path: "/blog" };
+  }
+}

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { canAddFlipBook } from "@/lib/plan-limits";
 import { FlipBookToggle } from "@/components/admin/flip-book-toggle";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 
 export default async function AdminFlipBooksPage() {
   const authorId = await getAdminAuthorId();
@@ -25,6 +26,7 @@ export default async function AdminFlipBooksPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <NavVisibilityBanner authorId={authorId} navKey="flipBooks" />
 
       {/* Header */}
       <div className="flex items-center justify-between">
