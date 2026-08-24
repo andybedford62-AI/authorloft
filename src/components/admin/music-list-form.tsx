@@ -12,7 +12,7 @@ import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
 // Delete, ghost = Cancel.
 
-type TrackRow = { url: string; title: string };
+type TrackRow = { url: string; title: string; description: string; originalHtml: string };
 
 interface Props {
   /** Absent when creating. */
@@ -28,6 +28,8 @@ interface Props {
   trackCap: number | null;
 }
 
+const blankTrack = (): TrackRow => ({ url: "", title: "", description: "", originalHtml: "" });
+
 const inputClass =
   "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
@@ -39,7 +41,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
   const [description, setDescription] = useState(initial?.description ?? "");
   const [coverImageUrl, setCoverImageUrl] = useState(initial?.coverImageUrl ?? "");
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
-  const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [{ url: "", title: "" }]);
+  const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [blankTrack()]);
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -71,7 +73,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
         description,
         coverImageUrl,
         isPublished,
-        tracks: tracks.filter((t) => t.url.trim()),
+        tracks: tracks.filter((t) => t.url.trim()),  // description + originalHtml ride along
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
         method: isEdit ? "PATCH" : "POST",
@@ -163,6 +165,13 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
                     className={inputClass}
                     placeholder="Track title (optional)"
                   />
+                  <textarea
+                    value={track.description}
+                    onChange={(e) => updateTrack(i, { description: e.target.value })}
+                    rows={2}
+                    className={inputClass}
+                    placeholder="Short note about this track (optional)"
+                  />
                   {invalid && (
                     <p className="text-xs text-red-600">Not a usable https link.</p>
                   )}
@@ -188,7 +197,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
           variant="outline"
           className="mt-4"
           disabled={atCap}
-          onClick={() => setTracks((p) => [...p, { url: "", title: "" }])}
+          onClick={() => setTracks((p) => [...p, blankTrack()])}
         >
           <Plus className="h-4 w-4 mr-2" /> Add track
         </Button>

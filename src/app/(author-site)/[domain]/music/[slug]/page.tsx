@@ -5,6 +5,8 @@ import { ArrowLeft, ListMusic } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import { sanitize } from "@/lib/sanitize";
+import { resolveTrackLink } from "@/lib/music-links";
 import { MusicTrackList, type PublicTrack } from "@/components/author-site/music-track-list";
 import type { Metadata } from "next";
 
@@ -54,12 +56,33 @@ export default async function MusicListPage({
   if (!list) notFound();
 
   const tracks: PublicTrack[] = list.modules.flatMap((m) =>
-    m.lessons.map((l) => ({
-      id: l.id,
-      title: l.title,
-      videoUrl: l.videoUrl,
-      thumbnailUrl: l.thumbnailUrl,
-    }))
+    m.lessons.map((l) => {
+      const html = l.contentHtml?.trim() ? sanitize(l.contentHtml) : null;
+      // Plain-text one-liner for the collapsed row; the full note (image and
+      // all) still renders under the player once the track is open.
+      const text = html
+        ? html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() || null
+        : null;
+
+      // Tracks imported from elsewhere have no cached artwork. A YouTube
+      // thumbnail is derivable from the id, so fall back to it rather than
+      // showing a placeholder icon.
+      const link = l.videoUrl ? resolveTrackLink(l.videoUrl) : null;
+      const ytId =
+        link?.provider === "youtube" && link.embedUrl
+          ? link.embedUrl.split("/embed/")[1]
+          : null;
+
+      return {
+        id: l.id,
+        title: l.title,
+        videoUrl: l.videoUrl,
+        thumbnailUrl:
+          l.thumbnailUrl ?? (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : null),
+        description: text,
+        descriptionHtml: html,
+      };
+    })
   );
 
   return (

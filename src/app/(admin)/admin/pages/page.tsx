@@ -25,7 +25,7 @@ export default async function AdminPagesPage() {
         navShowBundles: true,
         navShowCourses: true,
         navShowMusic: true,
-        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true, bundlesEnabled: true, coursesEnabled: true } },
+        plan: { select: { flipBooksLimit: true, mediaKitEnabled: true, bundlesEnabled: true, coursesEnabled: true, musicEnabled: true } },
       },
     }),
     prisma.authorPage.findMany({

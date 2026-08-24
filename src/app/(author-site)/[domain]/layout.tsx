@@ -55,7 +55,7 @@ async function resolveAuthor(domain: string) {
       customAccentColor: true,
       isActive: true,
       plan: {
-        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true, salesEnabled: true, bundlesEnabled: true, coursesEnabled: true },
+        select: { flipBooksLimit: true, tier: true, mediaKitEnabled: true, salesEnabled: true, bundlesEnabled: true, coursesEnabled: true, musicEnabled: true },
       },
     },
   });

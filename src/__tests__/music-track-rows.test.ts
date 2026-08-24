@@ -97,3 +97,27 @@ describe("buildTrackRows", () => {
     expect(fetchTrackMetadata).not.toHaveBeenCalled();
   });
 });
+
+describe("buildTrackContentHtml — edits must not flatten a rich note", () => {
+  it("keeps the original markup when the text is untouched", async () => {
+    // Imported course lessons can carry an <img>; PATCH replaces every lesson
+    // row, so without this an unrelated save would destroy the image.
+    const original = '<img src="https://x/a.png" alt=""><p>Dedicated to the americans.</p>';
+    const { buildTrackContentHtml } = await import("@/app/api/admin/music/route");
+    expect(
+      buildTrackContentHtml({ description: "Dedicated to the americans.", originalHtml: original })
+    ).toBe(original);
+  });
+
+  it("writes escaped paragraphs once the author actually changes the text", async () => {
+    const { buildTrackContentHtml } = await import("@/app/api/admin/music/route");
+    expect(
+      buildTrackContentHtml({ description: "New <b>note</b>", originalHtml: "<p>Old</p>" })
+    ).toBe("<p>New &lt;b&gt;note&lt;/b&gt;</p>");
+  });
+
+  it("clears the note when the author empties the field", async () => {
+    const { buildTrackContentHtml } = await import("@/app/api/admin/music/route");
+    expect(buildTrackContentHtml({ description: "  ", originalHtml: "<p>Old</p>" })).toBeNull();
+  });
+});

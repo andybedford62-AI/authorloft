@@ -19,6 +19,11 @@ export type PublicTrack = {
   title: string;
   videoUrl: string | null;
   thumbnailUrl: string | null;
+  /** Plain-text one-liner for the collapsed row. */
+  description: string | null;
+  /** Sanitized on the server; shown under the player when a track is open, so
+   *  richer notes (and any image) survive rather than being dropped. */
+  descriptionHtml: string | null;
 };
 
 export function MusicTrackList({
@@ -60,6 +65,13 @@ export function MusicTrackList({
                     loading="lazy"
                   />
                 </div>
+                <p className="mt-2 text-sm font-medium text-gray-900">{track.title}</p>
+                {track.descriptionHtml && (
+                  <div
+                    className="rich-content text-sm text-gray-600 mt-1"
+                    dangerouslySetInnerHTML={{ __html: track.descriptionHtml }}
+                  />
+                )}
                 <button
                   type="button"
                   onClick={() => setOpenId(null)}
@@ -114,11 +126,13 @@ function TrackRow({
 
       <span className="flex-1 min-w-0 text-left">
         <span className="block text-sm font-medium text-gray-900 truncate">{track.title}</span>
-        {providerName && (
+        {track.description ? (
+          <span className="block text-xs text-gray-500 truncate">{track.description}</span>
+        ) : providerName ? (
           <span className="block text-xs text-gray-500">
             {canEmbed ? providerName : `Opens on ${providerName}`}
           </span>
-        )}
+        ) : null}
       </span>
 
       {canEmbed ? (

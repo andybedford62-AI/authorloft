@@ -9,7 +9,35 @@ import { resolveTrackLink, fetchTrackMetadata } from "@/lib/music-links";
 // track a CourseLesson whose videoUrl is a public streaming link. Nothing is
 // uploaded — see lib/music-links.ts.
 
-export type IncomingTrack = { url?: string; title?: string };
+export type IncomingTrack = {
+  url?: string;
+  title?: string;
+  /** Plain-text note the author typed. */
+  description?: string;
+  /** The track's existing contentHtml, echoed back by the editor. Lets a
+   *  richer note (e.g. one containing an image, as imported course lessons
+   *  can) survive an edit that didn't touch the text — PATCH replaces every
+   *  lesson row, so without this any save would flatten it. */
+  originalHtml?: string;
+};
+
+function escapeHtml(v: string): string {
+  return v
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+const stripTags = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+/** Keeps the original markup when the author left the text alone; otherwise
+ *  writes their plain text back as escaped paragraphs. */
+export function buildTrackContentHtml(track: IncomingTrack): string | null {
+  const text = track.description?.trim();
+  const original = track.originalHtml?.trim();
+  if (!text) return null;
+  if (original && stripTags(original) === text) return original;
+  return text.split(/\n{2,}/).map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br />")}</p>`).join("\n");
+}
 
 /**
  * Validates each pasted URL and fills in the title/artwork from the target
@@ -32,6 +60,7 @@ export async function buildTrackRows(tracks: IncomingTrack[], cap: number | null
         title: raw.title?.trim() || meta.title || `Track ${i + 1}`,
         videoUrl: link.canonicalUrl,
         thumbnailUrl: meta.thumbnailUrl,
+        contentHtml: buildTrackContentHtml(raw),
         sortOrder: i,
         isPreview: false,
       };

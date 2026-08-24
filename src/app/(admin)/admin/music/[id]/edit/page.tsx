@@ -29,7 +29,14 @@ export default async function EditMusicListPage({
 
   const trackCap = await maxTracksPerList(authorId);
   const tracks = list.modules.flatMap((m) =>
-    m.lessons.map((l) => ({ url: l.videoUrl ?? "", title: l.title }))
+    m.lessons.map((l) => ({
+      url: l.videoUrl ?? "",
+      title: l.title,
+      // Edited as plain text; the original markup is echoed back so a note
+      // containing an image survives a save that didn't change the wording.
+      description: (l.contentHtml ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+      originalHtml: l.contentHtml ?? "",
+    }))
   );
 
   return (
@@ -48,7 +55,7 @@ export default async function EditMusicListPage({
           description: list.description ?? "",
           coverImageUrl: list.coverImageUrl ?? "",
           isPublished: list.isPublished,
-          tracks: tracks.length > 0 ? tracks : [{ url: "", title: "" }],
+          tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />
     </div>
