@@ -1,6 +1,7 @@
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
 import { getActiveSaleDiscounts } from "@/lib/discount-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { BooksBundlesTabs } from "@/components/author-site/books-bundles-tabs";
 import { PageBanner } from "@/components/author-site/page-banner";
 import type { Metadata } from "next";
@@ -15,6 +16,7 @@ export async function generateMetadata({
   const authorName = author.displayName || author.name;
   return {
     title: "Books",
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/books` },
     description: `Browse all books by ${authorName} — explore the full catalog of novels, stories, and more.`,
     openGraph: {
       title: `Books by ${authorName}`,

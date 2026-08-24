@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ShoppingCart, BookOpen, Film, Package, Lock } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
+import type { Metadata } from "next";
 import { formatCents } from "@/lib/utils";
 import { BuySection } from "@/components/author-site/buy-section";
 
@@ -21,6 +22,11 @@ interface Props {
   params: Promise<{ domain: string; slug: string }>;
   searchParams: Promise<{ item?: string }>;
 }
+
+// Transactional page — never a search result. The layout used to point its
+// canonical at the site root, which suppressed it as a side effect; now that
+// the cascade is gone it needs to say so explicitly.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function BuyPage({ params, searchParams }: Props) {
   const { domain, slug } = await params;

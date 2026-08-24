@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BookCard } from "@/components/author-site/book-card";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { sanitize } from "@/lib/sanitize";
 import type { Metadata } from "next";
 
@@ -36,6 +37,7 @@ export async function generateMetadata({
   const authorName = author.displayName || author.name;
   return {
     title: series.name,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/series/${slug}` },
     description: series.description || `Books in the ${series.name} series by ${authorName}.`,
   };
 }

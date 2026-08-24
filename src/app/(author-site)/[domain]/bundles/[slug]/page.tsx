@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Package, BookOpen, ArrowLeft } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { formatCents } from "@/lib/utils";
 import { BundleBuyButton } from "./bundle-buy-button";
 import type { Metadata } from "next";
@@ -22,6 +23,7 @@ export async function generateMetadata({
 
   return {
     title: bundle.title,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/bundles/${slug}` },
     description: bundle.description || `Get the ${bundle.title} bundle at a discounted price.`,
     openGraph: {
       title: bundle.title,

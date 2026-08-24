@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { FileText } from "lucide-react";
 import { resolveAccentColor } from "@/lib/themes";
 import { sanitize } from "@/lib/sanitize";
@@ -18,7 +19,7 @@ async function resolveAuthorAndPage(domain: string, pageSlug: string) {
       where: {
         OR: [{ slug: domain }, { customDomain: domain }],
       },
-      select: { id: true, name: true, displayName: true, siteTheme: true, customAccentColor: true, plan: { select: { tier: true } } },
+      select: { id: true, name: true, displayName: true, slug: true, customDomain: true, siteTheme: true, customAccentColor: true, plan: { select: { tier: true } } },
     });
 
     if (!author) return null;
@@ -57,6 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { author, page } = result;
   return {
     title: page.title,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/${pageSlug}` },
     description: `${page.title} — ${author.displayName || author.name}`,
   };
 }

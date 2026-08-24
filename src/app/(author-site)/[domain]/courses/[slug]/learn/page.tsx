@@ -17,7 +17,10 @@ export async function generateMetadata({
     where: { authorId: author.id, slug, isPublished: true },
     select: { title: true },
   });
-  return { title: course ? `Learn: ${course.title}` : "Course" };
+  return {
+    title: course ? `Learn: ${course.title}` : "Course",
+    robots: { index: false, follow: false },
+  };
 }
 
 function extractVideoEmbed(url: string): string | null {

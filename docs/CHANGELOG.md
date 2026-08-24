@@ -13,6 +13,33 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Author-site pages all canonicalised to the author's homepage
+
+Found while chasing a Search Console "Alternate page with proper canonical tag" report. That status is informational — Google saw a canonical and honoured it — but one of the four URLs led somewhere worse.
+
+`(author-site)/[domain]/layout.tsx` set `alternates: { canonical: baseUrl }`. Next merges layout metadata into every page beneath it, so that canonical **cascaded to every author-site page that didn't override it**. Only three did: `/blog`, `/blog/[slug]` and `/books/[slug]`. Everything else — `/about`, `/books`, `/contact`, `/flip-books`, `/flip-books/[slug]`, `/courses`, `/bundles`, `/series/[slug]`, `/specials`, `/legal` and custom `[pageSlug]` pages — told Google it was a duplicate of the author's homepage.
+
+The sitemap was simultaneously submitting those same URLs as distinct pages, so the two directives contradicted each other outright. Google honours the canonical, so none of them could rank. Confirmed live before fixing, on a real author site:
+
+```
+/           -> https://apbedford.authorloft.com   correct
+/blog       -> .../blog                           correct
+/about      -> https://apbedford.authorloft.com   WRONG
+/books      -> https://apbedford.authorloft.com   WRONG
+/contact    -> https://apbedford.authorloft.com   WRONG
+/flip-books -> https://apbedford.authorloft.com   WRONG
+```
+
+On that one author, 10 of the 27 URLs in its own sitemap were self-suppressing. This applied to every author site on the platform. Book detail pages and blog posts were already correct, which is likely why it went unnoticed — the highest-value content was unaffected.
+
+The layout no longer sets a canonical at all, and every page now declares its own. Pages that should never be search results say so explicitly rather than relying on the cascade to suppress them as a side effect: `/books/[slug]/buy`, `/books/[slug]/success`, `/cart/success` and `/courses/[slug]/learn` get `robots: { index: false, follow: false }`, and `/courses/access` gets a tiny `layout.tsx` carrying the same rule because the page itself is a client component and cannot export metadata. `/courses/[slug]/print` already had it. `/media-kit` and `/bundles` are pure redirects and need nothing.
+
+Three author selects had to gain `slug` / `customDomain` so `getAuthorBaseUrl()` could build the URL — `contact`, `legal`, and `[pageSlug]` were each fetching only display fields.
+
+Guarded by `src/__tests__/author-site-canonicals.test.ts`, which is a source-level scan rather than a rendering test: it asserts the layout sets no `alternates`, that every author-site page either declares a canonical or opts out of indexing, and that nothing but the home page canonicalises to the bare site root. Verified it actually catches the regression by reintroducing the cascade and watching it fail. 27 assertions, full suite green at 59 tests, `next build` clean.
+
+**Also fixed: `/bookstore?q=` did nothing.** The `WebSite` `SearchAction` in `app/layout.tsx` advertises `/bookstore?q={search_term_string}` to Google as a sitelinks searchbox target, but `BookstorePage()` took no props and the search box was pure client state seeded to `""` — so `/bookstore?q=anything` rendered the unfiltered catalog and silently dropped the query. (This is also why Google had crawled the literal `{search_term_string}` URL.) `bookstore-grid.tsx` now seeds its search state from `?q=` after mount. Done in an effect rather than via `useSearchParams` deliberately: that hook would force a Suspense boundary at all three call sites and opt the page out of the static rendering its `revalidate = 1800` depends on.
+
 ## August 24, 2026 — Search Console indexing failures: retired subdomains were blocking their own redirects
 
 Investigated two batches of Search Console failures, reported a few hours apart and with different causes.

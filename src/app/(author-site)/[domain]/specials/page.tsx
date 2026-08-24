@@ -7,7 +7,24 @@ import { Button } from "@/components/ui/button";
 import { CopyCodeButton } from "@/components/author-site/copy-code-button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import type { Metadata } from "next";
 import { formatCents } from "@/lib/utils";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ domain: string }>;
+}): Promise<Metadata> {
+  const { domain } = await params;
+  const author = await getAuthorByDomain(domain);
+  const authorName = author.displayName || author.name;
+  return {
+    title: "Specials",
+    description: `Current offers and discounts from ${authorName}.`,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/specials` },
+  };
+}
 
 export default async function SpecialsPage({
   params,

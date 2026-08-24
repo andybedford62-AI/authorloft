@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { notFound } from "next/navigation";
 import { ContactForm } from "./contact-form";
 import { Mail, Clock, MessageSquare } from "lucide-react";
@@ -16,12 +17,13 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await prisma.author.findFirst({
     where: { OR: [{ slug: domain }, { customDomain: domain }], isActive: true },
-    select: { displayName: true, name: true },
+    select: { displayName: true, name: true, slug: true, customDomain: true },
   });
   if (!author) return { title: "Contact" };
   const authorName = author.displayName || author.name;
   return {
     title: "Contact",
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/contact` },
     description: `Get in touch with ${authorName} — reader questions, media inquiries, speaking engagements, and more.`,
     openGraph: { title: `Contact ${authorName}`, description: `Send a message to ${authorName}.` },
   };

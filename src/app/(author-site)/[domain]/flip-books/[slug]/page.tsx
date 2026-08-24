@@ -4,6 +4,7 @@ import Image from "next/image";
 import { BookMarked, ArrowLeft, ExternalLink, Lock, Play } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props) {
     if (!flipBook) return {};
     return {
       title: `${flipBook.title} | ${author.displayName ?? author.name}`,
+      alternates: { canonical: `${getAuthorBaseUrl(author)}/flip-books/${slug}` },
       description: flipBook.description ?? `Read ${flipBook.title} — interactive flip book edition`,
       openGraph: {
         images: flipBook.coverImageUrl ? [flipBook.coverImageUrl] : [],

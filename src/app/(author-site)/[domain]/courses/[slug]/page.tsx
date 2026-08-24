@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { formatCents } from "@/lib/utils";
 import { CourseBuyButton } from "./course-buy-button";
 import { CourseFeedbackForm } from "@/components/author-site/course-feedback-form";
@@ -23,6 +24,7 @@ export async function generateMetadata({
 
   return {
     title: course.title,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/courses/${slug}` },
     description: course.description || `Enroll in ${course.title} — learn from an expert.`,
     openGraph: {
       title: course.title,

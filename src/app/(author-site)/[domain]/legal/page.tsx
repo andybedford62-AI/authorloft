@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 import { sanitize } from "@/lib/sanitize";
 
@@ -12,6 +13,8 @@ async function getAuthorLegal(domain: string) {
     select: {
       name: true,
       displayName: true,
+      slug: true,
+      customDomain: true,
       legalNotice: true,
       legalNoticeUpdatedAt: true,
     },
@@ -29,6 +32,7 @@ export async function generateMetadata({
   const authorName = author.displayName || author.name;
   return {
     title: "Legal Notice",
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/legal` },
     description: `Legal notice and disclaimer for ${authorName}'s author website.`,
   };
 }

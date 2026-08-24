@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 import { formatCents } from "@/lib/utils";
 import type { Metadata } from "next";
 
@@ -17,6 +18,7 @@ export async function generateMetadata({
   const authorName = author.displayName || author.name;
   return {
     title: "Courses",
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/courses` },
     description: `Online courses and workshops from ${authorName} — learn from an expert.`,
   };
 }

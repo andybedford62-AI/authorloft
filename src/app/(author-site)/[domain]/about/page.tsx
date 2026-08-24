@@ -31,6 +31,7 @@ export async function generateMetadata({
   return {
     title: "About",
     description,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/about` },
     openGraph: {
       title: `About ${authorName}`,
       description,

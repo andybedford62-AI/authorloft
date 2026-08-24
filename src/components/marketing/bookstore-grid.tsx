@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { type BookstoreBook } from "@/components/marketing/bookstore-book-card";
 import { BookstoreListCard } from "@/components/marketing/bookstore-list-card";
@@ -46,6 +46,20 @@ export function BookstoreGrid({
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState<number>(PER_PAGE_OPTIONS[0]);
   const [quickViewBook, setQuickViewBook] = useState<BookstoreBook | null>(null);
+
+  // The WebSite SearchAction in app/layout.tsx advertises
+  // /bookstore?q={search_term_string} to Google, but nothing ever read `q`, so
+  // anyone arriving from a sitelinks searchbox landed on the unfiltered
+  // catalog with their query dropped. Seeding after mount rather than via
+  // useSearchParams keeps the page statically rendered (revalidate = 1800) and
+  // avoids needing a Suspense boundary at all three call sites.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) {
+      setSearch(q);
+      setPage(1);
+    }
+  }, []);
 
   // Only show format chips for formats that actually appear in the catalog
   const availableFormats = useMemo(() => {

@@ -5,6 +5,23 @@ import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ domain: string }>;
+}): Promise<Metadata> {
+  const { domain } = await params;
+  const author = await getAuthorByDomain(domain);
+  const authorName = author.displayName || author.name;
+  return {
+    title: "Flip Books",
+    description: `Read interactive flip-book editions from ${authorName}.`,
+    alternates: { canonical: `${getAuthorBaseUrl(author)}/flip-books` },
+  };
+}
 
 export default async function FlipBooksPage({
   params,

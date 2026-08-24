@@ -98,9 +98,14 @@ export async function generateMetadata({
       description,
       ...(ogImages.length > 0 && { images: [ogImages[0].url] }),
     },
-    alternates: {
-      canonical: baseUrl,
-    },
+    // No `alternates.canonical` here on purpose. Next merges layout metadata
+    // into every page below it, so a canonical set at this level cascades to
+    // each page that doesn't override it — which meant /about, /books,
+    // /contact, /flip-books and the rest all declared the site root as their
+    // canonical and told Google they were duplicates of the homepage, while
+    // the sitemap was busy submitting them as distinct URLs. Each page now
+    // sets its own; anything that shouldn't be indexed sets robots.index
+    // false instead.
     verification: {
       ...(author.googleSiteVerification && {
         google: author.googleSiteVerification,
