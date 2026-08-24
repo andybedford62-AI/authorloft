@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip, Download } from "lucide-react";
+import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip, Download, ExternalLink } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { sanitize } from "@/lib/sanitize";
@@ -169,6 +169,23 @@ export default async function CourseLearnPage({
                 title={activeLesson.title}
               />
             </div>
+          )}
+
+          {/* A videoUrl we can't embed (anything but YouTube/Vimeo — Loom,
+              Wistia, a bare .mp4 link…) used to render nothing at all: the
+              lesson just looked empty, with no hint a video was attached.
+              Offer the link instead of silently dropping it. */}
+          {activeLesson.videoUrl && !embedUrl && (
+            <a
+              href={activeLesson.videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 mb-8 px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              <Video className="h-4 w-4 flex-shrink-0" style={{ color: accentColor }} />
+              <span className="flex-1">Watch the video for this lesson</span>
+              <ExternalLink className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+            </a>
           )}
 
           {/* Lesson content */}

@@ -13,6 +13,18 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Editor images had no way to remove them; unsupported video hosts rendered nothing
+
+Two reports from the same course-lesson screen.
+
+**No way to remove an image in the rich text editor.** The toolbar had an insert-image button and nothing else — removing one required knowing to click the image and press Delete, which nothing on screen indicated. Links already had exactly this affordance (a Remove-link button that appears when a link is active), so images now mirror it: select an image and a Remove-image button appears in the toolbar. Editor images also get `cursor: pointer` so it's visible that clicking does something — scoped to `.tiptap-editor img.rte-image`, deliberately not `.rich-content img`, which is also the public render on blog posts and lessons.
+
+Worth being straight about the diagnosis: this was fixed as a missing affordance, not a reproduced failure. Clicking an image should already produce a ProseMirror node selection (the selected-node outline is styled, and the editor's state wiring through `course-form.tsx` round-trips correctly), so keyboard deletion was most likely working and simply undiscoverable. Without an admin session there was no way to drive the editor interactively and confirm which of the two it was. If Delete genuinely doesn't work on a selected image, the new button will surface that, since it runs `deleteSelection()` on the same selection.
+
+**A lesson video from any host but YouTube or Vimeo rendered nothing at all.** `extractVideoEmbed` returns null for anything it can't turn into an embed, and the video block was simply skipped — so a lesson with a Loom, Wistia, or bare `.mp4` link looked like it had no video, with no hint one was attached. Those lessons now render a "Watch the video for this lesson" link out to the URL instead of dropping it silently. Only seed data (`example.com` rows) hits this today, so nothing live changes appearance.
+
+The flip-book admin preview iframe, blocked by the same CSP as the lesson videos, is deliberately still untouched — its URLs are arbitrary author-supplied hosts and allowlisting them is a separate decision.
+
 ## August 24, 2026 — Course lesson videos were blocked by our own CSP
 
 Reported as "why is the public page showing 2 different image placeholders?" on a course lesson. It wasn't two images. The lower one was a real cover image loading fine from Supabase; the upper grey box with a broken-content icon was the lesson's **video `<iframe>` being blocked by our Content-Security-Policy**.

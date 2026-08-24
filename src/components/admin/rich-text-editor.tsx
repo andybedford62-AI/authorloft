@@ -18,7 +18,7 @@ import {
   List, ListOrdered, Quote, Minus, Link as LinkIcon,
   Link2Off, Undo, Redo, Highlighter, ChevronDown,
   Type, Heading1, Heading2, Heading3, Heading4,
-  ImageIcon, Upload, Link2, Loader2,
+  ImageIcon, ImageOff, Upload, Link2, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -712,6 +712,18 @@ function Toolbar({ editor }: { editor: Editor }) {
       )}
 
       <ImageButton editor={editor} />
+
+      {/* Removing an image previously had no button at all — you had to know to
+          click it and press Delete, and nothing on screen said so. Mirrors the
+          Remove-link affordance above; appears once an image node is selected. */}
+      {editor.isActive("image") && (
+        <ToolbarButton
+          onClick={() => editor.chain().focus().deleteSelection().run()}
+          title="Remove image (or select it and press Delete)"
+        >
+          <ImageOff className="h-3.5 w-3.5" />
+        </ToolbarButton>
+      )}
 
       <ToolbarDivider />
 

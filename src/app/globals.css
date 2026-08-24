@@ -658,6 +658,10 @@ input[type="file"] {
   margin: 1rem 0;
   display: block;
 }
+/* Editor images only (NOT .rich-content, which is also the public render):
+   signal that clicking selects the image, which is what enables Delete and
+   reveals the Remove-image toolbar button. */
+.tiptap-editor img.rte-image { cursor: pointer; }
 .tiptap-editor img.rte-image.ProseMirror-selectednode {
   outline: 3px solid #3b82f6;
   border-radius: 8px;
