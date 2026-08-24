@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 24, 2026 — Author sitemaps now cover every public page
+
+End-of-day audit comparing every route under `(author-site)/[domain]` against what the sitemap actually emits. Four families were public, had correct canonicals after the morning's canonical fix, and were submitted nowhere: **`/courses` and `/courses/[slug]`, `/bundles/[slug]`, `/specials`, and `/series/[slug]`**. Google had no route to them except by following links.
+
+All four added, gated on the same nav-toggle and plan conditions the nav itself uses, so the sitemap can't advertise a page the visitor can't reach. Index pages are only submitted when they have content (matching the existing flip-books pattern), `/specials` only when there's an active offer, and `/bundles` is deliberately excluded because it only redirects to `/books?tab=bundles` — the detail pages are the real content.
+
+Also fixed while there: the music block checked `navShowMusic` but not `plan.musicEnabled`, so a plan-hidden music page could still have been submitted. It now matches `getNavPageVisibility`.
+
+Verified by re-running the audit: of 26 public routes, 17 are covered and 9 are intentionally excluded (checkout, success, gated learn/print, course access, the `/bundles` and `/media-kit` redirects, and per-author `/legal`). **Zero missing.**
+
 ## August 24, 2026 — Warn on the admin screen when a public page is hidden
 
 The show/hide toggles live on `/admin/pages`, but the work happens on the catalog screens — so an author could spend an afternoon adding courses that no visitor can reach and get no hint why. Each catalog screen now carries a banner at the top when its public page is switched off: Books, Flip Books, Bundles, Courses, Music, Specials and Blog.

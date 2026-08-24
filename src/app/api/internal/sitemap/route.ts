@@ -142,6 +142,8 @@ async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
       id: true, updatedAt: true,
       navShowAbout: true, navShowBooks: true, navShowContact: true,
       navShowBlog: true, navShowFlipBooks: true, navShowMusic: true,
+      navShowCourses: true, navShowSpecials: true, navShowBundles: true,
+      plan: { select: { coursesEnabled: true, bundlesEnabled: true, musicEnabled: true } },
     },
   }).catch(() => null);
 
@@ -196,7 +198,7 @@ async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
     }
   }
 
-  if (author.navShowMusic) {
+  if (author.navShowMusic && author.plan?.musicEnabled) {
     const lists = await prisma.course.findMany({
       where:  { authorId: author.id, kind: "MUSIC", isPublished: true },
       select: { slug: true, updatedAt: true },
@@ -206,6 +208,53 @@ async function buildAuthorSitemap(host: string): Promise<Entry[] | null> {
       for (const l of lists) {
         entries.push({ loc: `${base}/music/${l.slug}`, lastmod: l.updatedAt, changefreq: "monthly", priority: 0.5 });
       }
+    }
+  }
+
+  if (author.navShowCourses && author.plan?.coursesEnabled) {
+    const courses = await prisma.course.findMany({
+      where:  { authorId: author.id, kind: "COURSE", isPublished: true },
+      select: { slug: true, updatedAt: true },
+    }).catch(() => []);
+    if (courses.length > 0) {
+      entries.push({ loc: `${base}/courses`, lastmod: now, changefreq: "weekly", priority: 0.7 });
+      for (const c of courses) {
+        entries.push({ loc: `${base}/courses/${c.slug}`, lastmod: c.updatedAt, changefreq: "monthly", priority: 0.6 });
+      }
+    }
+  }
+
+  // /bundles itself only redirects to /books?tab=bundles, so it is deliberately
+  // not submitted — the detail pages are the real content.
+  if (author.navShowBundles && author.plan?.bundlesEnabled) {
+    const bundles = await prisma.bundle.findMany({
+      where:  { authorId: author.id, isPublished: true },
+      select: { slug: true, updatedAt: true },
+    }).catch(() => []);
+    for (const b of bundles) {
+      entries.push({ loc: `${base}/bundles/${b.slug}`, lastmod: b.updatedAt, changefreq: "monthly", priority: 0.6 });
+    }
+  }
+
+  if (author.navShowSpecials) {
+    // Only worth submitting when there's an offer to see.
+    const activeSpecials = await prisma.special.count({
+      where: { authorId: author.id, isActive: true },
+    }).catch(() => 0);
+    if (activeSpecials > 0) {
+      entries.push({ loc: `${base}/specials`, lastmod: now, changefreq: "weekly", priority: 0.6 });
+    }
+  }
+
+  // Series pages are reached from the books they group, so they follow Books'
+  // visibility rather than having a toggle of their own.
+  if (author.navShowBooks) {
+    const series = await prisma.series.findMany({
+      where:  { authorId: author.id },
+      select: { slug: true, updatedAt: true },
+    }).catch(() => []);
+    for (const sr of series) {
+      entries.push({ loc: `${base}/series/${sr.slug}`, lastmod: sr.updatedAt, changefreq: "monthly", priority: 0.5 });
     }
   }
 

@@ -161,7 +161,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
-          name: "Music Import (YouTube playlist)",
+          name: "Music Import (YouTube playlist or bulk paste)",
           tiers: {
             FREE: free?.musicEnabled ? "✓" : "—",
             STANDARD: standard?.musicEnabled ? "✓" : "—",
