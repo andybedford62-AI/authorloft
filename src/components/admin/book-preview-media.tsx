@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
+import {
+  limitForMime, tooLargeMessage, unsupportedTypeMessage,
+  PREVIEW_LIMIT_SUMMARY,
+} from "@/lib/preview-media-limits";
 import { ImageIcon, Video, Music, UploadCloud, Trash2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -47,18 +51,64 @@ function MediaSlot({
   const mediaType: MediaType = media?.mediaType ?? "IMAGE";
   const needsPoster           = mediaType === "VIDEO" || mediaType === "AUDIO";
 
+  /** Reads an error body without assuming it is JSON. A platform-level
+   *  rejection (413, 502, a gateway page) comes back as text, and calling
+   *  .json() on it produced the useless "Unexpected token 'R'" alert. */
+  async function errorFrom(res: Response, fallback: string): Promise<string> {
+    const text = await res.text().catch(() => "");
+    try {
+      return (JSON.parse(text)?.error as string) || fallback;
+    } catch {
+      if (res.status === 413 || /request entity too large/i.test(text)) {
+        return `That file is too large to upload. ${PREVIEW_LIMIT_SUMMARY}.`;
+      }
+      return fallback;
+    }
+  }
+
   async function uploadFile(file: File, slot: "media" | "thumbnail") {
+    // Checked here first so an oversized file is rejected instantly rather than
+    // after a long upload that was always going to fail.
+    const limit = limitForMime(file.type);
+    if (!limit) {
+      alert(unsupportedTypeMessage(file));
+      return;
+    }
+    if (file.size > limit) {
+      alert(tooLargeMessage(file, limit));
+      return;
+    }
+    if (slot === "thumbnail" && !file.type.startsWith("image/")) {
+      alert("The poster image must be a JPG, PNG, WebP or GIF.");
+      return;
+    }
+
     setUploading(slot);
     try {
-      const fd = new FormData();
-      fd.append("bookId",   bookId);
-      fd.append("position", String(position));
-      fd.append("slot",     slot);
-      fd.append("file",     file);
+      // Two steps, so the bytes never pass through a Vercel function and its
+      // 4.5 MB request-body cap — the same flow book files already use.
+      const startRes = await fetch("/api/admin/upload/book-preview-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId, position, slot, fileName: file.name }),
+      });
+      if (!startRes.ok) throw new Error(await errorFrom(startRes, "Could not start the upload."));
+      const { signedUrl, fileKey } = await startRes.json();
 
-      const res  = await fetch("/api/admin/upload/book-preview", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Upload failed");
+      const putRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!putRes.ok) throw new Error(await errorFrom(putRes, "Upload to storage failed."));
+
+      const doneRes = await fetch("/api/admin/upload/book-preview-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookId, position, slot, fileKey }),
+      });
+      if (!doneRes.ok) throw new Error(await errorFrom(doneRes, "Could not finish the upload."));
+      const json = await doneRes.json();
       onSave(json.record as PreviewMedia);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Upload failed");
@@ -134,7 +184,7 @@ function MediaSlot({
         <input
           ref={mediaInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,audio/mpeg"
+          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,audio/mpeg"
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) uploadFile(f, "media"); e.target.value = ""; }}
         />
@@ -215,8 +265,13 @@ export function BookPreviewMedia({ bookId, initial }: Props) {
       <div>
         <h3 className="text-sm font-semibold text-gray-900">Preview Media</h3>
         <p className="text-xs text-gray-500 mt-0.5">
-          Up to 3 preview images, videos (MP4), or audio (MP3) shown on the public book page.
+          Up to 3 preview images, videos, or audio clips shown on the public book page.
           Video and audio slots require a poster image for the thumbnail.
+        </p>
+        {/* Stated up front, and generated from the same table the server
+            enforces, so the label can't promise something the upload refuses. */}
+        <p className="text-xs text-gray-500 mt-1.5">
+          <span className="font-medium text-gray-700">Size limits:</span> {PREVIEW_LIMIT_SUMMARY}
         </p>
       </div>
 

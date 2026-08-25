@@ -13,6 +13,24 @@ line rather than listing every commit.
 
 ---
 
+## August 25, 2026 — Book preview video upload was impossible above ~4.5 MB
+
+Reported as `Unexpected token 'R', "Request En"... is not valid JSON` when uploading a 9.7 MB MP4 to a book's preview media.
+
+Nothing was wrong with the file. `/api/admin/upload/book-preview` took the bytes as a multipart POST through a Vercel function, and **Vercel caps request bodies at 4.5 MB**. The route's own table advertised **50 MB for MP4** — a limit it could never honour, because the platform rejected the request first with a plain-text `Request Entity Too Large`. The client then called `.json()` on that text, so the author saw a JSON parse error instead of "too big". Every video worth uploading failed this way; only small images ever got through, and even a 5 MB image (the route's own image limit) would have failed.
+
+Fixed with the two-step direct upload the codebase already uses for book files — whose own comment says it exists to bypass exactly this limit. New `book-preview-url` returns a signed Supabase URL, the browser PUTs straight to storage, and `book-preview-complete` records the row. The bytes never pass through us, so the 50 MB limit is now real.
+
+Alongside it:
+
+- **Limits are stated on the page**, as asked — "Images up to 5 MB · Video (MP4, MOV) up to 50 MB · Audio (MP3) up to 20 MB" — generated from `src/lib/preview-media-limits.ts`, the same table the server enforces, so the label can't promise what the upload refuses.
+- **Oversized and unsupported files are refused instantly**, before any upload, naming the file, its actual size and the actual limit.
+- **Non-JSON error bodies are handled.** A 413 or gateway page now produces a readable message rather than a parse error — the class of bug that made this one so opaque.
+- **Replaced files are deleted from storage**, which the old route never did, leaving orphans in the bucket on every re-upload.
+- **`.mov` is now accepted** (what iPhones actually record). The `book-previews` bucket enforces its own mime allowlist, so `video/quicktime` was added there too — checked against the live bucket rather than assumed, and pinned by a test asserting the app's limits never exceed the bucket's 50 MB cap or include a type it would reject.
+
+8 new tests. Suite green at 148; `next build` clean.
+
 ## August 24, 2026 — Author sitemaps now cover every public page
 
 End-of-day audit comparing every route under `(author-site)/[domain]` against what the sitemap actually emits. Four families were public, had correct canonicals after the morning's canonical fix, and were submitted nowhere: **`/courses` and `/courses/[slug]`, `/bundles/[slug]`, `/specials`, and `/series/[slug]`**. Google had no route to them except by following links.
