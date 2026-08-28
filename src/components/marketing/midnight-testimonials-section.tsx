@@ -1,6 +1,14 @@
-import type { Testimonial } from './testimonials-section';
 import { sanitize } from '@/lib/sanitize';
 import { VAULT } from '@/components/marketing/vault-theme';
+
+export interface Testimonial {
+  id: string;
+  authorName: string;
+  authorRole: string | null;
+  quote: string;
+  rating: number | null;
+  image: string | null;
+}
 
 function StarRow({ rating }: { rating: number | null }) {
   if (!rating) return null;
