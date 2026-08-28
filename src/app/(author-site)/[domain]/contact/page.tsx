@@ -94,7 +94,7 @@ export default async function ContactPage({
           {/* ── Left info card ─────────────────────────────────────────────── */}
           <div
             className="md:col-span-2 rounded-2xl p-6 space-y-6 text-white"
-            style={{ backgroundColor: "var(--nav-bg, #1a2236)" }}
+            style={{ backgroundColor: "var(--author-nav-bg, #1a2236)" }}
           >
             <div>
               <h2 className="text-lg font-bold text-white">{displayName}</h2>

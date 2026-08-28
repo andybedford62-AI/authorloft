@@ -112,7 +112,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
 
             {/* Headline */}
             <h1
-              className="font-heading text-[clamp(44px,7vw,96px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
+              className="author-font-heading text-[clamp(44px,7vw,96px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
               dangerouslySetInnerHTML={{ __html: formatHeadline(headline, accent) }}
             />
 
@@ -176,7 +176,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               {author.pressOutlets.map((name) => (
                 <span
                   key={name}
-                  className="font-heading italic text-[13px] tracking-wide opacity-40 text-[#FBF6E9]"
+                  className="author-font-heading italic text-[13px] tracking-wide opacity-40 text-[#FBF6E9]"
                 >
                   {name}
                 </span>
@@ -197,7 +197,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 <div className="relative">
                   {/* Decorative "01" */}
                   <span
-                    className="absolute -top-4 -left-6 font-heading text-[160px] leading-none font-bold select-none pointer-events-none hidden lg:block"
+                    className="absolute -top-4 -left-6 author-font-heading text-[160px] leading-none font-bold select-none pointer-events-none hidden lg:block"
                     style={{ color: accent + "10" }}
                   >
                     01
@@ -236,11 +236,11 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                       ? ` · ${new Date(featuredBook.releaseDate).getFullYear()}`
                       : ""}
                   </p>
-                  <h2 className="font-heading text-[clamp(36px,5vw,64px)] leading-tight text-[#FBF6E9]">
+                  <h2 className="author-font-heading text-[clamp(36px,5vw,64px)] leading-tight text-[#FBF6E9]">
                     {featuredBook.title}
                   </h2>
                   {featuredBook.subtitle && (
-                    <p className="font-heading italic mt-1 text-lg" style={{ color: accent }}>
+                    <p className="author-font-heading italic mt-1 text-lg" style={{ color: accent }}>
                       {featuredBook.subtitle}
                     </p>
                   )}
@@ -297,7 +297,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                   The Shelf
                 </p>
-                <h2 className="font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+                <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
                   The complete shelf
                 </h2>
               </div>
@@ -322,7 +322,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                 Collections
               </p>
-              <h2 className="font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+              <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
                 Choose your series
               </h2>
             </div>
@@ -365,7 +365,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                       >
                         {s.books.length} {s.books.length === 1 ? "book" : "books"}
                       </span>
-                      <h3 className="font-heading text-[22px] text-[#FBF6E9] leading-tight mb-2">
+                      <h3 className="author-font-heading text-[22px] text-[#FBF6E9] leading-tight mb-2">
                         {s.name}
                       </h3>
                       {s.description && (
@@ -430,7 +430,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
                 <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
                   About
                 </p>
-                <h2 className="font-heading text-[clamp(28px,4vw,48px)] leading-tight text-[#FBF6E9]">
+                <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] leading-tight text-[#FBF6E9]">
                   {authorName}
                 </h2>
               </div>
@@ -476,7 +476,7 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-3" style={{ color: accent }}>
                 {firstName}'s Dispatch · Monthly
               </p>
-              <h2 className="font-heading text-[clamp(28px,3.5vw,44px)] leading-tight text-[#FBF6E9] mb-3">
+              <h2 className="author-font-heading text-[clamp(28px,3.5vw,44px)] leading-tight text-[#FBF6E9] mb-3">
                 Letters from {firstName}.
               </h2>
               <p className="text-base text-[#FBF6E9]/55">

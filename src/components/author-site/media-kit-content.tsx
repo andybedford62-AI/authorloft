@@ -148,7 +148,7 @@ export function MediaKitContent({
 
         {/* Quick Reference */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 font-heading border-b pb-2" style={{ borderColor: accentColor }}>
+          <h2 className="text-xl font-bold text-gray-900 author-font-heading border-b pb-2" style={{ borderColor: accentColor }}>
             Quick Reference
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -182,7 +182,7 @@ export function MediaKitContent({
         {/* Books for Press */}
         {books.length > 0 && (
           <section className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-900 font-heading border-b pb-2" style={{ borderColor: accentColor }}>
+            <h2 className="text-xl font-bold text-gray-900 author-font-heading border-b pb-2" style={{ borderColor: accentColor }}>
               Books for Press
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
@@ -221,7 +221,7 @@ export function MediaKitContent({
         {/* Connect */}
         {socialLinks.length > 0 && (
           <section className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-900 font-heading border-b pb-2" style={{ borderColor: accentColor }}>
+            <h2 className="text-xl font-bold text-gray-900 author-font-heading border-b pb-2" style={{ borderColor: accentColor }}>
               Connect
             </h2>
             <SocialLinks links={socialLinks} accentColor={accentColor} />

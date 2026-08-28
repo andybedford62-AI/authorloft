@@ -212,7 +212,7 @@ export default async function AboutPage({
           <div className="flex-1 min-w-0">
 
             {/* Name + tagline */}
-            <h2 className="text-3xl font-bold text-gray-900 font-heading">{authorName}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 author-font-heading">{authorName}</h2>
             {author.tagline && (
               <p className="mt-1 text-base font-semibold" style={{ color: accentColor }}>
                 {author.tagline}

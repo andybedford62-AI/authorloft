@@ -93,7 +93,7 @@ export function CinematicBooksFilter({ books, accentColor }: Props) {
                 {book.series.name}
               </p>
             )}
-            <h3 className="text-sm font-semibold text-[#FBF6E9] leading-snug line-clamp-2 font-heading">
+            <h3 className="text-sm font-semibold text-[#FBF6E9] leading-snug line-clamp-2 author-font-heading">
               {book.title}
             </h3>
             <p className="text-xs text-[#FBF6E9]/50 -mt-1">{formatPrice(book.priceCents)}</p>

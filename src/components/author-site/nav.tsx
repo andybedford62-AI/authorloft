@@ -50,7 +50,7 @@ interface NavProps {
 
 // ── Template → nav variant ───────────────────────────────────────────────────
 // Cinematic and Bold both open on a dark hero/strip, so the fixed dark
-// --nav-bg reads as one continuous surface. Classic and Minimal (and any
+// --author-nav-bg reads as one continuous surface. Classic and Minimal (and any
 // unknown/future template) run light page bodies almost everywhere below
 // the hero, so the same dark bar reads as chrome bolted onto the wrong page
 // once the reader scrolls past the top. Light-nav is the default/fallback.
@@ -60,7 +60,7 @@ function isDarkTemplate(homeTemplate?: string | null) {
 
 function navTokens(dark: boolean) {
   return {
-    header:       dark ? "bg-[var(--nav-bg)] shadow-lg" : "bg-white border-b border-gray-100 shadow-sm",
+    header:       dark ? "bg-[var(--author-nav-bg)] shadow-lg" : "bg-white border-b border-gray-100 shadow-sm",
     logoText:     dark ? "text-white" : "text-gray-900",
     logoIcon:     dark ? "text-white/70" : "text-gray-400",
     dashboardBadge: dark
@@ -74,7 +74,7 @@ function navTokens(dark: boolean) {
     cartIcon:     dark ? "text-white/70 hover:text-white" : "text-gray-500 hover:text-gray-900",
     hamburger:    dark ? "text-white/60 hover:text-white" : "text-gray-500 hover:text-gray-900",
     mobileBorder: dark ? "border-white/[0.08]" : "border-gray-100",
-    mobilePanel:  dark ? "bg-[var(--nav-bg)]" : "bg-white",
+    mobilePanel:  dark ? "bg-[var(--author-nav-bg)]" : "bg-white",
     mobileLinkActive:   dark ? "text-white bg-white/10" : "text-gray-900 bg-gray-100",
     mobileLinkInactive: dark
       ? "text-white/60 hover:text-white hover:bg-white/10"
@@ -162,7 +162,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
             ) : (
               <>
                 <BookOpen className={cn("h-5 w-5 flex-shrink-0 transition-opacity group-hover:opacity-80", t.logoIcon)} />
-                <span className={cn("font-heading font-semibold text-sm group-hover:opacity-80 transition-opacity", t.logoText)}>
+                <span className={cn("author-font-heading font-semibold text-sm group-hover:opacity-80 transition-opacity", t.logoText)}>
                   {author.displayName || author.name}
                 </span>
               </>
@@ -189,7 +189,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                "px-3 py-1.5 text-sm font-body font-medium transition-colors relative",
+                "px-3 py-1.5 text-sm author-font-body font-medium transition-colors relative",
                 isActive(link.href)
                   ? cn(t.linkActive, "after:absolute after:bottom-0 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-current")
                   : cn(t.linkInactive, "rounded-md")
@@ -204,7 +204,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
               href={bookstoreUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn("px-3 py-1.5 text-sm font-body font-medium rounded-md transition-colors inline-flex items-center gap-1", t.linkInactive)}
+              className={cn("px-3 py-1.5 text-sm author-font-body font-medium rounded-md transition-colors inline-flex items-center gap-1", t.linkInactive)}
               title="Discover more authors on the AuthorLoft Bookstore"
             >
               Bookstore
@@ -267,7 +267,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-body font-medium transition-colors",
+                  "px-3 py-2 rounded-md text-sm author-font-body font-medium transition-colors",
                   isActive(link.href) ? t.mobileLinkActive : t.mobileLinkInactive
                 )}
               >
@@ -281,7 +281,7 @@ export function AuthorNav({ author, navConfig, customPages }: NavProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
-                className={cn("px-3 py-2 rounded-md text-sm font-body font-medium transition-colors inline-flex items-center gap-1.5", t.mobileLinkInactive)}
+                className={cn("px-3 py-2 rounded-md text-sm author-font-body font-medium transition-colors inline-flex items-center gap-1.5", t.mobileLinkInactive)}
               >
                 Bookstore
                 <ExternalLink className="h-3 w-3 opacity-70" />

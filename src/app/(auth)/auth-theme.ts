@@ -4,10 +4,11 @@
  *
  * These pages shipped as stock Tailwind: `bg-gray-50` page, `bg-white
  * rounded-2xl border-gray-200` card, and `#2563EB` (Tailwind blue) as the
- * primary action — none of which is AuthorLoft's brand. The marketing site runs
- * navy + brass + cream (see globals.css --navy/--cream and the marketing hero
- * palette), so signing in looked like a different product than the site that
- * sent you there, in the most generic default a generator produces.
+ * primary action — none of which is AuthorLoft's brand. The public marketing
+ * site runs the dark navy/gold "Vault" identity (see globals.css's
+ * `@theme` block, --color-vault-*), so signing in looked like a different
+ * product than the site that sent you there, in the most generic default a
+ * generator produces.
  *
  * Anchored to the real brand instead. Kept light: the logo PNG has an opaque
  * near-white background, so it can't sit on a dark surface.

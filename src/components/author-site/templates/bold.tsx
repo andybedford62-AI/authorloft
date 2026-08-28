@@ -115,7 +115,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
                 )}
 
                 {/* Title */}
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-heading leading-tight">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white author-font-heading leading-tight">
                   {spotlightBook.title}
                 </h2>
 
@@ -163,7 +163,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
         <section className="py-14 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-baseline justify-between mb-8">
-              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight font-heading">
+              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight author-font-heading">
                 More Books
               </h2>
               <Link
@@ -251,7 +251,7 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
               <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: accentOnDark }}>
                 {firstName}&rsquo;s Newsletter
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-heading leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white author-font-heading leading-tight">
                 Letters from {firstName}
               </h2>
               <p className="text-gray-400 mt-2 leading-relaxed">

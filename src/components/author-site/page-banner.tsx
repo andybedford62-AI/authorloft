@@ -30,14 +30,14 @@ export function PageBanner({
 }) {
   const background = accentColor
     ? accentAsSurface(accentColor)
-    : "var(--navy, #1a2236)";
+    : "var(--author-navy, #1a2236)";
 
   return (
     <section className="w-full py-7 px-4 text-center" style={{ backgroundColor: background }}>
       <p className="text-xs font-bold uppercase tracking-widest mb-2 text-white/75">
         {label}
       </p>
-      <h1 className="text-2xl sm:text-3xl font-bold text-white font-heading leading-tight">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white author-font-heading leading-tight">
         {title}
       </h1>
       {subtitle && (

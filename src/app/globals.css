@@ -4,7 +4,7 @@
    Single source of truth for the "Vault" visual identity — dark navy/gold,
    Georgia-italic display type — used across the public marketing site only.
    NOT used by the admin UI (separate dark-mode allowlist below) or the
-   per-author site theme system (--font-heading/--navy/--cream + [data-theme]
+   per-author site theme system (--author-font-heading/--author-navy/--author-cream + [data-theme]
    further down this file) — keep those namespaces from ever colliding.
    Generates real Tailwind utilities: bg-vault-surf, text-vault-gold, etc.
    src/components/marketing/vault-theme.ts mirrors these values for the few
@@ -40,14 +40,14 @@
   --accent: #c89b3c;  /* Classic Literary gold — matches BASE_THEMES[0].preview.accent */
 
   /* ── Author site design system ──────────────────────────────────────── */
-  --font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;
-  --font-body:    var(--font-inter), 'Inter', system-ui, sans-serif;
+  --author-font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --author-font-body:    var(--font-inter), 'Inter', system-ui, sans-serif;
 
   /* Fixed structural colours — same across all author themes */
-  --navy:    #1a2236;  /* nav, footer, hero backgrounds          */
-  --navy2:   #151c2c;  /* slightly darker for bottom bar         */
-  --cream:   #faf7f2;  /* warm off-white content background      */
-  --nav-bg:  #1a2236;  /* nav background — overridden per theme  */
+  --author-navy:    #1a2236;  /* nav, footer, hero backgrounds          */
+  --author-navy2:   #151c2c;  /* slightly darker for bottom bar         */
+  --author-cream:   #faf7f2;  /* warm off-white content background      */
+  --author-nav-bg:  #1a2236;  /* nav background — overridden per theme  */
 }
 
 /* ── Google Fonts ───────────────────────────────────────────────────────── */
@@ -58,11 +58,11 @@
 /* Applied via data-theme attribute on the author site wrapper div         */
 
 /* Default (Classic Literary) — no data-theme needed */
-/* ── --nav-bg is overridden per theme so the nav matches each palette card.  */
-/* --navy stays as the fallback default; --cream stays fixed across themes.   */
+/* ── --author-nav-bg is overridden per theme so the nav matches each palette card.  */
+/* --author-navy stays as the fallback default; --author-cream stays fixed across themes.   */
 
 [data-theme='modern'] {
-  --nav-bg: #0a0a0a;
+  --author-nav-bg: #0a0a0a;
   --background: 0 0% 100%;
   --foreground: 0 0% 4%;
   --primary: 0 0% 4%;
@@ -71,24 +71,24 @@
   --muted-foreground: 240 4% 46%;
   --accent: 239 84% 67%;
   --border: 240 6% 90%;
-  --font-heading: var(--font-inter), 'DM Sans', sans-serif;
-  --font-body: var(--font-inter), 'DM Sans', sans-serif;
+  --author-font-heading: var(--font-inter), 'DM Sans', sans-serif;
+  --author-font-body: var(--font-inter), 'DM Sans', sans-serif;
 }
 
 [data-theme='dark'] {
-  --nav-bg: #0d1117;
+  --author-nav-bg: #0d1117;
   --background: 222 47% 7%;
   --foreground: 210 20% 98%;
   --primary: 210 20% 98%;
   --muted-foreground: 210 15% 58%;
   --accent: 38 60% 57%;
   --border: 222 20% 18%;
-  --font-heading: var(--font-playfair), 'Libre Baskerville', serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), 'Libre Baskerville', serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='thriller'] {
-  --nav-bg: #0b1220;
+  --author-nav-bg: #0b1220;
   --background: 0 0% 90%;
   --foreground: 0 0% 10%;
   --primary: 218 56% 7%;
@@ -96,12 +96,12 @@
   --muted-foreground: 0 0% 40%;
   --accent: 353 67% 50%;
   --border: 0 0% 78%;
-  --font-heading: var(--font-inter), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='fantasy'] {
-  --nav-bg: #2d1b5e;
+  --author-nav-bg: #2d1b5e;
   --background: 40 25% 96%;
   --foreground: 10 15% 20%;
   --primary: 270 50% 24%;
@@ -109,12 +109,12 @@
   --muted-foreground: 10 10% 45%;
   --accent: 46 78% 60%;
   --border: 40 18% 83%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='romance'] {
-  --nav-bg: #7a2040;
+  --author-nav-bg: #7a2040;
   --background: 15 100% 99%;
   --foreground: 0 10% 29%;
   --primary: 335 55% 46%;
@@ -122,12 +122,12 @@
   --muted-foreground: 0 8% 50%;
   --accent: 33 100% 83%;
   --border: 10 30% 88%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='scifi'] {
-  --nav-bg: #060b18;
+  --author-nav-bg: #060b18;
   --background: 240 50% 4%;
   --foreground: 0 0% 95%;
   --primary: 214 22% 39%;
@@ -135,12 +135,12 @@
   --muted-foreground: 0 0% 60%;
   --accent: 187 100% 50%;
   --border: 218 30% 20%;
-  --font-heading: var(--font-inter), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='nautical'] {
-  --nav-bg: #001f3f;
+  --author-nav-bg: #001f3f;
   --background: 205 32% 93%;
   --foreground: 0 0% 5%;
   --primary: 210 100% 12%;
@@ -148,12 +148,12 @@
   --muted-foreground: 0 0% 42%;
   --accent: 37 100% 50%;
   --border: 205 18% 82%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='childrens'] {
-  --nav-bg: #1a5c5a;
+  --author-nav-bg: #1a5c5a;
   --background: 0 0% 100%;
   --foreground: 0 0% 20%;
   --primary: 184 56% 22%;
@@ -161,12 +161,12 @@
   --muted-foreground: 0 0% 44%;
   --accent: 51 100% 71%;
   --border: 0 0% 88%;
-  --font-heading: var(--font-inter), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='literary'] {
-  --nav-bg: #1a1a1a;
+  --author-nav-bg: #1a1a1a;
   --background: 0 0% 98%;
   --foreground: 0 0% 10%;
   --primary: 0 0% 17%;
@@ -174,12 +174,12 @@
   --muted-foreground: 0 0% 44%;
   --accent: 29 35% 57%;
   --border: 0 0% 88%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='western'] {
-  --nav-bg: #3d1f0d;
+  --author-nav-bg: #3d1f0d;
   --background: 36 40% 96%;
   --foreground: 10 15% 20%;
   --primary: 18 50% 36%;
@@ -187,12 +187,12 @@
   --muted-foreground: 10 10% 48%;
   --accent: 38 62% 55%;
   --border: 36 18% 82%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='cinematic'] {
-  --nav-bg: #050D1C;
+  --author-nav-bg: #050D1C;
   --background: 214 68% 8%;
   --foreground: 42 67% 95%;
   --primary: 42 67% 95%;
@@ -200,14 +200,14 @@
   --muted-foreground: 42 30% 68%;
   --accent: 46 63% 52%;
   --border: 214 40% 18%;
-  --font-heading: var(--font-playfair), 'Playfair Display', serif;
-  --font-body: var(--font-inter), 'Inter', sans-serif;
+  --author-font-heading: var(--font-playfair), 'Playfair Display', serif;
+  --author-font-body: var(--font-inter), 'Inter', sans-serif;
 }
 
 /* ── Subgenre palettes ──────────────────────────────────────────────────── */
 
 [data-theme='aviation'] {
-  --nav-bg: #0B1E33;
+  --author-nav-bg: #0B1E33;
   --background: 210 38% 93%;
   --foreground: 219 30% 9%;
   --primary: 212 68% 17%;
@@ -215,12 +215,12 @@
   --muted-foreground: 211 16% 42%;
   --accent: 21 100% 59%;
   --border: 210 32% 88%;
-  --font-heading: var(--font-inter), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='scuba-diving'] {
-  --nav-bg: #04282B;
+  --author-nav-bg: #04282B;
   --background: 171 40% 93%;
   --foreground: 177 51% 8%;
   --primary: 184 80% 14%;
@@ -228,12 +228,12 @@
   --muted-foreground: 176 16% 37%;
   --accent: 6 100% 68%;
   --border: 170 36% 87%;
-  --font-heading: var(--font-playfair), serif;
-  --font-body: var(--font-inter), sans-serif;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
 }
 
 [data-theme='mountain-adventure'] {
-  --nav-bg: #161F18;
+  --author-nav-bg: #161F18;
   --background: 100 15% 93%;
   --foreground: 133 17% 10%;
   --primary: 132 14% 21%;
@@ -241,16 +241,16 @@
   --muted-foreground: 128 10% 44%;
   --accent: 193 38% 47%;
   --border: 129 11% 88%;
-  --font-heading: var(--font-playfair), 'Playfair Display', serif;
-  --font-body: var(--font-inter), 'Inter', sans-serif;
+  --author-font-heading: var(--font-playfair), 'Playfair Display', serif;
+  --author-font-body: var(--font-inter), 'Inter', sans-serif;
 }
 
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
-.author-site .font-heading,
-.font-heading { font-family: var(--font-heading); }
-.author-site .font-body,
-.font-body    { font-family: var(--font-body); }
+.author-site .author-font-heading,
+.author-font-heading { font-family: var(--author-font-heading); }
+.author-site .author-font-body,
+.author-font-body    { font-family: var(--author-font-body); }
 
 html {
   scroll-behavior: smooth;

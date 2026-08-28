@@ -91,7 +91,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
                 {author.heroTitle}
               </span>
             )}
-            <h1 className="text-3xl sm:text-5xl font-bold leading-tight font-heading">
+            <h1 className="text-3xl sm:text-5xl font-bold leading-tight author-font-heading">
               {featuredBook?.title || `Books by ${authorName}`}
             </h1>
             {author.heroSubtitle && (
@@ -262,7 +262,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               {author.heroTitle}
             </p>
           )}
-          <h1 className="text-4xl font-bold text-white leading-tight font-heading">{authorName}</h1>
+          <h1 className="text-4xl font-bold text-white leading-tight author-font-heading">{authorName}</h1>
           {author.heroSubtitle && (
             <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.70)" }}>
               {author.heroSubtitle}
@@ -308,7 +308,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               {author.heroTitle}
             </p>
           )}
-          <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight font-heading">
+          <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight author-font-heading">
             {authorName}
           </h1>
           {author.heroSubtitle && (
