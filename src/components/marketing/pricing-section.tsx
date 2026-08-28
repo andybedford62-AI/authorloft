@@ -108,19 +108,19 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
       {/* Annual / Monthly toggle */}
       {hasAnnual && (
         <div className="flex items-center justify-center gap-3">
-          <span className={`text-sm font-medium ${!annual ? "text-[#f3ecdb]" : "text-[#93a0bc]"}`}>Monthly</span>
+          <span className={`text-sm font-medium ${!annual ? "text-vault-ink" : "text-vault-mute"}`}>Monthly</span>
           <button
             type="button"
             role="switch"
             aria-checked={annual}
             onClick={() => setAnnual((v) => !v)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-[#d6a94a]" : "bg-[#243756]"}`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-vault-gold" : "bg-vault-surf-2"}`}
           >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-[#f3ecdb] shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-vault-ink shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
           </button>
-          <span className={`text-sm font-medium ${annual ? "text-[#f3ecdb]" : "text-[#93a0bc]"}`}>Annual</span>
+          <span className={`text-sm font-medium ${annual ? "text-vault-ink" : "text-vault-mute"}`}>Annual</span>
           {annual && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#5fbf8a] bg-[rgba(95,191,138,0.14)] px-2.5 py-0.5 rounded-full">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-vault-good bg-vault-good/14 px-2.5 py-0.5 rounded-full">
               <Zap className="h-3 w-3" /> Save up to 20%
             </span>
           )}
@@ -144,8 +144,8 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
           return (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border bg-[#1e2f4d] flex flex-col gap-6 p-8 transition-all hover:shadow-lg ${
-                hasFeatured ? `ring-2 ${ringClass} shadow-lg` : "border-[rgba(243,236,219,0.12)]"
+              className={`relative rounded-2xl border bg-vault-surf flex flex-col gap-6 p-8 transition-all hover:shadow-lg ${
+                hasFeatured ? `ring-2 ${ringClass} shadow-lg` : "border-vault-ink/12"
               }`}
             >
               {/* Featured badge */}
@@ -159,18 +159,18 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
 
               {/* Name + price */}
               <div>
-                <h3 className="text-lg font-bold text-[#f3ecdb] mb-3">{plan.name}</h3>
+                <h3 className="text-lg font-bold text-vault-ink mb-3">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-[#f3ecdb]">{displayPrice}</span>
-                  <span className="text-sm text-[#93a0bc]">{isFree ? "/forever" : "/mo"}</span>
+                  <span className="text-4xl font-extrabold text-vault-ink">{displayPrice}</span>
+                  <span className="text-sm text-vault-mute">{isFree ? "/forever" : "/mo"}</span>
                 </div>
                 {annual && plan.annualPriceCents > 0 && (
-                  <p className="text-xs text-[#93a0bc] mt-1">
+                  <p className="text-xs text-vault-mute mt-1">
                     Billed {formatAnnualTotal(plan.annualPriceCents)}/year
                   </p>
                 )}
                 {plan.description && (
-                  <p className="text-sm text-[#93a0bc] mt-2 leading-relaxed">{plan.description}</p>
+                  <p className="text-sm text-vault-mute mt-2 leading-relaxed">{plan.description}</p>
                 )}
               </div>
 
@@ -178,7 +178,7 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
               <ul className="space-y-2.5 flex-1">
                 {features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-[#d6a94a]" />
+                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-vault-gold" />
                     <span className="text-[#c7cede]">{f}</span>
                   </li>
                 ))}
@@ -190,16 +190,16 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
                   ? "/register"
                   : `/register?plan=${plan.tier.toLowerCase()}${annual ? "&billing=annual" : ""}`
                 }
-                className={`block w-full text-center py-3 px-6 rounded-[6px] font-semibold text-sm transition-colors ${
+                className={`block w-full text-center py-3 px-6 rounded-vault font-semibold text-sm transition-colors ${
                   hasFeatured
                     ? `${badgeClass.split(" ")[0]} text-white hover:opacity-90`
-                    : "bg-[#d6a94a] text-[#16233d] hover:bg-[#e2bc6e]"
+                    : "bg-vault-gold text-vault-bg hover:bg-vault-gold-light"
                 }`}
               >
                 {isFree ? "Get Started Free" : `Start Free → ${plan.name}`}
               </Link>
               {!isFree && (
-                <p className="text-center text-xs text-[#93a0bc] mt-2">
+                <p className="text-center text-xs text-vault-mute mt-2">
                   Free account first, then upgrade — takes 2 minutes
                 </p>
               )}
@@ -209,14 +209,14 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
       </div>
 
       {/* Footer note */}
-      <p className="text-center text-sm text-[#93a0bc]">
+      <p className="text-center text-sm text-vault-mute">
         No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee
       </p>
 
       {/* Full-page FAQ */}
       {fullPage && (
-        <div className="max-w-2xl mx-auto pt-8 border-t border-[rgba(243,236,219,0.12)] space-y-6">
-          <h3 className="text-lg font-bold text-[#f3ecdb] text-center">Common questions</h3>
+        <div className="max-w-2xl mx-auto pt-8 border-t border-vault-ink/12 space-y-6">
+          <h3 className="text-lg font-bold text-vault-ink text-center">Common questions</h3>
           {[
             { q: "Can I switch plans later?", a: "Yes — upgrade or downgrade at any time. Changes take effect immediately. If you upgrade mid-cycle you're charged a prorated amount." },
             { q: "What happens if I exceed my book limit?", a: "You can still view and edit existing books, but you won't be able to add new ones until you upgrade or remove a book." },
@@ -225,8 +225,8 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
             { q: "Is there a contract or lock-in?", a: "No contract, no lock-in. Monthly plans can be cancelled anytime. Annual plans are billed yearly and include a 30-day money-back window." },
           ].map(({ q, a }) => (
             <div key={q} className="space-y-1">
-              <p className="font-semibold text-[#f3ecdb]">{q}</p>
-              <p className="text-sm text-[#93a0bc] leading-relaxed">{a}</p>
+              <p className="font-semibold text-vault-ink">{q}</p>
+              <p className="text-sm text-vault-mute leading-relaxed">{a}</p>
             </div>
           ))}
         </div>

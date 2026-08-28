@@ -80,7 +80,7 @@ function cellCls(type: CellType) {
   if (type === "yes") return "text-green-500 font-semibold";
   if (type === "no") return "text-red-400 font-semibold";
   if (type === "limited") return "text-amber-400 font-medium";
-  return "text-[#93a0bc]";
+  return "text-vault-mute";
 }
 
 type CompCell = { val: string; type: CellType };
@@ -160,7 +160,7 @@ export default async function PricingPage() {
   const comparisonRows = buildComparisonRows(plans);
 
   return (
-    <div className="min-h-screen bg-[#16233d]">
+    <div className="min-h-screen bg-vault-bg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Nav */}
@@ -169,7 +169,7 @@ export default async function PricingPage() {
       {/* Hero */}
       <MarketingPageHeader
         eyebrow="Plans & pricing"
-        title={<>Simple, <span className="italic text-[#d6a94a]">transparent</span> pricing</>}
+        title={<>Simple, <span className="italic text-vault-gold">transparent</span> pricing</>}
         subtitle="Start free with no credit card. Upgrade when you're ready to grow your author platform."
         backgroundImage="/pricing-header.png"
       />
@@ -177,15 +177,15 @@ export default async function PricingPage() {
       {/* Pricing cards — live from DB */}
       <section className="px-4 pb-20 max-w-5xl mx-auto">
         {foundingOffer && (
-          <div className="max-w-2xl mx-auto mb-10 flex items-center gap-5 rounded-2xl border border-[#d6a94a]/60 bg-[#243756] px-6 py-5 shadow-xl shadow-[#16233d]/25">
-            <div className="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-[#e2bc6e] to-[#d6a94a] text-[#16233d] shadow-md">
+          <div className="max-w-2xl mx-auto mb-10 flex items-center gap-5 rounded-2xl border border-vault-gold/60 bg-vault-surf-2 px-6 py-5 shadow-xl shadow-vault-bg/25">
+            <div className="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-vault-gold-light to-vault-gold text-vault-bg shadow-md">
               <span className="text-2xl font-extrabold leading-none">{foundingOffer.percentOff}%</span>
               <span className="text-[10px] font-bold uppercase tracking-wide">off</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-[#d6a94a] mb-1">🎉 Founding Member Offer</p>
-              <p className="text-base sm:text-lg font-bold text-[#f3ecdb] leading-snug">{foundingOffer.headline}</p>
-              <p className="text-sm text-[#93a0bc] mt-1">{foundingOffer.subtext}</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-vault-gold mb-1">🎉 Founding Member Offer</p>
+              <p className="text-base sm:text-lg font-bold text-vault-ink leading-snug">{foundingOffer.headline}</p>
+              <p className="text-sm text-vault-mute mt-1">{foundingOffer.subtext}</p>
             </div>
           </div>
         )}
@@ -193,7 +193,7 @@ export default async function PricingPage() {
           <PricingSection plans={plans} fullPage />
         ) : (
           // Fallback if DB has no plans yet
-          <div className="text-center py-20 text-[#93a0bc]">
+          <div className="text-center py-20 text-vault-mute">
             <p>Pricing plans are being set up. Check back soon.</p>
           </div>
         )}
@@ -202,11 +202,11 @@ export default async function PricingPage() {
       {/* See All Features CTA */}
       <section className="py-12 px-4 text-center">
         <div className="max-w-2xl mx-auto">
-          <p className="text-[#93a0bc] mb-4">Want to see the complete feature breakdown?</p>
+          <p className="text-vault-mute mb-4">Want to see the complete feature breakdown?</p>
           <Link
             href="/features"
             target="_blank"
-            className="inline-block bg-transparent text-[#d6a94a] font-semibold px-6 py-3 rounded-[6px] hover:bg-[rgba(214,169,74,0.1)] border border-[#d6a94a]/50 transition-colors"
+            className="inline-block bg-transparent text-vault-gold font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold/10 border border-vault-gold/50 transition-colors"
           >
             See All Features →
           </Link>
@@ -214,52 +214,52 @@ export default async function PricingPage() {
       </section>
 
       {/* Feature comparison table */}
-      <section className="py-20 bg-[#1e2f4d] px-4">
+      <section className="py-20 bg-vault-surf px-4">
         <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#d6a94a] text-center mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-vault-gold text-center mb-2">
             Plan details
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#f3ecdb] text-center mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-vault-ink text-center mb-3">
             Quick feature comparison
           </h2>
-          <p className="text-[#93a0bc] text-sm text-center max-w-xl mx-auto mb-10">
+          <p className="text-vault-mute text-sm text-center max-w-xl mx-auto mb-10">
             See what&apos;s included at every level — from free to premium.
           </p>
-          <div className="bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.2)] overflow-hidden shadow-lg">
+          <div className="bg-vault-surf rounded-2xl border border-vault-ink/20 overflow-hidden shadow-lg">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
-                  <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-1/2">Feature</th>
-                  <th className="text-center px-6 py-4 font-semibold text-[#f3ecdb]">Free</th>
-                  <th className="text-center px-6 py-4 font-semibold text-[#d6a94a]">Standard</th>
-                  <th className="text-center px-6 py-4 font-semibold text-[#e2bc6e]">Premium</th>
+                <tr className="border-b-2 border-vault-ink/20 bg-vault-surf-2">
+                  <th className="text-left px-6 py-4 font-medium text-vault-mute w-1/2">Feature</th>
+                  <th className="text-center px-6 py-4 font-semibold text-vault-ink">Free</th>
+                  <th className="text-center px-6 py-4 font-semibold text-vault-gold">Standard</th>
+                  <th className="text-center px-6 py-4 font-semibold text-vault-gold-light">Premium</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
+              <tbody className="divide-y divide-vault-ink/15">
                 {comparisonRows.map(({ label, free, standard, premium }) => (
-                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
-                    <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{label}</td>
-                    <td className="px-6 py-3.5 text-center text-[#93a0bc]">{free}</td>
-                    <td className="px-6 py-3.5 text-center text-[#f3ecdb] bg-[#d6a94a]/[0.07]">{standard}</td>
-                    <td className="px-6 py-3.5 text-center text-[#f3ecdb]">{premium}</td>
+                  <tr key={label} className="hover:bg-vault-ink/6 transition-colors">
+                    <td className="px-6 py-3.5 text-vault-ink font-medium">{label}</td>
+                    <td className="px-6 py-3.5 text-center text-vault-mute">{free}</td>
+                    <td className="px-6 py-3.5 text-center text-vault-ink bg-vault-gold/[0.07]">{standard}</td>
+                    <td className="px-6 py-3.5 text-center text-vault-ink">{premium}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t border-[rgba(243,236,219,0.12)] bg-[#243756]">
+                <tr className="border-t border-vault-ink/12 bg-vault-surf-2">
                   <td className="px-6 py-4" />
                   <td className="px-6 py-4 text-center">
-                    <Link href="/register" className="text-sm font-semibold text-[#d6a94a] hover:underline">
+                    <Link href="/register" className="text-sm font-semibold text-vault-gold hover:underline">
                       Get started →
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-center bg-[#243756]">
-                    <Link href="/register?plan=standard" className="text-sm font-semibold text-[#d6a94a] hover:underline">
+                  <td className="px-6 py-4 text-center bg-vault-surf-2">
+                    <Link href="/register?plan=standard" className="text-sm font-semibold text-vault-gold hover:underline">
                       Start free → Standard
                     </Link>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <Link href="/register?plan=premium" className="text-sm font-semibold text-[#e2bc6e] hover:underline">
+                    <Link href="/register?plan=premium" className="text-sm font-semibold text-vault-gold-light hover:underline">
                       Start free → Premium
                     </Link>
                   </td>
@@ -267,57 +267,57 @@ export default async function PricingPage() {
               </tfoot>
             </table>
           </div>
-          <p className="text-center text-sm text-[#93a0bc] mt-6">
+          <p className="text-center text-sm text-vault-mute mt-6">
             All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.
           </p>
         </div>
       </section>
 
       {/* Competitor comparison table */}
-      <section id="comparison" className="py-20 bg-[#16233d] px-4">
+      <section id="comparison" className="py-20 bg-vault-bg px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#d6a94a] mb-2">How we compare</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#f3ecdb] mb-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-vault-gold mb-2">How we compare</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-vault-ink mb-3">
               AuthorLoft vs. the competition
             </h2>
-            <p className="text-[#93a0bc] text-sm max-w-xl mx-auto">
+            <p className="text-vault-mute text-sm max-w-xl mx-auto">
               An apples-to-apples look at AuthorLoft <strong>Standard</strong> next to each competitor&apos;s entry paid tier.
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-[rgba(243,236,219,0.2)] bg-[#1e2f4d] shadow-lg">
+          <div className="overflow-x-auto rounded-2xl border border-vault-ink/20 bg-vault-surf shadow-lg">
             <table className="w-full text-sm min-w-[720px]">
               <thead>
-                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
-                  <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-[30%]">Feature</th>
-                  <th className="text-center px-4 py-4 font-bold text-[#d6a94a] bg-[#243756] border-x border-[rgba(243,236,219,0.12)]">
+                <tr className="border-b-2 border-vault-ink/20 bg-vault-surf-2">
+                  <th className="text-left px-6 py-4 font-medium text-vault-mute w-[30%]">Feature</th>
+                  <th className="text-center px-4 py-4 font-bold text-vault-gold bg-vault-surf-2 border-x border-vault-ink/12">
                     AuthorLoft
-                    <span className="block text-xs font-semibold text-[#e2bc6e] mt-0.5">STANDARD · $19.99/mo</span>
+                    <span className="block text-xs font-semibold text-vault-gold-light mt-0.5">STANDARD · $19.99/mo</span>
                   </th>
-                  <th className="text-center px-4 py-4 font-semibold text-[#f3ecdb]">
-                    <Link href="/compare/tertulia" className="hover:text-[#d6a94a] hover:underline transition-colors">Tertulia</Link>
-                    <span className="block text-xs font-normal text-[#93a0bc] mt-0.5">$7.99/mo</span>
+                  <th className="text-center px-4 py-4 font-semibold text-vault-ink">
+                    <Link href="/compare/tertulia" className="hover:text-vault-gold hover:underline transition-colors">Tertulia</Link>
+                    <span className="block text-xs font-normal text-vault-mute mt-0.5">$7.99/mo</span>
                   </th>
-                  <th className="text-center px-4 py-4 font-semibold text-[#f3ecdb]">
-                    <Link href="/compare/quilltips" className="hover:text-[#d6a94a] hover:underline transition-colors">Quilltips</Link>
-                    <span className="block text-xs font-normal text-[#93a0bc] mt-0.5">$4.99/mo</span>
+                  <th className="text-center px-4 py-4 font-semibold text-vault-ink">
+                    <Link href="/compare/quilltips" className="hover:text-vault-gold hover:underline transition-colors">Quilltips</Link>
+                    <span className="block text-xs font-normal text-vault-mute mt-0.5">$4.99/mo</span>
                   </th>
-                  <th className="text-center px-4 py-4 font-semibold text-[#f3ecdb]">
-                    <Link href="/compare/storyorigin" className="hover:text-[#d6a94a] hover:underline transition-colors">StoryOrigin</Link>
-                    <span className="block text-xs font-normal text-[#93a0bc] mt-0.5">~$20/mo</span>
+                  <th className="text-center px-4 py-4 font-semibold text-vault-ink">
+                    <Link href="/compare/storyorigin" className="hover:text-vault-gold hover:underline transition-colors">StoryOrigin</Link>
+                    <span className="block text-xs font-normal text-vault-mute mt-0.5">~$20/mo</span>
                   </th>
-                  <th className="text-center px-4 py-4 font-semibold text-[#f3ecdb]">
-                    <Link href="/compare/bookfunnel" className="hover:text-[#d6a94a] hover:underline transition-colors">BookFunnel</Link>
-                    <span className="block text-xs font-normal text-[#93a0bc] mt-0.5">~$49/mo</span>
+                  <th className="text-center px-4 py-4 font-semibold text-vault-ink">
+                    <Link href="/compare/bookfunnel" className="hover:text-vault-gold hover:underline transition-colors">BookFunnel</Link>
+                    <span className="block text-xs font-normal text-vault-mute mt-0.5">~$49/mo</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
+              <tbody className="divide-y divide-vault-ink/15">
                 {COMPETITOR_ROWS.map(({ label, authorloft, tertulia, quilltips, storyorigin, bookfunnel }) => (
-                  <tr key={label} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
-                    <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{label}</td>
-                    <td className={`px-4 py-3.5 text-center bg-[#243756] border-x border-[rgba(243,236,219,0.12)] ${cellCls(authorloft.type)}`}>{authorloft.val}</td>
+                  <tr key={label} className="hover:bg-vault-ink/6 transition-colors">
+                    <td className="px-6 py-3.5 text-vault-ink font-medium">{label}</td>
+                    <td className={`px-4 py-3.5 text-center bg-vault-surf-2 border-x border-vault-ink/12 ${cellCls(authorloft.type)}`}>{authorloft.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(tertulia.type)}`}>{tertulia.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(quilltips.type)}`}>{quilltips.val}</td>
                     <td className={`px-4 py-3.5 text-center ${cellCls(storyorigin.type)}`}>{storyorigin.val}</td>
@@ -326,47 +326,47 @@ export default async function PricingPage() {
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-[rgba(243,236,219,0.12)] bg-[#243756]">
-                  <td className="px-6 py-4 text-xs text-[#93a0bc] italic">Entry paid plan compared</td>
-                  <td className="px-4 py-4 text-center bg-[#243756] border-x border-[rgba(243,236,219,0.12)]">
-                    <Link href="/register" className="inline-block bg-[#d6a94a] text-[#16233d] text-xs font-semibold px-4 py-2 rounded-[6px] hover:bg-[#e2bc6e] transition-colors">
+                <tr className="border-t-2 border-vault-ink/12 bg-vault-surf-2">
+                  <td className="px-6 py-4 text-xs text-vault-mute italic">Entry paid plan compared</td>
+                  <td className="px-4 py-4 text-center bg-vault-surf-2 border-x border-vault-ink/12">
+                    <Link href="/register" className="inline-block bg-vault-gold text-vault-bg text-xs font-semibold px-4 py-2 rounded-vault hover:bg-vault-gold-light transition-colors">
                       Get Started →
                     </Link>
                   </td>
-                  <td colSpan={4} className="px-4 py-4 text-center text-xs text-[#93a0bc]">
+                  <td colSpan={4} className="px-4 py-4 text-center text-xs text-vault-mute">
                     Compared at each competitor&apos;s entry paid tier
                   </td>
                 </tr>
               </tfoot>
             </table>
           </div>
-          <p className="text-center text-xs text-[#93a0bc] mt-4">
+          <p className="text-center text-xs text-vault-mute mt-4">
             Competitor features based on publicly listed plans as of June 2026. Features subject to change.
           </p>
-          <p className="text-center text-sm mt-3 text-[#93a0bc]">
+          <p className="text-center text-sm mt-3 text-vault-mute">
             Full comparisons:{" "}
-            <Link href="/compare/bookfunnel" className="text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors">vs BookFunnel</Link>
+            <Link href="/compare/bookfunnel" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookFunnel</Link>
             {" · "}
-            <Link href="/compare/storyorigin" className="text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors">vs StoryOrigin</Link>
+            <Link href="/compare/storyorigin" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs StoryOrigin</Link>
             {" · "}
-            <Link href="/compare/tertulia" className="text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors">vs Tertulia</Link>
+            <Link href="/compare/tertulia" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Tertulia</Link>
             {" · "}
-            <Link href="/compare/quilltips" className="text-[#d6a94a] hover:text-[#f3ecdb] font-medium transition-colors">vs Quilltips</Link>
+            <Link href="/compare/quilltips" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Quilltips</Link>
           </p>
         </div>
       </section>
 
       {/* Have questions CTA */}
-      <section className="bg-[#1e2f4d] py-16 px-4">
+      <section className="bg-vault-surf py-16 px-4">
         <div className="max-w-2xl mx-auto text-center space-y-4">
-          <h2 className="text-2xl font-bold text-[#f3ecdb]">Not sure which plan is right for you?</h2>
-          <p className="text-[#93a0bc]">
+          <h2 className="text-2xl font-bold text-vault-ink">Not sure which plan is right for you?</h2>
+          <p className="text-vault-mute">
             We&apos;re happy to help you find the perfect fit for your author platform.
           </p>
           <div className="mt-6">
             <Link
               href="/contact"
-              className="inline-block bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
+              className="inline-block bg-vault-gold text-vault-bg font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold-light transition-colors"
             >
               Contact Us →
             </Link>

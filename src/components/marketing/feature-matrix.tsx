@@ -404,27 +404,27 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
     <div className="space-y-8">
       {featureRows.map((section) => (
         <div key={section.category}>
-          <h2 className={`text-xl font-bold text-[#f3ecdb] ${section.description ? 'mb-1' : 'mb-4'}`}>{section.category}</h2>
+          <h2 className={`text-xl font-bold text-vault-ink ${section.description ? 'mb-1' : 'mb-4'}`}>{section.category}</h2>
           {section.description && (
-            <p className="text-sm text-[#93a0bc] mb-4 max-w-2xl" style={{ fontFamily: 'Georgia, serif', lineHeight: 1.6 }}>
+            <p className="text-sm text-vault-mute mb-4 max-w-2xl font-vault-display" style={{ lineHeight: 1.6 }}>
               {section.description}
             </p>
           )}
-          <div className="bg-[#1e2f4d] rounded-lg border border-[rgba(243,236,219,0.2)] shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden">
+          <div className="bg-vault-surf rounded-lg border border-vault-ink/20 shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
-                <tr className="border-b-2 border-[rgba(243,236,219,0.2)] bg-[#243756]">
-                  <th className="text-left px-6 py-4 font-medium text-[#93a0bc] w-2/5">Feature</th>
+                <tr className="border-b-2 border-vault-ink/20 bg-vault-surf-2">
+                  <th className="text-left px-6 py-4 font-medium text-vault-mute w-2/5">Feature</th>
                   {tiers.map((tier) => (
                     <th
                       key={tier}
                       className={`text-center px-6 py-4 font-semibold ${
                         tier === "FREE"
-                          ? "text-[#93a0bc]"
+                          ? "text-vault-mute"
                           : tier === "STANDARD"
-                            ? "text-[#d6a94a]"
-                            : "text-[#e2bc6e]"
+                            ? "text-vault-gold"
+                            : "text-vault-gold-light"
                       }`}
                     >
                       {tier}
@@ -432,15 +432,15 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(243,236,219,0.15)]">
+              <tbody className="divide-y divide-vault-ink/15">
                 {section.features.map((feature) => (
-                  <tr key={feature.name} className="hover:bg-[rgba(243,236,219,0.06)] transition-colors">
-                    <td className="px-6 py-3.5 text-[#f3ecdb] font-medium">{feature.name}</td>
+                  <tr key={feature.name} className="hover:bg-vault-ink/6 transition-colors">
+                    <td className="px-6 py-3.5 text-vault-ink font-medium">{feature.name}</td>
                     {tiers.map((tier) => (
                       <td
                         key={`${feature.name}-${tier}`}
-                        className={`px-6 py-3.5 text-center text-[#93a0bc] ${
-                          tier === "STANDARD" ? "bg-[#d6a94a]/[0.07]" : ""
+                        className={`px-6 py-3.5 text-center text-vault-mute ${
+                          tier === "STANDARD" ? "bg-vault-gold/[0.07]" : ""
                         }`}
                       >
                         {feature.tiers[tier]}
@@ -462,8 +462,8 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
           let a shipped feature linger here — it directly contradicts the table
           above it, which pulls live from the Plan model. */}
       <div>
-        <h2 className="text-xl font-bold text-[#f3ecdb] mb-4">On the Roadmap</h2>
-        <div className="bg-[#243756] rounded-lg border border-[#d6a94a]/20 p-6">
+        <h2 className="text-xl font-bold text-vault-ink mb-4">On the Roadmap</h2>
+        <div className="bg-vault-surf-2 rounded-lg border border-vault-gold/20 p-6">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { name: "Author Mobile App", desc: "Native iOS / Android app for managing your AuthorLoft from anywhere" },
@@ -475,8 +475,8 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
               { name: "Dynamic OG Images", desc: "Auto-generated per-page social cards for every individual book and post, not just fixed marketing pages" },
             ].map((item) => (
               <div key={item.name}>
-                <p className="font-semibold text-[#f3ecdb]">{item.name}</p>
-                <p className="text-sm text-[#93a0bc]">{item.desc}</p>
+                <p className="font-semibold text-vault-ink">{item.name}</p>
+                <p className="text-sm text-vault-mute">{item.desc}</p>
               </div>
             ))}
           </div>
