@@ -35,6 +35,7 @@ export interface LandingPageData {
 export const LANDING_PAGES: Record<string, LandingPageData> = {
   "author-website-builder": {
     slug: "author-website-builder",
+    backgroundImage: "/author-website-builder-header.jpg",
     metaTitle: "Author Website Builder — Create Your Author Site in Minutes",
     metaDescription: "Build a professional author website with book pages, blog, custom domain, and direct sales — no coding required. Free to start.",
     eyebrow: "Author Website Builder",
@@ -89,6 +90,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "sell-books-directly": {
     slug: "sell-books-directly",
+    backgroundImage: "/sell-books-directly-header.jpg",
     metaTitle: "Sell Books Directly to Readers — Keep 100% of Revenue",
     metaDescription: "Sell ebooks, print books, and audiobooks directly to readers. Keep 100% of your revenue with AuthorLoft's built-in direct sales platform.",
     eyebrow: "Direct Book Sales",
@@ -142,6 +144,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "book-marketing-platform": {
     slug: "book-marketing-platform",
+    backgroundImage: "/book-marketing-platform-header.jpg",
     metaTitle: "Book Marketing Platform for Independent Authors",
     metaDescription: "Market your books with AI-powered social media posts, SEO tools, pre-order campaigns, affiliate programs, and bookstore discovery — all in one platform.",
     eyebrow: "Book Marketing",
@@ -195,6 +198,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-newsletter-platform": {
     slug: "author-newsletter-platform",
+    backgroundImage: "/author-newsletter-platform-header.jpg",
     metaTitle: "Author Newsletter & Email List Platform",
     metaDescription: "Build your author email list with built-in subscriber forms, reader magnets, and Mailchimp integration. Own your audience — no middleman.",
     eyebrow: "Author Newsletter",
@@ -248,6 +252,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "arc-management": {
     slug: "arc-management",
+    backgroundImage: "/arc-management-header.jpg",
     metaTitle: "ARC Management for Authors — Collect Reviews & Build Your ARC Team",
     metaDescription: "Manage advance reader copies, collect reader reviews, and display approved feedback on your book pages — all built into your author platform.",
     eyebrow: "ARC Management",
@@ -301,6 +306,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-media-kit": {
     slug: "author-media-kit",
+    backgroundImage: "/author-media-kit-header.jpg",
     metaTitle: "Author Media Kit Generator — Professional Press Kit",
     metaDescription: "Auto-generate a professional author media kit with bio, headshots, book covers, and press-ready assets. Perfect for interviews, podcasts, and events.",
     eyebrow: "Author Media Kit",
@@ -354,6 +360,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "ai-tools-for-authors": {
     slug: "ai-tools-for-authors",
+    backgroundImage: "/ai-tools-for-authors-header.jpg",
     metaTitle: "AI Tools for Authors — Social Posts, SEO Audit & Writing Assistant",
     metaDescription: "AI-powered tools for independent authors: social media post generator, SEO auditor, writing assistant, and reader feedback analysis. Built for authors, not marketers.",
     eyebrow: "AI Tools for Authors",
@@ -407,6 +414,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "indie-author-bookstore": {
     slug: "indie-author-bookstore",
+    backgroundImage: "/bookstore-header.png",
     metaTitle: "Indie Author Bookstore — Discover & Sell Independent Books",
     metaDescription: "A curated bookstore for independent authors. List your books, get discovered by genre, and reach new readers through AuthorLoft's shared catalog.",
     eyebrow: "Indie Bookstore",
@@ -459,6 +467,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "book-pre-orders": {
     slug: "book-pre-orders",
+    backgroundImage: "/book-pre-orders-header.jpg",
     metaTitle: "Book Pre-Order Pages for Authors — Countdown, Signups & Launch",
     metaDescription: "Create pre-order pages with launch countdowns, email signups, and automatic notifications. Build anticipation and capture readers before your book drops.",
     eyebrow: "Book Pre-Orders",
@@ -512,6 +521,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-affiliate-program": {
     slug: "author-affiliate-program",
+    backgroundImage: "/author-affiliate-program-header.jpg",
     metaTitle: "Author Affiliate Program — Let Fans Sell Your Books",
     metaDescription: "Built-in affiliate program for authors. Let book bloggers, fans, and influencers earn commission promoting your books with tracked referral links.",
     eyebrow: "Affiliate Program",
@@ -565,6 +575,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "reader-analytics-for-authors": {
     slug: "reader-analytics-for-authors",
+    backgroundImage: "/reader-analytics-for-authors-header.jpg",
     metaTitle: "Reader Analytics for Authors — Understand Your Audience",
     metaDescription: "PostHog-powered analytics for independent authors. Track page views, book popularity, reader behavior, and audience growth — all from your dashboard.",
     eyebrow: "Reader Analytics",
@@ -618,6 +629,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "author-courses": {
     slug: "author-courses",
+    backgroundImage: "/author-courses-header.jpg",
     metaTitle: "Sell Online Courses — Teach What You Know",
     metaDescription: "Build and sell online courses from your own site. Modules, lessons, video, worksheets, and Stripe checkout — you keep 100% of every sale.",
     eyebrow: "Author Courses",
