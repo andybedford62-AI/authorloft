@@ -16,14 +16,6 @@ interface MarketingPageHeaderProps {
    * When omitted, the band shows the clean navy gradient + texture.
    */
   backgroundImage?: string;
-  /**
-   * Optional decorative illustration (an inline SVG element) shown to the right
-   * of the title on md+ screens, in place of a photo — for pages with no
-   * real screenshot or banner photo available. Ignored when backgroundImage
-   * is set (a real photo always wins over abstract art). See
-   * solution-hero-art.tsx for the current set, one per solution page.
-   */
-  heroArt?: ReactNode;
 }
 
 /**
@@ -38,9 +30,8 @@ interface MarketingPageHeaderProps {
  *
  * Accent a word in the title with: <span className="italic text-vault-gold">Word</span>
  */
-export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, heroArt }: MarketingPageHeaderProps) {
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage }: MarketingPageHeaderProps) {
   const hasBanner = !!backgroundImage;
-  const hasHeroArt = !hasBanner && !!heroArt;
 
   return (
     <section className="relative overflow-hidden bg-vault-surf">
@@ -97,13 +88,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
           {subtitle && <p className="mt-4 text-base text-vault-mute max-w-xl leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">{subtitle}</p>}
         </div>
 
-        {hasHeroArt && (
-          <div className="hidden md:flex flex-shrink-0 w-64 lg:w-80" aria-hidden>
-            {heroArt}
-          </div>
-        )}
-
-        {imageSrc && !hasBanner && !hasHeroArt && (
+        {imageSrc && !hasBanner && (
           <div className="hidden md:flex flex-shrink-0">
             <span className="inline-flex items-center justify-center bg-white rounded-2xl p-2 shadow-lg">
               {/* eslint-disable-next-line @next/next/no-img-element */}

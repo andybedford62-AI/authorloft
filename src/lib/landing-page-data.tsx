@@ -22,6 +22,14 @@ export interface LandingPageData {
   sections: LandingSection[];
   faqs: LandingFaq[];
   relatedGuideSlug?: string;
+  /**
+   * Optional hero banner photo (same convention as pricing/features/faq/etc:
+   * ~1920x620 PNG/WebP, subject weighted right so the left 45% stays clear
+   * for the headline — see MarketingPageHeader). Omitted = plain gradient.
+   * None of the 12 solution pages have one yet; add the filename here once
+   * a real photo exists for that page.
+   */
+  backgroundImage?: string;
 }
 
 export const LANDING_PAGES: Record<string, LandingPageData> = {
