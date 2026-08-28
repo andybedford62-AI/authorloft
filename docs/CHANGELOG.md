@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## August 28, 2026 — Vault visual identity extended site-wide; corrects the August 15 "homepage-only" record
+
+The August 15 entry below (and the `memory/project_visual_identity_vault.md` it pointed to, which turned out not to exist) said Vault was scoped to the homepage only, pending "a follow-up pass." That was already inaccurate by the time this work started: Vault had quietly leaked into several shared components — the sitewide nav, the shared page-header band, pricing, features, FAQ, contact, and resources — through **four uncoordinated patterns**: a canonical `VAULT` import, locally duplicated `const VAULT` copies (two separate files), raw Tailwind hex classes with no token reference, and hex values hand-copied by value with no import at all (`marketing-nav.tsx` — invisible to a `grep "VAULT"` audit). Every other public page still ran the old Playfair/Inter, navy-gold-pill, centered-heading system in parallel, so the site had a jarring quality drop the moment a visitor clicked off the homepage.
+
+Fixed properly, in six batches, each pushed to `dev` and verified on staging before promotion:
+
+1. **Token architecture.** Promoted `VAULT` into a real Tailwind v4 `@theme` block in `globals.css` (`--color-vault-*`, generating `bg-vault-surf`, `text-vault-gold`, `rounded-vault`, `font-vault-display`, etc.) as the single source of truth. `vault-theme.ts` is now a documented mirror for the handful of call sites that structurally need a raw JS value (inline SVG fill, numeric radius), not the canonical source. Added four primitives — `VaultButton`, `VaultCard`, `VaultSection`, `VaultBadge` — under `src/components/marketing/vault/`. Migrated the sitewide nav (+ its dropdown/solutions/mobile-menu sub-components, which turned out to be the "copied by value" drift instance) and the footer, which is now restyled onto a light "cream" companion palette instead of an unrelated bespoke color set.
+2. **Pricing + features** — the highest-traffic conversion pages, plus `marketing-page-header.tsx` (the shared hero band used on bookstore/blog/news/FAQ/guides/resources/contact), whose multi-stop gradients now read the underlying `--color-vault-*` CSS custom properties directly.
+3. **All 12 solution pages** via the single shared `landing-page.tsx` component. Also fixed a fifth drift instance here: the hero-title accent word on every one of those 12 pages used `#D4AE6A`, a near-but-not-quite gold left over from an earlier, fully superseded "Rebel" design pass (`animated-sections.tsx` and siblings — confirmed unused, left in place rather than deleted since removing dead code wasn't in scope) — corrected to the real `vault-gold` (`#d6a94a`).
+4. **FAQ, blog, news, guides, resources** — content/list pages sharing a common shape. Found and fixed a real, previously-invisible rendering bug along the way: several files used `var(--font-heading, serif)` expecting the fallback to kick in, but `--font-heading` **is** globally defined (it's the per-author-site Playfair token), so the fallback never activated — these headings were silently rendering in Playfair instead of Vault's Georgia display face. `testimonials-section.tsx`/`faq-section.tsx` were investigated as candidates for this batch but confirmed unused (no live imports) and left untouched.
+5. **Bookstore** — the largest piece (~1650 lines across 9 components + 2 routes), previously deferred once already for its size. Verified the interactive parts explicitly on staging (search/genre/format/price filtering, pagination, the quick-view modal) since state logic and styling are interleaved in `bookstore-grid.tsx`.
+6. This entry, plus a proper `memory/project_visual_identity_vault.md` (previously referenced but missing) documenting the real final state.
+
+**Confirmed out of scope, still on the old/other systems:** the admin UI (separate hand-maintained dark-mode class allowlist), per-author public sites (`src/lib/themes.ts`, a different theming system entirely — not touched or renamed), and legal/`/compare` pages (inherit the new nav/footer/typography from batch 1 automatically; no dedicated redesign pass, by decision).
+
 ## August 25, 2026 — Book preview video upload was impossible above ~4.5 MB
 
 Reported as `Unexpected token 'R', "Request En"... is not valid JSON` when uploading a 9.7 MB MP4 to a book's preview media.
