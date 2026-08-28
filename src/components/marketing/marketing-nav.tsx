@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
 import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
 import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solutions";
+import { VaultButton } from "@/components/marketing/vault";
 
 
 export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" | "faq" }) {
@@ -31,31 +32,28 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
   const displayName = author?.displayName || author?.name || session?.user?.name || "My Account";
 
   return (
-    <header className="sticky top-0 z-50 bg-[#1e2f4d] border-b border-[rgba(243,236,219,0.12)]">
+    <header className="sticky top-0 z-50 bg-vault-surf border-b border-vault-ink/12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
 
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
             <svg viewBox="0 0 260 38" width={200} height={34} aria-label="AuthorLoft" role="img">
-              <text x="0" y="30" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
-                <tspan fill="#d6a94a">Author</tspan><tspan fill="#f3ecdb">Loft</tspan>
+              <text x="0" y="30" style={{ fontFamily: 'var(--font-vault-display)', fontStyle: 'italic', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
+                <tspan className="fill-vault-gold">Author</tspan><tspan className="fill-vault-ink">Loft</tspan>
               </text>
             </svg>
           </Link>
 
           {author && (
             <>
-              <span className="hidden sm:block text-[rgba(243,236,219,0.2)] select-none">|</span>
+              <span className="hidden sm:block text-vault-ink/20 select-none">|</span>
               <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-[#93a0bc]">{displayName}</span>
-                <Link
-                  href="/admin/dashboard"
-                  className="flex items-center gap-1.5 text-sm font-medium text-[#d6a94a] hover:text-[#e2bc6e] bg-[rgba(214,169,74,0.1)] hover:bg-[rgba(214,169,74,0.18)] px-3 py-1.5 rounded-[6px] transition-colors"
-                >
+                <span className="text-sm text-vault-mute">{displayName}</span>
+                <VaultButton href="/admin/dashboard" variant="subtle" size="sm">
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   Dashboard
-                </Link>
+                </VaultButton>
               </div>
             </>
           )}
@@ -65,7 +63,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
         <nav className="hidden md:flex items-center gap-6">
           <Link
             href="/bookstore"
-            className="text-sm font-medium text-[#d6a94a] hover:text-[#e2bc6e] transition-colors"
+            className="text-sm font-medium text-vault-gold hover:text-vault-gold-light transition-colors"
           >
             Bookstore
           </Link>
@@ -73,8 +71,8 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             href="/features"
             className={`text-sm transition-colors ${
               activePage === "features"
-                ? "font-medium text-[#d6a94a]"
-                : "text-[#93a0bc] hover:text-[#f3ecdb]"
+                ? "font-medium text-vault-gold"
+                : "text-vault-mute hover:text-vault-ink"
             }`}
           >
             Features
@@ -84,8 +82,8 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             href="/faq"
             className={`text-sm transition-colors ${
               activePage === "faq"
-                ? "font-medium text-[#d6a94a]"
-                : "text-[#93a0bc] hover:text-[#f3ecdb]"
+                ? "font-medium text-vault-gold"
+                : "text-vault-mute hover:text-vault-ink"
             }`}
           >
             FAQ
@@ -95,8 +93,8 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
             href="/pricing"
             className={`text-sm transition-colors ${
               activePage === "pricing"
-                ? "font-medium text-[#d6a94a]"
-                : "text-[#93a0bc] hover:text-[#f3ecdb]"
+                ? "font-medium text-vault-gold"
+                : "text-vault-mute hover:text-vault-ink"
             }`}
           >
             Pricing
@@ -107,27 +105,18 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
         <div className="flex items-center gap-2">
           {author ? (
             /* Mobile: show Dashboard button on the right when logo area is too small */
-            <Link
-              href="/admin/dashboard"
-              className="flex sm:hidden items-center gap-1.5 text-sm font-medium text-[#d6a94a] bg-[rgba(214,169,74,0.1)] hover:bg-[rgba(214,169,74,0.18)] px-3 py-1.5 rounded-[6px] transition-colors"
-            >
+            <VaultButton href="/admin/dashboard" variant="subtle" size="sm" className="flex sm:hidden">
               <LayoutDashboard className="h-3.5 w-3.5" />
               Dashboard
-            </Link>
+            </VaultButton>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="hidden sm:inline-flex items-center border border-[rgba(243,236,219,0.25)] text-[#f3ecdb] text-sm font-semibold px-4 py-2 rounded-[6px] hover:border-[rgba(243,236,219,0.4)] hover:bg-[rgba(243,236,219,0.05)] transition-colors"
-              >
+              <VaultButton href="/login" variant="secondary" className="hidden sm:inline-flex">
                 Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="hidden sm:inline-flex bg-[#d6a94a] text-[#16233d] text-sm font-semibold px-4 py-2 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
-              >
+              </VaultButton>
+              <VaultButton href="/register" variant="primary" className="hidden sm:inline-flex">
                 Start free →
-              </Link>
+              </VaultButton>
             </>
           )}
           <MarketingMobileMenu isAuthor={!!author} />

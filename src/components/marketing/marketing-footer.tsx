@@ -32,15 +32,15 @@ export async function MarketingFooter() {
   const navLinks: [string, string][] = [...NAV_LINKS, ["Demo", demoSiteUrl]];
 
   return (
-    <footer className="bg-[#E8E5DD] border-t border-[#DCDBD3]" style={{ padding: "28px 24px" }}>
+    <footer className="bg-vault-cream border-t border-vault-cream-border" style={{ padding: "28px 24px" }}>
       <div className="max-w-6xl mx-auto">
         {/* Newsletter signup row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 mb-5 border-b border-[#DCDBD3]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 mb-5 border-b border-vault-cream-border">
           <div>
-            <p className="text-sm font-semibold text-[#1B2B47]" style={{ fontFamily: "Georgia, serif" }}>
+            <p className="text-sm font-semibold text-vault-cream-ink font-vault-display">
               Get AuthorLoft News in your inbox
             </p>
-            <p className="text-xs text-[#5C6E89]">Updates, new features, specials &amp; events.</p>
+            <p className="text-xs text-vault-cream-mute">Updates, new features, specials &amp; events.</p>
           </div>
           <NewsSubscribeForm source="footer" variant="compact" />
         </div>
@@ -49,8 +49,7 @@ export async function MarketingFooter() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <Link
             href="/"
-            className="text-lg font-bold text-[#1B2B47] hover:text-[#C26A4A] transition-colors"
-            style={{ fontFamily: "Georgia, serif" }}
+            className="text-lg font-bold italic text-vault-cream-ink hover:text-vault-gold-muted transition-colors font-vault-display"
           >
             AuthorLoft
           </Link>
@@ -59,21 +58,20 @@ export async function MarketingFooter() {
               <span key={label} className="inline-flex items-center">
                 <Link
                   href={href}
-                  className="text-[13px] text-[#5C6E89] hover:text-[#1B2B47] transition-colors px-2.5"
-                  style={{ fontFamily: "Georgia, serif" }}
+                  className="text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors px-2.5 font-vault-display"
                   {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
                   {label}
                 </Link>
-                {i < navLinks.length - 1 && <span className="text-[#DCDBD3]">·</span>}
+                {i < navLinks.length - 1 && <span className="text-vault-cream-border">·</span>}
               </span>
             ))}
           </div>
         </div>
 
         {/* Bottom row: copyright + social icons */}
-        <div className="border-t border-[#DCDBD3] pt-3.5 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-[#5C6E89]/80 m-0" style={{ fontFamily: "Georgia, serif" }}>
+        <div className="border-t border-vault-cream-border pt-3.5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-vault-cream-mute/80 m-0 font-vault-display">
             © {new Date().getFullYear()} AuthorLoft. Built for authors, by someone who actually loves books.
           </p>
 
@@ -89,7 +87,7 @@ export async function MarketingFooter() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={link.platform}
-                    className="text-[#5C6E89] opacity-60 hover:opacity-100 transition-opacity"
+                    className="text-vault-cream-mute opacity-60 hover:opacity-100 transition-opacity"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -98,7 +96,7 @@ export async function MarketingFooter() {
             </div>
           )}
 
-          <p className="text-xs text-[#5C6E89]/60 italic m-0" style={{ fontFamily: "Georgia, serif" }}>
+          <p className="text-xs text-vault-cream-mute/60 italic m-0 font-vault-display">
             —— your books · your readers · your business ——
           </p>
         </div>

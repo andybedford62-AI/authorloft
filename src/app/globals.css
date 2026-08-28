@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+/* ── Vault design tokens (public marketing site) ─────────────────────────────
+   Single source of truth for the "Vault" visual identity — dark navy/gold,
+   Georgia-italic display type — used across the public marketing site only.
+   NOT used by the admin UI (separate dark-mode allowlist below) or the
+   per-author site theme system (--font-heading/--navy/--cream + [data-theme]
+   further down this file) — keep those namespaces from ever colliding.
+   Generates real Tailwind utilities: bg-vault-surf, text-vault-gold, etc.
+   src/components/marketing/vault-theme.ts mirrors these values for the few
+   call sites that need a raw JS value (inline SVG fill, numeric radius). */
+@theme {
+  --color-vault-bg: #16233d;
+  --color-vault-bg-deep: #111b30;
+  --color-vault-surf: #1e2f4d;
+  --color-vault-surf-2: #243756;
+  --color-vault-ink: #f3ecdb;
+  --color-vault-mute: #93a0bc;
+  --color-vault-gold: #d6a94a;
+  --color-vault-gold-light: #e2bc6e;
+  --color-vault-gold-muted: #a8752a;
+  --color-vault-good: #5fbf8a;
+  --color-vault-line: #2c3f5e;
+  --color-vault-hair: rgba(243, 236, 219, 0.12);
+
+  /* Light "break" palette — the deliberate cream section used mid-page
+     (e.g. the homepage newsletter block) to vary rhythm against the dark
+     Vault ground. Not a separate system; part of the same token set. */
+  --color-vault-cream: #f5f0e8;
+  --color-vault-cream-border: #d8ceb8;
+  --color-vault-cream-ink: #1a1008;
+  --color-vault-cream-mute: #5a4a38;
+
+  --radius-vault: 6px;
+  --font-vault-display: Georgia, 'Iowan Old Style', serif;
+  --font-vault-body: 'Helvetica Neue', Arial, sans-serif;
+}
+
 :root {
   --accent: #c89b3c;  /* Classic Literary gold — matches BASE_THEMES[0].preview.accent */
 
