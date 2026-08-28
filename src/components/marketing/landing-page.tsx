@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { getSolutionHeroArt } from "@/components/marketing/solution-hero-art";
 import type { LandingPageData } from "@/lib/landing-page-data";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
@@ -45,6 +46,7 @@ export function LandingPage({ data }: { data: LandingPageData }) {
         eyebrow={data.eyebrow}
         title={data.heroTitle}
         subtitle={data.heroSubtitle}
+        heroArt={getSolutionHeroArt(data.slug)}
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
