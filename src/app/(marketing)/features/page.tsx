@@ -130,7 +130,7 @@ export default async function FeaturesPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Nav */}
-      <MarketingNav activePage="features" />
+      <MarketingNav />
 
       {/* Hero */}
       <MarketingPageHeader

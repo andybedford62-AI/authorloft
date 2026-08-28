@@ -10,7 +10,7 @@ import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solu
 import { VaultButton } from "@/components/marketing/vault";
 
 
-export async function MarketingNav({ activePage }: { activePage?: "features" | "pricing" | "faq" }) {
+export async function MarketingNav({ activePage }: { activePage?: "pricing" }) {
   // Reading cookies opts this component into dynamic rendering so the session
   // is never served from a stale static cache.
   await cookies();
@@ -67,27 +67,7 @@ export async function MarketingNav({ activePage }: { activePage?: "features" | "
           >
             Bookstore
           </Link>
-          <Link
-            href="/features"
-            className={`text-sm transition-colors ${
-              activePage === "features"
-                ? "font-medium text-vault-gold"
-                : "text-vault-mute hover:text-vault-ink"
-            }`}
-          >
-            Features
-          </Link>
           <MarketingNavSolutions />
-          <Link
-            href="/faq"
-            className={`text-sm transition-colors ${
-              activePage === "faq"
-                ? "font-medium text-vault-gold"
-                : "text-vault-mute hover:text-vault-ink"
-            }`}
-          >
-            FAQ
-          </Link>
           <MarketingNavDropdown />
           <Link
             href="/pricing"

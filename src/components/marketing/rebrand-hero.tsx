@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useId } from 'react';
-import { HeroMobileMenu } from '@/components/marketing/hero-mobile-menu';
+import { MarketingMobileMenu } from '@/components/marketing/marketing-mobile-menu';
 import { VAULT } from '@/components/marketing/vault-theme';
+import { SOLUTION_CATEGORIES } from '@/lib/solution-categories';
 
 function NebulaBG() {
   const uid = useId();
@@ -188,6 +189,41 @@ function HeroNavDropdown({ label, items }: { label: string; items: [string, stri
   );
 }
 
+// Solutions dropdown — mirrors marketing-nav-solutions.tsx's slim 4-category
+// structure (category name + one-line description, not all 12 pages listed)
+// so the homepage nav stops diverging from every other page's nav.
+function HeroSolutionsDropdown() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: VAULT.ink, fontWeight: 400, opacity: 0.85, cursor: 'pointer', borderRadius: VAULT.radius, background: 'none', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        Solutions <span style={{ fontSize: 9, opacity: 0.7, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, paddingTop: 8, zIndex: 50 }}>
+          <div style={{ width: 340, background: VAULT.surf, border: `1px solid ${VAULT.hair}`, borderRadius: 14, padding: 10, boxShadow: '0 20px 44px -12px rgba(0,0,0,0.6)' }}>
+            <Link href="/features" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', marginBottom: 4, borderRadius: VAULT.radius, background: 'rgba(214,169,74,0.08)', fontSize: 12.5, fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
+              Compare every feature
+            </Link>
+            <div style={{ height: 1, background: VAULT.hair, margin: '4px 0' }} />
+            {SOLUTION_CATEGORIES.map((cat) => (
+              <Link key={cat.id} href={`/solutions#${cat.id}`} style={{ display: 'block', padding: '8px 10px', borderRadius: VAULT.radius, textDecoration: 'none' }}>
+                <span style={{ display: 'block', fontSize: 13, color: VAULT.ink }}>{cat.label}</span>
+                <span style={{ display: 'block', fontSize: 11, color: VAULT.mute, marginTop: 1 }}>{cat.description}</span>
+              </Link>
+            ))}
+            <div style={{ height: 1, background: VAULT.hair, margin: '4px 0' }} />
+            <Link href="/solutions" style={{ display: 'block', padding: '8px 10px', fontSize: 11.5, fontWeight: 500, color: VAULT.mute, textDecoration: 'none' }}>
+              Browse all 12 →
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RebelHero({
   isAuthor = false,
   headlineLine1,
@@ -233,27 +269,13 @@ export function RebelHero({
         </Link>
         <div style={{ alignItems: 'center', gap: 4, padding: 4, background: 'rgba(243,236,219,0.08)', borderRadius: VAULT.radius, border: `1px solid ${VAULT.hair}`, backdropFilter: 'blur(8px)' }} className="hidden md:flex">
           <Link href="/bookstore" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: VAULT.gold, fontWeight: 600, borderRadius: VAULT.radius, textDecoration: 'none' }}>Bookstore</Link>
-          <Link href="/features" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: VAULT.ink, opacity: 0.85, borderRadius: VAULT.radius, textDecoration: 'none' }}>Features</Link>
-          <HeroNavDropdown label="Solutions" items={[
-            ['/author-website-builder',       'Author Website Builder'],
-            ['/sell-books-directly',           'Sell Books Directly'],
-            ['/book-marketing-platform',       'Book Marketing'],
-            ['/author-newsletter-platform',    'Newsletter Platform'],
-            ['/arc-management',                'ARC Management'],
-            ['/author-media-kit',              'Author Media Kit'],
-            ['/ai-tools-for-authors',          'AI Tools for Authors'],
-            ['/indie-author-bookstore',        'Indie Author Bookstore'],
-            ['/author-courses',                'Sell Online Courses'],
-            ['/book-pre-orders',               'Book Pre-Orders'],
-            ['/author-affiliate-program',      'Affiliate Program'],
-            ['/reader-analytics-for-authors',  'Reader Analytics'],
-          ]} />
-          <Link href="/faq" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: VAULT.ink, opacity: 0.85, borderRadius: VAULT.radius, textDecoration: 'none' }}>FAQ</Link>
+          <HeroSolutionsDropdown />
           <HeroNavDropdown label="Resources" items={[
             ['/guides',    'Learn'],
             ['/blog',      'Blog'],
             ['/news',      'News'],
             ['/resources', 'Tools & Communities'],
+            ['/faq',       'FAQ'],
           ]} />
           <Link href="/pricing" style={{ padding: '8px 14px', fontFamily: 'inherit', fontSize: 13, color: VAULT.ink, opacity: 0.85, borderRadius: VAULT.radius, textDecoration: 'none' }}>Pricing</Link>
         </div>
@@ -271,7 +293,7 @@ export function RebelHero({
             </>
           )}
         </div>
-        <HeroMobileMenu isAuthor={isAuthor} />
+        <MarketingMobileMenu isAuthor={isAuthor} />
       </nav>
 
       {/* Content grid */}

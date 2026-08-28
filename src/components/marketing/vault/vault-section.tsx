@@ -27,6 +27,7 @@ export function VaultSection({
   className,
   reveal = true,
   bordered = true,
+  id,
 }: {
   tone?: VaultSectionTone;
   eyebrow?: string;
@@ -36,6 +37,8 @@ export function VaultSection({
   className?: string;
   reveal?: boolean;
   bordered?: boolean;
+  /** For nav anchor links (e.g. /solutions#your-platform) — includes scroll-margin so the sticky header doesn't cover the heading. */
+  id?: string;
 }) {
   const isLight = tone === "cream";
 
@@ -81,8 +84,10 @@ export function VaultSection({
 
   return (
     <section
+      id={id}
       className={cn(
         "py-16 px-7",
+        id && "scroll-mt-24",
         bordered && (isLight ? "border-t border-b border-vault-cream-border" : "border-t border-b border-vault-line"),
         TONE_BG[tone],
         className

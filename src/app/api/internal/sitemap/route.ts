@@ -77,6 +77,7 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
   const entries: Entry[] = [
     { loc: `${base}/`,          lastmod: now, changefreq: "weekly",  priority: 1.0 },
     { loc: `${base}/features`,  lastmod: now, changefreq: "monthly", priority: 0.9 },
+    { loc: `${base}/solutions`, lastmod: now, changefreq: "monthly", priority: 0.85 },
     { loc: `${base}/pricing`,   lastmod: now, changefreq: "monthly", priority: 0.9 },
     { loc: `${base}/bookstore`, lastmod: now, changefreq: "weekly",  priority: 0.85 },
   ];

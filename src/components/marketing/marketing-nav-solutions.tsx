@@ -2,42 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-
-const GROUPS: { label: string; items: [string, string][] }[] = [
-  {
-    label: "Your Platform",
-    items: [
-      ["/author-website-builder", "Author Website Builder"],
-      ["/indie-author-bookstore", "Indie Author Bookstore"],
-    ],
-  },
-  {
-    label: "Sell & Grow",
-    items: [
-      ["/sell-books-directly", "Sell Books Directly"],
-      ["/author-courses", "Sell Online Courses"],
-      ["/book-pre-orders", "Book Pre-Orders"],
-      ["/author-affiliate-program", "Affiliate Program"],
-    ],
-  },
-  {
-    label: "Marketing & Tools",
-    items: [
-      ["/book-marketing-platform", "Book Marketing"],
-      ["/author-newsletter-platform", "Newsletter Platform"],
-      ["/ai-tools-for-authors", "AI Tools for Authors"],
-      ["/author-media-kit", "Author Media Kit"],
-    ],
-  },
-  {
-    label: "Readers & Analytics",
-    items: [
-      ["/arc-management", "ARC Management"],
-      ["/reader-analytics-for-authors", "Reader Analytics"],
-    ],
-  },
-];
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { SOLUTION_CATEGORIES } from "@/lib/solution-categories";
 
 export function MarketingNavSolutions() {
   const [open, setOpen] = useState(false);
@@ -58,28 +24,41 @@ export function MarketingNavSolutions() {
       </button>
       {open && (
         <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50">
-          <div className="min-w-[460px] bg-vault-surf border border-vault-ink/12 rounded-xl shadow-lg p-4 grid grid-cols-2 gap-4">
-            {GROUPS.map((group) => (
-              <div key={group.label}>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-vault-mute mb-1.5 px-2 pb-1.5 border-b border-vault-ink/8">
-                  {group.label}
-                </p>
-                {group.items.map(([href, label]) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="block px-2 py-1.5 text-sm text-vault-ink hover:text-vault-gold hover:bg-vault-ink/6 rounded-md transition-colors"
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
+          <div className="w-[380px] bg-vault-surf border border-vault-ink/12 rounded-xl shadow-lg p-3">
+            <Link
+              href="/features"
+              className="flex items-center justify-between gap-3 bg-vault-gold/8 rounded-lg px-3 py-2.5 mb-2 hover:bg-vault-gold/14 transition-colors"
+            >
+              <span className="text-[13.5px] font-semibold text-vault-gold">Compare every feature</span>
+              <ChevronRight className="h-3.5 w-3.5 text-vault-gold flex-shrink-0" />
+            </Link>
+
+            <div className="border-t border-vault-ink/8 my-1.5" />
+
+            {SOLUTION_CATEGORIES.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/solutions#${cat.id}`}
+                className="flex items-center justify-between gap-3 px-3 py-2.5 -mx-3 rounded-lg hover:bg-vault-ink/6 transition-colors group"
+              >
+                <span>
+                  <span className="block text-sm font-semibold text-vault-ink group-hover:text-vault-gold transition-colors">
+                    {cat.label}
+                  </span>
+                  <span className="block text-xs text-vault-mute mt-0.5">{cat.description}</span>
+                </span>
+                <ChevronRight className="h-3.5 w-3.5 text-vault-mute flex-shrink-0" />
+              </Link>
             ))}
+
+            <div className="border-t border-vault-ink/8 mt-1.5 pt-2">
+              <Link href="/solutions" className="text-xs font-medium text-vault-mute hover:text-vault-gold transition-colors">
+                Browse all 12 →
+              </Link>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
-
-export const SOLUTION_ITEMS: [string, string][] = GROUPS.flatMap((g) => g.items);

@@ -9,6 +9,7 @@ const ITEMS: [string, string][] = [
   ["/blog", "Blog"],
   ["/news", "News"],
   ["/resources", "Tools & Communities"],
+  ["/faq", "FAQ"],
 ];
 
 /** Light-theme "Resources ▾" dropdown for the secondary marketing nav. */
