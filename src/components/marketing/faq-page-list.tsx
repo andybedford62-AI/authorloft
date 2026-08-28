@@ -62,7 +62,7 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
 
   if (groups.length === 0) {
     return (
-      <p style={{ textAlign: "center", color: "#93a0bc", fontFamily: "Georgia, serif", padding: "60px 0" }}>
+      <p style={{ textAlign: "center", color: "var(--color-vault-mute)", fontFamily: "var(--font-vault-display)", padding: "60px 0" }}>
         FAQs coming soon.
       </p>
     );
@@ -85,13 +85,13 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
 
       {visibleGroups.length === 0 ? (
         <div className="text-center py-18">
-          <Search className="h-10 w-10 text-[#d6a94a]/40 mx-auto mb-4" />
-          <h3 className="font-serif text-2xl text-[#f3ecdb] mb-2">No questions found</h3>
-          <p className="text-sm text-[#93a0bc] mb-4">Try a different category or clear your search.</p>
+          <Search className="h-10 w-10 text-vault-gold/40 mx-auto mb-4" />
+          <h3 className="font-vault-display text-2xl text-vault-ink mb-2">No questions found</h3>
+          <p className="text-sm text-vault-mute mb-4">Try a different category or clear your search.</p>
           <button
             type="button"
             onClick={() => { setActiveName(""); setQuery(""); }}
-            className="border border-[#d6a94a] text-[#d6a94a] text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#d6a94a]/10 transition-colors"
+            className="border border-vault-gold text-vault-gold text-sm font-semibold px-5 py-2 rounded-full hover:bg-vault-gold/10 transition-colors"
           >
             Clear filters
           </button>
@@ -105,7 +105,7 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
               key={group.slug}
               id={group.slug}
               style={{
-                background: "#1e2f4d",
+                background: "var(--color-vault-surf)",
                 border: "1px solid rgba(243,236,219,0.12)",
                 borderRadius: 16,
                 boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
@@ -114,16 +114,16 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
             >
               {/* Category heading with icon */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                <Icon style={{ width: 15, height: 15, color: "#d6a94a", flexShrink: 0 }} />
-                <h2 style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "#d6a94a", margin: 0 }}>
+                <Icon style={{ width: 15, height: 15, color: "var(--color-vault-gold)", flexShrink: 0 }} />
+                <h2 style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-vault-gold)", margin: 0 }}>
                   {group.name}
                 </h2>
                 <div style={{ flex: 1, height: 1, background: "rgba(243,236,219,0.12)" }} />
-                <span style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 11, color: "#93a0bc" }}>{group.items.length}</span>
+                <span style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 11, color: "var(--color-vault-mute)" }}>{group.items.length}</span>
               </div>
 
               {/* Accordion */}
-              <div style={{ borderTop: "2px solid #d6a94a" }}>
+              <div style={{ borderTop: "2px solid var(--color-vault-gold)" }}>
                 {group.items.map((item) => {
                   const open = openId === item.id;
                   return (
@@ -136,17 +136,17 @@ export function FaqPageList({ groups }: { groups: FaqGroup[] }) {
                           padding: "20px 0", background: "none", border: "none", cursor: "pointer", textAlign: "left",
                         }}
                       >
-                        <span style={{ flex: 1, fontFamily: "var(--font-heading, serif)", fontSize: 19, fontWeight: 400, color: "#f3ecdb", lineHeight: 1.3 }}>
+                        <span style={{ flex: 1, fontFamily: "var(--font-vault-display)", fontSize: 19, fontWeight: 400, color: "var(--color-vault-ink)", lineHeight: 1.3 }}>
                           {item.question}
                         </span>
-                        <span style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 20, color: "#d6a94a", flexShrink: 0, lineHeight: 1, transform: open ? "rotate(45deg)" : "none", transition: "transform 0.2s", display: "inline-block" }}>
+                        <span style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 20, color: "var(--color-vault-gold)", flexShrink: 0, lineHeight: 1, transform: open ? "rotate(45deg)" : "none", transition: "transform 0.2s", display: "inline-block" }}>
                           +
                         </span>
                       </button>
                       {open && (
                         <div
                           className="rich-content"
-                          style={{ padding: "0 0 22px", fontFamily: "Georgia, serif", fontSize: 15, lineHeight: 1.7, color: "#93a0bc" }}
+                          style={{ padding: "0 0 22px", fontFamily: "var(--font-vault-display)", fontSize: 15, lineHeight: 1.7, color: "var(--color-vault-mute)" }}
                           dangerouslySetInnerHTML={{ __html: item.answer }}
                         />
                       )}

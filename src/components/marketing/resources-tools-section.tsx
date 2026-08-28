@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { ArrowUpRight, Star, Search } from "lucide-react";
 import { MarketingFilterToolbar } from "./marketing-filter-toolbar";
+import { VAULT } from "./vault-theme";
 
 type Resource = {
   id: string;
@@ -26,10 +27,6 @@ const CATEGORY_META: Record<string, { accent: string; label: string }> = {
 function catMeta(category: string) {
   return CATEGORY_META[category] ?? { accent: "#d6a94a", label: category };
 }
-
-const VAULT = {
-  bg: "#16233d", surf2: "#243756", ink: "#f3ecdb", mute: "#93a0bc", gold: "#d6a94a",
-};
 
 export function ResourcesToolsSection({
   resources,
@@ -116,14 +113,14 @@ export function ResourcesToolsSection({
                       {resource.logoUrl ? (
                         <Image src={resource.logoUrl} alt={resource.name} width={80} height={80} style={{ objectFit: "contain", padding: 8 }} />
                       ) : (
-                        <span style={{ fontFamily: "var(--font-heading, serif)", fontSize: (resource.initials?.length ?? 0) > 2 ? 16 : 22, fontWeight: 600, color: VAULT.ink }}>
+                        <span style={{ fontFamily: "var(--font-vault-display)", fontSize: (resource.initials?.length ?? 0) > 2 ? 16 : 22, fontWeight: 600, color: VAULT.ink }}>
                           {resource.initials || resource.name[0]}
                         </span>
                       )}
                     </div>
                     <div style={{ flex: 1, paddingTop: 6 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <p style={{ fontFamily: "var(--font-heading, serif)", fontStyle: "italic", fontSize: 18, fontWeight: 400, color: VAULT.ink, margin: 0, lineHeight: 1.3 }}>{resource.name}</p>
+                        <p style={{ fontFamily: "var(--font-vault-display)", fontStyle: "italic", fontSize: 18, fontWeight: 400, color: VAULT.ink, margin: 0, lineHeight: 1.3 }}>{resource.name}</p>
                         <ArrowUpRight style={{ width: 15, height: 15, color: VAULT.gold, flexShrink: 0 }} />
                       </div>
                     </div>

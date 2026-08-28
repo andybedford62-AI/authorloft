@@ -7,6 +7,7 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { DownloadButton } from "@/components/marketing/download-button";
 import { ResourcesToolsSection } from "@/components/marketing/resources-tools-section";
 import { prisma } from "@/lib/db";
+import { VAULT } from "@/components/marketing/vault-theme";
 
 export const revalidate = 60;
 
@@ -31,11 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
     },
   };
 }
-
-const VAULT = {
-  bg: "#16233d", surf: "#1e2f4d", surf2: "#243756",
-  ink: "#f3ecdb", mute: "#93a0bc", gold: "#d6a94a",
-};
 
 export default async function ResourcesPage() {
   const [resources, downloads, downloadCats] = await Promise.all([
@@ -78,7 +74,7 @@ export default async function ResourcesPage() {
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <MarketingPageHeader
         eyebrow="Curated Resources"
-        title={<>Tools &amp; communities <span className="italic text-[#d6a94a]">every author should know</span></>}
+        title={<>Tools &amp; communities <span className="italic text-vault-gold">every author should know</span></>}
         subtitle="A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers."
         backgroundImage="/resources-header.png"
       />
@@ -106,7 +102,7 @@ export default async function ResourcesPage() {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 12 }}>· Free Downloads ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
+              <h2 style={{ fontFamily: 'var(--font-vault-display)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
                 Checklists, guides &amp; templates<br /><span style={{ fontStyle: 'italic', color: VAULT.gold }}>to grow your author business</span>
               </h2>
             </div>
@@ -134,7 +130,7 @@ export default async function ResourcesPage() {
                           </div>
                         )}
                         <div style={{ padding: '18px 20px 12px' }}>
-                          <p style={{ fontFamily: 'var(--font-heading, serif)', fontStyle: 'italic', fontSize: 17, fontWeight: 400, color: VAULT.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
+                          <p style={{ fontFamily: 'var(--font-vault-display)', fontStyle: 'italic', fontSize: 17, fontWeight: 400, color: VAULT.ink, margin: '0 0 6px', lineHeight: 1.3 }}>{d.title}</p>
                           {d.description && (
                             <p style={{ fontFamily: 'Georgia, serif', fontSize: 13, lineHeight: 1.6, color: VAULT.mute, margin: 0 }}>{d.description}</p>
                           )}
@@ -145,7 +141,7 @@ export default async function ResourcesPage() {
                           id={d.id}
                           title={d.title}
                           requiresEmail={d.requiresEmail}
-                          className="w-full inline-flex items-center justify-center gap-2 bg-[#d6a94a] text-[#16233d] text-sm font-semibold px-4 py-2.5 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
+                          className="w-full inline-flex items-center justify-center gap-2 bg-vault-gold text-vault-bg text-sm font-semibold px-4 py-2.5 rounded-vault hover:bg-vault-gold-light transition-colors"
                         />
                       </div>
                     </div>
@@ -164,7 +160,7 @@ export default async function ResourcesPage() {
           {downloadGroups.length > 0 && (
             <div style={{ textAlign: 'center', marginBottom: 44 }}>
               <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 12 }}>· Tools &amp; Communities ·</p>
-              <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
+              <h2 style={{ fontFamily: 'var(--font-vault-display)', fontSize: 'clamp(28px, 3.4vw, 44px)', fontWeight: 400, lineHeight: 1.05, color: VAULT.ink, margin: 0 }}>
                 Trusted partners &amp; <span style={{ fontStyle: 'italic', color: VAULT.gold }}>where to go next</span>
               </h2>
             </div>
@@ -177,7 +173,7 @@ export default async function ResourcesPage() {
       <section style={{ margin: '0 60px 80px', borderRadius: 24, background: `linear-gradient(135deg, ${VAULT.surf} 0%, ${VAULT.surf2} 100%)`, border: '1px solid rgba(214,169,74,0.2)', padding: '72px 60px', textAlign: 'center' }}>
         <div style={{ maxWidth: 620, margin: '0 auto' }}>
           <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 16 }}>· Work with us ·</p>
-          <h2 style={{ fontFamily: 'var(--font-heading, serif)', fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: VAULT.ink, margin: '0 0 20px' }}>
+          <h2 style={{ fontFamily: 'var(--font-vault-display)', fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 400, lineHeight: 0.95, letterSpacing: '-0.025em', color: VAULT.ink, margin: '0 0 20px' }}>
             Serve independent authors?<br /><span style={{ fontStyle: 'italic', color: VAULT.gold }}>Let&apos;s work together.</span>
           </h2>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, lineHeight: 1.7, color: `${VAULT.ink}cc`, margin: '0 0 32px' }}>

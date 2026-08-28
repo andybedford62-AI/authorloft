@@ -7,14 +7,11 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { DownloadButton } from "@/components/marketing/download-button";
 import { prisma } from "@/lib/db";
 import { sanitize } from "@/lib/sanitize";
+import { VAULT } from "@/components/marketing/vault-theme";
 
 export const revalidate = 60;
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
-
-const VAULT = {
-  bg: "#16233d", surf2: "#243756", ink: "#f3ecdb", mute: "#93a0bc", gold: "#d6a94a",
-};
 
 async function getDownload(slug: string) {
   return prisma.resourceDownload.findFirst({
@@ -115,7 +112,7 @@ export default async function ResourceDownloadPage(
             <p style={{ fontFamily: "var(--font-geist-mono, monospace)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: VAULT.gold, marginBottom: 10 }}>
               · Free Download ·
             </p>
-            <h1 style={{ fontFamily: "var(--font-heading, serif)", fontStyle: "italic", fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 400, color: VAULT.ink, lineHeight: 1.15, margin: "0 0 16px" }}>
+            <h1 style={{ fontFamily: "var(--font-vault-display)", fontStyle: "italic", fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 400, color: VAULT.ink, lineHeight: 1.15, margin: "0 0 16px" }}>
               {d.title}
             </h1>
             {d.description && (
@@ -128,7 +125,7 @@ export default async function ResourceDownloadPage(
               id={d.id}
               title={d.title}
               requiresEmail={d.requiresEmail}
-              className="inline-flex items-center justify-center gap-2 bg-[#d6a94a] text-[#16233d] text-sm font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-vault-gold text-vault-bg text-sm font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold-light transition-colors"
             />
 
             {/* Body content */}

@@ -9,7 +9,7 @@ function NewsCard({ post }: { post: FilterablePost }) {
   return (
     <Link
       href={`/news/${post.slug}`}
-      className="group flex flex-col sm:flex-row gap-4 sm:gap-6 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)] overflow-hidden hover:shadow-md transition-shadow p-5"
+      className="group flex flex-col sm:flex-row gap-4 sm:gap-6 bg-vault-surf rounded-2xl border border-vault-ink/12 overflow-hidden hover:shadow-md transition-shadow p-5"
     >
       {post.coverImageUrl && (
         /* eslint-disable-next-line @next/next/no-img-element */
@@ -22,26 +22,26 @@ function NewsCard({ post }: { post: FilterablePost }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-2 flex-wrap">
           {post.category && (
-            <span className="text-xs font-mono uppercase tracking-wider text-[#d6a94a] bg-[#d6a94a]/10 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-mono uppercase tracking-wider text-vault-gold bg-vault-gold/10 px-2.5 py-1 rounded-full">
               {post.category}
             </span>
           )}
-          <span className="text-xs text-[#93a0bc]">
+          <span className="text-xs text-vault-mute">
             {post.publishedAt
               ? new Date(post.publishedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
               : ""}
           </span>
-          <span className="flex items-center gap-1 text-xs text-[#93a0bc]">
+          <span className="flex items-center gap-1 text-xs text-vault-mute">
             <Clock className="h-3 w-3" /> {post.readTimeMinutes} min
           </span>
         </div>
-        <h3 className="font-serif text-xl text-[#f3ecdb] leading-snug mb-1 group-hover:text-[#d6a94a] transition-colors">
+        <h3 className="font-vault-display text-xl text-vault-ink leading-snug mb-1 group-hover:text-vault-gold transition-colors">
           {post.title}
         </h3>
         {post.excerpt && (
-          <p className="text-sm text-[#93a0bc] leading-relaxed line-clamp-2">{post.excerpt}</p>
+          <p className="text-sm text-vault-mute leading-relaxed line-clamp-2">{post.excerpt}</p>
         )}
-        <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#d6a94a] group-hover:gap-2 transition-all">
+        <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-vault-gold group-hover:gap-2 transition-all">
           Read more <ArrowRight className="h-3 w-3" />
         </span>
       </div>
@@ -77,9 +77,9 @@ export function NewsList({ posts }: { posts: FilterablePost[] }) {
       />
 
       {f.filtered.length === 0 ? (
-        <div className="text-center py-20 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)]">
-          <Megaphone className="h-10 w-10 text-[#93a0bc] mx-auto mb-4" />
-          <p className="text-[#93a0bc]">No news matches your filters.</p>
+        <div className="text-center py-20 bg-vault-surf rounded-2xl border border-vault-ink/12">
+          <Megaphone className="h-10 w-10 text-vault-mute mx-auto mb-4" />
+          <p className="text-vault-mute">No news matches your filters.</p>
         </div>
       ) : f.isFiltering ? (
         <div className="space-y-4">
@@ -89,7 +89,7 @@ export function NewsList({ posts }: { posts: FilterablePost[] }) {
         <div className="space-y-12">
           {Array.from(groups.keys()).map((year) => (
             <section key={year}>
-              <h2 className="font-serif text-2xl text-[#f3ecdb] mb-5 pb-2 border-b border-[rgba(243,236,219,0.12)]">{year}</h2>
+              <h2 className="font-vault-display text-2xl text-vault-ink mb-5 pb-2 border-b border-vault-ink/12">{year}</h2>
               <div className="space-y-4">
                 {groups.get(year)!.map((p) => <NewsCard key={p.id} post={p} />)}
               </div>

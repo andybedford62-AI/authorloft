@@ -49,12 +49,12 @@ export default async function BlogIndexPage() {
   const posts = rows.map((p) => ({ ...p, publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null }));
 
   return (
-    <div className="min-h-screen bg-[#16233d]">
+    <div className="min-h-screen bg-vault-bg">
       <MarketingNav />
 
       <MarketingPageHeader
         eyebrow="From the team"
-        title={<>The AuthorLoft <span className="italic text-[#d6a94a]">Blog</span></>}
+        title={<>The AuthorLoft <span className="italic text-vault-gold">Blog</span></>}
         subtitle="Guides, strategies, and insights for independent authors building a direct connection with readers."
         backgroundImage="/blog-header.png"
       />
@@ -62,9 +62,9 @@ export default async function BlogIndexPage() {
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
 
         {posts.length === 0 ? (
-          <div className="text-center py-24 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)]">
-            <BookOpen className="h-10 w-10 text-[#93a0bc] mx-auto mb-4" />
-            <p className="text-[#93a0bc]">Posts coming soon. Check back shortly.</p>
+          <div className="text-center py-24 bg-vault-surf rounded-2xl border border-vault-ink/12">
+            <BookOpen className="h-10 w-10 text-vault-mute mx-auto mb-4" />
+            <p className="text-vault-mute">Posts coming soon. Check back shortly.</p>
           </div>
         ) : (
           <BlogIndex posts={posts} />
@@ -72,14 +72,14 @@ export default async function BlogIndexPage() {
       </div>
 
       {/* Footer CTA */}
-      <div className="bg-[#243756] py-16 px-4 text-center mt-16">
-        <p className="text-sm font-mono uppercase tracking-widest text-[#d6a94a] mb-4">· Ready to start your business? ·</p>
-        <h2 className="font-serif italic text-3xl text-[#f3ecdb] font-normal mb-6">
-          Own your author business <span className="italic text-[#d6a94a]">starting today</span>
+      <div className="bg-vault-surf-2 py-16 px-4 text-center mt-16">
+        <p className="text-sm font-mono uppercase tracking-widest text-vault-gold mb-4">· Ready to start your business? ·</p>
+        <h2 className="font-vault-display italic text-3xl text-vault-ink font-normal mb-6">
+          Own your author business <span className="italic text-vault-gold">starting today</span>
         </h2>
         <Link
           href="/register"
-          className="inline-flex items-center gap-2 bg-[#d6a94a] text-[#16233d] font-semibold px-6 py-3 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
+          className="inline-flex items-center gap-2 bg-vault-gold text-vault-bg font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold-light transition-colors"
         >
           Get Started Free <ArrowRight className="h-4 w-4" />
         </Link>
