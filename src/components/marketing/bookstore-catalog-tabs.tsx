@@ -29,10 +29,10 @@ export function BookstoreCatalogTabs({
         <button
           type="button"
           onClick={() => setActive("books")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-serif text-lg transition-colors ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-vault-display text-lg transition-colors ${
             active === "books"
-              ? "bg-[#d6a94a] text-[#16233d]"
-              : "bg-[#16233d] text-[#93a0bc] border border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
+              ? "bg-vault-gold text-vault-bg"
+              : "bg-vault-bg text-vault-mute border border-vault-ink/15 hover:border-vault-gold"
           }`}
         >
           <Library className="h-4 w-4" /> Books ({books.length})
@@ -40,10 +40,10 @@ export function BookstoreCatalogTabs({
         <button
           type="button"
           onClick={() => setActive("courses")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-serif text-lg transition-colors ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-vault-display text-lg transition-colors ${
             active === "courses"
-              ? "bg-[#d6a94a] text-[#16233d]"
-              : "bg-[#16233d] text-[#93a0bc] border border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
+              ? "bg-vault-gold text-vault-bg"
+              : "bg-vault-bg text-vault-mute border border-vault-ink/15 hover:border-vault-gold"
           }`}
         >
           <GraduationCap className="h-4 w-4" /> Courses ({courses.length})

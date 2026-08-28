@@ -157,7 +157,7 @@ export default async function BookstorePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#16233d]">
+    <div className="min-h-screen bg-vault-bg">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
@@ -171,13 +171,13 @@ export default async function BookstorePage() {
       {/* ── Hero (unified brand band + banner) ───────────────────────────── */}
       <MarketingPageHeader
         eyebrow="Discover independent authors"
-        title={<>The AuthorLoft <span className="italic text-[#d6a94a]">Bookstore</span></>}
+        title={<>The AuthorLoft <span className="italic text-vault-gold">Bookstore</span></>}
         subtitle="A shared shelf of books from independent authors across every genre. Find your next read, then buy directly from each author's own site."
         backgroundImage="/bookstore-header.png"
       />
 
       {/* ── Stat bar + social ────────────────────────────────────────────── */}
-      <div className="bg-[#1e2f4d]">
+      <div className="bg-vault-surf">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-3 divide-x divide-white/10 text-center">
           {[
             { icon: Library, value: stats.books, label: stats.books === 1 ? "Book" : "Books" },
@@ -185,21 +185,21 @@ export default async function BookstorePage() {
             { icon: Tag, value: stats.genres, label: stats.genres === 1 ? "Genre" : "Genres" },
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="flex flex-col items-center gap-1 px-2">
-              <Icon className="h-4 w-4 text-[#d6a94a]" />
-              <span className="text-2xl sm:text-3xl font-serif text-[#f3ecdb] leading-none">{value}</span>
-              <span className="text-[11px] uppercase tracking-widest text-[#93a0bc]">{label}</span>
+              <Icon className="h-4 w-4 text-vault-gold" />
+              <span className="text-2xl sm:text-3xl font-vault-display text-vault-ink leading-none">{value}</span>
+              <span className="text-[11px] uppercase tracking-widest text-vault-mute">{label}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── Trust line ───────────────────────────────────────────────────── */}
-      <div className="bg-[#16233d] border-b border-[rgba(243,236,219,0.12)]">
+      <div className="bg-vault-bg border-b border-vault-ink/12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-2 text-center">
-          <BookMarked className="h-4 w-4 text-[#d6a94a] flex-shrink-0" />
-          <p className="text-xs sm:text-sm text-[#93a0bc]">
+          <BookMarked className="h-4 w-4 text-vault-gold flex-shrink-0" />
+          <p className="text-xs sm:text-sm text-vault-mute">
             Every book here is published by an independent author on{" "}
-            <span className="font-semibold text-[#f3ecdb]">AuthorLoft</span>.
+            <span className="font-semibold text-vault-ink">AuthorLoft</span>.
           </p>
         </div>
       </div>
@@ -211,8 +211,8 @@ export default async function BookstorePage() {
         {/* ── Author spotlight ───────────────────────────────────────────── */}
         {spotlight && (
           <section className="mb-8">
-            <div className="relative overflow-hidden rounded-2xl bg-[#243756] text-[#f3ecdb] p-4 sm:p-5">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#16233d] bg-[#d6a94a] px-3 py-1 rounded-full mb-3">
+            <div className="relative overflow-hidden rounded-2xl bg-vault-surf-2 text-vault-ink p-4 sm:p-5">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-vault-bg bg-vault-gold px-3 py-1 rounded-full mb-3">
                 <Sparkles className="h-3 w-3" /> Author Spotlight
               </div>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
@@ -223,8 +223,8 @@ export default async function BookstorePage() {
                   className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-white/15 shadow-lg flex-shrink-0"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <h2 className="font-serif italic text-lg sm:text-xl mb-0.5">{spotlight.name}</h2>
-                  <p className="text-xs text-[#93a0bc] mb-1.5">
+                  <h2 className="font-vault-display italic text-lg sm:text-xl mb-0.5">{spotlight.name}</h2>
+                  <p className="text-xs text-vault-mute mb-1.5">
                     {spotlight.bookCount} book{spotlight.bookCount !== 1 ? "s" : ""} in the bookstore
                   </p>
                   <p className="text-sm text-[#c7cede] leading-relaxed max-w-2xl line-clamp-2">{spotlight.bio}</p>
@@ -234,7 +234,7 @@ export default async function BookstorePage() {
                         <span
                           key={badge.key}
                           title={badge.description ?? badge.label}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-[#d6a94a]/40 bg-[#d6a94a]/10 text-[#d6a94a]"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-vault-gold/40 bg-vault-gold/10 text-vault-gold"
                         >
                           {badge.label}
                         </span>
@@ -243,7 +243,7 @@ export default async function BookstorePage() {
                   )}
                   <a
                     href={spotlight.url}
-                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[#d6a94a] hover:gap-2.5 transition-all"
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-vault-gold hover:gap-2.5 transition-all"
                   >
                     Visit {spotlight.name}&apos;s site <ArrowRight className="h-4 w-4" />
                   </a>
@@ -270,7 +270,7 @@ export default async function BookstorePage() {
         <BookstoreRow
           title="New on the Shelf"
           subtitle={newBooksSubtitle}
-          icon={<Clock className="h-5 w-5 text-[#d6a94a]" />}
+          icon={<Clock className="h-5 w-5 text-vault-gold" />}
           books={newBooks}
           variant="gold"
           compact
@@ -282,7 +282,7 @@ export default async function BookstorePage() {
         {SHOW_TRENDING && (
           <BookstoreRow
             title="Trending Now"
-            icon={<TrendingUp className="h-5 w-5 text-[#d6a94a]" />}
+            icon={<TrendingUp className="h-5 w-5 text-vault-gold" />}
             books={trending}
             variant="slate"
             quickView
@@ -297,7 +297,7 @@ export default async function BookstorePage() {
              (genre chips for books, category chips for courses) since the
              two catalogs don't share a taxonomy. Courses tab only shows once
              there's at least one to browse. ─────────────────────────────── */}
-        <section className="mb-12 rounded-2xl border border-[rgba(243,236,219,0.12)] bg-[#16233d] p-4 sm:p-6">
+        <section className="mb-12 rounded-2xl border border-vault-ink/12 bg-vault-bg p-4 sm:p-6">
           {courses.length > 0 ? (
             <BookstoreCatalogTabs
               books={books}
@@ -307,8 +307,8 @@ export default async function BookstorePage() {
             />
           ) : (
             <>
-              <h2 className="flex items-center gap-2 font-serif italic text-2xl text-[#f3ecdb] mb-5">
-                <Library className="h-5 w-5 text-[#d6a94a]" />
+              <h2 className="flex items-center gap-2 font-vault-display italic text-2xl text-vault-ink mb-5">
+                <Library className="h-5 w-5 text-vault-gold" />
                 Browse All Books
               </h2>
               <BookstoreGrid books={books} allGenres={genres.map((g) => g.name)} />
@@ -318,24 +318,24 @@ export default async function BookstorePage() {
       </div>
 
       {/* ── How it works (author signup nudge) ───────────────────────────── */}
-      <div className="bg-[#1e2f4d] border-y border-[rgba(243,236,219,0.12)]">
+      <div className="bg-vault-surf border-y border-vault-ink/12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#d6a94a]">· For authors ·</p>
-            <h2 className="font-serif italic text-lg sm:text-xl text-[#f3ecdb]">How the Bookstore works</h2>
+            <p className="text-xs font-mono uppercase tracking-widest text-vault-gold">· For authors ·</p>
+            <h2 className="font-vault-display italic text-lg sm:text-xl text-vault-ink">How the Bookstore works</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {steps.map(({ icon: Icon, title, text }, i) => (
               <div key={title} className="flex items-center gap-3 text-left sm:flex-col sm:text-center">
-                <div className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl bg-[#243756] flex-shrink-0">
-                  <Icon className="h-4.5 w-4.5 text-[#d6a94a]" />
-                  <span className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-[#d6a94a] text-[#16233d] text-[10px] font-bold flex items-center justify-center">
+                <div className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl bg-vault-surf-2 flex-shrink-0">
+                  <Icon className="h-4.5 w-4.5 text-vault-gold" />
+                  <span className="absolute -top-1.5 -right-1.5 h-4.5 w-4.5 rounded-full bg-vault-gold text-vault-bg text-[10px] font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-serif text-sm text-[#f3ecdb]">{title}</h3>
-                  <p className="text-xs text-[#93a0bc] leading-snug sm:max-w-[200px] sm:mx-auto">{text}</p>
+                  <h3 className="font-vault-display text-sm text-vault-ink">{title}</h3>
+                  <p className="text-xs text-vault-mute leading-snug sm:max-w-[200px] sm:mx-auto">{text}</p>
                 </div>
               </div>
             ))}
@@ -344,14 +344,14 @@ export default async function BookstorePage() {
       </div>
 
       {/* ── Author CTA band ──────────────────────────────────────────────── */}
-      <div className="bg-[#243756] py-6 px-4 text-center">
+      <div className="bg-vault-surf-2 py-6 px-4 text-center">
         <div className="max-w-3xl mx-auto flex items-center justify-center gap-4 flex-wrap">
-          <p className="font-serif text-base sm:text-lg text-[#f3ecdb] font-normal">
-            List your books in the <span className="italic text-[#d6a94a]">AuthorLoft Bookstore</span> — available on Standard and Premium.
+          <p className="font-vault-display text-base sm:text-lg text-vault-ink font-normal">
+            List your books in the <span className="italic text-vault-gold">AuthorLoft Bookstore</span> — available on Standard and Premium.
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 bg-[#d6a94a] text-[#16233d] font-semibold px-4 py-2 rounded-[6px] hover:bg-[#e2bc6e] transition-colors text-sm flex-shrink-0"
+            className="inline-flex items-center gap-1.5 bg-vault-gold text-vault-bg font-semibold px-4 py-2 rounded-vault hover:bg-vault-gold-light transition-colors text-sm flex-shrink-0"
           >
             Get Started Free <ArrowRight className="h-3.5 w-3.5" />
           </Link>

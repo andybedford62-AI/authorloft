@@ -10,8 +10,8 @@ import { BookstoreBookCard, type BookstoreBook } from "@/components/marketing/bo
  * - compact: simplified cards (cover + title + author + View Book only).
  */
 const BANDS: Record<string, { wrapper: string; subtitle: string }> = {
-  gold:  { wrapper: "border-[#d6a94a]/30 bg-gradient-to-br from-[#1e2f4d] to-[#16233d]", subtitle: "text-[#d6a94a]" },
-  slate: { wrapper: "border-[rgba(243,236,219,0.12)] bg-[#16233d]",                       subtitle: "text-[#93a0bc]" },
+  gold:  { wrapper: "border-vault-gold/30 bg-gradient-to-br from-vault-surf to-vault-bg", subtitle: "text-vault-gold" },
+  slate: { wrapper: "border-vault-ink/12 bg-vault-bg",                       subtitle: "text-vault-mute" },
 };
 
 export function BookstoreRow({
@@ -48,7 +48,7 @@ export function BookstoreRow({
     return (
       <section className="mb-12">
         <div className={`rounded-3xl border ${band.wrapper} p-6 sm:p-8 shadow-sm`}>
-          <h2 className="flex items-center gap-2 font-serif italic text-2xl text-[#f3ecdb]">
+          <h2 className="flex items-center gap-2 font-vault-display italic text-2xl text-vault-ink">
             {icon}
             {title}
           </h2>
@@ -61,7 +61,7 @@ export function BookstoreRow({
 
   return (
     <section className="mb-12">
-      <h2 className="flex items-center gap-2 font-serif italic text-2xl text-[#f3ecdb] mb-4">
+      <h2 className="flex items-center gap-2 font-vault-display italic text-2xl text-vault-ink mb-4">
         {icon}
         {title}
       </h2>

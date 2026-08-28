@@ -137,21 +137,21 @@ export function BookstoreGrid({
     !!search || selectedGenres.length > 0 || format !== "all" || price !== "all";
 
   const selectClass =
-    "rounded-lg border border-[rgba(243,236,219,0.15)] bg-[#16233d] px-2.5 py-1.5 text-sm text-[#f3ecdb] shadow-sm focus:border-[#d6a94a] focus:outline-none focus:ring-1 focus:ring-[#d6a94a]";
+    "rounded-lg border border-vault-ink/15 bg-vault-bg px-2.5 py-1.5 text-sm text-vault-ink shadow-sm focus:border-vault-gold focus:outline-none focus:ring-1 focus:ring-vault-gold";
 
   return (
     <div>
       {/* ── Search + filters — one compact bar instead of two stacked boxes ── */}
-      <div className="bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-3 mb-6">
+      <div className="bg-vault-surf rounded-xl border border-vault-ink/12 p-3 mb-6">
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <div className="relative flex-1 min-w-[180px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#d6a94a]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-vault-gold" />
             <input
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Find books by title, author, or genre…"
-              className="w-full rounded-lg border border-[rgba(243,236,219,0.15)] bg-[#16233d] pl-9 pr-3 py-1.5 text-sm text-[#f3ecdb] placeholder-[#93a0bc] transition-all focus:border-[#d6a94a] focus:outline-none focus:ring-1 focus:ring-[#d6a94a]/30"
+              className="w-full rounded-lg border border-vault-ink/15 bg-vault-bg pl-9 pr-3 py-1.5 text-sm text-vault-ink placeholder-vault-mute transition-all focus:border-vault-gold focus:outline-none focus:ring-1 focus:ring-vault-gold/30"
             />
           </div>
 
@@ -196,8 +196,8 @@ export function BookstoreGrid({
 
         {/* Genre chips */}
         {allGenres.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-[rgba(243,236,219,0.12)]">
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-[#93a0bc] mr-0.5">
+          <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-vault-ink/12">
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-vault-mute mr-0.5">
               <SlidersHorizontal className="h-3 w-3" /> Genres:
             </span>
             {allGenres.map((g) => {
@@ -209,8 +209,8 @@ export function BookstoreGrid({
                   onClick={() => toggleGenre(g)}
                   className={`px-2.5 py-0.5 rounded-full text-[11px] border transition-colors ${
                     active
-                      ? "bg-[#d6a94a] text-[#16233d] border-[#d6a94a]"
-                      : "bg-[#16233d] text-[#93a0bc] border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
+                      ? "bg-vault-gold text-vault-bg border-vault-gold"
+                      : "bg-vault-bg text-vault-mute border-vault-ink/15 hover:border-vault-gold"
                   }`}
                 >
                   {g}
@@ -223,7 +223,7 @@ export function BookstoreGrid({
 
       {/* ── Results header ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-3 mb-5">
-        <p className="text-sm text-[#93a0bc]">
+        <p className="text-sm text-vault-mute">
           {filtered.length === 0
             ? "No books found"
             : `Showing ${pageItems.length} of ${filtered.length} book${filtered.length !== 1 ? "s" : ""}`}
@@ -233,7 +233,7 @@ export function BookstoreGrid({
             <button
               type="button"
               onClick={resetAll}
-              className="inline-flex items-center gap-1 text-xs font-medium text-[#d6a94a] hover:text-[#f3ecdb] transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-medium text-vault-gold hover:text-vault-ink transition-colors"
             >
               <X className="h-3.5 w-3.5" /> Clear filters
             </button>
@@ -255,9 +255,9 @@ export function BookstoreGrid({
 
       {/* ── Grid / empty state ─────────────────────────────────────────── */}
       {filtered.length === 0 ? (
-        <div className="text-center py-24 bg-[#1e2f4d] rounded-2xl border border-[rgba(243,236,219,0.12)]">
-          <BookOpen className="h-10 w-10 text-[#93a0bc] mx-auto mb-4" />
-          <p className="text-[#93a0bc] mb-4">
+        <div className="text-center py-24 bg-vault-surf rounded-2xl border border-vault-ink/12">
+          <BookOpen className="h-10 w-10 text-vault-mute mx-auto mb-4" />
+          <p className="text-vault-mute mb-4">
             {books.length === 0
               ? "The bookstore shelf is being stocked. Check back soon!"
               : "No books match your filters."}
@@ -266,7 +266,7 @@ export function BookstoreGrid({
             <button
               type="button"
               onClick={resetAll}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#16233d] bg-[#d6a94a] px-4 py-2 rounded-[6px] hover:bg-[#e2bc6e] transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-vault-bg bg-vault-gold px-4 py-2 rounded-vault hover:bg-vault-gold-light transition-colors"
             >
               Reset filters
             </button>
@@ -287,7 +287,7 @@ export function BookstoreGrid({
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-[rgba(243,236,219,0.15)] bg-[#1e2f4d] text-sm text-[#93a0bc] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#d6a94a] transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-vault-ink/15 bg-vault-surf text-sm text-vault-mute disabled:opacity-40 disabled:cursor-not-allowed hover:border-vault-gold transition-colors"
           >
             <ChevronLeft className="h-4 w-4" /> Prev
           </button>
@@ -299,8 +299,8 @@ export function BookstoreGrid({
               onClick={() => setPage(n)}
               className={`min-w-9 px-3 py-2 rounded-lg border text-sm transition-colors ${
                 n === currentPage
-                  ? "bg-[#d6a94a] text-[#16233d] border-[#d6a94a]"
-                  : "bg-[#1e2f4d] text-[#93a0bc] border-[rgba(243,236,219,0.15)] hover:border-[#d6a94a]"
+                  ? "bg-vault-gold text-vault-bg border-vault-gold"
+                  : "bg-vault-surf text-vault-mute border-vault-ink/15 hover:border-vault-gold"
               }`}
             >
               {n}
@@ -311,7 +311,7 @@ export function BookstoreGrid({
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-[rgba(243,236,219,0.15)] bg-[#1e2f4d] text-sm text-[#93a0bc] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#d6a94a] transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-vault-ink/15 bg-vault-surf text-sm text-vault-mute disabled:opacity-40 disabled:cursor-not-allowed hover:border-vault-gold transition-colors"
           >
             Next <ChevronRight className="h-4 w-4" />
           </button>
