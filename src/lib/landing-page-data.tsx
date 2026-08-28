@@ -30,7 +30,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Author Website Builder — Create Your Author Site in Minutes",
     metaDescription: "Build a professional author website with book pages, blog, custom domain, and direct sales — no coding required. Free to start.",
     eyebrow: "Author Website Builder",
-    heroTitle: <>Build a professional author website <span className="italic text-[#D4AE6A]">without code</span></>,
+    heroTitle: <>Build a professional author website <span className="italic text-vault-gold">without code</span></>,
     heroSubtitle: "A complete author site with book pages, blog, about page, and contact form — live in minutes, not months.",
     intro: "Your author website is the hub of your career. Unlike renting space on Amazon or social media, your website is yours — you control the design, the content, and every reader relationship. AuthorLoft gives you everything you need to build a beautiful, professional author site without touching a line of code.",
     sections: [
@@ -84,7 +84,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Sell Books Directly to Readers — Keep 100% of Revenue",
     metaDescription: "Sell ebooks, print books, and audiobooks directly to readers. Keep 100% of your revenue with AuthorLoft's built-in direct sales platform.",
     eyebrow: "Direct Book Sales",
-    heroTitle: <>Sell books directly and <span className="italic text-[#D4AE6A]">keep every dollar</span></>,
+    heroTitle: <>Sell books directly and <span className="italic text-vault-gold">keep every dollar</span></>,
     heroSubtitle: "No marketplace fees, no middleman. Sell ebooks, print books, and audiobooks straight to your readers.",
     intro: "Every sale through Amazon, Kobo, or another retailer costs you 30–65% in fees. With AuthorLoft, you sell directly to your readers and keep 100% of the revenue (minus standard payment processing). Your books, your prices, your customers — no middleman.",
     sections: [
@@ -137,7 +137,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Book Marketing Platform for Independent Authors",
     metaDescription: "Market your books with AI-powered social media posts, SEO tools, pre-order campaigns, affiliate programs, and bookstore discovery — all in one platform.",
     eyebrow: "Book Marketing",
-    heroTitle: <>Market your books <span className="italic text-[#D4AE6A]">like a publishing house</span></>,
+    heroTitle: <>Market your books <span className="italic text-vault-gold">like a publishing house</span></>,
     heroSubtitle: "AI social posts, SEO tools, pre-order campaigns, affiliate programs, and bookstore discovery — without the team or the budget.",
     intro: "Independent authors wear every hat — writer, publisher, and marketer. AuthorLoft gives you the same marketing tools that traditional publishing houses use, automated and built into your author platform so you can focus on writing while your marketing works in the background.",
     sections: [
@@ -190,7 +190,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Author Newsletter & Email List Platform",
     metaDescription: "Build your author email list with built-in subscriber forms, reader magnets, and Mailchimp integration. Own your audience — no middleman.",
     eyebrow: "Author Newsletter",
-    heroTitle: <>Build an email list that <span className="italic text-[#D4AE6A]">you own</span></>,
+    heroTitle: <>Build an email list that <span className="italic text-vault-gold">you own</span></>,
     heroSubtitle: "Subscriber capture forms, reader magnets, and newsletter tools — built into your author site, not bolted on.",
     intro: "Social media followers aren't yours — the algorithm decides who sees your posts. Your email list is the one audience asset no platform can take away. AuthorLoft makes it easy to capture subscribers, deliver reader magnets, and send newsletters — all from the same platform where you sell your books.",
     sections: [
@@ -243,7 +243,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "ARC Management for Authors — Collect Reviews & Build Your ARC Team",
     metaDescription: "Manage advance reader copies, collect reader reviews, and display approved feedback on your book pages — all built into your author platform.",
     eyebrow: "ARC Management",
-    heroTitle: <>Build your ARC team and <span className="italic text-[#D4AE6A]">collect reviews</span></>,
+    heroTitle: <>Build your ARC team and <span className="italic text-vault-gold">collect reviews</span></>,
     heroSubtitle: "Manage advance reader copies, collect feedback, and display approved reviews — all from your author dashboard.",
     intro: "Reviews make or break a book launch. AuthorLoft gives you a complete workflow for managing advance reader copies — from distributing ARCs to collecting feedback and displaying approved reviews on your book pages. No spreadsheets, no separate ARC platforms, no extra subscriptions.",
     sections: [
@@ -296,7 +296,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Author Media Kit Generator — Professional Press Kit",
     metaDescription: "Auto-generate a professional author media kit with bio, headshots, book covers, and press-ready assets. Perfect for interviews, podcasts, and events.",
     eyebrow: "Author Media Kit",
-    heroTitle: <>A professional press kit, <span className="italic text-[#D4AE6A]">always ready</span></>,
+    heroTitle: <>A professional press kit, <span className="italic text-vault-gold">always ready</span></>,
     heroSubtitle: "Auto-generated media kit with your bio, headshots, book covers, and press-ready assets — updated every time you change your profile.",
     intro: "When a podcast host, book blogger, or event organizer wants to feature you, they need your bio, headshot, book covers, and key facts — fast. AuthorLoft auto-generates a polished media kit from your existing profile data, so you always have a professional press kit ready to share.",
     sections: [
@@ -349,7 +349,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "AI Tools for Authors — Social Posts, SEO Audit & Writing Assistant",
     metaDescription: "AI-powered tools for independent authors: social media post generator, SEO auditor, writing assistant, and reader feedback analysis. Built for authors, not marketers.",
     eyebrow: "AI Tools for Authors",
-    heroTitle: <>AI tools built for <span className="italic text-[#D4AE6A]">authors, not marketers</span></>,
+    heroTitle: <>AI tools built for <span className="italic text-vault-gold">authors, not marketers</span></>,
     heroSubtitle: "Generate social posts, audit your SEO, get writing assistance, and analyze reader feedback — all powered by AI, all inside your author dashboard.",
     intro: "AI can save indie authors hours every week — but generic AI tools don't understand the publishing industry. AuthorLoft's AI tools are purpose-built for authors: they know book marketing, understand reader audiences, and speak in your voice. No prompt engineering required.",
     sections: [
@@ -402,7 +402,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Indie Author Bookstore — Discover & Sell Independent Books",
     metaDescription: "A curated bookstore for independent authors. List your books, get discovered by genre, and reach new readers through AuthorLoft's shared catalog.",
     eyebrow: "Indie Bookstore",
-    heroTitle: <>A bookstore where <span className="italic text-[#D4AE6A]">indie authors are the stars</span></>,
+    heroTitle: <>A bookstore where <span className="italic text-vault-gold">indie authors are the stars</span></>,
     heroSubtitle: "List your books in a shared catalog, get discovered by genre, and reach readers who are actively looking for their next favorite indie author.",
     intro: "Visibility is the #1 challenge for independent authors. AuthorLoft's shared Bookstore at authorloft.com/bookstore puts your books in front of readers who are specifically looking for indie authors — organized by genre, sorted by popularity, and linked directly to your author site where you make the sale.",
     sections: [
@@ -454,7 +454,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Book Pre-Order Pages for Authors — Countdown, Signups & Launch",
     metaDescription: "Create pre-order pages with launch countdowns, email signups, and automatic notifications. Build anticipation and capture readers before your book drops.",
     eyebrow: "Book Pre-Orders",
-    heroTitle: <>Build anticipation <span className="italic text-[#D4AE6A]">before launch day</span></>,
+    heroTitle: <>Build anticipation <span className="italic text-vault-gold">before launch day</span></>,
     heroSubtitle: "Pre-order pages with launch countdowns, email signups, and automatic reader notifications — turn your launch into an event.",
     intro: "The weeks before a book launch are the most critical marketing window you'll have. AuthorLoft's pre-order system lets you capture reader interest, build your email list, and create urgency with countdown timers — all before your book is even available. When launch day arrives, your audience is already waiting.",
     sections: [
@@ -507,7 +507,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Author Affiliate Program — Let Fans Sell Your Books",
     metaDescription: "Built-in affiliate program for authors. Let book bloggers, fans, and influencers earn commission promoting your books with tracked referral links.",
     eyebrow: "Affiliate Program",
-    heroTitle: <>Let your biggest fans <span className="italic text-[#D4AE6A]">sell for you</span></>,
+    heroTitle: <>Let your biggest fans <span className="italic text-vault-gold">sell for you</span></>,
     heroSubtitle: "Built-in affiliate program with tracked referral links, customizable commissions, and automatic attribution — turn readers into your sales team.",
     intro: "Your most passionate readers are already recommending your books to friends. AuthorLoft's built-in affiliate program gives them a reason to promote even harder — and gives you a scalable way to reach new readers through word-of-mouth marketing that actually pays for itself.",
     sections: [
@@ -560,7 +560,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Reader Analytics for Authors — Understand Your Audience",
     metaDescription: "PostHog-powered analytics for independent authors. Track page views, book popularity, reader behavior, and audience growth — all from your dashboard.",
     eyebrow: "Reader Analytics",
-    heroTitle: <>Understand your readers <span className="italic text-[#D4AE6A]">like never before</span></>,
+    heroTitle: <>Understand your readers <span className="italic text-vault-gold">like never before</span></>,
     heroSubtitle: "Know which books get the most attention, where your readers come from, and how they engage with your site — powered by PostHog analytics.",
     intro: "Most indie authors are marketing blind — they publish books and hope for the best. AuthorLoft's reader analytics give you real data on what's working: which books attract the most views, which blog posts drive traffic, where your readers come from, and how they move through your site. Data-driven decisions replace guesswork.",
     sections: [
@@ -613,7 +613,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     metaTitle: "Sell Online Courses — Teach What You Know",
     metaDescription: "Build and sell online courses from your own site. Modules, lessons, video, worksheets, and Stripe checkout — you keep 100% of every sale.",
     eyebrow: "Author Courses",
-    heroTitle: <>Your expertise is worth more than <span className="italic text-[#D4AE6A]">one more book sale</span></>,
+    heroTitle: <>Your expertise is worth more than <span className="italic text-vault-gold">one more book sale</span></>,
     heroSubtitle: "Build a course from the knowledge you already have, host it on your own site, and sell it direct — no course-platform cut, no separate login for your students.",
     intro: "Every author knows something worth teaching, whether it's the craft itself or the subject matter behind the books. A course turns that knowledge into income that doesn't depend on your next release. AuthorLoft courses live on your own site, next to your books, sold through your own Stripe account — so a reader who trusts your writing can buy your teaching without ever leaving your world.",
     sections: [
