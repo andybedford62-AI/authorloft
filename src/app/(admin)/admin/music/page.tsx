@@ -59,27 +59,52 @@ export default async function MusicListsPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        <div className="space-y-3">
           {lists.map((list) => {
             const trackCount = list.modules.reduce((n, m) => n + m.lessons.length, 0);
             return (
               <div
                 key={list.id}
-                className="relative flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="relative flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
               >
                 <Link
                   href={`/admin/music/${list.id}/edit`}
                   className="absolute inset-0 z-0"
                   aria-label={`Edit ${list.title}`}
                 />
-                <ListMusic className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                <span className="flex-1 min-w-0">
-                  <span className="block font-medium text-gray-900 truncate">{list.title}</span>
-                  <span className="block text-xs text-gray-400">
+
+                {/* Cover */}
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                  {list.coverImageUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={list.coverImageUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ListMusic className="h-6 w-6 text-gray-300" />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                      {list.title}
+                    </h3>
+                    <Badge variant={list.isPublished ? "success" : "outline"}>
+                      {list.isPublished ? "Published" : "Draft"}
+                    </Badge>
+                  </div>
+                  {list.description && (
+                    <p className="text-xs text-gray-500 truncate mb-0.5">{list.description}</p>
+                  )}
+                  <p className="text-xs text-gray-500">
                     {trackCount} track{trackCount === 1 ? "" : "s"}
-                  </span>
-                </span>
-                <Badge variant="outline">{list.isPublished ? "Published" : "Draft"}</Badge>
+                  </p>
+                </div>
+
                 <FeaturedStarButton
                   endpoint={`/api/admin/music/${list.id}/feature`}
                   initialFeatured={list.isFeatured}
