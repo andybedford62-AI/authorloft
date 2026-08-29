@@ -155,8 +155,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
                   title={featuredItem.title}
                   coverImageUrl={featuredItem.coverImageUrl}
                   caption={featuredItem.caption}
-                  width={210}
-                  height={118}
+                  width={260}
+                  height={146}
                   icon={config.icon}
                 />
               )}
@@ -199,8 +199,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               title={featuredItem.title}
               coverImageUrl={featuredItem.coverImageUrl}
               caption={featuredItem.caption}
-              width={320}
-              height={180}
+              width={400}
+              height={225}
               icon={config.icon}
             />
           )}
@@ -308,8 +308,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               title={featuredItem.title}
               coverImageUrl={featuredItem.coverImageUrl}
               caption={featuredItem.caption}
-              width={256}
-              height={144}
+              width={300}
+              height={169}
               icon={config.icon}
             />
           )
