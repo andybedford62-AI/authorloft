@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, listInBookstore, categoryIds, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, listInBookstore, workbookFileKey, workbookFileName, workbookUrl, categoryIds, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -114,6 +114,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
       isPublished: isPublished ?? existing.isPublished,
       allowDownload: allowDownload ?? existing.allowDownload,
       listInBookstore: listInBookstore ?? existing.listInBookstore,
+      workbookFileKey: workbookFileKey !== undefined ? (workbookFileKey?.trim() || null) : existing.workbookFileKey,
+      workbookFileName: workbookFileName !== undefined ? (workbookFileName?.trim() || null) : existing.workbookFileName,
+      workbookUrl: workbookUrl !== undefined ? (workbookUrl?.trim() || null) : existing.workbookUrl,
     },
     include: {
       modules: {

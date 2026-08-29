@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -40,6 +40,9 @@ export interface CourseData {
   isPublished: boolean;
   allowDownload: boolean;
   listInBookstore: boolean;
+  workbookFileKey: string | null;
+  workbookFileName: string | null;
+  workbookUrl: string | null;
   categoryIds: string[];
   modules: ModuleData[];
 }
@@ -144,6 +147,118 @@ function LessonFileAttachment({
   );
 }
 
+function WorkbookUpload({
+  fileKey,
+  fileName,
+  url,
+  onChange,
+}: {
+  fileKey: string;
+  fileName: string;
+  url: string;
+  onChange: (patch: { fileKey: string; fileName: string; url: string }) => void;
+}) {
+  const [tab, setTab] = useState<"upload" | "url">(url ? "url" : "upload");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload/course-file", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      onChange({ fileKey: data.fileKey, fileName: data.fileName, url: "" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1.5">
+        <BookText className="h-4 w-4 text-gray-400" /> Course Workbook
+      </label>
+      <p className="text-xs text-gray-500 mb-2">
+        Optional PDF or DOCX workbook. Readers can only download it after enrolling — same as the
+        full-course download.
+      </p>
+
+      {fileKey || url ? (
+        <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50">
+          {fileKey ? <Paperclip className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" /> : <Link2 className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />}
+          <span className="flex-1 truncate text-gray-700">{fileKey ? (fileName || "Uploaded workbook") : url}</span>
+          <button
+            type="button"
+            onClick={() => onChange({ fileKey: "", fileName: "", url: "" })}
+            className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+            title="Remove workbook"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="inline-flex rounded-lg border border-gray-200 p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setTab("upload")}
+              className={`px-3 py-1 rounded-md transition-colors ${tab === "upload" ? "bg-gray-900 text-white" : "text-gray-500 hover:text-gray-800"}`}
+            >
+              Upload file
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("url")}
+              className={`px-3 py-1 rounded-md transition-colors ${tab === "url" ? "bg-gray-900 text-white" : "text-gray-500 hover:text-gray-800"}`}
+            >
+              Link to a URL
+            </button>
+          </div>
+
+          {tab === "upload" ? (
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="w-full flex items-center justify-center gap-2 border border-dashed border-gray-300 rounded-lg px-3 py-3 text-sm text-blue-600 hover:text-blue-800 hover:border-gray-400 disabled:opacity-50 transition-colors"
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
+              {uploading ? "Uploading…" : "Choose a PDF or DOCX file"}
+            </button>
+          ) : (
+            <input
+              type="url"
+              placeholder="https://example.com/workbook.pdf"
+              onBlur={(e) => {
+                if (e.target.value.trim()) onChange({ fileKey: "", fileName: "", url: e.target.value.trim() });
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          )}
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={handleFile}
+            className="hidden"
+          />
+        </div>
+      )}
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+    </div>
+  );
+}
+
 export function CourseForm({ initial, mode, bookstoreEnabled = false, categories = [] }: CourseFormProps) {
   const router = useRouter();
 
@@ -156,6 +271,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
+  const [workbookFileKey, setWorkbookFileKey] = useState(initial?.workbookFileKey ?? "");
+  const [workbookFileName, setWorkbookFileName] = useState(initial?.workbookFileName ?? "");
+  const [workbookUrl, setWorkbookUrl] = useState(initial?.workbookUrl ?? "");
   const initialSelection = deriveCategorySelection(initial?.categoryIds ?? [], categories);
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialSelection.categoryId);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(initialSelection.subcategoryId);
@@ -258,6 +376,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         isPublished,
         allowDownload,
         listInBookstore,
+        workbookFileKey: workbookFileKey || null,
+        workbookFileName: workbookFileName || null,
+        workbookUrl: workbookUrl || null,
         categoryIds: selectedCategoryId
           ? (selectedSubcategoryId ? [selectedCategoryId, selectedSubcategoryId] : [selectedCategoryId])
           : [],
@@ -531,6 +652,18 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
           })}
         </div>
       </div>
+
+      {/* Course Workbook */}
+      <WorkbookUpload
+        fileKey={workbookFileKey}
+        fileName={workbookFileName}
+        url={workbookUrl}
+        onChange={(patch) => {
+          setWorkbookFileKey(patch.fileKey);
+          setWorkbookFileName(patch.fileName);
+          setWorkbookUrl(patch.url);
+        }}
+      />
 
       {/* Published */}
       <div className="flex items-center gap-3">

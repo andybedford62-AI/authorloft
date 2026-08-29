@@ -1,0 +1,4 @@
+ALTER TABLE "Course"
+  ADD COLUMN IF NOT EXISTS "workbookFileKey" TEXT,
+  ADD COLUMN IF NOT EXISTS "workbookFileName" TEXT,
+  ADD COLUMN IF NOT EXISTS "workbookUrl" TEXT;

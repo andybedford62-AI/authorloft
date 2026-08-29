@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip, Download, ExternalLink } from "lucide-react";
+import { ArrowLeft, BookOpen, Video, CheckCircle, Lock, Paperclip, Download, ExternalLink, BookText } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { sanitize } from "@/lib/sanitize";
@@ -119,6 +119,15 @@ export default async function CourseLearnPage({
             >
               <Download className="h-3 w-3" /> Print / Download full course
             </Link>
+          )}
+          {hasAccess && (course.workbookFileKey || course.workbookUrl) && (
+            <a
+              href={`/api/courses/workbook-resource/${course.id}${token ? `?token=${token}` : ""}`}
+              className="inline-flex items-center gap-1.5 text-xs mt-2 hover:underline"
+              style={{ color: accentColor }}
+            >
+              <BookText className="h-3 w-3" /> Download Workbook
+            </a>
           )}
         </div>
         <nav className="p-2 space-y-1">

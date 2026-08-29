@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star } from "lucide-react";
+import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star, BookText } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -237,6 +237,16 @@ export default async function CourseDetailPage({
               >
                 <Download className="h-4 w-4" style={{ color: accentColor }} />
                 Print / Download full course
+              </Link>
+            )}
+
+            {(course.workbookFileKey || course.workbookUrl) && (
+              <Link
+                href={`/courses/${slug}/workbook`}
+                className="flex items-center justify-center gap-2 text-sm font-medium border border-gray-200 rounded-lg px-4 py-2.5 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                <BookText className="h-4 w-4" style={{ color: accentColor }} />
+                Download Workbook
               </Link>
             )}
 

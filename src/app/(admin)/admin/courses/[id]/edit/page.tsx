@@ -74,6 +74,9 @@ export default async function EditCoursePage({ params }: Props) {
           isPublished: course.isPublished,
           allowDownload: course.allowDownload,
           listInBookstore: course.listInBookstore,
+          workbookFileKey: course.workbookFileKey,
+          workbookFileName: course.workbookFileName,
+          workbookUrl: course.workbookUrl,
           categoryIds: course.categories.map((c) => c.categoryId),
           modules: course.modules.map((m) => ({
             title: m.title,

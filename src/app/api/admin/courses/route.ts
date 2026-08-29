@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, categoryIds, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, workbookFileKey, workbookFileName, workbookUrl, categoryIds, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -58,6 +58,9 @@ export async function POST(req: NextRequest) {
       priceCents: priceCents ?? 0,
       isPublished: isPublished ?? false,
       allowDownload: allowDownload ?? true,
+      workbookFileKey: workbookFileKey?.trim() || null,
+      workbookFileName: workbookFileName?.trim() || null,
+      workbookUrl: workbookUrl?.trim() || null,
       categories: Array.isArray(categoryIds) && categoryIds.length > 0
         ? { create: categoryIds.map((categoryId: string) => ({ categoryId })) }
         : undefined,
