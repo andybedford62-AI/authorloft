@@ -22,12 +22,12 @@ interface HeroBannerProps {
 
 const FOCUS_CONFIG: Record<
   HeroFocusType,
-  { ctaLabel: string; hrefBase: string; useTilt: boolean; noun: string; icon: typeof GraduationCap }
+  { ctaLabel: string; hrefBase: string; useTilt: boolean; noun: string; icon: typeof GraduationCap; personLabel: string }
 > = {
   // icon is only ever read for non-tilt focuses (see useTilt), BOOKS keeps BookCoverTilt's own fallback icon.
-  BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", icon: GraduationCap },
-  COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", icon: GraduationCap },
-  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: ListMusic },
+  BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", icon: GraduationCap, personLabel: "Meet the Author" },
+  COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", icon: GraduationCap, personLabel: "Meet the Creator" },
+  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: ListMusic, personLabel: "Meet the Creator" },
 };
 
 // Background and scenic image stay theme-derived. The accent deliberately does
@@ -125,7 +125,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold uppercase tracking-widest text-white/85 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10"
                 style={{ border: hasSecondary ? `1px solid ${secondary}80` : "1px solid rgba(255,255,255,0.4)" }}
               >
-                Meet the Author
+                {config.personLabel}
               </Link>
             </div>
           </div>
@@ -254,7 +254,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
         style={{ left: layout === "author-left" ? "auto" : "16px", right: layout === "author-left" ? "16px" : "auto", textAlign: layout === "author-left" ? "right" : "left" }}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.28em] mb-1" style={{ color: "rgba(255,255,255,0.50)" }}>
-          Meet the Author
+          {config.personLabel}
         </p>
         <p
           className="text-2xl xl:text-3xl font-bold leading-none"
@@ -332,7 +332,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               className="w-full py-3 px-6 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
               style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
-              Meet the Author
+              {config.personLabel}
             </Link>
           </div>
         </div>
@@ -384,7 +384,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               className="w-full py-3 px-4 text-sm font-semibold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5"
               style={{ border: `2px solid ${secondary}60`, color: "rgba(255,255,255,0.85)" }}
             >
-              Meet the Author
+              {config.personLabel}
             </Link>
           </div>
           {featuredItem && (
