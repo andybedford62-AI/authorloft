@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { LucideIcon } from "lucide-react";
 import { BookOpen } from "lucide-react";
 
 interface FlatCoverCardProps {
@@ -13,7 +12,15 @@ interface FlatCoverCardProps {
   caption?: string | null;
   width?: number;
   height?: number;
-  icon?: LucideIcon;
+  /**
+   * Pre-rendered fallback icon element, not a component reference — this is
+   * a Client Component, and a Server Component parent (hero-banner.tsx)
+   * can't pass a raw component/function as a prop across that boundary
+   * ("Functions cannot be passed directly to Client Components"). Passing
+   * an already-rendered element (e.g. `<GraduationCap className="..." />`)
+   * is fine; passing the bare `GraduationCap` function is not.
+   */
+  fallbackIcon?: ReactNode;
 }
 
 /**
@@ -31,7 +38,7 @@ export function FlatCoverCard({
   caption,
   width = 160,
   height = 240,
-  icon: Icon = BookOpen,
+  fallbackIcon = <BookOpen className="h-12 w-12 text-white/40" />,
 }: FlatCoverCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +76,7 @@ export function FlatCoverCard({
             <Image src={coverImageUrl} alt={title} fill className="object-cover" priority />
           ) : (
             <div className="w-full h-full bg-white/10 flex items-center justify-center">
-              <Icon className="h-12 w-12 text-white/40" />
+              {fallbackIcon}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />

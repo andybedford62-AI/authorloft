@@ -157,7 +157,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
                   caption={featuredItem.caption}
                   width={260}
                   height={146}
-                  icon={config.icon}
+                  fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
                 />
               )}
             </div>
@@ -201,7 +201,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               caption={featuredItem.caption}
               width={400}
               height={225}
-              icon={config.icon}
+              fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
             />
           )}
         </div>
@@ -310,7 +310,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               caption={featuredItem.caption}
               width={300}
               height={169}
-              icon={config.icon}
+              fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
             />
           )
         )}
