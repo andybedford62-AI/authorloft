@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { FlatCoverCard } from "@/components/author-site/flat-cover-card";
-import { getTheme, getThemeSurfaceColor } from "@/lib/themes";
+import { getTheme } from "@/lib/themes";
 import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
 import { readableTextOn } from "@/lib/color-contrast";
 import type { AuthorForTemplate } from "./templates/types";
@@ -44,7 +44,8 @@ const FOCUS_CONFIG: Record<
 // NOT come from here -- see the accent resolution in HeroBanner below.
 function getHeroColors(siteTheme: string) {
   const theme = getTheme(siteTheme);
-  const bg = getThemeSurfaceColor(siteTheme);
+  const darkBgThemes = ["dark-elegant", "scifi"];
+  const bg = darkBgThemes.includes(siteTheme) ? theme.preview.bg : theme.preview.primary;
   // Hero image resolution: an explicit defaultHeroImageUrl wins; otherwise fall
   // back to the naming convention /images/themes/{id}-hero.jpg if that file was
   // present at build time (see THEME_HERO_IDS). No file → undefined → solid colour.
