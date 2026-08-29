@@ -23,6 +23,11 @@ interface HeroBannerProps {
    *  the global heroLayout setting override that would silently reintroduce
    *  the author photo whenever an account happens to be on author-left/right. */
   layoutOverride?: "portrait";
+  /** Only affects the "portrait" layout. "sm" (default) is the compact size
+   *  used by the "Classic" option in Branding -> Hero. "lg" gives the
+   *  featured item a much larger, more centered treatment — used by Spotlight,
+   *  which leads with the content rather than treating it as a small aside. */
+  coverSize?: "sm" | "lg";
 }
 
 const FOCUS_CONFIG: Record<
@@ -50,7 +55,7 @@ function getHeroColors(siteTheme: string) {
   return { bg, defaultHeroImageUrl: heroImage };
 }
 
-export function HeroBanner({ author, focus, featuredItem, layoutOverride }: HeroBannerProps) {
+export function HeroBanner({ author, focus, featuredItem, layoutOverride, coverSize = "sm" }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
   const config = FOCUS_CONFIG[focus];
   // The 3-column layouts' eyebrow shows author.heroTitle — a free-text field
@@ -96,10 +101,11 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride }: Hero
 
   // ── Classic layout (formerly "portrait") — accent bg, text left, book right ──
   if (layout === "portrait") {
+    const large = coverSize === "lg";
     return (
       <section
-        className="relative w-full overflow-hidden py-10 px-4"
-        style={{ backgroundColor: accent }}
+        className="relative w-full overflow-hidden px-4"
+        style={{ backgroundColor: accent, minHeight: large ? "clamp(480px, 65vh, 640px)" : undefined }}
         aria-label="Author hero"
       >
         {SceneBackdrop}
@@ -109,7 +115,10 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride }: Hero
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-25 bg-white" />
         <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full blur-2xl pointer-events-none opacity-20 bg-white" />
 
-        <div className="relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 py-6">
+        <div
+          className={`relative z-10 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 ${large ? "py-16 md:py-20" : "py-6"}`}
+          style={large ? { minHeight: "clamp(480px, 65vh, 640px)" } : undefined}
+        >
 
           {/* Text */}
           <div className="flex-1 text-white space-y-5">
@@ -118,7 +127,7 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride }: Hero
                 {eyebrowText}
               </span>
             )}
-            <h1 className="text-3xl sm:text-5xl font-bold leading-tight author-font-heading">
+            <h1 className={`font-bold leading-tight author-font-heading ${large ? "text-4xl sm:text-6xl" : "text-3xl sm:text-5xl"}`}>
               {featuredItem?.title || `${config.noun} by ${authorName}`}
             </h1>
             {author.heroSubtitle && (
@@ -144,24 +153,24 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride }: Hero
 
           {/* Featured item cover */}
           {featuredItem && (
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex flex-col items-center">
               {config.useTilt ? (
                 <BookCoverTilt
                   href={buyHref}
                   title={featuredItem.title}
                   coverImageUrl={featuredItem.coverImageUrl}
-                  caption={featuredItem.caption}
-                  width={130}
-                  height={195}
+                  caption={large ? undefined : featuredItem.caption}
+                  width={large ? 240 : 130}
+                  height={large ? 360 : 195}
                 />
               ) : (
                 <FlatCoverCard
                   href={buyHref}
                   title={featuredItem.title}
                   coverImageUrl={featuredItem.coverImageUrl}
-                  caption={featuredItem.caption}
-                  width={260}
-                  height={146}
+                  caption={large ? undefined : featuredItem.caption}
+                  width={large ? 420 : 260}
+                  height={large ? 236 : 146}
                   fallbackIconKind={config.fallbackIconKind}
                 />
               )}

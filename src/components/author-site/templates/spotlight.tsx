@@ -58,13 +58,31 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
           regardless of the account's Branding -> Hero setting — Spotlight leads
           with the content, and introduces the author separately below. */}
       {author.showHeroBanner !== false && (
-        <HeroBanner author={author} focus={author.heroFocus} featuredItem={spotlightItem} layoutOverride="portrait" />
+        <HeroBanner author={author} focus={author.heroFocus} featuredItem={spotlightItem} layoutOverride="portrait" coverSize="lg" />
       )}
 
       {/* ── Meet the Author ──────────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 py-16 md:py-20" style={{ backgroundColor: accentColor + "1f" }}>
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-10 items-start">
+          <div className="flex flex-col md:flex-row gap-10 md:gap-14 items-center">
+
+            {/* Photo — leads on the left, mirroring the hero's cover-on-the-right
+                composition so the two sections read as a deliberate pair. */}
+            <div className="w-full max-w-xs md:w-80 md:max-w-none flex-shrink-0">
+              <div
+                className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 shadow-lg relative ring-4"
+                style={{ "--tw-ring-color": accentColor + "40" } as React.CSSProperties}
+              >
+                {author.profileImageUrl ? (
+                  <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-gray-300">
+                    {author.name[0]}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex-1 space-y-5">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>
@@ -99,21 +117,6 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                 <Link href="/contact" className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline" style={{ color: accentText }}>
                   <Mail className="h-3.5 w-3.5" /> Email {firstName}
                 </Link>
-              </div>
-            </div>
-
-            <div className="flex-shrink-0">
-              <div
-                className="w-56 h-56 rounded-2xl overflow-hidden bg-gray-100 shadow-lg relative ring-4"
-                style={{ "--tw-ring-color": accentColor + "40" } as React.CSSProperties}
-              >
-                {author.profileImageUrl ? (
-                  <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-gray-300">
-                    {author.name[0]}
-                  </div>
-                )}
               </div>
             </div>
           </div>
