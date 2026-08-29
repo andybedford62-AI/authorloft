@@ -64,6 +64,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Site Themes** | 3 base colour themes | 3 base + 12 genre/style palettes (15 total) | 15 themes + custom accent & secondary colour |
 | **Logo Upload** | ✅ | ✅ | ✅ |
 | **Hero Banner** (customizable header image) | ✅ | ✅ | ✅ |
+| **Hero Focus** (homepage hero showcases Books, Courses, or Music — whichever's published) | ✅ | ✅ | ✅ |
 | **Bio & Contact Form** (on author site) | ✅ | ✅ | ✅ |
 | **Social Links** (Instagram, Twitter, etc.) | ✅ | ✅ | ✅ |
 | **About Page** (editable bio/background) | ✅ | ✅ | ✅ |

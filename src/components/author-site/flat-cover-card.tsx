@@ -1,6 +1,3 @@
-"use client";
-
-import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, GraduationCap, ListMusic } from "lucide-react";
@@ -12,18 +9,7 @@ interface FlatCoverCardProps {
   caption?: string | null;
   width?: number;
   height?: number;
-  /**
-   * Which fallback icon to render when there's no cover image — a plain
-   * string, not a component reference. This is a Client Component, and a
-   * Server Component parent (hero-banner.tsx) can't pass a component/function
-   * across that boundary at all, including one wrapped in an already-created
-   * element (`<GraduationCap />`'s `type` is still the bare function under
-   * the hood, so that fails the same way `icon={GraduationCap}` does — only
-   * `children` gets special pre-rendered-server-slot treatment, not an
-   * arbitrary named prop). A string discriminant sidesteps the whole
-   * problem: FlatCoverCard picks its own icon internally, the same way
-   * BookCoverTilt hardcodes BookOpen without ever taking an icon prop.
-   */
+  /** Which fallback icon to render when there's no cover image. */
   fallbackIconKind?: "course" | "music";
 }
 
@@ -33,9 +19,17 @@ const FALLBACK_ICONS = { course: GraduationCap, music: ListMusic } as const;
  * Flat, non-tilted-paperback sibling of BookCoverTilt (same prop signature,
  * drop-in swap) — used for Courses/Music hero art, where the tilted-spine
  * shadow/ring styling reads as the wrong physical metaphor for a course
- * thumbnail or album cover. Still shares BookCoverTilt's mouse-tracked
- * tilt/scale interaction on hover, so Courses/Music covers feel as alive as
- * a Book cover, just without the paperback-specific visual treatment.
+ * thumbnail or album cover.
+ *
+ * Deliberately a Server Component, not a client-side mouse-tracked tilt like
+ * BookCoverTilt — an earlier attempt at porting that exact interaction here
+ * made this a Client Component and intermittently 500'd in production
+ * ("Functions cannot be passed directly to Client Components") in a way that
+ * resisted three separate fix attempts (bare icon prop → rendered icon
+ * element → string discriminant) without a clear root cause, on this
+ * project's Turbopack build. Not worth the risk for a hover effect — this
+ * uses a plain CSS hover lift/scale instead, which needs no client boundary
+ * at all and can never reproduce that failure class.
  */
 export function FlatCoverCard({
   href,
@@ -47,36 +41,12 @@ export function FlatCoverCard({
   fallbackIconKind,
 }: FlatCoverCardProps) {
   const Icon = fallbackIconKind ? FALLBACK_ICONS[fallbackIconKind] : BookOpen;
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    el.style.transform = `perspective(700px) rotateY(${x * 20}deg) rotateX(${-y * 15}deg) scale3d(1.06,1.06,1.06)`;
-  }
-
-  function onMouseLeave() {
-    const el = cardRef.current;
-    if (!el) return;
-    el.style.transform = "perspective(700px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)";
-  }
 
   return (
     <div className="flex-shrink-0 order-1 md:order-2">
       <div
-        ref={cardRef}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
-        style={{
-          width,
-          height,
-          transition: "transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-          transformStyle: "preserve-3d",
-        }}
-        className="relative rounded-xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.35)] ring-2 ring-white/30"
+        style={{ width, height }}
+        className="relative rounded-xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.35)] ring-2 ring-white/30 transition-transform duration-300 ease-out hover:scale-[1.04] hover:-translate-y-1"
       >
         <Link href={href} title={title} className="block w-full h-full">
           {coverImageUrl ? (

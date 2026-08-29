@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Star, Loader2 } from "lucide-react";
 
@@ -19,6 +19,15 @@ export function FeaturedStarButton({ endpoint, initialFeatured }: FeaturedStarBu
   const router = useRouter();
   const [featured, setFeatured] = useState(initialFeatured);
   const [saving, setSaving] = useState(false);
+
+  // router.refresh() re-renders every row's server props (including sibling
+  // rows this button didn't itself toggle, whose isFeatured just got cleared
+  // server-side) — but an already-mounted instance doesn't re-derive local
+  // state from a changed prop on its own, so this button's own star could
+  // otherwise stay stale after a sibling star is clicked.
+  useEffect(() => {
+    setFeatured(initialFeatured);
+  }, [initialFeatured]);
 
   async function handleClick(e: React.MouseEvent) {
     e.preventDefault();

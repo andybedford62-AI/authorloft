@@ -107,9 +107,9 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
 
           {/* Text */}
           <div className="flex-1 text-white space-y-5">
-            {author.heroTitle && (
+            {eyebrowText && (
               <span className="block text-sm font-medium uppercase tracking-widest opacity-70">
-                {author.heroTitle}
+                {eyebrowText}
               </span>
             )}
             <h1 className="text-3xl sm:text-5xl font-bold leading-tight author-font-heading">

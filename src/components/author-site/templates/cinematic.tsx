@@ -61,6 +61,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
     heroEyebrowBook;
   const browseHref  = author.heroFocus === "COURSES" ? "/courses" : author.heroFocus === "MUSIC" ? "/music" : "/books";
   const browseLabel = author.heroFocus === "COURSES" ? "Browse Courses" : author.heroFocus === "MUSIC" ? "Browse Music" : "Browse Books";
+  const personLabel = author.heroFocus === "COURSES" || author.heroFocus === "MUSIC" ? "Meet the Creator" : "Meet the Author";
   // featuredBook: full BookForTemplate, used for the Featured Release section
   const featuredBook = books.find((b) => b.isFeatured) ?? books[0] ?? null;
   const headline    = author.heroTitle    || author.tagline || authorName;
@@ -152,7 +153,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border transition-all duration-200 hover:border-opacity-100 hover:-translate-y-0.5 text-[#FBF6E9]"
                 style={{ borderColor: accent + "66" }}
               >
-                Meet the Author
+                {personLabel}
               </Link>
             </div>
 

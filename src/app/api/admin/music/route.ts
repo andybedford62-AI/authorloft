@@ -106,20 +106,33 @@ export async function POST(req: NextRequest) {
     cap
   );
 
-  const list = await prisma.course.create({
-    data: {
-      authorId,
-      kind: "MUSIC",
-      title,
-      slug,
-      description: typeof body?.description === "string" ? body.description.trim() || null : null,
-      coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : null,
-      isPublished: body?.isPublished === true,
-      isFeatured: body?.isFeatured === true,
-      // A music list is a flat set of tracks; the single module is structural.
-      modules: { create: [{ title: "Tracks", sortOrder: 0, lessons: { create: rows } }] },
-    },
-    select: { id: true, slug: true },
+  const isFeatured = body?.isFeatured === true;
+
+  const list = await prisma.$transaction(async (tx) => {
+    // Only one music list may be featured at a time — see the same guard on
+    // the PATCH route and the Course POST/PUT routes.
+    if (isFeatured) {
+      await tx.course.updateMany({
+        where: { authorId, kind: "MUSIC", isFeatured: true },
+        data: { isFeatured: false },
+      });
+    }
+
+    return tx.course.create({
+      data: {
+        authorId,
+        kind: "MUSIC",
+        title,
+        slug,
+        description: typeof body?.description === "string" ? body.description.trim() || null : null,
+        coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : null,
+        isPublished: body?.isPublished === true,
+        isFeatured,
+        // A music list is a flat set of tracks; the single module is structural.
+        modules: { create: [{ title: "Tracks", sortOrder: 0, lessons: { create: rows } }] },
+      },
+      select: { id: true, slug: true },
+    });
   });
 
   // Mirrors the course side: an author whose first music list is this one gets

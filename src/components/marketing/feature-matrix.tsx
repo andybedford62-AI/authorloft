@@ -237,6 +237,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {
+          name: "Hero Focus (Books / Courses / Music)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "About, Bio & Contact Pages",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
