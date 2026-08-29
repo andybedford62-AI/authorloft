@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { GraduationCap, ListMusic } from "lucide-react";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { FlatCoverCard } from "@/components/author-site/flat-cover-card";
 import { getTheme } from "@/lib/themes";
@@ -22,12 +21,12 @@ interface HeroBannerProps {
 
 const FOCUS_CONFIG: Record<
   HeroFocusType,
-  { ctaLabel: string; hrefBase: string; useTilt: boolean; noun: string; icon: typeof GraduationCap; personLabel: string }
+  { ctaLabel: string; hrefBase: string; useTilt: boolean; noun: string; fallbackIconKind: "course" | "music"; personLabel: string }
 > = {
-  // icon is only ever read for non-tilt focuses (see useTilt), BOOKS keeps BookCoverTilt's own fallback icon.
-  BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", icon: GraduationCap, personLabel: "Meet the Author" },
-  COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", icon: GraduationCap, personLabel: "Meet the Creator" },
-  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: ListMusic, personLabel: "Meet the Creator" },
+  // fallbackIconKind is only ever read for non-tilt focuses (see useTilt), BOOKS keeps BookCoverTilt's own fallback icon.
+  BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", fallbackIconKind: "course", personLabel: "Meet the Author" },
+  COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", fallbackIconKind: "course", personLabel: "Meet the Creator" },
+  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", fallbackIconKind: "music", personLabel: "Meet the Creator" },
 };
 
 // Background and scenic image stay theme-derived. The accent deliberately does
@@ -157,7 +156,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
                   caption={featuredItem.caption}
                   width={260}
                   height={146}
-                  fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
+                  fallbackIconKind={config.fallbackIconKind}
                 />
               )}
             </div>
@@ -201,7 +200,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               caption={featuredItem.caption}
               width={400}
               height={225}
-              fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
+              fallbackIconKind={config.fallbackIconKind}
             />
           )}
         </div>
@@ -310,7 +309,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               caption={featuredItem.caption}
               width={300}
               height={169}
-              fallbackIcon={<config.icon className="h-12 w-12 text-white/40" />}
+              fallbackIconKind={config.fallbackIconKind}
             />
           )
         )}

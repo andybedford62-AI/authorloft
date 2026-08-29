@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen } from "lucide-react";
+import { BookOpen, GraduationCap, ListMusic } from "lucide-react";
 
 interface FlatCoverCardProps {
   href: string;
@@ -13,15 +13,21 @@ interface FlatCoverCardProps {
   width?: number;
   height?: number;
   /**
-   * Pre-rendered fallback icon element, not a component reference — this is
-   * a Client Component, and a Server Component parent (hero-banner.tsx)
-   * can't pass a raw component/function as a prop across that boundary
-   * ("Functions cannot be passed directly to Client Components"). Passing
-   * an already-rendered element (e.g. `<GraduationCap className="..." />`)
-   * is fine; passing the bare `GraduationCap` function is not.
+   * Which fallback icon to render when there's no cover image — a plain
+   * string, not a component reference. This is a Client Component, and a
+   * Server Component parent (hero-banner.tsx) can't pass a component/function
+   * across that boundary at all, including one wrapped in an already-created
+   * element (`<GraduationCap />`'s `type` is still the bare function under
+   * the hood, so that fails the same way `icon={GraduationCap}` does — only
+   * `children` gets special pre-rendered-server-slot treatment, not an
+   * arbitrary named prop). A string discriminant sidesteps the whole
+   * problem: FlatCoverCard picks its own icon internally, the same way
+   * BookCoverTilt hardcodes BookOpen without ever taking an icon prop.
    */
-  fallbackIcon?: ReactNode;
+  fallbackIconKind?: "course" | "music";
 }
+
+const FALLBACK_ICONS = { course: GraduationCap, music: ListMusic } as const;
 
 /**
  * Flat, non-tilted-paperback sibling of BookCoverTilt (same prop signature,
@@ -38,8 +44,9 @@ export function FlatCoverCard({
   caption,
   width = 160,
   height = 240,
-  fallbackIcon = <BookOpen className="h-12 w-12 text-white/40" />,
+  fallbackIconKind,
 }: FlatCoverCardProps) {
+  const Icon = fallbackIconKind ? FALLBACK_ICONS[fallbackIconKind] : BookOpen;
   const cardRef = useRef<HTMLDivElement>(null);
 
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -76,7 +83,7 @@ export function FlatCoverCard({
             <Image src={coverImageUrl} alt={title} fill className="object-cover" priority />
           ) : (
             <div className="w-full h-full bg-white/10 flex items-center justify-center">
-              {fallbackIcon}
+              <Icon className="h-12 w-12 text-white/40" />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
