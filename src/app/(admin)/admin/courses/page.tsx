@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, GraduationCap, Upload } from "lucide-react";
+import { Plus, GraduationCap, Upload, Download, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/db";
@@ -99,6 +99,16 @@ export default async function AdminCoursesPage() {
                     <Badge variant={course.isPublished ? "success" : "outline"}>
                       {course.isPublished ? "Published" : "Draft"}
                     </Badge>
+                    {course.allowDownload && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-sky-50 text-sky-600">
+                        <Download className="h-2.5 w-2.5" /> Downloadable
+                      </span>
+                    )}
+                    {course.listInBookstore && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-600">
+                        <Store className="h-2.5 w-2.5" /> Bookstore
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-gray-500">
                     {course.modules.length} module{course.modules.length !== 1 ? "s" : ""}
