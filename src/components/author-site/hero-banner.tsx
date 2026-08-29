@@ -48,6 +48,13 @@ function getHeroColors(siteTheme: string) {
 export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
   const config = FOCUS_CONFIG[focus];
+  // The 3-column layouts' eyebrow shows author.heroTitle — a free-text field
+  // the author types themselves — for Books, since the H1 there is just the
+  // author's name and heroTitle is the only content-flavored label available.
+  // For Courses/Music, ignore that (usually stale book-era copy an author
+  // never thought to update) and show the featured item's own title instead,
+  // so the eyebrow always reflects what's actually being showcased.
+  const eyebrowText = focus === "BOOKS" ? author.heroTitle : featuredItem?.title;
   const { bg, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
   // Accent comes from the author, not the theme. resolveAccentColor() (see
   // lib/themes.ts) is documented as the effective accent "across the public
@@ -308,9 +315,9 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
           )
         )}
         <div className="flex flex-col items-center gap-4 max-w-sm">
-          {author.heroTitle && (
+          {eyebrowText && (
             <p className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: accent }}>
-              {author.heroTitle}
+              {eyebrowText}
             </p>
           )}
           <h1 className="text-4xl font-bold text-white leading-tight author-font-heading">{authorName}</h1>
@@ -354,9 +361,9 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
 
         {/* Center: Content */}
         <div className="flex flex-col items-center text-center gap-5" style={{ order: 2 }}>
-          {author.heroTitle && (
+          {eyebrowText && (
             <p className="text-xs font-bold uppercase tracking-[0.35em]" style={{ color: accent }}>
-              {author.heroTitle}
+              {eyebrowText}
             </p>
           )}
           <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight author-font-heading">
@@ -387,7 +394,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               {config.personLabel}
             </Link>
           </div>
-          {featuredItem && (
+          {/* Books-only: for Courses/Music this would just repeat eyebrowText above. */}
+          {focus === "BOOKS" && featuredItem && (
             <p className="text-xs uppercase tracking-widest pt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
               {featuredItem.title}
             </p>
