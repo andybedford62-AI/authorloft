@@ -14,6 +14,7 @@ import { ClassicTemplate } from "@/components/author-site/templates/classic";
 import { MinimalTemplate } from "@/components/author-site/templates/minimal";
 import { BoldTemplate } from "@/components/author-site/templates/bold";
 import { CinematicTemplate } from "@/components/author-site/templates/cinematic";
+import { SpotlightTemplate } from "@/components/author-site/templates/spotlight";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 import type { HomeTemplateProps } from "@/components/author-site/templates/types";
@@ -63,6 +64,8 @@ export default async function AuthorHomePage({
       return <BoldTemplate {...props} />;
     case "cinematic":
       return <CinematicTemplate {...props} />;
+    case "spotlight":
+      return <SpotlightTemplate {...props} />;
     default:
       return <ClassicTemplate {...props} />;
   }

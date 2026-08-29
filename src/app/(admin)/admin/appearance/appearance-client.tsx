@@ -70,6 +70,20 @@ const TEMPLATES = [
       { label: "Books + About",   h: 14, dark: true,   accent: false },
     ],
   },
+  {
+    id:          "spotlight",
+    name:        "Spotlight",
+    tagline:     "Story-First",
+    description: "Hero banner → full author intro → one long-form featured release → books grid → genre breakdown.",
+    badges:      ["Hero banner", "Author intro", "Featured release", "Genre breakdown"],
+    isPremium:   true,
+    diagram: [
+      { label: "HERO BANNER",      h: 18, dark: true,   accent: false },
+      { label: "Meet the Author",  h: 18, dark: false,  accent: false },
+      { label: "FEATURED RELEASE", h: 26, dark: false,  accent: true  },
+      { label: "Books + Genres",   h: 18, dark: false,  accent: false },
+    ],
+  },
 ] as const;
 
 // ── Theme preview card ───────────────────────────────────────────────────────

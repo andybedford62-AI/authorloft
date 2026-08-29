@@ -32,6 +32,7 @@ export interface BookForTemplate {
   title: string;
   slug: string;
   subtitle: string | null;
+  description: string | null;
   shortDescription: string | null;
   sampleContent: string | null;
   coverImageUrl: string | null;
@@ -43,6 +44,7 @@ export interface BookForTemplate {
   isPreOrder: boolean;
   releaseDate: Date | null;
   series: { id: string; name: string; slug: string } | null;
+  genres: { genre: { id: string; name: string; slug: string } }[];
   retailerLinks: { id: string; retailer: string; label: string; url: string }[];
   directSaleItems: { id: string; format: string; label: string; description: string | null; priceCents: number }[];
 }
