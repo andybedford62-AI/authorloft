@@ -3,10 +3,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, ChevronRight, Mail } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, GraduationCap, ListMusic, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { CinematicBooksFilter } from "./cinematic-books-filter";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
+import { formatCents } from "@/lib/utils";
 import type { HomeTemplateProps } from "./types";
 
 const NAVY_DEEP   = "#050D1C";
@@ -327,6 +328,98 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
               </Link>
             </div>
             <CinematicBooksFilter books={books} accentColor={accent} />
+          </div>
+        </section>
+      )}
+
+      {/* ── All Courses (replaces the Featured Release + Books Grid pair when
+               focus is Courses — the hero already shows the featured course
+               large, and a full search/filter grid is more than a teaser
+               section needs) ────────────────────────────────────────────── */}
+      {author.heroFocus === "COURSES" && courses.length > 0 && (
+        <section style={{ background: NAVY_DEEP }}>
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
+                  The Learning
+                </p>
+                <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+                  All courses
+                </h2>
+              </div>
+              <Link
+                href="/courses"
+                className="hidden sm:flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
+                style={{ color: accent }}
+              >
+                All courses <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {courses.map((course) => (
+                <Link key={course.id} href={`/courses/${course.slug}`} className="group block">
+                  <div className="relative aspect-video rounded-sm overflow-hidden mb-3" style={{ background: NAVY_CARD }}>
+                    {course.coverImageUrl ? (
+                      <Image src={course.coverImageUrl} alt={course.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <GraduationCap className="w-10 h-10" style={{ color: accent + "55" }} />
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="author-font-heading text-lg text-[#FBF6E9] group-hover:opacity-80 transition-opacity">
+                    {course.title}
+                  </h3>
+                  <p className="text-sm mt-1" style={{ color: accent }}>
+                    {course.priceCents === 0 ? "Free" : formatCents(course.priceCents)}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── All Playlists ─────────────────────────────────────────────────── */}
+      {author.heroFocus === "MUSIC" && music.length > 0 && (
+        <section style={{ background: NAVY_DEEP }}>
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
+                  The Playlist
+                </p>
+                <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+                  All music
+                </h2>
+              </div>
+              <Link
+                href="/music"
+                className="hidden sm:flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
+                style={{ color: accent }}
+              >
+                All music <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {music.map((list) => (
+                <Link key={list.id} href={`/music/${list.slug}`} className="group block">
+                  <div className="relative aspect-video rounded-sm overflow-hidden mb-3" style={{ background: NAVY_CARD }}>
+                    {list.coverImageUrl ? (
+                      <Image src={list.coverImageUrl} alt={list.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ListMusic className="w-10 h-10" style={{ color: accent + "55" }} />
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="author-font-heading text-lg text-[#FBF6E9] group-hover:opacity-80 transition-opacity">
+                    {list.title}
+                  </h3>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}

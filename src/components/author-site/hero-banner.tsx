@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { GraduationCap, Music as MusicIcon } from "lucide-react";
+import { GraduationCap, ListMusic } from "lucide-react";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
 import { FlatCoverCard } from "@/components/author-site/flat-cover-card";
 import { getTheme } from "@/lib/themes";
@@ -27,7 +27,7 @@ const FOCUS_CONFIG: Record<
   // icon is only ever read for non-tilt focuses (see useTilt), BOOKS keeps BookCoverTilt's own fallback icon.
   BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", icon: GraduationCap },
   COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", icon: GraduationCap },
-  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: MusicIcon },
+  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: ListMusic },
 };
 
 // Background and scenic image stay theme-derived. The accent deliberately does
@@ -148,8 +148,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
                   title={featuredItem.title}
                   coverImageUrl={featuredItem.coverImageUrl}
                   caption={featuredItem.caption}
-                  width={130}
-                  height={195}
+                  width={210}
+                  height={118}
                   icon={config.icon}
                 />
               )}
@@ -192,8 +192,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               title={featuredItem.title}
               coverImageUrl={featuredItem.coverImageUrl}
               caption={featuredItem.caption}
-              width={240}
-              height={360}
+              width={320}
+              height={180}
               icon={config.icon}
             />
           )}
@@ -301,8 +301,8 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
               title={featuredItem.title}
               coverImageUrl={featuredItem.coverImageUrl}
               caption={featuredItem.caption}
-              width={160}
-              height={240}
+              width={256}
+              height={144}
               icon={config.icon}
             />
           )

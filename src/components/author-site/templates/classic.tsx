@@ -3,12 +3,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, BookOpen, Mail } from "lucide-react";
+import { ChevronRight, BookOpen, GraduationCap, ListMusic, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import { accentAsTextOn } from "@/lib/color-contrast";
+import { formatCents } from "@/lib/utils";
 import type { HomeTemplateProps } from "./types";
 
 // ── Gradient palette for series cards (cycles by index) ──────────────────────
@@ -182,6 +183,109 @@ export function ClassicTemplate({ author, books, courses, music, series }: HomeT
                 )}
                 <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
                   {book.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Featured Courses ─────────────────────────────────────────────────── */}
+      {/* Same shape as Featured Books above, shown instead of it when the hero
+          is focused on Courses. */}
+      {author.heroFocus === "COURSES" && courses.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 md:pb-20">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
+                {firstName}&rsquo;s Latest
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 author-font-heading tracking-tight">Featured Courses</h2>
+            </div>
+            <Link
+              href="/courses"
+              className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: accentText }}
+            >
+              View All <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
+            {courses.slice(0, 3).map((course) => (
+              <Link
+                key={course.id}
+                href={`/courses/${course.slug}`}
+                className="group flex flex-col space-y-3"
+              >
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                  {course.coverImageUrl ? (
+                    <Image
+                      src={course.coverImageUrl}
+                      alt={course.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <GraduationCap className="h-12 w-12 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
+                  {course.title}
+                </h3>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+                  {course.priceCents === 0 ? "Free" : formatCents(course.priceCents)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Featured Music ───────────────────────────────────────────────────── */}
+      {author.heroFocus === "MUSIC" && music.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 md:pb-20">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
+                {firstName}&rsquo;s Latest
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 author-font-heading tracking-tight">Featured Music</h2>
+            </div>
+            <Link
+              href="/music"
+              className="flex items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: accentText }}
+            >
+              View All <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-10 max-w-4xl mx-auto">
+            {music.slice(0, 3).map((list) => (
+              <Link
+                key={list.id}
+                href={`/music/${list.slug}`}
+                className="group flex flex-col space-y-3"
+              >
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                  {list.coverImageUrl ? (
+                    <Image
+                      src={list.coverImageUrl}
+                      alt={list.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ListMusic className="h-12 w-12 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors">
+                  {list.title}
                 </h3>
               </Link>
             ))}
