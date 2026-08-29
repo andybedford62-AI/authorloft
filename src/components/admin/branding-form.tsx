@@ -601,12 +601,10 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                               </>
                             )}
                             {value === "portrait" && (
-                              <div className="flex-1 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500 relative overflow-hidden">
-                                <span>Full Photo</span>
-                                <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-400 flex items-center justify-center">
-                                  <span className="text-[6px] text-white">name overlay</span>
-                                </div>
-                              </div>
+                              <>
+                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Title+Text</div>
+                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Book</div>
+                              </>
                             )}
                           </div>
                           <span className={`text-xs font-medium ${heroLayout === value && !locked ? "text-blue-600" : "text-gray-600"}`}>
