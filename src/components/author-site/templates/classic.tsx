@@ -122,7 +122,9 @@ export function ClassicTemplate({ author, books, courses, music, series }: HomeT
       </section>
 
       {/* ── Featured Books (top 3) ──────────────────────────────────────────── */}
-      {books.length > 0 && (
+      {/* Books-specific — hidden when the hero is focused on Courses/Music so a
+          Music-focused homepage doesn't lead with someone else's content type. */}
+      {author.heroFocus === "BOOKS" && books.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 md:pb-20">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -188,7 +190,8 @@ export function ClassicTemplate({ author, books, courses, music, series }: HomeT
       )}
 
       {/* ── Browse by Series ────────────────────────────────────────────────── */}
-      {series.length > 0 && (
+      {/* Series are book collections — same focus gate as Featured Books above. */}
+      {author.heroFocus === "BOOKS" && series.length > 0 && (
         <section className="py-16 md:py-20" style={{ backgroundColor: accentColor + "1f" }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
             <div>

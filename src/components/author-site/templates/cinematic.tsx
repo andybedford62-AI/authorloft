@@ -201,7 +201,10 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       )}
 
       {/* ── Featured Release ─────────────────────────────────────────────── */}
-      {featuredBook && (
+      {/* Books-specific — hidden when the hero is focused on Courses/Music, so
+          a Music-focused homepage doesn't lead with someone else's content
+          type further down the page. */}
+      {author.heroFocus === "BOOKS" && featuredBook && (
         <section style={{ background: NAVY }}>
           <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
@@ -303,7 +306,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       )}
 
       {/* ── All Books ─────────────────────────────────────────────────────── */}
-      {books.length > 0 && (
+      {author.heroFocus === "BOOKS" && books.length > 0 && (
         <section style={{ background: NAVY_DEEP }}>
           <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
             <div className="flex items-end justify-between mb-10">
@@ -329,7 +332,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       )}
 
       {/* ── Browse by Series ─────────────────────────────────────────────── */}
-      {series.length > 0 && (
+      {author.heroFocus === "BOOKS" && series.length > 0 && (
         <section style={{ background: NAVY }}>
           <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
             <div className="text-center mb-12">

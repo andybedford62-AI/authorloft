@@ -79,7 +79,8 @@ export function BoldTemplate({ author, books, courses, music, series }: HomeTemp
       </section>
 
       {/* ── 3. Featured Book Spotlight ────────────────────────────────────── */}
-      {spotlightBook && (
+      {/* Books-specific — hidden when the hero is focused on Courses/Music. */}
+      {author.heroFocus === "BOOKS" && spotlightBook && (
         <section className="py-20 bg-gray-950">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
@@ -169,7 +170,7 @@ export function BoldTemplate({ author, books, courses, music, series }: HomeTemp
       )}
 
       {/* ── 4. More Books Grid ────────────────────────────────────────────── */}
-      {remainingBooks.length > 0 && (
+      {author.heroFocus === "BOOKS" && remainingBooks.length > 0 && (
         <section className="py-14 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-baseline justify-between mb-8">
@@ -228,7 +229,7 @@ export function BoldTemplate({ author, books, courses, music, series }: HomeTemp
       )}
 
       {/* ── 5. Series ────────────────────────────────────────────────────── */}
-      {series.length > 0 && (
+      {author.heroFocus === "BOOKS" && series.length > 0 && (
         <section className="py-14 bg-gray-950 text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl font-extrabold mb-6 tracking-tight">Series</h2>
