@@ -194,13 +194,13 @@ export const SUBGENRE_PALETTES: ThemeDefinition[] = [
   {
     id: "scuba-diving",
     name: "Scuba / Underwater Adventure",
-    description: "Deep-reef teal with sunlit aqua accents — immersive and exploratory.",
+    description: "Deep-reef teal with coral accents — immersive and exploratory.",
     isPremium: false,
     dataTheme: "scuba-diving",
     emoji: "🤿",
     mood: "Immersive, exploratory, deep-reef adventure",
-    preview: { bg: "#dbf0ee", primary: "#073B3F", accent: "#2FC9E0" },
-    swatches: ["#073B3F", "#0E5E5C", "#1FA8A0", "#7FE0D6", "#F2F9F8", "#CDEDE8", "#2FC9E0", "#9FE8F0", "#04282B"],
+    preview: { bg: "#dbf0ee", primary: "#073B3F", accent: "#FF6F5E" },
+    swatches: ["#073B3F", "#0E5E5C", "#1FA8A0", "#7FE0D6", "#F2F9F8", "#CDEDE8", "#FF6F5E", "#FFB199", "#04282B"],
     defaultHeroImageUrl: "/images/themes/scuba-diving-hero.jpg",
   },
   {
