@@ -96,9 +96,11 @@ export default async function MusicListPage({
 
       {/* Banner, not a square thumbnail: the index card already renders this
           image 16:9, and cropping a wide banner to a 160px square here made the
-          same upload look wrong in two places. */}
+          same upload look wrong in two places. Match that same 16:9 ratio here
+          (was aspect-[3/1] — a wider/shorter box that cropped the top and
+          bottom off every genuinely-16:9 cover). */}
       {list.coverImageUrl && (
-        <div className="relative aspect-[3/1] w-full rounded-xl overflow-hidden bg-gray-100 mb-6">
+        <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-gray-100 mb-6">
           <Image
             src={list.coverImageUrl}
             alt=""
