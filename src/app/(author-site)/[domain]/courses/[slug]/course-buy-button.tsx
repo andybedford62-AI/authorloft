@@ -19,6 +19,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
   const [email, setEmail] = useState("");
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [applied, setApplied] = useState<AppliedDiscount | null>(null);
+  const [notifyFutureCourses, setNotifyFutureCourses] = useState(false);
 
   async function handleBuy() {
     setLoading(true);
@@ -60,7 +61,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
       const res = await fetch("/api/courses/enroll", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId, email: email.trim() }),
+        body: JSON.stringify({ courseId, email: email.trim(), notifyFutureCourses }),
       });
       const data = await res.json();
 
@@ -109,6 +110,15 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
           required
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
+        <label className="flex items-start gap-2 text-xs text-gray-500 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={notifyFutureCourses}
+            onChange={(e) => setNotifyFutureCourses(e.target.checked)}
+            className="mt-0.5 h-3.5 w-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+          />
+          Notify me about future courses from this author
+        </label>
         <Button
           type="submit"
           disabled={loading}

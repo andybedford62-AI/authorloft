@@ -1606,6 +1606,7 @@ model Course {
   workbookFileKey  String?         // uploaded PDF/DOCX, mutually exclusive with workbookUrl
   workbookFileName String?
   workbookUrl      String?         // externally-hosted workbook link, mutually exclusive with workbookFileKey
+  courseAnnouncedAt DateTime?      // stamped once the author sends the "new course" announcement — guards against re-sending on later edits/unpublish-republish
   displayOrder  Int                @default(0)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt

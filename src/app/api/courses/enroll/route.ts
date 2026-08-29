@@ -7,6 +7,7 @@ const schema = z.object({
   courseId: z.string().min(1),
   email: z.string().email(),
   name: z.string().max(200).optional(),
+  notifyFutureCourses: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const { courseId, email, name } = parsed.data;
+  const { courseId, email, name, notifyFutureCourses } = parsed.data;
 
   // findFirst + kind, not findUnique by id: a music list must never be
   // enrollable, and the id comes from the caller.
@@ -40,13 +41,31 @@ export async function POST(req: NextRequest) {
     select: { accessToken: true },
   });
 
-  // Save the student as a subscriber for the author's newsletter/correspondence,
-  // same as a free reader-magnet download does for books.
-  await prisma.subscriber.upsert({
-    where: { authorId_email: { authorId: course.authorId, email } },
-    update: { name },
-    create: { authorId: course.authorId, email, name, isConfirmed: true },
-  }).catch((e) => console.error("[enroll] Failed to upsert subscriber:", e));
+  // Only subscribe them if they explicitly opted in via the "notify me about
+  // future courses" checkbox — unlike a book reader-magnet or purchase, free
+  // course enrollment has no other implicit-consent signal, so it's asked for.
+  if (notifyFutureCourses) {
+    const existingSub = await prisma.subscriber.findUnique({
+      where: { authorId_email: { authorId: course.authorId, email } },
+      select: { categoryPrefs: true },
+    });
+    // Empty categoryPrefs means "send me everything" (see Subscriber model) --
+    // never narrow an existing all-categories subscriber down to just "courses".
+    let categoryPrefs: string[];
+    if (!existingSub) {
+      categoryPrefs = ["courses"];
+    } else if (existingSub.categoryPrefs.length === 0 || existingSub.categoryPrefs.includes("courses")) {
+      categoryPrefs = existingSub.categoryPrefs;
+    } else {
+      categoryPrefs = [...existingSub.categoryPrefs, "courses"];
+    }
+
+    await prisma.subscriber.upsert({
+      where: { authorId_email: { authorId: course.authorId, email } },
+      update: { name, categoryPrefs },
+      create: { authorId: course.authorId, email, name, isConfirmed: true, categoryPrefs },
+    }).catch((e) => console.error("[enroll] Failed to upsert subscriber:", e));
+  }
 
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const accessUrl = `https://${course.author.slug}.${platformDomain}/courses/${course.slug}/learn?token=${enrollment.accessToken}`;

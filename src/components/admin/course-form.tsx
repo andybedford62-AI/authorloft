@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2 } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2, Megaphone, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -43,6 +43,7 @@ export interface CourseData {
   workbookFileKey: string | null;
   workbookFileName: string | null;
   workbookUrl: string | null;
+  courseAnnouncedAt: string | null;
   categoryIds: string[];
   modules: ModuleData[];
 }
@@ -288,6 +289,10 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+  const [announcing, setAnnouncing] = useState(false);
+  const [announceError, setAnnounceError] = useState("");
+  const [announceResult, setAnnounceResult] = useState<{ sent: number; total: number } | null>(null);
+  const [courseAnnouncedAt, setCourseAnnouncedAt] = useState(initial?.courseAnnouncedAt ?? null);
 
   const priceCents = Math.round(parseFloat(priceDollars || "0") * 100);
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
@@ -414,6 +419,27 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
       setError("Something went wrong");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAnnounce() {
+    if (!initial?.id) return;
+    if (!confirm("Email everyone who opted in to course announcements about this course? This can't be undone.")) return;
+    setAnnouncing(true);
+    setAnnounceError("");
+    try {
+      const res = await fetch(`/api/admin/courses/${initial.id}/announce`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setAnnounceError(data.error ?? "Failed to send announcement");
+        return;
+      }
+      setAnnounceResult({ sent: data.sent, total: data.total });
+      setCourseAnnouncedAt(new Date().toISOString());
+    } catch {
+      setAnnounceError("Something went wrong");
+    } finally {
+      setAnnouncing(false);
     }
   }
 
@@ -678,6 +704,36 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
           Published (visible on your site)
         </label>
       </div>
+
+      {/* Announce to subscribers — edit mode only, once the saved course is published */}
+      {mode === "edit" && initial?.isPublished && (
+        <div className="rounded-lg border border-gray-200 px-4 py-3.5">
+          {courseAnnouncedAt ? (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+              Announced to subscribers on {new Date(courseAnnouncedAt).toLocaleDateString()}
+              {announceResult && ` — sent to ${announceResult.sent} of ${announceResult.total} subscribers`}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                  <Megaphone className="h-3.5 w-3.5 text-gray-400" />
+                  Announce this course
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Email subscribers who opted in to hear about new courses. One-time send — editing or re-saving this course afterward won&apos;t trigger another.
+                </p>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={handleAnnounce} disabled={announcing} className="flex-shrink-0">
+                {announcing && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+                Announce to Subscribers
+              </Button>
+            </div>
+          )}
+          {announceError && <p className="text-xs text-red-600 mt-2">{announceError}</p>}
+        </div>
+      )}
 
       {/* Allow download/print */}
       <div className="flex items-center gap-3">
