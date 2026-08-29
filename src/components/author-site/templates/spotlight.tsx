@@ -8,7 +8,8 @@ import { sanitize } from "@/lib/sanitize";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
-import { accentAsTextOn } from "@/lib/color-contrast";
+import { accentAsTextOn, readableTextOn } from "@/lib/color-contrast";
+import { getTheme } from "@/lib/themes";
 import type { HomeTemplateProps } from "./types";
 
 export function SpotlightTemplate({ author, books, courses, music, genreTree }: HomeTemplateProps) {
@@ -16,7 +17,20 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
   const salesEnabled = author.plan?.salesEnabled ?? false;
-  const accentText   = accentAsTextOn(accentColor, "#ffffff");
+
+  // Every section below (not just the hero) reads its surface from the
+  // author's chosen Colour Theme / genre palette, so a dark, moody palette
+  // reads as one immersive page rather than a colour band at the top with
+  // plain white sections underneath — the whole point of "Story-First".
+  const pageBg     = getTheme(author.siteTheme).preview.bg;
+  const textColor  = readableTextOn(pageBg);
+  const isDarkPage = textColor === "#fff";
+  const bodyText    = isDarkPage ? "rgba(255,255,255,0.68)" : "rgba(17,17,17,0.62)";
+  const subtleText  = isDarkPage ? "rgba(255,255,255,0.45)" : "rgba(17,17,17,0.45)";
+  const hairline     = isDarkPage ? "rgba(255,255,255,0.12)" : "rgba(17,17,17,0.08)";
+  const placeholderBg = isDarkPage ? "rgba(255,255,255,0.06)" : "rgba(17,17,17,0.04)";
+  const tintBg = (ratio: number) => `color-mix(in srgb, ${accentColor} ${ratio}%, ${pageBg})`;
+  const accentText = accentAsTextOn(accentColor, pageBg);
 
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
 
@@ -62,7 +76,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
       )}
 
       {/* ── Meet the Author ──────────────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 py-16 md:py-20" style={{ backgroundColor: accentColor + "1f" }}>
+      <section className="px-4 sm:px-6 py-16 md:py-20" style={{ backgroundColor: tintBg(10) }}>
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row gap-10 md:gap-14 items-center">
 
@@ -70,13 +84,13 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                 composition so the two sections read as a deliberate pair. */}
             <div className="w-full max-w-xs md:w-80 md:max-w-none flex-shrink-0">
               <div
-                className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100 shadow-lg relative ring-4"
-                style={{ "--tw-ring-color": accentColor + "40" } as React.CSSProperties}
+                className="w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-lg relative ring-4"
+                style={{ backgroundColor: placeholderBg, "--tw-ring-color": accentColor + "40" } as React.CSSProperties}
               >
                 {author.profileImageUrl ? (
                   <Image src={author.profileImageUrl} alt={authorName} fill className="object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-gray-300">
+                  <div className="w-full h-full flex items-center justify-center text-6xl font-bold" style={{ color: subtleText }}>
                     {author.name[0]}
                   </div>
                 )}
@@ -88,11 +102,12 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>
                   Meet the Author
                 </p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 author-font-heading tracking-tight">{authorName}</h2>
+                <h2 className="text-2xl sm:text-3xl font-extrabold author-font-heading tracking-tight" style={{ color: textColor }}>{authorName}</h2>
               </div>
 
               <div
-                className="text-gray-600 leading-relaxed rich-content"
+                className="leading-relaxed rich-content"
+                style={{ color: bodyText }}
                 dangerouslySetInnerHTML={{ __html: sanitize(author.shortBio || "<p>Author bio coming soon.</p>") }}
               />
 
@@ -125,7 +140,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
 
       {/* ── Featured Release — Books ─────────────────────────────────────────── */}
       {author.heroFocus === "BOOKS" && heroBook && (
-        <section className="py-16 md:py-20 bg-white border-t border-gray-100">
+        <section className="py-16 md:py-20" style={{ backgroundColor: pageBg, borderTop: `1px solid ${hairline}` }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
               <div className="flex-shrink-0 w-56 md:w-72">
@@ -137,8 +152,8 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                     {heroBook.coverImageUrl ? (
                       <Image src={heroBook.coverImageUrl} alt={heroBook.title} fill className="object-cover" priority />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <BookOpen className="h-16 w-16 text-gray-300" />
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: placeholderBg }}>
+                        <BookOpen className="h-16 w-16" style={{ color: subtleText }} />
                       </div>
                     )}
                   </div>
@@ -149,14 +164,15 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>
                   Featured Release{heroBookGenreLabel ? ` · ${heroBookGenreLabel}` : ""}
                 </p>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 author-font-heading leading-tight">
+                <h2 className="text-3xl sm:text-4xl font-extrabold author-font-heading leading-tight" style={{ color: textColor }}>
                   {heroBook.title}
                 </h2>
                 {heroBook.subtitle && (
-                  <p className="text-lg text-gray-500 font-light italic">{heroBook.subtitle}</p>
+                  <p className="text-lg font-light italic" style={{ color: subtleText }}>{heroBook.subtitle}</p>
                 )}
                 <div
-                  className="text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  className="leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  style={{ color: bodyText }}
                   dangerouslySetInnerHTML={{ __html: sanitize(heroBook.description || heroBook.shortDescription || "") }}
                 />
                 <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start pt-2">
@@ -179,7 +195,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
 
       {/* ── Featured Release — Courses ───────────────────────────────────────── */}
       {author.heroFocus === "COURSES" && heroCourse && (
-        <section className="py-16 md:py-20 bg-white border-t border-gray-100">
+        <section className="py-16 md:py-20" style={{ backgroundColor: pageBg, borderTop: `1px solid ${hairline}` }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
               <div className="flex-shrink-0 w-full md:w-96">
@@ -191,8 +207,8 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                     {heroCourse.coverImageUrl ? (
                       <Image src={heroCourse.coverImageUrl} alt={heroCourse.title} fill className="object-cover" priority />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <GraduationCap className="h-16 w-16 text-gray-300" />
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: placeholderBg }}>
+                        <GraduationCap className="h-16 w-16" style={{ color: subtleText }} />
                       </div>
                     )}
                   </div>
@@ -200,9 +216,10 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
               </div>
               <div className="flex-1 space-y-4 text-center md:text-left">
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>Featured Course</p>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 author-font-heading leading-tight">{heroCourse.title}</h2>
+                <h2 className="text-3xl sm:text-4xl font-extrabold author-font-heading leading-tight" style={{ color: textColor }}>{heroCourse.title}</h2>
                 <div
-                  className="text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  className="leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  style={{ color: bodyText }}
                   dangerouslySetInnerHTML={{ __html: sanitize(heroCourse.description || "") }}
                 />
                 <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start pt-2">
@@ -220,7 +237,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
 
       {/* ── Featured Release — Music ──────────────────────────────────────────── */}
       {author.heroFocus === "MUSIC" && heroMusic && (
-        <section className="py-16 md:py-20 bg-white border-t border-gray-100">
+        <section className="py-16 md:py-20" style={{ backgroundColor: pageBg, borderTop: `1px solid ${hairline}` }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
               <div className="flex-shrink-0 w-full md:w-96">
@@ -232,8 +249,8 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                     {heroMusic.coverImageUrl ? (
                       <Image src={heroMusic.coverImageUrl} alt={heroMusic.title} fill className="object-cover" priority />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                        <ListMusic className="h-16 w-16 text-gray-300" />
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: placeholderBg }}>
+                        <ListMusic className="h-16 w-16" style={{ color: subtleText }} />
                       </div>
                     )}
                   </div>
@@ -241,9 +258,10 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
               </div>
               <div className="flex-1 space-y-4 text-center md:text-left">
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentText }}>Featured Playlist</p>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 author-font-heading leading-tight">{heroMusic.title}</h2>
+                <h2 className="text-3xl sm:text-4xl font-extrabold author-font-heading leading-tight" style={{ color: textColor }}>{heroMusic.title}</h2>
                 <div
-                  className="text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  className="leading-relaxed max-w-lg mx-auto md:mx-0 rich-content"
+                  style={{ color: bodyText }}
                   dangerouslySetInnerHTML={{ __html: sanitize(heroMusic.description || "") }}
                 />
                 <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start pt-2">
@@ -261,10 +279,10 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
 
       {/* ── More Books ────────────────────────────────────────────────────────── */}
       {author.heroFocus === "BOOKS" && remainingBooks.length > 0 && (
-        <section className="py-14 md:py-16 bg-gray-50">
+        <section className="py-14 md:py-16" style={{ backgroundColor: tintBg(5), borderTop: `1px solid ${hairline}` }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-baseline justify-between mb-8">
-              <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight author-font-heading">More Books</h2>
+              <h2 className="text-2xl font-extrabold tracking-tight author-font-heading" style={{ color: textColor }}>More Books</h2>
               <Link
                 href="/books"
                 className="text-sm font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity"
@@ -276,7 +294,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-8">
               {remainingBooks.map((book) => (
                 <Link key={book.id} href={`/books/${book.slug}`} className="group space-y-2.5">
-                  <div className="aspect-[2/3] rounded-xl overflow-hidden bg-white relative shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                  <div className="aspect-[2/3] rounded-xl overflow-hidden relative shadow-md group-hover:shadow-xl transition-shadow duration-300" style={{ backgroundColor: placeholderBg }}>
                     {book.coverImageUrl ? (
                       <Image
                         src={book.coverImageUrl}
@@ -286,7 +304,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <BookOpen className="h-10 w-10 text-gray-300" />
+                        <BookOpen className="h-10 w-10" style={{ color: subtleText }} />
                       </div>
                     )}
                     {(book.caption || book.isPreOrder) && (
@@ -298,7 +316,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
                       </span>
                     )}
                   </div>
-                  <p className="font-bold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:underline">{book.title}</p>
+                  <p className="font-bold text-sm leading-snug line-clamp-2 group-hover:underline" style={{ color: textColor }}>{book.title}</p>
                 </Link>
               ))}
             </div>
@@ -308,16 +326,16 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
 
       {/* ── Genre Breakdown ───────────────────────────────────────────────────── */}
       {author.heroFocus === "BOOKS" && genreCounts.length > 0 && (
-        <section className="py-12 bg-white border-t border-gray-100">
+        <section className="py-12" style={{ backgroundColor: pageBg, borderTop: `1px solid ${hairline}` }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5 text-center">Browse by Genre</p>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-5 text-center" style={{ color: subtleText }}>Browse by Genre</p>
             <div className="flex flex-wrap justify-center gap-3">
               {genreCounts.map((g) => (
                 <Link
                   key={g.id}
                   href="/books"
-                  className="px-4 py-2 rounded-full border text-sm font-medium text-gray-700 hover:text-white hover:bg-[var(--accent)] transition-colors"
-                  style={{ borderColor: accentColor + "40" }}
+                  className="px-4 py-2 rounded-full border text-sm font-medium hover:text-white hover:bg-[var(--accent)] transition-colors"
+                  style={{ borderColor: accentColor + "40", color: textColor }}
                 >
                   {g.name} <span className="opacity-60">· {g.count} {g.count === 1 ? "book" : "books"}</span>
                 </Link>
@@ -328,32 +346,32 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
       )}
 
       {/* ── Newsletter ─────────────────────────────────────────────────────────── */}
-      <section className="py-16 md:py-20 bg-white border-t border-gray-100">
+      <section className="py-16 md:py-20" style={{ backgroundColor: tintBg(5), borderTop: `1px solid ${hairline}` }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: accentText }}>
                 {firstName}&rsquo;s Newsletter
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 author-font-heading tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold author-font-heading tracking-tight" style={{ color: textColor }}>
                 Letters from {firstName}
               </h2>
-              <p className="text-gray-500 mt-2 leading-relaxed">
+              <p className="mt-2 leading-relaxed" style={{ color: bodyText }}>
                 New releases, behind-the-scenes notes, and reading recommendations —
                 straight to your inbox.
               </p>
             </div>
-            <NewsletterInlineForm authorId={author.id} accentColor={accentColor} tone="light" />
+            <NewsletterInlineForm authorId={author.id} accentColor={accentColor} tone={isDarkPage ? "dark" : "light"} />
           </div>
         </div>
       </section>
 
       {/* ── Contact CTA ────────────────────────────────────────────────────────── */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: accentColor + "15" }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: tintBg(12) }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Get in Touch with {firstName}</h2>
-            <p className="text-gray-500 text-sm mt-1">Inquiries, collaborations, and media welcome.</p>
+            <h2 className="text-xl font-bold" style={{ color: textColor }}>Get in Touch with {firstName}</h2>
+            <p className="text-sm mt-1" style={{ color: bodyText }}>Inquiries, collaborations, and media welcome.</p>
           </div>
           <Link href="/contact">
             <Button size="lg">Contact {authorName}</Button>
