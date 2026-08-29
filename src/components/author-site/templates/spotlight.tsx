@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/author-site/hero-banner";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import { accentAsTextOn, readableTextOn } from "@/lib/color-contrast";
-import { getTheme } from "@/lib/themes";
+import { getThemeSurfaceColor } from "@/lib/themes";
 import type { HomeTemplateProps } from "./types";
 
 export function SpotlightTemplate({ author, books, courses, music, genreTree }: HomeTemplateProps) {
@@ -22,7 +22,7 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
   // author's chosen Colour Theme / genre palette, so a dark, moody palette
   // reads as one immersive page rather than a colour band at the top with
   // plain white sections underneath — the whole point of "Story-First".
-  const pageBg     = getTheme(author.siteTheme).preview.bg;
+  const pageBg     = getThemeSurfaceColor(author.siteTheme);
   const textColor  = readableTextOn(pageBg);
   const isDarkPage = textColor === "#fff";
   const bodyText    = isDarkPage ? "rgba(255,255,255,0.68)" : "rgba(17,17,17,0.62)";

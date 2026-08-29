@@ -226,6 +226,26 @@ export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];
 }
 
+// Themes whose admin-preview `bg` field is genuinely the rich/dark colour the
+// theme is built around, with `primary` holding the light on-dark text colour
+// instead (the inverse of every other theme, where `bg` is a pale page colour
+// and `primary` is the dark, saturated signature colour).
+const DARK_BG_THEME_IDS: readonly string[] = ["dark-elegant", "scifi"];
+
+/**
+ * Resolves the rich, saturated colour a theme is actually built around — the
+ * one large surfaces (hero backgrounds, and any full-page-mood section) should
+ * use, as opposed to `preview.bg`, which is only ever a pale swatch colour
+ * meant for the small admin theme-picker card. For most themes that's
+ * `preview.primary`; for the two themes whose overall page is already dark
+ * (their `bg` holds the dark colour and `primary` holds light on-dark text),
+ * it's `preview.bg` instead.
+ */
+export function getThemeSurfaceColor(siteTheme: string | null | undefined): string {
+  const theme = getTheme(siteTheme);
+  return DARK_BG_THEME_IDS.includes(theme.id) ? theme.preview.bg : theme.preview.primary;
+}
+
 /** Returns the hex accent colour for a given theme — used to drive inline styles across the author site. */
 export function getThemeAccentHex(siteTheme: string | null | undefined): string {
   return getTheme(siteTheme).preview.accent;
