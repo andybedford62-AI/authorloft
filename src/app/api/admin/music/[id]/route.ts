@@ -56,7 +56,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // Tracks are a small ordered set with no state of their own, so replacing
   // them wholesale is simpler and safer than diffing — and it can't strand a
   // row at a stale sortOrder.
+  const isFeatured = typeof body?.isFeatured === "boolean" ? body.isFeatured : undefined;
+
   await prisma.$transaction(async (tx) => {
+    // Only one music list may be featured at a time — see the same guard on Course PUT/POST.
+    if (isFeatured) {
+      await tx.course.updateMany({
+        where: { authorId, kind: "MUSIC", id: { not: id }, isFeatured: true },
+        data: { isFeatured: false },
+      });
+    }
+
     await tx.course.update({
       where: { id },
       data: {
@@ -65,7 +75,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         description: typeof body?.description === "string" ? body.description.trim() || null : existing.description,
         coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : existing.coverImageUrl,
         ...(typeof body?.isPublished === "boolean" ? { isPublished: body.isPublished } : {}),
-        ...(typeof body?.isFeatured === "boolean" ? { isFeatured: body.isFeatured } : {}),
+        ...(isFeatured !== undefined ? { isFeatured } : {}),
       },
     });
 

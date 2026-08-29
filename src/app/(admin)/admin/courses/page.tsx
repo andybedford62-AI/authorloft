@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
+import { FeaturedStarButton } from "@/components/admin/featured-star-button";
 import { formatCents } from "@/lib/utils";
 
 export default async function AdminCoursesPage() {
@@ -71,11 +72,15 @@ export default async function AdminCoursesPage() {
             const lessonCount = course.modules.reduce((s, m) => s + m.lessons.length, 0);
 
             return (
-              <Link
+              <div
                 key={course.id}
-                href={`/admin/courses/${course.id}/edit`}
-                className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
+                className="relative flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
               >
+                <Link
+                  href={`/admin/courses/${course.id}/edit`}
+                  className="absolute inset-0 z-0"
+                  aria-label={`Edit ${course.title}`}
+                />
                 {/* Cover */}
                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
                   {course.coverImageUrl ? (
@@ -124,7 +129,12 @@ export default async function AdminCoursesPage() {
                     {course.priceCents === 0 ? "Free" : formatCents(course.priceCents)}
                   </p>
                 </div>
-              </Link>
+
+                <FeaturedStarButton
+                  endpoint={`/api/admin/courses/${course.id}/feature`}
+                  initialFeatured={course.isFeatured}
+                />
+              </div>
             );
           })}
         </div>

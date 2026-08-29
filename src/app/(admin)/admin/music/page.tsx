@@ -7,6 +7,7 @@ import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MusicAddTabs } from "@/components/admin/music-add-tabs";
+import { FeaturedStarButton } from "@/components/admin/featured-star-button";
 
 export const dynamic = "force-dynamic";
 
@@ -62,11 +63,15 @@ export default async function MusicListsPage() {
           {lists.map((list) => {
             const trackCount = list.modules.reduce((n, m) => n + m.lessons.length, 0);
             return (
-              <Link
+              <div
                 key={list.id}
-                href={`/admin/music/${list.id}/edit`}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="relative flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
               >
+                <Link
+                  href={`/admin/music/${list.id}/edit`}
+                  className="absolute inset-0 z-0"
+                  aria-label={`Edit ${list.title}`}
+                />
                 <ListMusic className="h-4 w-4 text-gray-400 flex-shrink-0" />
                 <span className="flex-1 min-w-0">
                   <span className="block font-medium text-gray-900 truncate">{list.title}</span>
@@ -75,7 +80,11 @@ export default async function MusicListsPage() {
                   </span>
                 </span>
                 <Badge variant="outline">{list.isPublished ? "Published" : "Draft"}</Badge>
-              </Link>
+                <FeaturedStarButton
+                  endpoint={`/api/admin/music/${list.id}/feature`}
+                  initialFeatured={list.isFeatured}
+                />
+              </div>
             );
           })}
         </div>

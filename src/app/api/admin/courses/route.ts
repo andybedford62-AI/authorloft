@@ -48,48 +48,58 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A course with this slug already exists" }, { status: 400 });
   }
 
-  const course = await prisma.course.create({
-    data: {
-      authorId,
-      title: title.trim(),
-      slug,
-      description: description?.trim() || null,
-      coverImageUrl: coverImageUrl?.trim() || null,
-      priceCents: priceCents ?? 0,
-      isPublished: isPublished ?? false,
-      allowDownload: allowDownload ?? true,
-      isFeatured: isFeatured ?? false,
-      workbookFileKey: workbookFileKey?.trim() || null,
-      workbookFileName: workbookFileName?.trim() || null,
-      workbookUrl: workbookUrl?.trim() || null,
-      categories: Array.isArray(categoryIds) && categoryIds.length > 0
-        ? { create: categoryIds.map((categoryId: string) => ({ categoryId })) }
-        : undefined,
-      modules: {
-        create: (modules ?? []).map((mod: any, mi: number) => ({
-          title: mod.title?.trim() || `Module ${mi + 1}`,
-          description: mod.description?.trim() || null,
-          sortOrder: mi,
-          lessons: {
-            create: (mod.lessons ?? []).map((les: any, li: number) => ({
-              title: les.title?.trim() || `Lesson ${li + 1}`,
-              contentHtml: les.contentHtml || null,
-              videoUrl: les.videoUrl?.trim() || null,
-              fileKey: les.fileKey?.trim() || null,
-              fileName: les.fileName?.trim() || null,
-              sortOrder: li,
-              isPreview: les.isPreview ?? false,
-            })),
-          },
-        })),
+  const course = await prisma.$transaction(async (tx) => {
+    // Only one course may be featured at a time — see the same guard in PUT.
+    if (isFeatured) {
+      await tx.course.updateMany({
+        where: { authorId, kind: "COURSE", isFeatured: true },
+        data: { isFeatured: false },
+      });
+    }
+
+    return tx.course.create({
+      data: {
+        authorId,
+        title: title.trim(),
+        slug,
+        description: description?.trim() || null,
+        coverImageUrl: coverImageUrl?.trim() || null,
+        priceCents: priceCents ?? 0,
+        isPublished: isPublished ?? false,
+        allowDownload: allowDownload ?? true,
+        isFeatured: isFeatured ?? false,
+        workbookFileKey: workbookFileKey?.trim() || null,
+        workbookFileName: workbookFileName?.trim() || null,
+        workbookUrl: workbookUrl?.trim() || null,
+        categories: Array.isArray(categoryIds) && categoryIds.length > 0
+          ? { create: categoryIds.map((categoryId: string) => ({ categoryId })) }
+          : undefined,
+        modules: {
+          create: (modules ?? []).map((mod: any, mi: number) => ({
+            title: mod.title?.trim() || `Module ${mi + 1}`,
+            description: mod.description?.trim() || null,
+            sortOrder: mi,
+            lessons: {
+              create: (mod.lessons ?? []).map((les: any, li: number) => ({
+                title: les.title?.trim() || `Lesson ${li + 1}`,
+                contentHtml: les.contentHtml || null,
+                videoUrl: les.videoUrl?.trim() || null,
+                fileKey: les.fileKey?.trim() || null,
+                fileName: les.fileName?.trim() || null,
+                sortOrder: li,
+                isPreview: les.isPreview ?? false,
+              })),
+            },
+          })),
+        },
       },
-    },
-    include: {
-      modules: {
-        include: { lessons: true },
-        orderBy: { sortOrder: "asc" },
+      include: {
+        modules: {
+          include: { lessons: true },
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
+    });
   });
 
   // First course ever for this author — turn on the "Courses" nav link so it's

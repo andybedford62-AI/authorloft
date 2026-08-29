@@ -103,28 +103,40 @@ export async function PUT(req: NextRequest, { params }: Params) {
     }
   }
 
-  const course = await prisma.course.update({
-    where: { id },
-    data: {
-      title: title.trim(),
-      slug,
-      description: description?.trim() || null,
-      coverImageUrl: coverImageUrl !== undefined ? (coverImageUrl?.trim() || null) : existing.coverImageUrl,
-      priceCents: priceCents ?? existing.priceCents,
-      isPublished: isPublished ?? existing.isPublished,
-      allowDownload: allowDownload ?? existing.allowDownload,
-      isFeatured: isFeatured ?? existing.isFeatured,
-      listInBookstore: listInBookstore ?? existing.listInBookstore,
-      workbookFileKey: workbookFileKey !== undefined ? (workbookFileKey?.trim() || null) : existing.workbookFileKey,
-      workbookFileName: workbookFileName !== undefined ? (workbookFileName?.trim() || null) : existing.workbookFileName,
-      workbookUrl: workbookUrl !== undefined ? (workbookUrl?.trim() || null) : existing.workbookUrl,
-    },
-    include: {
-      modules: {
-        include: { lessons: { orderBy: { sortOrder: "asc" } } },
-        orderBy: { sortOrder: "asc" },
+  const course = await prisma.$transaction(async (tx) => {
+    // Only one course (and, separately, one music list) may be featured at a
+    // time — clear the flag on all other COURSE-kind rows first. Scoped by
+    // kind so featuring a course never touches a music list's flag.
+    if (isFeatured) {
+      await tx.course.updateMany({
+        where: { authorId, kind: "COURSE", id: { not: id }, isFeatured: true },
+        data: { isFeatured: false },
+      });
+    }
+
+    return tx.course.update({
+      where: { id },
+      data: {
+        title: title.trim(),
+        slug,
+        description: description?.trim() || null,
+        coverImageUrl: coverImageUrl !== undefined ? (coverImageUrl?.trim() || null) : existing.coverImageUrl,
+        priceCents: priceCents ?? existing.priceCents,
+        isPublished: isPublished ?? existing.isPublished,
+        allowDownload: allowDownload ?? existing.allowDownload,
+        isFeatured: isFeatured ?? existing.isFeatured,
+        listInBookstore: listInBookstore ?? existing.listInBookstore,
+        workbookFileKey: workbookFileKey !== undefined ? (workbookFileKey?.trim() || null) : existing.workbookFileKey,
+        workbookFileName: workbookFileName !== undefined ? (workbookFileName?.trim() || null) : existing.workbookFileName,
+        workbookUrl: workbookUrl !== undefined ? (workbookUrl?.trim() || null) : existing.workbookUrl,
       },
-    },
+      include: {
+        modules: {
+          include: { lessons: { orderBy: { sortOrder: "asc" } } },
+          orderBy: { sortOrder: "asc" },
+        },
+      },
+    });
   });
 
   return NextResponse.json({ course });
