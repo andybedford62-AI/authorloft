@@ -54,8 +54,11 @@ export function SpotlightTemplate({ author, books, courses, music, genreTree }: 
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
       {/* ── Hero Banner ────────────────────────────────────────────────────── */}
+      {/* Always the "portrait" layout (title + featured item, no author photo)
+          regardless of the account's Branding -> Hero setting — Spotlight leads
+          with the content, and introduces the author separately below. */}
       {author.showHeroBanner !== false && (
-        <HeroBanner author={author} focus={author.heroFocus} featuredItem={spotlightItem} />
+        <HeroBanner author={author} focus={author.heroFocus} featuredItem={spotlightItem} layoutOverride="portrait" />
       )}
 
       {/* ── Meet the Author ──────────────────────────────────────────────────── */}

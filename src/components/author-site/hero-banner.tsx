@@ -17,6 +17,12 @@ interface HeroBannerProps {
     coverImageUrl: string | null;
     caption?: string | null;
   } | null;
+  /** Forces a specific layout regardless of the account's Branding -> Hero
+   *  setting. Used by templates (e.g. Spotlight) whose whole premise is
+   *  leading with the featured item rather than the author's photo — letting
+   *  the global heroLayout setting override that would silently reintroduce
+   *  the author photo whenever an account happens to be on author-left/right. */
+  layoutOverride?: "portrait";
 }
 
 const FOCUS_CONFIG: Record<
@@ -44,7 +50,7 @@ function getHeroColors(siteTheme: string) {
   return { bg, defaultHeroImageUrl: heroImage };
 }
 
-export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
+export function HeroBanner({ author, focus, featuredItem, layoutOverride }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
   const config = FOCUS_CONFIG[focus];
   // The 3-column layouts' eyebrow shows author.heroTitle — a free-text field
@@ -71,7 +77,7 @@ export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
   // Author portrait — their own uploads only. The theme's scenic image is NOT a
   // portrait stand-in; it's used as the full hero backdrop below (subgenre themes).
   const photoSrc = author.heroImageUrl || author.profileImageUrl;
-  const layout = author.heroLayout ?? "author-right";
+  const layout = layoutOverride ?? author.heroLayout ?? "author-right";
 
   // Subgenre palettes (mountain/scuba/aviation) ship a scenic image used as the
   // full-bleed hero background, behind all content, with a dark overlay for text.
