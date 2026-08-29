@@ -115,6 +115,7 @@ export async function POST(req: NextRequest) {
       description: typeof body?.description === "string" ? body.description.trim() || null : null,
       coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : null,
       isPublished: body?.isPublished === true,
+      isFeatured: body?.isFeatured === true,
       // A music list is a flat set of tracks; the single module is structural.
       modules: { create: [{ title: "Tracks", sortOrder: 0, lessons: { create: rows } }] },
     },

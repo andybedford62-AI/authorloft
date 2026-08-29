@@ -172,6 +172,7 @@ model Author {
   showHeroBanner                Boolean               @default(true)
   heroFeaturedBookId            String?
   heroFeaturedBook              Book?                 @relation("HeroFeaturedBook", fields: [heroFeaturedBookId], references: [id])
+  heroFocus                     String? // "BOOKS" | "COURSES" | "MUSIC" | null. null = no explicit choice yet, auto-resolved from published-content presence (see resolveHeroFocus in src/lib/site-pages.ts). A stale value (type no longer published) self-heals at render time, so no validation needed here.
   homeTemplate                  String                @default("classic")
   booksLayout                   String                @default("list")
   siteTheme                     String                @default("classic-literary")
@@ -1602,6 +1603,7 @@ model Course {
   priceCents    Int                @default(0)
   isPublished   Boolean            @default(false)
   allowDownload Boolean            @default(true)
+  isFeatured    Boolean            @default(false) // author-marked "featured" item for the homepage hero, mirrors Book.isFeatured. Applies to both COURSE and MUSIC kind rows — ALWAYS filter by kind when querying "the featured one" (see CourseKind doc comment above).
   listInBookstore Boolean          @default(false) // author opt-in to the public AuthorLoft Bookstore (mirrors Book.listInBookstore)
   workbookFileKey  String?         // uploaded PDF/DOCX, mutually exclusive with workbookUrl
   workbookFileName String?

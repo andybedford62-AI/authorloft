@@ -19,6 +19,7 @@ type BrandingFormProps = {
     heroImageUrl: string;
     heroLayout: string;
     heroFeaturedBookId: string;
+    heroFocus: string;
     linkedinUrl: string;
     youtubeUrl: string;
     facebookUrl: string;
@@ -37,6 +38,8 @@ type BrandingFormProps = {
   };
   books: { id: string; title: string; coverImageUrl: string | null }[];
   planTier?: string;
+  /** Which content types this author has published — gates what Hero Focus offers. */
+  presence: { hasBooks: boolean; hasCourses: boolean; hasMusic: boolean };
 };
 
 type Tab = "profile" | "about" | "hero" | "social";
@@ -48,7 +51,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "social",  label: "Social & Contact" },
 ];
 
-export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingFormProps) {
+export function BrandingForm({ initial, books, planTier = "FREE", presence }: BrandingFormProps) {
   const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
 
@@ -85,6 +88,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
   const [heroTitle, setHeroTitle] = useState(initial.heroTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(initial.heroSubtitle);
   const [heroFeaturedBookId, setHeroFeaturedBookId] = useState(initial.heroFeaturedBookId);
+  const [heroFocus, setHeroFocus] = useState(initial.heroFocus);
   const [showHeroBanner, setShowHeroBanner] = useState(initial.showHeroBanner);
   const [aboutStats, setAboutStats] = useState<Stat[]>(initial.aboutStats);
   // Exactly 3 slots; empty string means "don't show"
@@ -224,7 +228,7 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
         profileImageUrl, logoUrl, heroImageUrl, heroLayout,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
         contactEmail, contactResponseTime, contactOpenTo,
-        heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
+        heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId, heroFocus,
         aboutStats, credentials,
         pressOutlets: pressOutlets.map(s => s.trim()).filter(Boolean),
       }),
@@ -630,6 +634,48 @@ export function BrandingForm({ initial, books, planTier = "FREE" }: BrandingForm
                   hint="Small text above the book title in the hero banner." />
                 <Input label="Hero Subtitle" value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)}
                   placeholder="e.g. Thrilling underwater mysteries by A.P. Bedford" />
+
+                {/* Hero Focus — which content type the homepage hero showcases.
+                    Only offers types this author actually has published, so an
+                    author who never publishes a Course/Music list can't select
+                    one they don't have. */}
+                {(() => {
+                  const options = [
+                    { value: "BOOKS", label: "Books", available: presence.hasBooks },
+                    { value: "COURSES", label: "Courses", available: presence.hasCourses },
+                    { value: "MUSIC", label: "Music", available: presence.hasMusic },
+                  ].filter((o) => o.available);
+
+                  if (options.length <= 1) {
+                    return (
+                      <p className="text-xs text-gray-400 italic">
+                        Your homepage hero shows {options[0]?.label ?? "your content"} — publish a Course or Music list to choose between them.
+                      </p>
+                    );
+                  }
+                  return (
+                    <div className="space-y-1">
+                      <label className="block text-sm font-medium text-gray-700">Hero Focus</label>
+                      <div className="flex gap-2">
+                        {options.map((o) => (
+                          <button
+                            key={o.value}
+                            type="button"
+                            onClick={() => setHeroFocus(o.value)}
+                            className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                              heroFocus === o.value
+                                ? "border-blue-500 bg-blue-50 text-blue-600"
+                                : "border-gray-200 text-gray-600 hover:border-gray-300"
+                            }`}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400">What your homepage hero banner showcases.</p>
+                    </div>
+                  );
+                })()}
 
                 {/* Featured Book Selector */}
                 <div className="space-y-1">

@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## August 30, 2026 — Hero Focus: homepage hero now showcases Books, Courses, or Music
+
+Authors who run Courses or Music (or all three, alongside Books) can now pick which one their homepage hero showcases, instead of the hero always assuming Books. The picker (Branding → Hero tab) only offers content types the author actually has published — an author with only Books+Music can't select Courses, and an author with just one type published sees an informational line instead of a real choice.
+
+New `Course.isFeatured` column (mirrors `Book.isFeatured`, applies to both `kind: COURSE` and `kind: MUSIC` rows — Course and Music editors each got their own "Featured" toggle) and `Author.heroFocus` (nullable; a stale choice — e.g. the author unpublished everything of that type — self-heals back to an available type at render time rather than showing a dead hero). `hero-banner.tsx` now branches CTA label ("Buy Now"/"Enroll Now"/"Listen Now"), link target, and cover art (the existing 3D-tilt effect stays Books-only; Courses/Music get a new flat `FlatCoverCard`) by the resolved focus. Cinematic's custom inline hero (it doesn't use `<HeroBanner>`) got its eyebrow label and "Browse X" CTA branched the same way; its separate "Featured Release" section stays Books-only.
+
+Also fixed a pre-existing gap in `plan-limits.ts`'s `OPEN_LIMITS` fallback: it was missing `musicEnabled`/`maxMusicLists`/`maxTracksPerList`, so a plan-less author could never create a Music list at all.
+
+---
+
 ## August 28, 2026 — Vault visual identity extended site-wide; corrects the August 15 "homepage-only" record
 
 The August 15 entry below (and the `memory/project_visual_identity_vault.md` it pointed to, which turned out not to exist) said Vault was scoped to the homepage only, pending "a follow-up pass." That was already inaccurate by the time this work started: Vault had quietly leaked into several shared components — the sitewide nav, the shared page-header band, pricing, features, FAQ, contact, and resources — through **four uncoordinated patterns**: a canonical `VAULT` import, locally duplicated `const VAULT` copies (two separate files), raw Tailwind hex classes with no token reference, and hex values hand-copied by value with no import at all (`marketing-nav.tsx` — invisible to a `grep "VAULT"` audit). Every other public page still ran the old Playfair/Inter, navy-gold-pill, centered-heading system in parallel, so the site had a jarring quality drop the moment a visitor clicked off the homepage.

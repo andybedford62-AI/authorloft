@@ -16,6 +16,9 @@ const OPEN_LIMITS = {
   preOrdersEnabled: true,
   coursesEnabled:  true,
   maxCourses:      null as number | null,
+  musicEnabled:    true,
+  maxMusicLists:   null as number | null,
+  maxTracksPerList: null as number | null,
 };
 
 // ─── Core lookup ─────────────────────────────────────────────────────────────

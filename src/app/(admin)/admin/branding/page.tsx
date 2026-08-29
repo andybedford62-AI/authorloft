@@ -2,11 +2,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { BrandingForm } from "@/components/admin/branding-form";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { getAuthorContentPresence } from "@/lib/author-queries";
 
 export default async function BrandingPage() {
   const authorId = await getAdminAuthorId();
 
-  const [author, books] = await Promise.all([
+  const [author, books, presence] = await Promise.all([
     prisma.author.findUnique({
       where: { id: authorId },
       select: {
@@ -16,6 +17,7 @@ export default async function BrandingPage() {
         heroImageUrl: true,
         heroLayout: true,
         heroFeaturedBookId: true,
+        heroFocus: true,
         linkedinUrl: true, youtubeUrl: true, facebookUrl: true,
         twitterUrl: true, instagramUrl: true, supportUrl: true,
         contactEmail: true, contactResponseTime: true, contactOpenTo: true,
@@ -32,6 +34,7 @@ export default async function BrandingPage() {
       select: { id: true, title: true, coverImageUrl: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     }),
+    getAuthorContentPresence(authorId),
   ]);
 
   if (!author) redirect("/login");
@@ -58,6 +61,7 @@ export default async function BrandingPage() {
     heroSubtitle:        author.heroSubtitle        ?? "",
     showHeroBanner:      author.showHeroBanner      ?? true,
     heroFeaturedBookId:  author.heroFeaturedBookId  ?? "",
+    heroFocus:           author.heroFocus           ?? "",
     aboutStats: Array.isArray(author.aboutStats)
       ? (author.aboutStats as { value: string; label: string }[])
       : [],
@@ -75,7 +79,7 @@ export default async function BrandingPage() {
           Update your photo, bio, and how your author site looks and feels.
         </p>
       </div>
-      <BrandingForm initial={initial} books={books} planTier={author.plan?.tier ?? "FREE"} />
+      <BrandingForm initial={initial} books={books} planTier={author.plan?.tier ?? "FREE"} presence={presence} />
     </div>
   );
 }

@@ -1,6 +1,34 @@
 // Builds the list of live public pages for an author's site, matching the
 // links shown in their site nav (see components/author-site/nav.tsx).
 
+import type { ContentPresence } from "@/lib/author-queries";
+
+export type HeroFocusType = "BOOKS" | "COURSES" | "MUSIC";
+
+/**
+ * Resolves what the homepage hero should showcase. A valid stored choice
+ * always wins (even after the author gains a new content type later — no
+ * silent auto-switch). A missing or stale choice (the stored type is no
+ * longer published) falls through to the first available type in
+ * Books > Courses > Music order, matching the existing isFeatured/heroBook
+ * fallback precedent already used per-type. Returns null only when the
+ * author has nothing published at all.
+ */
+export function resolveHeroFocus(
+  storedHeroFocus: string | null | undefined,
+  presence: ContentPresence
+): HeroFocusType | null {
+  const order: HeroFocusType[] = ["BOOKS", "COURSES", "MUSIC"];
+  const available = order.filter((t) =>
+    t === "BOOKS" ? presence.hasBooks : t === "COURSES" ? presence.hasCourses : presence.hasMusic
+  );
+  if (available.length === 0) return null;
+  if (storedHeroFocus && available.includes(storedHeroFocus as HeroFocusType)) {
+    return storedHeroFocus as HeroFocusType;
+  }
+  return available[0];
+}
+
 export interface AuthorSitePage {
   label: string;
   path: string;

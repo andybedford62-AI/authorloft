@@ -35,7 +35,7 @@ function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-export function CinematicTemplate({ author, books, series }: HomeTemplateProps) {
+export function CinematicTemplate({ author, books, courses, music, series }: HomeTemplateProps) {
   const accent       = author.accentColor || GOLD_DEFAULT;
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
@@ -44,8 +44,22 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
   // author.heroImageUrl || author.profileImageUrl precedent used by Classic/Bold);
   // falls back to the profile photo so authors who haven't set one still see something.
   const heroPhotoSrc = author.heroImageUrl || author.profileImageUrl;
-  // heroEyebrow: minimal type, used only for eyebrow label in the hero section
-  const heroEyebrow = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
+  // heroEyebrow: minimal type, used only for eyebrow label + Browse CTA in the
+  // hero section — this template has no cover-art hero slot (no HeroBanner
+  // call here), so heroFocus only ever needs to steer this text, not imagery.
+  // The separate Featured Release section below stays Books-only/untouched —
+  // it's a distinct, unconfirmed piece of scope.
+  const heroEyebrowBook   = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
+  const heroEyebrowCourse = courses.find((c) => c.isFeatured) ?? courses[0] ?? null;
+  const heroEyebrowMusic  = music.find((m) => m.isFeatured) ?? music[0] ?? null;
+  // Normalized to a common shape — Course/Music have no `caption` field (they
+  // have `description` instead), so the eyebrow simply omits it for those two.
+  const heroEyebrow: { title: string; caption: string | null } | null =
+    author.heroFocus === "COURSES" ? (heroEyebrowCourse && { title: heroEyebrowCourse.title, caption: null }) :
+    author.heroFocus === "MUSIC"   ? (heroEyebrowMusic && { title: heroEyebrowMusic.title, caption: null })  :
+    heroEyebrowBook;
+  const browseHref  = author.heroFocus === "COURSES" ? "/courses" : author.heroFocus === "MUSIC" ? "/music" : "/books";
+  const browseLabel = author.heroFocus === "COURSES" ? "Browse Courses" : author.heroFocus === "MUSIC" ? "Browse Music" : "Browse Books";
   // featuredBook: full BookForTemplate, used for the Featured Release section
   const featuredBook = books.find((b) => b.isFeatured) ?? books[0] ?? null;
   const headline    = author.heroTitle    || author.tagline || authorName;
@@ -126,11 +140,11 @@ export function CinematicTemplate({ author, books, series }: HomeTemplateProps) 
             {/* CTAs */}
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
-                href="/books"
+                href={browseHref}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
                 style={{ background: accent, color: NAVY_DEEP }}
               >
-                Browse Books <ArrowRight className="w-4 h-4" />
+                {browseLabel} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/about"

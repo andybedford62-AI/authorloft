@@ -12,7 +12,7 @@ import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline
 import { accentAsTextOn } from "@/lib/color-contrast";
 import type { HomeTemplateProps } from "./types";
 
-export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
+export function BoldTemplate({ author, books, courses, music, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
@@ -23,10 +23,19 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
   const accentOnDark  = accentAsTextOn(accentColor, "#111827");
   const accentOnLight = accentAsTextOn(accentColor, "#ffffff");
 
-  // Spotlight book: resolve through books[] so we get the full BookForTemplate type
+  // Spotlight book: resolve through books[] so we get the full BookForTemplate type.
+  // The heroFeaturedBook slug-match only applies to Books (there's no
+  // heroFeaturedCourseId/heroFeaturedMusicId override in scope) — Courses/Music
+  // use the plain isFeatured-then-first chain.
   const spotlightBook: typeof books[0] | null = author.heroFeaturedBook
     ? (books.find((b) => b.slug === author.heroFeaturedBook!.slug) ?? books.find((b) => b.isFeatured) ?? books[0] ?? null)
     : (books.find((b) => b.isFeatured) ?? books[0] ?? null);
+  const spotlightCourse = courses.find((c) => c.isFeatured) ?? courses[0] ?? null;
+  const spotlightMusic  = music.find((m) => m.isFeatured) ?? music[0] ?? null;
+  const spotlightItem =
+    author.heroFocus === "COURSES" ? spotlightCourse :
+    author.heroFocus === "MUSIC"   ? spotlightMusic  :
+    spotlightBook;
 
   // Remaining books — exclude the spotlight book from the grid
   const remainingBooks = books.filter((b) => b.id !== spotlightBook?.id).slice(0, 4);
@@ -38,7 +47,8 @@ export function BoldTemplate({ author, books, series }: HomeTemplateProps) {
       {author.showHeroBanner !== false && (
         <HeroBanner
           author={author}
-          featuredBook={spotlightBook}
+          focus={author.heroFocus}
+          featuredItem={spotlightItem}
         />
       )}
 

@@ -23,6 +23,7 @@ interface Props {
     description: string;
     coverImageUrl: string;
     isPublished: boolean;
+    isFeatured: boolean;
     tracks: TrackRow[];
   };
   /** Plan cap on tracks; null = unlimited. */
@@ -42,6 +43,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
   const [description, setDescription] = useState(initial?.description ?? "");
   const [coverImageUrl, setCoverImageUrl] = useState(initial?.coverImageUrl ?? "");
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
+  const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [blankTrack()]);
 
   const [saving, setSaving] = useState(false);
@@ -74,6 +76,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
         description,
         coverImageUrl,
         isPublished,
+        isFeatured,
         tracks: tracks.filter((t) => t.url.trim()),  // description + originalHtml ride along
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
@@ -131,6 +134,10 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
         <label className="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} className="rounded border-gray-300" />
           Published (visible on your public Music page)
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="rounded border-gray-300" />
+          Featured (shown as the hero highlight when your homepage focus is set to Music)
         </label>
       </div>
 

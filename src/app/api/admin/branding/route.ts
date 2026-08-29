@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
     profileImageUrl, logoUrl, heroImageUrl, heroLayout,
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
     contactEmail, contactResponseTime, contactOpenTo,
-    heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId,
+    heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId, heroFocus,
     aboutStats, credentials, pressOutlets,
   } = body;
 
@@ -93,6 +93,12 @@ export async function PATCH(req: NextRequest) {
       ...(typeof showHeroBanner === "boolean" && { showHeroBanner }),
       ...(heroFeaturedBookId !== undefined && {
         heroFeaturedBookId: heroFeaturedBookId || null,
+      }),
+      // A stale/invalid value self-heals at render time (resolveHeroFocus
+      // only honors it if that type is still published), so no enum
+      // validation is needed here.
+      ...(heroFocus !== undefined && {
+        heroFocus: ["BOOKS", "COURSES", "MUSIC"].includes(heroFocus) ? heroFocus : null,
       }),
       ...(Array.isArray(aboutStats) && { aboutStats }),
       ...(Array.isArray(credentials) && { credentials: credentials.slice(0, 3) }),

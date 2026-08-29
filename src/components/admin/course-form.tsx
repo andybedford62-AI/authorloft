@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2, Megaphone, CheckCircle2 } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2, Megaphone, CheckCircle2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -39,6 +39,7 @@ export interface CourseData {
   priceCents: number;
   isPublished: boolean;
   allowDownload: boolean;
+  isFeatured: boolean;
   listInBookstore: boolean;
   workbookFileKey: string | null;
   workbookFileName: string | null;
@@ -271,6 +272,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   );
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [allowDownload, setAllowDownload] = useState(initial?.allowDownload ?? true);
+  const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
   const [workbookFileKey, setWorkbookFileKey] = useState(initial?.workbookFileKey ?? "");
   const [workbookFileName, setWorkbookFileName] = useState(initial?.workbookFileName ?? "");
@@ -380,6 +382,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         priceCents,
         isPublished,
         allowDownload,
+        isFeatured,
         listInBookstore,
         workbookFileKey: workbookFileKey || null,
         workbookFileName: workbookFileName || null,
@@ -703,6 +706,22 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         <label htmlFor="isPublished" className="text-sm text-gray-700">
           Published (visible on your site)
         </label>
+      </div>
+
+      {/* Featured — the hero highlight when the author's homepage focus is set to Courses/Music */}
+      <div className="flex items-center gap-4 cursor-pointer select-none" onClick={() => setIsFeatured((v) => !v)}>
+        <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${isFeatured ? "bg-amber-500" : "bg-gray-300"}`}>
+          <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${isFeatured ? "translate-x-5" : "translate-x-1"}`} />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+            <Star className="h-3.5 w-3.5 text-amber-500" />
+            Featured
+          </p>
+          <p className="text-xs text-gray-400">
+            Shown as the hero highlight when your homepage focus is set to Courses.
+          </p>
+        </div>
       </div>
 
       {/* Announce to subscribers — edit mode only, once the saved course is published */}

@@ -65,6 +65,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         description: typeof body?.description === "string" ? body.description.trim() || null : existing.description,
         coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : existing.coverImageUrl,
         ...(typeof body?.isPublished === "boolean" ? { isPublished: body.isPublished } : {}),
+        ...(typeof body?.isFeatured === "boolean" ? { isFeatured: body.isFeatured } : {}),
       },
     });
 

@@ -1,20 +1,34 @@
 import Link from "next/link";
 import Image from "next/image";
+import { GraduationCap, Music as MusicIcon } from "lucide-react";
 import { BookCoverTilt } from "@/components/author-site/book-cover-tilt";
+import { FlatCoverCard } from "@/components/author-site/flat-cover-card";
 import { getTheme } from "@/lib/themes";
 import { THEME_HERO_IDS } from "@/lib/theme-hero-manifest";
 import { readableTextOn } from "@/lib/color-contrast";
 import type { AuthorForTemplate } from "./templates/types";
+import type { HeroFocusType } from "@/lib/site-pages";
 
 interface HeroBannerProps {
   author: AuthorForTemplate;
-  featuredBook: {
+  focus: HeroFocusType;
+  featuredItem: {
     title: string;
     slug: string;
     coverImageUrl: string | null;
     caption?: string | null;
   } | null;
 }
+
+const FOCUS_CONFIG: Record<
+  HeroFocusType,
+  { ctaLabel: string; hrefBase: string; useTilt: boolean; noun: string; icon: typeof GraduationCap }
+> = {
+  // icon is only ever read for non-tilt focuses (see useTilt), BOOKS keeps BookCoverTilt's own fallback icon.
+  BOOKS: { ctaLabel: "Buy Now", hrefBase: "/books", useTilt: true, noun: "Books", icon: GraduationCap },
+  COURSES: { ctaLabel: "Enroll Now", hrefBase: "/courses", useTilt: false, noun: "Courses", icon: GraduationCap },
+  MUSIC: { ctaLabel: "Listen Now", hrefBase: "/music", useTilt: false, noun: "Music", icon: MusicIcon },
+};
 
 // Background and scenic image stay theme-derived. The accent deliberately does
 // NOT come from here -- see the accent resolution in HeroBanner below.
@@ -31,8 +45,9 @@ function getHeroColors(siteTheme: string) {
   return { bg, defaultHeroImageUrl: heroImage };
 }
 
-export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
+export function HeroBanner({ author, focus, featuredItem }: HeroBannerProps) {
   const authorName = author.displayName || author.name;
+  const config = FOCUS_CONFIG[focus];
   const { bg, defaultHeroImageUrl } = getHeroColors(author.siteTheme);
   // Accent comes from the author, not the theme. resolveAccentColor() (see
   // lib/themes.ts) is documented as the effective accent "across the public
@@ -46,7 +61,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
   // PREMIUM two-tone override — falls back to accent-only styling when not set.
   const secondary = author.secondaryColor || accent;
   const hasSecondary = !!author.secondaryColor;
-  const buyHref = featuredBook ? `/books/${featuredBook.slug}` : "/books";
+  const buyHref = featuredItem ? `${config.hrefBase}/${featuredItem.slug}` : config.hrefBase;
   // Author portrait — their own uploads only. The theme's scenic image is NOT a
   // portrait stand-in; it's used as the full hero backdrop below (subgenre themes).
   const photoSrc = author.heroImageUrl || author.profileImageUrl;
@@ -92,7 +107,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               </span>
             )}
             <h1 className="text-3xl sm:text-5xl font-bold leading-tight author-font-heading">
-              {featuredBook?.title || `Books by ${authorName}`}
+              {featuredItem?.title || `${config.noun} by ${authorName}`}
             </h1>
             {author.heroSubtitle && (
               <p className="text-white/80 text-lg max-w-md">{author.heroSubtitle}</p>
@@ -103,7 +118,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl"
                 style={{ background: "#fff", color: accent }}
               >
-                Buy Now
+                {config.ctaLabel}
               </Link>
               <Link
                 href="/about"
@@ -115,17 +130,29 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
             </div>
           </div>
 
-          {/* Book cover */}
-          {featuredBook && (
+          {/* Featured item cover */}
+          {featuredItem && (
             <div className="flex-shrink-0">
-              <BookCoverTilt
-                href={buyHref}
-                title={featuredBook.title}
-                coverImageUrl={featuredBook.coverImageUrl}
-                caption={featuredBook.caption}
-                width={130}
-                height={195}
-              />
+              {config.useTilt ? (
+                <BookCoverTilt
+                  href={buyHref}
+                  title={featuredItem.title}
+                  coverImageUrl={featuredItem.coverImageUrl}
+                  caption={featuredItem.caption}
+                  width={130}
+                  height={195}
+                />
+              ) : (
+                <FlatCoverCard
+                  href={buyHref}
+                  title={featuredItem.title}
+                  coverImageUrl={featuredItem.coverImageUrl}
+                  caption={featuredItem.caption}
+                  width={130}
+                  height={195}
+                  icon={config.icon}
+                />
+              )}
             </div>
           )}
         </div>
@@ -144,20 +171,32 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
       className="flex justify-end items-center pr-6"
       style={{ perspective: "1200px", order: bookOrder }}
     >
-      {featuredBook ? (
+      {featuredItem ? (
         <div className="relative">
           <div
             className="absolute -inset-10 rounded-full opacity-60 blur-2xl pointer-events-none"
             style={{ background: `radial-gradient(ellipse, ${accent}40 0%, transparent 70%)` }}
           />
-          <BookCoverTilt
-            href={buyHref}
-            title={featuredBook.title}
-            coverImageUrl={featuredBook.coverImageUrl}
-            caption={featuredBook.caption}
-            width={240}
-            height={360}
-          />
+          {config.useTilt ? (
+            <BookCoverTilt
+              href={buyHref}
+              title={featuredItem.title}
+              coverImageUrl={featuredItem.coverImageUrl}
+              caption={featuredItem.caption}
+              width={240}
+              height={360}
+            />
+          ) : (
+            <FlatCoverCard
+              href={buyHref}
+              title={featuredItem.title}
+              coverImageUrl={featuredItem.coverImageUrl}
+              caption={featuredItem.caption}
+              width={240}
+              height={360}
+              icon={config.icon}
+            />
+          )}
         </div>
       ) : (
         <div className="w-48 h-72 rounded-xl opacity-20" style={{ background: `${accent}40` }} />
@@ -246,15 +285,27 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
 
       {/* ── Mobile layout ── */}
       <div className="relative z-10 flex flex-col items-center gap-8 px-6 py-16 text-center md:hidden">
-        {featuredBook && (
-          <BookCoverTilt
-            href={buyHref}
-            title={featuredBook.title}
-            coverImageUrl={featuredBook.coverImageUrl}
-            caption={featuredBook.caption}
-            width={160}
-            height={240}
-          />
+        {featuredItem && (
+          config.useTilt ? (
+            <BookCoverTilt
+              href={buyHref}
+              title={featuredItem.title}
+              coverImageUrl={featuredItem.coverImageUrl}
+              caption={featuredItem.caption}
+              width={160}
+              height={240}
+            />
+          ) : (
+            <FlatCoverCard
+              href={buyHref}
+              title={featuredItem.title}
+              coverImageUrl={featuredItem.coverImageUrl}
+              caption={featuredItem.caption}
+              width={160}
+              height={240}
+              icon={config.icon}
+            />
+          )
         )}
         <div className="flex flex-col items-center gap-4 max-w-sm">
           {author.heroTitle && (
@@ -274,7 +325,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               className="w-full py-3 px-6 text-sm font-bold uppercase tracking-widest rounded-xl text-center transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
               style={{ background: accent, color: readableTextOn(accent), boxShadow: `0 4px 24px ${accent}55` }}
             >
-              Buy Now
+              {config.ctaLabel}
             </Link>
             <Link
               href="/about"
@@ -326,7 +377,7 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
                 boxShadow: `0 4px 24px ${accent}55`,
               }}
             >
-              Buy Now
+              {config.ctaLabel}
             </Link>
             <Link
               href="/about"
@@ -336,9 +387,9 @@ export function HeroBanner({ author, featuredBook }: HeroBannerProps) {
               Meet the Author
             </Link>
           </div>
-          {featuredBook && (
+          {featuredItem && (
             <p className="text-xs uppercase tracking-widest pt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-              {featuredBook.title}
+              {featuredItem.title}
             </p>
           )}
         </div>

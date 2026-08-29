@@ -55,6 +55,7 @@ export default async function EditMusicListPage({
           description: list.description ?? "",
           coverImageUrl: list.coverImageUrl ?? "",
           isPublished: list.isPublished,
+          isFeatured: list.isFeatured,
           tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />

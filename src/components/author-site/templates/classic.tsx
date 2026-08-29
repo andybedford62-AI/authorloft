@@ -21,7 +21,7 @@ const SERIES_GRADIENTS = [
   ["#7c3aed", "#db2777"],   // violet → pink
 ];
 
-export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
+export function ClassicTemplate({ author, books, courses, music, series }: HomeTemplateProps) {
   const accentColor  = author.accentColor;
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
@@ -34,15 +34,23 @@ export function ClassicTemplate({ author, books, series }: HomeTemplateProps) {
   // Credential pills — filter out blanks, only render if at least one has text
   const credentialPills = (author.credentials ?? []).filter((c) => c?.trim());
 
-  // Featured book for hero: use heroFeaturedBook if set, otherwise fall back to isFeatured book
-  const heroBook = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
+  // Featured item for hero: use heroFeaturedBook if set, otherwise fall back to
+  // isFeatured, per content type — heroFocus (resolved server-side from
+  // published-content presence) picks which one HeroBanner actually shows.
+  const heroBook   = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
+  const heroCourse = courses.find((c) => c.isFeatured) ?? courses[0] ?? null;
+  const heroMusic  = music.find((m) => m.isFeatured) ?? music[0] ?? null;
+  const heroFeaturedItem =
+    author.heroFocus === "COURSES" ? heroCourse :
+    author.heroFocus === "MUSIC"   ? heroMusic  :
+    heroBook;
 
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
 
       {/* ── Hero Banner ────────────────────────────────────────────────────── */}
       {author.showHeroBanner !== false && (
-        <HeroBanner author={author} featuredBook={heroBook} />
+        <HeroBanner author={author} focus={author.heroFocus} featuredItem={heroFeaturedItem} />
       )}
 
       {/* ── Author Bio ──────────────────────────────────────────────────────── */}

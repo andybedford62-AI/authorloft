@@ -1,5 +1,7 @@
 // Shared prop types for all home page templates
 
+import type { HeroFocusType } from "@/lib/site-pages";
+
 export interface AuthorForTemplate {
   id: string;
   name: string;
@@ -19,6 +21,7 @@ export interface AuthorForTemplate {
   showHeroBanner: boolean;
   homeTemplate: string;
   heroFeaturedBook: { title: string; slug: string; coverImageUrl: string | null; caption: string | null } | null;
+  heroFocus: HeroFocusType;
   credentials: string[] | null;
   pressOutlets: string[];
   plan: { salesEnabled: boolean } | null;
@@ -59,9 +62,23 @@ export interface GenreForTemplate {
   children: { id: string; name: string; slug: string }[];
 }
 
+// Courses and Music share the same underlying Course model (kind discriminates
+// them) — one shape covers both here, same as elsewhere in the codebase.
+export interface CourseForTemplate {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  coverImageUrl: string | null;
+  isFeatured: boolean;
+  priceCents: number;
+}
+
 export interface HomeTemplateProps {
   author: AuthorForTemplate;
   books: BookForTemplate[];
+  courses: CourseForTemplate[];
+  music: CourseForTemplate[];
   series: SeriesForTemplate[];
   genreTree: GenreForTemplate[];
 }

@@ -73,6 +73,7 @@ export default async function EditCoursePage({ params }: Props) {
           priceCents: course.priceCents,
           isPublished: course.isPublished,
           allowDownload: course.allowDownload,
+          isFeatured: course.isFeatured,
           listInBookstore: course.listInBookstore,
           workbookFileKey: course.workbookFileKey,
           workbookFileName: course.workbookFileName,

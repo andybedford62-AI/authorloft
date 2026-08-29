@@ -98,6 +98,33 @@ export async function getAuthorBooks(authorId: string) {
   });
 }
 
+export type ContentPresence = { hasBooks: boolean; hasCourses: boolean; hasMusic: boolean };
+
+/** Whether an author has any *published* content of each type — used to gate which
+ *  options the Hero Focus picker offers (see resolveHeroFocus in @/lib/site-pages). */
+export async function getAuthorContentPresence(authorId: string): Promise<ContentPresence> {
+  const [books, courses, music] = await Promise.all([
+    prisma.book.count({ where: { authorId, isPublished: true } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE", isPublished: true } }),
+    prisma.course.count({ where: { authorId, kind: "MUSIC", isPublished: true } }),
+  ]);
+  return { hasBooks: books > 0, hasCourses: courses > 0, hasMusic: music > 0 };
+}
+
+export async function getAuthorCourses(authorId: string) {
+  return prisma.course.findMany({
+    where: { authorId, kind: "COURSE", isPublished: true },
+    orderBy: [{ displayOrder: "asc" }, { isFeatured: "desc" }, { createdAt: "desc" }],
+  });
+}
+
+export async function getAuthorMusic(authorId: string) {
+  return prisma.course.findMany({
+    where: { authorId, kind: "MUSIC", isPublished: true },
+    orderBy: [{ displayOrder: "asc" }, { isFeatured: "desc" }, { createdAt: "desc" }],
+  });
+}
+
 export async function getAuthorSeries(authorId: string) {
   return prisma.series.findMany({
     where: { authorId, books: { some: { isPublished: true } } },

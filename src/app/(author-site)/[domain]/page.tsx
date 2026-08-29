@@ -5,7 +5,11 @@ import {
   getAuthorBooks,
   getAuthorSeries,
   getAuthorGenres,
+  getAuthorCourses,
+  getAuthorMusic,
+  getAuthorContentPresence,
 } from "@/lib/author-queries";
+import { resolveHeroFocus } from "@/lib/site-pages";
 import { ClassicTemplate } from "@/components/author-site/templates/classic";
 import { MinimalTemplate } from "@/components/author-site/templates/minimal";
 import { BoldTemplate } from "@/components/author-site/templates/bold";
@@ -33,13 +37,24 @@ export default async function AuthorHomePage({
 }) {
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
-  const [books, series, genreTree] = await Promise.all([
+  const [books, series, genreTree, courses, music, presence] = await Promise.all([
     getAuthorBooks(author.id),
     getAuthorSeries(author.id),
     getAuthorGenres(author.id),
+    getAuthorCourses(author.id),
+    getAuthorMusic(author.id),
+    getAuthorContentPresence(author.id),
   ]);
+  const heroFocus = resolveHeroFocus(author.heroFocus, presence) ?? "BOOKS";
 
-  const props = { author, books, series, genreTree } as unknown as HomeTemplateProps;
+  const props = {
+    author: { ...author, heroFocus },
+    books,
+    courses,
+    music,
+    series,
+    genreTree,
+  } as unknown as HomeTemplateProps;
 
   switch (author.homeTemplate) {
     case "minimal":
