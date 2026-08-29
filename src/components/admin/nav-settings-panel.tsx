@@ -27,12 +27,20 @@ interface NavSettingsPanelProps {
   musicEnabled: boolean;
 }
 
+// Alphabetical by label (Home stays pinned above this list, rendered separately below).
 const BUILT_IN_ITEMS = [
   {
     key: "navShowAbout" as keyof NavSettings,
     label: "About",
     href: "/about",
     description: "Your author bio page",
+    alwaysOn: false,
+  },
+  {
+    key: "navShowBlog" as keyof NavSettings,
+    label: "Blog / News",
+    href: "/blog",
+    description: "Posts, announcements, and updates",
     alwaysOn: false,
   },
   {
@@ -43,42 +51,11 @@ const BUILT_IN_ITEMS = [
     alwaysOn: false,
   },
   {
-    key: "navShowSpecials" as keyof NavSettings,
-    label: "Specials",
-    href: "/specials",
-    description: "Promotions and special offers",
+    key: "navShowBookstore" as keyof NavSettings,
+    label: "Bookstore",
+    href: "AuthorLoft bookstore (external)",
+    description: "Cross-link to the AuthorLoft Bookstore so readers can discover more authors",
     alwaysOn: false,
-  },
-  {
-    key: "navShowFlipBooks" as keyof NavSettings,
-    label: "Flip Books",
-    href: "/flip-books",
-    description: "Interactive flip book reader",
-    alwaysOn: false,
-    planGated: true,
-  },
-  {
-    key: "navShowBlog" as keyof NavSettings,
-    label: "Blog / News",
-    href: "/blog",
-    description: "Posts, announcements, and updates",
-    alwaysOn: false,
-  },
-  {
-    key: "navShowContact" as keyof NavSettings,
-    label: "Contact",
-    href: "/contact",
-    description: "Contact form for readers",
-    alwaysOn: false,
-  },
-  {
-    key: "navShowMediaKit" as keyof NavSettings,
-    label: "Media Kit",
-    href: "/about",
-    description: "Press biography and downloadable assets — shown as a tab on your About page",
-    alwaysOn: false,
-    planGated: true,
-    planGateKey: "mediaKit" as const,
   },
   {
     key: "navShowBundles" as keyof NavSettings,
@@ -90,6 +67,13 @@ const BUILT_IN_ITEMS = [
     planGateKey: "bundles" as const,
   },
   {
+    key: "navShowContact" as keyof NavSettings,
+    label: "Contact",
+    href: "/contact",
+    description: "Contact form for readers",
+    alwaysOn: false,
+  },
+  {
     key: "navShowCourses" as keyof NavSettings,
     label: "Courses",
     href: "/courses",
@@ -97,6 +81,23 @@ const BUILT_IN_ITEMS = [
     alwaysOn: false,
     planGated: true,
     planGateKey: "courses" as const,
+  },
+  {
+    key: "navShowFlipBooks" as keyof NavSettings,
+    label: "Flip Books",
+    href: "/flip-books",
+    description: "Interactive flip book reader",
+    alwaysOn: false,
+    planGated: true,
+  },
+  {
+    key: "navShowMediaKit" as keyof NavSettings,
+    label: "Media Kit",
+    href: "/about",
+    description: "Press biography and downloadable assets — shown as a tab on your About page",
+    alwaysOn: false,
+    planGated: true,
+    planGateKey: "mediaKit" as const,
   },
   {
     key: "navShowMusic" as keyof NavSettings,
@@ -108,10 +109,10 @@ const BUILT_IN_ITEMS = [
     planGateKey: "music" as const,
   },
   {
-    key: "navShowBookstore" as keyof NavSettings,
-    label: "Bookstore",
-    href: "AuthorLoft bookstore (external)",
-    description: "Cross-link to the AuthorLoft Bookstore so readers can discover more authors",
+    key: "navShowSpecials" as keyof NavSettings,
+    label: "Specials",
+    href: "/specials",
+    description: "Promotions and special offers",
     alwaysOn: false,
   },
 ];
