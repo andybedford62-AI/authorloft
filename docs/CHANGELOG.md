@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Homepage "See the actual product" now shows Books, Courses, and Music
+
+The 3 screenshots in `ProductPreviewSection` (dashboard, theme picker, plus one author site) were all Books-only, same gap as the rest of the homepage work earlier today. Replaced with real screenshots of the founder's own live site (`apbedford.authorloft.com`, which has real published books, courses, and music) at its Books/Courses/Music-focused homepage states — converted from `.jpg` to `.webp` via `sharp` (`product-preview-books.webp`, `product-preview-courses.webp`, `product-preview-music.webp`).
+
+Also restructured the layout: the old "1 big + 2 stacked" grid assumed a wide dashboard screenshot and a wide theme-picker screenshot; all 3 new images are full-page portrait screenshots (~585×780-877px), so stacking two of them in a narrow column would have made the section very tall. Changed to a 3-equal-column row (`repeat(3, 1fr)`, single column on mobile) so all three sit side by side.
+
 ## September 3, 2026 — Signup type (Book/Course/Music) surfaced in Super Admin + email targeting
 
 `Author.creatorType` (what the author picked in the onboarding wizard) was tracked in the DB since it was introduced but never shown anywhere in Super Admin — no way to see or act on it. Added:

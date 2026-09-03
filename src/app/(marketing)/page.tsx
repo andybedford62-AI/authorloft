@@ -422,13 +422,30 @@ function ProductPreviewSection() {
     );
   }
 
+  const previews = [
+    {
+      src: "/product-preview-books.webp",
+      alt: "A live AuthorLoft author site",
+      caption: <>This is an author&apos;s actual site, <strong style={{ color: VAULT.ink }}>live right now</strong> — not a template preview.</>,
+    },
+    {
+      src: "/product-preview-courses.webp",
+      alt: "A live AuthorLoft site focused on courses",
+      caption: <>Same platform, <strong style={{ color: VAULT.ink }}>focused on courses</strong> — modules, lessons, and enrollment, no separate tool needed.</>,
+    },
+    {
+      src: "/product-preview-music.webp",
+      alt: "A live AuthorLoft site focused on music",
+      caption: <>And for musicians — <strong style={{ color: VAULT.ink }}>playlists that link straight to your tracks</strong>, shown right on your own site.</>,
+    },
+  ];
+
   return (
     <section style={{ background: VAULT.bgDeep, borderTop: `1px solid ${VAULT.line}`, borderBottom: `1px solid ${VAULT.line}`, padding: '64px 0' }}>
       <style>{`
-        .rdh-preview-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; }
-        .rdh-preview-stack { display: grid; gap: 24px; }
+        .rdh-preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: start; }
         @media (max-width: 900px) {
-          .rdh-preview-grid { grid-template-columns: 1fr; }
+          .rdh-preview-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
         }
       `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 28px' }}>
@@ -438,43 +455,18 @@ function ProductPreviewSection() {
             See the actual product.
           </h2>
           <p style={{ fontSize: '1.0625rem', color: VAULT.mute, maxWidth: 540, margin: 0, lineHeight: 1.72 }}>
-            These are real screenshots from a live AuthorLoft site. Nothing here is a mockup or a stock photo.
+            The same platform, three ways to use it — real screenshots from a live AuthorLoft site. Nothing here is a mockup or a stock photo.
           </p>
         </div>
         <div className="rdh-preview-grid">
-          <div>
-            <BrowserFrame
-              src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845641135.png"
-              alt="A live AuthorLoft author site"
-              aspectRatio="823 / 942"
-              chrome={false}
-            />
-            <p style={{ marginTop: 14, fontSize: '0.9rem', color: VAULT.mute, lineHeight: 1.6 }}>
-              This is an author&apos;s actual AuthorLoft site, <strong style={{ color: VAULT.ink }}>live right now</strong>, not a template preview.
-            </p>
-          </div>
-          <div className="rdh-preview-stack">
-            <div>
-              <BrowserFrame
-                src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845582294.png"
-                alt="The AuthorLoft dashboard"
-                aspectRatio="4 / 3.4"
-              />
+          {previews.map((p) => (
+            <div key={p.src}>
+              <BrowserFrame src={p.src} alt={p.alt} aspectRatio="3 / 4" chrome={false} />
               <p style={{ marginTop: 14, fontSize: '0.9rem', color: VAULT.mute, lineHeight: 1.6 }}>
-                <strong style={{ color: VAULT.ink }}>Your dashboard</strong> shows books, subscribers, and sales on one screen instead of five different tabs.
+                {p.caption}
               </p>
             </div>
-            <div>
-              <BrowserFrame
-                src="https://fweccazwdlrdbcrdbbev.supabase.co/storage/v1/object/public/book-covers/blog/cover-1786845608667.png"
-                alt="AuthorLoft theme picker with genre palettes"
-                aspectRatio="16 / 10.5"
-              />
-              <p style={{ marginTop: 14, fontSize: '0.9rem', color: VAULT.mute, lineHeight: 1.6 }}>
-                <strong style={{ color: VAULT.ink }}>Pick a theme built for your genre</strong>, and change it anytime without a developer.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
