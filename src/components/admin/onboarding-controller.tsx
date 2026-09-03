@@ -49,7 +49,7 @@ export function OnboardingController({
     !hasBio                    && { label: "Complete your author bio and profile photo", href: "/admin/branding",   icon: User },
     wantsBook   && !hasBook    && { label: "Add your first book",                        href: "/admin/books/new",  icon: BookOpen },
     wantsCourse && !hasCourse  && { label: "Add your first course",                      href: "/admin/courses/new", icon: GraduationCap },
-    wantsMusic  && !hasMusic   && { label: "Add your first music list",                  href: "/admin/music/new",  icon: Music },
+    wantsMusic  && !hasMusic   && { label: "Add your first music list / album",          href: "/admin/music/new",  icon: Music },
   ].filter(Boolean) as { label: string; href: string; icon: React.ElementType }[];
 
   return (

@@ -39,7 +39,7 @@ export default async function MusicListsPage() {
         </div>
         {!atCap && (
           <Link href="/admin/music/new">
-            <Button><Plus className="h-4 w-4 mr-2" />New Music List</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />New Music List / Album</Button>
           </Link>
         )}
       </div>
@@ -49,13 +49,13 @@ export default async function MusicListsPage() {
       {lists.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Music className="h-10 w-10 text-gray-200 mx-auto mb-4" />
-          <h2 className="text-lg font-semibold text-gray-700">No music lists yet</h2>
+          <h2 className="text-lg font-semibold text-gray-700">No music lists or albums yet</h2>
           <p className="text-sm text-gray-500 mt-2 mb-6 max-w-sm mx-auto">
             Import a YouTube playlist or paste your links above &mdash; YouTube and Spotify
             play inline, Suno and other sites open in a new tab. Nothing is uploaded.
           </p>
           <Link href="/admin/music/new">
-            <Button><Plus className="h-4 w-4 mr-2" />New Music List</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />New Music List / Album</Button>
           </Link>
         </div>
       ) : (

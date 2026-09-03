@@ -16,7 +16,7 @@ export default async function NewMusicListPage() {
         <Link href="/admin/music" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-3">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Music
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">New Music List</h1>
+        <h1 className="text-2xl font-bold text-gray-900">New Music List / Album</h1>
         <p className="text-sm text-gray-500 mt-1">
           Add tracks by pasting public links. Nothing is uploaded or stored here.
         </p>

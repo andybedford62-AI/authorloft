@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink,
+  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
@@ -116,7 +116,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
     <div className="space-y-6">
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">List title</label>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Music List / Album Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} placeholder="e.g. Songs for the Road" />
         </div>
         <div>
@@ -139,6 +139,15 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
           <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="rounded border-gray-300" />
           Featured (shown as the hero highlight when your homepage focus is set to Music)
         </label>
+        {!isPublished && (
+          <div className="flex items-start gap-2.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-800">
+            <EyeOff className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+            <span>
+              This is a draft — readers won&apos;t see it. Check <strong>Published</strong> above
+              and save to make it appear on your public Music page.
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -240,7 +249,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
             ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
             : isEdit
               ? <><Check className="h-4 w-4 mr-2" />Save changes</>
-              : <><Plus className="h-4 w-4 mr-2" />Create music list</>}
+              : <><Plus className="h-4 w-4 mr-2" />Create Music List / Album</>}
         </Button>
         {isEdit && (
           <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>

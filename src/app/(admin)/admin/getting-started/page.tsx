@@ -118,7 +118,7 @@ export default async function GettingStartedPage() {
       ],
     },
     {
-      key: "catalog", title: wantsMusic ? "Your First Music List" : wantsCourse && !wantsBook ? "Your First Course" : "Your First Book",
+      key: "catalog", title: wantsMusic ? "Your First Music List / Album" : wantsCourse && !wantsBook ? "Your First Course" : "Your First Book",
       subtitle: "The thing readers actually came for",
       items: [
         ...(wantsBook ? [
@@ -140,7 +140,7 @@ export default async function GettingStartedPage() {
           hint: "A title and one module is enough to start", href: "/admin/courses/new",
         }] : []),
         ...(wantsMusic ? [{
-          label: "Add your first music list", done: hasMusic,
+          label: "Add your first music list / album", done: hasMusic,
           hint: "Paste links to tracks — a title is enough to start", href: "/admin/music/new",
         }] : []),
       ],

@@ -19,6 +19,8 @@ The "What will you create first?" wizard shown to new signups offered Book / Cou
 
 Also fixed: `POST /api/admin/music` never stamped `onboardingCompletedAt` the way first-book/first-course creation does — a music-only signup would have been caught by the `onboarding-cleanup` cron's day-14 ghost-account deletion (which only checks for a *book*) despite having a live music list. Added the same stamp there.
 
+**Follow-up same day:** the music editor's Published/Featured checkboxes existed already but gave no active warning that an unpublished (draft) list stays invisible on the public Music page — added an amber reminder banner under those checkboxes, shown whenever "Published" is unchecked. Also relabeled the entity from "Music List" to "Music List / Album" across the admin surfaces an author actually sees creating one — `/admin/music` (page heading button, empty state), `/admin/music/new`, the editor's title field and Create button, and the onboarding/getting-started checklist items — since authors building a discography think in "albums," not "lists."
+
 ## August 30, 2026 — Hero Focus: homepage hero now showcases Books, Courses, or Music
 
 Authors who run Courses or Music (or all three, alongside Books) can now pick which one their homepage hero — and the sections right below it — showcases, instead of everything always assuming Books. The picker (Branding → Hero tab) only offers content types the author actually has published — an author with only Books+Music can't select Courses, and an author with just one type published sees an informational line instead of a real choice.
