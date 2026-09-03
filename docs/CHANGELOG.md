@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Main landing page now advertises Books, Courses, and Music
+
+The public homepage's messaging was 100% book-specific everywhere — hero headline ("You wrote the book. They keep the reader."), page `<title>`/OG/Twitter tags ("Your Books. Your Readers. Your Business."), and the JSON-LD `featureList`/`HowTo` structured data — despite Courses and Music (shipped Aug 24) being live features nobody landing on the homepage would ever learn about. Also found `/solutions` has a real "Sell Online Courses" entry but zero mention of Music at all; flagged separately as a follow-up rather than bundled into this change.
+
+Changes, scoped to what the user approved:
+- **Hero headline** (`rebrand-hero.tsx` fallback + the live `PlatformSettings.heroHeadlineLine1/2/heroSubheadline` DB row, updated directly via SQL since that content is DB-backed and bypasses the dev→staging→prod code pipeline entirely — it's live on production immediately): "You wrote the book. They keep the reader." → "You made the work. They keep the fans."; subheadline now explicitly says "whether you're selling books, courses, or music."
+- **Hero carousel** (`PainSolutionCards` in `rebrand-hero.tsx`, an existing 6-card auto-rotating pain/solution carousel that was Books/Authors-only, one card literally titled "For Authors") — added two cards: "For Course Creators" and "For Musicians", same pain/solution format.
+- **New "Built for every kind of creator" section** (`page.tsx`, `BuiltForSection`) — a 3-column strip (Authors / Course Creators / Musicians, one line each) placed directly under the hero, before the existing "What actually changes" section.
+- **SEO**: page title/OG/Twitter widened to "Your Books. Your Courses. Your Music. Your Business.", JSON-LD `featureList` gained "Online Course Creation & Sales" and "Music Lists & Link-Only Playlists", and the `HowTo` steps' copy now mentions all three content types instead of only books.
+
 ## September 3, 2026 — Signup onboarding gets a Music path; "Both" option retired
 
 The "What will you create first?" wizard shown to new signups offered Book / Course / Both — Music (shipped Aug 24) had no path through it at all. Replaced "Both" with a "Music" option: after the bio step it saves the author's profile and hands off to the existing `/admin/music/new` page (paste-links / YouTube-import form) rather than duplicating that UI as a wizard step — the author can save with just a title and add tracks later. Picking Music also switches off the Books/Courses nav links (`PUT /api/admin/nav-settings`) since a music-first author isn't publishing either. `creatorType` is now `"book" | "course" | "music"`; legacy `"both"` accounts are treated like `"book"` everywhere that value is read (`onboarding-controller.tsx`, `getting-started/page.tsx`) since the column is informational-only and never rewritten after signup.

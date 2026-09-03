@@ -84,6 +84,8 @@ const PAIN_CARDS = [
   { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.webp", title: "Your Platform" },
   { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.webp", title: "Your Brand" },
   { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.webp", title: "For Authors" },
+  { pain: "Course platforms take a cut and bury your brand", solution: "Your course, your platform, your price", image: "/hero-card-3.webp", title: "For Course Creators" },
+  { pain: "Streaming pays fractions of a cent per play", solution: "Link your tracks, keep every fan", image: "/hero-card-4.webp", title: "For Musicians" },
 ];
 
 function PainSolutionCards() {
@@ -237,10 +239,10 @@ export function RebelHero({
   subheadline?: string | null;
   demoUrl?: string | null;
 }) {
-  const line1 = headlineLine1 || "You wrote the book. They keep the reader.";
+  const line1 = headlineLine1 || "You made the work. They keep the fans.";
   const line2 = headlineLine2 || "Take it back.";
   const demoHref = demoUrl || "https://demo.authorloft.com";
-  const sub    = subheadline || "Every sale through someone else's storefront is a reader you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own list, and everything you earn. It's free to start and takes about fifteen minutes to launch.";
+  const sub    = subheadline || "Every sale through someone else's platform is someone you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own audience list, and everything you earn, whether you're selling books, courses, or music. It's free to start and takes about fifteen minutes to launch.";
 
   return (
     <section style={{ position: 'relative', background: VAULT.bg, overflow: 'hidden', minHeight: '56vh' }}>

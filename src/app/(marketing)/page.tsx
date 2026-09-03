@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
 import Image from "next/image";
+import { BookOpen, GraduationCap, Music } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
@@ -19,20 +20,20 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Your Books. Your Readers. Your Business.",
+    title: "Your Books. Your Courses. Your Music. Your Business.",
     description:
-      "Your own storefront, your own reader list, 100% of every sale. Free to start, live in 15 minutes.",
+      "Your own storefront for books, courses, or music — your own audience list, 100% of every sale. Free to start, live in 15 minutes.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders, all in one platform, free to start.",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your readers, your business" }],
+      title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
+      description: "Own your creative business with AuthorLoft. Your own storefront, your own audience list, 100% of every sale. Direct sales for books, courses, and music, newsletter campaigns, audience analytics, media kits, and pre-orders, all in one platform, free to start.",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Your Books. Your Readers. Your Business. | AuthorLoft",
-      description: "Own your author business with AuthorLoft. Your own storefront, your own reader list, 100% of every sale. Direct book sales, newsletter campaigns, reader analytics, media kits, and pre-orders, all in one platform, free to start.",
+      title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
+      description: "Own your creative business with AuthorLoft. Your own storefront, your own audience list, 100% of every sale. Direct sales for books, courses, and music, newsletter campaigns, audience analytics, media kits, and pre-orders, all in one platform, free to start.",
       images:      [ogImage],
     },
   };
@@ -102,10 +103,10 @@ const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "
 const webPageLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "AuthorLoft: Your Books. Your Readers. Your Business.",
+  name: "AuthorLoft: Your Books. Your Courses. Your Music. Your Business.",
   url: PLATFORM_URL,
   description:
-    "Own your author business with AuthorLoft. Direct sales, reader analytics, newsletter capture, and every tool to grow, all on one platform, free to start.",
+    "Own your creative business with AuthorLoft. Direct sales for books, courses, and music, audience analytics, newsletter capture, and every tool to grow, all on one platform, free to start.",
   isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: PLATFORM_URL },
   speakable: {
     "@type": "SpeakableSpecification",
@@ -123,12 +124,14 @@ const webPageLd = {
       description: "Free to start, no credit card required",
     },
     featureList: [
-      "Author Website Builder",
+      "Creator Website Builder",
       "Direct Book Sales (ebooks, print, audiobooks)",
+      "Online Course Creation & Sales",
+      "Music Lists & Link-Only Playlists",
       "Newsletter & Email Marketing",
-      "Reader Analytics",
+      "Audience Analytics",
       "ARC Management",
-      "Author Media Kit",
+      "Creator Media Kit",
       "AI Writing & Marketing Tools",
       "Indie Author Bookstore",
       "Book Pre-Orders",
@@ -143,26 +146,26 @@ const webPageLd = {
 const howToLd = {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  name: "How to launch and grow your independent author business with AuthorLoft",
-  description: "Three pillars to owning your author business: launch your storefront, sell direct, and own your reader list.",
+  name: "How to launch and grow your independent creator business with AuthorLoft",
+  description: "Three pillars to owning your creator business: launch your storefront, sell direct, and own your audience list.",
   step: [
     {
       "@type": "HowToStep",
       position: 1,
       name: "Your Storefront",
-      text: "Launch a beautiful author website with a built-in bookstore, live in 15 minutes. Your domain, your design, your brand.",
+      text: "Launch a beautiful website for your books, courses, or music, live in 15 minutes. Your domain, your design, your brand.",
     },
     {
       "@type": "HowToStep",
       position: 2,
       name: "Your Sales",
-      text: "Sell eBooks, audiobooks, and print direct to readers via Stripe. There's no platform fee, so every dollar from every sale goes straight to you.",
+      text: "Sell eBooks, audiobooks, print, and online courses direct to your audience via Stripe, or share music links, free. There's no platform fee, so every dollar from every sale goes straight to you.",
     },
     {
       "@type": "HowToStep",
       position: 3,
       name: "Your List",
-      text: "Capture reader emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.",
+      text: "Capture audience emails with newsletter campaigns and reader magnets. Own the list. Nobody can take it away, restrict it, or charge you to reach it.",
     },
   ],
 };
@@ -221,6 +224,9 @@ export default async function HomePage() {
 
       {/* ── Divider ───────────────────────────────────────────────────── */}
       <hr style={{ border: 'none', borderTop: `1px solid ${VAULT.line}` }} />
+
+      {/* ── Built for every kind of creator ─────────────────────────────── */}
+      <BuiltForSection />
 
       {/* ── What actually changes (consolidated problem/solution) ─────── */}
       <WhatChangesSection />
@@ -288,6 +294,43 @@ export default async function HomePage() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // Inline section components (specific to this redesign)
 // ═══════════════════════════════════════════════════════════════════════════════
+
+function BuiltForSection() {
+  const SERIF = VAULT.fontDisplay;
+  const cards = [
+    { icon: BookOpen,      label: "Authors",         copy: "Sell eBooks, audiobooks, and print, direct to readers." },
+    { icon: GraduationCap, label: "Course Creators",  copy: "Turn what you know into a paid course, hosted on your own site." },
+    { icon: Music,         label: "Musicians",        copy: "Share playlists and albums that link straight to your music — no cut taken." },
+  ];
+  return (
+    <section style={{ background: VAULT.surf, padding: '48px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, textAlign: 'center', marginBottom: 32 }}>
+          Built for every kind of creator
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
+          {cards.map(({ icon: Icon, label, copy }) => (
+            <div key={label} style={{ textAlign: 'center' }}>
+              <div style={{
+                width: 52, height: 52, margin: '0 auto 16px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: `${VAULT.gold}1a`, border: `1px solid ${VAULT.gold}44`,
+              }}>
+                <Icon size={22} color={VAULT.gold} />
+              </div>
+              <h3 style={{ fontFamily: SERIF, fontSize: '1.15rem', fontWeight: 600, fontStyle: 'italic', color: VAULT.ink, margin: '0 0 8px' }}>
+                {label}
+              </h3>
+              <p style={{ fontSize: '0.9rem', color: VAULT.mute, lineHeight: 1.6, margin: 0, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
+                {copy}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function WhatChangesSection() {
   const SERIF = VAULT.fontDisplay;
