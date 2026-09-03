@@ -24,6 +24,10 @@ Competitors researched fresh rather than assumed, since these are public factual
 
 New files: `src/lib/compare-hub-data.ts` (row data), `src/components/marketing/compare-hub-tabs.tsx` (client tab component). Added to the sitemap and linked from the pricing page's existing competitor table ("Teach courses or make music? See how AuthorLoft compares for those too").
 
+Verified live on staging: deployment for commit `61534241` confirmed, all 3 tabs switch and show the correct competitors, no errors traceable to the new page.
+
+**Same-day follow-up:** the page had exactly one entry point (that pricing-page link) — added a "Compare vs. the competition" link next to the existing "Compare every feature" link everywhere it appears, so discovery doesn't depend on scrolling to the bottom of a specific pricing-table section: the desktop Solutions dropdown (`marketing-nav-solutions.tsx`), the hero's own duplicate Solutions dropdown (`rebrand-hero.tsx`), the mobile menu (`marketing-mobile-menu.tsx`), and a secondary button on the `/solutions` hub page itself.
+
 ## September 3, 2026 — Music-support gap audit: dashboard checklist, onboarding emails, pricing table, hero picker
 
 Ran a full audit ("is there anything we missed?") of Music support across the platform after today's earlier onboarding/marketing/theme work. Found and fixed:

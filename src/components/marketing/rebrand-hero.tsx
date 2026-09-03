@@ -242,6 +242,9 @@ function HeroSolutionsDropdown() {
             <Link href="/features" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', marginBottom: 4, borderRadius: VAULT.radius, background: 'rgba(214,169,74,0.08)', fontSize: 12.5, fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
               Compare every feature
             </Link>
+            <Link href="/compare" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', marginBottom: 4, borderRadius: VAULT.radius, background: 'rgba(214,169,74,0.08)', fontSize: 12.5, fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
+              Compare vs. the competition
+            </Link>
             <div style={{ height: 1, background: VAULT.hair, margin: '4px 0' }} />
             {SOLUTION_CATEGORIES.map((cat) => (
               <Link key={cat.id} href={`/solutions#${cat.id}`} style={{ display: 'block', padding: '8px 10px', borderRadius: VAULT.radius, textDecoration: 'none' }}>

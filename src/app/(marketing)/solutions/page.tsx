@@ -77,9 +77,12 @@ export default function SolutionsPage() {
         </VaultSection>
       ))}
 
-      <div className="max-w-[1100px] mx-auto px-7 py-16 text-left">
+      <div className="max-w-[1100px] mx-auto px-7 py-16 text-left flex flex-wrap gap-3">
         <VaultButton href="/features" variant="primary">
           Compare every feature side-by-side <ArrowRight className="h-3.5 w-3.5" />
+        </VaultButton>
+        <VaultButton href="/compare" variant="secondary">
+          See how we compare vs. the competition <ArrowRight className="h-3.5 w-3.5" />
         </VaultButton>
       </div>
     </div>

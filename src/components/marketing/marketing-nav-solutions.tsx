@@ -33,6 +33,14 @@ export function MarketingNavSolutions() {
               <ChevronRight className="h-3.5 w-3.5 text-vault-gold flex-shrink-0" />
             </Link>
 
+            <Link
+              href="/compare"
+              className="flex items-center justify-between gap-3 bg-vault-gold/8 rounded-lg px-3 py-2.5 mb-2 hover:bg-vault-gold/14 transition-colors"
+            >
+              <span className="text-[13.5px] font-semibold text-vault-gold">Compare vs. the competition</span>
+              <ChevronRight className="h-3.5 w-3.5 text-vault-gold flex-shrink-0" />
+            </Link>
+
             <div className="border-t border-vault-ink/8 my-1.5" />
 
             {SOLUTION_CATEGORIES.map((cat) => (

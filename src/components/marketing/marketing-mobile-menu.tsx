@@ -92,6 +92,13 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
               >
                 Compare every feature →
               </Link>
+              <Link
+                href="/compare"
+                onClick={() => setOpen(false)}
+                className="py-2.5 pl-3 text-sm font-medium text-vault-gold border-b border-vault-ink/8 transition-colors"
+              >
+                Compare vs. the competition →
+              </Link>
 
               {/* Resources group */}
               <p className="pt-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-vault-mute">Resources</p>
