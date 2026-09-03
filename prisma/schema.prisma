@@ -160,7 +160,7 @@ model Author {
   contactResponseTime           String?
   contactOpenTo                 String?
   adminTheme                    String                @default("light") // admin UI preference: "light" | "dark"
-  creatorType                   String                @default("book") // onboarding path: "book" | "course" | "both" — set at first-login onboarding, editable never (informational only, doesn't gate features)
+  creatorType                   String                @default("book") // onboarding path: "book" | "course" | "music" (legacy accounts may still hold "both") — set at first-login onboarding, editable never (informational only, doesn't gate features)
   aiApiKey                      String?
   aiUsageCount                  Int                   @default(0)
   aiUsageCap                    Int                   @default(20)

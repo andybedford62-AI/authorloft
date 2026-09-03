@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, GraduationCap, User, ArrowRight, PlayCircle } from "lucide-react";
+import { BookOpen, GraduationCap, Music, User, ArrowRight, PlayCircle } from "lucide-react";
 import { OnboardingGuidedModal } from "./onboarding-guided-modal";
 
 export function OnboardingController({
@@ -10,12 +10,14 @@ export function OnboardingController({
   hasBio,
   hasBook,
   hasCourse = false,
+  hasMusic = false,
   creatorType = "book",
 }: {
   authorSlug: string;
   hasBio: boolean;
   hasBook: boolean;
   hasCourse?: boolean;
+  hasMusic?: boolean;
   creatorType?: string;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,14 +39,17 @@ export function OnboardingController({
   }
 
   // The signup-time choice only decides what's shown here as the "required" nudge —
-  // both content types stay fully available in admin regardless of creatorType.
-  const wantsCourse = creatorType === "course" || creatorType === "both";
-  const wantsBook   = creatorType !== "course";
+  // all content types stay fully available in admin regardless of creatorType.
+  // "both" is a legacy value from before the Music option existed; treat it like "book".
+  const wantsCourse = creatorType === "course";
+  const wantsMusic  = creatorType === "music";
+  const wantsBook   = !wantsCourse && !wantsMusic;
 
   const incompleteTasks = [
     !hasBio                    && { label: "Complete your author bio and profile photo", href: "/admin/branding",   icon: User },
     wantsBook   && !hasBook    && { label: "Add your first book",                        href: "/admin/books/new",  icon: BookOpen },
     wantsCourse && !hasCourse  && { label: "Add your first course",                      href: "/admin/courses/new", icon: GraduationCap },
+    wantsMusic  && !hasMusic   && { label: "Add your first music list",                  href: "/admin/music/new",  icon: Music },
   ].filter(Boolean) as { label: string; href: string; icon: React.ElementType }[];
 
   return (

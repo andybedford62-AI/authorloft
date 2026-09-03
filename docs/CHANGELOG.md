@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Signup onboarding gets a Music path; "Both" option retired
+
+The "What will you create first?" wizard shown to new signups offered Book / Course / Both — Music (shipped Aug 24) had no path through it at all. Replaced "Both" with a "Music" option: after the bio step it saves the author's profile and hands off to the existing `/admin/music/new` page (paste-links / YouTube-import form) rather than duplicating that UI as a wizard step — the author can save with just a title and add tracks later. Picking Music also switches off the Books/Courses nav links (`PUT /api/admin/nav-settings`) since a music-first author isn't publishing either. `creatorType` is now `"book" | "course" | "music"`; legacy `"both"` accounts are treated like `"book"` everywhere that value is read (`onboarding-controller.tsx`, `getting-started/page.tsx`) since the column is informational-only and never rewritten after signup.
+
+Also fixed: `POST /api/admin/music` never stamped `onboardingCompletedAt` the way first-book/first-course creation does — a music-only signup would have been caught by the `onboarding-cleanup` cron's day-14 ghost-account deletion (which only checks for a *book*) despite having a live music list. Added the same stamp there.
+
 ## August 30, 2026 — Hero Focus: homepage hero now showcases Books, Courses, or Music
 
 Authors who run Courses or Music (or all three, alongside Books) can now pick which one their homepage hero — and the sections right below it — showcases, instead of everything always assuming Books. The picker (Branding → Hero tab) only offers content types the author actually has published — an author with only Books+Music can't select Courses, and an author with just one type published sees an informational line instead of a real choice.

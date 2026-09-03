@@ -145,6 +145,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Mark onboarding complete on first music list — mirrors the same stamp on
+  // first book/course, so a music-first signup isn't flagged as a ghost by
+  // the onboarding-cleanup cron (which otherwise deletes bookless accounts).
+  await prisma.author.updateMany({
+    where: { id: authorId, onboardingCompletedAt: null },
+    data:  { onboardingCompletedAt: new Date() },
+  });
+
   const warnings: string[] = [];
   if (skipped > 0) warnings.push(`${skipped} link${skipped === 1 ? " was" : "s were"} not a usable https URL and ${skipped === 1 ? "was" : "were"} skipped.`);
   if (trimmed > 0) warnings.push(`Your plan allows ${cap} tracks per list — the first ${cap} were kept and ${trimmed} skipped.`);

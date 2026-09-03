@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  User, BookOpen, GraduationCap, ChevronRight, ChevronLeft,
+  User, BookOpen, GraduationCap, Music, ChevronRight, ChevronLeft,
   Upload, CheckCircle, ExternalLink, Loader2, X, Store, FileText,
 } from "lucide-react";
 
@@ -16,7 +16,7 @@ function toSlug(title: string): string {
   return base || `book-${Date.now()}`;
 }
 
-type CreatorType = "book" | "course" | "both";
+type CreatorType = "book" | "course" | "music";
 type Phase = "type" | "bio" | "book" | "course" | "celebration";
 
 interface BioState {
@@ -42,10 +42,12 @@ interface CourseState {
 }
 
 /** The phases that actually appear (in order) for a given creator type — used both
- *  to decide what's next and to compute the "Step X of N" progress indicator. */
+ *  to decide what's next and to compute the "Step X of N" progress indicator.
+ *  "music" has no in-wizard creation phase — bio is the last step before the
+ *  author is handed off to /admin/music/new (see handleContinueToMusic). */
 function getPhaseOrder(creatorType: CreatorType | null): Phase[] {
   if (creatorType === "course") return ["type", "bio", "course", "celebration"];
-  if (creatorType === "both")   return ["type", "bio", "book", "course", "celebration"];
+  if (creatorType === "music")  return ["type", "bio"];
   return ["type", "bio", "book", "celebration"]; // default / "book"
 }
 
@@ -120,6 +122,16 @@ export function OnboardingGuidedModal({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ creatorType: type }),
     }).catch(() => {});
+
+    // A music-first signup isn't publishing books or courses — hide those nav
+    // links so their live site doesn't show empty sections.
+    if (type === "music") {
+      fetch("/api/admin/nav-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ navShowBooks: false, navShowCourses: false }),
+      }).catch(() => {});
+    }
   }
 
   // ── Step navigation ──────────────────────────────────────────────────────
@@ -130,12 +142,52 @@ export function OnboardingGuidedModal({
       return;
     }
     setError(null);
+    if (creatorType === "music") {
+      handleContinueToMusic();
+      return;
+    }
     setPhase(creatorType === "course" ? "course" : "book");
   }
 
   function goBack() {
     setError(null);
     setPhase("bio");
+  }
+
+  // ── Music: save bio, then hand off to the dedicated music setup page ───────
+  // Music lists are built with a paste-links / YouTube-import form that
+  // already exists at /admin/music/new — no need to duplicate it as a wizard
+  // step. The author can save that page with just a title and add tracks later.
+
+  async function handleContinueToMusic() {
+    setError(null);
+    setSaving(true);
+    try {
+      let profileImageUrl: string | undefined;
+      if (bio.profileFile) {
+        const fd = new FormData();
+        fd.append("file", bio.profileFile);
+        const res = await fetch("/api/admin/upload/profile", { method: "POST", body: fd });
+        if (res.ok) profileImageUrl = (await res.json()).url;
+      }
+      const shortBio = bio.bio.trim().slice(0, 155);
+      await fetch("/api/admin/branding", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bio: bio.bio.trim(),
+          shortBio,
+          tagline:      bio.tagline.trim()      || undefined,
+          contactEmail: bio.contactEmail.trim() || undefined,
+          ...(profileImageUrl ? { profileImageUrl } : {}),
+        }),
+      });
+
+      router.push("/admin/music/new");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSaving(false);
+    }
   }
 
   // ── Create book ───────────────────────────────────────────────────────────
@@ -200,7 +252,7 @@ export function OnboardingGuidedModal({
       }
 
       setCreatedBook(true);
-      setPhase(creatorType === "both" ? "course" : "celebration");
+      setPhase("celebration");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -300,7 +352,7 @@ export function OnboardingGuidedModal({
           </p>
           <h2 className="text-2xl font-bold text-gray-900">What will you create first?</h2>
           <p className="text-sm text-gray-500 mt-1 mb-6">
-            You can always add the other one later — nothing here is locked in.
+            You can always add more later — nothing here is locked in.
           </p>
 
           <div className="space-y-3">
@@ -317,10 +369,10 @@ export function OnboardingGuidedModal({
               onClick={() => handleTypeSelect("course")}
             />
             <TypeOption
-              icon={CheckCircle}
-              title="Both"
-              desc="Set up a book first, then add a course right after."
-              onClick={() => handleTypeSelect("both")}
+              icon={Music}
+              title="Music"
+              desc="Share playlists and albums — link out to Spotify, YouTube, and more."
+              onClick={() => handleTypeSelect("music")}
             />
           </div>
         </div>
@@ -356,7 +408,7 @@ export function OnboardingGuidedModal({
             onClick={() => setPhase("type")}
             className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 mb-4"
           >
-            <ChevronLeft className="h-3 w-3" /> Change what I&apos;m creating{creatorType ? ` (currently: ${creatorType === "both" ? "Book + Course" : creatorType === "course" ? "Course" : "Book"})` : ""}
+            <ChevronLeft className="h-3 w-3" /> Change what I&apos;m creating{creatorType ? ` (currently: ${creatorType === "music" ? "Music" : creatorType === "course" ? "Course" : "Book"})` : ""}
           </button>
 
           {/* Profile photo */}
@@ -451,9 +503,14 @@ export function OnboardingGuidedModal({
 
           <button
             onClick={goNext}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+            disabled={saving}
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Next: Add Your {creatorType === "course" ? "Course" : "Book"} <ChevronRight className="h-4 w-4" />
+            {saving ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+            ) : (
+              <>Next: Add Your {creatorType === "course" ? "Course" : creatorType === "music" ? "Music" : "Book"} <ChevronRight className="h-4 w-4" /></>
+            )}
           </button>
         </div>
       </Shell>
@@ -570,8 +627,6 @@ export function OnboardingGuidedModal({
             >
               {saving ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> Publishing...</>
-              ) : creatorType === "both" ? (
-                <>Next: Add Your Course <ChevronRight className="h-4 w-4" /></>
               ) : (
                 <>Publish My Site <ChevronRight className="h-4 w-4" /></>
               )}
@@ -694,16 +749,6 @@ export function OnboardingGuidedModal({
               )}
             </button>
           </div>
-
-          {creatorType === "both" && (
-            <button
-              onClick={() => setPhase("celebration")}
-              disabled={saving}
-              className="w-full text-center text-xs text-gray-400 hover:text-gray-600 mt-3"
-            >
-              Skip for now — I&apos;ll add my course later
-            </button>
-          )}
 
           <p className="text-center text-xs text-gray-400 mt-3">
             You can add more modules, lessons, and video after publishing.

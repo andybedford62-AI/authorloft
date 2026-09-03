@@ -208,7 +208,7 @@ function ChecklistRow({
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
 
-  const [data, authorMeta, customPages, courseCount] = await Promise.all([
+  const [data, authorMeta, customPages, courseCount, musicCount] = await Promise.all([
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
@@ -255,6 +255,7 @@ export default async function DashboardPage() {
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
     prisma.course.count({ where: { authorId, kind: "COURSE" } }),
+    prisma.course.count({ where: { authorId, kind: "MUSIC" } }),
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
@@ -345,6 +346,7 @@ export default async function DashboardPage() {
           hasBio={hasProfile}
           hasBook={hasBook}
           hasCourse={courseCount > 0}
+          hasMusic={musicCount > 0}
           creatorType={authorMeta?.creatorType}
         />
       )}

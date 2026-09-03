@@ -24,7 +24,7 @@ type Section = {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 async function getData(authorId: string) {
-  const [author, books, courseCount] = await Promise.all([
+  const [author, books, courseCount, musicCount] = await Promise.all([
     prisma.author.findUnique({
       where:  { id: authorId },
       select: {
@@ -47,22 +47,26 @@ async function getData(authorId: string) {
       },
     }),
     prisma.course.count({ where: { authorId, kind: "COURSE" } }),
+    prisma.course.count({ where: { authorId, kind: "MUSIC" } }),
   ]);
 
-  return { author, books, courseCount };
+  return { author, books, courseCount, musicCount };
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function GettingStartedPage() {
   const authorId = await getAdminAuthorId();
-  const { author, books, courseCount } = await getData(authorId);
+  const { author, books, courseCount, musicCount } = await getData(authorId);
 
-  const wantsBook   = author?.creatorType !== "course";
-  const wantsCourse = author?.creatorType === "course" || author?.creatorType === "both";
+  // "both" is a legacy value from before the Music option existed; treat it like "book".
+  const wantsCourse = author?.creatorType === "course";
+  const wantsMusic  = author?.creatorType === "music";
+  const wantsBook   = !wantsCourse && !wantsMusic;
 
   const hasBook   = books.length > 0;
   const hasCourse = courseCount > 0;
+  const hasMusic  = musicCount > 0;
   const incompleteBookCount = books.filter((b) => !getBookCompletionSummary({
     coverImageUrl:        b.coverImageUrl,
     description:          b.description,
@@ -114,7 +118,7 @@ export default async function GettingStartedPage() {
       ],
     },
     {
-      key: "catalog", title: wantsCourse && !wantsBook ? "Your First Course" : "Your First Book",
+      key: "catalog", title: wantsMusic ? "Your First Music List" : wantsCourse && !wantsBook ? "Your First Course" : "Your First Book",
       subtitle: "The thing readers actually came for",
       items: [
         ...(wantsBook ? [
@@ -134,6 +138,10 @@ export default async function GettingStartedPage() {
         ...(wantsCourse ? [{
           label: "Add your first course", done: hasCourse,
           hint: "A title and one module is enough to start", href: "/admin/courses/new",
+        }] : []),
+        ...(wantsMusic ? [{
+          label: "Add your first music list", done: hasMusic,
+          hint: "Paste links to tracks — a title is enough to start", href: "/admin/music/new",
         }] : []),
       ],
     },

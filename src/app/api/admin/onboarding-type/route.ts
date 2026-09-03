@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
-const VALID_TYPES = ["book", "course", "both"] as const;
+const VALID_TYPES = ["book", "course", "music"] as const;
 
 export async function PATCH(req: NextRequest) {
   const authorId = await getAdminAuthorIdForApi();
@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest) {
 
   const { creatorType } = await req.json();
   if (!VALID_TYPES.includes(creatorType)) {
-    return NextResponse.json({ error: "creatorType must be 'book', 'course', or 'both'." }, { status: 400 });
+    return NextResponse.json({ error: "creatorType must be 'book', 'course', or 'music'." }, { status: 400 });
   }
 
   await prisma.author.update({
