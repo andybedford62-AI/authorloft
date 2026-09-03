@@ -587,17 +587,27 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                               ? "border-blue-500 bg-blue-50 cursor-pointer"
                               : "border-gray-200 hover:border-gray-300 cursor-pointer"
                           }`}>
-                          <div className="flex gap-1 w-full h-8">
+                          <div className="flex gap-1.5 w-full h-8 items-center">
                             {value === "author-left" && (
                               <>
-                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
-                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
+                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                                  <User className="w-4 h-4 text-gray-500" />
+                                </div>
+                                <div className="flex-1 h-8 rounded bg-gray-100 flex flex-col justify-center gap-1 px-2">
+                                  <div className="h-1 bg-gray-300 rounded w-3/4" />
+                                  <div className="h-1 bg-gray-300 rounded w-1/2" />
+                                </div>
                               </>
                             )}
                             {value === "author-right" && (
                               <>
-                                <div className="flex-1 rounded bg-gray-100 flex items-center justify-center text-[8px] text-gray-400">Book+Text</div>
-                                <div className="w-2/5 rounded bg-gray-300 flex items-center justify-center text-[8px] text-gray-500">Photo</div>
+                                <div className="flex-1 h-8 rounded bg-gray-100 flex flex-col justify-center gap-1 px-2">
+                                  <div className="h-1 bg-gray-300 rounded w-3/4" />
+                                  <div className="h-1 bg-gray-300 rounded w-1/2" />
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                                  <User className="w-4 h-4 text-gray-500" />
+                                </div>
                               </>
                             )}
                             {value === "portrait" && (

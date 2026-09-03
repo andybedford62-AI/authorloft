@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   const author = await prisma.author.findUnique({
     where:  { id: authorId },
-    select: { id: true, email: true, name: true, displayName: true, slug: true, isSuperAdmin: true, onboardingCompletedAt: true },
+    select: { id: true, email: true, name: true, displayName: true, slug: true, isSuperAdmin: true, onboardingCompletedAt: true, creatorType: true },
   });
 
   if (!author || author.isSuperAdmin || author.onboardingCompletedAt) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
   if (action === "remind") {
     const name = author.displayName || author.name;
-    await sendOnboardingReminderEmail(author.email, name, author.slug);
+    await sendOnboardingReminderEmail(author.email, name, author.slug, author.creatorType);
     await prisma.author.update({
       where: { id: authorId },
       data:  { onboardingReminderSentAt: new Date() },

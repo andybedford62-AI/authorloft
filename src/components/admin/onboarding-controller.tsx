@@ -68,7 +68,7 @@ export function OnboardingController({
             <div className="flex-1">
               <h2 className="font-semibold text-blue-900 mb-0.5">Finish setting up your author site</h2>
               <p className="text-sm text-blue-700 mb-4">
-                Complete these steps so readers see a full profile and book when they visit your site.
+                Complete these steps so visitors see a full profile and {wantsMusic ? "your music" : wantsCourse ? "your course" : "a book"} when they visit your site.
               </p>
               <ul className="space-y-2.5">
                 {incompleteTasks.map(({ label, href, icon: Icon }) => (

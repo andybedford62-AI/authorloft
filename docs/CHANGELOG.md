@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Music-support gap audit: dashboard checklist, onboarding emails, pricing table, hero picker
+
+Ran a full audit ("is there anything we missed?") of Music support across the platform after today's earlier onboarding/marketing/theme work. Found and fixed:
+
+- **Admin dashboard's own checklist** (`admin/dashboard/page.tsx`) required "Add your first book" as a mandatory step for every author regardless of `creatorType`, unlike `getting-started` and the onboarding controller which both already branched correctly — a Music-only author could never reach "all done." Now branches the required first-content step by creatorType (book/course/music), matching the existing pattern elsewhere.
+- **Transactional onboarding emails were hardcoded to "book"** (`lib/mailer.ts`): the day-3 and day-7 reminder emails (subject, body, CTA button, and link target) now branch by `creatorType` via a shared `onboardingReminderCopy()` helper — a musician gets "Add My First Music List" → `/admin/music/new`, not a book nag. Threaded `creatorType` through the 3 call sites (`cron/onboarding-cleanup`, `super-admin/ghost-users`). The immediate welcome email couldn't be branched the same way — `creatorType` genuinely isn't chosen yet when it sends (it fires before the user ever sees the onboarding wizard) — so its "first 3 steps" and upgrade-pitch copy were genericized instead ("book, course, or music list" rather than assuming books).
+- **Pricing page comparison table** fetched `musicEnabled`/`maxMusicLists`/`maxTracksPerList` but never rendered a Music row (Author Courses had one, Music didn't) — added to both the AuthorLoft-vs-plan-tier table and the AuthorLoft-vs-competitors table.
+- **Branding → Hero "Banner Style" picker**: user reported "Author Left" and "Author Right" looked identical in the tiny preview diagram (both were 8px-text shaded boxes, mirrored but easy to miss). Verified the actual live rendering (`hero-banner.tsx`) genuinely differs between them — this was a picker-legibility issue, not a functional bug — replaced the diagram with a circular photo-icon whose left/right position makes the difference obvious at a glance.
+
+Flagged as a separate follow-up (not fixed today, bigger scope): `src/lib/comparison-data.tsx` powering `/compare/[competitor]` pages is 100% book-only (77 "book" mentions, 0 "course"/"music").
+
 ## September 3, 2026 — 8 new Music Genre Palettes; "Minimal" page structure retired
 
 Added 8 hand-crafted colour palettes for musicians (Rock, Country, Pop, Hip-Hop, Electronic/EDM, Jazz, Classical, R&B/Soul) to `src/lib/themes.ts`, matching the existing book genre palette system (full HSL colour system in `globals.css`, 9-swatch preview strip, mood tag). Kept as a separate `MUSIC_GENRE_PALETTES` export (not merged into `STYLE_PALETTES`) so `/admin/appearance` renders them in their own "Music Genre Palettes" section instead of one long mixed grid of book and music genres — same Standard+ availability as the book palettes.

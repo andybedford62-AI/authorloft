@@ -110,11 +110,13 @@ const COMPETITOR_ROWS: Array<{
   { label: "3rd-Party Integrations",  authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✓", type: "yes" },  bookfunnel: { val: "✓", type: "yes" }      },
   { label: "Book Bundles",            authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
   { label: "Author Courses",          authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
+  { label: "Music Lists",             authorloft: { val: "✓", type: "yes" },      tertulia: { val: "✗", type: "no" },        quilltips: { val: "✗", type: "no" },         storyorigin: { val: "✗", type: "no" },   bookfunnel: { val: "✗", type: "no" }       },
 ];
 
-// Feature comparison table rows. "Books" / "News posts" / "Author Courses" are
-// computed live from each plan's quantity limits (see buildComparisonRows) —
-// everything else here is curated marketing copy, not a raw feature-flag mirror.
+// Feature comparison table rows. "Books" / "News posts" / "Author Courses" /
+// "Music Lists" are computed live from each plan's quantity limits (see
+// buildComparisonRows) — everything else here is curated marketing copy, not
+// a raw feature-flag mirror.
 function buildComparisonRows(plans: Awaited<ReturnType<typeof getActivePlans>>) {
   const free = planByTier(plans, "FREE");
   const standard = planByTier(plans, "STANDARD");
@@ -132,6 +134,7 @@ function buildComparisonRows(plans: Awaited<ReturnType<typeof getActivePlans>>) 
     { label: "Discount Codes",     free: "✓",         standard: "✓",          premium: "✓"          },
     { label: "Book Bundles",       free: "—",         standard: "✓",          premium: "✓"          },
     { label: "Author Courses",     free: free?.coursesEnabled ? formatLimit(free?.maxCourses, 5) : "—", standard: standard?.coursesEnabled ? formatLimit(standard?.maxCourses, 25) : "—", premium: premium?.coursesEnabled ? formatLimit(premium?.maxCourses, 0) : "—" },
+    { label: "Music Lists",        free: free?.musicEnabled ? formatLimit(free?.maxMusicLists, 5) : "—", standard: standard?.musicEnabled ? formatLimit(standard?.maxMusicLists, 20) : "—", premium: premium?.musicEnabled ? formatLimit(premium?.maxMusicLists, 0) : "—" },
     { label: "Flip book previews", free: "—",         standard: "✓",          premium: "✓"          },
     { label: "Sales analytics",    free: "—",         standard: "—",          premium: "✓"          },
     { label: "Support Link (Patreon, Ko-fi)", free: "✓", standard: "✓",       premium: "✓"          },

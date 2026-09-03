@@ -262,9 +262,20 @@ export default async function DashboardPage() {
   // Bio alone satisfies "complete profile" — photo is optional since new onboarding flow
   const hasProfile     = !!authorMeta?.bio;
   const hasBook        = data.books.length > 0;
+  const hasCourse      = courseCount > 0;
+  const hasMusic       = musicCount > 0;
   const hasStripe      = !!authorMeta?.stripeConnectOnboarded;
   const hasFile        = !!(authorMeta?.books?.[0]?.directSaleItems?.length);
   const salesEnabled   = !!authorMeta?.plan?.salesEnabled;
+
+  // "both" is a legacy value from before the Music option existed; treat it like "book".
+  const wantsCourse = authorMeta?.creatorType === "course";
+  const wantsMusic  = authorMeta?.creatorType === "music";
+  const firstContentStep = wantsMusic
+    ? { done: hasMusic, label: "Add your first music list / album", hint: "Paste links to tracks — a title is enough to start", href: "/admin/music/new" }
+    : wantsCourse
+    ? { done: hasCourse, label: "Add your first course", hint: "A title and one module is enough to start", href: "/admin/courses/new" }
+    : { done: hasBook, label: "Add your first book", hint: "Upload a cover, description, and set your price", href: "/admin/books/new" };
 
   const checklistSteps = [
     {
@@ -282,10 +293,10 @@ export default async function DashboardPage() {
       optional: false,
     },
     {
-      done: hasBook,
-      label: "Add your first book",
-      hint: "Upload a cover, description, and set your price",
-      href: "/admin/books/new",
+      done: firstContentStep.done,
+      label: firstContentStep.label,
+      hint: firstContentStep.hint,
+      href: firstContentStep.href,
       optional: false,
     },
     {

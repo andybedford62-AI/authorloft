@@ -38,13 +38,13 @@ export async function GET(req: NextRequest) {
       emailVerified:                 { gte: day4, lte: day3 },
       books:                         { none: {} },
     },
-    select: { id: true, email: true, name: true, displayName: true, slug: true },
+    select: { id: true, email: true, name: true, displayName: true, slug: true, creatorType: true },
   });
 
   let earlyReminded = 0;
   for (const author of needsEarlyReminder) {
     const name = author.displayName || author.name;
-    sendOnboardingEarlyReminderEmail(author.email, name, author.slug)
+    sendOnboardingEarlyReminderEmail(author.email, name, author.slug, author.creatorType)
       .catch((e) => console.error(`[cron/onboarding-cleanup] Early reminder failed for ${author.id}:`, e));
 
     await prisma.author.update({
@@ -63,13 +63,13 @@ export async function GET(req: NextRequest) {
       emailVerified:            { gte: day8, lte: day7 },
       books:                    { none: {} },
     },
-    select: { id: true, email: true, name: true, displayName: true, slug: true },
+    select: { id: true, email: true, name: true, displayName: true, slug: true, creatorType: true },
   });
 
   let reminded = 0;
   for (const author of needsReminder) {
     const name = author.displayName || author.name;
-    sendOnboardingReminderEmail(author.email, name, author.slug)
+    sendOnboardingReminderEmail(author.email, name, author.slug, author.creatorType)
       .catch((e) => console.error(`[cron/onboarding-cleanup] Reminder email failed for ${author.id}:`, e));
 
     await prisma.author.update({

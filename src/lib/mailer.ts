@@ -385,18 +385,18 @@ Your site: {{siteUrl}}
 
 ─── Your first 3 steps ───
 
-1. Add your books — Head to the Books menu and add your first title. Include a cover, description, and buy links.
-2. Personalise your site — Upload your author photo, write your bio, and set your accent colour in Appearance.
-3. Share your link — Post your site URL on social, add it to your email signature, and tell your readers.
+1. Add your first book, course, or music list — whichever you're here to share. Add it from your dashboard with a cover, description, and buy links (or track links, for music).
+2. Personalise your site — Upload your photo, write your bio, and set your accent colour in Appearance.
+3. Share your link — Post your site URL on social, add it to your email signature, and tell your audience.
 
 ─── When you're ready to grow ───
 
 Your free plan is a great start. Here's what unlocks on Standard ($19.99/mo):
-• Sell books directly — Keep more revenue. No middlemen.
-• Custom domain — Use your own authorname.com address.
-• Up to 20 books — Room to grow your catalog.
+• Sell direct — Keep more revenue. No middlemen.
+• Custom domain — Use your own name.com address.
+• More room to grow — Add more books, courses, or music lists.
 
-And on Premium ($59.99/mo): unlimited books plus full analytics so you can see exactly who's finding you and where they come from.
+And on Premium ($59.99/mo): unlimited books, courses, and music lists plus full analytics so you can see exactly who's finding you and where they come from.
 
 No pressure — upgrade whenever it makes sense.
 
@@ -1034,33 +1034,47 @@ export async function sendRenewalReminderEmail({
   });
 }
 
+// ── Onboarding reminder copy — branches by what the author signed up to create
+// (Author.creatorType) so a Course/Music signup doesn't get nagged about "books". ──
+
+function onboardingReminderCopy(creatorType: string | null | undefined) {
+  if (creatorType === "course") {
+    return { noun: "course", ctaLabel: "Add My First Course", listHref: "/admin/courses", newHref: "/admin/courses/new" };
+  }
+  if (creatorType === "music") {
+    return { noun: "music list", ctaLabel: "Add My First Music List", listHref: "/admin/music", newHref: "/admin/music/new" };
+  }
+  return { noun: "book", ctaLabel: "Add My First Book", listHref: "/admin/books", newHref: "/admin/books/new" };
+}
+
 // ── Onboarding reminder email (to author) ────────────────────────────────────
 
-export async function sendOnboardingReminderEmail(to: string, name: string, slug: string) {
+export async function sendOnboardingReminderEmail(to: string, name: string, slug: string, creatorType?: string | null) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-  const dashboardUrl   = `${baseUrl()}/admin/books`;
+  const { noun, ctaLabel, listHref } = onboardingReminderCopy(creatorType);
+  const dashboardUrl   = `${baseUrl()}${listHref}`;
   const publicSiteUrl  = `https://${slug}.${platformDomain}`;
   const firstName      = esc(name.split(" ")[0]);
 
   return sendMail({
     to,
-    subject: "Your AuthorLoft site is waiting — add your first book",
+    subject: `Your AuthorLoft site is waiting — add your first ${noun}`,
     text: [
       `Hi ${firstName},`,
-      `You signed up for AuthorLoft a week ago but haven't added any books yet.`,
-      `Your author site is live at ${publicSiteUrl} — it just needs a book to really shine.`,
-      `Add your first book here: ${dashboardUrl}`,
+      `You signed up for AuthorLoft a week ago but haven't added any ${noun}s yet.`,
+      `Your site is live at ${publicSiteUrl} — it just needs a ${noun} to really shine.`,
+      `Add your first ${noun} here: ${dashboardUrl}`,
       `If you no longer need your account, you can simply ignore this email and it will be automatically removed in 7 days.`,
       `— The AuthorLoft Team`,
     ].join("\n\n"),
-    html: wrapHtml("Your site is waiting for its first book", `
+    html: wrapHtml(`Your site is waiting for its first ${noun}`, `
       <p style="margin:0 0 16px;">Hi ${firstName},</p>
       <p style="margin:0 0 16px;">
-        You signed up for AuthorLoft a week ago — great to have you! Your author site is live,
-        but it's still waiting for its first book.
+        You signed up for AuthorLoft a week ago — great to have you! Your site is live,
+        but it's still waiting for its first ${noun}.
       </p>
       <p style="margin:0 0 24px;font-size:14px;color:#374151;">
-        Adding a book takes just a few minutes and brings your site to life for readers.
+        Adding a ${noun} takes just a few minutes and brings your site to life for your audience.
       </p>
 
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -1068,7 +1082,7 @@ export async function sendOnboardingReminderEmail(to: string, name: string, slug
           <td align="center" style="padding:8px 0 24px;">
             <a href="${dashboardUrl}"
                style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
-              Add My First Book
+              ${ctaLabel}
             </a>
           </td>
         </tr>
@@ -1086,23 +1100,24 @@ export async function sendOnboardingReminderEmail(to: string, name: string, slug
 
 // ── Onboarding early reminder email — day 3 (to author) ──────────────────────
 
-export async function sendOnboardingEarlyReminderEmail(to: string, name: string, slug: string) {
+export async function sendOnboardingEarlyReminderEmail(to: string, name: string, slug: string, creatorType?: string | null) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-  const dashboardUrl   = `${baseUrl()}/admin/books/new`;
+  const { noun, ctaLabel, newHref } = onboardingReminderCopy(creatorType);
+  const dashboardUrl   = `${baseUrl()}${newHref}`;
   const publicSiteUrl  = `https://${slug}.${platformDomain}`;
   const firstName      = esc(name.split(" ")[0]);
 
   return sendMail({
     to,
-    subject: `${firstName}, your author site is live — add your first book`,
+    subject: `${firstName}, your author site is live — add your first ${noun}`,
     text: [
       `Hi ${firstName},`,
       `Your AuthorLoft site went live 3 days ago at ${publicSiteUrl}.`,
-      `The only thing missing is a book — once you add one, readers can find you and your site really comes together.`,
+      `The only thing missing is a ${noun} — once you add one, your audience can find you and your site really comes together.`,
       `It only takes a few minutes: ${dashboardUrl}`,
       `— The AuthorLoft Team`,
     ].join("\n\n"),
-    html: wrapHtml("Your site is live — add your first book", `
+    html: wrapHtml(`Your site is live — add your first ${noun}`, `
       <p style="margin:0 0 16px;">Hi ${firstName},</p>
       <p style="margin:0 0 16px;">
         Your AuthorLoft site went live 3 days ago at
@@ -1110,7 +1125,7 @@ export async function sendOnboardingEarlyReminderEmail(to: string, name: string,
         exciting stuff!
       </p>
       <p style="margin:0 0 24px;font-size:14px;color:#374151;">
-        The only thing missing is a book. Once you add one, readers can discover you
+        The only thing missing is a ${noun}. Once you add one, your audience can discover you
         and your site really comes to life. It only takes a few minutes.
       </p>
 
@@ -1119,7 +1134,7 @@ export async function sendOnboardingEarlyReminderEmail(to: string, name: string,
           <td align="center" style="padding:8px 0 28px;">
             <a href="${dashboardUrl}"
                style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
-              Add My First Book
+              ${ctaLabel}
             </a>
           </td>
         </tr>

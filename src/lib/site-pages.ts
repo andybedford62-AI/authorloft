@@ -45,7 +45,7 @@ export interface AuthorNavFlags {
   navShowCourses: boolean;
   navShowMusic: boolean;
   navShowBundles: boolean;
-  plan?: { flipBooksLimit: number; mediaKitEnabled: boolean; coursesEnabled: boolean; bundlesEnabled: boolean; musicEnabled?: boolean } | null;
+  plan?: { flipBooksLimit: number; mediaKitEnabled: boolean; coursesEnabled: boolean; bundlesEnabled: boolean; musicEnabled: boolean } | null;
 }
 
 export interface AuthorCustomPage {
