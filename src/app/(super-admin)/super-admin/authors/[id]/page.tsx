@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { AuthorEditForm } from "./author-edit-form";
+import { CreatorTypeBadge } from "../authors-table-client";
 
 export default async function AuthorDetailPage({
   params,
@@ -34,6 +35,7 @@ export default async function AuthorDetailPage({
         isSuperAdmin: true,
         hideNextStepsChecklist: true,
         isFoundingMember: true,
+        creatorType: true,
         foundingMemberSince: true,
         planId: true,
         trialPlanId: true,
@@ -104,9 +106,12 @@ export default async function AuthorDetailPage({
       </div>
 
       {/* Metadata row */}
-      <div className="text-xs text-gray-400 flex gap-4 flex-wrap">
+      <div className="text-xs text-gray-400 flex items-center gap-4 flex-wrap">
         <span>Joined {new Date(author.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
         <span>Last updated {new Date(author.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+        <span className="flex items-center gap-1.5">
+          Signed up for: <CreatorTypeBadge creatorType={author.creatorType} />
+        </span>
         {author.isSuperAdmin && (
           <span className="text-purple-600 font-medium">Super Admin account</span>
         )}

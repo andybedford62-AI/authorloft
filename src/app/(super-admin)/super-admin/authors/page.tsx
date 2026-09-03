@@ -14,6 +14,7 @@ export default async function SuperAdminAuthorsPage() {
       isActive: true,
       isSuperAdmin: true,
       isFoundingMember: true,
+      creatorType: true,
       createdAt: true,
       lastLoginAt: true,
       plan: { select: { name: true, tier: true, monthlyPriceCents: true } },

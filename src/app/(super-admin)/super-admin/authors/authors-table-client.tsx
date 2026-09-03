@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  CheckCircle, XCircle, ExternalLink, BookOpen,
+  CheckCircle, XCircle, ExternalLink, BookOpen, GraduationCap, Music,
   Mail, Pencil, Trash2, Loader2, UserCheck, Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ type Author = {
   isActive: boolean;
   isSuperAdmin: boolean;
   isFoundingMember: boolean;
+  creatorType: string;
   createdAt: Date;
   lastLoginAt: Date | null;
   plan: { name: string; tier: string; monthlyPriceCents: number } | null;
@@ -32,6 +33,27 @@ const TIER_VARIANT: Record<string, "plan-premium" | "plan-standard" | "warning">
   STANDARD: "plan-standard",
   FREE:     "warning",
 };
+
+// What the author picked in the "What will you create first?" signup wizard —
+// informational only, doesn't gate features, but useful for targeted mass
+// emails (see the Mass Email panel's audience filter). "both" is a legacy
+// value from before the Music option existed.
+const CREATOR_TYPE_META: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  book:   { label: "Book",         icon: BookOpen,      className: "bg-blue-50 text-blue-700" },
+  course: { label: "Course",       icon: GraduationCap, className: "bg-emerald-50 text-emerald-700" },
+  music:  { label: "Music",        icon: Music,         className: "bg-purple-50 text-purple-700" },
+  both:   { label: "Book+Course",  icon: BookOpen,      className: "bg-blue-50 text-blue-700" },
+};
+
+export function CreatorTypeBadge({ creatorType }: { creatorType: string }) {
+  const meta = CREATOR_TYPE_META[creatorType] ?? CREATOR_TYPE_META.book;
+  const Icon = meta.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${meta.className}`}>
+      <Icon className="h-3 w-3" /> {meta.label}
+    </span>
+  );
+}
 
 // Helper to format relative time (e.g., "2 days ago", "1 hour ago", "Never")
 function formatLastLogin(date: Date | null): string {
@@ -70,7 +92,12 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
   const [deleting,      setDeleting]      = useState<string | null>(null);
   const [confirmId,     setConfirmId]     = useState<string | null>(null);
   const [impersonating, setImpersonating] = useState<string | null>(null);
+  const [typeFilter,    setTypeFilter]    = useState<string>("ALL");
   const [emailTarget,   setEmailTarget]   = useState<Author | null>(null);
+
+  const filteredAuthors = typeFilter === "ALL"
+    ? authors
+    : authors.filter((a) => a.creatorType === typeFilter);
 
   async function toggleActive(author: Author) {
     setToggling(author.id);
@@ -142,12 +169,32 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
 
   return (
     <>
+      <div className="flex items-center justify-between mb-3">
+        <label className="flex items-center gap-2 text-sm text-gray-600">
+          Signed up for:
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          >
+            <option value="ALL">All</option>
+            <option value="book">Book</option>
+            <option value="course">Course</option>
+            <option value="music">Music</option>
+          </select>
+        </label>
+        {typeFilter !== "ALL" && (
+          <p className="text-xs text-gray-400">{filteredAuthors.length} of {authors.length} authors</p>
+        )}
+      </div>
+
       <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Author</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:table-cell">Plan</th>
+              <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:table-cell">Signed Up For</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden md:table-cell">Books</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden md:table-cell">Subscribers</th>
               <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide hidden lg:table-cell">Status</th>
@@ -157,14 +204,14 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {authors.length === 0 && (
+            {filteredAuthors.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-5 py-10 text-center text-gray-400 text-sm">
+                <td colSpan={9} className="px-5 py-10 text-center text-gray-400 text-sm">
                   No authors found.
                 </td>
               </tr>
             )}
-            {authors.map((author) => (
+            {filteredAuthors.map((author) => (
               <tr key={author.id} className="hover:bg-gray-50 transition-colors">
                 {/* Name / email / slug */}
                 <td className="px-5 py-4">
@@ -198,6 +245,11 @@ export function AuthorsTableClient({ authors: initial }: { authors: Author[] }) 
                   <Badge variant={TIER_VARIANT[author.plan?.tier ?? "FREE"] ?? "default"}>
                     {author.plan?.name ?? "No Plan"}
                   </Badge>
+                </td>
+
+                {/* Signed up for (creatorType) */}
+                <td className="px-5 py-4 hidden sm:table-cell">
+                  <CreatorTypeBadge creatorType={author.creatorType} />
                 </td>
 
                 {/* Books */}

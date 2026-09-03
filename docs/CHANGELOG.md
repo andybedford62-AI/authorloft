@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Signup type (Book/Course/Music) surfaced in Super Admin + email targeting
+
+`Author.creatorType` (what the author picked in the onboarding wizard) was tracked in the DB since it was introduced but never shown anywhere in Super Admin — no way to see or act on it. Added:
+- **Authors list** (`super-admin/authors`) — a "Signed Up For" column (Book/Course/Music badge) plus a filter dropdown above the table.
+- **Author detail page** (`super-admin/authors/[id]`) — the same badge in the metadata row, reusing the now-exported `CreatorTypeBadge` from the list's client component.
+- **Mass Email panel** (Settings → Mass Email) — `AudienceFilter` extended from plan-tier-only (`FREE`/`STANDARD`/`PREMIUM`) to also include `BOOK`/`COURSE`/`MUSIC`, so a broadcast can target authors by signup type instead of just plan. `POST/GET /api/super-admin/broadcasts` share one `audienceWhere()` helper for both the recipient-count preview and the actual send.
+
+Legacy `"both"` accounts (pre-dates the Music option) show a distinct "Book+Course" badge on the list/detail views rather than being folded into "Book" — but aren't one of the Mass Email targeting options, since that's a discontinued signup path.
+
 ## September 3, 2026 — Main landing page now advertises Books, Courses, and Music
 
 The public homepage's messaging was 100% book-specific everywhere — hero headline ("You wrote the book. They keep the reader."), page `<title>`/OG/Twitter tags ("Your Books. Your Readers. Your Business."), and the JSON-LD `featureList`/`HowTo` structured data — despite Courses and Music (shipped Aug 24) being live features nobody landing on the homepage would ever learn about. Also found `/solutions` has a real "Sell Online Courses" entry but zero mention of Music at all; flagged separately as a follow-up rather than bundled into this change.

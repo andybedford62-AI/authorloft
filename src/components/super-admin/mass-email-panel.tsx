@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmailComposer } from "./email-composer";
 import { useActiveSupportEmails } from "./use-active-support-emails";
 
-type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM";
+type AudienceFilter = "ALL" | "FREE" | "STANDARD" | "PREMIUM" | "BOOK" | "COURSE" | "MUSIC";
 
 interface Broadcast {
   id:                string;
@@ -30,6 +30,9 @@ const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
   { value: "FREE",     label: "Free Plan Only"  },
   { value: "STANDARD", label: "Standard Plan"   },
   { value: "PREMIUM",  label: "Premium Plan"    },
+  { value: "BOOK",     label: "Signed Up: Books"   },
+  { value: "COURSE",   label: "Signed Up: Courses" },
+  { value: "MUSIC",    label: "Signed Up: Music"   },
 ];
 
 export function MassEmailPanel({ initialReplyToEmail }: { initialReplyToEmail: string | null }) {

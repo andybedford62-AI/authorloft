@@ -5,8 +5,24 @@ import { Resend } from "resend";
 import { buildBroadcastMailPayload } from "@/lib/mailer";
 
 const BATCH_SIZE = 50;
-const VALID_FILTERS = ["ALL", "FREE", "STANDARD", "PREMIUM"] as const;
+const VALID_FILTERS = ["ALL", "FREE", "STANDARD", "PREMIUM", "BOOK", "COURSE", "MUSIC"] as const;
 type AudienceFilter = (typeof VALID_FILTERS)[number];
+
+const PLAN_TIERS = ["FREE", "STANDARD", "PREMIUM"] as const;
+const CREATOR_TYPES = ["BOOK", "COURSE", "MUSIC"] as const;
+
+/** Builds the extra `where` clause for an audience filter — plan tier
+ *  ("FREE"/"STANDARD"/"PREMIUM") or signup type ("BOOK"/"COURSE"/"MUSIC",
+ *  matched against Author.creatorType which is stored lowercase). */
+function audienceWhere(filter: AudienceFilter) {
+  if ((PLAN_TIERS as readonly string[]).includes(filter)) {
+    return { plan: { tier: filter as (typeof PLAN_TIERS)[number] } };
+  }
+  if ((CREATOR_TYPES as readonly string[]).includes(filter)) {
+    return { creatorType: filter.toLowerCase() };
+  }
+  return {};
+}
 
 export async function GET(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,10 +30,8 @@ export async function GET(req: NextRequest) {
   // ?count=1&filter=ALL — return recipient count estimate for the compose UI
   if (req.nextUrl.searchParams.get("count") === "1") {
     const filter = (req.nextUrl.searchParams.get("filter") ?? "ALL") as AudienceFilter;
-    type PlanTier = "FREE" | "STANDARD" | "PREMIUM";
-    const planFilter = filter !== "ALL" ? { plan: { tier: filter as PlanTier } } : {};
     const count = await prisma.author.count({
-      where: { platformEmailOptOut: false, emailVerified: { not: null }, isActive: true, ...planFilter },
+      where: { platformEmailOptOut: false, emailVerified: { not: null }, isActive: true, ...audienceWhere(filter) },
     });
     return NextResponse.json({ count });
   }
@@ -113,17 +127,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Build author query — exclude opted-out and unverified
-  type PlanTier = "FREE" | "STANDARD" | "PREMIUM";
-  const planFilter = audienceFilter !== "ALL"
-    ? { plan: { tier: audienceFilter as PlanTier } }
-    : {};
-
   const authors = await prisma.author.findMany({
     where: {
       platformEmailOptOut: false,
       emailVerified: { not: null },
       isActive: true,
-      ...planFilter,
+      ...audienceWhere(audienceFilter),
     },
     select: { id: true, email: true, name: true, displayName: true, platformEmailsToken: true },
   });
