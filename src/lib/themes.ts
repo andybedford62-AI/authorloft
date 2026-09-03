@@ -18,7 +18,16 @@ export type ThemeId =
   // Subgenre palettes
   | "aviation"
   | "scuba-diving"
-  | "mountain-adventure";
+  | "mountain-adventure"
+  // Music genre palettes
+  | "rock"
+  | "country"
+  | "pop"
+  | "hip-hop"
+  | "electronic"
+  | "jazz"
+  | "classical"
+  | "rnb";
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -220,7 +229,106 @@ export const SUBGENRE_PALETTES: ThemeDefinition[] = [
 /** Merged genre + subgenre palettes — single Standard+ collection, no internal split. */
 export const STYLE_PALETTES = [...GENRE_PALETTES, ...SUBGENRE_PALETTES];
 
-export const ALL_THEMES = [...BASE_THEMES, ...STYLE_PALETTES];
+// ── Music Genre Palettes (Standard+) ─────────────────────────────────────────
+// Same Standard+ availability as the book GENRE_PALETTES above — kept as a
+// separate array (not merged into STYLE_PALETTES) so the appearance picker can
+// render them in their own "Music Genre Palettes" section instead of mixing
+// book and music genres into one long, cluttered grid. Header images follow
+// the same public/images/themes/{id}-hero.jpg convention as the book palettes
+// (auto-detected at build time via theme-hero-manifest.ts) — none exist yet,
+// so these render as solid colour until real/curated photos are added.
+export const MUSIC_GENRE_PALETTES: ThemeDefinition[] = [
+  {
+    id: "rock",
+    name: "Rock",
+    description: "Raw, electric, rebellious",
+    isPremium: false,
+    dataTheme: "rock",
+    emoji: "🎸",
+    mood: "Raw, electric, rebellious",
+    preview: { bg: "#0d0d0d", primary: "#f2f2f2", accent: "#dd2338" },
+    swatches: ["#0d0d0d", "#1a1a1a", "#dd2338", "#ff4d5e", "#f2f2f2", "#cccccc", "#8a8a8a", "#3d3d3d", "#2b0a0d"],
+  },
+  {
+    id: "country",
+    name: "Country",
+    description: "Warm, rustic, open-road Americana",
+    isPremium: false,
+    dataTheme: "country",
+    emoji: "🪕",
+    mood: "Warm, rustic, open-road Americana",
+    preview: { bg: "#f5ecdc", primary: "#4a2f1a", accent: "#cd8a3a" },
+    swatches: ["#4a2f1a", "#6b4526", "#cd8a3a", "#e0ac66", "#f9f2e6", "#eaddc4", "#a97c48", "#7a5228", "#2e1c0f"],
+  },
+  {
+    id: "pop",
+    name: "Pop",
+    description: "Bright, bold, high-energy",
+    isPremium: false,
+    dataTheme: "pop",
+    emoji: "🎤",
+    mood: "Bright, bold, high-energy",
+    preview: { bg: "#ffffff", primary: "#dd2a8f", accent: "#8a4fe0" },
+    swatches: ["#dd2a8f", "#ff5cb3", "#8a4fe0", "#b184f0", "#ffffff", "#f5f0fa", "#3ad6d0", "#1a0b2e", "#ffe14d"],
+  },
+  {
+    id: "hip-hop",
+    name: "Hip-Hop",
+    description: "Urban, bold, street-smart",
+    isPremium: false,
+    dataTheme: "hip-hop",
+    emoji: "🎧",
+    mood: "Urban, bold, street-smart",
+    preview: { bg: "#0a0a0c", primary: "#f0e9d8", accent: "#c99a34" },
+    swatches: ["#0a0a0c", "#1a1a20", "#c99a34", "#e0bd6a", "#f0e9d8", "#4a2f70", "#7a3fb0", "#2d2d35", "#000000"],
+  },
+  {
+    id: "electronic",
+    name: "Electronic / EDM",
+    description: "Futuristic, neon-lit, pulsing",
+    isPremium: false,
+    dataTheme: "electronic",
+    emoji: "🎛️",
+    mood: "Futuristic, neon-lit, pulsing",
+    preview: { bg: "#0a0820", primary: "#f0f0ff", accent: "#25d9f0" },
+    swatches: ["#0a0820", "#1a1440", "#25d9f0", "#8fefff", "#ff2ec4", "#ff8fe0", "#f0f0ff", "#3d2d80", "#050414"],
+  },
+  {
+    id: "jazz",
+    name: "Jazz",
+    description: "Moody, smoky, late-night sophistication",
+    isPremium: false,
+    dataTheme: "jazz",
+    emoji: "🎷",
+    mood: "Moody, smoky, late-night sophistication",
+    preview: { bg: "#2a0f18", primary: "#f0e4d4", accent: "#c99248" },
+    swatches: ["#2a0f18", "#421827", "#c99248", "#e0b878", "#f0e4d4", "#8a4a5a", "#5c1f2e", "#1a0810", "#3d2410"],
+  },
+  {
+    id: "classical",
+    name: "Classical",
+    description: "Elegant, timeless, grand",
+    isPremium: false,
+    dataTheme: "classical",
+    emoji: "🎻",
+    mood: "Elegant, timeless, grand",
+    preview: { bg: "#f8f0e0", primary: "#5c1830", accent: "#bb9440" },
+    swatches: ["#5c1830", "#7a2440", "#bb9440", "#d4b878", "#f8f0e0", "#ecdcc0", "#8a6a3a", "#3a0f1c", "#2c1320"],
+  },
+  {
+    id: "rnb",
+    name: "R&B / Soul",
+    description: "Warm, sultry, soulful",
+    isPremium: false,
+    dataTheme: "rnb",
+    emoji: "🎙️",
+    mood: "Warm, sultry, soulful",
+    preview: { bg: "#2e1030", primary: "#f0dfd0", accent: "#e0906a" },
+    swatches: ["#2e1030", "#48184c", "#e0906a", "#f0b894", "#f0dfd0", "#a05470", "#6a2450", "#1a0a1c", "#3a2018"],
+  },
+];
+
+export const ALL_THEMES = [...BASE_THEMES, ...STYLE_PALETTES, ...MUSIC_GENRE_PALETTES];
 
 export function getTheme(id: string | null | undefined): ThemeDefinition {
   return ALL_THEMES.find((t) => t.id === id) ?? BASE_THEMES[0];

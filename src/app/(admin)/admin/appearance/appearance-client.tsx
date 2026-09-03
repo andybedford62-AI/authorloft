@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, Loader2, Lock, Sparkles, CheckCircle2, Palette, RotateCcw, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BASE_THEMES, STYLE_PALETTES } from "@/lib/themes";
+import { BASE_THEMES, STYLE_PALETTES, MUSIC_GENRE_PALETTES } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 
 interface AppearanceClientProps {
@@ -28,19 +28,6 @@ const TEMPLATES = [
       { label: "Author Bio",   h: 22, dark: false,  accent: false },
       { label: "Books",        h: 20, dark: false,  accent: true  },
       { label: "Series",       h: 14, dark: false,  accent: false },
-    ],
-  },
-  {
-    id:          "minimal",
-    name:        "Minimal",
-    tagline:     "Books First",
-    description: "Slim author header → books catalog leads → bio below.",
-    badges:      ["No hero banner", "Books catalog first", "Compact bio", "Series"],
-    diagram: [
-      { label: "Author Header", h: 16, dark: false, accent: false },
-      { label: "Books Catalog", h: 36, dark: false, accent: true  },
-      { label: "Bio",           h: 14, dark: false, accent: false },
-      { label: "Series",        h: 12, dark: false, accent: false },
     ],
   },
   {
@@ -420,12 +407,7 @@ export function AppearanceClient({
                     {tmpl.badges.map((badge) => (
                       <span
                         key={badge}
-                        className={cn(
-                          "text-[9px] font-medium px-1.5 py-0.5 rounded-full",
-                          badge.startsWith("No ") || badge === "Compact bio"
-                            ? "bg-gray-100 text-gray-400"
-                            : "bg-blue-50 text-blue-600"
-                        )}
+                        className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600"
                       >
                         {badge}
                       </span>
@@ -516,6 +498,38 @@ export function AppearanceClient({
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {STYLE_PALETTES.map((palette) => (
+            <ThemeCard
+              key={palette.id}
+              theme={palette}
+              isActive={selectedTheme === palette.id}
+              locked={isFree}
+              lockLabel="Upgrade to Standard"
+              saving={savingTheme === palette.id}
+              onClick={() => handleSelectTheme(palette.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Music Genre Palettes ─────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            Music Genre Palettes
+            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3" /> Standard +
+            </span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Hand-crafted palettes for musicians and playlist curators — kept separate from the book genre palettes above so both stay easy to scan.
+            {isFree && (
+              <span className="ml-1 text-blue-600 font-medium">Available on Standard and Premium plans.</span>
+            )}
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {MUSIC_GENRE_PALETTES.map((palette) => (
             <ThemeCard
               key={palette.id}
               theme={palette}

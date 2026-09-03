@@ -245,6 +245,112 @@
   --author-font-body: var(--font-inter), 'Inter', sans-serif;
 }
 
+/* ── Music genre palettes ─────────────────────────────────────────────────── */
+
+[data-theme='rock'] {
+  --author-nav-bg: #0d0d0d;
+  --background: 0 0% 7%;
+  --foreground: 0 0% 96%;
+  --primary: 0 0% 14%;
+  --primary-foreground: 0 0% 96%;
+  --muted-foreground: 0 0% 62%;
+  --accent: 356 75% 52%;
+  --border: 0 0% 20%;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='country'] {
+  --author-nav-bg: #4a2f1a;
+  --background: 34 45% 94%;
+  --foreground: 20 25% 18%;
+  --primary: 24 45% 28%;
+  --primary-foreground: 34 45% 96%;
+  --muted-foreground: 20 15% 45%;
+  --accent: 32 70% 52%;
+  --border: 34 25% 84%;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='pop'] {
+  --author-nav-bg: #1a0b2e;
+  --background: 0 0% 99%;
+  --foreground: 270 20% 12%;
+  --primary: 320 70% 50%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 270 10% 45%;
+  --accent: 262 75% 60%;
+  --border: 270 15% 90%;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='hip-hop'] {
+  --author-nav-bg: #0a0a0c;
+  --background: 260 15% 8%;
+  --foreground: 45 40% 92%;
+  --primary: 260 15% 14%;
+  --primary-foreground: 45 40% 92%;
+  --muted-foreground: 260 8% 58%;
+  --accent: 43 74% 52%;
+  --border: 260 10% 20%;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='electronic'] {
+  --author-nav-bg: #0a0820;
+  --background: 258 55% 6%;
+  --foreground: 0 0% 96%;
+  --primary: 258 30% 16%;
+  --primary-foreground: 0 0% 96%;
+  --muted-foreground: 258 10% 62%;
+  --accent: 190 95% 55%;
+  --border: 258 25% 22%;
+  --author-font-heading: var(--font-inter), sans-serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='jazz'] {
+  --author-nav-bg: #2a0f18;
+  --background: 350 30% 10%;
+  --foreground: 36 30% 90%;
+  --primary: 350 25% 16%;
+  --primary-foreground: 36 30% 92%;
+  --muted-foreground: 350 10% 60%;
+  --accent: 36 65% 55%;
+  --border: 350 15% 22%;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
+[data-theme='classical'] {
+  --author-nav-bg: #2c1320;
+  --background: 42 35% 95%;
+  --foreground: 340 20% 15%;
+  --primary: 340 45% 24%;
+  --primary-foreground: 42 35% 96%;
+  --muted-foreground: 340 10% 45%;
+  --accent: 43 55% 48%;
+  --border: 42 20% 85%;
+  --author-font-heading: var(--font-playfair), 'Playfair Display', serif;
+  --author-font-body: var(--font-playfair), 'Playfair Display', serif;
+}
+
+[data-theme='rnb'] {
+  --author-nav-bg: #2e1030;
+  --background: 285 30% 10%;
+  --foreground: 30 30% 92%;
+  --primary: 285 25% 18%;
+  --primary-foreground: 30 30% 92%;
+  --muted-foreground: 285 10% 62%;
+  --accent: 15 65% 62%;
+  --border: 285 15% 24%;
+  --author-font-heading: var(--font-playfair), serif;
+  --author-font-body: var(--font-inter), sans-serif;
+}
+
 /* ── Font utility classes (author site only) ────────────────────────────── */
 /* Scoped to avoid affecting the admin UI */
 .author-site .author-font-heading,

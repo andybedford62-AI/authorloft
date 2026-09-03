@@ -11,7 +11,6 @@ import {
 } from "@/lib/author-queries";
 import { resolveHeroFocus } from "@/lib/site-pages";
 import { ClassicTemplate } from "@/components/author-site/templates/classic";
-import { MinimalTemplate } from "@/components/author-site/templates/minimal";
 import { BoldTemplate } from "@/components/author-site/templates/bold";
 import { CinematicTemplate } from "@/components/author-site/templates/cinematic";
 import { SpotlightTemplate } from "@/components/author-site/templates/spotlight";
@@ -58,8 +57,6 @@ export default async function AuthorHomePage({
   } as unknown as HomeTemplateProps;
 
   switch (author.homeTemplate) {
-    case "minimal":
-      return <MinimalTemplate {...props} />;
     case "bold":
       return <BoldTemplate {...props} />;
     case "cinematic":

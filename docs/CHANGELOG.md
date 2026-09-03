@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — 8 new Music Genre Palettes; "Minimal" page structure retired
+
+Added 8 hand-crafted colour palettes for musicians (Rock, Country, Pop, Hip-Hop, Electronic/EDM, Jazz, Classical, R&B/Soul) to `src/lib/themes.ts`, matching the existing book genre palette system (full HSL colour system in `globals.css`, 9-swatch preview strip, mood tag). Kept as a separate `MUSIC_GENRE_PALETTES` export (not merged into `STYLE_PALETTES`) so `/admin/appearance` renders them in their own "Music Genre Palettes" section instead of one long mixed grid of book and music genres — same Standard+ availability as the book palettes. Header images aren't in yet (Gamma image generation is out of credits — 402, non-retryable); they'll auto-wire in with zero code changes the moment a file lands at `public/images/themes/{id}-hero.jpg`, same convention the book palettes already use (see `scripts/gen-theme-hero-manifest.mjs`).
+
+Also removed the "Minimal" page structure (`/admin/appearance`'s Page Structure picker) at the user's request — zero live authors were using it, so the picker option, its `MinimalTemplate` component, and the `VALID_TEMPLATES`/render-switch entries were deleted outright rather than deprecated.
+
 ## September 3, 2026 — Homepage "See the actual product" now shows Books, Courses, and Music
 
 The 3 screenshots in `ProductPreviewSection` (dashboard, theme picker, plus one author site) were all Books-only, same gap as the rest of the homepage work earlier today. Replaced with real screenshots of the founder's own live site (`apbedford.authorloft.com`, which has real published books, courses, and music) at its Books/Courses/Music-focused homepage states — converted from `.jpg` to `.webp` via `sharp` (`product-preview-books.webp`, `product-preview-courses.webp`, `product-preview-music.webp`).
