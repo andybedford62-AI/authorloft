@@ -107,9 +107,12 @@ const PAIN_CARDS = [
   { pain: "No idea who your audience is",         solution: "Full audience analytics, always", image: "/hero-card-3.webp", title: "Your Analytics" },
   { pain: "Paying for 5 tools that don't connect", solution: "One platform, everything built in", image: "/hero-card-4.webp", title: "Your Platform" },
   { pain: "Their storefront, their brand",        solution: "Your domain, your design", image: "/hero-card-5.webp", title: "Your Brand" },
-  { pain: "Amazon owns your readers",              solution: "Sell direct, own your readers", image: "/hero-card-2.webp", title: "For Authors" },
-  { pain: "Course platforms take a cut and bury your brand", solution: "Your course, your platform, your price", image: "/hero-card-3.webp", title: "For Course Creators" },
-  { pain: "Streaming pays fractions of a cent per play", solution: "Link your tracks, keep every fan", image: "/hero-card-4.webp", title: "For Musicians" },
+  // These 3 are fully-composed real photos (badge, headline, and pain/solution
+  // text already baked into the image itself) — rendered as plain images with
+  // no HTML text overlay, unlike the 5 abstract cards above.
+  { image: "/hero-card-books-real.webp",   title: "For Authors",         fullImage: true },
+  { image: "/hero-card-courses-real.webp", title: "For Course Creators", fullImage: true },
+  { image: "/hero-card-music-real.webp",   title: "For Musicians",       fullImage: true },
 ];
 
 function PainSolutionCards() {
@@ -134,46 +137,53 @@ function PainSolutionCards() {
             transition: 'opacity 0.8s ease, transform 0.8s ease',
             pointerEvents: i === idx ? 'auto' : 'none',
           }}>
-            <div style={{
-              borderRadius: 20,
-              overflow: 'hidden',
-              position: 'relative',
-              border: `1px solid ${VAULT.hair}`,
-              boxShadow: '0 24px 60px -16px rgba(0,0,0,0.5)',
-            }}>
-              {/* Background image */}
+            {card.fullImage ? (
+              <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 24px 60px -16px rgba(0,0,0,0.5)' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={card.image} alt={card.title} style={{ display: 'block', width: '100%', height: 'auto' }} />
+              </div>
+            ) : (
               <div style={{
-                position: 'absolute', inset: 0,
-                backgroundImage: `url(${card.image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }} />
-              {/* Dark scrim for text readability */}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(22,35,61,0.55) 0%, rgba(22,35,61,0.85) 100%)' }} />
+                borderRadius: 20,
+                overflow: 'hidden',
+                position: 'relative',
+                border: `1px solid ${VAULT.hair}`,
+                boxShadow: '0 24px 60px -16px rgba(0,0,0,0.5)',
+              }}>
+                {/* Background image */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url(${card.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }} />
+                {/* Dark scrim for text readability */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(22,35,61,0.55) 0%, rgba(22,35,61,0.85) 100%)' }} />
 
-              {/* Content */}
-              <div style={{ position: 'relative', padding: '44px 36px' }}>
-                {/* Title label */}
-                <div style={{ marginBottom: 24 }}>
-                  <span style={{
-                    fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.16em',
-                    textTransform: 'uppercase', color: VAULT.gold, fontWeight: 600,
-                    padding: '4px 12px', background: 'rgba(22,35,61,0.5)', border: `1px solid ${VAULT.gold}44`,
-                    borderRadius: 999, backdropFilter: 'blur(6px)',
-                  }}>{card.title}</span>
-                </div>
+                {/* Content */}
+                <div style={{ position: 'relative', padding: '44px 36px' }}>
+                  {/* Title label */}
+                  <div style={{ marginBottom: 24 }}>
+                    <span style={{
+                      fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.16em',
+                      textTransform: 'uppercase', color: VAULT.gold, fontWeight: 600,
+                      padding: '4px 12px', background: 'rgba(22,35,61,0.5)', border: `1px solid ${VAULT.gold}44`,
+                      borderRadius: 999, backdropFilter: 'blur(6px)',
+                    }}>{card.title}</span>
+                  </div>
 
-                <div style={{ marginBottom: 28 }}>
-                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: VAULT.goldMuted, marginBottom: 10 }}>The old way</p>
-                  <p style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(20px, 2.2vw, 26px)', fontWeight: 400, lineHeight: 1.25, color: `${VAULT.ink}77`, margin: 0, fontStyle: 'italic' }}>{card.pain}</p>
-                </div>
-                <div style={{ width: 48, height: 1, background: `linear-gradient(90deg, ${VAULT.gold}00, ${VAULT.gold}, ${VAULT.gold}00)`, marginBottom: 28 }} />
-                <div>
-                  <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 10 }}>With AuthorLoft</p>
-                  <p style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(24px, 2.8vw, 32px)', fontWeight: 400, lineHeight: 1.2, color: VAULT.ink, margin: 0 }}>{card.solution}</p>
+                  <div style={{ marginBottom: 28 }}>
+                    <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: VAULT.goldMuted, marginBottom: 10 }}>The old way</p>
+                    <p style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(20px, 2.2vw, 26px)', fontWeight: 400, lineHeight: 1.25, color: `${VAULT.ink}77`, margin: 0, fontStyle: 'italic' }}>{card.pain}</p>
+                  </div>
+                  <div style={{ width: 48, height: 1, background: `linear-gradient(90deg, ${VAULT.gold}00, ${VAULT.gold}, ${VAULT.gold}00)`, marginBottom: 28 }} />
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: VAULT.gold, marginBottom: 10 }}>With AuthorLoft</p>
+                    <p style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(24px, 2.8vw, 32px)', fontWeight: 400, lineHeight: 1.2, color: VAULT.ink, margin: 0 }}>{card.solution}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
 
