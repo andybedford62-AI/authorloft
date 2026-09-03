@@ -2,9 +2,33 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useId } from 'react';
+import { BookOpen, GraduationCap, Music } from 'lucide-react';
 import { MarketingMobileMenu } from '@/components/marketing/marketing-mobile-menu';
 import { VAULT } from '@/components/marketing/vault-theme';
 import { SOLUTION_CATEGORIES } from '@/lib/solution-categories';
+
+const CREATOR_BADGES = [
+  { icon: BookOpen,      label: 'Authors' },
+  { icon: GraduationCap, label: 'Course Creators' },
+  { icon: Music,         label: 'Musicians' },
+];
+
+function CreatorBadgeRow() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18, animation: 'rbFadeUp 0.7s 0.05s ease both', opacity: 0 }}>
+      {CREATOR_BADGES.map(({ icon: Icon, label }) => (
+        <span key={label} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '6px 13px', borderRadius: 999,
+          background: 'rgba(214,169,74,0.12)', border: `1px solid ${VAULT.gold}55`,
+          fontSize: 12, fontWeight: 600, color: VAULT.gold, letterSpacing: '0.02em',
+        }}>
+          <Icon size={13} strokeWidth={2.25} /> {label}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function NebulaBG() {
   const uid = useId();
@@ -303,6 +327,9 @@ export function RebelHero({
 
         {/* Left: copy */}
         <div style={{ color: VAULT.ink }}>
+          {/* Creator-type badges — the "who this is for" splash, first thing seen */}
+          <CreatorBadgeRow />
+
           {/* Headline */}
           <h1 style={{ fontFamily: VAULT.fontDisplay, fontWeight: 400, fontSize: 'clamp(32px, 4.5vw, 68px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
             <span style={{ display: 'block' }}>{line1}</span>
