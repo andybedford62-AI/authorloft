@@ -79,6 +79,7 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     { loc: `${base}/features`,  lastmod: now, changefreq: "monthly", priority: 0.9 },
     { loc: `${base}/solutions`, lastmod: now, changefreq: "monthly", priority: 0.85 },
     { loc: `${base}/pricing`,   lastmod: now, changefreq: "monthly", priority: 0.9 },
+    { loc: `${base}/compare`,   lastmod: now, changefreq: "monthly", priority: 0.8 },
     { loc: `${base}/bookstore`, lastmod: now, changefreq: "weekly",  priority: 0.85 },
   ];
 

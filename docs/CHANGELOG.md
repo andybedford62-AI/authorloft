@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — New /compare hub: tabbed Books/Courses/Music comparison tables
+
+Added a new `/compare` page — a single hub with a Books/Courses/Music tab switcher, each tab showing a feature-comparison table against the competitors relevant to that category. Distinct from the existing deep-dive `/compare/[competitor]` pages (still book-only, e.g. `/compare/bookfunnel`), which are unaffected.
+
+Competitors researched fresh rather than assumed, since these are public factual claims:
+- **Books** (existing set, reused): Tertulia, Quilltips, StoryOrigin, BookFunnel.
+- **Courses**: Teachable, Thinkific, Podia, Kajabi — the standard "creator economy" course-platform set (not enterprise LMS tools). AuthorLoft's real differentiators here: a free plan (none of the four have one), YouTube-playlist/CSV course import, and bundling with books/music on one site — honestly, AuthorLoft has no quiz/certificate/drip-content tooling, so those axes were left out of the table rather than claimed.
+- **Music**: Linktree, Feature.fm, Bandzoogle, Beacons — link-in-bio and music-marketing tools, since AuthorLoft's music feature is link-only playlists (nothing uploaded/streamed), not a competitor to full streaming hosts like SoundCloud/Bandcamp. Verified Feature.fm and Linktree both have real free tiers (not just AuthorLoft), so "free plan" isn't a unique differentiator there — the honest angle is "a real website, not just a link page" vs. Linktree/Beacons, and the table includes one row (pre-save/smart-link campaigns) where Feature.fm's specialist tooling genuinely beats AuthorLoft, rather than curating only favorable rows.
+
+New files: `src/lib/compare-hub-data.ts` (row data), `src/components/marketing/compare-hub-tabs.tsx` (client tab component). Added to the sitemap and linked from the pricing page's existing competitor table ("Teach courses or make music? See how AuthorLoft compares for those too").
+
 ## September 3, 2026 — Music-support gap audit: dashboard checklist, onboarding emails, pricing table, hero picker
 
 Ran a full audit ("is there anything we missed?") of Music support across the platform after today's earlier onboarding/marketing/theme work. Found and fixed:

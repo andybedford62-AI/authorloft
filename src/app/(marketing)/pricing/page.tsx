@@ -356,6 +356,11 @@ export default async function PricingPage() {
             {" · "}
             <Link href="/compare/quilltips" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Quilltips</Link>
           </p>
+          <p className="text-center text-sm mt-4">
+            <Link href="/compare" className="text-vault-gold hover:text-vault-ink font-semibold transition-colors">
+              Teach courses or make music? See how AuthorLoft compares for those too →
+            </Link>
+          </p>
         </div>
       </section>
 
