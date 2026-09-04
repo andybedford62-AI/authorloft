@@ -1,7 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ListMusic } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -94,42 +93,15 @@ export default async function MusicListPage({
         <ArrowLeft className="h-3.5 w-3.5" /> All music
       </Link>
 
-      {/* Banner, not a square thumbnail: the index card already renders this
-          image 16:9, and cropping a wide banner to a 160px square here made the
-          same upload look wrong in two places. Match that same 16:9 ratio here
-          (was aspect-[3/1] — a wider/shorter box that cropped the top and
-          bottom off every genuinely-16:9 cover). */}
-      {list.coverImageUrl && (
-        <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-gray-100 mb-6">
-          <Image
-            src={list.coverImageUrl}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 768px"
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row gap-6 mb-8">
-        {!list.coverImageUrl && (
-          <div className="relative h-40 w-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-            <ListMusic className="h-10 w-10 text-gray-300" />
-          </div>
-        )}
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900">{list.title}</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            {tracks.length} track{tracks.length === 1 ? "" : "s"}
-          </p>
-          {list.description && (
-            <p className="text-gray-600 mt-3 whitespace-pre-line">{list.description}</p>
-          )}
-        </div>
-      </div>
-
-      <MusicTrackList tracks={tracks} accentColor={author.accentColor} />
+      <MusicTrackList
+        tracks={tracks}
+        accentColor={author.accentColor}
+        hero={{
+          title: list.title,
+          description: list.description,
+          coverImageUrl: list.coverImageUrl,
+        }}
+      />
     </div>
   );
 }
