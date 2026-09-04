@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — On-page "how it works" help for first Course/Music, parity check across Books
+
+Audited existing help coverage before building anything new, since the picture turned out uneven rather than uniformly missing: Courses already had a rich on-page `CourseHelpModal` (triggered by a "How courses work" button in the editor) but zero presence in the DB-driven Help Center; Books had a solid Help Center article ("How do I add my first book?") but no on-page link at all; Music had neither.
+
+- **Music**: new `MusicHelpModal` (`src/components/admin/music-help-modal.tsx`), mirroring `CourseHelpModal`'s pattern exactly — 6 sections (how lists work, adding tracks, YouTube import, cover & featured, publishing, plan limits), triggered by a "How music lists work" button now in `music-list-form.tsx`.
+- **Help Center**: added two new topics, "Courses" and "Music" (previously both had zero articles — "Content & Books" was book-only despite the name), each with a "How do I add my first X?" article matching the existing article style. Added matching `HelpTooltip` rows ("course-first", "music-first") and wired `HelpTip` (?) icons next to the Curriculum section (course editor) and Tracks section (music editor) — both link through to the new articles.
+- **Books**: added a lightweight "How adding a book works" link (opens the existing Help Center article in a new tab, not a new modal — that content was already good) to `book-form.tsx`, which previously had no on-page help of any kind.
+- Both help modals now also link out to their full Help Center article ("View the full step-by-step guide in the Help Center") for readers who want more than the quick summary.
+
+Flagged as a separate follow-up (found along the way, not fixed today): 6 of the 10 pre-existing `HelpTooltip` rows use a stale `/admin/help#anchor` hash-link format that the Help Center page doesn't actually support (it only handles `?article=<id>` for deep-linking) — those "Learn more" links silently land on the general Help page instead of the specific answer.
+
 ## September 3, 2026 — New /compare hub: tabbed Books/Courses/Music comparison tables
 
 Added a new `/compare` page — a single hub with a Books/Courses/Music tab switcher, each tab showing a feature-comparison table against the competitors relevant to that category. Distinct from the existing deep-dive `/compare/[competitor]` pages (still book-only, e.g. `/compare/bookfunnel`), which are unaffected.

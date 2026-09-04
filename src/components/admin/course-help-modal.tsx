@@ -1,6 +1,7 @@
 "use client";
 
 import { X, BookOpen, Layers, Video, Eye, DollarSign, Globe, Mail } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface CourseHelpModalProps {
@@ -98,10 +99,17 @@ export function CourseHelpModal({ open, onClose }: CourseHelpModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100">
+        <div className="px-6 py-4 border-t border-gray-100 space-y-2">
           <Button onClick={onClose} className="w-full">
             Got it
           </Button>
+          <Link
+            href="/admin/help?article=ha_course_first"
+            onClick={onClose}
+            className="block text-center text-xs text-blue-600 hover:text-blue-800 hover:underline"
+          >
+            View the full step-by-step guide in the Help Center
+          </Link>
         </div>
       </div>
     </div>

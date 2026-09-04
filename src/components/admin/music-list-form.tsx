@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff,
+  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
+import { MusicHelpModal } from "@/components/admin/music-help-modal";
+import { HelpTip } from "@/components/admin/help-tip";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
@@ -50,6 +52,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [showHelp, setShowHelp] = useState(false);
 
   const atCap = trackCap !== null && tracks.length >= trackCap;
 
@@ -114,6 +117,17 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
 
   return (
     <div className="space-y-6">
+      <MusicHelpModal open={showHelp} onClose={() => setShowHelp(false)} />
+
+      <button
+        type="button"
+        onClick={() => setShowHelp(true)}
+        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+      >
+        <HelpCircle className="h-4 w-4" />
+        How music lists work
+      </button>
+
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">Music List / Album Title</label>
@@ -152,7 +166,10 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-semibold text-gray-900">Tracks</h2>
+          <div className="flex items-center gap-1.5">
+            <h2 className="text-sm font-semibold text-gray-900">Tracks</h2>
+            <HelpTip id="music-first" />
+          </div>
           <span className="text-xs text-gray-400">
             {tracks.length}{trackCap !== null ? ` / ${trackCap}` : ""}
           </span>

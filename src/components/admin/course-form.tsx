@@ -7,6 +7,7 @@ import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, 
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
+import { HelpTip } from "@/components/admin/help-tip";
 
 const RichTextEditor = dynamic(
   () => import("@/components/admin/rich-text-editor").then((m) => m.RichTextEditor),
@@ -572,9 +573,12 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
       {/* Modules & Lessons */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Curriculum ({modules.length} module{modules.length !== 1 ? "s" : ""}, {totalLessons} lesson{totalLessons !== 1 ? "s" : ""})
-          </label>
+          <div className="flex items-center gap-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Curriculum ({modules.length} module{modules.length !== 1 ? "s" : ""}, {totalLessons} lesson{totalLessons !== 1 ? "s" : ""})
+            </label>
+            <HelpTip id="course-first" />
+          </div>
           <Button type="button" variant="outline" size="sm" onClick={addModule}>
             <Plus className="h-3.5 w-3.5 mr-1" /> Add Module
           </Button>

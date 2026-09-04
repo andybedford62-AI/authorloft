@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Check, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket } from "lucide-react";
+import Link from "next/link";
+import { Loader2, Trash2, Check, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
@@ -435,6 +436,17 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} onChange={() => setDirty(true)} className={`space-y-6${formHidden ? " hidden" : ""}`}>
+
+      {!formHidden && (
+        <Link
+          href="/admin/help?article=ha20"
+          target="_blank"
+          className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          <HelpCircle className="h-4 w-4" />
+          How adding a book works
+        </Link>
+      )}
 
       {/* ── ISBN Lookup ──────────────────────────────────────────────────────── */}
       {showDetails && <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
