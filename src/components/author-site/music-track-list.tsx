@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Play, ExternalLink, Music, ListMusic } from "lucide-react";
+import { Play, ExternalLink, ListMusic } from "lucide-react";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 import { accentAsSurface, accentAsTextOn } from "@/lib/color-contrast";
 
@@ -115,84 +115,86 @@ export function MusicTrackList({
         </p>
       )}
 
-      {/* ── Track list ──────────────────────────────────────────────────────── */}
+      {/* ── Track cards ─────────────────────────────────────────────────────── */}
       {tracks.length === 0 ? (
         <div className="text-center py-16 rounded-xl border border-dashed border-gray-200">
           <ListMusic className="h-8 w-8 text-gray-200 mx-auto mb-3" />
           <p className="text-sm text-gray-500">No tracks in this list yet.</p>
         </div>
       ) : (
-        <ul className="rounded-xl border border-gray-200 overflow-hidden bg-white divide-y divide-gray-100">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {tracks.map((track, index) => {
             const link = track.videoUrl ? resolveTrackLink(track.videoUrl) : null;
             const isOpen = openId === track.id;
             const canEmbed = link?.mode === "embed" && !!link.embedUrl;
 
-            return (
-              <li key={track.id} className="bg-white">
-                {isOpen && canEmbed ? (
-                  <div
-                    className="p-4"
-                    style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 5%, white)` }}
-                  >
-                    <p
-                      className="text-xs font-bold uppercase tracking-wide mb-2"
-                      style={{ color: textOnWhite }}
-                    >
+            return isOpen && canEmbed ? (
+              <div
+                key={track.id}
+                className="rounded-2xl border overflow-hidden sm:col-span-2 lg:col-span-3"
+                style={{
+                  borderColor: `color-mix(in srgb, ${accentColor} 30%, #e5e7eb)`,
+                  backgroundColor: `color-mix(in srgb, ${accentColor} 5%, white)`,
+                }}
+              >
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold uppercase tracking-wide" style={{ color: textOnWhite }}>
                       Now Playing
                     </p>
-                    <div className="rounded-lg overflow-hidden bg-black">
-                      <iframe
-                        src={link!.embedUrl!}
-                        title={track.title}
-                        className="w-full block"
-                        style={{ height: link!.embedHeight ?? 200 }}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        loading="lazy"
-                      />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold text-gray-900">{track.title}</p>
-                    {track.descriptionHtml && (
-                      <div
-                        className="rich-content text-sm text-gray-600 mt-1"
-                        dangerouslySetInnerHTML={{ __html: track.descriptionHtml }}
-                      />
-                    )}
                     <button
                       type="button"
                       onClick={() => setOpenId(null)}
-                      className="mt-3 text-xs font-medium text-gray-500 hover:text-gray-800"
+                      className="text-xs font-medium text-gray-500 hover:text-gray-800"
                     >
-                      Close
+                      Close ✕
                     </button>
                   </div>
-                ) : (
-                  <TrackRow
-                    track={track}
-                    index={index}
-                    surface={surface}
-                    canEmbed={canEmbed}
-                    href={link?.canonicalUrl ?? track.videoUrl ?? "#"}
-                    providerName={link ? providerLabel(link.provider) : null}
-                    onPlay={() => setOpenId(track.id)}
-                  />
-                )}
-              </li>
+                  <div className="rounded-lg overflow-hidden bg-black">
+                    <iframe
+                      src={link!.embedUrl!}
+                      title={track.title}
+                      className="w-full block"
+                      style={{ height: link!.embedHeight ?? 200 }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-gray-900">{track.title}</p>
+                  {track.descriptionHtml && (
+                    <div
+                      className="rich-content text-sm text-gray-600 mt-1"
+                      dangerouslySetInnerHTML={{ __html: track.descriptionHtml }}
+                    />
+                  )}
+                </div>
+              </div>
+            ) : (
+              <TrackCard
+                key={track.id}
+                track={track}
+                index={index}
+                surface={surface}
+                canEmbed={canEmbed}
+                canonicalUrl={link?.canonicalUrl ?? track.videoUrl ?? null}
+                providerName={link ? providerLabel(link.provider) : null}
+                onPlay={() => setOpenId(track.id)}
+              />
             );
           })}
-        </ul>
+        </div>
       )}
     </div>
   );
 }
 
-function TrackRow({
+function TrackCard({
   track,
   index,
   surface,
   canEmbed,
-  href,
+  canonicalUrl,
   providerName,
   onPlay,
 }: {
@@ -200,68 +202,86 @@ function TrackRow({
   index: number;
   surface: string;
   canEmbed: boolean;
-  href: string;
+  canonicalUrl: string | null;
   providerName: string | null;
   onPlay: () => void;
 }) {
-  const inner = (
-    <>
-      {/* Track number, replaced by a play glyph on hover — the artwork sits
-          behind both so a track keeps its cover art either way. */}
-      <span className="relative h-11 w-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+  let hostname: string | null = null;
+  if (canonicalUrl) {
+    try {
+      hostname = new URL(canonicalUrl).hostname.replace(/^www\./, "");
+    } catch {
+      hostname = null;
+    }
+  }
+
+  return (
+    <div className="group rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+      {/* Artwork + big play/external button — the primary, always-visible
+          affordance rather than something only hover reveals. */}
+      <button
+        type="button"
+        onClick={canEmbed ? onPlay : () => window.open(canonicalUrl ?? "#", "_blank", "noopener,noreferrer")}
+        className="relative aspect-video w-full bg-gray-100 flex items-center justify-center overflow-hidden"
+      >
         {track.thumbnailUrl ? (
-          // next/image proxies through our own origin, so an arbitrary artwork
-          // host needs no img-src entry (remotePatterns already allows https).
-          <Image src={track.thumbnailUrl} alt="" fill sizes="44px" className="object-cover" />
+          <Image
+            src={track.thumbnailUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
         ) : (
-          <Music className="h-4 w-4 text-gray-400" />
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(135deg, ${surface}, #111827)` }}
+          />
         )}
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-white bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition-colors" />
+
+        <span
+          className="relative h-12 w-12 rounded-full flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
+          style={{ backgroundColor: surface }}
+        >
           {canEmbed ? (
-            <Play className="h-4 w-4 fill-current" />
+            <Play className="h-5 w-5 fill-current translate-x-0.5" />
           ) : (
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-5 w-5" />
           )}
         </span>
-        {!track.thumbnailUrl && (
-          <span
-            className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full text-[9px] font-bold text-white flex items-center justify-center group-hover:opacity-0 transition-opacity"
-            style={{ backgroundColor: surface }}
-          >
-            {index + 1}
-          </span>
-        )}
-      </span>
 
-      <span className="flex-1 min-w-0 text-left">
-        <span className="block text-sm font-medium text-gray-900 truncate">{track.title}</span>
+        <span
+          className="absolute top-2.5 left-2.5 h-5 w-5 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+        >
+          {index + 1}
+        </span>
+      </button>
+
+      {/* Body */}
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="text-sm font-semibold text-gray-900 leading-snug">{track.title}</h3>
         {track.description ? (
-          <span className="block text-xs text-gray-500 truncate">{track.description}</span>
+          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{track.description}</p>
         ) : providerName ? (
-          <span className="block text-xs text-gray-500">
-            {canEmbed ? providerName : `Opens on ${providerName}`}
-          </span>
+          <p className="text-xs text-gray-500 mt-1">
+            {canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`}
+          </p>
         ) : null}
-      </span>
 
-      {canEmbed ? (
-        <Play className="h-4 w-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: surface }} />
-      ) : (
-        <ExternalLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
-      )}
-    </>
-  );
-
-  const className =
-    "group w-full flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_6%,white)]";
-
-  return canEmbed ? (
-    <button type="button" onClick={onPlay} className={className}>
-      {inner}
-    </button>
-  ) : (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
-      {inner}
-    </a>
+        {hostname && (
+          <a
+            href={canonicalUrl!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-auto pt-3 inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+            <span className="truncate">{hostname}</span>
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
