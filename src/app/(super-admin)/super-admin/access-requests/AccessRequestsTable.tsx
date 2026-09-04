@@ -27,7 +27,8 @@ export function AccessRequestsTable({ initial }: { initial: AccessRequest[] }) {
     });
   }
 
-  async function deleteRequest(id: string) {
+  async function deleteRequest(id: string, name: string) {
+    if (!confirm(`Delete the access request from "${name}"? This cannot be undone.`)) return;
     setRequests((prev) => prev.filter((r) => r.id !== id));
     await fetch(`/api/super-admin/access-requests/${id}`, { method: "DELETE" });
   }
@@ -106,7 +107,7 @@ export function AccessRequestsTable({ initial }: { initial: AccessRequest[] }) {
                     icon={<Trash2 className="h-4 w-4" />}
                     title="Delete"
                     variant="delete"
-                    onClick={() => deleteRequest(r.id)}
+                    onClick={() => deleteRequest(r.id, r.name)}
                   />
                 </div>
               </td>

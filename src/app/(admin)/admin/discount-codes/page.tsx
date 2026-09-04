@@ -218,7 +218,8 @@ export default function DiscountCodesPage() {
     }
   }
 
-  async function deleteCode(id: string) {
+  async function deleteCode(id: string, code: string) {
+    if (!confirm(`Delete discount code "${code}"? This cannot be undone.`)) return;
     setActionError("");
     setDeletingId(id);
     try {
@@ -637,7 +638,7 @@ export default function DiscountCodesPage() {
                             : <Trash2 className="h-4 w-4" />
                         }
                         title="Delete"
-                        onClick={() => deleteCode(code.id)}
+                        onClick={() => deleteCode(code.id, code.code)}
                         disabled={!!deletingId}
                         variant="delete"
                       />

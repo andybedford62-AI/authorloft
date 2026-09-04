@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Site-wide audit: 4 more one-click deletes with no confirmation
+
+Following the Music delete-confirmation fix earlier today, audited all 48 files with a `DELETE` fetch call for the same gap (every destructive action must confirm first — see `feedback_delete_confirmation_standard` memory). Found and fixed 4 more:
+- **Discount codes** (`admin/discount-codes/page.tsx`) — delete button removed a code immediately, no confirm.
+- **Access requests** (`super-admin/access-requests/AccessRequestsTable.tsx`) — worse than most: optimistically removed from local state *before* the fetch even resolved, no confirm, no error handling.
+- **Beta access codes** (`super-admin/beta-mode-panel.tsx`) — separate from the file's existing on/off confirm state, which didn't cover per-code deletion at all.
+- **Custom OG/social-share image** (`super-admin/seo-panel.tsx`) — "Clear" button wiped a page's custom image immediately.
+
+All four now use the same `confirm(\`Delete "X"? This cannot be undone.\`)` pattern already established in `book-form.tsx`/`course-form.tsx`. The other ~40 files with DELETE calls already had confirmation (native `confirm()` or a custom confirm modal) or weren't actually destructive (e.g. ending an impersonation session).
+
 ## September 3, 2026 — Fixed stale HelpTip deep-links; Music delete had no confirmation; edit/delete help articles
 
 Fixed 7 of the 10 pre-existing `HelpTooltip` rows (flagged as a follow-up earlier the same day) — their `learnMoreUrl` used a stale `/admin/help#anchor` hash format the Help Center page never actually supported (it only handles `?article=<id>`), so "Learn more" silently landed on the general Help page instead of the specific answer. Matched each to its real article (e.g. `discount-codes` had been pointing at Plans & Billing entirely — now correctly points at "How do I set a book price and accept discount codes?"). Pure DB content fix, no code change, live immediately.

@@ -117,7 +117,8 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
 
   // ── Code deletion ───────────────────────────────────────────────────────
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, code: string) {
+    if (!confirm(`Delete beta code "${code}"? This cannot be undone.`)) return;
     setDeletingId(id);
     try {
       await fetch(`/api/super-admin/beta/codes/${id}`, { method: "DELETE" });
@@ -392,7 +393,7 @@ export function BetaModePanel({ initialBetaMode, initialBetaMessage, initialCode
                         {/* Delete */}
                         <button
                           type="button"
-                          onClick={() => handleDelete(c.id)}
+                          onClick={() => handleDelete(c.id, c.code)}
                           disabled={deletingId === c.id}
                           title="Revoke code"
                           className="text-gray-400 hover:text-red-600 flex-shrink-0 disabled:opacity-50"

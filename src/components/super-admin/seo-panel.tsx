@@ -53,6 +53,7 @@ function PageImageEditor({ page, onSaved }: { page: SeoPage; onSaved: (id: strin
   }
 
   async function handleClear() {
+    if (!confirm(`Clear the custom social-share image for "${page.label}"? This cannot be undone.`)) return;
     setSaving(true); setError(""); setSuccess(false);
     try {
       await fetch(`/api/super-admin/seo/${page.id}`, { method: "DELETE" });
