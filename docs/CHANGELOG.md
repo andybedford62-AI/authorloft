@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## September 3, 2026 — Fixed stale HelpTip deep-links; Music delete had no confirmation; edit/delete help articles
+
+Fixed 7 of the 10 pre-existing `HelpTooltip` rows (flagged as a follow-up earlier the same day) — their `learnMoreUrl` used a stale `/admin/help#anchor` hash format the Help Center page never actually supported (it only handles `?article=<id>`), so "Learn more" silently landed on the general Help page instead of the specific answer. Matched each to its real article (e.g. `discount-codes` had been pointing at Plans & Billing entirely — now correctly points at "How do I set a book price and accept discount codes?"). Pure DB content fix, no code change, live immediately.
+
+While researching accurate steps for the new edit/delete help content below, found Music's "Delete list" button had **zero confirmation** — one click permanently deleted the list, no undo, unlike both Books and Courses which confirm first. Added the same `confirm()` guard `music-list-form.tsx` was missing.
+
+Added 4 new Help Center articles under "Managing Courses" / "Managing Music" (each subtopic previously only had the "add your first X" article from earlier today): "How do I edit an existing course/music list?" and "How do I delete a course/music list?" — including the reminder that unpublishing (not deleting) is the reversible way to hide something.
+
 ## September 3, 2026 — On-page "how it works" help for first Course/Music, parity check across Books
 
 Audited existing help coverage before building anything new, since the picture turned out uneven rather than uniformly missing: Courses already had a rich on-page `CourseHelpModal` (triggered by a "How courses work" button in the editor) but zero presence in the DB-driven Help Center; Books had a solid Help Center article ("How do I add my first book?") but no on-page link at all; Music had neither.

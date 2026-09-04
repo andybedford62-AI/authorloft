@@ -103,6 +103,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
 
   async function handleDelete() {
     if (!listId) return;
+    if (!confirm(`Delete "${title || "this music list"}" and all its tracks? This cannot be undone.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/admin/music/${listId}`, { method: "DELETE" });
