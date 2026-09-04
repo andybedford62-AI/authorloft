@@ -215,49 +215,68 @@ function TrackCard({
     }
   }
 
+  const mediaClassName =
+    "relative aspect-video w-full bg-gray-100 flex items-center justify-center overflow-hidden";
+
+  const mediaInner = (
+    <>
+      {track.thumbnailUrl ? (
+        <Image
+          src={track.thumbnailUrl}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{ background: `linear-gradient(135deg, ${surface}, #111827)` }}
+        />
+      )}
+      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition-colors" />
+
+      <span
+        className="relative h-12 w-12 rounded-full flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
+        style={{ backgroundColor: surface }}
+      >
+        {canEmbed ? (
+          <Play className="h-5 w-5 fill-current translate-x-0.5" />
+        ) : (
+          <ExternalLink className="h-5 w-5" />
+        )}
+      </span>
+
+      <span
+        className="absolute top-2.5 left-2.5 h-5 w-5 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+        style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+      >
+        {index + 1}
+      </span>
+    </>
+  );
+
   return (
     <div className="group rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
       {/* Artwork + big play/external button — the primary, always-visible
-          affordance rather than something only hover reveals. */}
-      <button
-        type="button"
-        onClick={canEmbed ? onPlay : () => window.open(canonicalUrl ?? "#", "_blank", "noopener,noreferrer")}
-        className="relative aspect-video w-full bg-gray-100 flex items-center justify-center overflow-hidden"
-      >
-        {track.thumbnailUrl ? (
-          <Image
-            src={track.thumbnailUrl}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(135deg, ${surface}, #111827)` }}
-          />
-        )}
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 transition-colors" />
-
-        <span
-          className="relative h-12 w-12 rounded-full flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
-          style={{ backgroundColor: surface }}
+          affordance rather than something only hover reveals. A real <a>
+          for non-embeddable tracks so ctrl/cmd-click, middle-click, and
+          "copy link" behave like a normal link instead of only working via
+          a JS-driven window.open(). */}
+      {canEmbed ? (
+        <button type="button" onClick={onPlay} className={mediaClassName}>
+          {mediaInner}
+        </button>
+      ) : (
+        <a
+          href={canonicalUrl ?? "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={mediaClassName}
         >
-          {canEmbed ? (
-            <Play className="h-5 w-5 fill-current translate-x-0.5" />
-          ) : (
-            <ExternalLink className="h-5 w-5" />
-          )}
-        </span>
-
-        <span
-          className="absolute top-2.5 left-2.5 h-5 w-5 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
-        >
-          {index + 1}
-        </span>
-      </button>
+          {mediaInner}
+        </a>
+      )}
 
       {/* Body */}
       <div className="p-4 flex flex-col flex-1">

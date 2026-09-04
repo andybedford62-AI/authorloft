@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## September 4, 2026 — Music pages redesign: album-style grid + interactive track cards
+
+The public Music pages read as a plain list — redesigned both for a more playful, streaming-app feel:
+- **`/music` index** — playlist cards are now square album tiles with a bottom gradient scrim, track-count chip, and a play button that scales in on hover.
+- **`/music/[slug]`** — replaced the plain header + flat row list with a cinematic hero (cover image, gradient, big title, a "Play" button that opens the first track) and a grid of track cards, each with artwork, a big play/external button, description, and the source link/hostname.
+
+All colors derive from each author's own `accentColor` via the existing `accentAsSurface`/`accentAsTextOn` contrast helpers, so it holds up for every author site. No AI/decorative imagery added — only real per-author cover art and thumbnails already in the DB.
+
 ## September 3, 2026 — Site-wide audit: 4 more one-click deletes with no confirmation
 
 Following the Music delete-confirmation fix earlier today, audited all 48 files with a `DELETE` fetch call for the same gap (every destructive action must confirm first — see `feedback_delete_confirmation_standard` memory). Found and fixed 4 more:
