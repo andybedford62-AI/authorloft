@@ -18,8 +18,8 @@ This document lists all features by plan tier (FREE, STANDARD, PREMIUM) organize
 
 **Pricing:**
 - **FREE** — Forever free, no credit card required
-- **STANDARD** — $19.99/month or $199.99/year (save ~17%)
-- **PREMIUM** — $59.99/month or $599.99/year (save ~17%)
+- **STANDARD** — $9.99/month or $99.99/year (save ~17%)
+- **PREMIUM** — $39.99/month or $399.99/year (save ~17%)
 
 Early bird / founding member discount available to FREE users within a configurable signup window (default 20% off, 3 months, 30-day window — adjustable in Super Admin → Coupons).
 

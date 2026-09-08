@@ -15,18 +15,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Pricing — Free Author Career Platform",
     description:
-      "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
+      "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
     alternates: { canonical: "/pricing" },
     openGraph: {
       type:        "website",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
       images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft pricing plans" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "AuthorLoft Pricing — Free Author Career Platform",
-      description: "Start free forever. Upgrade to Standard ($19.99/mo) for direct sales and custom domains, or Premium ($59.99/mo) for full analytics. No credit card required.",
+      description: "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
       images:      [ogImage],
     },
   };
@@ -296,7 +296,7 @@ export default async function PricingPage() {
                   <th className="text-left px-6 py-4 font-medium text-vault-mute w-[30%]">Feature</th>
                   <th className="text-center px-4 py-4 font-bold text-vault-gold bg-vault-surf-2 border-x border-vault-ink/12">
                     AuthorLoft
-                    <span className="block text-xs font-semibold text-vault-gold-light mt-0.5">STANDARD · $19.99/mo</span>
+                    <span className="block text-xs font-semibold text-vault-gold-light mt-0.5">STANDARD · $9.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-vault-ink">
                     <Link href="/compare/tertulia" className="hover:text-vault-gold hover:underline transition-colors">Tertulia</Link>

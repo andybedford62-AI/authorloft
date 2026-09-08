@@ -228,8 +228,8 @@ function sectionOverview() {
     // UPDATE HERE when plan features or pricing change
     threeColTable([
       ["Free",     "FREE",     "Forever free. Up to 5 books, 10 blog posts. Core site, newsletter capture, bookstore listing, reader feedback, and discount codes included."],
-      ["Standard", "STANDARD", "$19.99/month or $199.99/year. Up to 20 books, 100 blog posts. Direct sales, pre-orders, affiliate program, sales dashboard, shopping cart."],
-      ["Premium",  "PREMIUM",  "$59.99/month or $599.99/year. Unlimited books and posts. Audio books, flip books, AI assistant, SEO audit, custom colours, OG images."],
+      ["Standard", "STANDARD", "$9.99/month or $99.99/year. Up to 20 books, 100 blog posts. Direct sales, pre-orders, affiliate program, sales dashboard, shopping cart."],
+      ["Premium",  "PREMIUM",  "$39.99/month or $399.99/year. Unlimited books and posts. Audio books, flip books, AI assistant, SEO audit, custom colours, OG images."],
     ], [1800, 1800, 5760]),
     spacer(200),
     h2("User Roles"),

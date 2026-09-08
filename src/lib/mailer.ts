@@ -391,12 +391,12 @@ Your site: {{siteUrl}}
 
 ─── When you're ready to grow ───
 
-Your free plan is a great start. Here's what unlocks on Standard ($19.99/mo):
+Your free plan is a great start. Here's what unlocks on Standard ($9.99/mo):
 • Sell direct — Keep more revenue. No middlemen.
 • Custom domain — Use your own name.com address.
 • More room to grow — Add more books, courses, or music lists.
 
-And on Premium ($59.99/mo): unlimited books, courses, and music lists plus full analytics so you can see exactly who's finding you and where they come from.
+And on Premium ($39.99/mo): unlimited books, courses, and music lists plus full analytics so you can see exactly who's finding you and where they come from.
 
 No pressure — upgrade whenever it makes sense.
 

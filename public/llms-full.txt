@@ -21,7 +21,7 @@ Website: https://www.authorloft.com
 - Reader feedback & ratings
 - Price: $0/month forever
 
-### STANDARD Plan ($19.99/month or $191.90/year)
+### STANDARD Plan ($9.99/month or $99.99/year)
 - Everything in FREE, plus:
 - Custom domain support
 - All sales formats (eBook + Print) with shopping cart
@@ -35,7 +35,7 @@ Website: https://www.authorloft.com
 - SEO audit tools
 - Up to 25 published books
 
-### PREMIUM Plan ($79.99/month or $767.90/year)
+### PREMIUM Plan ($39.99/month or $399.99/year)
 - Everything in STANDARD, plus:
 - Full PostHog analytics dashboard
 - Auto-generated media kit PDF

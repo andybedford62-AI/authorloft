@@ -96,7 +96,7 @@ const softwareAppLd = {
     {
       "@type": "Offer",
       name: "Standard",
-      price: "19.99",
+      price: "9.99",
       priceCurrency: "USD",
       billingIncrement: "P1M",
       description: "Direct sales, custom domain, newsletter, bookstore listing, AI tools, and more.",
@@ -104,7 +104,7 @@ const softwareAppLd = {
     {
       "@type": "Offer",
       name: "Premium",
-      price: "59.99",
+      price: "39.99",
       priceCurrency: "USD",
       billingIncrement: "P1M",
       description: "Full analytics, media kit, audio previews, premium themes, and unlimited books.",

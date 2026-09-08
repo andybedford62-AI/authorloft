@@ -28,12 +28,12 @@ Your site: {{siteUrl}}
 
 ─── When you're ready to grow ───
 
-Your free plan is a great start. Here's what unlocks on Standard ($19.99/mo):
+Your free plan is a great start. Here's what unlocks on Standard ($9.99/mo):
 • Sell books directly — Keep more revenue. No middlemen.
 • Custom domain — Use your own authorname.com address.
 • Up to 20 books — Room to grow your catalog.
 
-And on Premium ($59.99/mo): unlimited books plus full analytics so you can see exactly who's finding you and where they come from.
+And on Premium ($39.99/mo): unlimited books plus full analytics so you can see exactly who's finding you and where they come from.
 
 No pressure — upgrade whenever it makes sense.
 
