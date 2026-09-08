@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { MusicHelpModal } from "@/components/admin/music-help-modal";
+import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 
@@ -118,6 +119,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
 
   return (
     <div className="space-y-6">
+      <MusicNoSalesBanner />
       <MusicHelpModal open={showHelp} onClose={() => setShowHelp(false)} />
 
       <button

@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## September 8, 2026 — Admin-side "no music sales" disclaimer
+
+Added a prominent, unmissable banner (`MusicNoSalesBanner`) to the top of the Music admin index page and the list editor: playlists/albums are link-only, AuthorLoft doesn't host or sell music, no price field exists anywhere in the flow. Prompted by confirming there's genuinely no way today for an author to charge for a playlist/album — deliberate, since hosting music would open copyright/licensing liability the link-only model avoids. Admin-only per decision; public `/music` pages don't show any price/buy affordance so there's nothing there to clarify.
+
 ## September 8, 2026 — Plan pricing cut: Standard $9.99/mo, Premium $39.99/mo
 
 Lowered subscription pricing: Standard $19.99→$9.99/mo ($199.99→$99.99/yr), Premium $59.99→$39.99/mo ($599.99→$399.99/yr). New live Stripe Prices created; existing subscribers keep their current price automatically (Stripe never moves an active subscription off the price it was created with — only the `Plan.stripePriceIdMonthly`/`stripePriceIdAnnual` pointer used by *new* checkouts changed). Updated every hardcoded price mention: pricing page metadata + comparison table, `/features` JSON-LD, marketing FAQs (landing-page-data, comparison-data), onboarding emails (mailer.ts, welcome-email-panel.tsx, and the two live `BroadcastTemplate` DB rows), `llms.txt`/`llms-full.txt`, and the feature-matrix docs/DOCX generator. Also fixed a pre-existing drift bug found along the way — `public/llms.txt` (the file Next actually serves at `/llms.txt`, unlike `public/llms-full.txt` which is shadowed by the `src/app/llms-full.txt` route) had Premium listed at $79.99, never $59.99.
