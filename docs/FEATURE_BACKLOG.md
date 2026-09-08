@@ -231,6 +231,7 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 - [ ] **Author expertise/credentials schema** — PARTIALLY BUILT (checked Aug 9, 2026): Person schema already exists on author about pages (`about/page.tsx`), but `knowsAbout` is a hardcoded generic string ("Writing, Publishing, Independent Author") rather than real per-author credentials/expertise fields. Remaining work is the data model + UI to make it per-author, not the schema itself. *(small–medium)*
 - [ ] **Bing URL Submission API** — note (Aug 9, 2026): `src/lib/indexnow.ts` already auto-pushes blog/guide URLs to Bing/Yandex via IndexNow on publish — a narrower, different automation than what this item describes (one-click full-sitemap submission via Bing's own API from `/admin/search-engines`, which today only shows manual instructions). Still open as literally scoped. *(small)*
 - [ ] **SEO setup checklist** — trackable onboarding checklist for search engine verification + sitemap submission with persistent completion state. *(small–medium)*
+- [ ] **Replace pricing page hero image with a real photo** — `public/pricing-header.png` is AI-generated (confirmed Sept 8, 2026: same asset since Aug 9, just without the visible "Made with AI" badge — violates the no-AI-imagery rule, which was known and enforced elsewhere but missed here). Shipped as a stopgap with updated $9.99/$39.99 pricing baked in; replace with a real photo (with pricing as a separate on-page text overlay, not baked into the image) when one is available. *(small, once a photo is sourced)*
 
 ---
 
