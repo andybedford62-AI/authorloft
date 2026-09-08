@@ -50,7 +50,7 @@ const sections = [
     title: "Track & List Limits",
     color: "text-indigo-600 bg-indigo-50",
     content:
-      "Free plans include up to 5 lists with 15 tracks each; Standard goes up to 20 lists with 50 tracks each; Premium is unlimited. Upgrade anytime from Settings if you need more room.",
+      "Free plans include up to 5 lists with 20 tracks each; Standard goes up to 20 lists with 75 tracks each; Premium goes up to 500 tracks per list. Upgrade anytime from Settings if you need more room.",
   },
 ];
 

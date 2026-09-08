@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## September 8, 2026 — Raised music track-per-list caps
+
+Free 15→20, Standard 50→75, Premium null (truly unlimited)→500. Not a storage-cost concern (each track is just a URL/title/description row) — Premium specifically moved from unlimited to a high soft cap as an abuse/import guardrail (each track save does a metadata fetch) and to keep a single playlist page browsable. `Plan.maxTracksPerList` DB values updated directly (live sitewide immediately, same as any Plan row); updated the one hardcoded copy of these numbers in the admin Music help modal.
+
 ## September 8, 2026 — Admin-side "no music sales" disclaimer
 
 Added a prominent, unmissable banner (`MusicNoSalesBanner`) to the top of the Music admin index page and the list editor: playlists/albums are link-only, AuthorLoft doesn't host or sell music, no price field exists anywhere in the flow. Prompted by confirming there's genuinely no way today for an author to charge for a playlist/album — deliberate, since hosting music would open copyright/licensing liability the link-only model avoids. Admin-only per decision; public `/music` pages don't show any price/buy affordance so there's nothing there to clarify.
