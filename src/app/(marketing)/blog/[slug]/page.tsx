@@ -131,7 +131,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               src={post.coverImageUrl}
               alt={post.title}
               fill
-              className="object-contain"
+              className="object-cover"
             />
           </div>
         )}

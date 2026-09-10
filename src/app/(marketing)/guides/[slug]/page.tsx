@@ -152,7 +152,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               src={guide.coverImageUrl}
               alt={guide.title}
               fill
-              className="object-contain"
+              className="object-cover"
             />
           </div>
         )}

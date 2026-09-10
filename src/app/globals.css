@@ -791,9 +791,15 @@ input[type="file"] {
 [data-admin-theme="dark"] .text-rose-500    { color: #fda4af !important; }
 [data-admin-theme="dark"] .text-yellow-700  { color: #fde047 !important; }
 
-/* Images inside the editor and on the public blog */
+/* Images inside the editor and on the public blog.
+   width: 100% (not just max-width) so images always span the content column —
+   the editor only ever inserts them as full-width blocks (ImageExtension is
+   configured inline: false), never as small inline-with-text icons, so a
+   source image narrower than the column should still fill it rather than
+   sit small at its native size. */
 .rich-content img,
 .tiptap-editor img.rte-image {
+  width: 100%;
   max-width: 100%;
   height: auto;
   border-radius: 8px;
