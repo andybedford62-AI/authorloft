@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSupabaseSignedUrl } from "@/lib/supabase-storage";
+import { getSupabaseSignedUrl, SIGNED_URL_TTL_DAY } from "@/lib/supabase-storage";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string; fileId: string }> }) {
   try {
@@ -31,8 +31,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    // Generate a signed download URL (valid for 1 hour)
-    const signedUrl = await getSupabaseSignedUrl("book-files", file.fileKey, 3600, file.fileName);
+    // Generate a signed download URL
+    const signedUrl = await getSupabaseSignedUrl("book-files", file.fileKey, SIGNED_URL_TTL_DAY, file.fileName);
 
     // Record download
     await prisma.arcReaderDownload.upsert({

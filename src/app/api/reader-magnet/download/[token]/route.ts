@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSupabaseSignedUrl } from "@/lib/supabase-storage";
+import { getSupabaseSignedUrl, SIGNED_URL_TTL_DAY } from "@/lib/supabase-storage";
 
 export async function GET(
   _req: NextRequest,
@@ -39,7 +39,7 @@ export async function GET(
     const signedUrl = await getSupabaseSignedUrl(
       "book-files",
       lead.saleItem.fileKey,
-      3600,
+      SIGNED_URL_TTL_DAY,
       lead.saleItem.fileName ?? undefined
     );
     return NextResponse.redirect(signedUrl);

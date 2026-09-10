@@ -24,6 +24,17 @@ if (!SUPABASE_URL || !SERVICE_KEY) {
 export const ONE_YEAR_CACHE = 31536000;
 
 /**
+ * Signed URL lifetime for customer-facing downloads (orders, ARC, reader-magnet,
+ * course resources). The real access control is the app-level check on every
+ * request (payment status, download count, link expiry) before a signed URL is
+ * even minted — the token's own expiry isn't the security boundary, so a longer
+ * TTL costs nothing there. It does let the signed-URL cache in this module stay
+ * warm 24x longer than the old 1-hour value, meaningfully raising the CDN cache
+ * hit rate for repeat/popular downloads.
+ */
+export const SIGNED_URL_TTL_DAY = 86400;
+
+/**
  * Upload a Buffer to a Supabase Storage bucket.
  *
  * @param bucket             Bucket name, e.g. "book-covers"

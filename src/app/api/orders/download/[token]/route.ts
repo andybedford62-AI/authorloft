@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSupabaseSignedUrl } from "@/lib/supabase-storage";
+import { getSupabaseSignedUrl, SIGNED_URL_TTL_DAY } from "@/lib/supabase-storage";
 
 const downloadAttempts = new Map<string, number[]>();
 function isRateLimited(ip: string): boolean {
@@ -80,11 +80,11 @@ export async function GET(
       data: { downloadCount: { increment: 1 } },
     });
 
-    // Generate a 1-hour Supabase signed URL for the private bucket
+    // Generate a Supabase signed URL for the private bucket
     const signedUrl = await getSupabaseSignedUrl(
       "book-files",
       item.fileKey,
-      3600,
+      SIGNED_URL_TTL_DAY,
       downloadName
     );
 

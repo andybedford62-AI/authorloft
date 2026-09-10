@@ -63,9 +63,9 @@ export async function GET(
       return NextResponse.redirect(new URL(lesson.fileKey, req.url));
     }
 
-    const { getSupabaseSignedUrl } = await import("@/lib/supabase-storage");
+    const { getSupabaseSignedUrl, SIGNED_URL_TTL_DAY } = await import("@/lib/supabase-storage");
     const downloadName = lesson.fileName || nodePath.basename(lesson.fileKey);
-    const signedUrl = await getSupabaseSignedUrl("course-files", lesson.fileKey, 3600, downloadName);
+    const signedUrl = await getSupabaseSignedUrl("course-files", lesson.fileKey, SIGNED_URL_TTL_DAY, downloadName);
 
     return NextResponse.redirect(signedUrl);
   } catch (err: any) {
