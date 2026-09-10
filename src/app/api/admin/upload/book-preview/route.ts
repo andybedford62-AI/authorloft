@@ -81,10 +81,10 @@ export async function POST(req: NextRequest) {
   const buffer      = Buffer.from(arrayBuffer);
   const storagePath = `${userId}/previews/${bookId}/${position}-${slot}-${Date.now()}.${ext}`;
 
-  const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+  const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
   let fileUrl: string;
   try {
-    fileUrl = await uploadToSupabaseStorage("book-previews", storagePath, buffer, file.type);
+    fileUrl = await uploadToSupabaseStorage("book-previews", storagePath, buffer, file.type, ONE_YEAR_CACHE);
   } catch (err) {
     console.error("[upload/book-preview] Supabase error:", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });

@@ -49,10 +49,10 @@ export async function POST(req: NextRequest) {
   let publicUrl: string;
 
   if (SUPABASE_CONFIGURED) {
-    const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+    const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
     const storagePath = `${authorId}/logos/${Date.now()}.${ext}`;
     try {
-      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type);
+      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type, ONE_YEAR_CACHE);
     } catch (err) {
       console.error("[upload/logo] Supabase error:", err);
       return NextResponse.json(

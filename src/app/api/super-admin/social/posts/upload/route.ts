@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse }      from "next/server";
 import { requireSuperAdminId }            from "@/lib/super-admin-auth";
-import { uploadToSupabaseStorage }        from "@/lib/supabase-storage";
+import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
 
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const buffer  = Buffer.from(await file.arrayBuffer());
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
     return NextResponse.json({ ok: true, url: publicUrl, mediaType: "IMAGE" });
   } catch {
     return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });

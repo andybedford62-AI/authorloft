@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
 import { revalidatePath } from "next/cache";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const buffer   = Buffer.from(await file.arrayBuffer());
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
 
     await prisma.platformSettings.upsert({
       where:  { id: "singleton" },

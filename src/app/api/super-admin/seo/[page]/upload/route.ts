@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 import { prisma } from "@/lib/db";
-import { uploadToSupabaseStorage } from "@/lib/supabase-storage";
+import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
 import { revalidatePath } from "next/cache";
 import { SEO_PAGES } from "@/lib/seo-config";
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pag
   const buffer   = Buffer.from(await file.arrayBuffer());
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
     const pageInfo  = SEO_PAGES.find(p => p.id === page)!;
 
     await prisma.seoConfig.upsert({

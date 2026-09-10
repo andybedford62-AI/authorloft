@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
 
   if (SUPABASE_CONFIGURED) {
     // ── Supabase Storage (production) ────────────────────────────────────────
-    const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+    const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
     const storagePath = `${authorId}/blog-images/${Date.now()}.${ext}`;
     try {
       // Reuse the existing "book-covers" bucket (same bucket, different subfolder)
-      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type);
+      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type, ONE_YEAR_CACHE);
     } catch (err) {
       console.error("[upload/image] Supabase error:", err);
       return NextResponse.json(
