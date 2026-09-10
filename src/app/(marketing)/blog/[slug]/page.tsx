@@ -145,7 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Content */}
         <div
-          className="rich-content"
+          className="rich-content rich-content-invert text-[#c7cede]"
           dangerouslySetInnerHTML={{ __html: safeContent }}
         />
 

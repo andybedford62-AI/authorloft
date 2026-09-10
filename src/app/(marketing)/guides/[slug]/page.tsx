@@ -158,7 +158,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
         {/* Content */}
         <div
-          className="rich-content"
+          className="rich-content rich-content-invert text-[#c7cede]"
           dangerouslySetInnerHTML={{ __html: safeContent }}
         />
 

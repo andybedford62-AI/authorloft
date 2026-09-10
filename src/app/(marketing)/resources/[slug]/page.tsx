@@ -131,7 +131,7 @@ export default async function ResourceDownloadPage(
             {/* Body content */}
             {bodyHtml && (
               <div
-                className="rich-content"
+                className="rich-content rich-content-invert"
                 style={{ marginTop: 40, paddingTop: 36, borderTop: "1px solid rgba(243,236,219,0.12)", fontFamily: "Georgia, serif", fontSize: 15, lineHeight: 1.75, color: VAULT.mute }}
                 dangerouslySetInnerHTML={{ __html: bodyHtml }}
               />

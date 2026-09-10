@@ -144,7 +144,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Content */}
-        <div className="rich-content" dangerouslySetInnerHTML={{ __html: safeContent }} />
+        <div className="rich-content rich-content-invert text-[#c7cede]" dangerouslySetInnerHTML={{ __html: safeContent }} />
 
         {/* Downloadable resource — only shown if a URL was set */}
         {post.attachmentUrl && (
