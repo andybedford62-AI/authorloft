@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { GraduationCap } from "lucide-react";
 import { PageBanner } from "@/components/author-site/page-banner";
 import { Button } from "@/components/ui/button";
@@ -79,11 +80,11 @@ export default async function CoursesPage({
                   {/* Cover */}
                   <div className="relative h-48 bg-gray-50 flex items-center justify-center">
                     {course.coverImageUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
+                      <Image
                         src={course.coverImageUrl}
                         alt={course.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <GraduationCap className="h-12 w-12 text-gray-300" />

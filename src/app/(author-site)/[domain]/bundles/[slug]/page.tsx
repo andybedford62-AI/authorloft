@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Package, BookOpen, ArrowLeft } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
@@ -99,12 +100,12 @@ export default async function BundleDetailPage({
                 className="flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:border-gray-300 hover:shadow-sm transition-all group bg-white"
               >
                 {item.saleItem.book.coverImageUrl ? (
-                  <div className="w-14 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="relative w-14 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <Image
                       src={item.saleItem.book.coverImageUrl}
                       alt={item.saleItem.book.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 ) : (

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Search } from "lucide-react";
 import { MarketingFilterToolbar } from "./marketing-filter-toolbar";
 
@@ -110,9 +111,8 @@ function GuideCard({ guide }: { guide: Guide }) {
       className="group bg-vault-surf rounded-2xl border border-vault-ink/12 overflow-hidden hover:shadow-lg hover:border-vault-gold/40 transition-all"
     >
       {guide.coverImageUrl && (
-        <div className="h-44 bg-vault-bg overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={guide.coverImageUrl} alt={guide.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <div className="relative h-44 bg-vault-bg overflow-hidden">
+          <Image src={guide.coverImageUrl} alt={guide.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
         </div>
       )}
       <div className="p-5">

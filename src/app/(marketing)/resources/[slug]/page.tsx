@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { FileDown, ArrowLeft } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -96,12 +97,14 @@ export default async function ResourceDownloadPage(
         <div style={{ background: VAULT.surf2, borderRadius: 24, overflow: "hidden", border: "1px solid rgba(243,236,219,0.12)" }}>
           {/* Cover */}
           {d.coverImageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={d.coverImageUrl}
-              alt={d.title}
-              style={{ width: "100%", maxHeight: 340, objectFit: "contain", background: VAULT.bg, display: "block" }}
-            />
+            <div style={{ position: "relative", width: "100%", height: 340, background: VAULT.bg }}>
+              <Image
+                src={d.coverImageUrl}
+                alt={d.title}
+                fill
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           ) : (
             <div style={{ width: "100%", height: 120, background: `${VAULT.gold}14`, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <FileDown style={{ width: 36, height: 36, color: VAULT.gold }} />

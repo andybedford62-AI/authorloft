@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
@@ -125,12 +126,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* Cover Image */}
         {post.coverImageUrl && (
-          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="relative w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] overflow-hidden">
+            <Image
               src={post.coverImageUrl}
               alt={post.title}
-              className="w-full h-full object-contain"
+              fill
+              className="object-contain"
             />
           </div>
         )}

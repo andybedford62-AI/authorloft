@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { authPageStyle, authCardStyle, AUTH_LINK, AUTH_BRASS } from "@/app/(auth)/auth-theme";
 
@@ -38,8 +39,7 @@ export default function AcceptTermsPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
+            <Image src="/authorloft-logo.png" alt="AuthorLoft" width={461} height={449} className="h-20 w-auto" />
           </Link>
         </div>
 

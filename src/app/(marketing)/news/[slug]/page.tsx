@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
@@ -127,12 +128,14 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
 
         {/* Cover Image */}
         {post.coverImageUrl && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={post.coverImageUrl}
-            alt={post.title}
-            className="w-full rounded-2xl object-cover h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)]"
-          />
+          <div className="relative w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] overflow-hidden">
+            <Image
+              src={post.coverImageUrl}
+              alt={post.title}
+              fill
+              className="object-cover"
+            />
+          </div>
         )}
 
         {/* Byline */}

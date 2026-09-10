@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star, BookText } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
@@ -92,10 +93,13 @@ export default async function CourseDetailPage({
         <div className="md:col-span-3">
           {course.coverImageUrl && (
             <div className="rounded-xl overflow-hidden mb-6 bg-gray-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* width/height only set the aspect ratio hint; w-full h-auto below
+                  makes the browser size it from the real image, same as a plain <img>. */}
+              <Image
                 src={course.coverImageUrl}
                 alt={course.title}
+                width={1200}
+                height={675}
                 className="w-full h-auto object-cover"
               />
             </div>

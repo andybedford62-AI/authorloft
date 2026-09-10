@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
@@ -146,12 +147,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
         {/* Cover Image */}
         {guide.coverImageUrl && (
-          <div className="w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="relative w-full rounded-2xl h-64 sm:h-80 mb-10 border border-[rgba(243,236,219,0.12)] bg-[#1e2f4d] overflow-hidden">
+            <Image
               src={guide.coverImageUrl}
               alt={guide.title}
-              className="w-full h-full object-contain"
+              fill
+              className="object-contain"
             />
           </div>
         )}
@@ -189,9 +190,8 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                   className="group flex gap-3 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-4 hover:border-[#d6a94a]/40 hover:shadow-md transition-all"
                 >
                   {post.coverImageUrl ? (
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#16233d]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover" />
+                    <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#16233d]">
+                      <Image src={post.coverImageUrl} alt={post.title} fill className="object-cover" />
                     </div>
                   ) : (
                     <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-[#16233d] flex items-center justify-center">

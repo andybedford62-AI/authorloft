@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { Star, BookOpen, ArrowRight, X, Sparkles } from "lucide-react";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
@@ -75,8 +76,7 @@ export function BookstoreQuickView({
           <div className="mx-auto sm:mx-0 w-36 sm:w-44 flex-shrink-0">
             <div className="relative w-full aspect-[2/3] rounded-xl bg-vault-bg overflow-hidden border border-vault-ink/12">
               {book.coverImageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={book.coverImageUrl} alt={book.title} className="h-full w-full object-contain" />
+                <Image src={book.coverImageUrl} alt={book.title} fill className="object-contain" />
               ) : (
                 <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-vault-mute">
                   <BookOpen className="h-9 w-9" />

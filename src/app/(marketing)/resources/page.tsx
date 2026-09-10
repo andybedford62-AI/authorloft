@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import Link from "next/link";
+import Image from "next/image";
 import { FileDown } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -120,9 +121,8 @@ export default async function ResourcesPage() {
                     <div key={d.id} style={{ display: 'flex', flexDirection: 'column', background: VAULT.surf2, border: '1px solid rgba(243,236,219,0.12)', borderRadius: 18, overflow: 'hidden' }}>
                       <Link href={`/resources/${d.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                         {d.coverImageUrl ? (
-                          <div style={{ width: '100%', height: 160, background: VAULT.surf }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={d.coverImageUrl} alt={d.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          <div style={{ position: 'relative', width: '100%', height: 160, background: VAULT.surf }}>
+                            <Image src={d.coverImageUrl} alt={d.title} fill style={{ objectFit: 'contain' }} />
                           </div>
                         ) : (
                           <div style={{ width: '100%', height: 84, background: `${VAULT.gold}14`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

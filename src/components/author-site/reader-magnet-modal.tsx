@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, Loader2, Mail, CheckCircle } from "lucide-react";
 
 type Props = {
@@ -74,9 +75,11 @@ export function ReaderMagnetModal({
             <X className="h-5 w-5" />
           </button>
           {coverImageUrl && (
-            <img
+            <Image
               src={coverImageUrl}
               alt={bookTitle}
+              width={64}
+              height={96}
               className="w-16 h-24 object-cover rounded-lg shadow-lg mb-3 mx-auto block"
             />
           )}

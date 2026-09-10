@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useId } from 'react';
 import { BookOpen, GraduationCap, Music } from 'lucide-react';
 import { MarketingMobileMenu } from '@/components/marketing/marketing-mobile-menu';
@@ -139,8 +140,9 @@ function PainSolutionCards() {
           }}>
             {card.fullImage ? (
               <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 24px 60px -16px rgba(0,0,0,0.5)' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={card.image} alt={card.title} style={{ display: 'block', width: '100%', height: 'auto' }} />
+                {/* All fullImage cards are the same 1376x768 static asset set — width/height
+                    here only establish the aspect ratio; the style below makes it responsive. */}
+                <Image src={card.image} alt={card.title} width={1376} height={768} style={{ display: 'block', width: '100%', height: 'auto' }} />
               </div>
             ) : (
               <div style={{

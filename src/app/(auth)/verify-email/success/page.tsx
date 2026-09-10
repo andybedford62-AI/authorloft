@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authPageStyle, authCardStyle, authPrimaryStyle } from "@/app/(auth)/auth-theme";
@@ -9,8 +10,7 @@ export default function VerifyEmailSuccessPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/authorloft-logo.png" alt="AuthorLoft" className="h-20 w-auto" />
+            <Image src="/authorloft-logo.png" alt="AuthorLoft" width={461} height={449} className="h-20 w-auto" />
           </Link>
         </div>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   BookMarked,
   ArrowRight,
@@ -216,10 +217,11 @@ export default async function BookstorePage() {
                 <Sparkles className="h-3 w-3" /> Author Spotlight
               </div>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={spotlight.image}
                   alt={spotlight.name}
+                  width={64}
+                  height={64}
                   className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover border-2 border-white/15 shadow-lg flex-shrink-0"
                 />
                 <div className="flex-1 text-center sm:text-left">
@@ -251,13 +253,9 @@ export default async function BookstorePage() {
                 {spotlight.sampleCovers.length > 0 && (
                   <div className="hidden lg:flex gap-2 flex-shrink-0">
                     {spotlight.sampleCovers.slice(0, 3).map((c, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={i}
-                        src={c}
-                        alt=""
-                        className="h-20 w-auto rounded-lg shadow-md object-cover"
-                      />
+                      <div key={i} className="relative h-20 aspect-[2/3] rounded-lg shadow-md overflow-hidden">
+                        <Image src={c} alt="" fill className="object-cover" />
+                      </div>
                     ))}
                   </div>
                 )}

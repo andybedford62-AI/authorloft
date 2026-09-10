@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 
 interface MarketingPageHeaderProps {
   /** Small mono uppercase label above the title, e.g. "From the team". */
@@ -39,8 +40,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         <>
           {/* Banner image — subject weighted right, calm space left. object-contain
               shows the full image (no cropping); navy bg fills the remaining space. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={backgroundImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-right" />
+          <Image src={backgroundImage!} alt="" aria-hidden fill className="object-cover object-right" />
           {/* Navy scrim so the left-aligned text stays readable over the art —
               stays dark across the text column even on bright/light photos,
               then fades out toward the right where the image is the focus. */}
@@ -91,8 +91,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         {imageSrc && !hasBanner && (
           <div className="hidden md:flex flex-shrink-0">
             <span className="inline-flex items-center justify-center bg-white rounded-2xl p-2 shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageSrc} alt={imageAlt} className="h-32 w-32 object-contain rounded-xl" />
+              <Image src={imageSrc} alt={imageAlt} width={128} height={128} className="h-32 w-32 object-contain rounded-xl" />
             </span>
           </div>
         )}
