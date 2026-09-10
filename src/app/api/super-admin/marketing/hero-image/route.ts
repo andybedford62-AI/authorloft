@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
+import { optimizeImageForWeb } from "@/lib/image-processing";
 import { revalidatePath } from "next/cache";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
@@ -53,12 +54,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Only JPG, PNG, WebP, or GIF images are allowed." }, { status: 400 });
   }
 
-  const ext      = file.type.split("/")[1].replace("jpeg", "jpg");
-  const fileKey  = `marketing/hero-${Date.now()}.${ext}`;
-  const buffer   = Buffer.from(await file.arrayBuffer());
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, { maxDimension: 2400 });
+  const fileKey = `marketing/hero-${Date.now()}.${ext}`;
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, contentType, ONE_YEAR_CACHE);
 
     await prisma.platformSettings.upsert({
       where:  { id: "singleton" },

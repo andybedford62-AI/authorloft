@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     let fileKey: string;
 
     if (SUPABASE_CONFIGURED) {
-      const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+      const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
       fileKey = `${authorId}/course-files/${safeName}`;
 
       try {
@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
           "course-files",
           fileKey,
           buffer,
-          file.type || "application/octet-stream"
+          file.type || "application/octet-stream",
+          ONE_YEAR_CACHE
         );
       } catch (err: any) {
         const detail = err?.message ?? String(err);

@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
   if (SUPABASE_CONFIGURED) {
     // ── Supabase Storage (PRIVATE bucket) ──────────────────────────────────────
-    const { uploadToSupabaseStorage, deleteFromSupabaseStorage } = await import(
+    const { uploadToSupabaseStorage, deleteFromSupabaseStorage, ONE_YEAR_CACHE } = await import(
       "@/lib/supabase-storage"
     );
 
@@ -114,7 +114,8 @@ export async function POST(req: NextRequest) {
         "book-files",
         fileKey,
         buffer,
-        file.type || `application/${ext}`
+        file.type || `application/${ext}`,
+        ONE_YEAR_CACHE
       );
     } catch (err: any) {
       const detail = err?.message ?? String(err);

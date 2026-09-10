@@ -36,8 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  const ext = ALLOWED_MIME[file.type];
-  if (!ext) {
+  if (!ALLOWED_MIME[file.type]) {
     return NextResponse.json(
       { error: `Unsupported format "${file.type}". Please upload JPG, PNG, WebP, or GIF.` },
       { status: 400 }
@@ -52,21 +51,24 @@ export async function POST(req: NextRequest) {
   }
 
   const arrayBuffer = await file.arrayBuffer();
-  const buffer      = Buffer.from(arrayBuffer);
+  const rawBuffer   = Buffer.from(arrayBuffer);
+  const { optimizeImageForWeb } = await import("@/lib/image-processing");
+  const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, { maxDimension: 2000 });
   const filename    = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   let publicUrl: string;
   let fileKey: string | null = null;
 
   if (SUPABASE_CONFIGURED) {
-    const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+    const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
     fileKey = `${authorId}/covers/${filename}`;
     try {
       publicUrl = await uploadToSupabaseStorage(
         "flip-book-covers",
         fileKey,
         buffer,
-        file.type,
+        contentType,
+        ONE_YEAR_CACHE,
       );
     } catch (err: any) {
       const detail = err?.message ?? String(err);
@@ -97,7 +99,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     url:     publicUrl,
     fileKey,
-    mimeType: file.type,
+    mimeType: contentType,
     originalName: file.name,
   });
 }

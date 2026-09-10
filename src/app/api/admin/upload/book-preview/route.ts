@@ -76,15 +76,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Book not found" }, { status: 404 });
   }
 
-  const ext         = file.name.split(".").pop()?.toLowerCase() ?? "bin";
   const arrayBuffer = await file.arrayBuffer();
-  const buffer      = Buffer.from(arrayBuffer);
+  const rawBuffer   = Buffer.from(arrayBuffer);
+
+  // Video/audio pass through untouched — only the image slots (thumbnail, or
+  // an image used in the "media" slot) get resized/re-encoded.
+  let buffer: Buffer = rawBuffer;
+  let contentType = file.type;
+  let ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+
+  if (file.type.startsWith("image/")) {
+    const { optimizeImageForWeb } = await import("@/lib/image-processing");
+    ({ buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, { maxDimension: 1600 }));
+  }
+
   const storagePath = `${userId}/previews/${bookId}/${position}-${slot}-${Date.now()}.${ext}`;
 
   const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
   let fileUrl: string;
   try {
-    fileUrl = await uploadToSupabaseStorage("book-previews", storagePath, buffer, file.type, ONE_YEAR_CACHE);
+    fileUrl = await uploadToSupabaseStorage("book-previews", storagePath, buffer, contentType, ONE_YEAR_CACHE);
   } catch (err) {
     console.error("[upload/book-preview] Supabase error:", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });

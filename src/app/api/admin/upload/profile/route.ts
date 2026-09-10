@@ -43,9 +43,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const ext         = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const arrayBuffer = await file.arrayBuffer();
-  const buffer      = Buffer.from(arrayBuffer);
+  const rawBuffer   = Buffer.from(arrayBuffer);
+  const { optimizeImageForWeb } = await import("@/lib/image-processing");
+  const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, { maxDimension: 1200 });
 
   let publicUrl: string;
 
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
     const storagePath = `${authorId}/profiles/${Date.now()}.${ext}`;
     try {
-      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, file.type, ONE_YEAR_CACHE);
+      publicUrl = await uploadToSupabaseStorage("book-covers", storagePath, buffer, contentType, ONE_YEAR_CACHE);
     } catch (err) {
       console.error("[upload/profile] Supabase error:", err);
       return NextResponse.json(

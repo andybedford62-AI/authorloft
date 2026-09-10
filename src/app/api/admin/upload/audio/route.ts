@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
   if (SUPABASE_CONFIGURED) {
     // ── Supabase Storage ─────────────────────────────────────────────────────
-    const { uploadToSupabaseStorage } = await import("@/lib/supabase-storage");
+    const { uploadToSupabaseStorage, ONE_YEAR_CACHE } = await import("@/lib/supabase-storage");
     fileKey = `${authorId}/audio/${filename}`;
     try {
       publicUrl = await uploadToSupabaseStorage(
@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
         fileKey,
         buffer,
         file.type || `audio/${ext}`,
+        ONE_YEAR_CACHE,
       );
     } catch (err: any) {
       const detail = err?.message ?? String(err);

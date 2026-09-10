@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 import { prisma } from "@/lib/db";
 import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
+import { optimizeImageForWeb } from "@/lib/image-processing";
 import { revalidatePath } from "next/cache";
 import { SEO_PAGES } from "@/lib/seo-config";
 
@@ -33,12 +34,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pag
     return NextResponse.json({ error: "Image must be 5 MB or smaller." }, { status: 400 });
   }
 
-  const ext      = file.type.split("/")[1].replace("jpeg", "jpg");
-  const fileKey  = `seo/og-${page}-${Date.now()}.${ext}`;
-  const buffer   = Buffer.from(await file.arrayBuffer());
+  // convertFormat: false — OG images are fetched by social crawlers (Facebook, Twitter/X)
+  // that don't reliably render WebP, so keep the original JPEG/PNG, just resized/recompressed.
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, {
+    maxDimension: 2400,
+    convertFormat: false,
+  });
+  const fileKey = `seo/og-${page}-${Date.now()}.${ext}`;
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, contentType, ONE_YEAR_CACHE);
     const pageInfo  = SEO_PAGES.find(p => p.id === page)!;
 
     await prisma.seoConfig.upsert({

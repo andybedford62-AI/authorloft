@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse }      from "next/server";
 import { requireSuperAdminId }            from "@/lib/super-admin-auth";
 import { uploadToSupabaseStorage, ONE_YEAR_CACHE } from "@/lib/supabase-storage";
+import { optimizeImageForWeb } from "@/lib/image-processing";
 
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,12 +21,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Only JPG, PNG, WebP, or GIF images are allowed." }, { status: 400 });
   }
 
-  const ext     = file.type.split("/")[1].replace("jpeg", "jpg");
+  // convertFormat: false — these get forwarded to third-party posting APIs
+  // (LinkedIn, Facebook, Instagram, X), so keep the original format they expect.
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, {
+    maxDimension: 2000,
+    convertFormat: false,
+  });
   const fileKey = `social/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const buffer  = Buffer.from(await file.arrayBuffer());
 
   try {
-    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, file.type, ONE_YEAR_CACHE);
+    const publicUrl = await uploadToSupabaseStorage("book-covers", fileKey, buffer, contentType, ONE_YEAR_CACHE);
     return NextResponse.json({ ok: true, url: publicUrl, mediaType: "IMAGE" });
   } catch {
     return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
