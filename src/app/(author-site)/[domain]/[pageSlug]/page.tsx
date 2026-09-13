@@ -13,6 +13,12 @@ interface PageProps {
 }
 
 async function resolveAuthorAndPage(domain: string, pageSlug: string) {
+  // Page slugs are always lowercase letters/digits/hyphens (enforced at creation
+  // in src/app/api/admin/pages/route.ts) — anything else can't be a real page,
+  // so reject before touching the DB. Stops file-probe bot scans
+  // (.aider.conf.yml, secrets.yaml, backup.sql, etc.) from ever reaching Prisma.
+  if (!/^[a-z0-9-]+$/.test(pageSlug)) return null;
+
   try {
     // Layout already validates isActive — no need to recheck here
     const author = await prisma.author.findFirst({
