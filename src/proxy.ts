@@ -48,6 +48,32 @@ const STATE_CHANGING_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
 // enforce their own (larger) per-route limits, so this only caps JSON bodies.
 const MAX_JSON_BODY_BYTES = 2 * 1024 * 1024; // 2MB
 
+// ── Author-site rate limiting (in-memory, Edge-safe) ────────────────────────
+// Caps requests per IP to blunt bot/scanner floods against author-site pages
+// (e.g. the file-probe scan on [domain]/[pageSlug] that exhausted the DB
+// connection pool on Sep 13 2026). Self-contained rather than reusing
+// checkRateLimit() from lib/rate-limit.ts: that helper pulls in the `redis`
+// package for its Redis-backed path, which needs Node.js sockets unavailable
+// on the Edge runtime this middleware runs on. Per-isolate, so the cap is
+// best-effort across regions/cold starts rather than a strict global limit —
+// still highly effective against a burst from one source.
+const AUTHOR_SITE_RATE_LIMIT = { maxRequests: 100, windowSeconds: 60 };
+const authorSiteRateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkAuthorSiteRateLimit(ip: string): { allowed: boolean; resetAt: number } {
+  const now = Date.now();
+  const windowMs = AUTHOR_SITE_RATE_LIMIT.windowSeconds * 1000;
+  const entry = authorSiteRateLimitStore.get(ip) || { count: 0, resetTime: now + windowMs };
+  if (now >= entry.resetTime) {
+    entry.count = 0;
+    entry.resetTime = now + windowMs;
+  }
+  const allowed = entry.count < AUTHOR_SITE_RATE_LIMIT.maxRequests;
+  entry.count++;
+  authorSiteRateLimitStore.set(ip, entry);
+  return { allowed, resetAt: entry.resetTime };
+}
+
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
@@ -214,6 +240,23 @@ export async function proxy(req: NextRequest) {
     isVercelHost
   ) {
     return NextResponse.next();
+  }
+
+  // ── Author-site rate limiting ────────────────────────────────────────────
+  // Every request past this point is a subdomain or custom-domain author-site
+  // page load. Real visitors load pages far below this rate; genuine crawlers
+  // back off on 429/Retry-After.
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const rateLimit = checkAuthorSiteRateLimit(clientIp);
+  if (!rateLimit.allowed) {
+    const retryAfter = Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment and try again." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
   }
 
   // ── Audit Logging ─────────────────────────────────────────────────────────
