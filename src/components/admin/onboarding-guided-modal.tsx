@@ -371,7 +371,7 @@ export function OnboardingGuidedModal({
             <TypeOption
               icon={Music}
               title="Music"
-              desc="Share playlists and albums — link out to Spotify, YouTube, and more."
+              desc="Organize your Suno tracks and playlists — plus Spotify, YouTube, Donna, and more."
               onClick={() => handleTypeSelect("music")}
             />
           </div>
