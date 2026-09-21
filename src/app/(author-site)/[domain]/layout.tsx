@@ -72,7 +72,7 @@ export async function generateMetadata({
   if (!author) return { title: "Author Not Found" };
 
   const authorName = author.displayName || author.name;
-  const description = toMetaDescription(author.shortBio, `Books and stories by ${authorName}.`);
+  const description = toMetaDescription(author.shortBio, `The official website of ${authorName}. Explore their work, read the latest news and updates, and get in touch.`);
   const baseUrl = getAuthorBaseUrl(author);
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
@@ -189,7 +189,7 @@ export default async function AuthorSiteLayout({
     "@type": "WebSite",
     name: authorName,
     url: baseUrl,
-    description: toMetaDescription(author.shortBio, `Books and stories by ${authorName}.`),
+    description: toMetaDescription(author.shortBio, `The official website of ${authorName}. Explore their work, read the latest news and updates, and get in touch.`),
     publisher: {
       "@type": "Person",
       name: authorName,

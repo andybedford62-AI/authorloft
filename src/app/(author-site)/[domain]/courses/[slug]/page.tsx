@@ -27,7 +27,7 @@ export async function generateMetadata({
   return {
     title: course.title,
     alternates: { canonical: `${getAuthorBaseUrl(author)}/courses/${slug}` },
-    description: toMetaDescription(course.description, `Enroll in ${course.title} — learn from an expert.`),
+    description: toMetaDescription(course.description, `Enroll in ${course.title} from ${author.displayName || author.name}: an online course with structured lessons you can work through at your own pace.`),
     openGraph: {
       title: course.title,
       description: toMetaDescription(course.description) || undefined,

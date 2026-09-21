@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props) {
     return {
       title: `${flipBook.title} | ${author.displayName ?? author.name}`,
       alternates: { canonical: `${getAuthorBaseUrl(author)}/flip-books/${slug}` },
-      description: toMetaDescription(flipBook.description, `Read ${flipBook.title} — interactive flip book edition`),
+      description: toMetaDescription(flipBook.description, `Read ${flipBook.title} by ${author.displayName ?? author.name} as an interactive flip book — turn the pages online and preview the book.`),
       openGraph: {
         images: flipBook.coverImageUrl ? [flipBook.coverImageUrl] : [],
       },

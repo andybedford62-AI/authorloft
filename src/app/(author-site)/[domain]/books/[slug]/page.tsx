@@ -49,7 +49,7 @@ export async function generateMetadata({
 
   const base        = getAuthorBaseUrl(author);
   const canonicalUrl = `${base}/books/${slug}`;
-  const description = toMetaDescription([book.shortDescription, book.description], `${book.title} by ${authorName}.`);
+  const description = toMetaDescription([book.shortDescription, book.description], `${book.title} by ${authorName}. See the description and available formats, and find where to buy.`);
 
   const ogImages = book.coverImageUrl
     ? [{ url: book.coverImageUrl, alt: book.title, width: 600, height: 900 }]

@@ -39,7 +39,7 @@ export async function generateMetadata({
   return {
     title: series.name,
     alternates: { canonical: `${getAuthorBaseUrl(author)}/series/${slug}` },
-    description: toMetaDescription(series.description, `Books in the ${series.name} series by ${authorName}.`),
+    description: toMetaDescription(series.description, `Explore every book in the ${series.name} series by ${authorName}, with details on each title and where to buy.`),
   };
 }
 

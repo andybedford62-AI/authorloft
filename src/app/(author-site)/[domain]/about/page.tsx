@@ -22,7 +22,7 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
-  const description = toMetaDescription([author.bio, author.shortBio], `Learn more about ${authorName}.`);
+  const description = toMetaDescription([author.bio, author.shortBio], `Learn more about ${authorName}: their story, their work, and how to get in touch or follow along for news and new releases.`);
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
     : [];

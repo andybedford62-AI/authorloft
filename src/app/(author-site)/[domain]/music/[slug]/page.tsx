@@ -35,7 +35,7 @@ export async function generateMetadata({
 
   return {
     title: list.title,
-    description: toMetaDescription(list.description, `${list.title} — music from ${author.displayName || author.name}.`),
+    description: toMetaDescription(list.description, `Listen to ${list.title}, a playlist from ${author.displayName || author.name}. Stream the tracks and discover more of their music.`),
     alternates: { canonical: `${getAuthorBaseUrl(author)}/music/${slug}` },
     openGraph: {
       title: list.title,

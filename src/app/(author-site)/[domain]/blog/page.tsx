@@ -19,12 +19,12 @@ export async function generateMetadata({
   const base = getAuthorBaseUrl(author);
   return {
     title: "News",
-    description: `News and updates from ${authorName}.`,
+    description: `News and updates from ${authorName}: announcements, behind-the-scenes posts and the latest on new work.`,
     alternates: { canonical: `${base}/blog` },
     openGraph: {
       type: "website",
       title: `Blog & News — ${authorName}`,
-      description: `News and updates from ${authorName}.`,
+      description: `News and updates from ${authorName}: announcements, behind-the-scenes posts and the latest on new work.`,
       url: `${base}/blog`,
       ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
     },
@@ -60,7 +60,7 @@ export default async function BlogListPage({
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: `Blog & News — ${authorName}`,
-    description: `News and updates from ${authorName}.`,
+    description: `News and updates from ${authorName}: announcements, behind-the-scenes posts and the latest on new work.`,
     url: `${base}/blog`,
     isPartOf: { "@type": "WebSite", name: authorName, url: base },
     publisher: { "@type": "Person", name: authorName, url: base },
