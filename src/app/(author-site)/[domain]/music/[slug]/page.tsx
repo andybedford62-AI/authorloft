@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -34,11 +35,11 @@ export async function generateMetadata({
 
   return {
     title: list.title,
-    description: list.description || `${list.title} — music from ${author.displayName || author.name}.`,
+    description: toMetaDescription(list.description, `${list.title} — music from ${author.displayName || author.name}.`),
     alternates: { canonical: `${getAuthorBaseUrl(author)}/music/${slug}` },
     openGraph: {
       title: list.title,
-      description: list.description || undefined,
+      description: toMetaDescription(list.description) || undefined,
       images: list.coverImageUrl ? [{ url: list.coverImageUrl }] : undefined,
     },
   };

@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: Props) {
     return {
       title: `${flipBook.title} | ${author.displayName ?? author.name}`,
       alternates: { canonical: `${getAuthorBaseUrl(author)}/flip-books/${slug}` },
-      description: flipBook.description ?? `Read ${flipBook.title} — interactive flip book edition`,
+      description: toMetaDescription(flipBook.description, `Read ${flipBook.title} — interactive flip book edition`),
       openGraph: {
         images: flipBook.coverImageUrl ? [flipBook.coverImageUrl] : [],
       },

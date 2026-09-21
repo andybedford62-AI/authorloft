@@ -21,6 +21,7 @@ export async function generateMetadata({
     openGraph: {
       title: `Books by ${authorName}`,
       description: `The complete book catalog for ${authorName}.`,
+      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
     },
   };
 }

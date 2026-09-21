@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { redirectIfRetiredSlug } from "@/lib/author-queries";
@@ -71,7 +72,7 @@ export async function generateMetadata({
   if (!author) return { title: "Author Not Found" };
 
   const authorName = author.displayName || author.name;
-  const description = author.shortBio || `Books and stories by ${authorName}.`;
+  const description = toMetaDescription(author.shortBio, `Books and stories by ${authorName}.`);
   const baseUrl = getAuthorBaseUrl(author);
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
@@ -188,7 +189,7 @@ export default async function AuthorSiteLayout({
     "@type": "WebSite",
     name: authorName,
     url: baseUrl,
-    description: author.shortBio || `Books and stories by ${authorName}.`,
+    description: toMetaDescription(author.shortBio, `Books and stories by ${authorName}.`),
     publisher: {
       "@type": "Person",
       name: authorName,

@@ -90,7 +90,7 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride, coverS
   const SceneBackdrop = sceneBg ? (
     <>
       <div className="absolute inset-0">
-        <Image src={sceneBg} alt="" fill priority className="object-cover object-center" />
+        <Image src={sceneBg} alt={`${authorName} — author website banner`} fill priority className="object-cover object-center" />
       </div>
       <div
         className="absolute inset-0 pointer-events-none"

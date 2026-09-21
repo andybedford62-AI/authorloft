@@ -26,6 +26,7 @@ export async function generateMetadata({
       title: `Blog & News — ${authorName}`,
       description: `News and updates from ${authorName}.`,
       url: `${base}/blog`,
+      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
     },
   };
 }

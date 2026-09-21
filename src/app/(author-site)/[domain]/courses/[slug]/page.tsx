@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,10 +27,10 @@ export async function generateMetadata({
   return {
     title: course.title,
     alternates: { canonical: `${getAuthorBaseUrl(author)}/courses/${slug}` },
-    description: course.description || `Enroll in ${course.title} — learn from an expert.`,
+    description: toMetaDescription(course.description, `Enroll in ${course.title} — learn from an expert.`),
     openGraph: {
       title: course.title,
-      description: course.description || undefined,
+      description: toMetaDescription(course.description) || undefined,
       images: course.coverImageUrl ? [{ url: course.coverImageUrl }] : undefined,
     },
   };

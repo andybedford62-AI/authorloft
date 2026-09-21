@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import Image from "next/image";
 import Link from "next/link";
 import { GraduationCap, Pin, BarChart2, Award, Mail } from "lucide-react";
@@ -21,10 +22,7 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await getAuthorByDomain(domain);
   const authorName = author.displayName || author.name;
-  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
-  const description = (author.bio ? stripHtml(author.bio).slice(0, 160) : null)
-    || author.shortBio
-    || `Learn more about ${authorName}.`;
+  const description = toMetaDescription([author.bio, author.shortBio], `Learn more about ${authorName}.`);
   const ogImages = author.profileImageUrl
     ? [{ url: author.profileImageUrl, alt: authorName }]
     : [];
@@ -118,7 +116,7 @@ export default async function AboutPage({
     ...(author.tagline && { jobTitle: author.tagline }),
     description: (author as any).bio
       ? stripHtml((author as any).bio).slice(0, 300)
-      : author.shortBio || `Independent author on AuthorLoft.`,
+      : toMetaDescription(author.shortBio, `Independent author on AuthorLoft.`),
     ...(sameAs.length > 0 && { sameAs }),
     ...(books.length > 0 && {
       knowsAbout: "Writing, Publishing, Independent Author",

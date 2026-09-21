@@ -63,7 +63,7 @@ export function MusicTrackList({
           <>
             <Image
               src={hero.coverImageUrl}
-              alt=""
+              alt={hero.title}
               fill
               sizes="(max-width: 768px) 100vw, 768px"
               className="object-cover"
@@ -223,7 +223,7 @@ function TrackCard({
       {track.thumbnailUrl ? (
         <Image
           src={track.thumbnailUrl}
-          alt=""
+          alt={track.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"

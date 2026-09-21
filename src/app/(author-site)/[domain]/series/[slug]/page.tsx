@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -38,7 +39,7 @@ export async function generateMetadata({
   return {
     title: series.name,
     alternates: { canonical: `${getAuthorBaseUrl(author)}/series/${slug}` },
-    description: series.description || `Books in the ${series.name} series by ${authorName}.`,
+    description: toMetaDescription(series.description, `Books in the ${series.name} series by ${authorName}.`),
   };
 }
 

@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await prisma.author.findFirst({
     where: { OR: [{ slug: domain }, { customDomain: domain }], isActive: true },
-    select: { displayName: true, name: true, slug: true, customDomain: true },
+    select: { displayName: true, name: true, slug: true, customDomain: true, profileImageUrl: true },
   });
   if (!author) return { title: "Contact" };
   const authorName = author.displayName || author.name;
@@ -25,7 +25,11 @@ export async function generateMetadata({
     title: "Contact",
     alternates: { canonical: `${getAuthorBaseUrl(author)}/contact` },
     description: `Get in touch with ${authorName} — reader questions, media inquiries, speaking engagements, and more.`,
-    openGraph: { title: `Contact ${authorName}`, description: `Send a message to ${authorName}.` },
+    openGraph: {
+      title: `Contact ${authorName}`,
+      description: `Send a message to ${authorName}.`,
+      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
+    },
   };
 }
 

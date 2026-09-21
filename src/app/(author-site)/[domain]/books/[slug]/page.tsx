@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,11 +49,7 @@ export async function generateMetadata({
 
   const base        = getAuthorBaseUrl(author);
   const canonicalUrl = `${base}/books/${slug}`;
-  const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "").trim();
-  const description =
-    (book.shortDescription ? stripHtml(book.shortDescription).slice(0, 160) : null) ||
-    (book.description ? stripHtml(book.description).slice(0, 160) : null) ||
-    `${book.title} by ${authorName}.`;
+  const description = toMetaDescription([book.shortDescription, book.description], `${book.title} by ${authorName}.`);
 
   const ogImages = book.coverImageUrl
     ? [{ url: book.coverImageUrl, alt: book.title, width: 600, height: 900 }]
@@ -181,7 +178,7 @@ export default async function BookDetailPage({
     name:       book.title,
     url:        bookUrl,
     author:     { "@type": "Person", name: authorName, url: `${base}/about`, sameAs: base, ...(author.profileImageUrl && { image: author.profileImageUrl }) },
-    description: book.shortDescription || (book.description ? book.description.replace(/<[^>]+>/g, "").slice(0, 300) : undefined),
+    description: toMetaDescription([book.shortDescription, book.description], "", 300) || undefined,
     ...(book.coverImageUrl && { image: book.coverImageUrl }),
     ...(book.isbn          && { isbn: book.isbn }),
     ...(book.pageCount     && { numberOfPages: book.pageCount }),
@@ -284,7 +281,7 @@ export default async function BookDetailPage({
             {/* Preview media thumbnails */}
             {book.previewMedia.length > 0 && (
               <div className="w-full overflow-visible">
-                <BookPreviewGallery items={book.previewMedia} accentColor={accentColor} />
+                <BookPreviewGallery items={book.previewMedia} accentColor={accentColor} bookTitle={book.title} />
               </div>
             )}
 

@@ -1,3 +1,4 @@
+import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -31,7 +32,7 @@ export async function generateMetadata({
   const canonicalUrl = `${base}/blog/${slug}`;
   const ogImages     = post.coverImageUrl ? [{ url: post.coverImageUrl, alt: post.title }] : [];
   const metaTitle    = post.seoTitle        || post.title;
-  const metaDesc     = post.metaDescription || post.excerpt;
+  const metaDesc     = toMetaDescription([post.metaDescription, post.excerpt]) || null;
 
   return {
     title:       metaTitle,
@@ -80,7 +81,7 @@ export default async function BlogPostPage({
     "@context":       "https://schema.org",
     "@type":          "BlogPosting",
     headline:         post.title,
-    description:      post.excerpt ?? undefined,
+    description:      toMetaDescription(post.excerpt, "", 300) || undefined,
     image:            post.coverImageUrl ?? undefined,
     datePublished:    post.createdAt.toISOString(),
     dateModified:     post.updatedAt.toISOString(),

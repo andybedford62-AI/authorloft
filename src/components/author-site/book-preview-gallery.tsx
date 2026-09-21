@@ -17,6 +17,8 @@ interface PreviewItem {
 interface Props {
   items:       PreviewItem[];
   accentColor: string;
+  /** Used for image alt text. */
+  bookTitle?:  string;
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
@@ -24,9 +26,11 @@ interface Props {
 function Lightbox({
   item,
   onClose,
+  alt,
 }: {
   item:    PreviewItem;
   onClose: () => void;
+  alt:     string;
 }) {
   return (
     <div
@@ -48,7 +52,7 @@ function Lightbox({
           <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
             <Image
               src={item.fileUrl}
-              alt=""
+              alt={alt}
               fill
               className="object-contain bg-black"
               sizes="(max-width: 768px) 100vw, 768px"
@@ -72,7 +76,7 @@ function Lightbox({
           <div className="bg-gray-900 p-8 rounded-xl flex flex-col items-center gap-4">
             {item.thumbnailUrl && (
               <div className="relative w-40 h-40 rounded-lg overflow-hidden">
-                <Image src={item.thumbnailUrl} alt="" fill className="object-cover" />
+                <Image src={item.thumbnailUrl} alt={alt} fill className="object-cover" />
               </div>
             )}
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -90,10 +94,12 @@ function ThumbCard({
   item,
   accentColor,
   onClick,
+  alt,
 }: {
   item:        PreviewItem;
   accentColor: string;
   onClick:     () => void;
+  alt:         string;
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -137,7 +143,7 @@ function ThumbCard({
             className="w-full h-full object-cover"
           />
         ) : imageSrc ? (
-          <Image src={imageSrc} alt="" fill className="object-cover" sizes="100px" />
+          <Image src={imageSrc} alt={alt} fill className="object-cover" sizes="100px" />
         ) : (
           // Audio with no poster uploaded
           <div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -175,7 +181,7 @@ function ThumbCard({
               className="w-full h-full object-cover"
             />
           ) : imageSrc ? (
-            <Image src={imageSrc} alt="" fill className="object-cover" sizes="220px" />
+            <Image src={imageSrc} alt={alt} fill className="object-cover" sizes="220px" />
           ) : null}
 
           {overlayIcon && (
@@ -191,25 +197,27 @@ function ThumbCard({
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
-export function BookPreviewGallery({ items, accentColor }: Props) {
+export function BookPreviewGallery({ items, accentColor, bookTitle }: Props) {
   const [active, setActive] = useState<PreviewItem | null>(null);
+  const altFor = (i: number) => `${bookTitle ? `${bookTitle} — ` : ""}preview ${i + 1}`;
 
   if (!items.length) return null;
 
   return (
     <>
       <div className="grid grid-cols-3 gap-2 w-full mt-1">
-        {items.map(item => (
+        {items.map((item, i) => (
           <ThumbCard
             key={item.id}
             item={item}
+            alt={altFor(i)}
             accentColor={accentColor}
             onClick={() => setActive(item)}
           />
         ))}
       </div>
 
-      {active && <Lightbox item={active} onClose={() => setActive(null)} />}
+      {active && <Lightbox item={active} alt={altFor(items.findIndex(x => x.id === active.id))} onClose={() => setActive(null)} />}
     </>
   );
 }
