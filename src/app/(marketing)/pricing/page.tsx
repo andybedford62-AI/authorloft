@@ -7,6 +7,7 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
+import { basicsSnapshot } from "@/lib/savings-calculator-data";
 
 export const revalidate = 60;
 
@@ -214,7 +215,21 @@ export default async function PricingPage() {
           </div>
         )}
         {plans.length > 0 ? (
-          <PricingSection plans={plans} fullPage />
+          <>
+            <PricingSection plans={plans} fullPage />
+            {(() => {
+              const { monthlyCost, setupHours } = basicsSnapshot();
+              return (
+                <p className="mt-8 text-center text-sm text-vault-mute max-w-2xl mx-auto leading-relaxed">
+                  Building the same basics yourself takes about <b className="text-vault-ink">{setupHours} hours</b> to set up and around{" "}
+                  <b className="text-vault-ink">${monthlyCost} a month</b>. The Free plan includes them.{" "}
+                  <Link href="/pricing/calculator" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">
+                    See the numbers for your project →
+                  </Link>
+                </p>
+              );
+            })()}
+          </>
         ) : (
           // Fallback if DB has no plans yet
           <div className="text-center py-20 text-vault-mute">

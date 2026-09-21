@@ -1,20 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
+import { captureEvent } from "@/lib/posthog-client";
 import {
   AL_MONTHLY_HOURS,
   AL_SETUP_HOURS,
   DIY_ITEMS,
   FALLBACK_PLANS,
   GROUPS,
+  PRESETS,
   PRICES_CHECKED,
   PRODUCT_LABEL,
   SOURCES,
   TIER_BY_RANK,
   TIER_RANK,
   type CalcPlan,
+  type PresetKey,
   type Product,
   type TierKey,
 } from "@/lib/savings-calculator-data";
@@ -95,6 +98,45 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
   const [rate, setRate] = useState(25);
   const [weeklyHours, setWeeklyHours] = useState(10);
 
+  // Analytics (consent-gated inside captureEvent): one "started" event per visit, on first interaction.
+  const started = useRef(false);
+  const markStarted = (how: string) => {
+    if (started.current) return;
+    started.current = true;
+    captureEvent("calculator_started", { via: how });
+  };
+
+  // Shareable links: ?preset=author|courses|music|all, with optional books=, courses=, music=, rate=, hours=
+  // overrides. Read after mount so the server-rendered page and first client render match.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const int = (k: string, min: number, max: number): number | null => {
+      const raw = q.get(k);
+      if (raw === null || raw.trim() === "") return null;
+      const n = Math.floor(Number(raw));
+      return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : null;
+    };
+    const key = q.get("preset");
+    const base = key && Object.prototype.hasOwnProperty.call(PRESETS, key) ? PRESETS[key as PresetKey].counts : null;
+    const books = int("books", 0, 999), courses = int("courses", 0, 999), music = int("music", 0, 999);
+    if (base || books !== null || courses !== null || music !== null) {
+      setCounts((c) => ({
+        books: books ?? base?.books ?? c.books,
+        courses: courses ?? base?.courses ?? c.courses,
+        music: music ?? base?.music ?? c.music,
+      }));
+    }
+    const rt = int("rate", 10, 150);
+    if (rt !== null) setRate(Math.round(rt / 5) * 5);
+    const h = int("hours", 1, 40);
+    if (h !== null) setWeeklyHours([3, 5, 10, 15, 20].reduce((best, o) => (Math.abs(o - h) < Math.abs(best - h) ? o : best)));
+  }, []);
+
+  const activePreset = (Object.keys(PRESETS) as PresetKey[]).find((k) => {
+    const p = PRESETS[k].counts;
+    return p.books === counts.books && p.courses === counts.courses && p.music === counts.music;
+  });
+
   const r = useMemo(() => {
     const items = DIY_ITEMS.filter((i) => (!i.needs || counts[i.needs] > 0) && checked[i.id]);
 
@@ -146,7 +188,16 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
   const planName = r.plan.name;
   const registerHref = r.tier === "FREE" ? "/register" : `/register?plan=${r.tier.toLowerCase()}`;
 
-  const toggle = (id: string) => setChecked((c) => ({ ...c, [id]: !c[id] }));
+  const toggle = (id: string) => { markStarted("features"); setChecked((c) => ({ ...c, [id]: !c[id] })); };
+  const trackCta = (cta: "start_free" | "see_plans") =>
+    captureEvent("calculator_cta_clicked", {
+      cta,
+      matched_plan: r.tier,
+      first_year_savings: Math.round(saved),
+      books: counts.books,
+      courses: counts.courses,
+      music: counts.music,
+    });
   const vendors = Array.from(new Set(r.items.map((i) => i.source)));
 
   return (
@@ -161,10 +212,28 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
         <section className="rounded-2xl border border-vault-line bg-vault-surf p-6">
           <h2 className="text-xl font-bold text-vault-ink"><span className="text-vault-gold">1.</span> What do you create?</h2>
           <p className="mt-1 text-sm text-vault-mute">Enter how many of each you have or plan to have. Use 0 if you don&apos;t make that.</p>
+          <div className="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Start with an example">
+            <span className="text-sm text-vault-mute">Start with an example:</span>
+            {(Object.keys(PRESETS) as PresetKey[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={activePreset === k}
+                onClick={() => { markStarted("preset_chip"); captureEvent("calculator_preset_selected", { preset: k }); setCounts({ ...PRESETS[k].counts }); }}
+                className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  activePreset === k
+                    ? "border-vault-gold bg-vault-gold text-vault-bg"
+                    : "border-vault-line text-vault-ink hover:border-vault-gold"
+                }`}
+              >
+                {PRESETS[k].label}
+              </button>
+            ))}
+          </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-3">
-            <Stepper id="n-books" label="Books" value={counts.books} onChange={(n) => setCounts((c) => ({ ...c, books: n }))} />
-            <Stepper id="n-courses" label="Courses" value={counts.courses} onChange={(n) => setCounts((c) => ({ ...c, courses: n }))} />
-            <Stepper id="n-music" label="Music lists" value={counts.music} onChange={(n) => setCounts((c) => ({ ...c, music: n }))} />
+            <Stepper id="n-books" label="Books" value={counts.books} onChange={(n) => { markStarted("counts"); setCounts((c) => ({ ...c, books: n })); }} />
+            <Stepper id="n-courses" label="Courses" value={counts.courses} onChange={(n) => { markStarted("counts"); setCounts((c) => ({ ...c, courses: n })); }} />
+            <Stepper id="n-music" label="Music lists" value={counts.music} onChange={(n) => { markStarted("counts"); setCounts((c) => ({ ...c, music: n })); }} />
           </div>
           <p className="mt-3 text-xs text-vault-mute">A &ldquo;music list&rdquo; is one playlist or album.</p>
         </section>
@@ -240,7 +309,7 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
               max={150}
               step={5}
               value={rate}
-              onChange={(e) => setRate(Number(e.target.value))}
+              onChange={(e) => { markStarted("rate"); setRate(Number(e.target.value)); }}
               className="mt-2 w-full accent-[#d6a94a] h-2 cursor-pointer"
             />
             <div className="flex justify-between text-xs text-vault-mute"><span>$10</span><span>$150</span></div>
@@ -250,7 +319,7 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
             <select
               id="weekly"
               value={weeklyHours}
-              onChange={(e) => setWeeklyHours(Number(e.target.value))}
+              onChange={(e) => { markStarted("weekly_hours"); setWeeklyHours(Number(e.target.value)); }}
               className="h-11 rounded-vault border border-vault-line bg-vault-bg px-3 text-vault-ink focus:outline-none focus:border-vault-gold"
             >
               {[3, 5, 10, 15, 20].map((h) => <option key={h} value={h}>{h} hours a week</option>)}
@@ -292,6 +361,27 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
             </div>
           </div>
 
+          {r.items.length > 0 && (
+            <div className="mt-4" aria-hidden="true">
+              {[
+                { label: "Building it yourself", tools: r.diyTools, time: r.diyTime, tone: "bg-red-400" },
+                { label: `AuthorLoft ${planName}`, tools: r.alTools, time: r.alTime, tone: "bg-vault-good" },
+              ].map((b) => {
+                const max = Math.max(r.diyYear1, r.alYear1, 1);
+                return (
+                  <div key={b.label} className="mb-2.5">
+                    <p className="text-xs text-vault-mute mb-1">{b.label}</p>
+                    <div className="flex h-3.5 overflow-hidden rounded-full bg-vault-bg/70">
+                      <span className={b.tone} style={{ width: `${(b.tools / max) * 100}%` }} />
+                      <span className={`${b.tone} opacity-40`} style={{ width: `${(b.time / max) * 100}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="text-[11px] text-vault-mute">Solid = money on tools and fees. Faded = the value of your time.</p>
+            </div>
+          )}
+
           <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
             <div className="rounded-xl bg-vault-bg/50 p-3">
               <dt className="text-[11px] uppercase tracking-wide text-vault-mute">Saved on tools</dt>
@@ -320,10 +410,10 @@ export function SavingsCalculator({ plans: planList }: { plans: CalcPlan[] }) {
           </div>
 
           <div className="mt-5 flex flex-col gap-3">
-            <Link href={registerHref} className="text-center bg-vault-gold text-vault-bg font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold-light transition-colors">
+            <Link href={registerHref} onClick={() => trackCta("start_free")} className="text-center bg-vault-gold text-vault-bg font-semibold px-6 py-3 rounded-vault hover:bg-vault-gold-light transition-colors">
               {r.tier === "FREE" ? "Start free — no credit card" : `Start free, then choose ${planName}`}
             </Link>
-            <Link href="/pricing" className="text-center text-vault-gold font-semibold px-6 py-3 rounded-vault border border-vault-gold/50 hover:bg-vault-gold/10 transition-colors">
+            <Link href="/pricing" onClick={() => trackCta("see_plans")} className="text-center text-vault-gold font-semibold px-6 py-3 rounded-vault border border-vault-gold/50 hover:bg-vault-gold/10 transition-colors">
               See all plans
             </Link>
           </div>

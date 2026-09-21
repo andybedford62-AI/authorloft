@@ -28,6 +28,19 @@ export const PRODUCT_LABEL: Record<Product, [string, string]> = {
   music: ["music list", "music lists"],
 };
 
+/**
+ * Starting points for the calculator. Used by the "start with an example" chips
+ * AND by shareable links: /pricing/calculator?preset=author (also books=, courses=,
+ * music=, rate=, hours= to override). Keep the keys stable — they are in live ads.
+ */
+export const PRESETS = {
+  author:  { label: "I'm an author",            counts: { books: 5, courses: 0, music: 0 } },
+  courses: { label: "I teach online courses",   counts: { books: 0, courses: 3, music: 0 } },
+  music:   { label: "I make music",             counts: { books: 0, courses: 0, music: 4 } },
+  all:     { label: "I make a bit of everything", counts: { books: 3, courses: 2, music: 2 } },
+} as const;
+export type PresetKey = keyof typeof PRESETS;
+
 export type CalcPlan = {
   tier: TierKey;
   name: string;
@@ -128,6 +141,19 @@ export const DIY_ITEMS: DiyItem[] = [
   { id: "og", tier: "PREMIUM", label: "Eye-catching preview pictures when your pages are shared", source: "canva", cost: 12, setupHours: 1, monthlyHours: 1,
     help: "The image people see when your link is posted on social media. You would design one for every page." },
 ];
+
+/**
+ * What the always-on basics cost to build yourself for a book-only creator (courses and
+ * music rows excluded). Drives the one-line comparison on /pricing so it can never
+ * drift from the calculator's own numbers.
+ */
+export function basicsSnapshot() {
+  const items = DIY_ITEMS.filter((i) => i.defaultOn && (!i.needs || i.needs === "books"));
+  return {
+    monthlyCost: items.reduce((s, i) => s + i.cost, 0),
+    setupHours: Math.round(items.reduce((s, i) => s + i.setupHours, 0)),
+  };
+}
 
 export const GROUPS: { tier: TierKey; title: string; blurb: string }[] = [
   { tier: "FREE", title: "The basics", blurb: "Included on every AuthorLoft plan, even Free." },

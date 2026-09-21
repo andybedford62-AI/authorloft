@@ -46,6 +46,12 @@ export function capturePageview(url: string) {
   posthog.capture("$pageview", { $current_url: url });
 }
 
+/** Custom event capture. No-ops until the visitor has accepted analytics (initialized). */
+export function captureEvent(name: string, properties?: Record<string, unknown>) {
+  if (!initialized) return;
+  posthog.capture(name, properties);
+}
+
 export function optOutPostHog() {
   if (initialized) posthog.opt_out_capturing();
 }

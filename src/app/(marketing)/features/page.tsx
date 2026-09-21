@@ -225,6 +225,10 @@ export default async function FeaturesPage() {
               View Pricing
             </Link>
           </div>
+          <p className="text-sm text-vault-mute pt-2">
+            Curious what building this yourself would cost?{" "}
+            <Link href="/pricing/calculator" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">Try the Cost Savings Calculator →</Link>
+          </p>
         </div>
       </section>
 

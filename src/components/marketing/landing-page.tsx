@@ -130,6 +130,10 @@ export function LandingPage({ data }: { data: LandingPageData }) {
               See pricing
             </Link>
           </div>
+          <p className="mt-5 text-sm text-vault-mute">
+            Wondering what building your own site would cost?{" "}
+            <Link href="/pricing/calculator" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">Try the Cost Savings Calculator →</Link>
+          </p>
         </section>
       </div>
     </div>

@@ -53,6 +53,14 @@ export default function CompareHubPage() {
           <ArrowLeft className="h-4 w-4" /> Back to pricing
         </Link>
 
+        <Link
+          href="/pricing/calculator"
+          className="mb-8 block rounded-xl border border-[#d6a94a]/50 bg-[#1e2f4d] px-5 py-4 text-sm text-[#c4cbdc] hover:border-[#d6a94a] transition-colors"
+        >
+          <span className="font-semibold text-[#d6a94a]">Cost Savings Calculator →</span>{" "}
+          Comparing costs? See what building and running your own site would cost in dollars and hours.
+        </Link>
+
         <CompareHubTabs />
 
         <p className="text-xs text-[#6b7a9c] mt-8 max-w-2xl">
