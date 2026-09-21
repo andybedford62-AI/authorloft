@@ -29,6 +29,7 @@ Allow: /blog
 Allow: /news
 Allow: /features
 Allow: /pricing
+Allow: /pricing/calculator
 Allow: /contact
 Allow: /privacy
 Allow: /terms

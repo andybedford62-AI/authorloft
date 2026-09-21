@@ -5,6 +5,7 @@ export const SEO_PAGES = [
   { id: "blog",                         label: "Blog",                   path: "/blog" },
   { id: "features",                     label: "Features",               path: "/features" },
   { id: "pricing",                      label: "Pricing",                path: "/pricing" },
+  { id: "pricing-calculator",           label: "Cost Calculator",        path: "/pricing/calculator" },
   { id: "contact",                      label: "Contact",                path: "/contact" },
   { id: "resources",                    label: "Resources",              path: "/resources" },
   { id: "author-website-builder",       label: "Author Website Builder", path: "/author-website-builder" },
