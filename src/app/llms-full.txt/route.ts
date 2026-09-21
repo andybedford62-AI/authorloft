@@ -53,6 +53,7 @@ export async function GET() {
     "",
     `- [Features](${BASE}/features): Full feature list across Free, Standard ($9.99/mo), and Premium ($39.99/mo) plans — book catalog, direct sales, custom domain, flip book previews, AI writing tools, and reader analytics.`,
     `- [Pricing](${BASE}/pricing): Plan comparison with full pricing details and side-by-side comparison against competitors (Tertulia, StoryOrigin, BookFunnel).`,
+    `- [Cost Savings Calculator](${BASE}/pricing/calculator): Interactive calculator comparing the cost, in dollars and hours, of building and running your own website for books, courses or music with using AuthorLoft.`,
     "",
   ];
 

@@ -177,8 +177,29 @@ export default async function PricingPage() {
         backgroundImage="/pricing-header.png"
       />
 
+      {/* Cost Savings Calculator callout — first thing under the hero */}
+      <section className="px-4 pt-10 max-w-5xl mx-auto">
+        <Link
+          href="/pricing/calculator"
+          className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 rounded-2xl border border-vault-gold/60 bg-vault-surf-2 px-6 py-5 shadow-xl shadow-vault-bg/25 hover:border-vault-gold transition-colors"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-vault-gold mb-1">New · Cost Savings Calculator</p>
+            <p className="text-base sm:text-lg font-bold text-vault-ink leading-snug">
+              What would it cost to build and run your own website?
+            </p>
+            <p className="text-sm text-vault-mute mt-1">
+              Compare doing it yourself with AuthorLoft, in dollars and hours. It takes about a minute.
+            </p>
+          </div>
+          <span className="shrink-0 inline-block bg-vault-gold text-vault-bg font-semibold px-6 py-3 rounded-vault group-hover:bg-vault-gold-light transition-colors">
+            Try the calculator →
+          </span>
+        </Link>
+      </section>
+
       {/* Pricing cards — live from DB */}
-      <section className="px-4 pb-20 max-w-5xl mx-auto">
+      <section className="px-4 pt-10 pb-20 max-w-5xl mx-auto">
         {foundingOffer && (
           <div className="max-w-2xl mx-auto mb-10 flex items-center gap-5 rounded-2xl border border-vault-gold/60 bg-vault-surf-2 px-6 py-5 shadow-xl shadow-vault-bg/25">
             <div className="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-vault-gold-light to-vault-gold text-vault-bg shadow-md">

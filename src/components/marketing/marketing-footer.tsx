@@ -8,6 +8,7 @@ const NAV_LINKS: [string, string][] = [
   ["Features", "/features"],
   ["Bookstore", "/bookstore"],
   ["Pricing", "/pricing"],
+  ["Cost Calculator", "/pricing/calculator"],
   ["Blog", "/blog"],
   ["News", "/news"],
   ["Learn", "/guides"],
