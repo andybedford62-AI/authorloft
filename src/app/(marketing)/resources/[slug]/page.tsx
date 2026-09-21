@@ -81,6 +81,7 @@ export default async function ResourceDownloadPage(
         title={<span style={{ color: VAULT.ink }}>{d.title}</span>}
         subtitle={d.description ?? ""}
         backgroundImage="/resources-header.png"
+        backgroundImageAlt="Open books spread across a wooden desk in a sunlit library, beside a quill in an inkwell and a globe"
       />
 
       <div style={{ maxWidth: 780, margin: "0 auto", padding: "56px 24px 96px" }}>

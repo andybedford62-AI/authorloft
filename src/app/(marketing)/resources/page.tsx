@@ -78,6 +78,7 @@ export default async function ResourcesPage() {
         title={<>Tools &amp; communities <span className="italic text-vault-gold">every author should know</span></>}
         subtitle="A hand-picked list of trusted organisations, tools, and educators that help independent authors build sustainable careers."
         backgroundImage="/resources-header.png"
+        backgroundImageAlt="Open books spread across a wooden desk in a sunlit library, beside a quill in an inkwell and a globe"
       />
       <div style={{ background: VAULT.bg, padding: '20px 24px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>

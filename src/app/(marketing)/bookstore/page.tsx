@@ -175,6 +175,7 @@ export default async function BookstorePage() {
         title={<>The AuthorLoft <span className="italic text-vault-gold">Bookstore</span></>}
         subtitle="A shared shelf of books from independent authors across every genre. Find your next read, then buy directly from each author's own site."
         backgroundImage="/bookstore-header.png"
+        backgroundImageAlt="A cozy independent bookshop with tall wooden shelves, a brass cash register and books displayed on a table"
       />
 
       {/* ── Stat bar + social ────────────────────────────────────────────── */}
@@ -254,7 +255,7 @@ export default async function BookstorePage() {
                   <div className="hidden lg:flex gap-2 flex-shrink-0">
                     {spotlight.sampleCovers.slice(0, 3).map((c, i) => (
                       <div key={i} className="relative h-20 aspect-[2/3] rounded-lg shadow-md overflow-hidden">
-                        <Image src={c} alt="" fill className="object-cover" />
+                        <Image src={c} alt={`Book cover by ${spotlight.name}`} fill className="object-cover" />
                       </div>
                     ))}
                   </div>

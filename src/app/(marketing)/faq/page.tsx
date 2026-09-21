@@ -93,6 +93,7 @@ export default async function FaqPage() {
         title={<>Frequently asked, <span className="italic text-vault-gold">plainly answered</span></>}
         subtitle="Everything you need to know about AuthorLoft — plans, publishing, selling direct, and getting set up."
         backgroundImage="/faq-header.png"
+        backgroundImageAlt="A stack of reference books, an almanac, a thesaurus and a dictionary, beside a quill in an inkwell on a wooden desk"
       />
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 20px 96px" }}>

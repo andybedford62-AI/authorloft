@@ -57,6 +57,7 @@ export default async function BlogIndexPage() {
         title={<>The AuthorLoft <span className="italic text-vault-gold">Blog</span></>}
         subtitle="Guides, strategies, and insights for independent authors building a direct connection with readers."
         backgroundImage="/blog-header.png"
+        backgroundImageAlt="An open journal and a pen with a quill in an inkwell on a wooden desk in front of a bookshelf"
       />
 
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 sm:py-16">

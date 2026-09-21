@@ -17,6 +17,12 @@ interface MarketingPageHeaderProps {
    * When omitted, the band shows the clean navy gradient + texture.
    */
   backgroundImage?: string;
+  /**
+   * Descriptive alt text for backgroundImage. Omit for a purely decorative banner (rendered with
+   * an empty alt and aria-hidden); pass it when the image is worth indexing, since some SEO
+   * checkers (e.g. Bing) flag empty alt text.
+   */
+  backgroundImageAlt?: string;
 }
 
 /**
@@ -31,7 +37,7 @@ interface MarketingPageHeaderProps {
  *
  * Accent a word in the title with: <span className="italic text-vault-gold">Word</span>
  */
-export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage }: MarketingPageHeaderProps) {
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, backgroundImageAlt }: MarketingPageHeaderProps) {
   const hasBanner = !!backgroundImage;
 
   return (
@@ -40,7 +46,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         <>
           {/* Banner image — subject weighted right, calm space left. object-contain
               shows the full image (no cropping); navy bg fills the remaining space. */}
-          <Image src={backgroundImage!} alt="" aria-hidden fill className="object-cover object-right" />
+          <Image src={backgroundImage!} alt={backgroundImageAlt ?? ""} aria-hidden={backgroundImageAlt ? undefined : true} fill className="object-cover object-right" />
           {/* Navy scrim so the left-aligned text stays readable over the art —
               stays dark across the text column even on bright/light photos,
               then fades out toward the right where the image is the focus. */}

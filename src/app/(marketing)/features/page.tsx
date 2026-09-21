@@ -138,6 +138,7 @@ export default async function FeaturesPage() {
         title={<>Everything you need to <span className="italic text-vault-gold">own your business</span></>}
         subtitle="Every tool an independent author needs to publish, sell, and grow — compared across Free, Standard, and Premium."
         backgroundImage="/features-header.png"
+        backgroundImageAlt="A laptop on a wooden desk listing features such as cataloging, blogging, newsletters and ARC management, beside a coffee cup and a quill"
       />
       <div className="bg-vault-bg border-b border-vault-ink/12 px-4">
         <div className="max-w-5xl mx-auto py-3">

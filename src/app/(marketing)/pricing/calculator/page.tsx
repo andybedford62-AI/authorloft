@@ -126,6 +126,7 @@ export default async function CalculatorPage() {
         title={<>What would it cost to <span className="italic text-vault-gold">build it yourself?</span></>}
         subtitle="Answer three quick questions. We'll compare going it alone with using AuthorLoft — in dollars and in hours."
         backgroundImage="/hero-pricing-calculator-real.webp"
+        backgroundImageAlt="A laptop on a wooden desk showing the AuthorLoft cost savings calculator, beside a calculator and a feather quill in an inkwell, with bookshelves behind"
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">

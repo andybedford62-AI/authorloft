@@ -114,6 +114,7 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
         title={name}
         subtitle={`${filtered.length} book${filtered.length !== 1 ? "s" : ""} from independent authors.`}
         backgroundImage="/bookstore-header.png"
+        backgroundImageAlt="A cozy independent bookshop with tall wooden shelves, a brass cash register and books displayed on a table"
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">

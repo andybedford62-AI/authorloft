@@ -176,6 +176,7 @@ export default async function PricingPage() {
         title={<>Simple, <span className="italic text-vault-gold">transparent</span> pricing</>}
         subtitle="Start free with no credit card. Upgrade when you're ready to grow your author platform."
         backgroundImage="/pricing-header.png"
+        backgroundImageAlt="A laptop on a wooden desk showing the AuthorLoft plans and prices, beside a calculator and a quill in an inkwell"
       />
 
       {/* Cost Savings Calculator callout — first thing under the hero */}

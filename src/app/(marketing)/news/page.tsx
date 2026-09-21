@@ -63,6 +63,7 @@ export default async function NewsIndexPage() {
         title={<>AuthorLoft <span className="italic text-vault-gold">News</span></>}
         subtitle="Product updates, new features, specials, and events — everything happening at AuthorLoft."
         backgroundImage="/news-header.png"
+        backgroundImageAlt="A folded newspaper with a magnifying glass and a sealed envelope on a wooden desk, beside a quill in an inkwell"
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
