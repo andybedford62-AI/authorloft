@@ -1,12 +1,63 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock } from "lucide-react";
+import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock, GripVertical } from "lucide-react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 type Stat = { value: string; label: string };
+type StatRow = Stat & { id: string };
+
+function newStatId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `stat-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function SortableStatRow({
+  stat, onValueChange, onLabelChange, onRemove,
+}: {
+  stat: StatRow;
+  onValueChange: (value: string) => void;
+  onLabelChange: (value: string) => void;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stat.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2 bg-white">
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="p-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none"
+        title="Drag to reorder"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <input type="text" value={stat.value}
+        onChange={(e) => onValueChange(e.target.value)}
+        placeholder="e.g. 40+"
+        className="w-24 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+      <input type="text" value={stat.label}
+        onChange={(e) => onLabelChange(e.target.value)}
+        placeholder="e.g. Years Diving"
+        className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+      <button type="button" onClick={onRemove}
+        className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove stat">
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 type BrandingFormProps = {
   initial: {
@@ -90,7 +141,20 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
   const [heroFeaturedBookId, setHeroFeaturedBookId] = useState(initial.heroFeaturedBookId);
   const [heroFocus, setHeroFocus] = useState(initial.heroFocus);
   const [showHeroBanner, setShowHeroBanner] = useState(initial.showHeroBanner);
-  const [aboutStats, setAboutStats] = useState<Stat[]>(initial.aboutStats);
+  const [aboutStats, setAboutStats] = useState<StatRow[]>(
+    initial.aboutStats.map((s) => ({ ...s, id: newStatId() }))
+  );
+  const statSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  function handleStatDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setAboutStats((items) => {
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  }
   // Exactly 3 slots; empty string means "don't show"
   const [credentials, setCredentials] = useState<string[]>(
     [...initial.credentials, "", "", ""].slice(0, 3)
@@ -229,7 +293,8 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId, heroFocus,
-        aboutStats, credentials,
+        aboutStats: aboutStats.map(({ value, label }) => ({ value, label })),
+        credentials,
         pressOutlets: pressOutlets.map(s => s.trim()).filter(Boolean),
       }),
     });
@@ -383,7 +448,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
               <div>
                 <h2 className="font-semibold text-gray-900">About Page Stats</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  Highlight facts about yourself on your About page. Your book count is always shown automatically — add as many custom stats as you like below.
+                  Highlight facts about yourself on your About page. Your book count is always shown automatically — add as many custom stats as you like below, and drag the handle to reorder them.
                 </p>
               </div>
               <div className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
@@ -394,25 +459,22 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                   <p className="text-sm text-gray-500">Books Published <span className="text-xs text-gray-400">(calculated automatically)</span></p>
                 </div>
               </div>
-              <div className="space-y-2">
-                {aboutStats.map((stat, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <input type="text" value={stat.value}
-                      onChange={(e) => { const next = [...aboutStats]; next[i] = { ...next[i], value: e.target.value }; setAboutStats(next); }}
-                      placeholder="e.g. 40+"
-                      className="w-24 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                    <input type="text" value={stat.label}
-                      onChange={(e) => { const next = [...aboutStats]; next[i] = { ...next[i], label: e.target.value }; setAboutStats(next); }}
-                      placeholder="e.g. Years Diving"
-                      className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                    <button type="button" onClick={() => setAboutStats(aboutStats.filter((_, idx) => idx !== i))}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove stat">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+              <DndContext sensors={statSensors} collisionDetection={closestCenter} onDragEnd={handleStatDragEnd}>
+                <SortableContext items={aboutStats.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-2">
+                    {aboutStats.map((stat) => (
+                      <SortableStatRow
+                        key={stat.id}
+                        stat={stat}
+                        onValueChange={(value) => setAboutStats(aboutStats.map((s) => s.id === stat.id ? { ...s, value } : s))}
+                        onLabelChange={(label) => setAboutStats(aboutStats.map((s) => s.id === stat.id ? { ...s, label } : s))}
+                        onRemove={() => setAboutStats(aboutStats.filter((s) => s.id !== stat.id))}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
-              <button type="button" onClick={() => setAboutStats([...aboutStats, { value: "", label: "" }])}
+                </SortableContext>
+              </DndContext>
+              <button type="button" onClick={() => setAboutStats([...aboutStats, { value: "", label: "", id: newStatId() }])}
                 className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
                 <Plus className="h-4 w-4" /> Add stat
               </button>
