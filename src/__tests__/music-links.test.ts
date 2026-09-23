@@ -59,6 +59,26 @@ describe("resolveTrackLink — Suno", () => {
   });
 });
 
+describe("resolveTrackLink — Udio and Donna", () => {
+  // Neither has a confirmed public embed format, so both link out rather
+  // than guess an iframe src — the wrong guess is the Spotify bug in reverse.
+  it("recognises Udio by name but links out", () => {
+    const r = resolveTrackLink("https://udio.com/songs/abc123")!;
+    expect(r.provider).toBe("udio");
+    expect(r.mode).toBe("link");
+    expect(r.embedUrl).toBeNull();
+    expect(providerLabel(r.provider)).toBe("Udio");
+  });
+
+  it("recognises Donna (musicdonna.com) by name but links out", () => {
+    const r = resolveTrackLink("https://musicdonna.com/track/abc123")!;
+    expect(r.provider).toBe("donna");
+    expect(r.mode).toBe("link");
+    expect(r.embedUrl).toBeNull();
+    expect(providerLabel(r.provider)).toBe("Donna");
+  });
+});
+
 describe("resolveTrackLink — unknown and invalid input", () => {
   it("degrades an unknown host to a link card rather than rejecting it", () => {
     const r = resolveTrackLink("https://bandcamp.com/track/whatever")!;

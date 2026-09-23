@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## September 23, 2026 — Recognize Udio and Donna as named music providers
+
+`resolveTrackLink()` (`src/lib/music-links.ts`) previously fell back to a
+generic "the artist's page" label for any host it didn't explicitly know,
+which caught Udio (`udio.com`) and Donna (`musicdonna.com`) links pasted into
+a music list. Both are now recognized by name and labeled "Udio" / "Donna" in
+track cards (admin list editor, paste panel, and the public music page).
+Both stay link-out (`mode: "link"`), same as Suno — neither has a confirmed
+public embed format, and guessing one wrong reproduces the exact blank-iframe
+failure the Spotify CSP bug above caused. Image thumbnail and text link
+already share one click target per track card, so once a host resolves,
+navigation for both is automatically consistent — no separate fix needed
+there. No admin UI changes required: `providerLabel()` is called generically
+everywhere it's used.
+
 ## September 23, 2026 — Fixed Spotify tracks silently failing to play on music pages
 
 `src/lib/music-links.ts` has treated Spotify links as embeddable since the music

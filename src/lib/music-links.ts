@@ -8,7 +8,7 @@
 // un-embeddable provider as embeddable produces a blank grey box — the exact
 // failure the course-video CSP bug caused. Hence two render modes.
 
-export type MusicProvider = "youtube" | "spotify" | "suno" | "other";
+export type MusicProvider = "youtube" | "spotify" | "suno" | "udio" | "donna" | "other";
 export type TrackRenderMode = "embed" | "link";
 
 export type ResolvedTrackLink = {
@@ -26,6 +26,8 @@ const PROVIDER_LABELS: Record<MusicProvider, string> = {
   youtube: "YouTube",
   spotify: "Spotify",
   suno: "Suno",
+  udio: "Udio",
+  donna: "Donna",
   other: "the artist's page",
 };
 
@@ -104,6 +106,17 @@ export function resolveTrackLink(input: string): ResolvedTrackLink | null {
   //    Verified against a live share URL — this is not a guess.
   if (host === "suno.com" || host === "suno.ai") {
     return { provider: "suno", mode: "link", embedUrl: null, canonicalUrl: u.toString(), embedHeight: null };
+  }
+
+  // ── Udio and Donna: link-out only. Neither has a confirmed public embed
+  //    format, and getting that wrong produces the exact blank-iframe failure
+  //    the Spotify CSP bug did — so until one is verified, these get a
+  //    properly branded card instead of a guessed embed.
+  if (host === "udio.com") {
+    return { provider: "udio", mode: "link", embedUrl: null, canonicalUrl: u.toString(), embedHeight: null };
+  }
+  if (host === "musicdonna.com") {
+    return { provider: "donna", mode: "link", embedUrl: null, canonicalUrl: u.toString(), embedHeight: null };
   }
 
   // ── Anything else degrades to a card rather than failing.
