@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { Plus, ListMusic, Music, Store } from "lucide-react";
+import { Plus, Music } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MusicAddTabs } from "@/components/admin/music-add-tabs";
-import { FeaturedStarButton } from "@/components/admin/featured-star-button";
+import { MusicListClient } from "@/components/admin/music-list-client";
 
 export const dynamic = "force-dynamic";
 
@@ -61,65 +60,18 @@ export default async function MusicListsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          {lists.map((list) => {
-            const trackCount = list.modules.reduce((n, m) => n + m.lessons.length, 0);
-            return (
-              <div
-                key={list.id}
-                className="relative flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
-              >
-                <Link
-                  href={`/admin/music/${list.id}/edit`}
-                  className="absolute inset-0 z-0"
-                  aria-label={`Edit ${list.title}`}
-                />
-
-                {/* Cover */}
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
-                  {list.coverImageUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={list.coverImageUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ListMusic className="h-6 w-6 text-gray-300" />
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                      {list.title}
-                    </h3>
-                    <Badge variant={list.isPublished ? "success" : "outline"}>
-                      {list.isPublished ? "Published" : "Draft"}
-                    </Badge>
-                    {list.listInBookstore && (
-                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-600">
-                        <Store className="h-2.5 w-2.5" /> Bookstore
-                      </span>
-                    )}
-                  </div>
-                  {list.description && (
-                    <p className="text-xs text-gray-500 truncate mb-0.5">{list.description}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    {trackCount} track{trackCount === 1 ? "" : "s"}
-                  </p>
-                </div>
-
-                <FeaturedStarButton
-                  endpoint={`/api/admin/music/${list.id}/feature`}
-                  initialFeatured={list.isFeatured}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <MusicListClient
+          initialLists={lists.map((list) => ({
+            id: list.id,
+            title: list.title,
+            description: list.description,
+            coverImageUrl: list.coverImageUrl,
+            isPublished: list.isPublished,
+            isFeatured: list.isFeatured,
+            listInBookstore: list.listInBookstore,
+            trackCount: list.modules.reduce((n, m) => n + m.lessons.length, 0),
+          }))}
+        />
       )}
 
       {atCap && (
