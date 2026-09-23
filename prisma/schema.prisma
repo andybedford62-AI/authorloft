@@ -178,7 +178,7 @@ model Author {
   siteTheme                     String                @default("classic-literary")
   navShowAbout                  Boolean               @default(true)
   navShowBooks                  Boolean               @default(true)
-  navShowSpecials               Boolean               @default(true)
+  navShowSpecials               Boolean               @default(false)
   navShowFlipBooks              Boolean               @default(true)
   navShowBlog                   Boolean               @default(false)
   navShowContact                Boolean               @default(true)

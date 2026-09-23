@@ -5,7 +5,7 @@ import { GraduationCap, Pin, BarChart2, Award, Mail } from "lucide-react";
 import { SocialLinks } from "@/components/author-site/social-links";
 import { sanitize } from "@/lib/sanitize";
 import { PageBanner } from "@/components/author-site/page-banner";
-import { getAuthorByDomain, getAuthorBooks } from "@/lib/author-queries";
+import { getAuthorByDomain, getAuthorBooks, getAuthorContentCounts } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getAuthorBadges } from "@/lib/badges";
 import { AuthorBadges } from "@/components/marketing/author-badges";
@@ -54,6 +54,7 @@ export default async function AboutPage({
   const author = await getAuthorByDomain(domain);
   const books = await getAuthorBooks(author.id);
   const badges = author.showBadges ? await getAuthorBadges(author.id) : [];
+  const contentCounts = await getAuthorContentCounts(author.id);
 
   // Media Kit tab: opt-in (navShowMediaKit), plan-gated (mediaKitEnabled) --
   // same double-gate the standalone /media-kit page used to enforce itself.
@@ -76,13 +77,39 @@ export default async function AboutPage({
     ...(author.contactEmail ? [{ href: "/contact", icon: "mail", label: "Contact" }] : []),
   ].filter((s): s is { href: string; icon: string; label: string } => !!s.href);
 
-  // Credential items — use custom credentials from branding if set
+  // Credential items — use custom credentials from branding if set, otherwise
+  // derive a role per content type actually published (Author / Course Creator /
+  // Music Creator), each paired with its own count. An author with no published
+  // content yet still gets the default "Author" role.
   const customCredentials = Array.isArray((author as any).credentials)
     ? ((author as any).credentials as string[]).filter((c: string) => c?.trim())
     : [];
+
+  const contentRoles: string[] = [];
+  const contentCountLabels: string[] = [];
+  if (contentCounts.books > 0) {
+    contentRoles.push("Author");
+    contentCountLabels.push(`${contentCounts.books} ${contentCounts.books === 1 ? "Book" : "Books"} Published`);
+  }
+  if (contentCounts.courses > 0) {
+    contentRoles.push("Course Creator");
+    contentCountLabels.push(`${contentCounts.courses} ${contentCounts.courses === 1 ? "Course" : "Courses"}`);
+  }
+  if (contentCounts.music > 0) {
+    contentRoles.push("Music Creator");
+    contentCountLabels.push(`${contentCounts.music} ${contentCounts.music === 1 ? "Playlist" : "Playlists"}`);
+  }
+  if (contentRoles.length === 0) contentRoles.push("Author");
+
   const credentials = customCredentials.length > 0
     ? customCredentials
-    : ["Author", ...(books.length > 0 ? [`${books.length} ${books.length === 1 ? "Book" : "Books"} Published`] : [])];
+    : [...contentRoles, ...contentCountLabels];
+
+  // Page banner title — "Author" only when books are the only published content;
+  // any course or music content (alone or alongside books) reads as "Creator".
+  const pageTitle = contentRoles.includes("Course Creator") || contentRoles.includes("Music Creator")
+    ? "About the Creator"
+    : "About the Author";
 
   // About page stats from branding. Custom stats fully replace the auto book
   // count rather than stacking on top of it -- same precedence as credentials
@@ -151,7 +178,7 @@ export default async function AboutPage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
-      <PageBanner label="Biography" title="About the Author" accentColor={accentColor} />
+      <PageBanner label="Biography" title={pageTitle} accentColor={accentColor} />
 
       <AboutMediaKitTabs
         accentColor={accentColor}

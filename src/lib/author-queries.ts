@@ -111,6 +111,19 @@ export async function getAuthorContentPresence(authorId: string): Promise<Conten
   return { hasBooks: books > 0, hasCourses: courses > 0, hasMusic: music > 0 };
 }
 
+export type ContentCounts = { books: number; courses: number; music: number };
+
+/** Published counts per content type — used to build content-specific credential
+ *  badges (Author / Course Creator / Music Creator) on the About page. */
+export async function getAuthorContentCounts(authorId: string): Promise<ContentCounts> {
+  const [books, courses, music] = await Promise.all([
+    prisma.book.count({ where: { authorId, isPublished: true } }),
+    prisma.course.count({ where: { authorId, kind: "COURSE", isPublished: true } }),
+    prisma.course.count({ where: { authorId, kind: "MUSIC", isPublished: true } }),
+  ]);
+  return { books, courses, music };
+}
+
 export async function getAuthorCourses(authorId: string) {
   return prisma.course.findMany({
     where: { authorId, kind: "COURSE", isPublished: true },
