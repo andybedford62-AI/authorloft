@@ -24,11 +24,14 @@ const ContentSecurityPolicy = [
   // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host)
   "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net",
   // Stripe 3D Secure and payment frames.
-  // Plus the two video hosts extractVideoEmbed() in courses/[slug]/learn
-  // rewrites author-supplied watch URLs to. Without them the lesson <iframe>
-  // is blocked outright and the video area renders as an empty grey box —
-  // which is what every YouTube course lesson did until Aug 24 2026.
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com",
+  // Plus the video/music hosts extractVideoEmbed() (course lessons) and
+  // resolveTrackLink() (music pages) rewrite author-supplied URLs to. Without
+  // them the <iframe> is blocked outright and the area renders as an empty
+  // grey box — which is what every YouTube course lesson did until Aug 24
+  // 2026, and what every Spotify track did until this was caught: the code
+  // called Spotify embeddable but this directive never allowed its frame, so
+  // the "Play" button opened a Now-Playing panel with nothing in it.
+  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://open.spotify.com",
   "media-src 'self' https://*.supabase.co https://*.amazonaws.com",
   "object-src 'none'",
   "base-uri 'self'",

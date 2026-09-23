@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## September 23, 2026 — Fixed Spotify tracks silently failing to play on music pages
+
+`src/lib/music-links.ts` has treated Spotify links as embeddable since the music
+feature shipped, but the CSP `frame-src` directive in `next.config.ts` never
+allowed `open.spotify.com` — the same class of bug that broke every YouTube
+course lesson on Aug 24, 2026. Effect: on a musician's public music page,
+tapping a Spotify track's thumbnail/play button opened the "Now Playing" panel
+with a silently-blocked, empty iframe instead of playing the song; only the
+small hostname link at the bottom of the card (a real `<a target="_blank">`,
+not a frame) still worked. YouTube was unaffected because its hosts were
+already allowlisted. Fixed by adding `https://open.spotify.com` to `frame-src`.
+Added a regression test (`csp-video-embeds.test.ts`) pinning the Spotify embed
+host on both sides, mirroring the existing YouTube/Vimeo guard, so this can't
+drift silently again.
+
 ## September 21, 2026 — Author-site SEO audit fixes (subdomain pages)
 
 Audited four staging author sites (64 pages). Sitemaps, robots.txt, canonicals, lang/viewport/favicon and Person/Book/BlogPosting/BreadcrumbList schema were all fine; fixed what wasn't: (1) **meta/og descriptions contained raw rich-text HTML** ("<p>…</p>", and "<p></p>" for empty bios) — new `src/lib/meta-text.ts` (`toMetaDescription`) strips tags, decodes entities, caps at ~160 chars on a word boundary and falls back to a sensible sentence; applied to the site layout, About, book, blog post, flip book, series, course and music pages and their JSON-LD; (2) **the footer QR code's SVG <title> ("QR code linking to …") was the first <title> on every page**, ahead of the real one — replaced with role=img + aria-label on a wrapper; (3) **empty alt** on book preview thumbnails/lightbox (now "<book> — preview N"), theme hero banner, music list/track covers; (4) **AuthorLoft's Organization + WebSite JSON-LD was emitted on every author page** from the root layout — moved to the (marketing) layout so only platform pages carry it; (5) /books, /contact and /blog listing pages lost their og:image because a page-level openGraph replaces the layout's — they now include the author's profile image. Follow-up: the fallback descriptions used when an author has no bio/blurb were lengthened to 100+ characters (home, About, blog, series, book, course, flip book, music) — they were 33–50 chars, which reads as thin in a search snippet. Deliberately left: the two <h1> on the author home page (mobile and desktop hero variants, only one visible at a time). Not audited: custom domains (prod only) and custom pages.

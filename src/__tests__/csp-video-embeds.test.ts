@@ -1,8 +1,11 @@
 // Guards the CSP against the class of bug found Aug 24 2026: the course lesson
 // viewer builds a YouTube/Vimeo <iframe>, but frame-src only allowed Stripe, so
 // the browser blocked every video lesson and rendered an empty grey box. The
-// embed hosts and the CSP live in different files, so nothing but a test keeps
-// them agreeing.
+// same class of bug hit Spotify on the music pages (found Sep 23 2026):
+// resolveTrackLink() called Spotify embeddable, but frame-src never allowed
+// open.spotify.com, so the "Play" button opened a Now-Playing panel with a
+// silently-blocked iframe instead of a song. The embed hosts and the CSP live
+// in different files, so nothing but a test keeps them agreeing.
 // @vitest-environment node
 
 import { describe, it, expect } from "vitest";
@@ -14,6 +17,7 @@ const learnPage = readFileSync(
   join(process.cwd(), "src", "app", "(author-site)", "[domain]", "courses", "[slug]", "learn", "page.tsx"),
   "utf8",
 );
+const musicLinks = readFileSync(join(process.cwd(), "src", "lib", "music-links.ts"), "utf8");
 
 function frameSrc(): string {
   const line = config.split("\n").find((l) => l.includes("frame-src"));
@@ -26,10 +30,12 @@ describe("CSP frame-src vs. the embed URLs we actually build", () => {
     expect(frameSrc()).toBeTruthy();
   });
 
-  // Each host extractVideoEmbed() can emit must be allowed to frame.
+  // Each host extractVideoEmbed() / resolveTrackLink() can emit must be
+  // allowed to frame.
   it.each([
     ["https://www.youtube-nocookie.com", "YouTube lesson videos"],
     ["https://player.vimeo.com", "Vimeo lesson videos"],
+    ["https://open.spotify.com", "Spotify music tracks"],
   ])("allows %s (%s)", (host) => {
     expect(frameSrc()).toContain(host);
   });
@@ -51,5 +57,9 @@ describe("CSP frame-src vs. the embed URLs we actually build", () => {
     // above would keep passing while the real embed broke again. Pin the link.
     expect(learnPage).toContain("youtube-nocookie.com/embed/");
     expect(learnPage).toContain("player.vimeo.com/video/");
+  });
+
+  it("music-links.ts still emits the Spotify embed host this test pins", () => {
+    expect(musicLinks).toContain("open.spotify.com/embed/");
   });
 });
