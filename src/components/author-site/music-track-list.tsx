@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Play, ExternalLink, ListMusic } from "lucide-react";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
@@ -43,6 +43,18 @@ export function MusicTrackList({
   hero: PlaylistHero;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
+
+  // The hero's Play button opens a track that may sit anywhere in the grid
+  // below — with no scroll, that looked exactly like a dead button ("has a
+  // play icon but isn't linked to anything"). Only the hero button needs
+  // this: clicking a track card directly already opens the player where the
+  // user is looking, so it shouldn't also jump the page.
+  const scrollToOpenRef = useRef(false);
+  useEffect(() => {
+    if (!openId || !scrollToOpenRef.current) return;
+    scrollToOpenRef.current = false;
+    document.getElementById(`track-player-${openId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [openId]);
 
   // Deepened once and reused everywhere white sits on the accent, so the hero,
   // the play button, and the hover state all clear the same contrast floor
@@ -97,7 +109,10 @@ export function MusicTrackList({
             {firstEmbeddable && (
               <button
                 type="button"
-                onClick={() => setOpenId(firstEmbeddable.id)}
+                onClick={() => {
+                  scrollToOpenRef.current = true;
+                  setOpenId(firstEmbeddable.id);
+                }}
                 className="flex-shrink-0 flex items-center gap-2 rounded-full pl-4 pr-5 py-2.5 font-semibold text-sm text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
                 style={{ backgroundColor: surface }}
               >
@@ -131,6 +146,7 @@ export function MusicTrackList({
             return isOpen && canEmbed ? (
               <div
                 key={track.id}
+                id={`track-player-${track.id}`}
                 className="rounded-2xl border overflow-hidden sm:col-span-2 lg:col-span-3"
                 style={{
                   borderColor: `color-mix(in srgb, ${accentColor} 30%, #e5e7eb)`,
