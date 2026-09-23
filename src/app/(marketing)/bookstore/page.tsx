@@ -19,7 +19,7 @@ import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreRow } from "@/components/marketing/bookstore-row";
 import { BookstoreHero } from "@/components/marketing/bookstore-hero";
 import { BookstoreCatalogTabs } from "@/components/marketing/bookstore-catalog-tabs";
-import { getBookstoreData, getBookstoreCourses } from "@/lib/bookstore";
+import { getBookstoreData, getBookstoreCourses, getBookstoreMusic } from "@/lib/bookstore";
 
 export const revalidate = 1800;
 
@@ -53,9 +53,10 @@ export const metadata: Metadata = {
 };
 
 export default async function BookstorePage() {
-  const [{ books, genres, stats, spotlight }, { courses, categories: courseCategories }] = await Promise.all([
+  const [{ books, genres, stats, spotlight }, { courses, categories: courseCategories }, { music }] = await Promise.all([
     getBookstoreData(),
     getBookstoreCourses(),
+    getBookstoreMusic(),
   ]);
 
   // "New on the Shelf" — genuinely new (released within the last 30 days,
@@ -137,17 +138,43 @@ export default async function BookstorePage() {
     },
   }));
 
+  // Music continues the same ItemList numbering after books and courses.
+  // schema.org MusicPlaylist requires no strict fields beyond name/url, so
+  // no description fallback is needed the way Course requires one.
+  const musicListItems = music.slice(0, 100).map((m, i) => ({
+    "@type": "ListItem",
+    position: bookListItems.length + courseListItems.length + i + 1,
+    item: {
+      "@type": "MusicPlaylist",
+      name: m.title,
+      url: m.musicUrl,
+      ...(m.description ? { description: m.description } : {}),
+      ...(m.coverImageUrl ? { image: m.coverImageUrl } : {}),
+      ...(m.averageRating !== null && m.ratingCount > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: m.averageRating,
+              ratingCount: m.ratingCount,
+              bestRating: 5,
+              worstRating: 1,
+            },
+          }
+        : {}),
+    },
+  }));
+
   const collectionLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "AuthorLoft Bookstore",
-    description: "Browse books and courses from independent authors on AuthorLoft across every genre.",
+    description: "Browse books, courses and music from independent authors on AuthorLoft across every genre.",
     url: `${BASE}/bookstore`,
     isPartOf: { "@type": "WebSite", name: "AuthorLoft", url: BASE },
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: bookListItems.length + courseListItems.length,
-      itemListElement: [...bookListItems, ...courseListItems],
+      numberOfItems: bookListItems.length + courseListItems.length + musicListItems.length,
+      itemListElement: [...bookListItems, ...courseListItems, ...musicListItems],
     },
   };
 
@@ -291,18 +318,20 @@ export default async function BookstorePage() {
         {/* ── Full catalog — one dark panel, consistent with the rest of the
              site now that the search bar and book cards inside it are dark
              too (previously a light-blue panel to contrast against white
-             cards). Books and Courses share one Type tab switcher instead of
-             two always-visible sections — each keeps its own facet filters
-             (genre chips for books, category chips for courses) since the
-             two catalogs don't share a taxonomy. Courses tab only shows once
-             there's at least one to browse. ─────────────────────────────── */}
+             cards). Books, Courses and Music share one Type tab switcher
+             instead of always-visible sections — each keeps its own facet
+             filters (genre chips for books, category chips for courses, none
+             for music) since the catalogs don't share a taxonomy. The tab
+             switcher only shows once there's at least one course or music
+             listing to browse alongside books. ─────────────────────────── */}
         <section className="mb-12 rounded-2xl border border-vault-ink/12 bg-vault-bg p-4 sm:p-6">
-          {courses.length > 0 ? (
+          {courses.length > 0 || music.length > 0 ? (
             <BookstoreCatalogTabs
               books={books}
               allGenres={genres.map((g) => g.name)}
               courses={courses}
               allCategories={courseCategories.map((c) => c.name)}
+              music={music}
             />
           ) : (
             <>

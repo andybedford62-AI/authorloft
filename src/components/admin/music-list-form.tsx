@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle,
+  Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle, Store, Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
@@ -27,10 +27,13 @@ interface Props {
     coverImageUrl: string;
     isPublished: boolean;
     isFeatured: boolean;
+    listInBookstore: boolean;
     tracks: TrackRow[];
   };
   /** Plan cap on tracks; null = unlimited. */
   trackCap: number | null;
+  /** STANDARD+ gate for the Bookstore opt-in toggle (mirrors CourseForm). */
+  bookstoreEnabled?: boolean;
 }
 
 const blankTrack = (): TrackRow => ({ url: "", title: "", description: "", originalHtml: "" });
@@ -38,7 +41,7 @@ const blankTrack = (): TrackRow => ({ url: "", title: "", description: "", origi
 const inputClass =
   "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
-export function MusicListForm({ listId, initial, trackCap }: Props) {
+export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = false }: Props) {
   const router = useRouter();
   const isEdit = !!listId;
 
@@ -47,6 +50,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
   const [coverImageUrl, setCoverImageUrl] = useState(initial?.coverImageUrl ?? "");
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
+  const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
   const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [blankTrack()]);
 
   const [saving, setSaving] = useState(false);
@@ -81,6 +85,7 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
         coverImageUrl,
         isPublished,
         isFeatured,
+        listInBookstore,
         tracks: tracks.filter((t) => t.url.trim()),  // description + originalHtml ride along
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
@@ -163,6 +168,45 @@ export function MusicListForm({ listId, initial, trackCap }: Props) {
               This is a draft — readers won&apos;t see it. Check <strong>Published</strong> above
               and save to make it appear on your public Music page.
             </span>
+          </div>
+        )}
+
+        {/* AuthorLoft Bookstore opt-in — edit mode only, mirrors CourseForm
+            (a new list has no id yet, so there's nothing to list). */}
+        {isEdit && (
+          <div className="pt-2 border-t border-gray-100">
+            {bookstoreEnabled ? (
+              <>
+                <div className="flex items-center gap-4 cursor-pointer select-none"
+                  onClick={() => setListInBookstore((v) => !v)}>
+                  <div className={`relative flex-shrink-0 w-10 h-6 rounded-full transition-colors ${listInBookstore ? "bg-emerald-600" : "bg-gray-300"}`}>
+                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${listInBookstore ? "translate-x-5" : "translate-x-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                      <Store className="h-3.5 w-3.5 text-emerald-600" />
+                      List in AuthorLoft Bookstore
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Feature this album/playlist in the public AuthorLoft Bookstore for cross-discovery. Listeners click through to this music list on your own site — no payment is taken there.
+                    </p>
+                  </div>
+                </div>
+                {listInBookstore && (
+                  <div className="ml-14 mt-2 rounded-lg p-3 text-xs bg-emerald-50 border border-emerald-100 text-emerald-700">
+                    Listed once this music list is <strong>Published</strong>. Make sure it has a cover image and description so it looks its best in the catalog.
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-semibold">The AuthorLoft Bookstore requires a Standard plan or higher.</span>{" "}
+                  <a href="/admin/settings#billing" className="underline hover:text-amber-900">Upgrade your plan</a> to list your music in the public bookstore for extra discovery.
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

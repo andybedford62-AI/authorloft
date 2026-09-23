@@ -16,16 +16,20 @@ export default async function EditMusicListPage({
   const { id } = await params;
   const authorId = await getAdminAuthorId();
 
-  const list = await prisma.course.findFirst({
-    where: { id, authorId, kind: "MUSIC" },
-    include: {
-      modules: {
-        orderBy: { sortOrder: "asc" },
-        include: { lessons: { orderBy: { sortOrder: "asc" } } },
+  const [list, author] = await Promise.all([
+    prisma.course.findFirst({
+      where: { id, authorId, kind: "MUSIC" },
+      include: {
+        modules: {
+          orderBy: { sortOrder: "asc" },
+          include: { lessons: { orderBy: { sortOrder: "asc" } } },
+        },
       },
-    },
-  });
+    }),
+    prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+  ]);
   if (!list) notFound();
+  const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
 
   const trackCap = await maxTracksPerList(authorId);
   const tracks = list.modules.flatMap((m) =>
@@ -50,12 +54,14 @@ export default async function EditMusicListPage({
       <MusicListForm
         listId={list.id}
         trackCap={trackCap}
+        bookstoreEnabled={bookstoreEnabled}
         initial={{
           title: list.title,
           description: list.description ?? "",
           coverImageUrl: list.coverImageUrl ?? "",
           isPublished: list.isPublished,
           isFeatured: list.isFeatured,
+          listInBookstore: list.listInBookstore,
           tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />

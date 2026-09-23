@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, ListMusic, Music } from "lucide-react";
+import { Plus, ListMusic, Music, Store } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
@@ -98,6 +98,11 @@ export default async function MusicListsPage() {
                     <Badge variant={list.isPublished ? "success" : "outline"}>
                       {list.isPublished ? "Published" : "Draft"}
                     </Badge>
+                    {list.listInBookstore && (
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 text-purple-600">
+                        <Store className="h-2.5 w-2.5" /> Bookstore
+                      </span>
+                    )}
                   </div>
                   {list.description && (
                     <p className="text-xs text-gray-500 truncate mb-0.5">{list.description}</p>

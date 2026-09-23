@@ -57,6 +57,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // them wholesale is simpler and safer than diffing — and it can't strand a
   // row at a stale sortOrder.
   const isFeatured = typeof body?.isFeatured === "boolean" ? body.isFeatured : undefined;
+  const listInBookstore = typeof body?.listInBookstore === "boolean" ? body.listInBookstore : undefined;
+
+  // Enforce bookstore listing limit when the author is turning this on (mirrors
+  // the same check on Book/Course — music has its own independent count).
+  if (listInBookstore && !existing.listInBookstore) {
+    const author = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { plan: { select: { bookstoreListingLimit: true } } },
+    });
+    const limit = author?.plan?.bookstoreListingLimit ?? -1;
+    if (limit !== -1) {
+      const currentCount = await prisma.course.count({ where: { authorId, kind: "MUSIC", listInBookstore: true, id: { not: id } } });
+      if (currentCount >= limit) {
+        return NextResponse.json(
+          { error: `Your plan allows up to ${limit} bookstore listing${limit === 1 ? "" : "s"}. Upgrade to list more.` },
+          { status: 403 }
+        );
+      }
+    }
+  }
 
   await prisma.$transaction(async (tx) => {
     // Only one music list may be featured at a time — see the same guard on Course PUT/POST.
@@ -76,6 +96,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         coverImageUrl: typeof body?.coverImageUrl === "string" ? body.coverImageUrl.trim() || null : existing.coverImageUrl,
         ...(typeof body?.isPublished === "boolean" ? { isPublished: body.isPublished } : {}),
         ...(isFeatured !== undefined ? { isFeatured } : {}),
+        ...(listInBookstore !== undefined ? { listInBookstore } : {}),
       },
     });
 

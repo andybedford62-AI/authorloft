@@ -13,6 +13,24 @@ line rather than listing every commit.
 
 ---
 
+## September 23, 2026 — Music tab on the AuthorLoft Bookstore
+
+Phase 1 of extending the Bookstore beyond books (the full "Discover" rebrand —
+media-neutral hero image, stat bar, copy — is scoped separately): musicians can
+now list an album/playlist in the public Bookstore at `/bookstore` the same way
+authors and course creators already could. `getBookstoreMusic()` in
+`src/lib/bookstore.ts` mirrors the existing `getBookstoreCourses()`, filtered to
+`Course.kind: "MUSIC"`; `BookstoreCatalogTabs` gained a third Music tab
+(`bookstore-music-card.tsx` / `bookstore-music-grid.tsx`) alongside Books and
+Courses. Music lists have no price (they're link-out only, same as everywhere
+else in the app) and no category taxonomy, so unlike Courses the Music tab has
+no filter facet — just the grid. `listInBookstore` was already a field on the
+shared Course model (present for both kinds), but the admin Music form had no
+UI for it — `MusicListForm` now has the same "List in AuthorLoft Bookstore"
+toggle `CourseForm` has (edit mode only, STANDARD+ gated, same per-plan
+`bookstoreListingLimit` counted independently per content kind), and the Music
+admin list page shows the same purple "Bookstore" badge Courses shows.
+
 ## September 23, 2026 — Content-aware creator badging on About page; Specials nav defaults off
 
 The About page "Credentials" line and page-banner title used to say "Author"

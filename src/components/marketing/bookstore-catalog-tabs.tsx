@@ -1,27 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Library, GraduationCap } from "lucide-react";
+import { Library, GraduationCap, Music2 } from "lucide-react";
 import { BookstoreGrid } from "@/components/marketing/bookstore-grid";
 import { BookstoreCourseGrid } from "@/components/marketing/bookstore-course-grid";
+import { BookstoreMusicGrid } from "@/components/marketing/bookstore-music-grid";
 import { type BookstoreBook } from "@/components/marketing/bookstore-book-card";
 import { type BookstoreCourse } from "@/components/marketing/bookstore-course-card";
+import { type BookstoreMusic } from "@/components/marketing/bookstore-music-card";
 
-// Books and Courses each keep their own grid/filter UI (different facets —
-// genre/format/price for books, category only for courses) but now live
-// under one shared type tab instead of two always-visible sections.
+// Books, Courses and Music each keep their own grid/filter UI (different facets —
+// genre/format/price for books, category for courses, none for music) but now
+// live under one shared type tab instead of always-visible sections.
 export function BookstoreCatalogTabs({
   books,
   allGenres,
   courses,
   allCategories,
+  music,
 }: {
   books: BookstoreBook[];
   allGenres: string[];
   courses: BookstoreCourse[];
   allCategories: string[];
+  music: BookstoreMusic[];
 }) {
-  const [active, setActive] = useState<"books" | "courses">("books");
+  const [active, setActive] = useState<"books" | "courses" | "music">("books");
 
   return (
     <div>
@@ -48,12 +52,25 @@ export function BookstoreCatalogTabs({
         >
           <GraduationCap className="h-4 w-4" /> Courses ({courses.length})
         </button>
+        <button
+          type="button"
+          onClick={() => setActive("music")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-vault-display text-lg transition-colors ${
+            active === "music"
+              ? "bg-vault-gold text-vault-bg"
+              : "bg-vault-bg text-vault-mute border border-vault-ink/15 hover:border-vault-gold"
+          }`}
+        >
+          <Music2 className="h-4 w-4" /> Music ({music.length})
+        </button>
       </div>
 
       {active === "books" ? (
         <BookstoreGrid books={books} allGenres={allGenres} />
-      ) : (
+      ) : active === "courses" ? (
         <BookstoreCourseGrid courses={courses} allCategories={allCategories} />
+      ) : (
+        <BookstoreMusicGrid music={music} />
       )}
     </div>
   );

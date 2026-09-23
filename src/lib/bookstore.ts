@@ -3,6 +3,7 @@ import { getAuthorBaseUrl } from "@/lib/site-url";
 import { slugify } from "@/lib/utils";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 import type { BookstoreCourse } from "@/components/marketing/bookstore-course-card";
+import type { BookstoreMusic } from "@/components/marketing/bookstore-music-card";
 
 export type GenreCount = { name: string; slug: string; count: number };
 
@@ -293,4 +294,74 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
   return { courses, categories };
+}
+
+export type BookstoreMusicData = { music: BookstoreMusic[] };
+
+/**
+ * Public bookstore music — parallel to getBookstoreCourses() but for MUSIC-kind
+ * Course rows. Music lists have no price (link-out only, see MusicNoSalesBanner)
+ * and no category taxonomy of their own (CourseCategory is course-specific), so
+ * unlike courses there's no filter facet here — just the catalog grid.
+ */
+export async function getBookstoreMusic(): Promise<BookstoreMusicData> {
+  const rows = await prisma.course
+    .findMany({
+      where: {
+        kind: "MUSIC",
+        listInBookstore: true,
+        isPublished: true,
+        author: {
+          isActive: true,
+          plan: { bookstoreListingEnabled: true },
+        },
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        coverImageUrl: true,
+        description: true,
+        createdAt: true,
+        author: {
+          select: {
+            slug: true,
+            customDomain: true,
+            displayName: true,
+            name: true,
+          },
+        },
+        modules: { select: { lessons: { select: { id: true } } } },
+        feedback: { where: { status: "APPROVED" }, select: { rating: true } },
+      },
+    })
+    .catch(() => []);
+
+  const music: BookstoreMusic[] = rows.map((m) => {
+    const trackCount = m.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
+
+    const ratings = m.feedback.map((f) => f.rating).filter((r) => r >= 1 && r <= 5);
+    const ratingCount = ratings.length;
+    const averageRating =
+      ratingCount > 0
+        ? Math.round((ratings.reduce((a, r) => a + r, 0) / ratingCount) * 10) / 10
+        : null;
+
+    return {
+      id: m.id,
+      title: m.title,
+      coverImageUrl: m.coverImageUrl,
+      authorName: m.author.displayName || m.author.name,
+      authorUrl: getAuthorBaseUrl(m.author),
+      musicUrl: `${getAuthorBaseUrl(m.author)}/music/${m.slug}`,
+      description: m.description ? stripHtml(m.description) : null,
+      trackCount,
+      sortTimestamp: new Date(m.createdAt).getTime(),
+      averageRating,
+      ratingCount,
+    };
+  });
+
+  return { music };
 }
