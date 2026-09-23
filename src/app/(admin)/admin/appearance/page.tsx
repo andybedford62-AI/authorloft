@@ -2,21 +2,25 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { AppearanceClient } from "./appearance-client";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { getAuthorContentPresence } from "@/lib/author-queries";
 
 export default async function AppearancePage() {
   const authorId = await getAdminAuthorId();
 
-  const author = await prisma.author.findUnique({
-    where: { id: authorId },
-    select: {
-      siteTheme:            true,
-      homeTemplate:         true,
-      slug:                 true,
-      customAccentColor:    true,
-      customSecondaryColor: true,
-      plan:                 { select: { tier: true } },
-    },
-  });
+  const [author, { hasMusic }] = await Promise.all([
+    prisma.author.findUnique({
+      where: { id: authorId },
+      select: {
+        siteTheme:            true,
+        homeTemplate:         true,
+        slug:                 true,
+        customAccentColor:    true,
+        customSecondaryColor: true,
+        plan:                 { select: { tier: true } },
+      },
+    }),
+    getAuthorContentPresence(authorId),
+  ]);
 
   if (!author) redirect("/login");
 
@@ -37,6 +41,7 @@ export default async function AppearancePage() {
         planTier={tier}
         currentCustomAccent={author.customAccentColor}
         currentCustomSecondary={author.customSecondaryColor}
+        hasMusicContent={hasMusic}
       />
     </div>
   );

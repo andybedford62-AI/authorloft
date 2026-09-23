@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/db";
 import { notFound, permanentRedirect } from "next/navigation";
 import { headers } from "next/headers";
-import { resolveAccentColor, resolveSecondaryColor, isThemeAllowed } from "@/lib/themes";
+import { resolveAccentColor, resolveSecondaryColor, isThemeAllowed, MUSIC_GENRE_PALETTE_IDS } from "@/lib/themes";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -50,9 +50,11 @@ export async function getAuthorByDomain(domain: string) {
   }
 
   // Enforce plan-based theme access at render time:
-  // FREE authors are locked to one of the 3 base colour themes regardless of what's stored.
+  // FREE authors are locked to one of the 3 base colour themes, unless they
+  // qualify for the music-content palette unlock (see isThemeAllowed above).
   const planTier = author.plan?.tier ?? "FREE";
-  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier)
+  const hasMusicContent = await getAuthorQualifiesForMusicPalette(author.id, author.siteTheme, planTier);
+  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier, { hasMusicContent })
     ? author.siteTheme
     : planTier === "FREE" ? "modern-minimal" : "classic-literary";
 
@@ -109,6 +111,26 @@ export async function getAuthorContentPresence(authorId: string): Promise<Conten
     prisma.course.count({ where: { authorId, kind: "MUSIC", isPublished: true } }),
   ]);
   return { hasBooks: books > 0, hasCourses: courses > 0, hasMusic: music > 0 };
+}
+
+/**
+ * Whether a FREE-tier author qualifies for the Music Genre Palette content
+ * unlock (published music, regardless of plan) — see isThemeAllowed() in
+ * @/lib/themes for how this feeds the actual gate. Short-circuits without a
+ * DB query whenever it can't matter (Standard+ never needs it; a FREE author
+ * whose theme isn't even a music palette doesn't either), so callers on hot
+ * render paths (every author-site page) only pay for the query in the narrow
+ * case it's actually relevant.
+ */
+export async function getAuthorQualifiesForMusicPalette(
+  authorId: string,
+  themeId: string | null | undefined,
+  planTier: string
+): Promise<boolean> {
+  if (planTier !== "FREE") return false;
+  if (!themeId || !(MUSIC_GENRE_PALETTE_IDS as string[]).includes(themeId)) return false;
+  const { hasMusic } = await getAuthorContentPresence(authorId);
+  return hasMusic;
 }
 
 export type ContentCounts = { books: number; courses: number; music: number };

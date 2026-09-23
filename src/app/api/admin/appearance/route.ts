@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { ALL_THEMES, BASE_THEME_IDS, isThemeAllowed } from "@/lib/themes";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 
 const VALID_THEMES = ALL_THEMES.map((t) => t.id);
 
@@ -24,9 +25,10 @@ export async function PATCH(req: NextRequest) {
     });
 
     const planTier = author?.plan?.tier ?? "FREE";
+    const hasMusicContent = await getAuthorQualifiesForMusicPalette(authorId, siteTheme, planTier);
 
     // Enforce plan access
-    if (!isThemeAllowed(siteTheme, planTier)) {
+    if (!isThemeAllowed(siteTheme, planTier, { hasMusicContent })) {
       return NextResponse.json(
         { error: "This theme is not available on your current plan." },
         { status: 403 }

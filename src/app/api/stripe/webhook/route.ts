@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
+import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 
 /**
  * Reverts the author's theme if their new plan no longer allows the current one.
@@ -18,7 +19,8 @@ async function revertThemeOnDowngrade(authorId: string, newPlanTier: string) {
   });
   if (!author) return;
 
-  if (isThemeAllowed(author.siteTheme, newPlanTier)) return; // already valid
+  const hasMusicContent = await getAuthorQualifiesForMusicPalette(authorId, author.siteTheme, newPlanTier);
+  if (isThemeAllowed(author.siteTheme, newPlanTier, { hasMusicContent })) return; // already valid
 
   // Determine the revert target
   // Note: STANDARD now allows all themes incl. genre palettes, so only FREE triggers a revert.

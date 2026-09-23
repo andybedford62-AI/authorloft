@@ -1,7 +1,7 @@
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { redirectIfRetiredSlug } from "@/lib/author-queries";
+import { redirectIfRetiredSlug, getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -167,7 +167,8 @@ export default async function AuthorSiteLayout({
 
   // Enforce plan-based theme access at render time
   const planTier = author.plan?.tier ?? "FREE";
-  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier)
+  const hasMusicContent = await getAuthorQualifiesForMusicPalette(author.id, author.siteTheme, planTier);
+  const effectiveSiteTheme = isThemeAllowed(author.siteTheme, planTier, { hasMusicContent })
     ? author.siteTheme
     : planTier === "FREE" ? "modern-minimal" : "classic-literary";
 

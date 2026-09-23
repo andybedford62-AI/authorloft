@@ -13,6 +13,30 @@ line rather than listing every commit.
 
 ---
 
+## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
+
+A content-specific perk, not a plan change: a FREE author who publishes music
+(at least one published MUSIC-kind list) can now pick any Music Genre Palette
+in Admin → Appearance, same as Standard+. The book Genre & Style Palettes
+section stays Standard+ only for everyone — this only opens the separate
+Music Genre Palettes section, and only for authors who actually use the Music
+feature. New `getAuthorQualifiesForMusicPalette()` in `src/lib/author-queries.ts`
+feeds an extended `isThemeAllowed(themeId, planTier, { hasMusicContent })` in
+`src/lib/themes.ts` (old two-arg call sites keep their exact previous
+behavior — the flag is opt-in). Threaded through every place a stored theme
+gets re-validated, not just the picker UI, so the unlock actually sticks:
+public site rendering (`getAuthorByDomain`, `[domain]/layout.tsx`), the save
+endpoint (`api/admin/appearance`), trial expiry (`cron/expire-trials`), and
+Stripe plan-downgrade reverts (`api/stripe/webhook`) — otherwise a musician
+could save a palette in the UI and have it silently reverted by an unrelated
+background job that didn't know about the content-based exception.
+
+Deliberately did *not* build the general "Super Admin assigns any palette to
+any plan" system discussed alongside this — that's a separate, larger project
+(schema change + Plan editor UI) tracked for later; this is the narrow fix for
+today's mismatch (FREE plans already have `musicEnabled: true` but no
+matching palette access).
+
 ## September 23, 2026 — Music tab on the AuthorLoft Bookstore
 
 Phase 1 of extending the Bookstore beyond books (the full "Discover" rebrand —

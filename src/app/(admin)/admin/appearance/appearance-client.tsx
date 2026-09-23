@@ -14,6 +14,8 @@ interface AppearanceClientProps {
   planTier:              string;
   currentCustomAccent:   string | null;
   currentCustomSecondary: string | null;
+  /** Author publishes music — unlocks Music Genre Palettes on FREE too. */
+  hasMusicContent:       boolean;
 }
 
 const TEMPLATES = [
@@ -193,6 +195,7 @@ export function AppearanceClient({
   planTier,
   currentCustomAccent,
   currentCustomSecondary,
+  hasMusicContent,
 }: AppearanceClientProps) {
   const [selectedTheme,    setSelectedTheme]    = useState(currentTheme);
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate);
@@ -215,6 +218,9 @@ export function AppearanceClient({
   const isFree     = planTier === "FREE";
   const isStandard = planTier === "STANDARD" || planTier === "PREMIUM";
   const isPremium  = planTier === "PREMIUM";
+  // FREE authors who publish music get Music Genre Palettes unlocked as a
+  // content-specific perk — see isThemeAllowed() in @/lib/themes.
+  const musicPalettesLocked = isFree && !hasMusicContent;
 
   async function saveCustomAccent(value: string | null) {
     setSavingAccent(true);
@@ -516,14 +522,23 @@ export function AppearanceClient({
         <div>
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
             Music Genre Palettes
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full">
-              <Sparkles className="w-3 h-3" /> Standard +
-            </span>
+            {musicPalettesLocked ? (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full">
+                <Sparkles className="w-3 h-3" /> Standard +
+              </span>
+            ) : isFree ? (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2.5 py-0.5 rounded-full">
+                <Sparkles className="w-3 h-3" /> Unlocked for musicians
+              </span>
+            ) : null}
           </h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Hand-crafted palettes for musicians and playlist curators — kept separate from the book genre palettes above so both stay easy to scan.
-            {isFree && (
+            {musicPalettesLocked && (
               <span className="ml-1 text-blue-600 font-medium">Available on Standard and Premium plans.</span>
+            )}
+            {!musicPalettesLocked && isFree && (
+              <span className="ml-1 text-emerald-600 font-medium">Unlocked because you publish music — free of charge.</span>
             )}
           </p>
         </div>
@@ -534,7 +549,7 @@ export function AppearanceClient({
               key={palette.id}
               theme={palette}
               isActive={selectedTheme === palette.id}
-              locked={isFree}
+              locked={musicPalettesLocked}
               lockLabel="Upgrade to Standard"
               saving={savingTheme === palette.id}
               onClick={() => handleSelectTheme(palette.id)}

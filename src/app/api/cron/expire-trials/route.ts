@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendTrialExpiryWarningEmail, sendTrialEndedEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
+import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 
 /**
  * GET /api/cron/expire-trials
@@ -83,9 +84,11 @@ export async function GET(req: NextRequest) {
     const planName   = author.trialPlan?.name ?? "trial plan";
     const authorName = author.displayName || author.name;
 
-    // Revert theme if the current theme isn't allowed on FREE
+    // Revert theme if the current theme isn't allowed on FREE (a music-content
+    // author keeps their Music Genre Palette even after the trial ends).
     if (author.siteTheme) {
-      const allowed = isThemeAllowed(author.siteTheme, "FREE");
+      const hasMusicContent = await getAuthorQualifiesForMusicPalette(author.id, author.siteTheme, "FREE");
+      const allowed = isThemeAllowed(author.siteTheme, "FREE", { hasMusicContent });
       if (!allowed) {
         const revertTo = "modern-minimal";
         await prisma.author.update({

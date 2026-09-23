@@ -378,9 +378,19 @@ export function resolveSecondaryColor(opts: {
  */
 export const BASE_THEME_IDS = BASE_THEMES.map((t) => t.id);
 export const STYLE_PALETTE_IDS = STYLE_PALETTES.map((t) => t.id);
+export const MUSIC_GENRE_PALETTE_IDS = MUSIC_GENRE_PALETTES.map((t) => t.id);
 
-export function isThemeAllowed(themeId: string, planTier: string): boolean {
+/**
+ * `opts.hasMusicContent` lets a FREE author who actually publishes music keep
+ * (or pick) a Music Genre Palette even though the book Genre & Style Palettes
+ * stay Standard+ only for them — a content-specific perk, not a plan change.
+ * See getAuthorQualifiesForMusicPalette() in @/lib/author-queries, which is
+ * how callers should usually produce this flag (it short-circuits to avoid an
+ * extra query whenever it isn't relevant).
+ */
+export function isThemeAllowed(themeId: string, planTier: string, opts?: { hasMusicContent?: boolean }): boolean {
   if (planTier === "PREMIUM" || planTier === "STANDARD") return true;
+  if (opts?.hasMusicContent && (MUSIC_GENRE_PALETTE_IDS as string[]).includes(themeId)) return true;
   // FREE — the 3 base colour themes only (no genre/style palettes)
   return (BASE_THEME_IDS as string[]).includes(themeId);
 }
