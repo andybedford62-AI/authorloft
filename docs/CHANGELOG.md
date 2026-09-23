@@ -13,9 +13,9 @@ line rather than listing every commit.
 
 ---
 
-## September 23, 2026 — Fixed the music-page hero "Play" button not visibly doing anything
+## September 23, 2026 — Removed the misleading Play button on the music-page hero
 
-Reported as: the cover image at the top of a playlist page has a Play button that "isn't linked to a music link." Root cause: `MusicTrackList`'s hero Play button (`src/components/author-site/music-track-list.tsx`) only set React state (`setOpenId`) to open the first embeddable track's player — that track's card can sit anywhere in the grid below the hero, and nothing scrolled the page there, so the click appeared to do nothing. Reproduced on both a YouTube-only playlist and a Spotify playlist, confirming it wasn't provider-specific. Fixed by scrolling smoothly to the opened "Now Playing" panel when it's triggered from the hero button specifically (clicking a track card directly already opens the player in view, so that path is untouched).
+Reported as: the cover image at the top of a playlist page has a Play button that "isn't linked to a music link." Root cause: `MusicTrackList`'s hero Play button (`src/components/author-site/music-track-list.tsx`) only set React state to open the first embeddable track's player — that track's card can sit anywhere in the grid below the hero, and nothing scrolled the page there, so the click appeared to do nothing. Reproduced on both a YouTube-only playlist and a Spotify playlist. First fix attempt scrolled the page to the opened player on click, which worked, but on review a Play icon that jumps to and opens a track (which for YouTube then still needs a second click inside the embed to actually play) misrepresents what the button does regardless of whether it scrolls. Each track card below already has its own accurate Play/external-link affordance, so the hero button added confusion without adding capability — removed entirely rather than relabeled.
 
 ## September 23, 2026 — Recognize Udio and Donna as named music providers
 

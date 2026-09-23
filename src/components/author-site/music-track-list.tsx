@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Play, ExternalLink, ListMusic } from "lucide-react";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
@@ -44,28 +44,11 @@ export function MusicTrackList({
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // The hero's Play button opens a track that may sit anywhere in the grid
-  // below — with no scroll, that looked exactly like a dead button ("has a
-  // play icon but isn't linked to anything"). Only the hero button needs
-  // this: clicking a track card directly already opens the player where the
-  // user is looking, so it shouldn't also jump the page.
-  const scrollToOpenRef = useRef(false);
-  useEffect(() => {
-    if (!openId || !scrollToOpenRef.current) return;
-    scrollToOpenRef.current = false;
-    document.getElementById(`track-player-${openId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [openId]);
-
-  // Deepened once and reused everywhere white sits on the accent, so the hero,
-  // the play button, and the hover state all clear the same contrast floor
-  // regardless of how light an author's chosen accent is.
+  // Deepened once and reused everywhere white sits on the accent, so the hero
+  // and the hover state both clear the same contrast floor regardless of how
+  // light an author's chosen accent is.
   const surface = accentAsSurface(accentColor);
   const textOnWhite = accentAsTextOn(accentColor);
-
-  const firstEmbeddable = tracks.find((t) => {
-    const link = t.videoUrl ? resolveTrackLink(t.videoUrl) : null;
-    return link?.mode === "embed" && !!link.embedUrl;
-  });
 
   return (
     <div style={{ "--accent": accentColor, "--accent-surface": surface } as React.CSSProperties}>
@@ -94,31 +77,14 @@ export function MusicTrackList({
           <p className="text-xs font-bold uppercase tracking-widest text-white/75 mb-1.5">
             Playlist · {tracks.length} track{tracks.length === 1 ? "" : "s"}
           </p>
-          <div className="flex items-end justify-between gap-4">
-            <div className="min-w-0">
-              <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight truncate sm:whitespace-normal sm:line-clamp-2">
-                {hero.title}
-              </h1>
-              {hero.description && (
-                <p className="hidden sm:block text-white/80 text-sm mt-2 max-w-xl line-clamp-2">
-                  {hero.description}
-                </p>
-              )}
-            </div>
-
-            {firstEmbeddable && (
-              <button
-                type="button"
-                onClick={() => {
-                  scrollToOpenRef.current = true;
-                  setOpenId(firstEmbeddable.id);
-                }}
-                className="flex-shrink-0 flex items-center gap-2 rounded-full pl-4 pr-5 py-2.5 font-semibold text-sm text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
-                style={{ backgroundColor: surface }}
-              >
-                <Play className="h-4 w-4 fill-current" />
-                Play
-              </button>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight truncate sm:whitespace-normal sm:line-clamp-2">
+              {hero.title}
+            </h1>
+            {hero.description && (
+              <p className="hidden sm:block text-white/80 text-sm mt-2 max-w-xl line-clamp-2">
+                {hero.description}
+              </p>
             )}
           </div>
         </div>
@@ -146,7 +112,6 @@ export function MusicTrackList({
             return isOpen && canEmbed ? (
               <div
                 key={track.id}
-                id={`track-player-${track.id}`}
                 className="rounded-2xl border overflow-hidden sm:col-span-2 lg:col-span-3"
                 style={{
                   borderColor: `color-mix(in srgb, ${accentColor} 30%, #e5e7eb)`,
