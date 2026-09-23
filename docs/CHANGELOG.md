@@ -13,6 +13,25 @@ line rather than listing every commit.
 
 ---
 
+## September 23, 2026 — Content-aware creator badging on About page; Specials nav defaults off
+
+The About page "Credentials" line and page-banner title used to say "Author"
+for every subscriber regardless of what they actually publish. Now derived
+from published content type: an author with only books still reads "Author",
+but courses and/or music content earns "Course Creator" / "Music Creator"
+badges (combined when an author publishes more than one type), each paired
+with its own count ("4 Books Published", "2 Courses", "1 Playlist"). Page
+banner title switches to "About the Creator" whenever course or music content
+is present. Reuses the `Course.kind` (COURSE/MUSIC) split already built for
+Hero Focus (`getAuthorContentCounts` in `src/lib/author-queries.ts`). A
+manual credentials override in branding still takes precedence, unchanged.
+
+Also: `navShowSpecials` defaulted to `true` in the schema — the only nav
+toggle for an opt-in content type (Bundles/Courses/Music/Media Kit all
+default `false`) still defaulting on. New subscribers now start with the
+Specials page hidden from their site nav until they opt in; existing
+authors' current toggle state is untouched.
+
 ## September 23, 2026 — Removed the misleading Play button on the music-page hero
 
 Reported as: the cover image at the top of a playlist page has a Play button that "isn't linked to a music link." Root cause: `MusicTrackList`'s hero Play button (`src/components/author-site/music-track-list.tsx`) only set React state to open the first embeddable track's player — that track's card can sit anywhere in the grid below the hero, and nothing scrolled the page there, so the click appeared to do nothing. Reproduced on both a YouTube-only playlist and a Spotify playlist. First fix attempt scrolled the page to the opened player on click, which worked, but on review a Play icon that jumps to and opens a track (which for YouTube then still needs a second click inside the embed to actually play) misrepresents what the button does regardless of whether it scrolls. Each track card below already has its own accurate Play/external-link affordance, so the hero button added confusion without adding capability — removed entirely rather than relabeled.
