@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Vercel Web Analytics
+
+Added `@vercel/analytics` (2.0.1) and `<Analytics />` in the root layout
+(`src/app/layout.tsx`), so it covers the marketing site, every author site and
+admin. Cookieless and served from `/_vercel/insights/*` on our own origin, so
+no CSP change and no consent gate; PostHog is unchanged and still the primary
+product analytics. Needs Web Analytics enabled in the Vercel project's
+Analytics tab to record anything.
+
 ## September 24, 2026 — Music sharing + release type
 
 Phase 1 of the music UX review. Musicians can now push a list or a single song

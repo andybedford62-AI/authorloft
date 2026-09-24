@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ConsentBanner } from "@/components/consent-banner";
 import { PostHogPageTracker } from "@/components/posthog-page-tracker";
 import "./globals.css";
@@ -80,6 +81,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
         {children}
         <PostHogPageTracker />
+        {/* Vercel Web Analytics — cookieless, served from /_vercel/insights on
+            our own origin (CSP 'self'), so it runs alongside the consent banner. */}
+        <Analytics />
         <ConsentBanner />
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="https://swapad.net/api/public/embed.js" data-swapboard="9b3330473c9d838eac" async />
