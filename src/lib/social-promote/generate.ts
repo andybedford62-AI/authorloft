@@ -27,6 +27,16 @@ export type GenerateResult =
   | { ok: true;  postId: string; outputText: string; assembledPrompt: string; inputTokens: number; outputTokens: number; costMicroCents: number; modelUsed: string }
   | { ok: false; postId: string | null; status: "FAILED" | "BLOCKED"; userMessage: string; errorDetail: string };
 
+/** Google's "busy" answers (503 high demand / 429 rate limit) — worth a retry,
+ *  unlike a bad key or a blocked prompt. */
+export function isTransientAiError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err ?? "");
+  return /\b(503|429)\b|overloaded|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(msg);
+}
+
+/** Separate-capacity model tried last when the configured one stays busy. */
+const FALLBACK_MODEL = "gemini-2.5-flash";
+
 /** Core generation function. Logs to GeneratedSocialPost on both success AND failure. */
 export async function generateSocialPost(req: GenerateRequest): Promise<GenerateResult> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -160,20 +170,48 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
   let outputText = "";
   let inputTokens = 0;
   let outputTokens = 0;
+  // The model that actually answered (or was last tried) — logged and priced.
+  let modelUsed = model;
 
   try {
     const genAI  = new GoogleGenerativeAI(apiKey);
-    const aiModel = genAI.getGenerativeModel({
-      model,
-      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.85 },
-    });
 
-    const aiCall = aiModel.generateContent(assembledPrompt);
+    // Gemini regularly returns 503 "high demand" for a few seconds at a time
+    // (seen Sept 24 2026: two failures in a row, nothing wrong on our side).
+    // Retry the configured model once, then try a separate-capacity model,
+    // all inside the one existing timeout budget.
+    const attempts: { model: string; delayMs: number }[] = [
+      { model, delayMs: 0 },
+      { model, delayMs: 1500 },
+      ...(model !== FALLBACK_MODEL ? [{ model: FALLBACK_MODEL, delayMs: 1500 }] : []),
+    ];
+    const deadline = Date.now() + timeoutMs;
+
+    const runAttempts = async () => {
+      let lastErr: unknown;
+      for (const attempt of attempts) {
+        if (attempt.delayMs) await new Promise((r) => setTimeout(r, attempt.delayMs));
+        if (Date.now() >= deadline) break;
+        modelUsed = attempt.model;
+        try {
+          const aiModel = genAI.getGenerativeModel({
+            model: attempt.model,
+            generationConfig: { maxOutputTokens: maxTokens, temperature: 0.85 },
+          });
+          return await aiModel.generateContent(assembledPrompt);
+        } catch (err) {
+          lastErr = err;
+          if (!isTransientAiError(err)) throw err;
+        }
+      }
+      throw lastErr ?? new Error("Generation timed out");
+    };
+
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Generation timed out")), timeoutMs)
     );
 
-    const result = await Promise.race([aiCall, timeoutPromise]);
+    const result = await Promise.race([runAttempts(), timeoutPromise]);
     outputText = (result.response.text() ?? "").trim();
 
     const usage = result.response.usageMetadata;
@@ -191,12 +229,12 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
         platformId: req.platformId,
         promoTypeId: req.promoTypeId,
         contextType: req.contextType,
-        model,
+        model: modelUsed,
         inputTokens,
         outputTokens,
       },
     });
-    const costMicroCents = calcCostMicroCents(model, inputTokens, outputTokens);
+    const costMicroCents = calcCostMicroCents(modelUsed, inputTokens, outputTokens);
     const logged = await prisma.generatedSocialPost.create({
       data: {
         authorId:       req.authorId,
@@ -207,7 +245,7 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
         contextSummary,
         promptUsed:     assembledPrompt,
         outputText:     "",
-        modelUsed:      model,
+        modelUsed,
         inputTokens,
         outputTokens,
         costMicroCents,
@@ -218,12 +256,14 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
     });
     return {
       ok: false, postId: logged.id, status: "FAILED",
-      userMessage: "Generation failed. Please try again in a moment.",
+      userMessage: isTransientAiError(err)
+        ? "The AI service is very busy right now (on Google's side). Please try again in a minute — failed attempts don't count against your limit."
+        : "Generation failed. Please try again in a moment.",
       errorDetail: err?.message ?? "Unknown error",
     };
   }
 
-  const costMicroCents = calcCostMicroCents(model, inputTokens, outputTokens);
+  const costMicroCents = calcCostMicroCents(modelUsed, inputTokens, outputTokens);
   const post = await prisma.generatedSocialPost.create({
     data: {
       authorId:       req.authorId,
@@ -234,7 +274,7 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
       contextSummary,
       promptUsed:     assembledPrompt,
       outputText,
-      modelUsed:      model,
+      modelUsed,
       inputTokens,
       outputTokens,
       costMicroCents,
@@ -255,6 +295,6 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
     inputTokens,
     outputTokens,
     costMicroCents,
-    modelUsed: model,
+    modelUsed,
   };
 }

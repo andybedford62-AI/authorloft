@@ -94,6 +94,14 @@ only appears for authors with published music. The music editor's share kit
 gets a "Write a post with AI" link (`/admin/promote?music=<id>`) that
 preselects the release. Covered by `src/__tests__/social-promote-music-prompt.test.ts`.
 
+Fast-follow: first staging test failed twice with Gemini **503 "model is
+currently experiencing high demand"** (Google-side, not our code). Social
+Promote generation now retries transient 503/429s — the configured model once
+more after 1.5s, then `gemini-2.5-flash` (separate capacity) — all inside the
+existing `timeoutMs` budget, logs/prices the model that actually answered, and
+tells the author the AI service is busy instead of a generic failure. Covered
+by `src/__tests__/social-promote-retry.test.ts`.
+
 ## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
 
 A content-specific perk, not a plan change: a FREE author who publishes music
