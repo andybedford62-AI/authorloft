@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 interface ArcData {
   arcId: string;
   bookId: string;
@@ -108,7 +109,7 @@ export function ArcsOverview({ books }: ArcsOverviewProps) {
             >
               {arc.bookCover ? (
                 <img
-                  src={arc.bookCover}
+                  src={cspSafeImageSrc(arc.bookCover)}
                   alt={arc.bookTitle}
                   className="w-14 h-20 object-cover rounded flex-shrink-0"
                 />

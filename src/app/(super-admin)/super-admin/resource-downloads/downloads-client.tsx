@@ -5,6 +5,7 @@ import { Loader2, Plus, Pencil, Trash2, Upload, Link2, X, FileDown, Download, Ey
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Download = {
   id: string; title: string; slug: string; description: string | null;
   body: string | null; category: string; fileUrl: string; coverImageUrl: string | null;
@@ -192,7 +193,7 @@ export function DownloadsClient({ initial, categories }: { initial: Download[]; 
               )}
               {form.coverImageUrl && (
                 <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-200 w-fit">
-                  <img src={form.coverImageUrl} alt="Cover preview" className="h-12 w-12 rounded object-contain border border-gray-200 p-1 bg-white" />
+                  <img src={cspSafeImageSrc(form.coverImageUrl)} alt="Cover preview" className="h-12 w-12 rounded object-contain border border-gray-200 p-1 bg-white" />
                   <button type="button" onClick={() => setForm({ ...form, coverImageUrl: "" })} className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
                     <X className="h-3.5 w-3.5" />
                   </button>

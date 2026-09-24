@@ -7,6 +7,7 @@ import { getAdminAuthorId } from "@/lib/admin-auth";
 import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { formatCents } from "@/lib/utils";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export default async function AdminBundlesPage() {
   const authorId = await getAdminAuthorId();
 
@@ -86,7 +87,7 @@ export default async function AdminBundlesPage() {
                       {item.saleItem.book.coverImageUrl ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
-                          src={item.saleItem.book.coverImageUrl}
+                          src={cspSafeImageSrc(item.saleItem.book.coverImageUrl)}
                           alt=""
                           className="w-full h-full object-cover"
                         />

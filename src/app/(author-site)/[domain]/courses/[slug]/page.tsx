@@ -20,18 +20,56 @@ export async function generateMetadata({
   const author = await getAuthorByDomain(domain);
   const course = await prisma.course.findFirst({
     where: { authorId: author.id, slug, kind: "COURSE", isPublished: true },
-    select: { title: true, description: true, coverImageUrl: true },
+    select: {
+      title: true, description: true, coverImageUrl: true,
+      // First lesson artwork, for the preview fallback below.
+      modules: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          lessons: {
+            where: { thumbnailUrl: { not: null } },
+            orderBy: { sortOrder: "asc" },
+            select: { thumbnailUrl: true },
+            take: 1,
+          },
+        },
+      },
+    },
   });
   if (!course) return {};
 
+  const authorName = author.displayName || author.name;
+  const canonicalUrl = `${getAuthorBaseUrl(author)}/courses/${slug}`;
+  const description = toMetaDescription(course.description, `Enroll in ${course.title} from ${authorName}: an online course with structured lessons you can work through at your own pace.`);
+  const title = `${course.title} — a course by ${authorName}`;
+
+  // Page-level openGraph replaces the layout's wholesale, so a coverless course
+  // used to unfurl with no image at all (and there was no twitter card, so X
+  // showed a bare text link). Real images only: the cover, a lesson's
+  // artwork, then the author's own photo.
+  const image =
+    course.coverImageUrl ||
+    course.modules.flatMap((m) => m.lessons)[0]?.thumbnailUrl ||
+    author.profileImageUrl ||
+    null;
+
   return {
     title: course.title,
-    alternates: { canonical: `${getAuthorBaseUrl(author)}/courses/${slug}` },
-    description: toMetaDescription(course.description, `Enroll in ${course.title} from ${author.displayName || author.name}: an online course with structured lessons you can work through at your own pace.`),
+    alternates: { canonical: canonicalUrl },
+    description,
     openGraph: {
-      title: course.title,
-      description: toMetaDescription(course.description) || undefined,
-      images: course.coverImageUrl ? [{ url: course.coverImageUrl }] : undefined,
+      type: "website",
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: authorName,
+      ...(image && { images: [{ url: image, alt: course.title }] }),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image && { images: [image] }),
     },
   };
 }

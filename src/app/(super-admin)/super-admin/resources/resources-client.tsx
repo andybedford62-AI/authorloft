@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Loader2, Plus, Pencil, Trash2, Star, Globe, Eye, EyeOff, Upload, Link2, X, Check, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Resource = {
   id: string; name: string; category: string; description: string;
   websiteUrl: string; logoUrl: string | null; initials: string;
@@ -199,7 +200,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
               {/* Preview + clear */}
               {form.logoUrl && (
                 <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg border border-gray-200 w-fit">
-                  <img src={form.logoUrl} alt="Logo preview" className="h-10 w-10 rounded object-contain border border-gray-200 p-1 bg-white" />
+                  <img src={cspSafeImageSrc(form.logoUrl)} alt="Logo preview" className="h-10 w-10 rounded object-contain border border-gray-200 p-1 bg-white" />
                   <div className="text-xs text-gray-500 max-w-xs truncate">{form.logoUrl}</div>
                   <button type="button" onClick={() => setForm({ ...form, logoUrl: "" })} className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0">
                     <X className="h-3.5 w-3.5" />
@@ -280,7 +281,7 @@ export function ResourcesClient({ initial, categoryOptions = [] }: { initial: Re
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-xs font-bold" style={{ background: r.avatarColor }}>
                         {r.logoUrl
-                          ? <img src={r.logoUrl} alt="" className="w-8 h-8 rounded-lg object-contain p-0.5" />
+                          ? <img src={cspSafeImageSrc(r.logoUrl)} alt="" className="w-8 h-8 rounded-lg object-contain p-0.5" />
                           : r.initials || r.name[0]}
                       </div>
                       <div>

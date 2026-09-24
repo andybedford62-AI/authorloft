@@ -13,6 +13,31 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Course link previews + admin images vs CSP
+
+Carrying two music-side fixes over to books and courses.
+
+- **Course link previews.** `/courses/[slug]` had no Twitter/X card (X showed
+  a bare text link) and no image at all for a coverless course. Now matches
+  the music page: `summary_large_image` card, `og:url`/`siteName`, title
+  "Course — a course by Author", image falls back cover → first lesson
+  artwork → author photo (real images only). Book pages get the same
+  author-photo fallback when a book has no cover.
+- **Admin images blocked by CSP `img-src`.** Confirmed on prod: a raw `<img>`
+  at a host CSP doesn't list (e.g. `m.media-amazon.com`) is blocked, while the
+  same URL via `/_next/image` loads. That hit the book form's cover preview and
+  ISBN-lookup cover (Google Books), the CSV import wizard, pasted cover/logo
+  URLs, and more. New `cspSafeImageSrc()` (`src/lib/csp-safe-image.ts`) routes
+  non-allowed hosts through `/_next/image` and leaves Supabase uploads,
+  `blob:`/`data:` previews and site paths alone; applied to all 29 dynamic
+  admin/super-admin `<img>` tags (21 files). No CSP change.
+  `src/__tests__/csp-safe-image.test.ts` includes a guard that fails on any new
+  raw dynamic admin `<img src>` (mutation-checked).
+- **Found, not fixed (data):** 3 published books by `jordana-faye` store an
+  Amazon *product page* (`amazon.com/dp/…`) as the cover URL, so their covers
+  are broken on the public site too (`/_next/image` → 400). Likely a CSV import
+  mapping the buy link into the cover column. Left for the author/owner.
+
 ## September 24, 2026 — Content-aware nav (Books / Courses / Music)
 
 Author sites no longer link to empty sections. The Books, Courses and Music

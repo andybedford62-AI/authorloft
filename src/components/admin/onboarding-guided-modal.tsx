@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 import {
   User, BookOpen, GraduationCap, Music, ChevronRight, ChevronLeft,
   Upload, CheckCircle, ExternalLink, Loader2, X, Store, FileText,
@@ -424,7 +425,7 @@ export function OnboardingGuidedModal({
                 aria-label="Upload profile photo"
               >
                 {bio.profilePreview ? (
-                  <img src={bio.profilePreview} alt="Profile preview" className="w-full h-full object-cover" />
+                  <img src={cspSafeImageSrc(bio.profilePreview)} alt="Profile preview" className="w-full h-full object-cover" />
                 ) : (
                   <User className="h-8 w-8 text-gray-400" />
                 )}
@@ -567,7 +568,7 @@ export function OnboardingGuidedModal({
             >
               {book.coverPreview ? (
                 <div className="flex items-center justify-center gap-4">
-                  <img src={book.coverPreview} alt="Cover preview" className="max-h-40 rounded-lg shadow-sm" />
+                  <img src={cspSafeImageSrc(book.coverPreview)} alt="Cover preview" className="max-h-40 rounded-lg shadow-sm" />
                 </div>
               ) : (
                 <>

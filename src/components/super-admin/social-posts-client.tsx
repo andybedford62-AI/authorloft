@@ -5,6 +5,7 @@ import Link            from "next/link";
 import { useRouter }   from "next/navigation";
 import { Pencil, Trash2, Send, Clock, CheckCircle2, AlertCircle, Loader2, RefreshCw } from "lucide-react";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type PostResult = { platform: string; status: string; platformPostId?: string | null; error?: string | null };
 type Post = {
   id:          string;
@@ -100,7 +101,7 @@ export function SocialPostsClient({ initialPosts }: { initialPosts: Post[] }) {
               {/* Thumbnail */}
               {post.mediaUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={post.mediaUrl} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-100" />
+                <img src={cspSafeImageSrc(post.mediaUrl)} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-100" />
               ) : (
                 <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-300 text-xs">
                   No image

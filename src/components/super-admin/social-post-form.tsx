@@ -5,6 +5,7 @@ import { useRouter }         from "next/navigation";
 import { ImageIcon, Upload, X, Loader2, Check, Send, Calendar, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Token    = { platform: string; accountName: string; isActive: boolean };
 type PostData = {
   id:          string;
@@ -217,7 +218,7 @@ export function SocialPostForm({ tokens, post }: Props) {
         {mediaUrl ? (
           <div className="relative w-full max-w-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={mediaUrl} alt="Post image preview" className="rounded-lg border border-gray-200 w-full h-40 object-cover" />
+            <img src={cspSafeImageSrc(mediaUrl)} alt="Post image preview" className="rounded-lg border border-gray-200 w-full h-40 object-cover" />
             <button
               type="button"
               onClick={() => setMediaUrl("")}

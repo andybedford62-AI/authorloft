@@ -10,6 +10,7 @@ import { slugify } from "@/lib/utils";
 import { lookupByIsbn, isKdpIsbn, type IsbnLookupResult } from "@/lib/isbn-lookup";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Series = { id: string; name: string };
 type Genre  = { id: string; name: string; parentName?: string };
 
@@ -112,7 +113,7 @@ function CoverUpload({ value, onChange }: CoverUploadProps) {
         <label className="block text-sm font-medium text-gray-700">Cover Image <span className="font-normal text-gray-400">(optional)</span></label>
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="Cover preview"
+          <img src={cspSafeImageSrc(value)} alt="Cover preview"
             className="h-44 w-auto rounded-lg shadow border border-gray-200 object-cover" />
           <div className="flex flex-col gap-2 pt-1">
             <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
@@ -492,7 +493,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             {isbnResult.coverUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={isbnResult.coverUrl}
+                src={cspSafeImageSrc(isbnResult.coverUrl)}
                 alt={isbnResult.title}
                 className="h-24 w-auto rounded shadow-sm object-cover flex-shrink-0"
               />

@@ -8,6 +8,7 @@ import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { FeaturedStarButton } from "@/components/admin/featured-star-button";
 import { formatCents } from "@/lib/utils";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export default async function AdminCoursesPage() {
   const authorId = await getAdminAuthorId();
 
@@ -86,7 +87,7 @@ export default async function AdminCoursesPage() {
                   {course.coverImageUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
-                      src={course.coverImageUrl}
+                      src={cspSafeImageSrc(course.coverImageUrl)}
                       alt=""
                       className="w-full h-full object-cover"
                     />

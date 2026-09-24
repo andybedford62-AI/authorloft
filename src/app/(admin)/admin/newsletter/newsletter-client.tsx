@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Subscriber = {
   id:            string;
   name:          string | null;
@@ -511,10 +512,10 @@ export function NewsletterClient({
                           <div className="px-8 py-8 text-center" style={{ backgroundColor: accentColor }}>
                             {logoUrl ? (
                               /* eslint-disable-next-line @next/next/no-img-element */
-                              <img src={logoUrl} alt={authorName} className="h-14 w-auto max-h-14 mx-auto" />
+                              <img src={cspSafeImageSrc(logoUrl)} alt={authorName} className="h-14 w-auto max-h-14 mx-auto" />
                             ) : profileImageUrl ? (
                               /* eslint-disable-next-line @next/next/no-img-element */
-                              <img src={profileImageUrl} alt={authorName} className="h-16 w-16 rounded-full object-cover mx-auto" />
+                              <img src={cspSafeImageSrc(profileImageUrl)} alt={authorName} className="h-16 w-16 rounded-full object-cover mx-auto" />
                             ) : (
                               <div className="h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto" style={{ backgroundColor: "#ffffff", color: accentColor }}>
                                 {authorName.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
@@ -549,7 +550,7 @@ export function NewsletterClient({
                               <div className="flex items-center gap-5 rounded-xl p-5" style={{ backgroundColor: "#f7f4ed" }}>
                                 {featuredBook.coverImageUrl && (
                                   /* eslint-disable-next-line @next/next/no-img-element */
-                                  <img src={featuredBook.coverImageUrl} alt={featuredBook.title} className="w-20 rounded" />
+                                  <img src={cspSafeImageSrc(featuredBook.coverImageUrl)} alt={featuredBook.title} className="w-20 rounded" />
                                 )}
                                 <div>
                                   <p className="text-[11px] uppercase tracking-widest" style={{ color: "#9a8a66" }}>{featuredBook.eyebrow}</p>
@@ -584,7 +585,7 @@ export function NewsletterClient({
                                   <div key={i} className="flex-1 text-center">
                                     {b.coverImageUrl && (
                                       /* eslint-disable-next-line @next/next/no-img-element */
-                                      <img src={b.coverImageUrl} alt={b.title} className="w-[80px] h-[120px] object-cover rounded mb-1 mx-auto" />
+                                      <img src={cspSafeImageSrc(b.coverImageUrl)} alt={b.title} className="w-[80px] h-[120px] object-cover rounded mb-1 mx-auto" />
                                     )}
                                     <span className="text-[11px] text-gray-500">{b.title}</span>
                                   </div>

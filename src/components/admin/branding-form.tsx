@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Stat = { value: string; label: string };
 type StatRow = Stat & { id: string };
 
@@ -345,7 +346,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border-2 border-gray-200 relative">
                   {profileImageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={cspSafeImageSrc(profileImageUrl)} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <User className="h-10 w-10 text-gray-300" />
@@ -389,7 +390,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                 <div className="w-32 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 flex items-center justify-center">
                   {logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={logoUrl} alt="Site logo" className="w-full h-full object-contain p-1" />
+                    <img src={cspSafeImageSrc(logoUrl)} alt="Site logo" className="w-full h-full object-contain p-1" />
                   ) : (
                     <span className="text-xs text-gray-400 text-center px-2">No logo</span>
                   )}
@@ -585,7 +586,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                   {heroImageUrl && (
                     <div className="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center" style={{ minHeight: "200px", maxHeight: "280px" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={heroImageUrl} alt="Hero preview" className="max-w-full max-h-[280px] object-contain block" />
+                      <img src={cspSafeImageSrc(heroImageUrl)} alt="Hero preview" className="max-w-full max-h-[280px] object-contain block" />
                       <p className="absolute bottom-2 left-3 bg-black/50 text-white text-xs font-medium px-2 py-0.5 rounded">Preview</p>
                     </div>
                   )}

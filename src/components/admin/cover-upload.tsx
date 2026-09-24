@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Loader2, UploadCloud, X, ImageIcon, Link2 } from "lucide-react";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 interface CoverUploadProps {
   value: string;
   onChange: (url: string) => void;
@@ -63,7 +64,7 @@ export function CoverUpload({ value, onChange, label = "Cover Image" }: CoverUpl
         <label className="block text-sm font-medium text-gray-700">{label} <span className="font-normal text-gray-400">(optional)</span></label>
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="Cover preview"
+          <img src={cspSafeImageSrc(value)} alt="Cover preview"
             className="h-44 w-auto rounded-lg shadow border border-gray-200 object-cover" />
           <div className="flex flex-col gap-2 pt-1">
             <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}

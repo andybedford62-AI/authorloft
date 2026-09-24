@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { Loader2, Check, Plus, Upload, X, Link as LinkIcon, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 const RichTextEditor = dynamic(
   () => import("@/components/admin/rich-text-editor").then((m) => m.RichTextEditor),
   { ssr: false, loading: () => <div className="h-80 border border-gray-200 rounded-lg bg-gray-50 animate-pulse" /> }
@@ -267,7 +268,7 @@ export function PostForm({ post }: PostFormProps) {
         {coverImageUrl ? (
           <div className="relative w-full rounded-xl overflow-hidden bg-gray-100 group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt="Cover preview" className="w-full h-52 object-contain" />
+            <img src={cspSafeImageSrc(coverImageUrl)} alt="Cover preview" className="w-full h-52 object-contain" />
             <button
               type="button"
               onClick={() => { setCoverImageUrl(""); setCoverUploadErr(""); }}

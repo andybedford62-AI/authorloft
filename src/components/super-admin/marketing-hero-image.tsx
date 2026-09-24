@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ImageIcon, Upload, Link, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }) {
   const [url, setUrl]           = useState(initialUrl ?? "");
   const [preview, setPreview]   = useState(initialUrl ?? "");
@@ -74,7 +75,7 @@ export function MarketingHeroImage({ initialUrl }: { initialUrl: string | null }
         {preview ? (
           <div className="relative">
             <img
-              src={preview}
+              src={cspSafeImageSrc(preview)}
               alt="Marketing hero preview"
               className="w-full h-48 object-cover object-top"
             />

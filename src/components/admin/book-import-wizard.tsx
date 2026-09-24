@@ -19,6 +19,7 @@ import {
 } from "@/lib/csv-import-presets";
 import { lookupByIsbn } from "@/lib/isbn-lookup";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Step = "upload" | "map" | "preview" | "results";
 
 type ImportResult = {
@@ -517,7 +518,7 @@ export function BookImportWizard({ existingGenres, existingSeries, remainingSlot
                       <td className="px-3 py-2">
                         {row.coverImageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={row.coverImageUrl} alt="" className="h-12 w-9 object-cover rounded border border-gray-200" />
+                          <img src={cspSafeImageSrc(row.coverImageUrl)} alt="" className="h-12 w-9 object-cover rounded border border-gray-200" />
                         ) : (
                           <div className="h-12 w-9 rounded border border-dashed border-gray-200 bg-gray-50" />
                         )}

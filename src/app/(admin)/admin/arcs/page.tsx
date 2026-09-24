@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import Link from "next/link";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export default async function ArcsPage() {
   const authorId = await getAdminAuthorId();
   if (!authorId) redirect("/login");
@@ -85,7 +86,7 @@ export default async function ArcsPage() {
               <div className="flex gap-4">
                 {arc.bookCover && (
                   <img
-                    src={arc.bookCover}
+                    src={cspSafeImageSrc(arc.bookCover)}
                     alt={arc.bookTitle}
                     className="w-16 h-24 object-cover rounded"
                   />

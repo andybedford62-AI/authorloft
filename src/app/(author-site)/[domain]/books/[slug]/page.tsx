@@ -51,9 +51,13 @@ export async function generateMetadata({
   const canonicalUrl = `${base}/books/${slug}`;
   const description = toMetaDescription([book.shortDescription, book.description], `${book.title} by ${authorName}. See the description and available formats, and find where to buy.`);
 
+  // Cover first; a coverless book falls back to the author's own photo rather
+  // than unfurling with no image (page-level openGraph replaces the layout's).
   const ogImages = book.coverImageUrl
     ? [{ url: book.coverImageUrl, alt: book.title, width: 600, height: 900 }]
-    : [];
+    : author.profileImageUrl
+      ? [{ url: author.profileImageUrl, alt: authorName }]
+      : [];
 
   return {
     title: book.title,

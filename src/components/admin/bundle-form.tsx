@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { formatCents } from "@/lib/utils";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export interface BundleData {
   id?: string;
   title: string;
@@ -203,7 +204,7 @@ export function BundleForm({ initial, mode }: BundleFormProps) {
                   {item.bookCoverUrl ? (
                     <div className="w-10 h-14 rounded overflow-hidden bg-gray-100 flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.bookCoverUrl} alt="" className="w-full h-full object-cover" />
+                      <img src={cspSafeImageSrc(item.bookCoverUrl)} alt="" className="w-full h-full object-cover" />
                     </div>
                   ) : (
                     <div className="w-10 h-14 rounded bg-gray-100 flex-shrink-0" />

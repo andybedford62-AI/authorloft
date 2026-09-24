@@ -6,6 +6,7 @@ import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ArrowLeft, Check, Loader2, Trash2, Upload, Link2, X, ImageIcon, FileDown, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Post = {
   id:              string;
   title:           string;
@@ -375,7 +376,7 @@ export function PlatformPostForm({ post, blogCategories = [], newsCategories = [
         {coverImageUrl && (
           <div className="relative w-full max-w-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt="Cover preview" className="rounded-lg border border-gray-200 w-full h-40 object-cover" />
+            <img src={cspSafeImageSrc(coverImageUrl)} alt="Cover preview" className="rounded-lg border border-gray-200 w-full h-40 object-cover" />
             <button
               type="button"
               onClick={() => { setCoverImageUrl(""); setUrlInput(""); }}

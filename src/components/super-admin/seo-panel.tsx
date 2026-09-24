@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, Link, Check, Loader2, X, ImageIcon, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type SeoPage = {
   id: string;
   label: string;
@@ -81,7 +82,7 @@ function PageImageEditor({ page, onSaved }: { page: SeoPage; onSaved: (id: strin
       <div className="rounded-lg border border-gray-100 overflow-hidden bg-gray-50 h-32">
         {preview ? (
           <div className="relative h-full">
-            <img src={preview} alt={`OG preview for ${page.label}`} className="w-full h-full object-cover" />
+            <img src={cspSafeImageSrc(preview)} alt={`OG preview for ${page.label}`} className="w-full h-full object-cover" />
             <button
               onClick={handleClear}
               disabled={saving}

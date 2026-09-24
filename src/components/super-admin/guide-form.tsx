@@ -6,6 +6,7 @@ import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { ArrowLeft, Check, Loader2, Trash2, Upload, Link2, X, ImageIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Guide = {
   id:              string;
   title:           string;
@@ -255,7 +256,7 @@ export function GuideForm({ guide, categoryOptions = [] }: Props) {
         {coverImageUrl && (
           <div className="mt-2 relative inline-block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt="Cover" className="h-24 rounded-lg border border-gray-200 object-cover" />
+            <img src={cspSafeImageSrc(coverImageUrl)} alt="Cover" className="h-24 rounded-lg border border-gray-200 object-cover" />
             <button onClick={() => { setCoverImageUrl(""); setUrlInput(""); }} className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5">
               <X className="h-3 w-3" />
             </button>

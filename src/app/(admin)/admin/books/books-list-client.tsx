@@ -6,6 +6,7 @@ import { Pencil, Star, BookOpen, ShoppingCart, ExternalLink, GripVertical, Store
 import { IconButton } from "@/components/admin/icon-button";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
 
+import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type BookRow = {
   id: string;
   title: string;
@@ -146,7 +147,7 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                   <div className="w-8 h-11 bg-gray-100 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {book.coverImageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={book.coverImageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                      <img src={cspSafeImageSrc(book.coverImageUrl)} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : (
                       <BookOpen className="h-4 w-4 text-gray-300" />
                     )}
