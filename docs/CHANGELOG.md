@@ -22,6 +22,9 @@ no CSP change and no consent gate; PostHog is unchanged and still the primary
 product analytics. Needs Web Analytics enabled in the Vercel project's
 Analytics tab to record anything.
 
+Also removed the `swapad.net` Swapboard embed script from the root layout — it
+was blocked by CSP `script-src` on every page, so it had never actually loaded.
+
 ## September 24, 2026 — Music sharing + release type
 
 Phase 1 of the music UX review. Musicians can now push a list or a single song

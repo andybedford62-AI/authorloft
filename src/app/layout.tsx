@@ -85,8 +85,6 @@ export default function RootLayout({
             our own origin (CSP 'self'), so it runs alongside the consent banner. */}
         <Analytics />
         <ConsentBanner />
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="https://swapad.net/api/public/embed.js" data-swapboard="9b3330473c9d838eac" async />
       </body>
     </html>
   );
