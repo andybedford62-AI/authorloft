@@ -13,6 +13,23 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Book page lower half redesign
+
+Below the hero, the book page was one narrow column of mismatched headings, an
+always-open rating form, and the book facts buried at the very bottom on phones.
+Now full-width sections with one heading style:
+
+- **About this book** — overview (6 lines, "Read more" only when it's cut off) beside
+  a **Book details** card (series, genre, published, pages, ISBN/ASIN). Replaces the
+  under-cover meta, the floating genre chips and the mobile-only meta block.
+- **Try before you buy** — excerpt and audio preview as side-by-side cards.
+- **Reviews** — rating summary, review cards (2-up on desktop), and a **Write a
+  review** button opening the form in a pop-up (bottom sheet on phones). No reviews →
+  a "Be the first to rate it" empty state instead of a bare form. New
+  `components/author-site/book-reviews.tsx`; `BookFeedbackForm` restyled as a stacked form.
+- **More by {author}** — up to 4 of the author's other books (same series first, then
+  featured) with "From" prices, replacing the bottom "Back to all books" button.
+
 ## September 24, 2026 — Format-first book page (price per format)
 
 Designed from an approved mockup (Anthony Bedford's *Night Dive*).

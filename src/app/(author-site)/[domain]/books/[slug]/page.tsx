@@ -3,27 +3,26 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
-import { ArrowLeft, BookOpen, ExternalLink, Tag, CalendarDays, FileText, Hash, Star } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, Star } from "lucide-react";
 import { BookOverview } from "@/components/author-site/book-overview";
 import { BookExcerptModal } from "@/components/author-site/book-excerpt-modal";
 import { FormatBadges } from "@/components/author-site/format-badges";
 import { AudioPlayer } from "@/components/author-site/audio-player";
 import { BookPreviewGallery } from "@/components/author-site/book-preview-gallery";
 import { BookBuySection } from "@/components/author-site/book-buy-section";
-import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
+import { BookReviews, type ReviewCard } from "@/components/author-site/book-reviews";
 import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-form";
 import { LaunchCountdown } from "@/components/author-site/launch-countdown";
 import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
 import { ShareBar } from "@/components/author-site/share-bar";
 import { BookFormatBuy } from "@/components/author-site/book-format-buy";
-import { buildFormatOptions } from "@/lib/book-formats";
+import { buildFormatOptions, listingPrice } from "@/lib/book-formats";
 import { accentAsSurface } from "@/lib/color-contrast";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getRetailer } from "@/lib/retailers";
 import { formatCents } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { AddToCartButtons } from "@/components/author-site/add-to-cart-buttons";
 import { ReaderMagnetButton } from "@/components/author-site/reader-magnet-button";
 import type { Metadata } from "next";
@@ -80,6 +79,9 @@ export async function generateMetadata({
     },
   };
 }
+
+/** One heading style for every section below the hero. */
+const SECTION_HEADING = "text-2xl font-bold text-gray-900 mb-5";
 
 // ── Format display helpers ────────────────────────────────────────────────────
 const FORMAT_COLORS: Record<string, { color: string; bg: string }> = {
@@ -249,6 +251,31 @@ export default async function BookDetailPage({
     };
   }
 
+  // Review cards: editorial pull-quotes, then approved reader reviews that say
+  // something (star-only ratings still count toward the average above).
+  const reviewCards: ReviewCard[] = [
+    ...book.reviews.map((r) => ({ id: r.id, quote: r.quote, reviewerName: r.reviewerName, source: r.source, rating: r.rating })),
+    ...book.bookFeedback
+      .filter((fb) => fb.comment?.trim())
+      .map((fb) => ({ id: fb.id, quote: fb.comment!, reviewerName: fb.reviewerName, source: null, rating: fb.rating })),
+  ];
+
+  const hasBookDetails =
+    !!book.series || book.genres.length > 0 || !!releaseDateFormatted || !!book.pageCount || !!book.isbn;
+
+  // "More by" row: same-series books first, then featured, then the author's order.
+  const otherBooks = await prisma.book.findMany({
+    where: { authorId: author.id, isPublished: true, id: { not: book.id } },
+    select: { id: true, title: true, slug: true, coverImageUrl: true, priceCents: true, formatPrices: true, seriesId: true, isFeatured: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    take: 24,
+  });
+  const moreBooks = otherBooks
+    .map((b, i) => ({ b, rank: (book.seriesId && b.seriesId === book.seriesId ? 0 : b.isFeatured ? 1 : 2) * 1000 + i }))
+    .sort((x, y) => x.rank - y.rank)
+    .slice(0, 4)
+    .map((x) => x.b);
+
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -322,29 +349,6 @@ export default async function BookDetailPage({
               </div>
             )}
 
-            {/* Book meta — ISBN, pages, release date (sidebar on desktop) */}
-            {(book.isbn || book.pageCount || releaseDateFormatted) && (
-              <div className="hidden md:flex flex-col gap-2.5 w-full pt-2 border-t border-gray-100">
-                {releaseDateFormatted && (
-                  <div className="flex items-start gap-2 text-xs text-gray-500">
-                    <CalendarDays className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-gray-400" />
-                    <span>{releaseDateFormatted}</span>
-                  </div>
-                )}
-                {book.pageCount && (
-                  <div className="flex items-start gap-2 text-xs text-gray-500">
-                    <FileText className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-gray-400" />
-                    <span>{book.pageCount} pages</span>
-                  </div>
-                )}
-                {book.isbn && (
-                  <div className="flex items-start gap-2 text-xs text-gray-500">
-                    <Hash className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-gray-400" />
-                    <span>ISBN {book.isbn}</span>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* ── Details column ────────────────────────────────────────────── */}
@@ -545,168 +549,147 @@ export default async function BookDetailPage({
               </BookBuySection>
             )}
 
-            {/* Book Overview — collapsible */}
-            {book.description && (
-              <BookOverview text={book.description} accentColor={accentColor} />
-            )}
+          </div>
+        </div>
 
-            {/* Read an Excerpt — modal */}
-            {book.sampleContent && (
-              <BookExcerptModal
-                sampleContent={sanitize(book.sampleContent)}
-                bookTitle={book.title}
-                bookSlug={book.slug}
-                hasBuyOptions={hasBuyOptions}
-                accentColor={accentColor}
-              />
-            )}
+        {/* ── Below the hero: full-width sections, one heading style ─────────── */}
+        <div className="space-y-14 pb-16">
 
-            {/* ── Audio Previews ─────────────────────────────────────────────── */}
-            {hasAudioTracks && (
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-5">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: accentColor + "20" }}
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="w-4 h-4"
-                      style={{ color: accentColor }}
-                      fill="currentColor"
-                    >
-                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                    </svg>
+          {/* About this book — overview + details card */}
+          {(book.description || hasBookDetails) && (
+            <section aria-labelledby="about-heading" className="border-t border-gray-100 pt-10">
+              <h2 id="about-heading" className={SECTION_HEADING}>About this book</h2>
+              <div className="grid gap-8 md:grid-cols-3">
+                {book.description && (
+                  <div className="md:col-span-2">
+                    <BookOverview text={book.description} accentColor={accentColor} />
                   </div>
-                  <div>
-                    <h2 className="font-bold text-gray-900 text-lg">Listen to a Preview</h2>
-                    <p className="text-sm text-gray-500">
-                      {book.audioTracks.length === 1
-                        ? "Audio clip from this book"
-                        : `${book.audioTracks.length} audio clips from this book`}
-                    </p>
-                  </div>
-                </div>
-                <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
-              </div>
-            )}
-
-            {/* Pull quotes / reviews + approved reader feedback */}
-            {(book.reviews.length > 0 || book.bookFeedback.length > 0) && (
-              <div className="pt-2 space-y-4">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">What Readers Are Saying</h2>
-                <div className="space-y-4">
-                  {book.reviews.map((review) => (
-                    <blockquote
-                      key={review.id}
-                      className="relative pl-5 border-l-4"
-                      style={{ borderColor: accentColor }}
-                    >
-                      {review.rating && (
-                        <div className="flex gap-0.5 mb-1.5">
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <Star
-                              key={n}
-                              className={`h-3.5 w-3.5 ${n <= review.rating! ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
-                            />
-                          ))}
+                )}
+                {hasBookDetails && (
+                  <aside className={`rounded-2xl border border-gray-200 bg-gray-50 p-5 h-fit ${book.description ? "" : "md:col-span-1"}`}>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Book details</h3>
+                    <dl className="divide-y divide-gray-200 text-sm">
+                      {book.series && (
+                        <div className="flex justify-between gap-4 py-2 first:pt-0">
+                          <dt className="text-gray-500">Series</dt>
+                          <dd className="text-right">
+                            <Link href={`/series/${book.series.slug}`} className="font-medium text-gray-900 hover:text-[var(--accent)]">
+                              {book.series.name}
+                            </Link>
+                          </dd>
                         </div>
                       )}
-                      <p className="text-base text-gray-700 leading-relaxed italic">
-                        &ldquo;{review.quote}&rdquo;
-                      </p>
-                      <footer className="mt-2 text-sm text-gray-500">
-                        — <span className="font-medium text-gray-700">{review.reviewerName}</span>
-                        {review.source && (
-                          <span className="text-gray-400">, {review.source}</span>
-                        )}
-                      </footer>
-                    </blockquote>
-                  ))}
-                  {book.bookFeedback.map((fb) => (
-                    <blockquote
-                      key={fb.id}
-                      className="relative pl-5 border-l-4"
-                      style={{ borderColor: accentColor }}
-                    >
-                      <div className="flex gap-0.5 mb-1.5">
-                        {[1, 2, 3, 4, 5].map((n) => (
-                          <Star
-                            key={n}
-                            className={`h-3.5 w-3.5 ${n <= fb.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
-                          />
-                        ))}
-                      </div>
-                      {fb.comment && (
-                        <p className="text-base text-gray-700 leading-relaxed italic">
-                          &ldquo;{fb.comment}&rdquo;
-                        </p>
+                      {book.genres.length > 0 && (
+                        <div className="flex justify-between gap-4 py-2 first:pt-0">
+                          <dt className="text-gray-500">Genre</dt>
+                          <dd className="text-right text-gray-900">{book.genres.map(({ genre }) => genre.name).join(", ")}</dd>
+                        </div>
                       )}
-                      <footer className="mt-2 text-sm text-gray-500">
-                        — <span className="font-medium text-gray-700">{fb.reviewerName}</span>
-                      </footer>
-                    </blockquote>
-                  ))}
-                </div>
+                      {releaseDateFormatted && (
+                        <div className="flex justify-between gap-4 py-2 first:pt-0">
+                          <dt className="text-gray-500">Published</dt>
+                          <dd className="text-right text-gray-900">{releaseDateFormatted}</dd>
+                        </div>
+                      )}
+                      {book.pageCount && (
+                        <div className="flex justify-between gap-4 py-2 first:pt-0">
+                          <dt className="text-gray-500">Pages</dt>
+                          <dd className="text-right text-gray-900">{book.pageCount}</dd>
+                        </div>
+                      )}
+                      {book.isbn && (
+                        <div className="flex justify-between gap-4 py-2 first:pt-0">
+                          <dt className="text-gray-500">ISBN / ASIN</dt>
+                          <dd className="text-right text-gray-900 break-all">{book.isbn}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </aside>
+                )}
               </div>
-            )}
+            </section>
+          )}
 
-            {/* Reader feedback form — below reviews */}
-            <BookFeedbackForm
+          {/* Try before you buy — excerpt + audio, as cards */}
+          {(book.sampleContent || hasAudioTracks) && (
+            <section aria-labelledby="try-heading">
+              <h2 id="try-heading" className={SECTION_HEADING}>Try before you buy</h2>
+              <div className={`grid gap-5 ${book.sampleContent && hasAudioTracks ? "md:grid-cols-2" : ""}`}>
+                {book.sampleContent && (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                    <BookExcerptModal
+                      sampleContent={sanitize(book.sampleContent)}
+                      bookTitle={book.title}
+                      bookSlug={book.slug}
+                      hasBuyOptions={hasBuyOptions}
+                      accentColor={accentColor}
+                    />
+                  </div>
+                )}
+                {hasAudioTracks && (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Listen to a clip</h3>
+                      <p className="text-sm text-gray-500">
+                        {book.audioTracks.length === 1
+                          ? "An audio clip from this book"
+                          : `${book.audioTracks.length} audio clips from this book`}
+                      </p>
+                    </div>
+                    <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Reviews — summary, cards, and a pop-up form */}
+          <section aria-labelledby="reviews-heading">
+            <h2 id="reviews-heading" className={SECTION_HEADING}>Reviews</h2>
+            <BookReviews
+              reviews={reviewCards}
+              averageRating={averageRating}
+              ratingCount={ratingCount}
+              bookTitle={book.title}
               bookSlug={book.slug}
               domain={domain}
               accentColor={accentColor}
             />
+          </section>
 
-            {/* Genres */}
-            {book.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 items-center pt-1">
-                <Tag className="h-3.5 w-3.5 text-gray-300" />
-                {book.genres.map(({ genre }) => (
-                  <span
-                    key={genre.id}
-                    className="text-xs px-2.5 py-1 rounded-full border border-gray-200 text-gray-500 bg-gray-50"
-                  >
-                    {genre.name}
-                  </span>
-                ))}
+          {/* More by the author — keeps readers browsing instead of a back button */}
+          {moreBooks.length > 0 && (
+            <section aria-labelledby="more-heading">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 id="more-heading" className={SECTION_HEADING}>More by {authorName}</h2>
+                <Link href="/books" className="text-sm font-semibold whitespace-nowrap hover:opacity-80" style={{ color: accentColor }}>
+                  View all books →
+                </Link>
               </div>
-            )}
-
-            {/* Book meta — mobile only (shown below content, not in sidebar) */}
-            {(book.isbn || book.pageCount || releaseDateFormatted) && (
-              <div className="md:hidden flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500 pt-3 border-t border-gray-100">
-                {releaseDateFormatted && (
-                  <span className="flex items-center gap-1.5">
-                    <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
-                    {releaseDateFormatted}
-                  </span>
-                )}
-                {book.pageCount && (
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-gray-400" />
-                    {book.pageCount} pages
-                  </span>
-                )}
-                {book.isbn && (
-                  <span className="flex items-center gap-1.5">
-                    <Hash className="h-3.5 w-3.5 text-gray-400" />
-                    ISBN {book.isbn}
-                  </span>
-                )}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                {moreBooks.map((b) => {
+                  const listed = listingPrice({ priceCents: b.priceCents, formatPrices: b.formatPrices });
+                  return (
+                    <Link key={b.id} href={`/books/${b.slug}`} className="group">
+                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-gray-100 shadow-md transition-transform group-hover:-translate-y-0.5">
+                        {b.coverImageUrl ? (
+                          <Image src={b.coverImageUrl} alt={b.title} fill sizes="(min-width: 640px) 25vw, 50vw" className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <BookOpen className="h-10 w-10 text-gray-300" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[var(--accent)]">{b.title}</p>
+                      {listed && (
+                        <p className="text-sm text-gray-500">{listed.from ? "From " : ""}{formatCents(listed.cents)}</p>
+                      )}
+                    </Link>
+                  );
+                })}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Back link ────────────────────────────────────────────────────── */}
-        <div className="pb-16 border-t border-gray-100 pt-8">
-          <Link href="/books">
-            <Button variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-1.5" />
-              Back to all books
-            </Button>
-          </Link>
+            </section>
+          )}
         </div>
       </div>
     </div>

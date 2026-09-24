@@ -36,8 +36,8 @@ export function BookExcerptModal({ sampleContent, bookTitle, bookSlug, hasBuyOpt
   return (
     <>
       {/* Trigger — teaser snippet + button */}
-      <div className="pt-2 space-y-3">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Read an Excerpt</h2>
+      <div className="space-y-3">
+        <h3 className="font-semibold text-gray-900">Read an excerpt</h3>
 
         {/* Short teaser — first ~200 chars, no HTML */}
         <p className="text-base text-gray-600 leading-relaxed line-clamp-3 italic">
