@@ -217,10 +217,15 @@ export function MusicTrackList({
             <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight truncate sm:whitespace-normal sm:line-clamp-2">
               {hero.title}
             </h1>
+            {/* `hidden` lives on a wrapper: line-clamp sets its own display,
+                which beat `hidden` on the same element and showed the
+                description twice on phones (here and below the hero). */}
             {hero.description && (
-              <p className="hidden sm:block text-white/80 text-sm mt-2 max-w-xl line-clamp-2">
-                {hero.description}
-              </p>
+              <div className="hidden sm:block">
+                <p className="text-white/80 text-sm mt-2 max-w-xl line-clamp-2">
+                  {hero.description}
+                </p>
+              </div>
             )}
           </div>
         </div>
