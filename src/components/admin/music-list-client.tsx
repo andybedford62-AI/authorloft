@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Check, ExternalLink, GripVertical, Link2, ListMusic, Store } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FeaturedStarButton } from "@/components/admin/featured-star-button";
@@ -125,14 +126,10 @@ export function MusicListClient({
             className="flex items-center gap-4 flex-1 min-w-0"
           >
             {/* Cover */}
-            <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
               {list.coverImageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={list.coverImageUrl}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
+                // next/image so a cover pasted from any host isn't blocked by CSP img-src.
+                <Image src={list.coverImageUrl} alt="" fill sizes="64px" className="object-cover" />
               ) : (
                 <ListMusic className="h-6 w-6 text-gray-300" />
               )}

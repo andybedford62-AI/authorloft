@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle, Store, Lock,
   ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote,
@@ -376,10 +377,13 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
                     <GripVertical className="h-4 w-4" />
                   </span>
                   <span className="w-5 text-right text-xs font-medium text-gray-400 tabular-nums flex-shrink-0">{i + 1}</span>
-                  <div className="w-16 h-9 rounded bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  <div className="relative w-16 h-9 rounded bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {/* next/image, not a raw <img>: it's fetched via /_next/image on
+                        our own origin, so the CSP img-src (which doesn't list
+                        i.ytimg.com, Spotify or Suno hosts) doesn't block it —
+                        same route the public track cards use. */}
                     {thumb ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={thumb} alt="" className="w-full h-full object-cover" />
+                      <Image src={thumb} alt="" fill sizes="64px" className="object-cover" />
                     ) : (
                       <Music2 className="h-4 w-4 text-gray-300" />
                     )}
