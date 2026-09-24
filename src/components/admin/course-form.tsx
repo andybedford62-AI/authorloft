@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2, Megaphone, CheckCircle2, Star } from "lucide-react";
+import { Loader2, Plus, Trash2, GripVertical, ChevronDown, ChevronRight, Video, Eye, HelpCircle, Paperclip, Store, Lock, BookText, Link2, Megaphone, CheckCircle2, Star, FileText, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
@@ -15,6 +15,8 @@ const RichTextEditor = dynamic(
 );
 
 interface LessonData {
+  /** Client-only key for the lesson's open/closed state; never sent to the API. */
+  uid?: string;
   title: string;
   contentHtml: string;
   videoUrl: string;
@@ -59,8 +61,48 @@ interface CourseFormProps {
   categories?: CourseCategoryOption[];
 }
 
+let lessonSeq = 0;
+const nextLessonUid = () => `lesson-${++lessonSeq}`;
+
 function emptyLesson(): LessonData {
-  return { title: "", contentHtml: "", videoUrl: "", isPreview: false, fileKey: "", fileName: "" };
+  return { uid: nextLessonUid(), title: "", contentHtml: "", videoUrl: "", isPreview: false, fileKey: "", fileName: "" };
+}
+
+/** A collapsible card for one part of the editor, like the music track rows:
+ *  the header always shows, with a one-line summary while it's closed. */
+function Section({
+  title,
+  summary,
+  open,
+  onToggle,
+  actions,
+  children,
+}: {
+  title: string;
+  summary?: React.ReactNode;
+  open: boolean;
+  onToggle: () => void;
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="bg-white rounded-xl border border-gray-200">
+      <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="flex flex-1 min-w-0 items-center gap-2 text-left"
+        >
+          {open ? <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" /> : <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />}
+          <span className="text-sm font-semibold text-gray-900">{title}</span>
+          {!open && summary && <span className="text-xs text-gray-500 truncate">{summary}</span>}
+        </button>
+        {open && actions}
+      </div>
+      {open && <div className="px-4 sm:px-5 pb-5 pt-1 space-y-5 border-t border-gray-100">{children}</div>}
+    </section>
+  );
 }
 
 function emptyModule(): ModuleData {
@@ -294,12 +336,26 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const initialSelection = deriveCategorySelection(initial?.categoryIds ?? [], categories);
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialSelection.categoryId);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(initialSelection.subcategoryId);
-  const [modules, setModules] = useState<ModuleData[]>(
-    initial?.modules?.length ? initial.modules : [emptyModule()]
+  const [modules, setModules] = useState<ModuleData[]>(() =>
+    initial?.modules?.length
+      ? initial.modules.map((m) => ({ ...m, lessons: m.lessons.map((l) => ({ ...l, uid: nextLessonUid() })) }))
+      : [emptyModule()]
   );
-  const [expandedModules, setExpandedModules] = useState<Set<number>>(
-    new Set(modules.map((_, i) => i))
+  // A new course opens everything so you can type straight in; an existing one
+  // opens collapsed (like the music track list) so it's scannable, not 12 screens.
+  const [expandedModules, setExpandedModules] = useState<Set<number>>(() =>
+    mode === "create" ? new Set(modules.map((_, i) => i)) : new Set()
   );
+  const [expandedLessons, setExpandedLessons] = useState<Set<string>>(() =>
+    mode === "create" ? new Set(modules.flatMap((m) => m.lessons.map((l) => l.uid!))) : new Set()
+  );
+  const [openSections, setOpenSections] = useState({
+    details: true,
+    curriculum: true,
+    workbook: false,
+    visibility: mode === "create",
+  });
+  const toggleSection = (k: keyof typeof openSections) => setOpenSections((p) => ({ ...p, [k]: !p[k] }));
 
   const [showHelp, setShowHelp] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -311,6 +367,40 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const [courseAnnouncedAt, setCourseAnnouncedAt] = useState(initial?.courseAnnouncedAt ?? null);
 
   const priceCents = Math.round(parseFloat(priceDollars || "0") * 100);
+
+  // "Unsaved changes" on the save bar: compare everything saveable with how it loaded.
+  const snapshot = useMemo(
+    () => JSON.stringify({
+      title, description, coverImageUrl, priceDollars, isPublished, allowDownload, isFeatured,
+      listInBookstore, workbookFileKey, workbookFileName, workbookUrl, releaseDate,
+      selectedCategoryId, selectedSubcategoryId,
+      modules: modules.map((m) => ({ ...m, lessons: m.lessons.map(({ uid: _uid, ...l }) => l) })),
+    }),
+    [title, description, coverImageUrl, priceDollars, isPublished, allowDownload, isFeatured,
+      listInBookstore, workbookFileKey, workbookFileName, workbookUrl, releaseDate,
+      selectedCategoryId, selectedSubcategoryId, modules]
+  );
+  const loadedSnapshot = useRef(snapshot);
+  const isDirty = snapshot !== loadedSnapshot.current;
+
+  function toggleLesson(uid: string) {
+    setExpandedLessons((prev) => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid);
+      else next.add(uid);
+      return next;
+    });
+  }
+
+  function expandAll() {
+    setExpandedModules(new Set(modules.map((_, i) => i)));
+    setExpandedLessons(new Set(modules.flatMap((m) => m.lessons.map((l) => l.uid!))));
+  }
+
+  function collapseAll() {
+    setExpandedModules(new Set());
+    setExpandedLessons(new Set());
+  }
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
 
   function handleCategoryChange(id: string) {
@@ -347,8 +437,10 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   }
 
   function addModule() {
-    setModules((prev) => [...prev, emptyModule()]);
+    const mod = emptyModule();
+    setModules((prev) => [...prev, mod]);
     setExpandedModules((prev) => new Set([...prev, modules.length]));
+    setExpandedLessons((prev) => new Set([...prev, ...mod.lessons.map((l) => l.uid!)]));
   }
 
   function updateLesson(modIdx: number, lesIdx: number, patch: Partial<LessonData>) {
@@ -370,11 +462,13 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   }
 
   function addLesson(modIdx: number) {
+    const lesson = emptyLesson();
     setModules((prev) =>
       prev.map((m, mi) =>
-        mi === modIdx ? { ...m, lessons: [...m.lessons, emptyLesson()] } : m
+        mi === modIdx ? { ...m, lessons: [...m.lessons, lesson] } : m
       )
     );
+    setExpandedLessons((prev) => new Set([...prev, lesson.uid!]));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -481,7 +575,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <CourseHelpModal open={showHelp} onClose={() => setShowHelp(false)} />
 
       <button
@@ -499,6 +593,12 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
+      <Section
+        title="Course details"
+        summary={[title || "Untitled", priceCents > 0 ? `${(priceCents / 100).toFixed(2)}` : "Free"].join(" · ")}
+        open={openSections.details}
+        onToggle={() => toggleSection("details")}
+      >
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
@@ -599,21 +699,34 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
+      </Section>
+
       {/* Modules & Lessons */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Curriculum ({modules.length} module{modules.length !== 1 ? "s" : ""}, {totalLessons} lesson{totalLessons !== 1 ? "s" : ""})
-            </label>
-            <HelpTip id="course-first" />
+      <Section
+        title="Curriculum"
+        summary={`${modules.length} module${modules.length !== 1 ? "s" : ""}, ${totalLessons} lesson${totalLessons !== 1 ? "s" : ""}`}
+        open={openSections.curriculum}
+        onToggle={() => toggleSection("curriculum")}
+        actions={<HelpTip id="course-first" />}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-gray-500">
+            {modules.length} module{modules.length !== 1 ? "s" : ""}, {totalLessons} lesson{totalLessons !== 1 ? "s" : ""}. Open a module, then a lesson, to edit it.
+          </p>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={expandAll} className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900">
+              <ChevronsUpDown className="h-3.5 w-3.5" /> Expand all
+            </button>
+            <button type="button" onClick={collapseAll} className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-gray-900">
+              <ChevronsDownUp className="h-3.5 w-3.5" /> Collapse all
+            </button>
+            <Button type="button" variant="outline" size="sm" onClick={addModule}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> Add Module
+            </Button>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={addModule}>
-            <Plus className="h-3.5 w-3.5 mr-1" /> Add Module
-          </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {modules.map((mod, mi) => {
             const isExpanded = expandedModules.has(mi);
             return (
@@ -640,7 +753,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
                 </div>
 
                 {isExpanded && (
-                  <div className="p-4 space-y-4">
+                  <div className="p-3 sm:p-4 space-y-3">
                     {/* Module description */}
                     <input
                       type="text"
@@ -651,11 +764,23 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
                     />
 
                     {/* Lessons */}
-                    <div className="space-y-3">
-                      {mod.lessons.map((les, li) => (
-                        <div key={li} className="border border-gray-100 rounded-lg p-3 bg-white space-y-2">
+                    <div className="space-y-2">
+                      {mod.lessons.map((les, li) => {
+                        const lessonOpen = expandedLessons.has(les.uid!);
+                        const hasText = !!les.contentHtml.replace(/<[^>]+>/g, "").trim();
+                        return (
+                        <div key={les.uid ?? li} className={`border rounded-lg bg-white ${lessonOpen ? "border-gray-200 p-3 space-y-2" : "border-gray-100 px-3 py-2"}`}>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-400 w-6 text-center">{li + 1}.</span>
+                            <button
+                              type="button"
+                              onClick={() => toggleLesson(les.uid!)}
+                              aria-expanded={lessonOpen}
+                              aria-label={lessonOpen ? "Collapse lesson" : "Edit lesson"}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              {lessonOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                            </button>
+                            <span className="text-xs text-gray-400 w-5 text-center">{li + 1}.</span>
                             <input
                               type="text"
                               value={les.title}
@@ -663,6 +788,13 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
                               className="flex-1 border border-gray-200 rounded-md px-3 py-1.5 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                               placeholder="Lesson title"
                             />
+                            {!lessonOpen && (
+                              <span className="hidden sm:flex items-center gap-1.5 text-gray-400" aria-hidden="true">
+                                {les.videoUrl.trim() && <Video className="h-3.5 w-3.5" />}
+                                {hasText && <FileText className="h-3.5 w-3.5" />}
+                                {les.fileKey && <Paperclip className="h-3.5 w-3.5" />}
+                              </span>
+                            )}
                             <button
                               type="button"
                               onClick={() => updateLesson(mi, li, { isPreview: !les.isPreview })}
@@ -677,6 +809,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
                               </button>
                             )}
                           </div>
+                          {lessonOpen && (<>
                           <div className="flex items-center gap-2 pl-8">
                             <Video className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
                             <input
@@ -700,8 +833,10 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
                             fileName={les.fileName}
                             onChange={(patch) => updateLesson(mi, li, patch)}
                           />
+                          </>)}
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <Button type="button" variant="ghost" size="sm" onClick={() => addLesson(mi)} className="text-gray-500">
@@ -713,9 +848,15 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
             );
           })}
         </div>
-      </div>
+      </Section>
 
       {/* Course Workbook */}
+      <Section
+        title="Workbook"
+        summary={workbookFileName || (workbookUrl ? "Linked" : "None")}
+        open={openSections.workbook}
+        onToggle={() => toggleSection("workbook")}
+      >
       <WorkbookUpload
         fileKey={workbookFileKey}
         fileName={workbookFileName}
@@ -726,7 +867,19 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
           setWorkbookUrl(patch.url);
         }}
       />
+      </Section>
 
+      <Section
+        title="Visibility & publishing"
+        summary={[
+          isPublished ? "Published" : "Draft",
+          isFeatured && "Featured",
+          allowDownload && "Downloadable",
+          listInBookstore && "In Bookstore",
+        ].filter(Boolean).join(" · ")}
+        open={openSections.visibility}
+        onToggle={() => toggleSection("visibility")}
+      >
       {/* Published */}
       <div className="flex items-center gap-3">
         <input
@@ -839,6 +992,8 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
+      </Section>
+
       {/* Actions — sticky to the bottom of the viewport so long courses (lots of
           modules/lessons) don't require scrolling all the way down to save. */}
       <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 flex items-center gap-3 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.08)]">
@@ -849,6 +1004,11 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         <Button type="button" variant="outline" onClick={() => router.push("/admin/courses")}>
           Cancel
         </Button>
+        {isDirty && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+            <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" /> Unsaved changes
+          </span>
+        )}
         {mode === "edit" && (
           <Button
             type="button"

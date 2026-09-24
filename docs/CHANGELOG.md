@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Course editor: collapsible sections + a save bar that actually sticks
+
+- **Admin sticky elements were silently broken.** `<main>` in `admin-shell.tsx` had
+  `overflow-y-auto` but no fixed height, so the window scrolled and `<main>` became a
+  scroll box that never scrolled — every `sticky` inside it (the course editor's Save bar,
+  the book editor's "Editing book" header) sat inert. A 10-module course measured
+  11,823px with Save at the very bottom. Now `overflow-x-clip` (still trims wide content,
+  isn't a scroll container).
+- **Course editor collapses like the music track list.** Sections: Course details
+  (open), Curriculum (open), Workbook and Visibility & publishing (collapsed on edit,
+  one-line summaries). On existing courses, modules and lessons start collapsed —
+  lessons as one-line rows (title, video/text/file icons, preview eye) that open to the
+  full editor. Expand all / Collapse all; new modules and lessons open automatically.
+- Save bar shows **Unsaved changes** when anything differs from how the course loaded.
+
 ## September 24, 2026 — Book page: two-column layout + separate ASIN
 
 Andy didn't like the full-width sections (below) and sketched a two-column version.

@@ -112,7 +112,10 @@ export function AdminShell({
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
+        {/* The window scrolls, not <main> (nothing gives it a fixed height). overflow-x-clip
+            still trims wide content, but unlike overflow-y-auto it doesn't make <main> a
+            scroll box — which silently disabled every sticky bar/header in the admin. */}
+        <main className="flex-1 min-w-0 p-4 sm:p-6 overflow-x-clip">
           {children}
         </main>
       </div>
