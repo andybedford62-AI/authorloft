@@ -13,6 +13,22 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Traffic Sources reads share tags + cover URL check
+
+- **Traffic Sources credits the network.** `/api/admin/analytics` now groups by the
+  link's `utm_source` (read from `$current_url`) before `$referring_domain`, so tagged
+  share links from Instagram/TikTok (in-app browsers send no referrer) no longer land
+  under "Direct". Tags get friendly labels via `src/lib/traffic-source.ts`
+  (`share-sheet` + `copy-link` merge into "Shared link", `qr` → "QR code").
+- **Cover addresses are checked on save.** New `src/lib/cover-url-check.ts` fetches
+  an outside cover URL and refuses the save when it's a web page or "not found"
+  (book + course create/edit; edits only check a *changed* cover). Timeouts, 403s
+  and 5xx are inconclusive and allowed; our own Supabase storage is skipped; private
+  hosts are refused, including via redirects. Book CSV import checks each distinct
+  cover (8 at a time, 20s budget) and imports bad-cover rows without a cover, listed
+  in the import warnings. Verified live: an `amazon.com/dp/…` page returns
+  `text/html` and is caught; a real `m.media-amazon.com` image passes.
+
 ## September 24, 2026 — Course link previews + admin images vs CSP
 
 Carrying two music-side fixes over to books and courses.

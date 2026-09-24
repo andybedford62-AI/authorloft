@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
+import { labelTrafficSources } from "@/lib/traffic-source";
 
 const POSTHOG_API_KEY = process.env.POSTHOG_PERSONAL_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
@@ -70,10 +71,19 @@ export async function GET(req: NextRequest) {
        FROM events WHERE ${baseWhere}
        GROUP BY path ORDER BY views DESC LIMIT 15`
     ),
+    // The network tag wins over the referring domain: Instagram and TikTok's
+    // in-app browsers send no referrer, so their visits would read as "Direct".
+    // Read it from $current_url (always the full href) rather than relying on
+    // posthog-js copying it into properties.utm_source. Wider LIMIT because
+    // labelTrafficSources merges rows (share-sheet + copy-link → "Shared link").
     queryPostHog(
-      `SELECT coalesce(nullIf(properties.$referring_domain, ''), 'Direct') as source, count() as views
+      `SELECT coalesce(
+                nullIf(extractURLParameter(properties.$current_url, 'utm_source'), ''),
+                nullIf(properties.$referring_domain, ''),
+                'Direct'
+              ) as source, count() as views
        FROM events WHERE ${baseWhere}
-       GROUP BY source ORDER BY views DESC LIMIT 10`
+       GROUP BY source ORDER BY views DESC LIMIT 25`
     ),
     queryPostHog(
       `SELECT coalesce(nullIf(properties.$geoip_country_name, ''), 'Unknown') as country, count() as views
@@ -89,7 +99,7 @@ export async function GET(req: NextRequest) {
     totalViews,
     trend:     trendData.results?.map((r: any[]) => ({ date: r[0] as string, views: Number(r[1]) || 0 })) ?? [],
     topPages:  topPagesData.results?.map((r: any[]) => ({ path: (r[0] as string) || "/", views: Number(r[1]) || 0 })) ?? [],
-    referrers: referrersData.results?.map((r: any[]) => ({ source: r[0] as string, views: Number(r[1]) || 0 })) ?? [],
+    referrers: labelTrafficSources(referrersData.results?.map((r: any[]) => ({ source: r[0] as string, views: Number(r[1]) || 0 })) ?? []),
     geography: geoData.results?.map((r: any[]) => ({ country: r[0] as string, views: Number(r[1]) || 0 })) ?? [],
   });
 }

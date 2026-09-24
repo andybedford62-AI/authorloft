@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { canAddBook } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { checkCoverUrl } from "@/lib/cover-url-check";
 import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
@@ -35,6 +36,9 @@ export async function POST(req: NextRequest) {
   if (!title?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: "Title and slug are required." }, { status: 400 });
   }
+
+  const cover = await checkCoverUrl(coverImageUrl);
+  if (!cover.ok) return NextResponse.json({ error: cover.reason }, { status: 400 });
 
   // Plan limit: check book count before creating
   const bookCheck = await canAddBook(authorId);

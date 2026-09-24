@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { checkCoverUrl } from "@/lib/cover-url-check";
 
 export async function GET(
   _req: NextRequest,
@@ -56,6 +57,12 @@ export async function PUT(
 
   if (!title?.trim() || !slug?.trim()) {
     return NextResponse.json({ error: "Title and slug are required." }, { status: 400 });
+  }
+
+  // Only a changed cover is checked, so an existing book never fails a save on it.
+  if (coverImageUrl && coverImageUrl !== existing.coverImageUrl) {
+    const cover = await checkCoverUrl(coverImageUrl);
+    if (!cover.ok) return NextResponse.json({ error: cover.reason }, { status: 400 });
   }
 
   // Check slug uniqueness if slug changed

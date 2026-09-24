@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { checkCoverUrl } from "@/lib/cover-url-check";
 import { slugify } from "@/lib/utils";
 import { capturePostHog } from "@/lib/posthog";
 import { canAddCourse } from "@/lib/plan-limits";
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest) {
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
+
+  const cover = await checkCoverUrl(coverImageUrl);
+  if (!cover.ok) return NextResponse.json({ error: cover.reason }, { status: 400 });
 
   const courseCheck = await canAddCourse(authorId);
   if (!courseCheck.allowed) {

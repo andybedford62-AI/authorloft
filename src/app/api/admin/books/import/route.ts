@@ -4,6 +4,7 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { slugify } from "@/lib/utils";
 import { MAX_IMPORT_ROWS, type MappedBookRow } from "@/lib/csv-import";
+import { findBadCoverUrls } from "@/lib/cover-url-check";
 
 function uniqueSlug(base: string, used: Set<string>): string {
   let slug = base || "item";
@@ -45,6 +46,18 @@ export async function POST(req: NextRequest) {
 
   if (toImport.length === 0) {
     return NextResponse.json({ imported: 0, skippedForPlanLimit, warnings });
+  }
+
+  // Cover check runs before the transaction (network calls don't belong inside it).
+  // A bad cover doesn't block the row — the book imports without one and is listed.
+  const coverUrls = [...new Set(toImport.map((r) => r.coverImageUrl?.trim()).filter((u): u is string => !!u))];
+  const badCovers = await findBadCoverUrls(coverUrls);
+  const badCoverTitles = toImport.filter((r) => badCovers.has(r.coverImageUrl?.trim() ?? "")).map((r) => `"${r.title.trim()}"`);
+  if (badCoverTitles.length > 0) {
+    warnings.push(
+      `Imported without a cover because the cover address isn't an image: ${badCoverTitles.join(", ")}. ` +
+      `Add the cover from each book's editor.`
+    );
   }
 
   // Pre-fetch existing genres/series/book slugs for case-insensitive matching + slug uniqueness.
@@ -112,7 +125,7 @@ export async function POST(req: NextRequest) {
           slug,
           subtitle:         row.subtitle || null,
           description:      row.description || null,
-          coverImageUrl:    row.coverImageUrl || null,
+          coverImageUrl:    row.coverImageUrl?.trim() && !badCovers.has(row.coverImageUrl.trim()) ? row.coverImageUrl.trim() : null,
           isbn:             row.isbn || null,
           pageCount:        row.pageCount ?? null,
           priceCents:       row.priceCents || 0,
