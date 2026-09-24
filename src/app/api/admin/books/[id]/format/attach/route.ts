@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { syncBookPrice } from "@/lib/book-price";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -88,5 +89,6 @@ export async function POST(
     await prisma.book.update({ where: { id: bookId }, data: { directSalesEnabled: true } });
   }
 
+  await syncBookPrice(bookId);
   return NextResponse.json({ ok: true, saleItem: item });
 }

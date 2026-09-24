@@ -37,6 +37,7 @@ export interface BookForTemplate {
   sampleContent: string | null;
   coverImageUrl: string | null;
   priceCents: number;
+  formatPrices?: unknown;
   isFeatured: boolean;
   directSalesEnabled: boolean;
   externalBuyUrl: string | null;

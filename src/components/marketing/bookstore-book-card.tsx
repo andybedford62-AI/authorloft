@@ -16,6 +16,8 @@ export type BookstoreBook = {
   genres: string[];
   formats: string[];      // EBOOK | PAPERBACK | HARDBACK | AUDIOBOOK
   priceCents: number | null;
+  /** More than one price across formats — shown as "From $x". */
+  priceFrom?: boolean;
   averageRating: number | null;
   ratingCount: number;
   isNew: boolean;
@@ -25,6 +27,10 @@ export type BookstoreBook = {
   authorBookCount: number;// how many of this author's books are in the store
   sortTimestamp: number;  // for "Newest" sort (releaseDate ?? createdAt)
 };
+
+export function withFrom(price: string | null, from?: boolean): string | null {
+  return price && from && price !== "Free" ? `From ${price}` : price;
+}
 
 function formatPrice(cents: number | null): string | null {
   if (cents === null) return null;
@@ -42,7 +48,7 @@ export function BookstoreBookCard({
   quickView?: boolean;
 }) {
   const [qvOpen, setQvOpen] = useState(false);
-  const price = formatPrice(book.priceCents);
+  const price = withFrom(formatPrice(book.priceCents), book.priceFrom);
   const isFree = book.priceCents === 0;
 
   // One priority badge keeps the cover clean.

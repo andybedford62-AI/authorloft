@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getRetailer } from "@/lib/retailers";
 import { CoverTilt } from "./cover-tilt";
 import { sanitize } from "@/lib/sanitize";
+import { listingPrice } from "@/lib/book-formats";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -35,6 +36,8 @@ interface BookCardProps {
     shortDescription?: string | null;
     coverImageUrl?: string | null;
     priceCents: number;
+    /** Per-format prices — when they differ the card says "From". */
+    formatPrices?: unknown;
     seriesName?: string | null;
     seriesSlug?: string | null;
     externalBuyUrl?: string | null;   // legacy single-URL field
@@ -117,6 +120,11 @@ function RetailerButtons({ links, size = "sm" }: { links: RetailerLinkPublic[]; 
 // ── BookCard ──────────────────────────────────────────────────────────────────
 
 export function BookCard({ book, accentColor, authorSlug, layout = "list" }: BookCardProps) {
+  const listed = listingPrice({
+    priceCents:   book.priceCents,
+    formatPrices: book.formatPrices,
+    directPrices: book.salesEnabled && book.directSalesEnabled ? (book.directSaleItems ?? []).map((i) => i.priceCents) : [],
+  });
   // Prefer multi-retailer links; fall back to the legacy single externalBuyUrl
   const hasRetailerLinks    = book.retailerLinks && book.retailerLinks.length > 0;
   // Per-format direct sale items (new system)
@@ -208,9 +216,9 @@ export function BookCard({ book, accentColor, authorSlug, layout = "list" }: Boo
                 {formatCents(book.priceCents)}
               </span>
             </div>
-          ) : book.priceCents > 0 ? (
+          ) : listed ? (
             <p className="text-sm font-semibold" style={{ color: accentColor }}>
-              {formatCents(book.priceCents)}
+              {listed.from ? "From " : ""}{formatCents(listed.cents)}
             </p>
           ) : null}
 

@@ -78,6 +78,7 @@ export default async function BooksPage({
     shortDescription: b.shortDescription,
     coverImageUrl: b.coverImageUrl,
     priceCents: b.priceCents,
+    formatPrices: b.formatPrices,
     isFeatured: b.isFeatured,
     externalBuyUrl: b.externalBuyUrl,
     releaseDate: b.releaseDate?.toISOString() ?? null,

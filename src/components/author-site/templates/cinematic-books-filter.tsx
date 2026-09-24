@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import type { BookForTemplate } from "./types";
+import { hasPriceRange } from "@/lib/book-formats";
 
 interface Props {
   books: BookForTemplate[];
@@ -96,7 +97,10 @@ export function CinematicBooksFilter({ books, accentColor }: Props) {
             <h3 className="text-sm font-semibold text-[#FBF6E9] leading-snug line-clamp-2 author-font-heading">
               {book.title}
             </h3>
-            <p className="text-xs text-[#FBF6E9]/50 -mt-1">{formatPrice(book.priceCents)}</p>
+            <p className="text-xs text-[#FBF6E9]/50 -mt-1">
+              {hasPriceRange(book.formatPrices, book.directSaleItems.map((i) => i.priceCents)) ? "From " : ""}
+              {formatPrice(book.priceCents)}
+            </p>
           </Link>
         ))}
 

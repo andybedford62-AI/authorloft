@@ -228,9 +228,6 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [seriesId, setSeriesId]     = useState(book?.seriesId ?? "");
   const [isbn, setIsbn]             = useState(book?.isbn ?? "");
   const [pageCount, setPageCount]   = useState(book?.pageCount?.toString() ?? "");
-  const [retailPrice, setRetailPrice] = useState(
-    book?.priceCents ? (book.priceCents / 100).toFixed(2) : ""
-  );
   const [isFeatured, setIsFeatured]               = useState(book?.isFeatured ?? false);
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
   const [directSalesEnabled, setDirectSalesEnabled] = useState(book?.directSalesEnabled ?? false);
@@ -355,7 +352,6 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       ),
       caption:     caption || null,
       releaseDate: releaseDate || null,
-      priceCents:  retailPrice ? Math.round(parseFloat(retailPrice) * 100) : 0,
     };
 
     const url    = mode === "edit" ? `/api/admin/books/${book!.id}` : "/api/admin/books";
@@ -653,30 +649,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
 
         <CoverUpload value={coverImageUrl} onChange={setCoverImageUrl} />
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <Input label="ISBN" value={isbn} onChange={(e) => setIsbn(e.target.value)}
             placeholder="978-0-000-00000-0" />
           <Input label="Page Count" type="number" value={pageCount}
             onChange={(e) => setPageCount(e.target.value)} placeholder="e.g. 312" />
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Display Price
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={retailPrice}
-                onChange={(e) => setRetailPrice(e.target.value)}
-                placeholder="0.00"
-                className="block w-full rounded-md border border-gray-300 bg-white pl-6 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              />
-            </div>
-            <p className="text-xs text-gray-400">Shown only if you haven't set prices per format (Organisation tab).</p>
-          </div>
         </div>
+        <p className="text-xs text-gray-400">
+          Prices are set per format on the <strong>Organisation</strong> tab, under Available Formats.
+        </p>
       </section>}
 
       {/* ── Organisation ────────────────────────────────────────────────────── */}
@@ -720,9 +701,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         <div>
           <h2 className="font-semibold text-gray-900">Available Formats</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Tick every format this book comes in. Each becomes a card on your book page. Add the list price you set
-            in KDP, IngramSpark etc. to show it on the card (optional; stores may charge less). Direct-sale prices
-            fill in automatically.
+            Tick every format this book comes in. Each becomes a card on your book page. Add each format's price to show it on
+            the card; it's treated as the same price at every store you link to. Direct-sale prices fill in automatically.
           </p>
         </div>
 
@@ -769,10 +749,10 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                     min="0"
                     step="0.01"
                     inputMode="decimal"
-                    aria-label={`${label} list price`}
+                    aria-label={`${label} price`}
                     value={formatPrices[id] ?? ""}
                     onChange={(e) => setFormatPrices((p) => ({ ...p, [id]: e.target.value }))}
-                    placeholder="List price"
+                    placeholder="Price"
                     className="block w-full rounded-md border border-gray-300 bg-white pl-6 pr-3 py-1.5 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                   />
                 </div>

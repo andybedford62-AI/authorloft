@@ -4,6 +4,7 @@ import { slugify } from "@/lib/utils";
 import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
 import type { BookstoreCourse } from "@/components/marketing/bookstore-course-card";
 import type { BookstoreMusic } from "@/components/marketing/bookstore-music-card";
+import { hasPriceRange } from "@/lib/book-formats";
 
 export type GenreCount = { name: string; slug: string; count: number };
 
@@ -70,6 +71,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
         description: true,
         availableFormats: true,
         priceCents: true,
+        formatPrices: true,
         releaseDate: true,
         createdAt: true,
         views: true,
@@ -107,7 +109,13 @@ export async function getBookstoreData(): Promise<BookstoreData> {
   const books: BookstoreBook[] = rows.map((b) => {
     const salePrices = b.directSaleItems.map((d) => d.priceCents).filter((p) => p >= 0);
     const lowestSale = salePrices.length > 0 ? Math.min(...salePrices) : null;
-    const priceCents = lowestSale !== null ? lowestSale : b.priceCents > 0 ? b.priceCents : null;
+    // Book.priceCents is the lowest format price (see syncBookPrice); a cheaper
+    // or free direct item still wins.
+    const priceCents =
+      lowestSale !== null && (lowestSale === 0 || b.priceCents <= 0 || lowestSale < b.priceCents)
+        ? lowestSale
+        : b.priceCents > 0 ? b.priceCents : lowestSale;
+    const priceFrom = hasPriceRange(b.formatPrices, salePrices);
 
     const ratings = b.bookFeedback.map((f) => f.rating).filter((r) => r >= 1 && r <= 5);
     const ratingCount = ratings.length;
@@ -142,6 +150,7 @@ export async function getBookstoreData(): Promise<BookstoreData> {
       genres: genreNames,
       formats: b.availableFormats ?? [],
       priceCents,
+      priceFrom,
       averageRating,
       ratingCount,
       isNew,

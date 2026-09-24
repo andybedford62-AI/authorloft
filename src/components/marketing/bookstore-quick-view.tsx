@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { Star, BookOpen, ArrowRight, X, Sparkles } from "lucide-react";
-import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { withFrom, type BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
 const FORMAT_LABELS: Record<string, string> = {
   EBOOK: "eBook",
@@ -48,7 +48,7 @@ export function BookstoreQuickView({
 
   if (!book || !mounted) return null;
 
-  const price = formatPrice(book.priceCents);
+  const price = withFrom(formatPrice(book.priceCents), book.priceFrom);
 
   const modal = (
     <div

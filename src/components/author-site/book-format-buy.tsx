@@ -98,7 +98,7 @@ export function BookFormatBuy({
                 <span className="block text-sm text-gray-400 mt-1">See stores</span>
               )}
               <span className="block text-[11.5px] text-gray-500">
-                {o.priceIsDirect ? `from ${authorFirstName}` : o.priceCents !== null ? "list price" : " "}
+                {o.priceIsDirect ? `from ${authorFirstName}` : "\u00a0"}
               </span>
             </button>
           );
@@ -170,10 +170,6 @@ export function BookFormatBuy({
               })}
             </div>
           </div>
-        )}
-
-        {!fmt.priceIsDirect && fmt.listPriceCents !== null && fmt.stores.length > 0 && (
-          <p className="text-[11.5px] text-gray-400">List price {formatCents(fmt.listPriceCents)}. Stores may charge less.</p>
         )}
 
         {!hasAnyWay && (

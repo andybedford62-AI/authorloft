@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import type { DirectSaleItemPublic } from "./book-card";
+import { listingPrice } from "@/lib/book-formats";
 
 export interface ShelfBook {
   id: string;
@@ -13,6 +14,7 @@ export interface ShelfBook {
   slug: string;
   coverImageUrl?: string | null;
   priceCents: number;
+  formatPrices?: unknown;
   salesEnabled: boolean;
   directSalesEnabled?: boolean;
   directSaleItems?: DirectSaleItemPublic[];
@@ -29,12 +31,10 @@ const SHELF_SIZE = 5; // books per shelf row on desktop
 
 function priceLabel(book: ShelfBook): string | null {
   const items = book.salesEnabled && book.directSalesEnabled ? (book.directSaleItems ?? []) : [];
-  if (items.length > 0) {
-    const lowest = Math.min(...items.map((i) => i.priceCents));
-    return lowest === 0 ? "Free" : `From ${formatCents(lowest)}`;
-  }
-  if (book.priceCents > 0) return formatCents(book.priceCents);
-  return null;
+  const direct = items.map((i) => i.priceCents);
+  if (direct.length > 0 && Math.min(...direct) === 0) return "Free";
+  const listed = listingPrice({ priceCents: book.priceCents, formatPrices: book.formatPrices, directPrices: direct });
+  return listed ? `${listed.from ? "From " : ""}${formatCents(listed.cents)}` : null;
 }
 
 // ── Single book spine on the shelf ────────────────────────────────────────────

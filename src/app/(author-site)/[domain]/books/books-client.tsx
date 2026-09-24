@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 interface Book {
   id: string; title: string; slug: string; subtitle?: string | null;
   shortDescription?: string | null; coverImageUrl?: string | null;
-  priceCents: number; isFeatured: boolean;
+  priceCents: number; formatPrices?: unknown; isFeatured: boolean;
   externalBuyUrl?: string | null; seriesId?: string | null;
   seriesName?: string | null; seriesSlug?: string | null;
   genreIds: string[]; salesEnabled: boolean;

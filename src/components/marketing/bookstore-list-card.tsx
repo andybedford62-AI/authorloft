@@ -1,5 +1,5 @@
 import { Star, BookOpen, Eye } from "lucide-react";
-import type { BookstoreBook } from "@/components/marketing/bookstore-book-card";
+import { withFrom, type BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
 function formatPrice(cents: number | null): string | null {
   if (cents === null) return null;
@@ -30,7 +30,7 @@ export function BookstoreListCard({
     ? { label: "Soon", cls: "text-vault-ink bg-vault-surf-2" }
     : null;
 
-  const price = formatPrice(book.priceCents);
+  const price = withFrom(formatPrice(book.priceCents), book.priceFrom);
 
   return (
     <div className="group relative flex gap-3.5 bg-vault-surf-2 rounded-xl border border-vault-ink/22 shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-3 hover:border-vault-gold hover:shadow-[0_4px_14px_rgba(0,0,0,0.4)] transition-all">

@@ -131,6 +131,7 @@ export default async function SeriesDetailPage({
                       shortDescription: book.shortDescription,
                       coverImageUrl: book.coverImageUrl,
                       priceCents: book.priceCents,
+                      formatPrices: book.formatPrices,
                       externalBuyUrl: book.externalBuyUrl,
                       salesEnabled,
                       directSalesEnabled: book.directSalesEnabled,

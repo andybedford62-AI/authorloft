@@ -4,6 +4,7 @@ import { canAddBook } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
 import { parseFormatPrices } from "@/lib/book-formats";
+import { syncBookPrice } from "@/lib/book-price";
 import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
       shortDescription: shortDescription || null,
       description: description || null,
       coverImageUrl: coverImageUrl || null,
-      // priceCents defaults to 0 (from schema); managed via Direct Sales items going forward
+      // priceCents is derived from format + direct-sale prices — see syncBookPrice
       seriesId: seriesId || null,
       isbn: isbn || null,
       pageCount: pageCount || null,
@@ -93,6 +94,8 @@ export async function POST(req: NextRequest) {
           : undefined,
     },
   });
+
+  await syncBookPrice(book.id);
 
   // Mark onboarding complete on first book — protects the account from ghost-cleanup
   const { count: onboardingJustCompleted } = await prisma.author.updateMany({

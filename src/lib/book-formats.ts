@@ -50,11 +50,11 @@ type Link = { id: string; retailer: string; label: string; url: string; formats:
 export type FormatOption = {
   id: BookFormatId;
   name: string;
-  /** Card price: the cheapest direct item, else the author's list price, else null. */
+  /** Card price: the cheapest direct item, else the format's price, else null. */
   priceCents: number | null;
   /** True when priceCents is a direct-sale price the reader can pay here. */
   priceIsDirect: boolean;
-  /** The author's list price for this format, if set. */
+  /** The price the author set for this format (same at every store), if any. */
   listPriceCents: number | null;
   directItems: SaleItem[];
   magnetItems: SaleItem[];
@@ -102,4 +102,36 @@ export function buildFormatOptions({
       stores: stores.filter((l) => l.formats.length === 0 || l.formats.includes(f.id)),
     };
   });
+}
+
+// ── The book's single price (Book.priceCents) ────────────────────────────────
+// Listings (book cards, series, the Bookstore) show one price per book. It's no
+// longer typed in: it's the lowest price a reader can see — any format's price
+// or a paid direct-sale item — kept in sync by syncBookPrice (lib/book-price).
+
+function visiblePrices(formatPrices: unknown, directPrices: number[]): number[] {
+  return [...Object.values(parseFormatPrices(formatPrices)), ...directPrices.filter((p) => p > 0)];
+}
+
+/** Lowest price across formats and paid direct items; null when none is set. */
+export function lowestBookPrice(formatPrices: unknown, directPrices: number[]): number | null {
+  const all = visiblePrices(formatPrices, directPrices);
+  return all.length ? Math.min(...all) : null;
+}
+
+/** True when the book has more than one distinct price, so listings say "From". */
+export function hasPriceRange(formatPrices: unknown, directPrices: number[]): boolean {
+  return new Set(visiblePrices(formatPrices, directPrices)).size > 1;
+}
+
+/** What a listing card shows: the lowest price, and whether to prefix "From". */
+export function listingPrice(b: {
+  priceCents: number;
+  formatPrices?: unknown;
+  directPrices?: number[];
+}): { cents: number; from: boolean } | null {
+  const direct = b.directPrices ?? [];
+  const lowest = lowestBookPrice(b.formatPrices, direct) ?? (b.priceCents > 0 ? b.priceCents : null);
+  if (lowest === null) return null;
+  return { cents: lowest, from: hasPriceRange(b.formatPrices, direct) };
 }

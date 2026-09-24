@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { syncBookPrice } from "@/lib/book-price";
 
 const VALID_FORMATS = ["EBOOK", "AUDIO", "FLIPBOOK", "PRINT"] as const;
 type DirectSaleFormat = (typeof VALID_FORMATS)[number];
@@ -99,5 +100,6 @@ export async function POST(
     await prisma.book.update({ where: { id: bookId }, data: { directSalesEnabled: true } });
   }
 
+  await syncBookPrice(bookId);
   return NextResponse.json(item, { status: 201 });
 }

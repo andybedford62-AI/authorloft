@@ -33,6 +33,13 @@ Designed from an approved mockup (Anthony Bedford's *Night Dive*).
 - Logic in `src/lib/book-formats.ts` (`buildFormatOptions`), unit-tested; UI in
   `components/author-site/book-format-buy.tsx`. Migration `20260924_book_format_prices`
   (additive). Also: course editor Price and Published date now side by side.
+- **One price per format, no separate Display Price.** A format's price is treated as
+  the same at every store (no "list price / stores may charge less" hedging). The
+  editor's Display Price field is gone: `Book.priceCents` is now derived on save as the
+  lowest format or paid direct-sale price (`syncBookPrice` in `lib/book-price.ts`, run by
+  the book and direct-sale routes), so book cards, series pages and the Bookstore keep
+  working. Books not yet re-saved keep their old single price. Cards say "From $x" when
+  a book's prices differ (`listingPrice` / `hasPriceRange`).
 
 ## September 24, 2026 — Published dates on courses and music
 

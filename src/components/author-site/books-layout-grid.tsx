@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import type { RetailerLinkPublic, DirectSaleItemPublic } from "./book-card";
+import { listingPrice } from "@/lib/book-formats";
 
 export interface GridBook {
   id: string;
@@ -12,6 +13,7 @@ export interface GridBook {
   slug: string;
   coverImageUrl?: string | null;
   priceCents: number;
+  formatPrices?: unknown;
   salesEnabled: boolean;
   directSalesEnabled?: boolean;
   directSaleItems?: DirectSaleItemPublic[];
@@ -26,12 +28,10 @@ interface Props {
 
 function priceLabel(book: GridBook): string | null {
   const items = book.salesEnabled && book.directSalesEnabled ? (book.directSaleItems ?? []) : [];
-  if (items.length > 0) {
-    const lowest = Math.min(...items.map((i) => i.priceCents));
-    return lowest === 0 ? "Free" : `From ${formatCents(lowest)}`;
-  }
-  if (book.priceCents > 0) return formatCents(book.priceCents);
-  return null;
+  const direct = items.map((i) => i.priceCents);
+  if (direct.length > 0 && Math.min(...direct) === 0) return "Free";
+  const listed = listingPrice({ priceCents: book.priceCents, formatPrices: book.formatPrices, directPrices: direct });
+  return listed ? `${listed.from ? "From " : ""}${formatCents(listed.cents)}` : null;
 }
 
 export function BooksLayoutGrid({ books, accentColor }: Props) {

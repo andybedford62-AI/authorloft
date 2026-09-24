@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
 import { parseFormatPrices } from "@/lib/book-formats";
+import { syncBookPrice, hasFormatPrices } from "@/lib/book-price";
 
 export async function GET(
   _req: NextRequest,
@@ -118,7 +119,8 @@ export async function PUT(
         shortDescription: shortDescription || null,
         description: description || null,
         coverImageUrl: coverImageUrl || null,
-        priceCents: typeof priceCents === "number" ? priceCents : 0,
+        // Derived by syncBookPrice below; only an older client still sends it.
+        priceCents: typeof priceCents === "number" ? priceCents : undefined,
         seriesId: seriesId || null,
         isbn: isbn || null,
         pageCount: pageCount || null,
@@ -146,6 +148,9 @@ export async function PUT(
     });
   });
 
+  // Clearing the last format price clears the single price too, rather than
+  // leaving a stale number on the listings.
+  await syncBookPrice(id, { clearIfNone: hasFormatPrices(existing.formatPrices) });
   return NextResponse.json(book);
 }
 

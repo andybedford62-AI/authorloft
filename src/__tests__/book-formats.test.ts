@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildFormatOptions, parseFormatPrices, parseLinkFormats, directSaleCardFormat } from "@/lib/book-formats";
+import {
+  buildFormatOptions, parseFormatPrices, parseLinkFormats, directSaleCardFormat,
+  lowestBookPrice, hasPriceRange, listingPrice,
+} from "@/lib/book-formats";
 
 const amazon = { id: "a", retailer: "amazon", label: "Buy on Amazon", url: "https://amazon.com/x", formats: [] as string[] };
 const etsy = { id: "e", retailer: "etsy", label: "Buy on Etsy", url: "https://etsy.com/x", formats: ["PAPERBACK"] };
@@ -57,5 +60,24 @@ describe("parsers", () => {
     expect(directSaleCardFormat("PRINT")).toBe("PAPERBACK");
     expect(directSaleCardFormat("AUDIO")).toBe("AUDIOBOOK");
     expect(directSaleCardFormat("FLIPBOOK")).toBe("EBOOK");
+  });
+});
+
+describe("single book price for listings", () => {
+  it("is the lowest of format prices and paid direct items", () => {
+    expect(lowestBookPrice({ PAPERBACK: 1499, HARDBACK: 2499 }, [699])).toBe(699);
+    expect(lowestBookPrice({ PAPERBACK: 1499 }, [0])).toBe(1499); // a free magnet isn't a price
+    expect(lowestBookPrice(null, [])).toBeNull();
+  });
+
+  it("says From only when prices actually differ", () => {
+    expect(hasPriceRange({ EBOOK: 699, PAPERBACK: 1499 }, [])).toBe(true);
+    expect(hasPriceRange({ EBOOK: 699 }, [699])).toBe(false);
+  });
+
+  it("falls back to the old single price for books without format prices", () => {
+    expect(listingPrice({ priceCents: 1299 })).toEqual({ cents: 1299, from: false });
+    expect(listingPrice({ priceCents: 0 })).toBeNull();
+    expect(listingPrice({ priceCents: 1299, formatPrices: { EBOOK: 499, HARDBACK: 2499 } })).toEqual({ cents: 499, from: true });
   });
 });

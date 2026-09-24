@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
+import { syncBookPrice } from "@/lib/book-price";
 import { canUseFeature } from "@/lib/plan-limits";
 
 // ── PATCH — update label, description, priceCents, isActive; or clear file ───
@@ -84,6 +85,7 @@ export async function PATCH(
     },
   });
 
+  await syncBookPrice(bookId);
   return NextResponse.json(updated);
 }
 
@@ -113,5 +115,6 @@ export async function DELETE(
   }
 
   await prisma.bookDirectSaleItem.delete({ where: { id: itemId } });
+  await syncBookPrice(bookId);
   return NextResponse.json({ ok: true });
 }
