@@ -7,7 +7,12 @@ import { PromotePanel } from "@/components/admin/promote/promote-panel";
 
 export const dynamic = "force-dynamic";
 
-export default async function AuthorPromotePage() {
+export default async function AuthorPromotePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ music?: string }>;
+}) {
+  const { music } = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
 
@@ -19,11 +24,11 @@ export default async function AuthorPromotePage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Promote</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Generate ready-to-paste social posts about your books and writing — built on your data, in your voice.
+          Generate ready-to-paste social posts about your books, music and writing — built on your data, in your voice.
         </p>
       </div>
 
-      <PromotePanel context={ctx} />
+      <PromotePanel context={ctx} initialMusicId={music ?? null} />
     </div>
   );
 }

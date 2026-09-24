@@ -29,6 +29,9 @@ export type AuthorPromoteContext = {
   }>;
   books: Array<{ id: string; title: string; subtitle: string | null }>;
   newsPosts: Array<{ id: string; title: string; publishedAt: Date | null }>;
+  /** Published MUSIC lists. Empty for authors who don't make music, and the
+   *  panel hides the music option entirely in that case. */
+  musicLists: Array<{ id: string; title: string; releaseType: string | null }>;
 };
 
 export async function loadAuthorPromoteContext(authorId: string): Promise<AuthorPromoteContext> {
@@ -45,6 +48,7 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
     activePromoTypes,
     books,
     newsPosts,
+    musicLists,
     todayCount,
     monthCount,
     todaySpend,
@@ -66,6 +70,11 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
       select: { id: true, title: true, publishedAt: true },
       orderBy: { publishedAt: "desc" },
       take:   20,
+    }),
+    prisma.course.findMany({
+      where:   { authorId, kind: "MUSIC", isPublished: true },
+      select:  { id: true, title: true, releaseType: true },
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
     }),
     prisma.generatedSocialPost.count({ where: { authorId, createdAt: { gte: startOfDay },   status: "SUCCESS" } }),
     prisma.generatedSocialPost.count({ where: { authorId, createdAt: { gte: startOfMonth }, status: "SUCCESS" } }),
@@ -100,5 +109,6 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
     })),
     books,
     newsPosts,
+    musicLists,
   };
 }

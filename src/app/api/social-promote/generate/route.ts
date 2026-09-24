@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({} as any));
   const { platformSlug, promoTypeSlug, contextType, contextRefId, topicText } = body;
 
-  if (!["book", "news", "topic"].includes(contextType)) {
+  if (!["book", "news", "topic", "music"].includes(contextType)) {
     return NextResponse.json({ error: "Invalid context type." }, { status: 400 });
   }
 
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     authorId,
     platformId:   platform.id,
     promoTypeId:  promoType.id,
-    contextType:  contextType as "book" | "news" | "topic",
+    contextType:  contextType as "book" | "news" | "topic" | "music",
     contextRefId: contextRefId ?? null,
     topicText:    topicText    ?? null,
     ipAddress,

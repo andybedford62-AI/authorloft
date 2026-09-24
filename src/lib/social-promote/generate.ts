@@ -4,12 +4,14 @@ import { prisma } from "@/lib/db";
 import { calcCostMicroCents } from "./pricing";
 import { assemblePrompt, type AssemblyInputs } from "./prompt-assembly";
 import { checkCostCeilingsAfterGen } from "./cost-alerts";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { releaseLabel, taggedUrl } from "@/lib/music-share";
 
 export type GenerateRequest = {
   authorId:      string;
   platformId:    string;
   promoTypeId:   string;
-  contextType:   "book" | "news" | "topic";
+  contextType:   "book" | "news" | "topic" | "music";
   contextRefId:  string | null;
   topicText:     string | null;
   ipAddress:     string | null;
@@ -74,6 +76,37 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
     }
     assemblyContext = { type: "book", book };
     contextSummary  = book.title;
+  } else if (req.contextType === "music") {
+    if (!req.contextRefId) {
+      return { ok: false, postId: null, status: "FAILED", userMessage: "Please pick a music release.", errorDetail: "contextRefId required for music context" };
+    }
+    // Published only: the post links to the public page, which 404s for a draft.
+    const [list, site] = await Promise.all([
+      prisma.course.findFirst({
+        where:  { id: req.contextRefId, authorId: req.authorId, kind: "MUSIC", isPublished: true },
+        select: {
+          title: true, slug: true, description: true, releaseType: true, releaseDate: true,
+          modules: { orderBy: { sortOrder: "asc" }, select: { lessons: { orderBy: { sortOrder: "asc" }, select: { title: true } } } },
+        },
+      }),
+      prisma.author.findUnique({ where: { id: req.authorId }, select: { slug: true, customDomain: true } }),
+    ]);
+    if (!list || !site) {
+      return { ok: false, postId: null, status: "FAILED", userMessage: "Music release not found.", errorDetail: "Music list missing, unpublished or not owned" };
+    }
+    assemblyContext = {
+      type: "music",
+      music: {
+        title:        list.title,
+        releaseLabel: releaseLabel(list.releaseType),
+        releaseYear:  list.releaseDate?.getUTCFullYear() ?? null,
+        description:  list.description,
+        trackTitles:  list.modules.flatMap((m) => m.lessons.map((l) => l.title)),
+        // Tagged with the platform so PostHog credits the network the post went out on.
+        url: taggedUrl(`${getAuthorBaseUrl(site)}/music/${list.slug}`, platform.slug, list.slug),
+      },
+    };
+    contextSummary = list.title;
   } else if (req.contextType === "news") {
     if (!req.contextRefId) {
       return { ok: false, postId: null, status: "FAILED", userMessage: "Please pick a news post.", errorDetail: "contextRefId required for news context" };

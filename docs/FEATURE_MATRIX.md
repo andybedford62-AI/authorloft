@@ -108,6 +108,8 @@ Early bird / founding member discount available to FREE users within a configura
 | — Meta Tag Optimization | ❌ | ❌ | ✅ |
 | — Keyword Density Analysis | ❌ | ❌ | ✅ |
 | — Internal Link Analysis | ❌ | ❌ | ✅ |
+| **Social Promote** (AI post generator at `/admin/promote` — posts about a book, news post, topic, or music release; music posts include a tracked link to the release) | ❌ | ✅ Facebook, Instagram, X, Reddit, Threads, Bluesky | ✅ All platforms + LinkedIn, TikTok |
+| — 18 promo types (14 book/news/topic + 4 music: New Release, Track Spotlight, Behind the Music, Ask Listeners) | ❌ | ✅ | ✅ |
 
 ---
 

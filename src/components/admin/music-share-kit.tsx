@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, ExternalLink, EyeOff, Share2, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { Check, Copy, ExternalLink, EyeOff, Share2, ChevronDown, Sparkles } from "lucide-react";
 import { BookQRCode } from "@/components/admin/book-qr-code";
 import { shareIntentUrl, taggedUrl } from "@/lib/music-share";
 
@@ -43,6 +44,7 @@ function CopyButton({ value, label = "Copy" }: { value: string; label?: string }
 }
 
 export function MusicShareKit({
+  listId,
   url,
   slug,
   title,
@@ -50,6 +52,7 @@ export function MusicShareKit({
   releaseLabel,
   isPublished,
 }: {
+  listId: string;
   url: string;
   slug: string;
   title: string;
@@ -113,6 +116,14 @@ export function MusicShareKit({
             {n === "x" ? "X" : n[0].toUpperCase() + n.slice(1)}
           </a>
         ))}
+        {isPublished && (
+          <Link
+            href={`/admin/promote?music=${listId}`}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-purple-200 bg-purple-50 text-xs font-medium text-purple-700 hover:bg-purple-100"
+          >
+            <Sparkles className="h-3 w-3" /> Write a post with AI
+          </Link>
+        )}
       </div>
 
       <button

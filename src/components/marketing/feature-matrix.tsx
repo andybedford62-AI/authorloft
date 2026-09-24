@@ -329,7 +329,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
-          name: "  • 14 promo types (sale, launch, quote, BTS, etc.)",
+          name: "  • 18 promo types (sale, launch, quote, BTS, music release, etc.)",
           tiers: {
             FREE: "—",
             STANDARD: "✓",

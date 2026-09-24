@@ -76,6 +76,23 @@ i.ytimg.com) — switched to `next/image` so they go via `/_next/image`.
   Release Type.
 - Deep-link scroll now uses setTimeout instead of rAF (rAF never fires in a
   background tab, e.g. a ctrl-clicked shared link).
+- Fast-follow: hero description rendered twice on phones (`line-clamp-2` sets
+  its own `display`, beating `hidden` on the same element); wrapper fix.
+
+**Phase 4, same day — Social Promote for music.** New `music` context type
+end to end (`generate.ts`, `prompt-assembly.ts`, author-context loader, both
+generate routes, Super Admin promo-type context options). The prompt gets the
+release title, type/year, description, up to 20 track titles and a
+platform-tagged link (`utm_source=<platform slug>`) inside `<author_data>`;
+new tokens `{{music.title}}`, `{{music.type}}`, `{{music.description}}`,
+`{{music.url}}`. Published lists only (the post links to the public page).
+Four music promo types seeded as data (migration
+`20260924_social_promote_music_types`, `ON CONFLICT DO NOTHING`): New Music
+Release, Track Spotlight, Behind the Music, Ask Listeners — each says "link in
+bio" instead of pasting the URL on Instagram/TikTok. The "Your music" option
+only appears for authors with published music. The music editor's share kit
+gets a "Write a post with AI" link (`/admin/promote?music=<id>`) that
+preselects the release. Covered by `src/__tests__/social-promote-music-prompt.test.ts`.
 
 ## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
 

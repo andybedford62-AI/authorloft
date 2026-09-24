@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     overridePromptTemplate, overridePromptAddendum, overrideVoice,
   } = body;
 
-  if (!["book", "news", "topic"].includes(contextType)) {
+  if (!["book", "news", "topic", "music"].includes(contextType)) {
     return NextResponse.json({ error: "Invalid context type." }, { status: 400 });
   }
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     authorId:     adminId,
     platformId:   platform.id,
     promoTypeId:  promoType.id,
-    contextType:  contextType as "book" | "news" | "topic",
+    contextType:  contextType as "book" | "news" | "topic" | "music",
     contextRefId: contextRefId ?? null,
     topicText:    topicText    ?? null,
     ipAddress,

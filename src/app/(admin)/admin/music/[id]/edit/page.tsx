@@ -60,6 +60,7 @@ export default async function EditMusicListPage({
       </div>
       {author && (
         <MusicShareKit
+          listId={list.id}
           url={`${getAuthorBaseUrl(author)}/music/${list.slug}`}
           slug={list.slug}
           title={list.title}

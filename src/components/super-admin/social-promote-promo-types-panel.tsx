@@ -33,6 +33,7 @@ const ALL_CONTEXTS = [
   { value: "book",  label: "Book" },
   { value: "news",  label: "News post" },
   { value: "topic", label: "Free-text topic" },
+  { value: "music", label: "Music release" },
 ];
 
 const emptyForm: FormState = {
