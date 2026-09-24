@@ -13,6 +13,19 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Published dates on courses and music
+
+- **Courses get a Published date.** Optional date on the course editor (new courses
+  pre-fill today; existing ones stay blank), reusing `Course.releaseDate` — the column
+  music already had, so no migration. Shown under the title on `/courses/[slug]` as
+  "Published September 24, 2026" and passed to Social Promote course posts.
+- **Music shows the full release date.** Hero reads "Album · 10 tracks · Released
+  September 24, 2026" from `sm` up; phones keep just the year. Books unchanged (already
+  show the full date).
+- `formatReleaseDate()` in `lib/music-share.ts` formats date-only columns in UTC so a
+  date never slips a day in a US-timezone server/browser (unit test passes
+  under `TZ=America/Los_Angeles`).
+
 ## September 24, 2026 — One share-and-promote layer for Books, Courses and Music
 
 The music sharing overhaul, generalised so books and courses get the same tools.

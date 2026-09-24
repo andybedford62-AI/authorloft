@@ -92,6 +92,7 @@ export default async function EditCoursePage({ params }: Props) {
           workbookFileKey: course.workbookFileKey,
           workbookFileName: course.workbookFileName,
           workbookUrl: course.workbookUrl,
+          releaseDate: course.releaseDate ? course.releaseDate.toISOString().slice(0, 10) : "",
           courseAnnouncedAt: course.courseAnnouncedAt?.toISOString() ?? null,
           categoryIds: course.categories.map((c) => c.categoryId),
           modules: course.modules.map((m) => ({

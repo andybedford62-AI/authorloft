@@ -2,7 +2,7 @@ import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star, BookText } from "lucide-react";
+import { GraduationCap, BookOpen, ArrowLeft, Eye, Lock, Video, Download, Star, BookText, CalendarDays } from "lucide-react";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -11,6 +11,7 @@ import { CourseBuyButton } from "./course-buy-button";
 import { CourseFeedbackForm } from "@/components/author-site/course-feedback-form";
 import { ShareBar } from "@/components/author-site/share-bar";
 import { accentAsSurface } from "@/lib/color-contrast";
+import { formatReleaseDate } from "@/lib/music-share";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -149,6 +150,12 @@ export default async function CourseDetailPage({
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
             {course.title}
           </h1>
+          {course.releaseDate && (
+            <p className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
+              <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
+              Published {formatReleaseDate(course.releaseDate)}
+            </p>
+          )}
           {course.description && (
             <p className="text-gray-600 leading-relaxed mb-5">{course.description}</p>
           )}

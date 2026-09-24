@@ -104,3 +104,9 @@ export function parseReleaseDate(input: unknown): Date | null | undefined {
   const d = new Date(`${input}T00:00:00Z`);
   return Number.isNaN(d.getTime()) ? undefined : d;
 }
+
+/** A @db.Date column as "September 24, 2026". Read in UTC: the column has no
+ *  time, so formatting in the server's local zone could land a day early. */
+export function formatReleaseDate(d: Date): string {
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+}

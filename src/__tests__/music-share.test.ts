@@ -1,8 +1,15 @@
 import { describe, it, expect } from "vitest";
 import {
   trackKeys, findTrackIndex, releaseLabel, taggedUrl, shareIntentUrl,
-  listenPlatform, parseListenLinks, parseReleaseDate,
+  listenPlatform, parseListenLinks, parseReleaseDate, formatReleaseDate,
 } from "@/lib/music-share";
+
+describe("formatReleaseDate", () => {
+  it("reads a date-only value in UTC, so it never slips a day", () => {
+    expect(formatReleaseDate(new Date("2026-09-24T00:00:00Z"))).toBe("September 24, 2026");
+    expect(formatReleaseDate(parseReleaseDate("2026-01-01")!)).toBe("January 1, 2026");
+  });
+});
 
 describe("trackKeys", () => {
   it("uses title slugs so links survive reorders and re-saves", () => {

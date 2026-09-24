@@ -35,6 +35,8 @@ export type AssemblyInputs = {
           lessonCount: number;
           /** Lessons anyone can open without enrolling. */
           previewLessonCount: number;
+          /** "September 24, 2026", when the author set one. */
+          publishedDate?: string | null;
           /** Public page, UTM-tagged for the target platform. Not author-typed. */
           url: string;
         };
@@ -115,6 +117,7 @@ export function assemblePrompt(inputs: AssemblyInputs): string {
     dataLines.push(`Course title: ${clip(c.title, 200)}`);
     if (c.description) dataLines.push(`Course description: ${clip(c.description, 1200)}`);
     dataLines.push(`Price: ${c.price}`);
+    if (c.publishedDate) dataLines.push(`Published: ${c.publishedDate}`);
     dataLines.push(`Size: ${c.moduleTitles.length} module${c.moduleTitles.length === 1 ? "" : "s"}, ${c.lessonCount} lesson${c.lessonCount === 1 ? "" : "s"}`);
     if (c.moduleTitles.length) {
       dataLines.push(`Modules: ${c.moduleTitles.slice(0, 20).map((t, i) => `${i + 1}. ${clip(t, 120)}`).join("; ")}`);

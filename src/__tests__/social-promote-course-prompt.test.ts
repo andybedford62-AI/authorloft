@@ -14,6 +14,7 @@ const course = {
   moduleTitles: ["Clues", "Red herrings"],
   lessonCount: 9,
   previewLessonCount: 2,
+  publishedDate: "September 24, 2026",
   url: "https://jo.authorloft.com/courses/plotting?utm_source=linkedin",
 };
 
@@ -31,6 +32,7 @@ describe("assemblePrompt — course context", () => {
     expect(data).toContain("Size: 2 modules, 9 lessons");
     expect(data).toContain("Modules: 1. Clues; 2. Red herrings");
     expect(data).toContain("Free preview lessons: 2");
+    expect(data).toContain("Published: September 24, 2026");
     expect(data).toContain("Link to the course: https://jo.authorloft.com/courses/plotting");
   });
 

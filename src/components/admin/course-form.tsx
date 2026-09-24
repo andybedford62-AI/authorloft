@@ -46,6 +46,8 @@ export interface CourseData {
   workbookFileName: string | null;
   workbookUrl: string | null;
   courseAnnouncedAt: string | null;
+  /** `YYYY-MM-DD`, shown as "Published <date>" on the public course page. */
+  releaseDate: string | null;
   categoryIds: string[];
   modules: ModuleData[];
 }
@@ -262,6 +264,12 @@ function WorkbookUpload({
   );
 }
 
+/** Today in the author's own timezone, as `YYYY-MM-DD` for a date input. */
+function todayLocalDate(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export function CourseForm({ initial, mode, bookstoreEnabled = false, categories = [] }: CourseFormProps) {
   const router = useRouter();
 
@@ -278,6 +286,11 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
   const [workbookFileKey, setWorkbookFileKey] = useState(initial?.workbookFileKey ?? "");
   const [workbookFileName, setWorkbookFileName] = useState(initial?.workbookFileName ?? "");
   const [workbookUrl, setWorkbookUrl] = useState(initial?.workbookUrl ?? "");
+  // A new course starts with today's date so it gets one without anyone
+  // thinking about it; existing courses keep whatever they have (often blank).
+  const [releaseDate, setReleaseDate] = useState(
+    initial?.releaseDate ?? (mode === "create" ? todayLocalDate() : "")
+  );
   const initialSelection = deriveCategorySelection(initial?.categoryIds ?? [], categories);
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialSelection.categoryId);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(initialSelection.subcategoryId);
@@ -388,6 +401,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         workbookFileKey: workbookFileKey || null,
         workbookFileName: workbookFileName || null,
         workbookUrl: workbookUrl || null,
+        releaseDate,
         categoryIds: selectedCategoryId
           ? (selectedSubcategoryId ? [selectedCategoryId, selectedSubcategoryId] : [selectedCategoryId])
           : [],
@@ -529,6 +543,20 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
           />
         </div>
         <p className="text-xs text-gray-500 mt-1">Set to $0 for a free course</p>
+      </div>
+
+      {/* Published date */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Published date <span className="font-normal text-gray-400">(optional)</span>
+        </label>
+        <input
+          type="date"
+          value={releaseDate}
+          onChange={(e) => setReleaseDate(e.target.value)}
+          className="w-full max-w-[12rem] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+        <p className="text-xs text-gray-500 mt-1">Shown on your public course page. Leave blank to hide it.</p>
       </div>
 
       {/* Category / Subcategory — optional, linked dropdowns */}

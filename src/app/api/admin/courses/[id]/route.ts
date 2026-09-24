@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
+import { parseReleaseDate } from "@/lib/music-share";
 import { slugify } from "@/lib/utils";
 
 type Params = { params: Promise<{ id: string }> };
@@ -35,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, isFeatured, listInBookstore, workbookFileKey, workbookFileName, workbookUrl, categoryIds, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, isFeatured, listInBookstore, workbookFileKey, workbookFileName, workbookUrl, releaseDate, categoryIds, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -128,6 +129,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
         slug,
         description: description?.trim() || null,
         coverImageUrl: coverImageUrl !== undefined ? (coverImageUrl?.trim() || null) : existing.coverImageUrl,
+        // undefined (absent or malformed) leaves the saved date alone; "" clears it.
+        releaseDate: parseReleaseDate(releaseDate),
         priceCents: priceCents ?? existing.priceCents,
         isPublished: isPublished ?? existing.isPublished,
         allowDownload: allowDownload ?? existing.allowDownload,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
+import { parseReleaseDate } from "@/lib/music-share";
 import { slugify } from "@/lib/utils";
 import { capturePostHog } from "@/lib/posthog";
 import { canAddCourse } from "@/lib/plan-limits";
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (!authorId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, isFeatured, workbookFileKey, workbookFileName, workbookUrl, categoryIds, modules } = body;
+  const { title, description, coverImageUrl, priceCents, isPublished, allowDownload, isFeatured, workbookFileKey, workbookFileName, workbookUrl, releaseDate, categoryIds, modules } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
         slug,
         description: description?.trim() || null,
         coverImageUrl: coverImageUrl?.trim() || null,
+        releaseDate: parseReleaseDate(releaseDate) ?? null,
         priceCents: priceCents ?? 0,
         isPublished: isPublished ?? false,
         allowDownload: allowDownload ?? true,

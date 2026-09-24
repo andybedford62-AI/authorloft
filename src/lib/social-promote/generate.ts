@@ -5,7 +5,7 @@ import { calcCostMicroCents } from "./pricing";
 import { assemblePrompt, type AssemblyInputs } from "./prompt-assembly";
 import { checkCostCeilingsAfterGen } from "./cost-alerts";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { releaseLabel } from "@/lib/music-share";
+import { releaseLabel, formatReleaseDate } from "@/lib/music-share";
 import { taggedUrl } from "@/lib/share";
 import { formatCents } from "@/lib/utils";
 
@@ -128,7 +128,7 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
       prisma.course.findFirst({
         where:  { id: req.contextRefId, authorId: req.authorId, kind: "COURSE", isPublished: true },
         select: {
-          title: true, slug: true, description: true, priceCents: true,
+          title: true, slug: true, description: true, priceCents: true, releaseDate: true,
           modules: { orderBy: { sortOrder: "asc" }, select: { title: true, lessons: { select: { isPreview: true } } } },
         },
       }),
@@ -145,6 +145,7 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
         price:        course.priceCents === 0 ? "Free" : formatCents(course.priceCents),
         moduleTitles: course.modules.map((m) => m.title),
         lessonCount:  course.modules.reduce((n, m) => n + m.lessons.length, 0),
+        publishedDate: course.releaseDate ? formatReleaseDate(course.releaseDate) : null,
         previewLessonCount: course.modules.reduce((n, m) => n + m.lessons.filter((l) => l.isPreview).length, 0),
         // Tagged with the platform so Traffic Sources credits the network the post went out on.
         url: taggedUrl(`${getAuthorBaseUrl(site)}/courses/${course.slug}`, platform.slug, course.slug),

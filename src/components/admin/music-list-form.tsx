@@ -258,7 +258,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
             onChange={(e) => setReleaseDate(e.target.value)}
             className={`${inputClass} max-w-[12rem]`}
           />
-          <p className="text-xs text-gray-400 mt-1">The year appears next to the release type on your public page.</p>
+          <p className="text-xs text-gray-400 mt-1">Shown next to the release type on your public page (the year only on phones).</p>
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">

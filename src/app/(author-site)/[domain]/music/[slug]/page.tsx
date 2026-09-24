@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { sanitize } from "@/lib/sanitize";
 import { resolveTrackLink } from "@/lib/music-links";
-import { releaseLabel, trackKeys, findTrackIndex, parseListenLinks } from "@/lib/music-share";
+import { releaseLabel, trackKeys, findTrackIndex, parseListenLinks, formatReleaseDate } from "@/lib/music-share";
 import { MusicTrackList, type PublicTrack } from "@/components/author-site/music-track-list";
 import type { Metadata } from "next";
 
@@ -162,6 +162,7 @@ export default async function MusicListPage({
           coverImageUrl: list.coverImageUrl,
           releaseLabel: releaseLabel(list.releaseType),
           releaseYear: list.releaseDate ? list.releaseDate.getUTCFullYear() : null,
+          releaseDate: list.releaseDate ? formatReleaseDate(list.releaseDate) : null,
           artistName: author.displayName || author.name,
         }}
         // Albums, EPs and singles read as a numbered tracklist; playlists keep

@@ -45,6 +45,8 @@ export type PlaylistHero = {
   /** "Playlist", "Album", "EP" or "Single". */
   releaseLabel: string;
   releaseYear: number | null;
+  /** "September 24, 2026" — shown in full from sm up; phones keep the year. */
+  releaseDate: string | null;
   artistName: string;
 };
 
@@ -211,7 +213,13 @@ export function MusicTrackList({
         <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7">
           <p className="text-xs font-bold uppercase tracking-widest text-white/75 mb-1.5">
             {hero.releaseLabel} · {tracks.length} track{tracks.length === 1 ? "" : "s"}
-            {hero.releaseYear ? ` · ${hero.releaseYear}` : ""}
+            {hero.releaseDate && (
+              <>
+                {" · "}
+                <span className="sm:hidden">{hero.releaseYear}</span>
+                <span className="hidden sm:inline">Released {hero.releaseDate}</span>
+              </>
+            )}
           </p>
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight truncate sm:whitespace-normal sm:line-clamp-2">

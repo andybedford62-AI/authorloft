@@ -1615,7 +1615,7 @@ model Course {
   isFeatured    Boolean            @default(false) // author-marked "featured" item for the homepage hero, mirrors Book.isFeatured. Applies to both COURSE and MUSIC kind rows — ALWAYS filter by kind when querying "the featured one" (see CourseKind doc comment above).
   listInBookstore Boolean          @default(false) // author opt-in to the public AuthorLoft Bookstore (mirrors Book.listInBookstore)
   releaseType   MusicReleaseType?  // MUSIC only — Playlist/Album/EP/Single label; null = Playlist
-  releaseDate   DateTime?          @db.Date // MUSIC only — optional; the hero shows its year
+  releaseDate   DateTime?          @db.Date // optional; MUSIC shows it as "Released", COURSE as "Published"
   listenLinks   Json?              // MUSIC only — album-level "Listen on" links: string[] of https URLs, platform detected from host
   workbookFileKey  String?         // uploaded PDF/DOCX, mutually exclusive with workbookUrl
   workbookFileName String?
