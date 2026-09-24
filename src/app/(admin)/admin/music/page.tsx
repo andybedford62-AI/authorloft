@@ -8,6 +8,7 @@ import { getAuthorPlanLimits } from "@/lib/plan-limits";
 import { Button } from "@/components/ui/button";
 import { MusicAddTabs } from "@/components/admin/music-add-tabs";
 import { MusicListClient } from "@/components/admin/music-list-client";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,10 @@ export default async function MusicListsPage() {
     orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
   });
 
-  const limits = await getAuthorPlanLimits(authorId);
+  const [limits, author] = await Promise.all([
+    getAuthorPlanLimits(authorId),
+    prisma.author.findUnique({ where: { id: authorId }, select: { slug: true, customDomain: true } }),
+  ]);
   const max = (limits as any).maxMusicLists as number | null;
   const trackCap = (limits as any).maxTracksPerList as number | null;
   const atCap = max !== null && lists.length >= max;
@@ -61,14 +65,17 @@ export default async function MusicListsPage() {
         </div>
       ) : (
         <MusicListClient
+          publicBaseUrl={author ? getAuthorBaseUrl(author) : ""}
           initialLists={lists.map((list) => ({
             id: list.id,
+            slug: list.slug,
             title: list.title,
             description: list.description,
             coverImageUrl: list.coverImageUrl,
             isPublished: list.isPublished,
             isFeatured: list.isFeatured,
             listInBookstore: list.listInBookstore,
+            releaseType: list.releaseType,
             trackCount: list.modules.reduce((n, m) => n + m.lessons.length, 0),
           }))}
         />

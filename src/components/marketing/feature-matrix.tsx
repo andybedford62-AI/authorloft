@@ -177,6 +177,15 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          // Not plan-gated beyond having Music at all.
+          name: "Music Sharing (share buttons, song links, tracked links, QR)",
+          tiers: {
+            FREE: free?.musicEnabled ? "✓" : "—",
+            STANDARD: standard?.musicEnabled ? "✓" : "—",
+            PREMIUM: premium?.musicEnabled ? "✓" : "—",
+          },
+        },
+        {
           // Follows Author Courses' gating: import is part of courses, plan
           // limits slice the import itself.
           name: "Courses Import (YouTube playlist or CSV)",

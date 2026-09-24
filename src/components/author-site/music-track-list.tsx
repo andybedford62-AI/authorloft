@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Play, ExternalLink, ListMusic } from "lucide-react";
+import { Play, ExternalLink, ListMusic, Share2, Check } from "lucide-react";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
 import { accentAsSurface, accentAsTextOn } from "@/lib/color-contrast";
+import { taggedUrl } from "@/lib/music-share";
+import { MusicShareBar, shareOrCopy } from "@/components/author-site/music-share-bar";
 
 // Click-to-play, mirroring book-preview-gallery: only the opened track loads an
 // iframe, so a 50-track list costs one embed instead of fifty. That's what keeps
@@ -17,6 +19,8 @@ import { accentAsSurface, accentAsTextOn } from "@/lib/color-contrast";
 
 export type PublicTrack = {
   id: string;
+  /** `?track=` value — see trackKeys() in lib/music-share. */
+  shareKey: string;
   title: string;
   videoUrl: string | null;
   thumbnailUrl: string | null;
@@ -31,24 +35,93 @@ export type PlaylistHero = {
   title: string;
   description: string | null;
   coverImageUrl: string | null;
+  /** "Playlist", "Album", "EP" or "Single". */
+  releaseLabel: string;
+  artistName: string;
+};
+
+export type PlaylistShare = {
+  /** Canonical list URL, untagged. */
+  url: string;
+  /** utm_campaign — the list slug. */
+  campaign: string;
 };
 
 export function MusicTrackList({
   tracks,
   accentColor,
   hero,
+  share,
+  initialTrackId,
 }: {
   tracks: PublicTrack[];
   accentColor: string;
   hero: PlaylistHero;
+  share: PlaylistShare;
+  /** From a `?track=` deep link: opened (or highlighted, if it can't embed) on load. */
+  initialTrackId?: string | null;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(initialTrackId ?? null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const trackRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Deepened once and reused everywhere white sits on the accent, so the hero
   // and the hover state both clear the same contrast floor regardless of how
   // light an author's chosen accent is.
   const surface = accentAsSurface(accentColor);
   const textOnWhite = accentAsTextOn(accentColor);
+
+  // Deep link: open the shared track (embeds) or just spotlight it (link-out
+  // cards — opening a new tab unprompted would be blocked anyway), then bring
+  // it into view.
+  useEffect(() => {
+    if (!initialTrackId) return;
+    const track = tracks.find((t) => t.id === initialTrackId);
+    if (!track) return;
+    const link = track.videoUrl ? resolveTrackLink(track.videoUrl) : null;
+    if (link?.mode === "embed" && link.embedUrl) setOpenId(track.id);
+    requestAnimationFrame(() =>
+      trackRefs.current[track.id]?.scrollIntoView({ behavior: "smooth", block: "center" })
+    );
+    const t = setTimeout(() => setHighlightId(null), 4000);
+    return () => clearTimeout(t);
+    // Deliberately once, on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the address bar pointing at the playing track, so copying the URL
+  // from the browser shares the song rather than the whole list.
+  function openTrack(id: string | null) {
+    setOpenId(id);
+    const key = id ? tracks.find((t) => t.id === id)?.shareKey : null;
+    const u = new URL(window.location.href);
+    if (key) u.searchParams.set("track", key);
+    else u.searchParams.delete("track");
+    window.history.replaceState(null, "", u.toString());
+  }
+
+  function trackUrl(track: PublicTrack) {
+    const u = new URL(share.url);
+    u.searchParams.set("track", track.shareKey);
+    return u.toString();
+  }
+
+  async function shareTrack(track: PublicTrack) {
+    const result = await shareOrCopy(
+      taggedUrl(trackUrl(track), "share-sheet", share.campaign, "share"),
+      track.title,
+      `Listen to "${track.title}" by ${hero.artistName}`
+    );
+    if (result === "copied") {
+      setCopiedId(track.id);
+      setTimeout(() => setCopiedId((c) => (c === track.id ? null : c)), 2000);
+    }
+  }
+
+  const shareText = `Listen to "${hero.title}"${
+    hero.releaseLabel === "Playlist" ? `, a playlist from ${hero.artistName}` : ` by ${hero.artistName}`
+  }`;
 
   return (
     <div style={{ "--accent": accentColor, "--accent-surface": surface } as React.CSSProperties}>
@@ -75,7 +148,7 @@ export function MusicTrackList({
 
         <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7">
           <p className="text-xs font-bold uppercase tracking-widest text-white/75 mb-1.5">
-            Playlist · {tracks.length} track{tracks.length === 1 ? "" : "s"}
+            {hero.releaseLabel} · {tracks.length} track{tracks.length === 1 ? "" : "s"}
           </p>
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight truncate sm:whitespace-normal sm:line-clamp-2">
@@ -91,10 +164,20 @@ export function MusicTrackList({
       </div>
 
       {hero.description && (
-        <p className="sm:hidden text-gray-600 text-sm mb-6 -mt-4 whitespace-pre-line">
+        <p className="sm:hidden text-gray-600 text-sm mb-4 -mt-4 whitespace-pre-line">
           {hero.description}
         </p>
       )}
+
+      <div className="mb-8 -mt-2">
+        <MusicShareBar
+          url={share.url}
+          title={hero.title}
+          text={shareText}
+          campaign={share.campaign}
+          accentSurface={surface}
+        />
+      </div>
 
       {/* ── Track cards ─────────────────────────────────────────────────────── */}
       {tracks.length === 0 ? (
@@ -112,7 +195,8 @@ export function MusicTrackList({
             return isOpen && canEmbed ? (
               <div
                 key={track.id}
-                className="rounded-2xl border overflow-hidden sm:col-span-2 lg:col-span-3"
+                ref={(el) => { trackRefs.current[track.id] = el; }}
+                className="rounded-2xl border overflow-hidden sm:col-span-2 lg:col-span-3 scroll-mt-24"
                 style={{
                   borderColor: `color-mix(in srgb, ${accentColor} 30%, #e5e7eb)`,
                   backgroundColor: `color-mix(in srgb, ${accentColor} 5%, white)`,
@@ -123,13 +207,24 @@ export function MusicTrackList({
                     <p className="text-xs font-bold uppercase tracking-wide" style={{ color: textOnWhite }}>
                       Now Playing
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => setOpenId(null)}
-                      className="text-xs font-medium text-gray-500 hover:text-gray-800"
-                    >
-                      Close ✕
-                    </button>
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => shareTrack(track)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-800"
+                      >
+                        {copiedId === track.id
+                          ? <><Check className="h-3.5 w-3.5 text-emerald-600" /> Link copied</>
+                          : <><Share2 className="h-3.5 w-3.5" /> Share track</>}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openTrack(null)}
+                        className="text-xs font-medium text-gray-500 hover:text-gray-800"
+                      >
+                        Close ✕
+                      </button>
+                    </div>
                   </div>
                   <div className="rounded-lg overflow-hidden bg-black">
                     <iframe
@@ -152,16 +247,26 @@ export function MusicTrackList({
                 </div>
               </div>
             ) : (
-              <TrackCard
+              <div
                 key={track.id}
-                track={track}
-                index={index}
-                surface={surface}
-                canEmbed={canEmbed}
-                canonicalUrl={link?.canonicalUrl ?? track.videoUrl ?? null}
-                providerName={link ? providerLabel(link.provider) : null}
-                onPlay={() => setOpenId(track.id)}
-              />
+                ref={(el) => { trackRefs.current[track.id] = el; }}
+                className={`scroll-mt-24 rounded-2xl transition-shadow duration-500 ${
+                  highlightId === track.id ? "ring-2 ring-offset-2" : ""
+                }`}
+                style={highlightId === track.id ? ({ "--tw-ring-color": surface } as React.CSSProperties) : undefined}
+              >
+                <TrackCard
+                  track={track}
+                  index={index}
+                  surface={surface}
+                  canEmbed={canEmbed}
+                  canonicalUrl={link?.canonicalUrl ?? track.videoUrl ?? null}
+                  providerName={link ? providerLabel(link.provider) : null}
+                  onPlay={() => openTrack(track.id)}
+                  onShare={() => shareTrack(track)}
+                  copied={copiedId === track.id}
+                />
+              </div>
             );
           })}
         </div>
@@ -178,6 +283,8 @@ function TrackCard({
   canonicalUrl,
   providerName,
   onPlay,
+  onShare,
+  copied,
 }: {
   track: PublicTrack;
   index: number;
@@ -186,6 +293,8 @@ function TrackCard({
   canonicalUrl: string | null;
   providerName: string | null;
   onPlay: () => void;
+  onShare: () => void;
+  copied: boolean;
 }) {
   let hostname: string | null = null;
   if (canonicalUrl) {
@@ -238,7 +347,7 @@ function TrackCard({
   );
 
   return (
-    <div className="group rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+    <div className="group h-full rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
       {/* Artwork + big play/external button — the primary, always-visible
           affordance rather than something only hover reveals. A real <a>
           for non-embeddable tracks so ctrl/cmd-click, middle-click, and
@@ -270,17 +379,29 @@ function TrackCard({
           </p>
         ) : null}
 
-        {hostname && (
-          <a
-            href={canonicalUrl!}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-auto pt-3 inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+        <div className="mt-auto pt-3 flex items-center justify-between gap-3">
+          {hostname ? (
+            <a
+              href={canonicalUrl!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-w-0 inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <ExternalLink className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{hostname}</span>
+            </a>
+          ) : <span />}
+          <button
+            type="button"
+            onClick={onShare}
+            className="flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-medium text-gray-400 hover:text-gray-700 transition-colors"
+            aria-label={`Share ${track.title}`}
           >
-            <ExternalLink className="h-3 w-3 flex-shrink-0" />
-            <span className="truncate">{hostname}</span>
-          </a>
-        )}
+            {copied
+              ? <><Check className="h-3 w-3 text-emerald-600" /> Copied</>
+              : <><Share2 className="h-3 w-3" /> Share</>}
+          </button>
+        </div>
       </div>
     </div>
   );

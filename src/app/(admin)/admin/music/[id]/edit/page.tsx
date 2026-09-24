@@ -5,6 +5,9 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { maxTracksPerList } from "@/lib/plan-limits";
 import { MusicListForm } from "@/components/admin/music-list-form";
+import { MusicShareKit } from "@/components/admin/music-share-kit";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { releaseLabel } from "@/lib/music-share";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +29,10 @@ export default async function EditMusicListPage({
         },
       },
     }),
-    prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+    prisma.author.findUnique({
+      where: { id: authorId },
+      select: { slug: true, customDomain: true, name: true, displayName: true, plan: { select: { tier: true } } },
+    }),
   ]);
   if (!list) notFound();
   const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
@@ -51,6 +57,16 @@ export default async function EditMusicListPage({
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">{list.title}</h1>
       </div>
+      {author && (
+        <MusicShareKit
+          url={`${getAuthorBaseUrl(author)}/music/${list.slug}`}
+          slug={list.slug}
+          title={list.title}
+          artistName={author.displayName || author.name}
+          releaseLabel={releaseLabel(list.releaseType)}
+          isPublished={list.isPublished}
+        />
+      )}
       <MusicListForm
         listId={list.id}
         trackCap={trackCap}
@@ -62,6 +78,7 @@ export default async function EditMusicListPage({
           isPublished: list.isPublished,
           isFeatured: list.isFeatured,
           listInBookstore: list.listInBookstore,
+          releaseType: list.releaseType ?? "PLAYLIST",
           tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />

@@ -45,6 +45,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Music Lists** (playlists of links to YouTube/Spotify/Suno etc; nothing uploaded) | Up to 5 | Up to 20 | Unlimited |
 | **Music Import** (YouTube playlist, or bulk-paste links — Tab/comma/pipe, spreadsheet-friendly) | ✅ | ✅ | ✅ |
 | **Tracks per Music List** | Up to 15 | Up to 50 | Unlimited |
+| **Music Sharing** (Playlist/Album/EP/Single release type; public share bar incl. phone share sheet for TikTok/Instagram; per-song `?track=` links with their own preview; admin share kit with tracked links, caption, QR) | ✅ | ✅ | ✅ |
 | **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |
 | **Discount Codes** (per-book, per-bundle, per-course, or sitewide) | ✅ | ✅ | ✅ |

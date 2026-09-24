@@ -12,6 +12,7 @@ import { MusicHelpModal } from "@/components/admin/music-help-modal";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
 import { resolveTrackLink, providerLabel } from "@/lib/music-links";
+import { RELEASE_TYPES, type MusicReleaseType } from "@/lib/music-share";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
 // Delete, ghost = Cancel.
@@ -28,6 +29,7 @@ interface Props {
     isPublished: boolean;
     isFeatured: boolean;
     listInBookstore: boolean;
+    releaseType: MusicReleaseType;
     tracks: TrackRow[];
   };
   /** Plan cap on tracks; null = unlimited. */
@@ -51,6 +53,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? false);
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
+  const [releaseType, setReleaseType] = useState<MusicReleaseType>(initial?.releaseType ?? "PLAYLIST");
   const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [blankTrack()]);
 
   const [saving, setSaving] = useState(false);
@@ -86,6 +89,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         isPublished,
         isFeatured,
         listInBookstore,
+        releaseType,
         tracks: tracks.filter((t) => t.url.trim()),  // description + originalHtml ride along
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
@@ -140,6 +144,32 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">Music List / Album Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} placeholder="e.g. Songs for the Road" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Release Type</label>
+          {/* Segmented rather than a <select>: four short options, and seeing
+              them all at once explains what the field is for. */}
+          <div className="inline-flex rounded-lg border border-gray-300 bg-gray-50 p-0.5" role="radiogroup" aria-label="Release type">
+            {RELEASE_TYPES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                role="radio"
+                aria-checked={releaseType === t.value}
+                onClick={() => setReleaseType(t.value)}
+                className={`px-3.5 py-1.5 text-sm rounded-md transition-colors ${
+                  releaseType === t.value
+                    ? "bg-white text-gray-900 font-medium shadow-sm"
+                    : "text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-1">
+            Shown on your public page and in link previews, e.g. &ldquo;Album · 10 tracks&rdquo;.
+          </p>
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">Description</label>

@@ -4,6 +4,7 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { maxTracksPerList } from "@/lib/plan-limits";
 import { slugify } from "@/lib/utils";
 import { buildTrackRows } from "../route";
+import { isReleaseType } from "@/lib/music-share";
 
 /** Every handler scopes by authorId AND kind, so a course id can't be driven
  *  through the music endpoints (or vice versa). */
@@ -97,6 +98,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(typeof body?.isPublished === "boolean" ? { isPublished: body.isPublished } : {}),
         ...(isFeatured !== undefined ? { isFeatured } : {}),
         ...(listInBookstore !== undefined ? { listInBookstore } : {}),
+        ...(isReleaseType(body?.releaseType) ? { releaseType: body.releaseType } : {}),
       },
     });
 

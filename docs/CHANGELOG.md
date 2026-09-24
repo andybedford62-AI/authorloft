@@ -13,6 +13,36 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Music sharing + release type
+
+Phase 1 of the music UX review. Musicians can now push a list or a single song
+out to social from both sides:
+
+- **Release type** — new nullable `Course.releaseType` (`MusicReleaseType`
+  enum: PLAYLIST/ALBUM/EP/SINGLE; null reads as Playlist, COURSE rows leave it
+  null). Segmented picker in the music editor; shown in the public hero
+  ("Album · 10 tracks"), on `/music` cards and the admin list, and in link
+  previews. Migration `20260924_music_release_type`.
+- **Public share bar** under the hero on `/music/[slug]`: Share (native phone
+  share sheet — the only web route into TikTok/Instagram), Copy link, Facebook,
+  X, Threads, WhatsApp, Reddit, Email. Every link carries `utm_source` per
+  network so PostHog attributes the visit.
+- **Per-song links** — `?track=<title-slug>` (falls back to position for
+  repeated titles; lesson ids aren't usable because saving recreates every
+  track row). Opens/scrolls to the song on load, each track card and the Now
+  Playing panel get a Share button, and opening a track updates the address
+  bar. Metadata previews a `?track=` link as that song with its own artwork.
+- **Link previews fixed** — music pages had no Twitter/X card and no image when
+  a list had no cover (page-level openGraph replaces the layout's). Now falls
+  back cover → first track artwork → artist photo; real images only.
+- **Admin share kit** on the music editor: live URL + Copy + View live,
+  one-click post (Facebook/X/Threads/LinkedIn), per-network tracked links
+  (Instagram, TikTok, Facebook, X, YouTube, newsletter), a suggested caption,
+  and a QR code (reuses `BookQRCode`, now with an optional `blurb`). Admin
+  Music list rows get Copy link / View live for published lists.
+- Shared logic in `src/lib/music-share.ts`, covered by
+  `src/__tests__/music-share.test.ts`.
+
 ## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
 
 A content-specific perk, not a plan change: a FREE author who publishes music

@@ -2,22 +2,44 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { GripVertical, ListMusic, Store } from "lucide-react";
+import { Check, ExternalLink, GripVertical, Link2, ListMusic, Store } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FeaturedStarButton } from "@/components/admin/featured-star-button";
+import { releaseLabel } from "@/lib/music-share";
 
 type MusicListRow = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   coverImageUrl: string | null;
   isPublished: boolean;
   isFeatured: boolean;
   listInBookstore: boolean;
+  releaseType: string | null;
   trackCount: number;
 };
 
-export function MusicListClient({ initialLists }: { initialLists: MusicListRow[] }) {
+export function MusicListClient({
+  initialLists,
+  publicBaseUrl,
+}: {
+  initialLists: MusicListRow[];
+  /** Author's public site root; list URLs are `${publicBaseUrl}/music/${slug}`. */
+  publicBaseUrl: string;
+}) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  async function copyLink(list: MusicListRow) {
+    try {
+      await navigator.clipboard.writeText(`${publicBaseUrl}/music/${list.slug}`);
+      setCopiedId(list.id);
+      setTimeout(() => setCopiedId((c) => (c === list.id ? null : c)), 2000);
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+
   const [lists, setLists] = useState<MusicListRow[]>(initialLists);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
@@ -135,10 +157,35 @@ export function MusicListClient({ initialLists }: { initialLists: MusicListRow[]
                 <p className="text-xs text-gray-500 truncate mb-0.5">{list.description}</p>
               )}
               <p className="text-xs text-gray-500">
-                {list.trackCount} track{list.trackCount === 1 ? "" : "s"}
+                {releaseLabel(list.releaseType)} · {list.trackCount} track{list.trackCount === 1 ? "" : "s"}
               </p>
             </div>
           </Link>
+
+          {/* Share shortcuts — published lists only; a draft's URL would 404. */}
+          {list.isPublished && (
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => copyLink(list)}
+                title="Copy public link"
+                aria-label={`Copy public link for ${list.title}`}
+                className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                {copiedId === list.id ? <Check className="h-4 w-4 text-emerald-600" /> : <Link2 className="h-4 w-4" />}
+              </button>
+              <a
+                href={`${publicBaseUrl}/music/${list.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="View live page"
+                aria-label={`View ${list.title} live`}
+                className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+          )}
 
           <FeaturedStarButton
             endpoint={`/api/admin/music/${list.id}/feature`}

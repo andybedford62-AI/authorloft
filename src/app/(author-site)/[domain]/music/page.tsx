@@ -7,6 +7,7 @@ import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { accentAsSurface } from "@/lib/color-contrast";
+import { releaseLabel } from "@/lib/music-share";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -48,6 +49,10 @@ export default async function MusicPage({
   // accent, light or dark — same helper the playlist hero uses.
   const surface = accentAsSurface(accentColor);
 
+  // "3 albums" when every list is the same type, otherwise the neutral "releases".
+  const labels = new Set(lists.map((l) => releaseLabel(l.releaseType)));
+  const countNoun = labels.size === 1 ? [...labels][0].toLowerCase() : "release";
+
   return (
     <div style={{ "--accent": accentColor } as React.CSSProperties}>
       <PageBanner
@@ -72,7 +77,7 @@ export default async function MusicPage({
         ) : (
           <>
             <p className="text-sm text-gray-500 mb-6">
-              {lists.length} playlist{lists.length === 1 ? "" : "s"} · {totalTracks} track
+              {lists.length} {countNoun}{lists.length === 1 ? "" : "s"} · {totalTracks} track
               {totalTracks === 1 ? "" : "s"} to explore
             </p>
 
@@ -108,7 +113,7 @@ export default async function MusicPage({
                           card reads at a glance without hovering. */}
                       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
                       <span className="absolute bottom-2.5 left-3 text-xs font-semibold text-white/90">
-                        {trackCount} track{trackCount === 1 ? "" : "s"}
+                        {releaseLabel(list.releaseType)} · {trackCount} track{trackCount === 1 ? "" : "s"}
                       </span>
 
                       {/* Play button, scales in on hover — the "fun" cue that

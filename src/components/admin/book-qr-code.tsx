@@ -7,9 +7,11 @@ import { Download, QrCode } from "lucide-react";
 type Props = {
   bookUrl: string;
   bookTitle: string;
+  /** Overrides the book-specific helper line (the music share kit reuses this). */
+  blurb?: string;
 };
 
-export function BookQRCode({ bookUrl, bookTitle }: Props) {
+export function BookQRCode({ bookUrl, bookTitle, blurb }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   function handleDownload() {
@@ -35,7 +37,7 @@ export function BookQRCode({ bookUrl, bookTitle }: Props) {
         <h3 className="font-semibold text-gray-900 text-sm">QR Code</h3>
       </div>
       <p className="text-xs text-gray-400">
-        Share on bookmarks, event tables, or author swag. Scans directly to this book&rsquo;s page.
+        {blurb ?? "Share on bookmarks, event tables, or author swag. Scans directly to this book’s page."}
       </p>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">

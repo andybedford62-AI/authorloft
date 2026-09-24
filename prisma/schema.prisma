@@ -73,6 +73,15 @@ enum CourseKind {
   MUSIC
 }
 
+// How a MUSIC list presents itself publicly. Null on COURSE rows; a MUSIC row
+// with no value renders as a Playlist.
+enum MusicReleaseType {
+  PLAYLIST
+  ALBUM
+  EP
+  SINGLE
+}
+
 enum PlanTier {
   FREE
   STANDARD
@@ -1605,6 +1614,7 @@ model Course {
   allowDownload Boolean            @default(true)
   isFeatured    Boolean            @default(false) // author-marked "featured" item for the homepage hero, mirrors Book.isFeatured. Applies to both COURSE and MUSIC kind rows — ALWAYS filter by kind when querying "the featured one" (see CourseKind doc comment above).
   listInBookstore Boolean          @default(false) // author opt-in to the public AuthorLoft Bookstore (mirrors Book.listInBookstore)
+  releaseType   MusicReleaseType?  // MUSIC only — Playlist/Album/EP/Single label; null = Playlist
   workbookFileKey  String?         // uploaded PDF/DOCX, mutually exclusive with workbookUrl
   workbookFileName String?
   workbookUrl      String?         // externally-hosted workbook link, mutually exclusive with workbookFileKey
