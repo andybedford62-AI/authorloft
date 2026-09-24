@@ -7,7 +7,7 @@ import { maxTracksPerList } from "@/lib/plan-limits";
 import { MusicListForm } from "@/components/admin/music-list-form";
 import { MusicShareKit } from "@/components/admin/music-share-kit";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { releaseLabel } from "@/lib/music-share";
+import { releaseLabel, parseListenLinks } from "@/lib/music-share";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +80,8 @@ export default async function EditMusicListPage({
           isFeatured: list.isFeatured,
           listInBookstore: list.listInBookstore,
           releaseType: list.releaseType ?? "PLAYLIST",
+          releaseDate: list.releaseDate ? list.releaseDate.toISOString().slice(0, 10) : "",
+          listenLinks: parseListenLinks(list.listenLinks),
           tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />

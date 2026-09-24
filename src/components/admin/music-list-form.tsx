@@ -14,7 +14,7 @@ import { MusicHelpModal } from "@/components/admin/music-help-modal";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
 import { resolveTrackLink, providerLabel, type ResolvedTrackLink } from "@/lib/music-links";
-import { RELEASE_TYPES, type MusicReleaseType } from "@/lib/music-share";
+import { RELEASE_TYPES, MAX_LISTEN_LINKS, listenPlatform, type MusicReleaseType } from "@/lib/music-share";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
 // Delete, ghost = Cancel.
@@ -44,6 +44,9 @@ interface Props {
     isFeatured: boolean;
     listInBookstore: boolean;
     releaseType: MusicReleaseType;
+    /** `YYYY-MM-DD` or "" */
+    releaseDate: string;
+    listenLinks: string[];
     tracks: InitialTrack[];
   };
   /** Plan cap on tracks; null = unlimited. */
@@ -78,6 +81,8 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
   const [releaseType, setReleaseType] = useState<MusicReleaseType>(initial?.releaseType ?? "PLAYLIST");
+  const [releaseDate, setReleaseDate] = useState(initial?.releaseDate ?? "");
+  const [listenLinks, setListenLinks] = useState<string[]>(initial?.listenLinks ?? []);
   const [tracks, setTracks] = useState<TrackRow[]>(() =>
     initial?.tracks?.length ? initial.tracks.map((t) => ({ ...t, uid: nextUid() })) : [blankTrack()]
   );
@@ -157,6 +162,8 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         isFeatured,
         listInBookstore,
         releaseType,
+        releaseDate,
+        listenLinks: listenLinks.map((l) => l.trim()).filter(Boolean),
         // description + originalHtml ride along; uid/thumbnailUrl are client-only.
         tracks: tracks
           .filter((t) => t.url.trim())
@@ -240,6 +247,55 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
           <p className="text-xs text-gray-400 mt-1">
             Shown on your public page and in link previews, e.g. &ldquo;Album · 10 tracks&rdquo;.
           </p>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">
+            Release Date <span className="font-normal text-gray-400">(optional)</span>
+          </label>
+          <input
+            type="date"
+            value={releaseDate}
+            onChange={(e) => setReleaseDate(e.target.value)}
+            className={`${inputClass} max-w-[12rem]`}
+          />
+          <p className="text-xs text-gray-400 mt-1">The year appears next to the release type on your public page.</p>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">
+            Listen On <span className="font-normal text-gray-400">(optional)</span>
+          </label>
+          <p className="text-xs text-gray-400 mb-2">
+            Links to this whole {releaseType === "PLAYLIST" ? "playlist" : "release"} on Spotify, Apple Music,
+            Bandcamp and so on. They show as &ldquo;Listen on&rdquo; buttons under the title.
+          </p>
+          <div className="space-y-2">
+            {listenLinks.map((link, i) => {
+              const trimmed = link.trim();
+              let valid = false;
+              try { valid = new URL(trimmed).protocol === "https:"; } catch { valid = false; }
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={link}
+                    onChange={(e) => setListenLinks((p) => p.map((l, idx) => (idx === i ? e.target.value : l)))}
+                    className={inputClass}
+                    placeholder="https://open.spotify.com/album/…"
+                  />
+                  <span className={`w-28 flex-shrink-0 text-xs truncate ${trimmed && !valid ? "text-red-600" : "text-gray-500"}`}>
+                    {!trimmed ? "" : valid ? listenPlatform(trimmed) : "Needs https://"}
+                  </span>
+                  <Button type="button" variant="ghost" onClick={() => setListenLinks((p) => p.filter((_, idx) => idx !== i))} title="Remove link">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+          {listenLinks.length < MAX_LISTEN_LINKS && (
+            <Button type="button" variant="outline" className="mt-2" onClick={() => setListenLinks((p) => [...p, ""])}>
+              <Plus className="h-4 w-4 mr-2" /> Add link
+            </Button>
+          )}
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-500 mb-1">Description</label>

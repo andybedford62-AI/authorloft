@@ -52,6 +52,30 @@ text selection in an open row never starts a drag); ▲/▼ kept as arrow button
 for keyboard users and on phones, where HTML5 drag doesn't work. Expand all /
 Collapse all, new tracks open straight into editing, and removing a filled-in
 track now asks first. Client-only `uid` keys (stripped from the save payload).
+Fast-follow: admin thumbnails were blocked by CSP `img-src` (raw `<img>` to
+i.ytimg.com) — switched to `next/image` so they go via `/_next/image`.
+
+**Phase 3, same day — public music player.**
+- **Now Playing dock** replaces the full-width inline card that reflowed the
+  grid: pinned bottom-left on desktop (bottom-right belongs to the cookie
+  consent card, z-40 — the dock is z-30 so consent stays on top on phones),
+  full-width bottom sheet on phones. Prev/Next, minimize (iframe stays mounted
+  so music keeps playing), Share, open-on-provider, and the track's rich note.
+- **Play all + auto-advance.** YouTube embeds get `enablejsapi=1`; the page
+  subscribes over `postMessage` (no script, so no CSP change) and moves to the
+  next embeddable track on state 0. Spotify can't report "ended" without
+  loading their iframe-API script, so it advances only via Next. Link-only
+  tracks (Suno etc.) are skipped by the queue.
+- **Numbered tracklist layout** for Album/EP/Single (playing bars, hover play
+  icon); Playlists keep the artwork grid.
+- **"Listen on" links** (Spotify, Apple Music, Bandcamp, YouTube Music,
+  SoundCloud, Amazon, Tidal, Deezer, Suno; unknown hosts show their domain) and
+  an optional **release date** (year shown in the hero). New nullable
+  `Course.releaseDate` (DATE) + `Course.listenLinks` (JSONB string[]),
+  migration `20260924_music_release_date_listen_links`; editor fields next to
+  Release Type.
+- Deep-link scroll now uses setTimeout instead of rAF (rAF never fires in a
+  background tab, e.g. a ctrl-clicked shared link).
 
 ## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
 

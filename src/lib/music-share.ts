@@ -74,3 +74,61 @@ export function shareIntentUrl(network: ShareNetwork, url: string, text: string)
     case "email":    return `mailto:?subject=${t}&body=${encodeURIComponent(`${text}\n\n${url}`)}`;
   }
 }
+
+// ── Album-level "Listen on" links ────────────────────────────────────────────
+
+export const MAX_LISTEN_LINKS = 8;
+
+const LISTEN_PLATFORMS: { hosts: string[]; label: string }[] = [
+  { hosts: ["open.spotify.com", "spotify.com", "spotify.link"], label: "Spotify" },
+  { hosts: ["music.apple.com", "itunes.apple.com"], label: "Apple Music" },
+  { hosts: ["music.youtube.com"], label: "YouTube Music" },
+  { hosts: ["youtube.com", "youtu.be"], label: "YouTube" },
+  { hosts: ["bandcamp.com"], label: "Bandcamp" },
+  { hosts: ["soundcloud.com", "on.soundcloud.com"], label: "SoundCloud" },
+  { hosts: ["music.amazon.com", "amazon.com"], label: "Amazon Music" },
+  { hosts: ["tidal.com", "listen.tidal.com"], label: "Tidal" },
+  { hosts: ["deezer.com", "deezer.page.link"], label: "Deezer" },
+  { hosts: ["suno.com", "suno.ai"], label: "Suno" },
+];
+
+/** Platform name for a "Listen on" link; unknown hosts show their domain. */
+export function listenPlatform(url: string): string {
+  let host: string;
+  try {
+    host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return "Link";
+  }
+  // Bandcamp artists live on <artist>.bandcamp.com, hence the suffix match.
+  const hit = LISTEN_PLATFORMS.find((p) => p.hosts.some((h) => host === h || host.endsWith(`.${h}`)));
+  return hit?.label ?? host;
+}
+
+/** Normalises whatever came in (API body or the Json column) to a clean list of
+ *  unique https URLs, capped. Anything else is dropped rather than rejected. */
+export function parseListenLinks(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  const out: string[] = [];
+  for (const v of input) {
+    if (typeof v !== "string") continue;
+    try {
+      const u = new URL(v.trim());
+      if (u.protocol !== "https:") continue;
+      const s = u.toString();
+      if (!out.includes(s)) out.push(s);
+    } catch {
+      /* not a URL */
+    }
+    if (out.length >= MAX_LISTEN_LINKS) break;
+  }
+  return out;
+}
+
+/** `YYYY-MM-DD` from the date input → a Date for the @db.Date column; "" clears. */
+export function parseReleaseDate(input: unknown): Date | null | undefined {
+  if (input === "" || input === null) return null;
+  if (typeof input !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(input)) return undefined;
+  const d = new Date(`${input}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}

@@ -4,7 +4,8 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { canAddMusicList, maxTracksPerList } from "@/lib/plan-limits";
 import { slugify } from "@/lib/utils";
 import { resolveTrackLink, fetchTrackMetadata } from "@/lib/music-links";
-import { isReleaseType } from "@/lib/music-share";
+import { Prisma } from "@prisma/client";
+import { isReleaseType, parseListenLinks, parseReleaseDate } from "@/lib/music-share";
 
 // Music lists are Courses with kind MUSIC: one module holding the tracks, each
 // track a CourseLesson whose videoUrl is a public streaming link. Nothing is
@@ -130,6 +131,11 @@ export async function POST(req: NextRequest) {
         isPublished: body?.isPublished === true,
         isFeatured,
         releaseType: isReleaseType(body?.releaseType) ? body.releaseType : "PLAYLIST",
+        releaseDate: parseReleaseDate(body?.releaseDate) ?? null,
+        listenLinks: (() => {
+          const links = parseListenLinks(body?.listenLinks);
+          return links.length ? links : Prisma.DbNull;
+        })(),
         // A music list is a flat set of tracks; the single module is structural.
         modules: { create: [{ title: "Tracks", sortOrder: 0, lessons: { create: rows } }] },
       },

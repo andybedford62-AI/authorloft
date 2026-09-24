@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { sanitize } from "@/lib/sanitize";
 import { resolveTrackLink } from "@/lib/music-links";
-import { releaseLabel, trackKeys, findTrackIndex } from "@/lib/music-share";
+import { releaseLabel, trackKeys, findTrackIndex, parseListenLinks } from "@/lib/music-share";
 import { MusicTrackList, type PublicTrack } from "@/components/author-site/music-track-list";
 import type { Metadata } from "next";
 
@@ -161,8 +161,13 @@ export default async function MusicListPage({
           description: list.description,
           coverImageUrl: list.coverImageUrl,
           releaseLabel: releaseLabel(list.releaseType),
+          releaseYear: list.releaseDate ? list.releaseDate.getUTCFullYear() : null,
           artistName: author.displayName || author.name,
         }}
+        // Albums, EPs and singles read as a numbered tracklist; playlists keep
+        // the artwork grid, which suits their mostly-video tracks.
+        layout={list.releaseType && list.releaseType !== "PLAYLIST" ? "list" : "grid"}
+        listenLinks={parseListenLinks(list.listenLinks)}
         share={{
           url: `${getAuthorBaseUrl(author)}/music/${slug}`,
           campaign: slug,

@@ -4,7 +4,8 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { maxTracksPerList } from "@/lib/plan-limits";
 import { slugify } from "@/lib/utils";
 import { buildTrackRows } from "../route";
-import { isReleaseType } from "@/lib/music-share";
+import { Prisma } from "@prisma/client";
+import { isReleaseType, parseListenLinks, parseReleaseDate } from "@/lib/music-share";
 
 /** Every handler scopes by authorId AND kind, so a course id can't be driven
  *  through the music endpoints (or vice versa). */
@@ -99,6 +100,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(isFeatured !== undefined ? { isFeatured } : {}),
         ...(listInBookstore !== undefined ? { listInBookstore } : {}),
         ...(isReleaseType(body?.releaseType) ? { releaseType: body.releaseType } : {}),
+        // undefined = field absent or malformed → leave as-is; null = cleared.
+        ...(parseReleaseDate(body?.releaseDate) !== undefined ? { releaseDate: parseReleaseDate(body?.releaseDate) } : {}),
+        ...(Array.isArray(body?.listenLinks)
+          ? (() => {
+              const links = parseListenLinks(body.listenLinks);
+              return { listenLinks: links.length ? links : Prisma.DbNull };
+            })()
+          : {}),
       },
     });
 
