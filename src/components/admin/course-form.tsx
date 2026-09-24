@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { CourseHelpModal } from "@/components/admin/course-help-modal";
 import { HelpTip } from "@/components/admin/help-tip";
+import { CollapsibleCard } from "@/components/admin/collapsible-card";
 
 const RichTextEditor = dynamic(
   () => import("@/components/admin/rich-text-editor").then((m) => m.RichTextEditor),
@@ -66,43 +67,6 @@ const nextLessonUid = () => `lesson-${++lessonSeq}`;
 
 function emptyLesson(): LessonData {
   return { uid: nextLessonUid(), title: "", contentHtml: "", videoUrl: "", isPreview: false, fileKey: "", fileName: "" };
-}
-
-/** A collapsible card for one part of the editor, like the music track rows:
- *  the header always shows, with a one-line summary while it's closed. */
-function Section({
-  title,
-  summary,
-  open,
-  onToggle,
-  actions,
-  children,
-}: {
-  title: string;
-  summary?: React.ReactNode;
-  open: boolean;
-  onToggle: () => void;
-  actions?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="bg-white rounded-xl border border-gray-200">
-      <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5">
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          className="flex flex-1 min-w-0 items-center gap-2 text-left"
-        >
-          {open ? <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" /> : <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />}
-          <span className="text-sm font-semibold text-gray-900">{title}</span>
-          {!open && summary && <span className="text-xs text-gray-500 truncate">{summary}</span>}
-        </button>
-        {open && actions}
-      </div>
-      {open && <div className="px-4 sm:px-5 pb-5 pt-1 space-y-5 border-t border-gray-100">{children}</div>}
-    </section>
-  );
 }
 
 function emptyModule(): ModuleData {
@@ -593,7 +557,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
-      <Section
+      <CollapsibleCard
         title="Course details"
         summary={[title || "Untitled", priceCents > 0 ? `${(priceCents / 100).toFixed(2)}` : "Free"].join(" · ")}
         open={openSections.details}
@@ -699,10 +663,10 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
-      </Section>
+      </CollapsibleCard>
 
       {/* Modules & Lessons */}
-      <Section
+      <CollapsibleCard
         title="Curriculum"
         summary={`${modules.length} module${modules.length !== 1 ? "s" : ""}, ${totalLessons} lesson${totalLessons !== 1 ? "s" : ""}`}
         open={openSections.curriculum}
@@ -848,10 +812,10 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
             );
           })}
         </div>
-      </Section>
+      </CollapsibleCard>
 
       {/* Course Workbook */}
-      <Section
+      <CollapsibleCard
         title="Workbook"
         summary={workbookFileName || (workbookUrl ? "Linked" : "None")}
         open={openSections.workbook}
@@ -867,9 +831,9 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
           setWorkbookUrl(patch.url);
         }}
       />
-      </Section>
+      </CollapsibleCard>
 
-      <Section
+      <CollapsibleCard
         title="Visibility & publishing"
         summary={[
           isPublished ? "Published" : "Draft",
@@ -992,7 +956,7 @@ export function CourseForm({ initial, mode, bookstoreEnabled = false, categories
         </div>
       )}
 
-      </Section>
+      </CollapsibleCard>
 
       {/* Actions — sticky to the bottom of the viewport so long courses (lots of
           modules/lessons) don't require scrolling all the way down to save. */}

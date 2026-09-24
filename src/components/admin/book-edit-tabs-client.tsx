@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Lock, CheckCircle2, Circle, Rocket } from "lucide-react";
+import { Lock, CheckCircle2, Circle, Rocket, Share2 } from "lucide-react";
+import { CollapsibleCard } from "@/components/admin/collapsible-card";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
@@ -131,6 +132,7 @@ function TabDot({ state }: { state: DotState }) {
 
 export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, retailerLinksCount, directSaleItemsCount, publicBaseUrl, authorName }: Props) {
   const searchParams = useSearchParams();
+  const [shareOpen, setShareOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
     return tab && TABS.some((t) => t.id === tab) ? tab : "details";
@@ -230,17 +232,27 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
       {/* ── Launch Toolkit + Share kit — Organisation tab: get it ready, then get it out ── */}
       {activeTab === "organisation" && (
         <>
-          <LaunchToolkit book={book} />
-          <ShareKit
-            kind="book"
-            itemId={book.id}
-            url={`${publicBaseUrl}/books/${book.slug}`}
-            slug={book.slug}
-            title={book.title}
-            creatorName={authorName}
-            isPublished={book.isPublished}
-            className="max-w-3xl mt-6"
-          />
+          <div className="max-w-3xl mt-4 space-y-4">
+            <LaunchToolkit book={book} />
+            <CollapsibleCard
+              title="Share this book"
+              icon={<Share2 className="h-4 w-4 text-gray-500 flex-shrink-0" />}
+              summary="Link, post buttons, tracked links, QR code"
+              open={shareOpen}
+              onToggle={() => setShareOpen((v) => !v)}
+            >
+              <ShareKit
+                kind="book"
+                itemId={book.id}
+                url={`${publicBaseUrl}/books/${book.slug}`}
+                slug={book.slug}
+                title={book.title}
+                creatorName={authorName}
+                isPublished={book.isPublished}
+                bare
+              />
+            </CollapsibleCard>
+          </div>
         </>
       )}
 
@@ -333,19 +345,24 @@ function LaunchToolkit({ book }: { book: BookData }) {
 
   const allDone    = checklist.every((c) => c.done);
   const doneCnt    = checklist.filter((c) => c.done).length;
+  // Opens by itself while something's still missing; collapses once it's all done.
+  const [open, setOpen] = useState(!allDone);
 
   return (
-    <div className="max-w-3xl mt-6 bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-      <div className="flex items-center gap-2">
-        <Rocket className="h-4 w-4 text-rose-500" />
-        <h3 className="font-semibold text-gray-900 text-sm">Launch Toolkit</h3>
-        <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
+    <CollapsibleCard
+      title="Launch Toolkit"
+      icon={<Rocket className="h-4 w-4 text-rose-500 flex-shrink-0" />}
+      summary={`${doneCnt}/${checklist.length} ready`}
+      open={open}
+      onToggle={() => setOpen((v) => !v)}
+      actions={
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
           allDone ? "bg-green-100 text-green-700" : "bg-amber-50 text-amber-700"
         }`}>
           {doneCnt}/{checklist.length} ready
         </span>
-      </div>
-
+      }
+    >
       {/* Checklist */}
       <div className="space-y-2">
         {checklist.map(({ label, done }) => (
@@ -358,6 +375,6 @@ function LaunchToolkit({ book }: { book: BookData }) {
           </div>
         ))}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

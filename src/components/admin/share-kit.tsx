@@ -77,6 +77,7 @@ export function ShareKit({
   noun = kind,
   isPublished,
   className = "",
+  bare = false,
 }: {
   kind: ShareKind;
   itemId: string;
@@ -89,6 +90,8 @@ export function ShareKit({
   noun?: string;
   isPublished: boolean;
   className?: string;
+  /** Content only — for use inside a CollapsibleCard that supplies the card and title. */
+  bare?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -97,11 +100,13 @@ export function ShareKit({
   const shownNoun = noun === "ep" ? "EP" : noun;
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 p-6 space-y-4 ${className}`}>
-      <div className="flex items-center gap-2">
-        <Share2 className="h-4 w-4 text-gray-500" />
-        <h2 className="text-sm font-semibold text-gray-900">Share this {shownNoun}</h2>
-      </div>
+    <div className={bare ? `space-y-4 ${className}` : `bg-white rounded-xl border border-gray-200 p-6 space-y-4 ${className}`}>
+      {!bare && (
+        <div className="flex items-center gap-2">
+          <Share2 className="h-4 w-4 text-gray-500" />
+          <h2 className="text-sm font-semibold text-gray-900">Share this {shownNoun}</h2>
+        </div>
+      )}
 
       {!isPublished && (
         <div className="flex items-start gap-2.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-800">

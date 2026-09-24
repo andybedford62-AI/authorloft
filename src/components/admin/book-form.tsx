@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Trash2, Check, UploadCloud, X, ImageIcon, Link2, Tablet, BookOpen, BookMarked, Headphones, Search, CheckCircle2, AlertCircle, Lock, Store, CalendarClock, Rocket, HelpCircle } from "lucide-react";
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/utils";
 import { lookupByIsbn, isKdpIsbn, type IsbnLookupResult } from "@/lib/isbn-lookup";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { CollapsibleCard } from "@/components/admin/collapsible-card";
+import { BOOK_FORMATS } from "@/lib/book-formats";
 
 import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Series = { id: string; name: string };
@@ -213,7 +215,6 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const router = useRouter();
   const [saving, setSaving]     = useState(false);
   const [justSaved, setJustSaved] = useState(false);
-  const [dirty, setDirty]       = useState(false);
   const formRef                 = useRef<HTMLFormElement>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError]       = useState("");
@@ -247,6 +248,37 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   );
   const [caption, setCaption]                     = useState(book?.caption ?? "");
   const [releaseDate, setReleaseDate]             = useState(book?.releaseDate ?? "");
+
+  // Which cards are open. A new book shows everything; an existing one opens
+  // on what's edited most and collapses the rest (summaries show what's inside).
+  const isNew = mode === "new";
+  const [openCards, setOpenCards] = useState({
+    isbnImport: isNew,
+    bookDetails: true,
+    cover: true,
+    seriesGenres: isNew,
+    formats: true,
+    visibility: isNew,
+  });
+  const toggleCard = (k: keyof typeof openCards) => setOpenCards((p) => ({ ...p, [k]: !p[k] }));
+
+  // "Unsaved changes": everything a save sends, compared with how the book loaded
+  // (or was last saved). Catches rich-text, toggles and chips too — the old form
+  // onChange only saw plain inputs.
+  const snapshot = useMemo(
+    () => JSON.stringify({
+      title, slug, subtitle, shortDescription, description, coverImageUrl, seriesId, isbn, asin, pageCount,
+      isFeatured, isPublished, directSalesEnabled, listInBookstore, isPreOrder, preOrderDate,
+      autoSendLaunchEmail, showCountdown, launchDate, selectedGenres, availableFormats, formatPrices,
+      caption, releaseDate,
+    }),
+    [title, slug, subtitle, shortDescription, description, coverImageUrl, seriesId, isbn, asin, pageCount,
+      isFeatured, isPublished, directSalesEnabled, listInBookstore, isPreOrder, preOrderDate,
+      autoSendLaunchEmail, showCountdown, launchDate, selectedGenres, availableFormats, formatPrices,
+      caption, releaseDate]
+  );
+  const savedSnapshot = useRef(snapshot);
+  const dirty = snapshot !== savedSnapshot.current;
 
   // ── ISBN lookup state ─────────────────────────────────────────────────────
   const [isbnQuery,      setIsbnQuery]      = useState("");
@@ -317,6 +349,8 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setFieldErrors(errs);
+      setOpenCards((p) => ({ ...p, bookDetails: true })); // title/slug live there
+
       setTimeout(() => {
         document.querySelector("[data-field-error]")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 50);
@@ -391,7 +425,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     // Edit mode → stay exactly where the author is (same tab) instead of kicking
     // them back to the book list. Just confirm the save and refresh server data.
     setSaving(false);
-    setDirty(false);
+    savedSnapshot.current = snapshot;
     setJustSaved(true);
     setTimeout(() => setJustSaved(false), 2500);
     router.refresh();
@@ -440,6 +474,33 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   // Hide the entire form when a non-form tab is active (state is preserved in memory)
   const formHidden = !!activeTab && activeTab !== "details" && activeTab !== "organisation";
 
+  const priceText = (id: string) => {
+    const n = parseFloat(formatPrices[id] ?? "");
+    return Number.isFinite(n) && n > 0 ? ` ${n.toFixed(2)}` : "";
+  };
+  const summaries = {
+    bookDetails: [title || "Untitled", subtitle].filter(Boolean).join(" · "),
+    cover: [
+      coverImageUrl ? "Cover set" : "No cover",
+      isbn && `ISBN ${isbn}`,
+      asin && `ASIN ${asin}`,
+      pageCount && `${pageCount} pages`,
+    ].filter(Boolean).join(" · "),
+    seriesGenres: [
+      series.find((x) => x.id === seriesId)?.name ?? "No series",
+      ...genres.filter((g) => selectedGenres.includes(g.id)).map((g) => g.name),
+    ].join(" · "),
+    formats: BOOK_FORMATS.filter((b) => availableFormats.includes(b.id)).map((b) => `${b.name}${priceText(b.id)}`).join(" · ") || "None ticked",
+    visibility: [
+      isPublished ? "Published" : "Draft",
+      isFeatured && "Featured",
+      directSalesEnabled && "Direct sales on",
+      listInBookstore && "In Bookstore",
+      isPreOrder && "Pre-order",
+      showCountdown && "Countdown",
+    ].filter(Boolean).join(" · "),
+  };
+
   const textareaClass =
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
@@ -447,7 +508,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
     "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setDirty(true)} className={`space-y-6${formHidden ? " hidden" : ""}`}>
+    <form ref={formRef} onSubmit={handleSubmit} className={`space-y-4${formHidden ? " hidden" : ""}`}>
 
       {!formHidden && (
         <Link
@@ -461,13 +522,16 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       )}
 
       {/* ── ISBN Lookup ──────────────────────────────────────────────────────── */}
-      {showDetails && <section className="bg-blue-50 rounded-xl border border-blue-200 p-6 space-y-4">
+      {showDetails && <CollapsibleCard
+        title="Import by ISBN"
+        icon={<Search className="h-4 w-4 text-blue-600 flex-shrink-0" />}
+        summary="Fill in details from an ISBN"
+        open={openCards.isbnImport}
+        onToggle={() => toggleCard("isbnImport")}
+        className="bg-blue-50 border-blue-200"
+      >
         <div>
-          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <Search className="h-4 w-4 text-blue-600" />
-            Import by ISBN
-          </h2>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500">
             Enter an ISBN (10 or 13 digits) to pre-fill book details. We search both
             Google Books and Open Library — covering traditionally published and many
             self-published titles. You can edit any field after importing.
@@ -542,14 +606,16 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             <span>Book data imported — review and edit the fields below, then save.</span>
           </div>
         )}
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Book Details ─────────────────────────────────────────────────────── */}
-      {showDetails && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900">Book Details</h2>
-          <p className="text-xs text-gray-400"><span className="text-red-500">*</span> Required field</p>
-        </div>
+      {showDetails && <CollapsibleCard
+        title="Book details"
+        summary={summaries.bookDetails}
+        open={openCards.bookDetails}
+        onToggle={() => toggleCard("bookDetails")}
+        actions={<p className="text-xs text-gray-400"><span className="text-red-500">*</span> Required</p>}
+      >
 
         {/* Title */}
         <div className="space-y-1" data-field-error={fieldErrors.title ? true : undefined}>
@@ -644,11 +710,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             <p className="text-xs text-gray-400">Displayed on the public book page.</p>
           </div>
         </div>
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Cover ────────────────────────────────────────────────────────────── */}
-      {showDetails && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        <h2 className="font-semibold text-gray-900">Cover</h2>
+      {showDetails && <CollapsibleCard
+        title="Cover & identifiers"
+        summary={summaries.cover}
+        open={openCards.cover}
+        onToggle={() => toggleCard("cover")}
+      >
 
         <CoverUpload value={coverImageUrl} onChange={setCoverImageUrl} />
 
@@ -663,11 +733,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         <p className="text-xs text-gray-400">
           Prices are set per format on the <strong>Organisation</strong> tab, under Available Formats.
         </p>
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Organisation ────────────────────────────────────────────────────── */}
-      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        <h2 className="font-semibold text-gray-900">Organisation</h2>
+      {showOrganisation && <CollapsibleCard
+        title="Series & genres"
+        summary={summaries.seriesGenres}
+        open={openCards.seriesGenres}
+        onToggle={() => toggleCard("seriesGenres")}
+      >
 
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-700">Series</label>
@@ -699,13 +773,17 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             )}
           </div>
         )}
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Available Formats ────────────────────────────────────────────────── */}
-      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+      {showOrganisation && <CollapsibleCard
+        title="Formats & prices"
+        summary={summaries.formats}
+        open={openCards.formats}
+        onToggle={() => toggleCard("formats")}
+      >
         <div>
-          <h2 className="font-semibold text-gray-900">Available Formats</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500">
             Tick every format this book comes in. Each becomes a card on your book page. Add each format's price to show it on
             the card; it's treated as the same price at every store you link to. Direct-sale prices fill in automatically.
           </p>
@@ -766,11 +844,15 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             );
           })}
         </div>
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Visibility & Publishing ──────────────────────────────────────────── */}
-      {showOrganisation && <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-900">Visibility & Publishing</h2>
+      {showOrganisation && <CollapsibleCard
+        title="Visibility & publishing"
+        summary={summaries.visibility}
+        open={openCards.visibility}
+        onToggle={() => toggleCard("visibility")}
+      >
 
         {/* Published */}
         <div className="flex items-center gap-4 cursor-pointer select-none"
@@ -976,7 +1058,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             )}
           </div>
         )}
-      </section>}
+      </CollapsibleCard>}
 
       {/* ── Actions ─────────────────────────────────────────────────────────── */}
       {error && (
@@ -994,7 +1076,9 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         </p>
       )}
 
-      <div className="flex items-center justify-between pb-8">
+      {/* Save bar — pinned to the bottom of the screen (same as the course and music
+          editors), shared by the Details and Organisation tabs: they're one form. */}
+      <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 flex items-center justify-between gap-3 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.08)]">
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving} size="md">
             {saving
@@ -1005,6 +1089,11 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
               <CheckCircle2 className="h-4 w-4" />
               Saved
+            </span>
+          )}
+          {!justSaved && dirty && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+              <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" /> Unsaved changes
             </span>
           )}
         </div>

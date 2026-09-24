@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Book editor: collapsible cards + pinned save bar
+
+Measured every tab on Night Dive: only Details (3.2 screens) and Organisation (2.6) were
+long — and they're the only tabs with a Save button (the rest save as you go).
+
+- **Details:** Import by ISBN (collapsed on existing books), Book details, Cover & identifiers.
+- **Organisation:** Series & genres, Formats & prices, Visibility & publishing, then the
+  Launch Toolkit (open only while something's missing) and Share this book (collapsed).
+  Every card shows a one-line summary while closed (e.g. "Ebook $6.99 · Paperback $14.99").
+- **Pinned Save bar** on both tabs with **Unsaved changes** — now a snapshot comparison, so
+  rich-text, toggles and chips count (the old form `onChange` only saw plain inputs). A
+  validation error re-opens Book details. `ShareKit` gained a `bare` mode.
+- The collapsible card is now shared: `components/admin/collapsible-card.tsx`, used by the
+  book and course editors.
+
 ## September 24, 2026 — Course editor: collapsible sections + a save bar that actually sticks
 
 - **Music editor gets the same pinned save bar** with an **Unsaved changes** dot (compares what a
