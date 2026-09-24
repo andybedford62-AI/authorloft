@@ -52,6 +52,7 @@ type BookData = {
   launchDate: string | null;
   genreIds: string[];
   availableFormats: string[];
+  formatPrices: Record<string, number>;
   caption: string | null;
   releaseDate: string | null;
   sampleContent: string | null;

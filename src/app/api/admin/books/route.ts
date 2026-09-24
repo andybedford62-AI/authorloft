@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { canAddBook } from "@/lib/plan-limits";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
+import { parseFormatPrices } from "@/lib/book-formats";
 import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
-    availableFormats, caption, releaseDate,
+    availableFormats, formatPrices, caption, releaseDate,
   } = body;
 
   if (!title?.trim() || !slug?.trim()) {
@@ -79,6 +80,8 @@ export async function POST(req: NextRequest) {
       isbn: isbn || null,
       pageCount: pageCount || null,
       availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
+      // Absent (older clients) leaves prices alone; anything malformed is dropped.
+      formatPrices: formatPrices !== undefined ? parseFormatPrices(formatPrices) : undefined,
       caption:     caption     || null,
       releaseDate: releaseDate ? new Date(releaseDate) : null,
       isFeatured: isFeatured ?? false,

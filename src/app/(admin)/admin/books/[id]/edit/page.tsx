@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { BookEditTabsClient } from "@/components/admin/book-edit-tabs-client";
+import { parseFormatPrices } from "@/lib/book-formats";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { AlertCircle } from "lucide-react";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
@@ -90,6 +91,7 @@ export default async function EditBookPage({
       : null,
     genreIds: book.genres.map((g) => g.genreId),
     availableFormats: book.availableFormats ?? [],
+    formatPrices: parseFormatPrices(book.formatPrices),
     caption: book.caption ?? null,
     releaseDate: book.releaseDate
       ? book.releaseDate.toISOString().split("T")[0]

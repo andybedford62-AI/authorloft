@@ -109,6 +109,10 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Format & Price Picker on book pages (price per format, stores per format)",
+          tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
+        },
+        {
           name: "Reader Magnets",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },

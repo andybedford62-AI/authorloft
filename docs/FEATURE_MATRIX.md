@@ -37,6 +37,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Custom Book Pricing** (set per-book prices) | ✅ | ✅ | ✅ |
 | **Direct Digital Sales** (via Stripe) | ✅ (eBook only) | ✅ | ✅ |
 | **Reader Magnets** (give a book/file away free for a reader's email; auto-adds to subscriber list; no Stripe required) | ✅ | ✅ | ✅ |
+| **Format & Price Picker** (book page: a card per format — Ebook/Paperback/Hardcover/Audiobook — with optional list price or the direct-sale price; buy panel shows buy-direct first, then only the stores that sell that format; sticky buy bar on phones) | ✅ | ✅ | ✅ |
 | **Sales Formats** (when Direct Sales enabled) | eBook | eBook, Print | eBook, Audio, Flipbook, Print |
 | **Affiliate / Referral Program** (per-book referral links, configurable commission, click + sale tracking) | ❌ | ✅ | ✅ |
 | **Book Bundles** (package multiple books at a discount) | ❌ | ✅ | ✅ |

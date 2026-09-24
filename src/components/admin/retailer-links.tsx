@@ -5,6 +5,7 @@ import { Plus, Loader2, Check, ExternalLink, ToggleLeft, ToggleRight, Trash2, Ed
 import { IconButton } from "@/components/admin/icon-button";
 import { Button } from "@/components/ui/button";
 import { RETAILERS, RETAILER_KEYS, getRetailer, type RetailerKey } from "@/lib/retailers";
+import { BOOK_FORMATS } from "@/lib/book-formats";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -13,9 +14,52 @@ type RetailerLink = {
   retailer: string;
   label: string;
   url: string;
+  /** Formats this store sells; empty = all. Drives the book page's format cards. */
+  formats: string[];
   isActive: boolean;
   sortOrder: number;
 };
+
+// Goodreads is a review site — it shows beside the book details, not under a format.
+const sellsFormats = (retailer: string) => retailer !== "goodreads";
+
+function formatsSummary(formats: string[]): string {
+  if (formats.length === 0) return "All formats";
+  return BOOK_FORMATS.filter((f) => formats.includes(f.id)).map((f) => f.name).join(", ");
+}
+
+/** "All formats" or a pick of specific ones — toggling the last one off returns to All. */
+function FormatChips({ value, onChange }: { value: string[]; onChange: (next: string[]) => void }) {
+  const chip = (on: boolean) =>
+    `px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+      on ? "bg-[var(--accent)] text-white border-[var(--accent)]" : "bg-white text-gray-600 border-gray-300 hover:border-[var(--accent)]"
+    }`;
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-medium text-gray-600">
+        Sells <span className="text-gray-400 font-normal">(which formats this store has)</span>
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        <button type="button" className={chip(value.length === 0)} onClick={() => onChange([])}>
+          All formats
+        </button>
+        {BOOK_FORMATS.map((f) => {
+          const on = value.includes(f.id);
+          return (
+            <button
+              key={f.id}
+              type="button"
+              className={chip(on)}
+              onClick={() => onChange(on ? value.filter((x) => x !== f.id) : [...value, f.id])}
+            >
+              {f.name}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 type Props = {
   bookId: string;
@@ -33,6 +77,7 @@ export function RetailerLinks({ bookId }: Props) {
   const [selectedRetailer, setSelectedRetailer] = useState<RetailerKey>("amazon");
   const [customLabel, setCustomLabel] = useState("");
   const [url, setUrl] = useState("");
+  const [addFormats, setAddFormats] = useState<string[]>([]);
   const [addError, setAddError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -44,6 +89,7 @@ export function RetailerLinks({ bookId }: Props) {
   const [editing, setEditing] = useState<Record<string, boolean>>({});
   const [editLabel, setEditLabel] = useState<Record<string, string>>({});
   const [editUrl, setEditUrl] = useState<Record<string, string>>({});
+  const [editFormats, setEditFormats] = useState<Record<string, string[]>>({});
   const [editError, setEditError] = useState<Record<string, string>>({});
 
   // ── Load links ─────────────────────────────────────────────────────────────
@@ -75,6 +121,7 @@ export function RetailerLinks({ bookId }: Props) {
         retailer: selectedRetailer,
         url: url.trim(),
         label: customLabel.trim() || undefined,
+        formats: sellsFormats(selectedRetailer) ? addFormats : [],
       }),
     });
 
@@ -86,6 +133,7 @@ export function RetailerLinks({ bookId }: Props) {
       setLinks((prev) => [...prev, created]);
       setUrl("");
       setCustomLabel("");
+      setAddFormats([]);
       setAdding(false);
     }
     setSaving(false);
@@ -132,6 +180,7 @@ export function RetailerLinks({ bookId }: Props) {
     setEditing((e) => ({ ...e, [link.id]: true }));
     setEditLabel((l) => ({ ...l, [link.id]: link.label }));
     setEditUrl((u) => ({ ...u, [link.id]: link.url }));
+    setEditFormats((f) => ({ ...f, [link.id]: link.formats ?? [] }));
     setEditError((e) => ({ ...e, [link.id]: "" }));
   }
 
@@ -170,6 +219,7 @@ export function RetailerLinks({ bookId }: Props) {
       body: JSON.stringify({
         label: newLabel || undefined,
         url: newUrl,
+        formats: sellsFormats(link.retailer) ? (editFormats[link.id] ?? []) : [],
       }),
     });
 
@@ -197,7 +247,8 @@ export function RetailerLinks({ bookId }: Props) {
         <div>
           <h2 className="font-semibold text-gray-900">Buy Links</h2>
           <p className="text-xs text-gray-400 mt-0.5">
-            Add links for each retailer where this book is available. Deactivated links are hidden from your public site.
+            Add links for each retailer where this book is available, and pick which formats each one sells so readers
+            see the right stores under Ebook, Paperback and so on. Deactivated links are hidden from your public site.
           </p>
         </div>
         {!adding && (
@@ -270,6 +321,8 @@ export function RetailerLinks({ bookId }: Props) {
             </div>
           </div>
 
+          {sellsFormats(selectedRetailer) && <FormatChips value={addFormats} onChange={setAddFormats} />}
+
           {addError && <p className="text-xs text-red-600">{addError}</p>}
 
           <div className="flex gap-2">
@@ -282,7 +335,7 @@ export function RetailerLinks({ bookId }: Props) {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => { setAdding(false); setAddError(""); setUrl(""); setCustomLabel(""); }}
+              onClick={() => { setAdding(false); setAddError(""); setUrl(""); setCustomLabel(""); setAddFormats([]); }}
             >
               Cancel
             </Button>
@@ -344,6 +397,9 @@ export function RetailerLinks({ bookId }: Props) {
                         {link.url.length > 55 ? link.url.slice(0, 55) + "…" : link.url}
                         <ExternalLink className="h-3 w-3 flex-shrink-0" />
                       </a>
+                      {sellsFormats(link.retailer) && (
+                        <p className="text-[11px] text-gray-500 mt-0.5">Sells: {formatsSummary(link.formats ?? [])}</p>
+                      )}
                     </div>
 
                     {/* Status badge */}
@@ -421,6 +477,13 @@ export function RetailerLinks({ bookId }: Props) {
                         />
                       </div>
                     </div>
+
+                    {sellsFormats(link.retailer) && (
+                      <FormatChips
+                        value={editFormats[link.id] ?? []}
+                        onChange={(next) => setEditFormats((f) => ({ ...f, [link.id]: next }))}
+                      />
+                    )}
 
                     {error && <p className="text-xs text-red-600">{error}</p>}
 

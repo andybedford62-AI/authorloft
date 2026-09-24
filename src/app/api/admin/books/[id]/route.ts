@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
+import { parseFormatPrices } from "@/lib/book-formats";
 
 export async function GET(
   _req: NextRequest,
@@ -51,7 +52,7 @@ export async function PUT(
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId, priceCents,
     isbn, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
-    availableFormats, caption, releaseDate, flipBookUrl, sampleContent,
+    availableFormats, formatPrices, caption, releaseDate, flipBookUrl, sampleContent,
     isPreOrder, preOrderDate, autoSendLaunchEmail, showCountdown, launchDate,
   } = body;
 
@@ -122,6 +123,8 @@ export async function PUT(
         isbn: isbn || null,
         pageCount: pageCount || null,
         availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
+        // Absent (older clients) leaves prices alone; anything malformed is dropped.
+        formatPrices: formatPrices !== undefined ? parseFormatPrices(formatPrices) : undefined,
         caption:       caption       || null,
         releaseDate:   releaseDate ? new Date(releaseDate) : null,
         flipBookUrl:   flipBookUrl   || null,

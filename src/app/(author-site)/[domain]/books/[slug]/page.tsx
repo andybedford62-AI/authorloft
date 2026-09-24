@@ -15,6 +15,8 @@ import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-for
 import { LaunchCountdown } from "@/components/author-site/launch-countdown";
 import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
 import { ShareBar } from "@/components/author-site/share-bar";
+import { BookFormatBuy } from "@/components/author-site/book-format-buy";
+import { buildFormatOptions } from "@/lib/book-formats";
 import { accentAsSurface } from "@/lib/color-contrast";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
@@ -105,7 +107,7 @@ export default async function BookDetailPage({
       },
       retailerLinks: {
         where: { isActive: true },
-        select: { id: true, retailer: true, label: true, url: true },
+        select: { id: true, retailer: true, label: true, url: true, formats: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
       directSaleItems: {
@@ -161,6 +163,20 @@ export default async function BookDetailPage({
   const hasAudioTracks      = audioEnabled && book.audioTracks.length > 0;
 
   const isPreOrderActive = book.isPreOrder && (!book.preOrderDate || book.preOrderDate > new Date());
+
+  // Format-first buy area: one card per format with its price and the ways to
+  // buy it. Books with no formats and no direct items keep the plain button row.
+  const formatOptions = buildFormatOptions({
+    availableFormats: book.availableFormats,
+    formatPrices:     book.formatPrices,
+    retailerLinks:    book.retailerLinks,
+    paidItems:        paidSaleItems,
+    magnetItems,
+  });
+  const showFormatCards = !isPreOrderActive && hasBuyOptions && formatOptions.length > 0;
+  const formatCardsPriced = showFormatCards && formatOptions.some((o) => o.priceCents !== null);
+  // Goodreads is a review site — with format cards it sits with the book details.
+  const goodreadsLink = showFormatCards ? book.retailerLinks.find((l) => l.retailer === "goodreads") : undefined;
   const showLaunchCountdown = book.showCountdown && !!book.launchDate && book.launchDate > new Date();
   const preOrderLaunchLabel = book.preOrderDate
     ? new Date(book.preOrderDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
@@ -190,7 +206,16 @@ export default async function BookDetailPage({
     ...(book.language      && { inLanguage: book.language }),
     ...(book.releaseDate   && { datePublished: new Date(book.releaseDate).toISOString().split("T")[0] }),
     ...(book.genres.length > 0 && { genre: book.genres.map((g) => g.genre.name) }),
-    ...(book.priceCents > 0 && {
+    ...(formatCardsPriced ? {
+      offers: formatOptions.filter((o) => o.priceCents !== null).map((o) => ({
+        "@type":       "Offer",
+        name:          o.name,
+        price:         (o.priceCents! / 100).toFixed(2),
+        priceCurrency: "USD",
+        availability:  "https://schema.org/InStock",
+        url:           bookUrl,
+      })),
+    } : book.priceCents > 0 && {
       offers: {
         "@type":       "Offer",
         price:         (book.priceCents / 100).toFixed(2),
@@ -291,7 +316,7 @@ export default async function BookDetailPage({
             )}
 
             {/* Format badges under cover */}
-            {book.availableFormats.length > 0 && (
+            {book.availableFormats.length > 0 && !showFormatCards && (
               <div className="w-full">
                 <FormatBadges formats={book.availableFormats} size="sm" />
               </div>
@@ -386,8 +411,19 @@ export default async function BookDetailPage({
                 </div>
               )}
 
-              {book.priceCents > 0 && (
+              {book.priceCents > 0 && !formatCardsPriced && (
                 <p className="mt-3 text-2xl font-bold text-gray-900">{formatCents(book.priceCents)}</p>
+              )}
+
+              {goodreadsLink && (
+                <a
+                  href={goodreadsLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#553B08] hover:underline"
+                >
+                  ★ Reviews on Goodreads <ExternalLink className="h-3.5 w-3.5" />
+                </a>
               )}
 
               <div className="mt-4">
@@ -428,8 +464,22 @@ export default async function BookDetailPage({
               />
             )}
 
-            {/* Buy / Retailer buttons */}
-            {!isPreOrderActive && hasBuyOptions && (
+            {/* Buy area — format cards when the book has formats */}
+            {showFormatCards && (
+              <BookBuySection>
+                <BookFormatBuy
+                  options={formatOptions}
+                  book={{ id: book.id, slug: book.slug, title: book.title, coverImageUrl: book.coverImageUrl }}
+                  authorId={author.id}
+                  authorFirstName={authorName.split(" ")[0]}
+                  accentColor={accentColor}
+                  accentSurface={accentAsSurface(accentColor)}
+                />
+              </BookBuySection>
+            )}
+
+            {/* Buy / Retailer buttons — books with no formats listed */}
+            {!isPreOrderActive && hasBuyOptions && !showFormatCards && (
               <BookBuySection>
                 <div id="buy" className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                   <p className="text-sm font-semibold text-gray-700 mb-3">Get this book</p>

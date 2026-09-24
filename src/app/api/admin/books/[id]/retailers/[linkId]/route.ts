@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseLinkFormats } from "@/lib/book-formats";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 
@@ -31,6 +32,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   if (typeof body.isActive === "boolean") data.isActive = body.isActive;
   if (typeof body.label === "string" && body.label.trim()) data.label = body.label.trim();
   if (typeof body.url === "string" && body.url.trim()) data.url = body.url.trim();
+  if (Array.isArray(body.formats)) data.formats = parseLinkFormats(body.formats);
 
   const updated = await prisma.bookRetailerLink.update({
     where: { id: linkId },

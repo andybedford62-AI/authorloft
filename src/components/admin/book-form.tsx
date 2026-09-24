@@ -37,6 +37,8 @@ type BookData = {
   launchDate: string | null;   // YYYY-MM-DDTHH:MM string for datetime-local input
   genreIds: string[];
   availableFormats: string[];
+  /** Optional list price per format, in cents — see lib/book-formats. */
+  formatPrices?: Record<string, number>;
   caption: string | null;
   releaseDate: string | null;  // YYYY-MM-DD string for the date input
 };
@@ -240,6 +242,10 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [launchDate, setLaunchDate]               = useState(book?.launchDate ?? "");
   const [selectedGenres, setSelectedGenres]       = useState<string[]>(book?.genreIds ?? []);
   const [availableFormats, setAvailableFormats]   = useState<string[]>(book?.availableFormats ?? []);
+  // Dollar strings per format, as typed; converted to cents on save.
+  const [formatPrices, setFormatPrices]           = useState<Record<string, string>>(() =>
+    Object.fromEntries(Object.entries(book?.formatPrices ?? {}).map(([k, c]) => [k, (c / 100).toFixed(2)]))
+  );
   const [caption, setCaption]                     = useState(book?.caption ?? "");
   const [releaseDate, setReleaseDate]             = useState(book?.releaseDate ?? "");
 
@@ -341,6 +347,12 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       launchDate: launchDate || null,
       genreIds: selectedGenres,
       availableFormats,
+      // Only ticked formats keep a price; unticking a format drops its price.
+      formatPrices: Object.fromEntries(
+        availableFormats
+          .map((f) => [f, Math.round(parseFloat(formatPrices[f] ?? "") * 100)] as const)
+          .filter(([, c]) => Number.isFinite(c) && c > 0)
+      ),
       caption:     caption || null,
       releaseDate: releaseDate || null,
       priceCents:  retailPrice ? Math.round(parseFloat(retailPrice) * 100) : 0,
@@ -648,7 +660,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             onChange={(e) => setPageCount(e.target.value)} placeholder="e.g. 312" />
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">
-              Retail / Display Price
+              Display Price
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
@@ -662,7 +674,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                 className="block w-full rounded-md border border-gray-300 bg-white pl-6 pr-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
-            <p className="text-xs text-gray-400">Shown on the public book page. Leave blank to hide.</p>
+            <p className="text-xs text-gray-400">Shown only if you haven't set prices per format (Organisation tab).</p>
           </div>
         </div>
       </section>}
@@ -708,7 +720,9 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
         <div>
           <h2 className="font-semibold text-gray-900">Available Formats</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Check every format this book is available in. These appear as badges on the public book page.
+            Tick every format this book comes in. Each becomes a card on your book page. Add the list price you set
+            in KDP, IngramSpark etc. to show it on the card (optional; stores may charge less). Direct-sale prices
+            fill in automatically.
           </p>
         </div>
 
@@ -717,14 +731,14 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
             [
               { id: "EBOOK",     label: "eBook",      Icon: Tablet     },
               { id: "PAPERBACK", label: "Paperback",  Icon: BookOpen   },
-              { id: "HARDBACK",  label: "Hardback",   Icon: BookMarked },
+              { id: "HARDBACK",  label: "Hardcover",  Icon: BookMarked },
               { id: "AUDIOBOOK", label: "Audiobook",  Icon: Headphones },
             ] as const
           ).map(({ id, label, Icon }) => {
             const checked = availableFormats.includes(id);
             return (
+              <div key={id} className="space-y-1.5">
               <button
-                key={id}
                 type="button"
                 onClick={() =>
                   setAvailableFormats((prev) =>
@@ -747,6 +761,23 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
                   </span>
                 )}
               </button>
+              {checked && (
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputMode="decimal"
+                    aria-label={`${label} list price`}
+                    value={formatPrices[id] ?? ""}
+                    onChange={(e) => setFormatPrices((p) => ({ ...p, [id]: e.target.value }))}
+                    placeholder="List price"
+                    className="block w-full rounded-md border border-gray-300 bg-white pl-6 pr-3 py-1.5 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                </div>
+              )}
+              </div>
             );
           })}
         </div>

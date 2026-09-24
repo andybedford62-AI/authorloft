@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseLinkFormats } from "@/lib/book-formats";
 import { prisma } from "@/lib/db";
 import { getRetailer, RETAILER_KEYS } from "@/lib/retailers";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
@@ -40,7 +41,7 @@ export async function POST(
   if (!book) return NextResponse.json({ error: "Book not found" }, { status: 404 });
 
   const body = await req.json();
-  const { retailer, url, label: customLabel } = body;
+  const { retailer, url, label: customLabel, formats } = body;
 
   // Validate
   if (!retailer || !url) {
@@ -60,7 +61,7 @@ export async function POST(
   const count = await prisma.bookRetailerLink.count({ where: { bookId } });
 
   const link = await prisma.bookRetailerLink.create({
-    data: { bookId, retailer, label, url, sortOrder: count },
+    data: { bookId, retailer, label, url, formats: parseLinkFormats(formats), sortOrder: count },
   });
 
   return NextResponse.json(link, { status: 201 });

@@ -13,6 +13,27 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Format-first book page (price per format)
+
+Designed from an approved mockup (Anthony Bedford's *Night Dive*).
+
+- **Format cards replace the single price.** One card per format the book comes in
+  (Ebook / Paperback / Hardcover / Audiobook) with its price; picking one updates a
+  buy panel: buy direct first, then only the stores that sell that format. Phones get
+  a sideways-scrolling card row and a sticky price + buy bar while the panel is off
+  screen. Books with no formats and no direct items keep the old button row; the
+  single "Display Price" still shows when no format has a price.
+- **Prices are per format, never per retailer** (retailer prices drift; Amazon's
+  affiliate terms restrict showing prices not fetched from their API). New optional
+  list price per ticked format on the book editor (`Book.formatPrices`); a direct-sale
+  item's price overrides it on its card. JSON-LD emits one Offer per priced format.
+- **Stores per format.** Buy Links get a "Sells" picker (`BookRetailerLink.formats`,
+  empty = all formats, so existing links are unchanged). Etsy added as a retailer.
+  Goodreads moves out of the buy buttons to a "Reviews on Goodreads" link by the title.
+- Logic in `src/lib/book-formats.ts` (`buildFormatOptions`), unit-tested; UI in
+  `components/author-site/book-format-buy.tsx`. Migration `20260924_book_format_prices`
+  (additive). Also: course editor Price and Published date now side by side.
+
 ## September 24, 2026 — Published dates on courses and music
 
 - **Courses get a Published date.** Optional date on the course editor (new courses

@@ -395,6 +395,7 @@ model Book {
   flipBookUrl                String?
   externalBuyUrl             String?
   availableFormats           String[]
+  formatPrices               Json? // optional list price per format, cents: { "EBOOK": 699, "PAPERBACK": 1499 } — see lib/book-formats
   caption                    String?
   releaseDate                DateTime?
   isFeatured                 Boolean              @default(false)
@@ -644,6 +645,7 @@ model BookRetailerLink {
   retailer  String
   label     String
   url       String
+  formats   String[] @default([]) // which book formats this store sells; empty = all
   isActive  Boolean  @default(true)
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())

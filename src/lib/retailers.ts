@@ -70,6 +70,12 @@ export const RETAILERS = {
     color:        "#1E7B45",
     badgeBg:      "#EBF5EF",
   },
+  etsy: {
+    label:        "Buy on Etsy",
+    shortLabel:   "Etsy",
+    color:        "#C2410C",
+    badgeBg:      "#FFF3EC",
+  },
   custom: {
     label:        "Buy Now",
     shortLabel:   "Custom",
