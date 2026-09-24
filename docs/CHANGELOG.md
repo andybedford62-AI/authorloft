@@ -13,6 +13,37 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Content-aware nav (Books / Courses / Music)
+
+Author sites no longer link to empty sections. The Books, Courses and Music
+menu links now need **plan allows it (Courses/Music) AND the toggle is on AND
+at least one item is published** — one rule (`contentLinkState` in
+`src/lib/site-pages.ts`) shared by the public header, the footer, the
+dashboard's "Your Site Pages" card and the admin hidden-page banner.
+
+- The header and footer each had their own copy of the link rules and had
+  drifted: the header skipped the plan check on Courses, the footer skipped it
+  on Courses *and* Music. Both now render a list the layout builds once with
+  `getPublicNavLinks()`; their private builders are gone.
+- `getAuthorContentPresence()` is wrapped in React `cache()`, so the layout
+  (menu), homepage (hero focus) and music-palette check share one set of
+  counts per request.
+- Admin: `getNavPageVisibility` gains `emptyBlocked`; the banner on the
+  Books/Courses/Music screens says the link will appear once something is
+  published (not "switch it on" when it already is), and the Navigation Menu
+  toggles show "Hidden until you publish …" with an amber dot.
+- Out of scope, unchanged: Specials / Flip Books / News, homepage sections,
+  and `/courses` / `/music` routes (a bookmarked link still resolves).
+- Impact at ship time: 1 of 12 active sites loses a Music link that pointed at
+  an empty page.
+- Tests: `nav-page-visibility.test.ts` (142 cases) covers the content rule, the
+  two drift regressions, and public-menu ↔ admin agreement across plan/toggle/
+  content combinations; mutation-checked (removing the content check fails 3).
+  `plan-gate-selects.test.ts` now checks the Music gate by behaviour instead of
+  matching source text. Also fixed `author-site-canonicals` — the phase-1 music
+  page used `alternates: { canonical }` shorthand the test's pattern didn't
+  match (the canonical itself was always correct).
+
 ## September 24, 2026 — Vercel Web Analytics
 
 Added `@vercel/analytics` (2.0.1) and `<Analytics />` in the root layout

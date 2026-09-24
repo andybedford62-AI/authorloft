@@ -16,6 +16,7 @@ import { SitePagesCard } from "@/components/admin/site-pages-card";
 import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
 import { SocialPromoteNudge } from "@/components/admin/social-promote-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import { getAuthorContentPresence } from "@/lib/author-queries";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 async function getDashboardData(authorId: string) {
@@ -208,7 +209,7 @@ function ChecklistRow({
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
 
-  const [data, authorMeta, customPages, courseCount, musicCount] = await Promise.all([
+  const [data, authorMeta, customPages, courseCount, musicCount, contentPresence] = await Promise.all([
     getDashboardData(authorId),
     prisma.author.findUnique({
       where: { id: authorId },
@@ -256,6 +257,7 @@ export default async function DashboardPage() {
     }),
     prisma.course.count({ where: { authorId, kind: "COURSE" } }),
     prisma.course.count({ where: { authorId, kind: "MUSIC" } }),
+    getAuthorContentPresence(authorId),
   ]);
 
   // ── Setup checklist state ────────────────────────────────────────────────
@@ -437,6 +439,7 @@ export default async function DashboardPage() {
         <SitePagesCard
           baseUrl={getAuthorBaseUrl({ slug: authorMeta.slug, customDomain: authorMeta.customDomain })}
           author={authorMeta}
+          presence={contentPresence}
           customPages={customPages}
         />
       )}

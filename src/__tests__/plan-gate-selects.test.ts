@@ -9,6 +9,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
+import { getPublicNavLinks, type AuthorNavFlags } from "@/lib/site-pages";
 
 // Files whose Plan select feeds a nav/plan gate.
 const FILES = [
@@ -31,7 +32,19 @@ describe("Plan selects keep parallel feature gates in step", () => {
 
   it("the nav registry gates Music on the plan flag, not just the toggle", () => {
     // Both halves matter: plan flag AND the author's own show/hide choice.
-    const src = read("src/lib/site-pages.ts");
-    expect(src).toMatch(/musicEnabled\s*&&\s*author\.navShowMusic/);
+    // Checked by behaviour rather than by matching source text, so a refactor
+    // of how the rule is written can't break (or fake) this.
+    const author = {
+      navShowAbout: true, navShowBooks: true, navShowSpecials: true, navShowFlipBooks: true,
+      navShowBlog: true, navShowContact: true, navShowMediaKit: true, navShowCourses: true,
+      navShowBundles: true, navShowMusic: true,
+      plan: { flipBooksLimit: 0, mediaKitEnabled: true, coursesEnabled: true, bundlesEnabled: true, musicEnabled: true },
+    } as AuthorNavFlags;
+    const presence = { hasBooks: true, hasCourses: true, hasMusic: true };
+    const hasMusic = (a: AuthorNavFlags) => getPublicNavLinks(a, presence).some((l) => l.href === "/music");
+
+    expect(hasMusic(author)).toBe(true);
+    expect(hasMusic({ ...author, plan: { ...author.plan!, musicEnabled: false } })).toBe(false);
+    expect(hasMusic({ ...author, navShowMusic: false })).toBe(false);
   });
 });

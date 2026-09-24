@@ -1,4 +1,5 @@
 // Reusable database queries for the public author site
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { notFound, permanentRedirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -102,16 +103,21 @@ export async function getAuthorBooks(authorId: string) {
 
 export type ContentPresence = { hasBooks: boolean; hasCourses: boolean; hasMusic: boolean };
 
-/** Whether an author has any *published* content of each type — used to gate which
- *  options the Hero Focus picker offers (see resolveHeroFocus in @/lib/site-pages). */
-export async function getAuthorContentPresence(authorId: string): Promise<ContentPresence> {
+/** Whether an author has any *published* content of each type — gates the
+ *  Books/Courses/Music menu links (see contentLinkState in @/lib/site-pages)
+ *  and which options the Hero Focus picker offers (resolveHeroFocus).
+ *
+ *  Wrapped in React cache(): the author-site layout (menu), the homepage (hero)
+ *  and the music-palette check all ask for it on the same request, and this
+ *  way they share one set of counts. */
+export const getAuthorContentPresence = cache(async (authorId: string): Promise<ContentPresence> => {
   const [books, courses, music] = await Promise.all([
     prisma.book.count({ where: { authorId, isPublished: true } }),
     prisma.course.count({ where: { authorId, kind: "COURSE", isPublished: true } }),
     prisma.course.count({ where: { authorId, kind: "MUSIC", isPublished: true } }),
   ]);
   return { hasBooks: books > 0, hasCourses: courses > 0, hasMusic: music > 0 };
-}
+});
 
 /**
  * Whether a FREE-tier author qualifies for the Music Genre Palette content

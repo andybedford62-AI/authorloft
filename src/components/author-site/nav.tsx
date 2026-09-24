@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/context/cart-context";
+import type { PublicNavLink } from "@/lib/site-pages";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,12 +25,6 @@ interface NavConfig {
   navShowMusic:     boolean;
 }
 
-interface CustomPage {
-  slug:     string;
-  title:    string;
-  navTitle: string | null;
-}
-
 interface NavProps {
   author: {
     id:           string;
@@ -45,7 +40,9 @@ interface NavProps {
     homeTemplate?: string | null;
   };
   navConfig?:   NavConfig;
-  customPages?: CustomPage[];
+  /** Built once by the layout via getPublicNavLinks (@/lib/site-pages) — the
+   *  same list the footer uses, so the two menus can't disagree. */
+  links:        PublicNavLink[];
 }
 
 // ── Template → nav variant ───────────────────────────────────────────────────
@@ -84,51 +81,13 @@ function navTokens(dark: boolean) {
 
 // ── Nav link builder ─────────────────────────────────────────────────────────
 
-function buildNavLinks(
-  showFlipBooks: boolean,
-  showMusic: boolean,
-  config?: NavConfig,
-  customPages?: CustomPage[]
-) {
-  const links: { label: string; href: string }[] = [
-    { label: "Home", href: "/" },
-  ];
-
-  // Bundles no longer gets its own nav link -- it's a tab on the Books page
-  // (see books-bundles-tabs.tsx) now, still gated by navShowBundles there.
-  // Courses stays fully independent of Books/Bundles so a course-only
-  // creator who turns Books off entirely still has Courses reachable.
-  if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
-  if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
-  if (showMusic && config?.navShowMusic) links.push({ label: "Music",      href: "/music" });
-  if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
-  if (showFlipBooks && (!config || config.navShowFlipBooks))
-                                         links.push({ label: "Flip Books", href: "/flip-books" });
-  if (config?.navShowBlog)               links.push({ label: "News",       href: "/blog" });
-
-  for (const page of customPages ?? []) {
-    links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
-  }
-
-  if (!config || config.navShowAbout)   links.push({ label: "About",     href: "/about" });
-  if (!config || config.navShowContact) links.push({ label: "Contact",   href: "/contact" });
-  // Media Kit no longer gets its own nav link either -- it's a tab on the
-  // About page (see about-media-kit-tabs.tsx) now, still gated by
-  // mediaKitEnabled + navShowMediaKit there.
-
-  return links;
-}
-
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function AuthorNav({ author, navConfig, customPages }: NavProps) {
+export function AuthorNav({ author, navConfig, links }: NavProps) {
   const [open, setOpen]     = useState(false);
   const { data: session }   = useSession();
   const pathname            = usePathname();
   const isOwner             = !!(session?.user && (session.user as any).id === author.id);
-  const showFlipBooks       = (author.plan?.flipBooksLimit ?? 0) !== 0;
-  const showMusic           = author.plan?.musicEnabled ?? false;
-  const links               = buildNavLinks(showFlipBooks, showMusic, navConfig, customPages);
   const accentColor         = author.accentColor;
   const { itemCount, openCart } = useCart();
   const dark                = isDarkTemplate(author.homeTemplate);

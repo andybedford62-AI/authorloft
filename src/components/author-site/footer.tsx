@@ -2,27 +2,9 @@ import Link from "next/link";
 import { NewsletterModalButton } from "./newsletter-modal";
 import { SiteQrCode } from "./site-qr-code";
 import { getAuthorBaseUrl } from "@/lib/site-url";
+import type { PublicNavLink } from "@/lib/site-pages";
 
 // ── Types ────────────────────────────────────────────────────────────────────
-
-interface NavConfig {
-  navShowAbout:     boolean;
-  navShowBooks:     boolean;
-  navShowSpecials:  boolean;
-  navShowFlipBooks: boolean;
-  navShowBlog:      boolean;
-  navShowContact:   boolean;
-  navShowMediaKit:  boolean;
-  navShowBundles?:  boolean;
-  navShowCourses?:  boolean;
-  navShowMusic?:    boolean;
-}
-
-interface CustomPage {
-  slug:     string;
-  title:    string;
-  navTitle: string | null;
-}
 
 interface FooterProps {
   author: {
@@ -40,49 +22,20 @@ interface FooterProps {
     accentColor:    string;
     plan?:          { flipBooksLimit: number; tier?: string } | null;
   };
-  navConfig?:    NavConfig;
-  customPages?:  CustomPage[];
+  /** The header menu's list (getPublicNavLinks); the footer shows it minus Home. */
+  links:         PublicNavLink[];
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildQuickLinks(
-  config?: NavConfig,
-  customPages?: CustomPage[],
-  showFlipBooks?: boolean,
-): { label: string; href: string }[] {
-  const links: { label: string; href: string }[] = [];
-
-  // Bundles and Media Kit don't get their own quick links -- they're tabs
-  // on Books and About respectively now (see books-bundles-tabs.tsx and
-  // about-media-kit-tabs.tsx), matching the main nav (nav.tsx).
-  if (!config || config.navShowBooks)    links.push({ label: "Books",      href: "/books" });
-  if (config?.navShowCourses)           links.push({ label: "Courses",    href: "/courses" });
-  if (config?.navShowMusic)             links.push({ label: "Music",      href: "/music" });
-  if (!config || config.navShowSpecials) links.push({ label: "Specials",   href: "/specials" });
-  if (showFlipBooks && (!config || config.navShowFlipBooks))
-                                         links.push({ label: "Flip Books", href: "/flip-books" });
-  if (config?.navShowBlog)               links.push({ label: "News",       href: "/blog" });
-
-  for (const page of customPages ?? []) {
-    links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
-  }
-
-  if (!config || config.navShowAbout)    links.push({ label: "About",     href: "/about" });
-  if (!config || config.navShowContact)  links.push({ label: "Contact",   href: "/contact" });
-
-  return links;
-}
-
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function AuthorFooter({ author, navConfig, customPages }: FooterProps) {
+export function AuthorFooter({ author, links }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const firstName    = displayName.split(" ")[0];
   const year         = new Date().getFullYear();
-  const showFlipBooks = (author.plan?.flipBooksLimit ?? 0) !== 0;
   const showPoweredBy = (author.plan?.tier ?? "FREE") === "FREE";
-  const quickLinks   = buildQuickLinks(navConfig, customPages, showFlipBooks);
+  const quickLinks   = links.filter((l) => l.href !== "/");
   const siteUrl      = getAuthorBaseUrl(author);
   // Env-var based, matching nav.tsx -- a hardcoded authorloft.com here would
   // send an author signing in from staging to the production login instead.

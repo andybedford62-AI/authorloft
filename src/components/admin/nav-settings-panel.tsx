@@ -25,7 +25,18 @@ interface NavSettingsPanelProps {
   bundlesEnabled: boolean;
   coursesEnabled: boolean;
   musicEnabled: boolean;
+  /** Published-content presence: a Books/Courses/Music link that's switched on
+   *  still stays off the live site until something is published (see
+   *  contentLinkState in @/lib/site-pages), and the row says so. */
+  presence: { hasBooks: boolean; hasCourses: boolean; hasMusic: boolean };
 }
+
+/** Which presence flag holds each content link back, and what to publish. */
+const CONTENT_GATE: Partial<Record<keyof NavSettings, { flag: "hasBooks" | "hasCourses" | "hasMusic"; noun: string }>> = {
+  navShowBooks:   { flag: "hasBooks",   noun: "a book" },
+  navShowCourses: { flag: "hasCourses", noun: "a course" },
+  navShowMusic:   { flag: "hasMusic",   noun: "a music list" },
+};
 
 // Alphabetical by label (Home stays pinned above this list, rendered separately below).
 const BUILT_IN_ITEMS = [
@@ -117,7 +128,7 @@ const BUILT_IN_ITEMS = [
   },
 ];
 
-export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, bundlesEnabled, coursesEnabled, musicEnabled }: NavSettingsPanelProps) {
+export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, bundlesEnabled, coursesEnabled, musicEnabled, presence }: NavSettingsPanelProps) {
   const [settings, setSettings] = useState<NavSettings>(initial);
   const [saving, setSaving] = useState<keyof NavSettings | null>(null);
   const [saved, setSaved] = useState<keyof NavSettings | null>(null);
@@ -170,6 +181,9 @@ export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, b
         const isOn = settings[item.key];
         const isSaving = saving === item.key;
         const isSaved = saved === item.key;
+        const gate = CONTENT_GATE[item.key];
+        // On, but held back from the live menu until something is published.
+        const heldBack = isOn && !!gate && !presence[gate.flag];
 
         return (
           <div
@@ -183,14 +197,20 @@ export function NavSettingsPanel({ initial, flipBooksEnabled, mediaKitEnabled, b
               <div
                 className={cn(
                   "w-2 h-2 rounded-full flex-shrink-0 transition-colors",
-                  isOn ? "bg-green-400" : "bg-gray-300"
+                  heldBack ? "bg-amber-400" : isOn ? "bg-green-400" : "bg-gray-300"
                 )}
               />
               <div>
                 <span className="text-sm font-medium text-gray-700">{item.label}</span>
                 <span className="ml-2 text-xs text-gray-400">{item.href}</span>
               </div>
-              <span className="text-xs text-gray-400 hidden sm:inline">{item.description}</span>
+              {heldBack ? (
+                <span className="text-xs text-amber-700">
+                  Hidden until you publish {gate!.noun}
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400 hidden sm:inline">{item.description}</span>
+              )}
             </div>
 
             <div className="flex items-center gap-3">

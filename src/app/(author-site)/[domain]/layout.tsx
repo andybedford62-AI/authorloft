@@ -1,7 +1,8 @@
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { redirectIfRetiredSlug, getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
+import { redirectIfRetiredSlug, getAuthorQualifiesForMusicPalette, getAuthorContentPresence } from "@/lib/author-queries";
+import { getPublicNavLinks, type AuthorNavFlags } from "@/lib/site-pages";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -165,6 +166,16 @@ export default async function AuthorSiteLayout({
     navShowMusic: author.navShowMusic,
   };
 
+  // Books/Courses/Music links only show when something is actually published
+  // (see contentLinkState in @/lib/site-pages). Cached per request, so the
+  // homepage hero and palette check below reuse these counts.
+  const presence = await getAuthorContentPresence(author.id);
+  const navLinks = getPublicNavLinks(
+    author as unknown as AuthorNavFlags,
+    presence,
+    customNavPages
+  );
+
   // Enforce plan-based theme access at render time
   const planTier = author.plan?.tier ?? "FREE";
   const hasMusicContent = await getAuthorQualifiesForMusicPalette(author.id, author.siteTheme, planTier);
@@ -210,11 +221,11 @@ export default async function AuthorSiteLayout({
           <AuthorNav
             author={authorWithAccent}
             navConfig={navConfig}
-            customPages={customNavPages}
+            links={navLinks}
           />
           <CartDrawer />
           <main className="min-h-screen">{children}</main>
-          <AuthorFooter author={authorWithAccent} navConfig={navConfig} customPages={customNavPages} />
+          <AuthorFooter author={authorWithAccent} links={navLinks} />
         </div>
       </CartProvider>
     </AdminSessionProvider>

@@ -1,5 +1,6 @@
-// Builds the list of live public pages for an author's site, matching the
-// links shown in their site nav (see components/author-site/nav.tsx).
+// The rules for which pages an author's site links to. getPublicNavLinks feeds
+// the public header and footer; getAuthorSitePages and getNavPageVisibility are
+// the admin views of the same rules (contentLinkState is shared by all three).
 
 import type { ContentPresence } from "@/lib/author-queries";
 
@@ -54,22 +55,90 @@ export interface AuthorCustomPage {
   navTitle: string | null;
 }
 
+/** The three catalog types whose menu link also needs something published. */
+type ContentNavKey = "books" | "courses" | "music";
+
+/**
+ * THE rule for the Books / Courses / Music menu links, used by the public nav,
+ * the footer and every admin view of them:
+ *
+ *   plan allows it (Courses, Music)  AND  the author's toggle is on
+ *                                    AND  at least one item is published
+ *
+ * The content check exists so a site never links to an empty page — e.g. a
+ * music list created then deleted (the create route switches the toggle on,
+ * nothing ever switches it back off), or a new author who hasn't published a
+ * book yet. The toggle still wins in the other direction: authors can hide a
+ * section they have content for.
+ */
+function contentLinkState(author: AuthorNavFlags, presence: ContentPresence, key: ContentNavKey) {
+  const plan = author.plan;
+  const planBlocked =
+    key === "courses" ? !plan?.coursesEnabled : key === "music" ? !plan?.musicEnabled : false;
+  const toggleOn =
+    key === "books" ? author.navShowBooks : key === "courses" ? author.navShowCourses : author.navShowMusic;
+  const hasContent =
+    key === "books" ? presence.hasBooks : key === "courses" ? presence.hasCourses : presence.hasMusic;
+  return { visible: !planBlocked && toggleOn && hasContent, planBlocked, toggleOn, hasContent };
+}
+
+export interface PublicNavLink {
+  label: string;
+  href: string;
+}
+
+/**
+ * Links for the author site's header menu (Home first) — the footer uses the
+ * same list minus Home. One builder for both, because separate copies in
+ * nav.tsx and footer.tsx had already drifted (the footer skipped the plan
+ * checks on Courses and Music; the header skipped it on Courses).
+ *
+ * Bundles and Media Kit are deliberately absent: they're tabs on Books and
+ * About now (books-bundles-tabs.tsx / about-media-kit-tabs.tsx), not links.
+ */
+export function getPublicNavLinks(
+  author: AuthorNavFlags,
+  presence: ContentPresence,
+  customPages: AuthorCustomPage[] = []
+): PublicNavLink[] {
+  const links: PublicNavLink[] = [{ label: "Home", href: "/" }];
+
+  if (contentLinkState(author, presence, "books").visible)   links.push({ label: "Books",   href: "/books" });
+  if (contentLinkState(author, presence, "courses").visible) links.push({ label: "Courses", href: "/courses" });
+  if (contentLinkState(author, presence, "music").visible)   links.push({ label: "Music",   href: "/music" });
+  if (author.navShowSpecials) links.push({ label: "Specials", href: "/specials" });
+  if ((author.plan?.flipBooksLimit ?? 0) !== 0 && author.navShowFlipBooks) {
+    links.push({ label: "Flip Books", href: "/flip-books" });
+  }
+  if (author.navShowBlog) links.push({ label: "News", href: "/blog" });
+
+  for (const page of customPages) {
+    links.push({ label: page.navTitle || page.title, href: `/${page.slug}` });
+  }
+
+  if (author.navShowAbout)   links.push({ label: "About",   href: "/about" });
+  if (author.navShowContact) links.push({ label: "Contact", href: "/contact" });
+
+  return links;
+}
+
 export function getAuthorSitePages(
   author: AuthorNavFlags,
+  presence: ContentPresence,
   customPages: AuthorCustomPage[] = []
 ): AuthorSitePage[] {
   const pages: AuthorSitePage[] = [{ label: "Home", path: "/" }];
 
-  if (author.navShowBooks) pages.push({ label: "Books", path: "/books" });
+  if (contentLinkState(author, presence, "books").visible) pages.push({ label: "Books", path: "/books" });
   if (author.plan?.bundlesEnabled && author.navShowBundles) {
     // Bundles is now a tab on /books (see books-bundles-tabs.tsx), not its
     // own page -- link straight there instead of through the /bundles redirect.
     pages.push({ label: "Bundles", path: "/books?tab=bundles" });
   }
-  if (author.plan?.coursesEnabled && author.navShowCourses) {
+  if (contentLinkState(author, presence, "courses").visible) {
     pages.push({ label: "Courses", path: "/courses" });
   }
-  if (author.plan?.musicEnabled && author.navShowMusic) {
+  if (contentLinkState(author, presence, "music").visible) {
     pages.push({ label: "Music", path: "/music" });
   }
   if (author.navShowSpecials) pages.push({ label: "Specials", path: "/specials" });
@@ -104,6 +173,10 @@ export type NavPageVisibility = {
   /** True when the plan itself excludes the feature — a different problem from
    *  the author having switched the menu item off, and a different fix. */
   planBlocked: boolean;
+  /** Books/Courses/Music only: plan allows it and the toggle is on, but nothing
+   *  is published yet, so the link is held back. The fix is to publish, not to
+   *  flip a toggle that's already on. */
+  emptyBlocked: boolean;
   label: string;
   path: string;
 };
@@ -115,39 +188,41 @@ export type NavPageVisibility = {
  */
 export function getNavPageVisibility(
   author: AuthorNavFlags,
+  presence: ContentPresence,
   key: NavPageKey
 ): NavPageVisibility {
   const plan = author.plan;
+  const content = (k: ContentNavKey, label: string, path: string): NavPageVisibility => {
+    const st = contentLinkState(author, presence, k);
+    return {
+      visible: st.visible,
+      planBlocked: st.planBlocked,
+      emptyBlocked: !st.planBlocked && st.toggleOn && !st.hasContent,
+      label, path,
+    };
+  };
   switch (key) {
     case "books":
-      return { visible: author.navShowBooks, planBlocked: false, label: "Books", path: "/books" };
+      return content("books", "Books", "/books");
     case "bundles":
       return {
         visible: !!plan?.bundlesEnabled && author.navShowBundles,
-        planBlocked: !plan?.bundlesEnabled,
+        planBlocked: !plan?.bundlesEnabled, emptyBlocked: false,
         label: "Bundles", path: "/books?tab=bundles",
       };
     case "courses":
-      return {
-        visible: !!plan?.coursesEnabled && author.navShowCourses,
-        planBlocked: !plan?.coursesEnabled,
-        label: "Courses", path: "/courses",
-      };
+      return content("courses", "Courses", "/courses");
     case "music":
-      return {
-        visible: !!plan?.musicEnabled && author.navShowMusic,
-        planBlocked: !plan?.musicEnabled,
-        label: "Music", path: "/music",
-      };
+      return content("music", "Music", "/music");
     case "specials":
-      return { visible: author.navShowSpecials, planBlocked: false, label: "Specials", path: "/specials" };
+      return { visible: author.navShowSpecials, planBlocked: false, emptyBlocked: false, label: "Specials", path: "/specials" };
     case "flipBooks":
       return {
         visible: (plan?.flipBooksLimit ?? 0) !== 0 && author.navShowFlipBooks,
-        planBlocked: (plan?.flipBooksLimit ?? 0) === 0,
+        planBlocked: (plan?.flipBooksLimit ?? 0) === 0, emptyBlocked: false,
         label: "Flip Books", path: "/flip-books",
       };
     case "blog":
-      return { visible: author.navShowBlog, planBlocked: false, label: "News", path: "/blog" };
+      return { visible: author.navShowBlog, planBlocked: false, emptyBlocked: false, label: "News", path: "/blog" };
   }
 }

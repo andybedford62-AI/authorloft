@@ -6,6 +6,7 @@ import { PagesListClient } from "@/components/admin/pages-list-client";
 import { Plus, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { getAuthorContentPresence } from "@/lib/author-queries";
 
 export default async function AdminPagesPage() {
   const authorId = await getAdminAuthorId();
@@ -92,6 +93,7 @@ export default async function AdminPagesPage() {
           bundlesEnabled={!!(author.plan as any)?.bundlesEnabled}
           coursesEnabled={!!(author.plan as any)?.coursesEnabled}
           musicEnabled={!!(author.plan as any)?.musicEnabled}
+          presence={await getAuthorContentPresence(authorId)}
         />
       </section>
 

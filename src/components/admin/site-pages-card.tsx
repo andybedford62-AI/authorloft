@@ -1,16 +1,19 @@
 import Link from "next/link";
 import { ExternalLink, Globe, ChevronRight } from "lucide-react";
 import { getAuthorSitePages, type AuthorNavFlags, type AuthorCustomPage } from "@/lib/site-pages";
+import type { ContentPresence } from "@/lib/author-queries";
 import { SitemapUrlPill } from "./sitemap-url-pill";
 
 interface Props {
   baseUrl: string;
   author: AuthorNavFlags;
+  /** Books/Courses/Music only list when something is published — same rule as the live menu. */
+  presence: ContentPresence;
   customPages?: AuthorCustomPage[];
 }
 
-export function SitePagesCard({ baseUrl, author, customPages }: Props) {
-  const pages = getAuthorSitePages(author, customPages);
+export function SitePagesCard({ baseUrl, author, presence, customPages }: Props) {
+  const pages = getAuthorSitePages(author, presence, customPages);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

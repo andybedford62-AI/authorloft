@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { EyeOff, Lock } from "lucide-react";
+import { EyeOff, Lock, Info } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getAuthorContentPresence } from "@/lib/author-queries";
 import { getNavPageVisibility, type NavPageKey, type AuthorNavFlags } from "@/lib/site-pages";
 
 // Shown at the top of a catalog screen when the matching public page is hidden
@@ -18,7 +19,7 @@ export async function NavVisibilityBanner({
   authorId: string;
   navKey: NavPageKey;
 }) {
-  const author = await prisma.author.findUnique({
+  const [author, presence] = await Promise.all([prisma.author.findUnique({
     where: { id: authorId },
     select: {
       navShowAbout: true, navShowBooks: true, navShowSpecials: true,
@@ -32,12 +33,13 @@ export async function NavVisibilityBanner({
         },
       },
     },
-  }).catch(() => null);
+  }).catch(() => null), getAuthorContentPresence(authorId)]);
 
   if (!author) return null;
 
-  const { visible, planBlocked, label, path } = getNavPageVisibility(
+  const { visible, planBlocked, emptyBlocked, label, path } = getNavPageVisibility(
     author as unknown as AuthorNavFlags,
+    presence,
     navKey
   );
   if (visible) return null;
@@ -53,6 +55,23 @@ export async function NavVisibilityBanner({
           won&apos;t appear on your site.{" "}
           <Link href="/admin/settings" className="underline font-medium">Upgrade your plan</Link>{" "}
           to publish it.
+        </span>
+      </div>
+    );
+  }
+
+  // Toggle is on and the plan allows it, there's just nothing published yet —
+  // the site holds the link back so visitors never land on an empty page.
+  // Informational, not a warning: publishing the first item fixes it.
+  if (emptyBlocked) {
+    const noun = navKey === "books" ? "a book" : navKey === "courses" ? "a course" : "a music list";
+    return (
+      <div className="flex items-start gap-2.5 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-800">
+        <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
+        <span>
+          Your <strong>{label}</strong> menu link is switched on, but it won&apos;t appear on
+          your site until you publish {noun} — so visitors never land on an empty page.
+          It shows up automatically once you do.
         </span>
       </div>
     );

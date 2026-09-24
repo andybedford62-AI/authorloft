@@ -62,7 +62,7 @@ export async function generateMetadata({
 
   const artist = author.displayName || author.name;
   const label = releaseLabel(list.releaseType);
-  const canonical = `${getAuthorBaseUrl(author)}/music/${slug}`;
+  const canonicalUrl = `${getAuthorBaseUrl(author)}/music/${slug}`;
   const tracks = flattenTracks(list);
 
   // A `?track=` link previews as that song — its own title and artwork — so a
@@ -90,12 +90,12 @@ export async function generateMetadata({
   return {
     title: shared ? shared.lesson.title : list.title,
     description,
-    alternates: { canonical },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       type: "music.playlist",
       title,
       description,
-      url: canonical,
+      url: canonicalUrl,
       siteName: artist,
       ...(image && { images: [{ url: image, alt: shared?.lesson.title ?? list.title }] }),
     },
