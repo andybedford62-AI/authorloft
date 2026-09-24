@@ -43,6 +43,16 @@ out to social from both sides:
 - Shared logic in `src/lib/music-share.ts`, covered by
   `src/__tests__/music-share.test.ts`.
 
+**Phase 2, same day — music track editor.** The editor's track list was one
+input stack per track (≈150 fields at 50 tracks). Tracks are now compact rows
+— number, artwork (saved thumbnail, or derived from a YouTube link as you
+type), title, provider/"plays inline" badge, note indicator — that expand to
+edit. Drag-and-drop reorder from a grip handle (armed only from the handle, so
+text selection in an open row never starts a drag); ▲/▼ kept as arrow buttons
+for keyboard users and on phones, where HTML5 drag doesn't work. Expand all /
+Collapse all, new tracks open straight into editing, and removing a filled-in
+track now asks first. Client-only `uid` keys (stripped from the save payload).
+
 ## September 23, 2026 — Music Genre Palettes unlocked for FREE-tier musicians
 
 A content-specific perk, not a plan change: a FREE author who publishes music

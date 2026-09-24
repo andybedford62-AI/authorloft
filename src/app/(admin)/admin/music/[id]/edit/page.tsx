@@ -46,6 +46,7 @@ export default async function EditMusicListPage({
       // containing an image survives a save that didn't change the wording.
       description: (l.contentHtml ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
       originalHtml: l.contentHtml ?? "",
+      thumbnailUrl: l.thumbnailUrl,
     }))
   );
 

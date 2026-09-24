@@ -1,23 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle, Store, Lock,
+  ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { MusicHelpModal } from "@/components/admin/music-help-modal";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
-import { resolveTrackLink, providerLabel } from "@/lib/music-links";
+import { resolveTrackLink, providerLabel, type ResolvedTrackLink } from "@/lib/music-links";
 import { RELEASE_TYPES, type MusicReleaseType } from "@/lib/music-share";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
 // Delete, ghost = Cancel.
 
-type TrackRow = { url: string; title: string; description: string; originalHtml: string };
+/** What the edit page hands in; `uid` is added client-side. */
+type InitialTrack = {
+  url: string;
+  title: string;
+  description: string;
+  originalHtml: string;
+  /** Saved artwork, so link-card tracks (Suno etc.) show their art in the row. */
+  thumbnailUrl?: string | null;
+};
+
+/** `uid` is a client-only stable key: rows reorder and expand independently,
+ *  so the array index can't be the React key. Never sent to the API. */
+type TrackRow = InitialTrack & { uid: string };
 
 interface Props {
   /** Absent when creating. */
@@ -30,7 +43,7 @@ interface Props {
     isFeatured: boolean;
     listInBookstore: boolean;
     releaseType: MusicReleaseType;
-    tracks: TrackRow[];
+    tracks: InitialTrack[];
   };
   /** Plan cap on tracks; null = unlimited. */
   trackCap: number | null;
@@ -38,7 +51,17 @@ interface Props {
   bookstoreEnabled?: boolean;
 }
 
-const blankTrack = (): TrackRow => ({ url: "", title: "", description: "", originalHtml: "" });
+let uidSeq = 0;
+const nextUid = () => `t${++uidSeq}`;
+const blankTrack = (): TrackRow => ({ uid: nextUid(), url: "", title: "", description: "", originalHtml: "" });
+
+/** Row artwork: saved thumbnail, else derived from a YouTube link as you type. */
+function rowThumbnail(track: TrackRow, link: ResolvedTrackLink | null): string | null {
+  if (link?.provider === "youtube" && link.embedUrl) {
+    return `https://i.ytimg.com/vi/${link.embedUrl.split("/embed/")[1]}/mqdefault.jpg`;
+  }
+  return track.thumbnailUrl ?? null;
+}
 
 const inputClass =
   "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
@@ -54,7 +77,19 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [listInBookstore, setListInBookstore] = useState(initial?.listInBookstore ?? false);
   const [releaseType, setReleaseType] = useState<MusicReleaseType>(initial?.releaseType ?? "PLAYLIST");
-  const [tracks, setTracks] = useState<TrackRow[]>(initial?.tracks ?? [blankTrack()]);
+  const [tracks, setTracks] = useState<TrackRow[]>(() =>
+    initial?.tracks?.length ? initial.tracks.map((t) => ({ ...t, uid: nextUid() })) : [blankTrack()]
+  );
+  // Rows start collapsed so a 50-track list is scannable; empty rows (a new
+  // list, or a freshly added track) open straight into editing.
+  const [expanded, setExpanded] = useState<Set<string>>(
+    () => new Set(tracks.filter((t) => !t.url.trim()).map((t) => t.uid))
+  );
+  // Drag only arms from the grip handle, so selecting text inside an open
+  // row's inputs never starts a drag by accident.
+  const [armedUid, setArmedUid] = useState<string | null>(null);
+  const dragUid = useRef<string | null>(null);
+  const [draggingUid, setDraggingUid] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -66,6 +101,37 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
 
   function updateTrack(i: number, patch: Partial<TrackRow>) {
     setTracks((prev) => prev.map((t, idx) => (idx === i ? { ...t, ...patch } : t)));
+  }
+  function toggleExpanded(uid: string) {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid);
+      else next.add(uid);
+      return next;
+    });
+  }
+  function addTrack() {
+    const t = blankTrack();
+    setTracks((p) => [...p, t]);
+    setExpanded((prev) => new Set(prev).add(t.uid));
+  }
+  function handleDragEnter(uid: string) {
+    const from = dragUid.current;
+    if (!from || from === uid) return;
+    setTracks((prev) => {
+      const list = [...prev];
+      const a = list.findIndex((t) => t.uid === from);
+      const b = list.findIndex((t) => t.uid === uid);
+      if (a === -1 || b === -1) return prev;
+      const [item] = list.splice(a, 1);
+      list.splice(b, 0, item);
+      return list;
+    });
+  }
+  function endDrag() {
+    dragUid.current = null;
+    setDraggingUid(null);
+    setArmedUid(null);
   }
   function move(i: number, dir: -1 | 1) {
     setTracks((prev) => {
@@ -90,7 +156,10 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         isFeatured,
         listInBookstore,
         releaseType,
-        tracks: tracks.filter((t) => t.url.trim()),  // description + originalHtml ride along
+        // description + originalHtml ride along; uid/thumbnailUrl are client-only.
+        tracks: tracks
+          .filter((t) => t.url.trim())
+          .map(({ url, title, description, originalHtml }) => ({ url, title, description, originalHtml })),
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
         method: isEdit ? "PATCH" : "POST",
@@ -253,66 +322,175 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         </div>
         <p className="text-xs text-gray-500 mb-4">
           Paste a public link — YouTube and Spotify play inline; Suno and other sites open in a new tab.
-          Leave the title blank to use the one from the linked page.
+          Drag the handle to reorder; click a track to edit it.
         </p>
 
-        <div className="space-y-3">
+        {tracks.length > 1 && (
+          <div className="flex justify-end gap-3 mb-2 text-xs">
+            <button type="button" className="text-gray-500 hover:text-gray-800" onClick={() => setExpanded(new Set(tracks.map((t) => t.uid)))}>
+              Expand all
+            </button>
+            <button type="button" className="text-gray-500 hover:text-gray-800" onClick={() => setExpanded(new Set())}>
+              Collapse all
+            </button>
+          </div>
+        )}
+
+        <ol className="space-y-2">
           {tracks.map((track, i) => {
             const link = track.url.trim() ? resolveTrackLink(track.url.trim()) : null;
             const invalid = track.url.trim() !== "" && link === null;
+            const isOpen = expanded.has(track.uid);
+            const thumb = rowThumbnail(track, link);
             return (
-              <div key={i} className="flex items-start gap-2">
-                <div className="flex flex-col pt-2 text-gray-300">
-                  <button type="button" onClick={() => move(i, -1)} className="hover:text-gray-600 leading-none" title="Move up">▲</button>
-                  <GripVertical className="h-3 w-3 my-0.5" />
-                  <button type="button" onClick={() => move(i, 1)} className="hover:text-gray-600 leading-none" title="Move down">▼</button>
-                </div>
-                <div className="flex-1 space-y-1.5">
-                  <input
-                    value={track.url}
-                    onChange={(e) => updateTrack(i, { url: e.target.value })}
-                    className={inputClass}
-                    placeholder="https://open.spotify.com/track/… or https://youtu.be/…"
-                  />
-                  <input
-                    value={track.title}
-                    onChange={(e) => updateTrack(i, { title: e.target.value })}
-                    className={inputClass}
-                    placeholder="Track title (optional)"
-                  />
-                  <textarea
-                    value={track.description}
-                    onChange={(e) => updateTrack(i, { description: e.target.value })}
-                    rows={2}
-                    className={inputClass}
-                    placeholder="Short note about this track (optional)"
-                  />
-                  {invalid && (
-                    <p className="text-xs text-red-600">Not a usable https link.</p>
-                  )}
-                  {link && (
-                    <p className="text-xs text-gray-500">
-                      {providerLabel(link.provider)} — {link.mode === "embed" ? "plays inline" : "opens in a new tab"}
-                      <a href={link.canonicalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 ml-2 underline">
-                        preview <ExternalLink className="h-3 w-3" />
-                      </a>
+              <li
+                key={track.uid}
+                draggable={armedUid === track.uid}
+                onDragStart={(e) => {
+                  dragUid.current = track.uid;
+                  setDraggingUid(track.uid);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragEnter={() => handleDragEnter(track.uid)}
+                onDragOver={(e) => e.preventDefault()}
+                onDragEnd={endDrag}
+                // Any press outside the handle disarms, so a press that started on
+                // the handle but never became a drag can't leave the row draggable.
+                onMouseDownCapture={(e) => {
+                  if (!(e.target as HTMLElement).closest("[data-drag-handle]")) setArmedUid(null);
+                }}
+                className={`rounded-lg border bg-white transition-colors ${
+                  draggingUid === track.uid ? "opacity-40 border-blue-300" : invalid ? "border-red-300" : "border-gray-200"
+                }`}
+              >
+                {/* ── Compact row ─────────────────────────────────────────── */}
+                <div className="flex items-center gap-2 p-2">
+                  <span
+                    data-drag-handle
+                    onMouseDown={() => setArmedUid(track.uid)}
+                    onMouseUp={() => setArmedUid(null)}
+                    className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 px-0.5"
+                    title="Drag to reorder"
+                    aria-hidden
+                  >
+                    <GripVertical className="h-4 w-4" />
+                  </span>
+                  <span className="w-5 text-right text-xs font-medium text-gray-400 tabular-nums flex-shrink-0">{i + 1}</span>
+                  <div className="w-16 h-9 rounded bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {thumb ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={thumb} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <Music2 className="h-4 w-4 text-gray-300" />
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleExpanded(track.uid)}
+                    className="flex-1 min-w-0 text-left"
+                    aria-expanded={isOpen}
+                  >
+                    <p className={`text-sm truncate ${track.title.trim() ? "text-gray-900 font-medium" : "text-gray-400 italic"}`}>
+                      {track.title.trim() || (track.url.trim() ? "Title from link on save" : "New track — paste a link")}
                     </p>
-                  )}
+                    <p className="text-xs truncate flex items-center gap-1.5">
+                      {invalid ? (
+                        <span className="text-red-600">Not a usable https link</span>
+                      ) : link ? (
+                        <span className="text-gray-500">
+                          {providerLabel(link.provider)} · {link.mode === "embed" ? "plays inline" : "opens in new tab"}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">No link yet</span>
+                      )}
+                      {track.description.trim() && (
+                        <span className="inline-flex items-center gap-0.5 text-gray-400" title="Has a note">
+                          <StickyNote className="h-3 w-3" /> note
+                        </span>
+                      )}
+                    </p>
+                  </button>
+                  {/* Arrow buttons stay for keyboard and touch users — HTML5
+                      drag-and-drop doesn't work on phones. */}
+                  <div className="hidden sm:flex items-center">
+                    <button type="button" onClick={() => move(i, -1)} disabled={i === 0}
+                      className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+                      title="Move up" aria-label={`Move track ${i + 1} up`}>
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button type="button" onClick={() => move(i, 1)} disabled={i === tracks.length - 1}
+                      className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+                      title="Move down" aria-label={`Move track ${i + 1} down`}>
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <button type="button" onClick={() => toggleExpanded(track.uid)}
+                    className="p-1.5 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                    title={isOpen ? "Collapse" : "Edit"} aria-label={isOpen ? "Collapse track" : "Edit track"}>
+                    {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                  <Button type="button" variant="ghost" onClick={() => {
+                    // Removing a filled-in track loses its link and note; a blank row doesn't need asking.
+                    if (track.url.trim() && !confirm(`Remove "${track.title.trim() || "this track"}" from the list?`)) return;
+                    setTracks((p) => p.filter((t) => t.uid !== track.uid));
+                  }} title="Remove track">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button type="button" variant="ghost" onClick={() => setTracks((p) => p.filter((_, idx) => idx !== i))} title="Remove track">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+
+                {/* ── Expanded editor ─────────────────────────────────────── */}
+                {isOpen && (
+                  <div className="px-3 pb-3 pt-1 space-y-1.5 border-t border-gray-100">
+                    <label className="block text-[11px] font-semibold text-gray-500 mt-1.5">Link</label>
+                    <input
+                      value={track.url}
+                      onChange={(e) => updateTrack(i, { url: e.target.value })}
+                      className={inputClass}
+                      placeholder="https://open.spotify.com/track/… or https://youtu.be/…"
+                      autoFocus={!track.url}
+                    />
+                    <label className="block text-[11px] font-semibold text-gray-500 pt-1">Title</label>
+                    <input
+                      value={track.title}
+                      onChange={(e) => updateTrack(i, { title: e.target.value })}
+                      className={inputClass}
+                      placeholder="Optional — leave blank to use the linked page's title"
+                    />
+                    <label className="block text-[11px] font-semibold text-gray-500 pt-1">Note</label>
+                    <textarea
+                      value={track.description}
+                      onChange={(e) => updateTrack(i, { description: e.target.value })}
+                      rows={2}
+                      className={inputClass}
+                      placeholder="Short note about this track (optional)"
+                    />
+                    {link && (
+                      <a href={link.canonicalUrl} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-gray-500 underline">
+                        Preview on {providerLabel(link.provider)} <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                    <div className="flex sm:hidden gap-2 pt-1">
+                      <Button type="button" variant="outline" onClick={() => move(i, -1)} disabled={i === 0}>
+                        <ArrowUp className="h-3.5 w-3.5 mr-1" /> Up
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => move(i, 1)} disabled={i === tracks.length - 1}>
+                        <ArrowDown className="h-3.5 w-3.5 mr-1" /> Down
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </li>
             );
           })}
-        </div>
+        </ol>
 
         <Button
           type="button"
           variant="outline"
           className="mt-4"
           disabled={atCap}
-          onClick={() => setTracks((p) => [...p, blankTrack()])}
+          onClick={addTrack}
         >
           <Plus className="h-4 w-4 mr-2" /> Add track
         </Button>
