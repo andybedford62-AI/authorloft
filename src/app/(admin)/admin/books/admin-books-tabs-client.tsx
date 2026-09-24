@@ -14,6 +14,7 @@ type Tab = "my-books" | "book-shelf" | "arcs";
 type BookRow = {
   id: string;
   title: string;
+  slug: string;
   subtitle: string | null;
   coverImageUrl: string | null;
   description: string | null;
@@ -32,9 +33,11 @@ interface Props {
   books:       BookRow[];
   booksLayout: string;
   planTier:    string;
+  /** Author site root; book pages are `${publicBaseUrl}/books/${slug}`. */
+  publicBaseUrl: string;
 }
 
-export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
+export function AdminBooksTabsClient({ books, booksLayout, planTier, publicBaseUrl }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("my-books");
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -76,7 +79,7 @@ export function AdminBooksTabsClient({ books, booksLayout, planTier }: Props) {
             </Link>
           </div>
         ) : (
-          <BooksListClient initialBooks={books} />
+          <BooksListClient initialBooks={books} publicBaseUrl={publicBaseUrl} />
         )
       )}
 

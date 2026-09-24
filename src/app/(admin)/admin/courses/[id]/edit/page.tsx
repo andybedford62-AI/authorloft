@@ -4,6 +4,8 @@ import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { CourseForm } from "@/components/admin/course-form";
+import { ShareKit } from "@/components/admin/share-kit";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -22,7 +24,7 @@ export default async function EditCoursePage({ params }: Props) {
         categories: { select: { categoryId: true } },
       },
     }),
-    prisma.author.findUnique({ where: { id: authorId }, select: { plan: { select: { tier: true } } } }),
+    prisma.author.findUnique({ where: { id: authorId }, select: { slug: true, customDomain: true, name: true, displayName: true, plan: { select: { tier: true } } } }),
     // Course Categories are one shared, platform-wide list (Super Admin-curated)
     // — every author picks from the same tree, so this is deliberately NOT
     // filtered by authorId. See docs/CHANGELOG.md Aug 17 2026.
@@ -60,6 +62,18 @@ export default async function EditCoursePage({ params }: Props) {
         <h1 className="text-2xl font-bold text-gray-900">Edit Course</h1>
         <p className="text-sm text-gray-500 mt-1">Update the curriculum and details for this course.</p>
       </div>
+
+      {author && (
+        <ShareKit
+          kind="course"
+          itemId={course.id}
+          url={`${getAuthorBaseUrl(author)}/courses/${course.slug}`}
+          slug={course.slug}
+          title={course.title}
+          creatorName={author.displayName || author.name}
+          isPublished={course.isPublished}
+        />
+      )}
 
       <CourseForm
         mode="edit"

@@ -8,7 +8,7 @@ import {
 import { resolveTrackLink, providerLabel, type ResolvedTrackLink } from "@/lib/music-links";
 import { accentAsSurface, accentAsTextOn } from "@/lib/color-contrast";
 import { taggedUrl, listenPlatform } from "@/lib/music-share";
-import { MusicShareBar, shareOrCopy } from "@/components/author-site/music-share-bar";
+import { ShareBar, shareOrCopy } from "@/components/author-site/share-bar";
 
 // Click-to-play, mirroring book-preview-gallery: only the playing track loads an
 // iframe, so a 50-track list costs one embed instead of fifty. That's what keeps
@@ -270,7 +270,7 @@ export function MusicTrackList({
             )}
           </div>
         )}
-        <MusicShareBar
+        <ShareBar
           url={share.url}
           title={hero.title}
           text={shareText}

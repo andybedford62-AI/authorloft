@@ -9,20 +9,27 @@ import { FeaturedStarButton } from "@/components/admin/featured-star-button";
 import { formatCents } from "@/lib/utils";
 
 import { cspSafeImageSrc } from "@/lib/csp-safe-image";
+import { getAuthorBaseUrl } from "@/lib/site-url";
+import { ShareRowActions } from "@/components/admin/share-row-actions";
+
 export default async function AdminCoursesPage() {
   const authorId = await getAdminAuthorId();
 
-  const courses = await prisma.course.findMany({
-    where: { authorId, kind: "COURSE" },
-    include: {
-      modules: {
-        include: { lessons: { select: { id: true } } },
-        orderBy: { sortOrder: "asc" },
+  const [courses, author] = await Promise.all([
+    prisma.course.findMany({
+      where: { authorId, kind: "COURSE" },
+      include: {
+        modules: {
+          include: { lessons: { select: { id: true } } },
+          orderBy: { sortOrder: "asc" },
+        },
+        _count: { select: { enrollments: true } },
       },
-      _count: { select: { enrollments: true } },
-    },
-    orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
-  });
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+    }),
+    prisma.author.findUnique({ where: { id: authorId }, select: { slug: true, customDomain: true } }),
+  ]);
+  const publicBaseUrl = author ? getAuthorBaseUrl(author) : "";
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -130,6 +137,13 @@ export default async function AdminCoursesPage() {
                     {course.priceCents === 0 ? "Free" : formatCents(course.priceCents)}
                   </p>
                 </div>
+
+                {/* Share shortcuts — published only; z-10 lifts them above the row link. */}
+                {course.isPublished && (
+                  <div className="relative z-10">
+                    <ShareRowActions url={`${publicBaseUrl}/courses/${course.slug}`} title={course.title} />
+                  </div>
+                )}
 
                 <FeaturedStarButton
                   endpoint={`/api/admin/courses/${course.id}/feature`}

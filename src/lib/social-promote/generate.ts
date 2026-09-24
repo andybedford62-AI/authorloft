@@ -5,13 +5,15 @@ import { calcCostMicroCents } from "./pricing";
 import { assemblePrompt, type AssemblyInputs } from "./prompt-assembly";
 import { checkCostCeilingsAfterGen } from "./cost-alerts";
 import { getAuthorBaseUrl } from "@/lib/site-url";
-import { releaseLabel, taggedUrl } from "@/lib/music-share";
+import { releaseLabel } from "@/lib/music-share";
+import { taggedUrl } from "@/lib/share";
+import { formatCents } from "@/lib/utils";
 
 export type GenerateRequest = {
   authorId:      string;
   platformId:    string;
   promoTypeId:   string;
-  contextType:   "book" | "news" | "topic" | "music";
+  contextType:   "book" | "course" | "news" | "topic" | "music";
   contextRefId:  string | null;
   topicText:     string | null;
   ipAddress:     string | null;
@@ -117,6 +119,38 @@ export async function generateSocialPost(req: GenerateRequest): Promise<Generate
       },
     };
     contextSummary = list.title;
+  } else if (req.contextType === "course") {
+    if (!req.contextRefId) {
+      return { ok: false, postId: null, status: "FAILED", userMessage: "Please pick a course.", errorDetail: "contextRefId required for course context" };
+    }
+    // Published only: the post links to the public page, which 404s for a draft.
+    const [course, site] = await Promise.all([
+      prisma.course.findFirst({
+        where:  { id: req.contextRefId, authorId: req.authorId, kind: "COURSE", isPublished: true },
+        select: {
+          title: true, slug: true, description: true, priceCents: true,
+          modules: { orderBy: { sortOrder: "asc" }, select: { title: true, lessons: { select: { isPreview: true } } } },
+        },
+      }),
+      prisma.author.findUnique({ where: { id: req.authorId }, select: { slug: true, customDomain: true } }),
+    ]);
+    if (!course || !site) {
+      return { ok: false, postId: null, status: "FAILED", userMessage: "Course not found.", errorDetail: "Course missing, unpublished or not owned" };
+    }
+    assemblyContext = {
+      type: "course",
+      course: {
+        title:        course.title,
+        description:  course.description,
+        price:        course.priceCents === 0 ? "Free" : formatCents(course.priceCents),
+        moduleTitles: course.modules.map((m) => m.title),
+        lessonCount:  course.modules.reduce((n, m) => n + m.lessons.length, 0),
+        previewLessonCount: course.modules.reduce((n, m) => n + m.lessons.filter((l) => l.isPreview).length, 0),
+        // Tagged with the platform so Traffic Sources credits the network the post went out on.
+        url: taggedUrl(`${getAuthorBaseUrl(site)}/courses/${course.slug}`, platform.slug, course.slug),
+      },
+    };
+    contextSummary = course.title;
   } else if (req.contextType === "news") {
     if (!req.contextRefId) {
       return { ok: false, postId: null, status: "FAILED", userMessage: "Please pick a news post.", errorDetail: "contextRefId required for news context" };

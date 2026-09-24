@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Sparkles, Lock, Check, Loader2, Copy, RefreshCw, AlertTriangle,
-  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil, X, Newspaper, Music2,
+  ChevronDown, ChevronUp, Mic, ShieldAlert, ArrowRight, BookOpen, Pencil, X, Newspaper, Music2, GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { AuthorPromoteContext } from "@/lib/social-promote/author-context";
 import { releaseLabel } from "@/lib/music-share";
 
-type ContextType = "book" | "news" | "topic" | "music" | "";
+type ContextType = "book" | "course" | "news" | "topic" | "music" | "";
+
+/** From `?book=`, `?course=` or `?music=` — an editor's share kit links here pre-selected. */
+export type PromotePreselect = { type: "book" | "course" | "music"; id: string } | null;
 
 type GenResult = {
   postId: string;
@@ -23,21 +26,20 @@ type GenResult = {
 
 export function PromotePanel({
   context: ctx,
-  initialMusicId,
+  preselect = null,
 }: {
   context: AuthorPromoteContext;
-  /** From `?music=<id>` — the music editor's share kit links here pre-selected. */
-  initialMusicId?: string | null;
+  preselect?: PromotePreselect;
 }) {
   // ── Free / disabled gates ────────────────────────────────────────────────
   if (!ctx.planAllowed) return <UpgradeCard />;
   if (!ctx.enabled)     return <UnavailableCard reason="Social Promote is temporarily unavailable. Please check back soon." />;
   if (ctx.costCeilingHit) return <UnavailableCard reason="Today's platform-wide cost ceiling has been reached. The generator will resume tomorrow." />;
 
-  return <Flow context={ctx} initialMusicId={initialMusicId} />;
+  return <Flow context={ctx} preselect={preselect} />;
 }
 
-function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext; initialMusicId?: string | null }) {
+function Flow({ context: ctx, preselect }: { context: AuthorPromoteContext; preselect: PromotePreselect }) {
   const router = useRouter();
   const [voice, setVoice] = useState<string>(ctx.voice ?? "");
   const [savingVoice, setSavingVoice] = useState(false);
@@ -45,13 +47,19 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
   const [voiceOpen, setVoiceOpen] = useState(!ctx.voice);
 
   // No defaults — every selection is deliberate to prevent accidental token burn.
-  // The one exception is arriving from a music list's "Write a post" link,
+  // The one exception is arriving from an editor's "Write a post with AI" link,
   // which has already said what the post is about (platform + promo type are
-  // still picked by hand, so nothing generates on its own).
-  const preselectedMusic = initialMusicId && ctx.musicLists.some((m) => m.id === initialMusicId) ? initialMusicId : "";
-  const [contextType, setContextType] = useState<ContextType>(preselectedMusic ? "music" : "");
-  const [musicId, setMusicId] = useState<string>(preselectedMusic);
-  const [bookId, setBookId] = useState<string>("");
+  // still picked by hand, so nothing generates on its own). An id that isn't
+  // in the author's published list is ignored.
+  const pre = preselect && (
+    preselect.type === "book"   ? ctx.books.some((b) => b.id === preselect.id)
+  : preselect.type === "course" ? ctx.courses.some((c) => c.id === preselect.id)
+  : ctx.musicLists.some((m) => m.id === preselect.id)
+  ) ? preselect : null;
+  const [contextType, setContextType] = useState<ContextType>(pre?.type ?? "");
+  const [musicId, setMusicId] = useState<string>(pre?.type === "music" ? pre.id : "");
+  const [bookId, setBookId] = useState<string>(pre?.type === "book" ? pre.id : "");
+  const [courseId, setCourseId] = useState<string>(pre?.type === "course" ? pre.id : "");
   const [newsId, setNewsId] = useState<string>("");
   const [topicText, setTopicText] = useState<string>("");
   const [platformSlug, setPlatformSlug] = useState<string>("");
@@ -79,7 +87,8 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
 
   // Step completion state
   const step1Done =
-    contextType === "book"  ? !!bookId
+    contextType === "book"   ? !!bookId
+  : contextType === "course" ? !!courseId
   : contextType === "news"  ? !!newsId
   : contextType === "topic" ? topicText.trim().length > 0
   : contextType === "music" ? !!musicId
@@ -91,11 +100,12 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
   const selectedBook     = ctx.books.find((b) => b.id === bookId);
   const selectedNews     = ctx.newsPosts.find((n) => n.id === newsId);
   const selectedMusic    = ctx.musicLists.find((m) => m.id === musicId);
+  const selectedCourse   = ctx.courses.find((c) => c.id === courseId);
   const selectedPlatform = ctx.platforms.find((p) => p.slug === platformSlug);
   const selectedPromo    = ctx.promoTypes.find((t) => t.slug === promoTypeSlug);
 
   function reset() {
-    setContextType(""); setBookId(""); setNewsId(""); setTopicText(""); setMusicId("");
+    setContextType(""); setBookId(""); setNewsId(""); setTopicText(""); setMusicId(""); setCourseId("");
     setPlatformSlug(""); setPromoTypeSlug("");
     setResult(null); setError(null);
   }
@@ -144,7 +154,8 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
         promoTypeSlug,
         contextType,
         contextRefId:
-            contextType === "book"  ? bookId
+            contextType === "book"   ? bookId
+          : contextType === "course" ? courseId
           : contextType === "news"  ? newsId
           : contextType === "music" ? musicId
           : null,
@@ -220,13 +231,7 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
   const overLimit = result && result.maxChars > 0 && charsUsed > result.maxChars;
   const isRemoved = (tag: string) => Array.from(removedHashtags).some((t) => t.toLowerCase() === tag.toLowerCase());
 
-  const canGenerate =
-    !!platformSlug &&
-    !!promoTypeSlug &&
-    !atLimit &&
-    (contextType === "book"  ? !!bookId
-   : contextType === "news"  ? !!newsId
-   : topicText.trim().length > 0);
+  const choiceCount = 3 + (ctx.courses.length > 0 ? 1 : 0) + (ctx.musicLists.length > 0 ? 1 : 0);
 
   return (
     <div className="space-y-3">
@@ -290,6 +295,8 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
         summary={
           step1Done && contextType === "book" && selectedBook
             ? `📖 ${selectedBook.title}`
+            : step1Done && contextType === "course" && selectedCourse
+            ? `🎓 ${selectedCourse.title}`
             : step1Done && contextType === "news" && selectedNews
             ? `📰 ${selectedNews.title}`
             : step1Done && contextType === "music" && selectedMusic
@@ -299,9 +306,11 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
             : null
         }
       >
-        {/* Music only appears for authors who've published some — a book-only
-            author never sees a permanently-disabled fourth option. */}
-        <div className={`grid gap-2 ${ctx.musicLists.length > 0 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
+        {/* Courses and music only appear for authors who've published some — a
+            book-only author never sees permanently-disabled extra options. */}
+        <div className={`grid gap-2 ${
+          choiceCount === 3 ? "grid-cols-3" : choiceCount === 4 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-3"
+        }`}>
           <ContextChoice
             icon={BookOpen}
             label="One of your books"
@@ -318,6 +327,15 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
             disabled={ctx.newsPosts.length === 0}
             onClick={() => { setContextType("news"); setBookId(""); setNewsId(""); setTopicText(""); setPromoTypeSlug(""); }}
           />
+          {ctx.courses.length > 0 && (
+            <ContextChoice
+              icon={GraduationCap}
+              label="Your courses"
+              hint={`${ctx.courses.length} published`}
+              selected={contextType === "course"}
+              onClick={() => { setContextType("course"); setCourseId(""); setPromoTypeSlug(""); }}
+            />
+          )}
           {ctx.musicLists.length > 0 && (
             <ContextChoice
               icon={Music2}
@@ -351,6 +369,27 @@ function Flow({ context: ctx, initialMusicId }: { context: AuthorPromoteContext;
                 <option key={b.id} value={b.id}>{b.title}{b.subtitle ? ` — ${b.subtitle}` : ""}</option>
               ))}
             </select>
+          </div>
+        )}
+
+        {contextType === "course" && ctx.courses.length > 0 && (
+          <div className="mt-3 p-3 rounded-md bg-purple-50/40 border border-purple-100">
+            <label className="block text-xs font-semibold text-gray-900 mb-1.5">
+              Which course? <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={courseId}
+              onChange={(e) => { setCourseId(e.target.value); setPromoTypeSlug(""); }}
+              className="w-full border border-purple-200 rounded-md px-2.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">— Pick one of your courses —</option>
+              {ctx.courses.map((c) => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+            <p className="text-[11px] text-gray-500 mt-1">
+              The post includes a tracked link to its public page, so you can see which network sent students.
+            </p>
           </div>
         )}
 

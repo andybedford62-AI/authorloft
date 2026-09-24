@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Check, ExternalLink, GripVertical, Link2, ListMusic, Store } from "lucide-react";
+import { GripVertical, ListMusic, Store } from "lucide-react";
+import { ShareRowActions } from "@/components/admin/share-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { FeaturedStarButton } from "@/components/admin/featured-star-button";
 import { releaseLabel } from "@/lib/music-share";
@@ -29,18 +30,6 @@ export function MusicListClient({
   /** Author's public site root; list URLs are `${publicBaseUrl}/music/${slug}`. */
   publicBaseUrl: string;
 }) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  async function copyLink(list: MusicListRow) {
-    try {
-      await navigator.clipboard.writeText(`${publicBaseUrl}/music/${list.slug}`);
-      setCopiedId(list.id);
-      setTimeout(() => setCopiedId((c) => (c === list.id ? null : c)), 2000);
-    } catch {
-      /* clipboard blocked */
-    }
-  }
-
   const [lists, setLists] = useState<MusicListRow[]>(initialLists);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
@@ -161,27 +150,7 @@ export function MusicListClient({
 
           {/* Share shortcuts — published lists only; a draft's URL would 404. */}
           {list.isPublished && (
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => copyLink(list)}
-                title="Copy public link"
-                aria-label={`Copy public link for ${list.title}`}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                {copiedId === list.id ? <Check className="h-4 w-4 text-emerald-600" /> : <Link2 className="h-4 w-4" />}
-              </button>
-              <a
-                href={`${publicBaseUrl}/music/${list.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="View live page"
-                aria-label={`View ${list.title} live`}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </div>
+            <ShareRowActions url={`${publicBaseUrl}/music/${list.slug}`} title={list.title} />
           )}
 
           <FeaturedStarButton

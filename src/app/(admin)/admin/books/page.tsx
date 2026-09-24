@@ -7,6 +7,7 @@ import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
 import { BooksListClient } from "./books-list-client";
 import { BookShelfPicker } from "./book-shelf-picker";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 export default async function AdminBooksPage() {
   const authorId = await getAdminAuthorId();
@@ -17,6 +18,7 @@ export default async function AdminBooksPage() {
       select: {
         id: true,
         title: true,
+        slug: true,
         subtitle: true,
         coverImageUrl: true,
         description: true,
@@ -34,12 +36,13 @@ export default async function AdminBooksPage() {
     }),
     prisma.author.findUnique({
       where: { id: authorId },
-      select: { booksLayout: true, plan: { select: { tier: true } } },
+      select: { slug: true, customDomain: true, booksLayout: true, plan: { select: { tier: true } } },
     }),
   ]);
 
   const booksLayout = author?.booksLayout ?? "list";
   const planTier    = author?.plan?.tier ?? "FREE";
+  const publicBaseUrl = author ? getAuthorBaseUrl(author) : "";
 
   const incompleteBooks = books.filter((b) => !getBookCompletionSummary({
     coverImageUrl:        b.coverImageUrl,
@@ -123,6 +126,7 @@ export default async function AdminBooksPage() {
           books={books}
           booksLayout={booksLayout}
           planTier={planTier}
+          publicBaseUrl={publicBaseUrl}
         />
       )}
     </div>
@@ -136,16 +140,19 @@ function AdminBooksTabs({
   books,
   booksLayout,
   planTier,
+  publicBaseUrl,
 }: {
   books: any[];
   booksLayout: string;
   planTier: string;
+  publicBaseUrl: string;
 }) {
   return (
     <AdminBooksTabsClient
       books={books}
       booksLayout={booksLayout}
       planTier={planTier}
+      publicBaseUrl={publicBaseUrl}
     />
   );
 }

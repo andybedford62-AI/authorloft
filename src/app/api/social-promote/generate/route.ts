@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
 import { checkPlatformAvailable, checkAuthorEntitlement } from "@/lib/social-promote/limits";
-import { generateSocialPost } from "@/lib/social-promote/generate";
+import { generateSocialPost, type GenerateRequest } from "@/lib/social-promote/generate";
 import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({} as any));
   const { platformSlug, promoTypeSlug, contextType, contextRefId, topicText } = body;
 
-  if (!["book", "news", "topic", "music"].includes(contextType)) {
+  if (!["book", "course", "news", "topic", "music"].includes(contextType)) {
     return NextResponse.json({ error: "Invalid context type." }, { status: 400 });
   }
 
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     authorId,
     platformId:   platform.id,
     promoTypeId:  promoType.id,
-    contextType:  contextType as "book" | "news" | "topic" | "music",
+    contextType:  contextType as GenerateRequest["contextType"],
     contextRefId: contextRefId ?? null,
     topicText:    topicText    ?? null,
     ipAddress,

@@ -9,6 +9,8 @@ import { getAuthorBaseUrl } from "@/lib/site-url";
 import { formatCents } from "@/lib/utils";
 import { CourseBuyButton } from "./course-buy-button";
 import { CourseFeedbackForm } from "@/components/author-site/course-feedback-form";
+import { ShareBar } from "@/components/author-site/share-bar";
+import { accentAsSurface } from "@/lib/color-contrast";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -148,8 +150,17 @@ export default async function CourseDetailPage({
             {course.title}
           </h1>
           {course.description && (
-            <p className="text-gray-600 leading-relaxed mb-8">{course.description}</p>
+            <p className="text-gray-600 leading-relaxed mb-5">{course.description}</p>
           )}
+          <div className="mb-8">
+            <ShareBar
+              url={`${getAuthorBaseUrl(author)}/courses/${course.slug}`}
+              title={course.title}
+              text={`Check out "${course.title}", a course by ${author.displayName || author.name}`}
+              campaign={course.slug}
+              accentSurface={accentAsSurface(accentColor)}
+            />
+          </div>
 
           {/* Curriculum outline */}
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">

@@ -4,13 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, Copy, ExternalLink, EyeOff, Share2, ChevronDown, Sparkles } from "lucide-react";
 import { BookQRCode } from "@/components/admin/book-qr-code";
-import { shareIntentUrl, taggedUrl } from "@/lib/music-share";
+import { shareIntentUrl, taggedUrl } from "@/lib/share";
 
-// Everything a musician needs to push a list out, in one card on the editor:
-// the live URL, per-network tagged links (so PostHog shows which network sent
-// the listeners), one-click post buttons, a ready caption and a QR code.
-// TikTok and Instagram have no web share intent, so they get a copyable bio
-// link instead of a post button.
+// Everything an author needs to push a book, course or music list out, in one
+// card on its editor: the live URL, one-click post buttons, per-network tagged
+// links (so Traffic Sources shows which network sent the visitors), a ready
+// caption, a QR code and a jump into Social Promote. TikTok and Instagram have
+// no web share intent, so they get a copyable bio link instead of a post button.
+
+export type ShareKind = "book" | "course" | "music";
 
 const TAGGED: { source: string; label: string; hint: string }[] = [
   { source: "instagram", label: "Instagram", hint: "Bio link or Story link sticker" },
@@ -20,6 +22,14 @@ const TAGGED: { source: string; label: string; hint: string }[] = [
   { source: "youtube",   label: "YouTube",   hint: "Video description" },
   { source: "newsletter", label: "Newsletter / email", hint: "Email campaigns" },
 ];
+
+const AUDIENCE: Record<ShareKind, string> = { book: "readers", course: "students", music: "listeners" };
+
+const QR_BLURB: Record<ShareKind, string> = {
+  book:   "Put it on bookmarks, signing tables or the back of your business card.",
+  course: "Put it on slides, workshop handouts or business cards.",
+  music:  "Put it on gig posters, merch tables or CD sleeves.",
+};
 
 function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -43,43 +53,62 @@ function CopyButton({ value, label = "Copy" }: { value: string; label?: string }
   );
 }
 
-export function MusicShareKit({
-  listId,
+function captionFor(kind: ShareKind, noun: string, title: string, link: string): string {
+  if (kind === "book")   return `📚 My book "${title}" is out now. Find out more and grab your copy here: ${link}`;
+  if (kind === "course") return `🎓 My course "${title}" is open. See what's inside: ${link}`;
+  return noun === "playlist"
+    ? `🎧 New playlist: "${title}" — have a listen and tell me your favourite track. ${link}`
+    : `🎶 My ${noun} "${title}" is out now — listen here: ${link}`;
+}
+
+function postTextFor(kind: ShareKind, title: string, creatorName: string): string {
+  if (kind === "music")  return `Listen to "${title}" by ${creatorName}`;
+  if (kind === "course") return `Check out "${title}", a course by ${creatorName}`;
+  return `Check out "${title}" by ${creatorName}`;
+}
+
+export function ShareKit({
+  kind,
+  itemId,
   url,
   slug,
   title,
-  artistName,
-  releaseLabel,
+  creatorName,
+  noun = kind,
   isPublished,
+  className = "",
 }: {
-  listId: string;
+  kind: ShareKind;
+  itemId: string;
+  /** Clean public URL — tags are added per network. */
   url: string;
   slug: string;
   title: string;
-  artistName: string;
-  releaseLabel: string;
+  creatorName: string;
+  /** What the item is called in copy: "book", "course", or a music release label ("album", "ep"…). */
+  noun?: string;
   isPublished: boolean;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
 
-  const noun = releaseLabel.toLowerCase();
-  const caption =
-    releaseLabel === "Playlist"
-      ? `🎧 New playlist: "${title}" — have a listen and tell me your favourite track. ${taggedUrl(url, "caption", slug)}`
-      : `🎶 My ${noun} "${title}" is out now — listen here: ${taggedUrl(url, "caption", slug)}`;
-  const postText = `Listen to "${title}" by ${artistName}`;
+  const caption = captionFor(kind, noun, title, taggedUrl(url, "caption", slug));
+  const postText = postTextFor(kind, title, creatorName);
+  const shownNoun = noun === "ep" ? "EP" : noun;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+    <div className={`bg-white rounded-xl border border-gray-200 p-6 space-y-4 ${className}`}>
       <div className="flex items-center gap-2">
         <Share2 className="h-4 w-4 text-gray-500" />
-        <h2 className="text-sm font-semibold text-gray-900">Share this {noun}</h2>
+        <h2 className="text-sm font-semibold text-gray-900">Share this {shownNoun}</h2>
       </div>
 
       {!isPublished && (
         <div className="flex items-start gap-2.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-800">
           <EyeOff className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-          <span>This is still a draft, so the link below won&apos;t work for listeners yet. Publish it first, then share.</span>
+          <span>
+            This is still a draft, so the link below won&apos;t work for {AUDIENCE[kind]} yet. Publish it first, then share.
+          </span>
         </div>
       )}
 
@@ -118,7 +147,7 @@ export function MusicShareKit({
         ))}
         {isPublished && (
           <Link
-            href={`/admin/promote?music=${listId}`}
+            href={`/admin/promote?${kind}=${itemId}`}
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-purple-200 bg-purple-50 text-xs font-medium text-purple-700 hover:bg-purple-100"
           >
             <Sparkles className="h-3 w-3" /> Write a post with AI
@@ -141,8 +170,10 @@ export function MusicShareKit({
           <div>
             <h3 className="text-xs font-semibold text-gray-500 mb-1">Tracked links</h3>
             <p className="text-xs text-gray-400 mb-3">
-              Same page, tagged per network, so your analytics show where listeners came from.
-              Each track also has a <strong>Share</strong> button on the public page for song-specific links.
+              Same page, tagged per network, so your Traffic Sources show where {AUDIENCE[kind]} came from.
+              {kind === "music" && (
+                <> Each track also has a <strong>Share</strong> button on the public page for song-specific links.</>
+              )}
             </p>
             <div className="space-y-2">
               {TAGGED.map((t) => {
@@ -174,7 +205,7 @@ export function MusicShareKit({
           <BookQRCode
             bookUrl={taggedUrl(url, "qr", slug, "offline")}
             bookTitle={title}
-            blurb={`Put it on gig posters, merch tables or CD sleeves. Scans straight to this ${noun}.`}
+            blurb={`${QR_BLURB[kind]} Scans straight to this ${shownNoun}.`}
           />
         </div>
       )}

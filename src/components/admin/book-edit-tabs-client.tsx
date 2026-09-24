@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Lock, CheckCircle2, Circle, Copy, Check, Rocket } from "lucide-react";
+import { Lock, CheckCircle2, Circle, Rocket } from "lucide-react";
 import { BookForm } from "@/components/admin/book-form";
 import { RetailerLinks } from "@/components/admin/retailer-links";
 import { DirectSalesItems } from "@/components/admin/direct-sales-items";
@@ -13,7 +13,7 @@ import { BookExcerptEditor } from "@/components/admin/book-excerpt-editor";
 import { ArcTab } from "@/components/admin/books/arc-tab";
 import { PreOrderSignups } from "@/components/admin/preorder-signups";
 import { AffiliateSettings } from "@/components/admin/affiliate-settings";
-import { BookQRCode } from "@/components/admin/book-qr-code";
+import { ShareKit } from "@/components/admin/share-kit";
 import { BookAutoFormatter } from "@/components/admin/book-auto-formatter";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
 type Series = { id: string; name: string };
@@ -72,6 +72,7 @@ type Props = {
   retailerLinksCount: number;
   directSaleItemsCount: number;
   publicBaseUrl: string;
+  authorName: string;
 };
 
 type TabId = "details" | "organisation" | "buy-links" | "direct-sales" | "affiliate" | "media" | "format" | "reviews" | "excerpt" | "arcs";
@@ -126,7 +127,7 @@ function TabDot({ state }: { state: DotState }) {
   );
 }
 
-export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, retailerLinksCount, directSaleItemsCount, publicBaseUrl }: Props) {
+export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEnabled, planTier, bookstoreEnabled, preOrdersEnabled, arcEnabled, stripeConnectOnboarded, previewMedia, retailerLinksCount, directSaleItemsCount, publicBaseUrl, authorName }: Props) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>(() => {
     const tab = searchParams.get("tab") as TabId | null;
@@ -224,19 +225,21 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
         </div>
       )}
 
-      {/* ── Launch Toolkit — shown on Organisation tab ── */}
+      {/* ── Launch Toolkit + Share kit — Organisation tab: get it ready, then get it out ── */}
       {activeTab === "organisation" && (
-        <LaunchToolkit book={book} publicBaseUrl={publicBaseUrl} />
-      )}
-
-      {/* ── QR Code — shown on Details tab so authors can grab it without hunting ── */}
-      {activeTab === "details" && (
-        <div className="max-w-3xl mt-6">
-          <BookQRCode
-            bookUrl={`${publicBaseUrl}/books/${book.slug}`}
-            bookTitle={book.title}
+        <>
+          <LaunchToolkit book={book} />
+          <ShareKit
+            kind="book"
+            itemId={book.id}
+            url={`${publicBaseUrl}/books/${book.slug}`}
+            slug={book.slug}
+            title={book.title}
+            creatorName={authorName}
+            isPublished={book.isPublished}
+            className="max-w-3xl mt-6"
           />
-        </div>
+        </>
       )}
 
       {/* ── Standalone tab panels — mounted only when active ── */}
@@ -315,12 +318,9 @@ export function BookEditTabsClient({ book, series, genres, audioEnabled, salesEn
   );
 }
 
-function LaunchToolkit({ book, publicBaseUrl }: { book: BookData; publicBaseUrl: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const bookUrl  = `${publicBaseUrl}/books/${book.slug}`;
-  const copyText = `🚀 My new book "${book.title}" is live — check it out! ${bookUrl}`;
-
+// Readiness checklist only — the announcement caption lives in the ShareKit below
+// it, alongside the tagged links, so there's one caption per book.
+function LaunchToolkit({ book }: { book: BookData }) {
   const checklist = [
     { label: "Cover image uploaded",         done: !!book.coverImageUrl },
     { label: "Description added",            done: !!book.description },
@@ -331,13 +331,6 @@ function LaunchToolkit({ book, publicBaseUrl }: { book: BookData; publicBaseUrl:
 
   const allDone    = checklist.every((c) => c.done);
   const doneCnt    = checklist.filter((c) => c.done).length;
-
-  function handleCopy() {
-    navigator.clipboard.writeText(copyText).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
 
   return (
     <div className="max-w-3xl mt-6 bg-white rounded-xl border border-gray-200 p-6 space-y-5">
@@ -362,23 +355,6 @@ function LaunchToolkit({ book, publicBaseUrl }: { book: BookData; publicBaseUrl:
             <span className={done ? "text-gray-700" : "text-gray-400"}>{label}</span>
           </div>
         ))}
-      </div>
-
-      {/* Social copy */}
-      <div className="space-y-1.5">
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Social Announcement</p>
-        <div className="relative rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 leading-relaxed pr-10">
-          {copyText}
-          <button
-            type="button"
-            onClick={handleCopy}
-            title="Copy to clipboard"
-            className="absolute top-2 right-2 p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
-          </button>
-        </div>
-        <p className="text-xs text-gray-400">Click the copy button to grab this for Instagram, X, Facebook, or LinkedIn.</p>
       </div>
     </div>
   );

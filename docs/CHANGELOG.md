@@ -13,6 +13,33 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — One share-and-promote layer for Books, Courses and Music
+
+The music sharing overhaul, generalised so books and courses get the same tools.
+
+- **Public share bar on book and course pages.** `MusicShareBar` became
+  `components/author-site/share-bar.tsx` (`ShareBar`): device share sheet, Copy link,
+  Facebook/X/Threads/WhatsApp/Reddit/Email, all UTM-tagged. New **QR code** button
+  opens a popover (tagged `utm_source=qr`); it replaces the book page's permanent
+  sidebar/mobile QR block (`book-qr-code-public.tsx` deleted), so all three page types
+  share one pattern.
+- **Admin share kit for books and courses.** `MusicShareKit` became
+  `components/admin/share-kit.tsx` (`ShareKit`, `kind` = book/course/music): live
+  link, post buttons, tracked links, caption, QR download, "Write a post with AI".
+  Book editor: on the Organisation tab under the Launch Toolkit, replacing the
+  Details-tab QR card; the Toolkit's duplicate "Social Announcement" caption was
+  removed. Course editor: above the form, same as music.
+- **Copy link / View live on list rows** for published Books and Courses —
+  shared `ShareRowActions`, also now used by the Music list.
+- **Social Promote covers courses.** "Your courses" option (shown only with a
+  published course); prompt gets title, description, price, modules, lesson and
+  free-preview counts plus a platform-tagged `/courses/slug` link; `{{course.*}}`
+  tokens. Editors deep-link with `?book=` / `?course=` / `?music=` preselected.
+  7 course promo types added (course-specific rather than reusing book types, whose
+  templates hard-code `{{book.title}}` and would render blank for a course).
+  Removed a dead `canGenerate` in the panel that had no music branch.
+- Share helpers moved to `lib/share.ts` (re-exported from `music-share.ts`).
+
 ## September 24, 2026 — Traffic Sources reads share tags + cover URL check
 
 - **Traffic Sources credits the network.** `/api/admin/analytics` now groups by the

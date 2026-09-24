@@ -7,9 +7,12 @@ import { IconButton } from "@/components/admin/icon-button";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
 
 import { cspSafeImageSrc } from "@/lib/csp-safe-image";
+import { ShareRowActions } from "@/components/admin/share-row-actions";
+
 type BookRow = {
   id: string;
   title: string;
+  slug: string;
   subtitle: string | null;
   coverImageUrl: string | null;
   description: string | null;
@@ -24,7 +27,7 @@ type BookRow = {
   _count: { directSaleItems: number; retailerLinks: number };
 };
 
-export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
+export function BooksListClient({ initialBooks, publicBaseUrl }: { initialBooks: BookRow[]; publicBaseUrl: string }) {
   const [books, setBooks]       = useState<BookRow[]>(initialBooks);
   const [saving,    setSaving]    = useState(false);
   const [saveMsg,   setSaveMsg]   = useState("");
@@ -246,9 +249,12 @@ export function BooksListClient({ initialBooks }: { initialBooks: BookRow[] }) {
                 </div>
               </td>
 
-              {/* Edit */}
+              {/* Share shortcuts (published only — a draft URL would 404) + Edit */}
               <td className="px-4 py-4">
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-end gap-1">
+                  {book.isPublished && (
+                    <ShareRowActions url={`${publicBaseUrl}/books/${book.slug}`} title={book.title} />
+                  )}
                   <Link href={`/admin/books/${book.id}/edit`}>
                     <IconButton icon={<Pencil className="h-4 w-4" />} title="Edit" variant="edit" />
                   </Link>

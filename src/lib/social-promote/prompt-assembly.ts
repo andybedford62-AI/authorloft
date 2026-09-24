@@ -25,6 +25,21 @@ export type AssemblyInputs = {
     | { type: "book"; book: { title: string; subtitle?: string | null; shortDescription?: string | null; description?: string | null } }
     | { type: "news"; news: { title: string; excerpt?: string | null } }
     | {
+        type: "course";
+        course: {
+          title: string;
+          description?: string | null;
+          /** "Free" or a formatted price, e.g. "$49.00". */
+          price: string;
+          moduleTitles: string[];
+          lessonCount: number;
+          /** Lessons anyone can open without enrolling. */
+          previewLessonCount: number;
+          /** Public page, UTM-tagged for the target platform. Not author-typed. */
+          url: string;
+        };
+      }
+    | {
         type: "music";
         music: {
           title: string;
@@ -95,6 +110,17 @@ export function assemblePrompt(inputs: AssemblyInputs): string {
       dataLines.push(`Track list: ${m.trackTitles.slice(0, 20).map((t, i) => `${i + 1}. ${clip(t, 120)}`).join("; ")}`);
     }
     dataLines.push(`Link to the release: ${m.url}`);
+  } else if (context.type === "course") {
+    const c = context.course;
+    dataLines.push(`Course title: ${clip(c.title, 200)}`);
+    if (c.description) dataLines.push(`Course description: ${clip(c.description, 1200)}`);
+    dataLines.push(`Price: ${c.price}`);
+    dataLines.push(`Size: ${c.moduleTitles.length} module${c.moduleTitles.length === 1 ? "" : "s"}, ${c.lessonCount} lesson${c.lessonCount === 1 ? "" : "s"}`);
+    if (c.moduleTitles.length) {
+      dataLines.push(`Modules: ${c.moduleTitles.slice(0, 20).map((t, i) => `${i + 1}. ${clip(t, 120)}`).join("; ")}`);
+    }
+    if (c.previewLessonCount > 0) dataLines.push(`Free preview lessons: ${c.previewLessonCount}`);
+    dataLines.push(`Link to the course: ${c.url}`);
   } else if (context.type === "news") {
     dataLines.push(`News title: ${clip(context.news.title, 200)}`);
     if (context.news.excerpt) dataLines.push(`News excerpt: ${clip(context.news.excerpt, 800)}`);
@@ -122,6 +148,10 @@ export function assemblePrompt(inputs: AssemblyInputs): string {
     "music.type":              context.type === "music" ? context.music.releaseLabel.toLowerCase() : "",
     "music.description":       context.type === "music" ? clip(context.music.description ?? "", 800) : "",
     "music.url":               context.type === "music" ? context.music.url : "",
+    "course.title":            context.type === "course" ? clip(context.course.title, 200) : "",
+    "course.description":      context.type === "course" ? clip(context.course.description ?? "", 1200) : "",
+    "course.price":            context.type === "course" ? context.course.price : "",
+    "course.url":              context.type === "course" ? context.course.url : "",
   };
   const substitutedTemplate = substituteTokens(promoType.promptTemplate, tokenVars);
 

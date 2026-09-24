@@ -329,7 +329,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
-          name: "  • 18 promo types (sale, launch, quote, BTS, music release, etc.)",
+          name: "  • 25 promo types (sale, launch, quote, BTS, music release, course launch, etc.)",
           tiers: {
             FREE: "—",
             STANDARD: "✓",
@@ -351,7 +351,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
       description: "Every reader who buys through a retailer is a reader you'll never email again. Own the relationship from day one.",
       features: [
         {
-          name: "Per-Book QR Code (download as SVG)",
+          name: "Share Tools for books & courses (share buttons, tracked links, caption, QR code)",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },
         {

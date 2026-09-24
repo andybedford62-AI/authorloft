@@ -81,6 +81,7 @@ Early bird / founding member discount available to FREE users within a configura
 
 | Feature | FREE | STANDARD | PREMIUM |
 |---------|------|----------|---------|
+| **Share Tools — books & courses** (public share bar incl. phone share sheet + QR popover on book/course pages; admin share kit with tracked links, caption, QR download, "Write a post with AI"; Copy link / View live on list rows) | ✅ | ✅ | ✅ |
 | **Newsletter Signup Form** | ✅ (full campaigns) | ✅ (full campaigns) | ✅ (full campaigns) |
 | **Newsletter Campaigns** (send to subscribers) | ✅ | ✅ | ✅ |
 | **Newsletter Integration** (3rd-party) | ❌ | ✅ (Resend, etc.) | ✅ (Resend, etc.) |
@@ -108,8 +109,8 @@ Early bird / founding member discount available to FREE users within a configura
 | — Meta Tag Optimization | ❌ | ❌ | ✅ |
 | — Keyword Density Analysis | ❌ | ❌ | ✅ |
 | — Internal Link Analysis | ❌ | ❌ | ✅ |
-| **Social Promote** (AI post generator at `/admin/promote` — posts about a book, news post, topic, or music release; music posts include a tracked link to the release) | ❌ | ✅ Facebook, Instagram, X, Reddit, Threads, Bluesky | ✅ All platforms + LinkedIn, TikTok |
-| — 18 promo types (14 book/news/topic + 4 music: New Release, Track Spotlight, Behind the Music, Ask Listeners) | ❌ | ✅ | ✅ |
+| **Social Promote** (AI post generator at `/admin/promote` — posts about a book, course, news post, topic, or music release; course and music posts include a tracked link to the page) | ❌ | ✅ Facebook, Instagram, X, Reddit, Threads, Bluesky | ✅ All platforms + LinkedIn, TikTok |
+| — 25 promo types (14 book/news/topic + 4 music: New Release, Track Spotlight, Behind the Music, Ask Listeners + 7 course: New Course Launch, Lesson Spotlight, Who This Course Is For, Behind the Course, Course Milestone, Course Sale, Try It Free) | ❌ | ✅ | ✅ |
 
 ---
 

@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, Facebook, Link2, Mail, MessageCircle, Share2, Twitter } from "lucide-react";
-import { shareIntentUrl, taggedUrl, type ShareNetwork } from "@/lib/music-share";
+import { useEffect, useRef, useState } from "react";
+import QRCode from "react-qr-code";
+import { Check, Facebook, Link2, Mail, MessageCircle, QrCode, Share2, Twitter, X } from "lucide-react";
+import { shareIntentUrl, taggedUrl, type ShareNetwork } from "@/lib/share";
+
+// One share bar for every public page with something to share: books, courses
+// and music lists. Every link is UTM-tagged so the author's Traffic Sources
+// show which button (or network) brought the visitor.
 
 /**
  * Native share sheet where the device has one (that's the only web route into
@@ -36,7 +41,7 @@ const NETWORKS: { id: ShareNetwork; label: string; icon?: typeof Facebook }[] = 
   { id: "email",    label: "Email",    icon: Mail },
 ];
 
-export function MusicShareBar({
+export function ShareBar({
   url,
   title,
   text,
@@ -48,18 +53,35 @@ export function MusicShareBar({
   title: string;
   /** Prefilled post text, e.g. `Listen to "Road Songs", the new album by Jo`. */
   text: string;
-  /** utm_campaign, the list slug. */
+  /** utm_campaign — the item's slug. */
   campaign: string;
   accentSurface: string;
 }) {
   const [canNativeShare, setCanNativeShare] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   // Checked after mount: navigator doesn't exist during SSR, and rendering the
   // button conditionally on the server would mismatch on hydration.
   useEffect(() => {
     setCanNativeShare(typeof navigator.share === "function");
   }, []);
+
+  // The QR popover closes on Escape or a click anywhere outside it.
+  useEffect(() => {
+    if (!qrOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (qrRef.current && !qrRef.current.contains(e.target as Node)) setQrOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setQrOpen(false);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [qrOpen]);
 
   async function handleNative() {
     const result = await shareOrCopy(taggedUrl(url, "share-sheet", campaign, "share"), title, text);
@@ -111,6 +133,42 @@ export function MusicShareBar({
           {label}
         </a>
       ))}
+
+      {/* QR: mostly for handing a page from a laptop to a phone, or to someone
+          standing next to you. Tagged "qr" so scans show as "QR code". */}
+      <div ref={qrRef} className="relative">
+        <button
+          type="button"
+          onClick={() => setQrOpen((v) => !v)}
+          className={pill}
+          aria-expanded={qrOpen}
+          aria-haspopup="dialog"
+        >
+          <QrCode className="h-3.5 w-3.5" /> QR code
+        </button>
+        {qrOpen && (
+          <div
+            role="dialog"
+            aria-label={`QR code for ${title}`}
+            className="absolute z-30 right-0 sm:right-auto sm:left-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
+          >
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <p className="text-xs text-gray-500">Scan to open this page on your phone.</p>
+              <button
+                type="button"
+                onClick={() => setQrOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+                aria-label="Close QR code"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <QRCode value={taggedUrl(url, "qr", campaign, "share")} size={168} level="M" />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { maxTracksPerList } from "@/lib/plan-limits";
 import { MusicListForm } from "@/components/admin/music-list-form";
-import { MusicShareKit } from "@/components/admin/music-share-kit";
+import { ShareKit } from "@/components/admin/share-kit";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { releaseLabel, parseListenLinks } from "@/lib/music-share";
 
@@ -59,13 +59,14 @@ export default async function EditMusicListPage({
         <h1 className="text-2xl font-bold text-gray-900">{list.title}</h1>
       </div>
       {author && (
-        <MusicShareKit
-          listId={list.id}
+        <ShareKit
+          kind="music"
+          itemId={list.id}
           url={`${getAuthorBaseUrl(author)}/music/${list.slug}`}
           slug={list.slug}
           title={list.title}
-          artistName={author.displayName || author.name}
-          releaseLabel={releaseLabel(list.releaseType)}
+          creatorName={author.displayName || author.name}
+          noun={releaseLabel(list.releaseType).toLowerCase()}
           isPublished={list.isPublished}
         />
       )}

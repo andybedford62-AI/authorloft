@@ -42,6 +42,8 @@ export default async function EditBookPage({
       select: {
         slug: true,
         customDomain: true,
+        name: true,
+        displayName: true,
         stripeConnectOnboarded: true,
         plan: { select: { flipBooksLimit: true, audioEnabled: true, salesEnabled: true, tier: true, preOrdersEnabled: true } },
       },
@@ -165,6 +167,7 @@ export default async function EditBookPage({
         retailerLinksCount={book._count.retailerLinks}
         directSaleItemsCount={book._count.directSaleItems}
         publicBaseUrl={author ? getAuthorBaseUrl(author) : ""}
+        authorName={author ? author.displayName || author.name : ""}
       />
     </div>
   );

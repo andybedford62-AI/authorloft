@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 import { checkPlatformAvailable } from "@/lib/social-promote/limits";
-import { generateSocialPost } from "@/lib/social-promote/generate";
+import { generateSocialPost, type GenerateRequest } from "@/lib/social-promote/generate";
 import { prisma } from "@/lib/db";
 
 /** Super Admin test-live endpoint. Skips plan/rate limits but still respects platform availability and cost ceiling. */
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     overridePromptTemplate, overridePromptAddendum, overrideVoice,
   } = body;
 
-  if (!["book", "news", "topic", "music"].includes(contextType)) {
+  if (!["book", "course", "news", "topic", "music"].includes(contextType)) {
     return NextResponse.json({ error: "Invalid context type." }, { status: 400 });
   }
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     authorId:     adminId,
     platformId:   platform.id,
     promoTypeId:  promoType.id,
-    contextType:  contextType as "book" | "news" | "topic" | "music",
+    contextType:  contextType as GenerateRequest["contextType"],
     contextRefId: contextRefId ?? null,
     topicText:    topicText    ?? null,
     ipAddress,

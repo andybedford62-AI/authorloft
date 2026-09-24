@@ -14,7 +14,8 @@ import { BookFeedbackForm } from "@/components/author-site/book-feedback-form";
 import { PreOrderSignupForm } from "@/components/author-site/preorder-signup-form";
 import { LaunchCountdown } from "@/components/author-site/launch-countdown";
 import { AffiliateRefTracker } from "@/components/author-site/affiliate-ref-tracker";
-import { BookQRCodePublic } from "@/components/author-site/book-qr-code-public";
+import { ShareBar } from "@/components/author-site/share-bar";
+import { accentAsSurface } from "@/lib/color-contrast";
 import { prisma } from "@/lib/db";
 import { getAuthorByDomain } from "@/lib/author-queries";
 import { getAuthorBaseUrl } from "@/lib/site-url";
@@ -319,11 +320,6 @@ export default async function BookDetailPage({
                 )}
               </div>
             )}
-
-            {/* QR Code — desktop sidebar */}
-            <div className="hidden md:block w-full pt-2 border-t border-gray-100">
-              <BookQRCodePublic bookUrl={bookUrl} size={96} />
-            </div>
           </div>
 
           {/* ── Details column ────────────────────────────────────────────── */}
@@ -393,6 +389,16 @@ export default async function BookDetailPage({
               {book.priceCents > 0 && (
                 <p className="mt-3 text-2xl font-bold text-gray-900">{formatCents(book.priceCents)}</p>
               )}
+
+              <div className="mt-4">
+                <ShareBar
+                  url={bookUrl}
+                  title={book.title}
+                  text={`Check out "${book.title}" by ${authorName}`}
+                  campaign={book.slug}
+                  accentSurface={accentAsSurface(accentColor)}
+                />
+              </div>
             </div>
 
             {/* Short description */}
@@ -640,11 +646,6 @@ export default async function BookDetailPage({
                 )}
               </div>
             )}
-
-            {/* QR Code — mobile */}
-            <div className="md:hidden pt-3 border-t border-gray-100">
-              <BookQRCodePublic bookUrl={bookUrl} size={88} />
-            </div>
           </div>
         </div>
 

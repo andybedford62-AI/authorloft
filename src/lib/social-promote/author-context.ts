@@ -28,6 +28,9 @@ export type AuthorPromoteContext = {
     applicablePlatforms: string[];
   }>;
   books: Array<{ id: string; title: string; subtitle: string | null }>;
+  /** Published courses. Empty for authors without any, and the panel hides
+   *  the course option entirely in that case. */
+  courses: Array<{ id: string; title: string }>;
   newsPosts: Array<{ id: string; title: string; publishedAt: Date | null }>;
   /** Published MUSIC lists. Empty for authors who don't make music, and the
    *  panel hides the music option entirely in that case. */
@@ -47,6 +50,7 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
     activePlatforms,
     activePromoTypes,
     books,
+    courses,
     newsPosts,
     musicLists,
     todayCount,
@@ -64,6 +68,11 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
       where:  { authorId, isPublished: true },
       select: { id: true, title: true, subtitle: true },
       orderBy: { title: "asc" },
+    }),
+    prisma.course.findMany({
+      where:   { authorId, kind: "COURSE", isPublished: true },
+      select:  { id: true, title: true },
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
     }),
     prisma.platformPost.findMany({
       where:  { isNews: true, isPublished: true },
@@ -108,6 +117,7 @@ export async function loadAuthorPromoteContext(authorId: string): Promise<Author
       applicableContexts: t.applicableContexts, applicablePlatforms: t.applicablePlatforms,
     })),
     books,
+    courses,
     newsPosts,
     musicLists,
   };
