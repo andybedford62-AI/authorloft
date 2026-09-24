@@ -13,6 +13,21 @@ line rather than listing every commit.
 
 ---
 
+## September 24, 2026 — Book page: two-column layout + separate ASIN
+
+Andy didn't like the full-width sections (below) and sketched a two-column version.
+
+- **Two columns all the way down.** Left: cover, preview images, then the Book details
+  card and the excerpt / "Listen to a clip" cards, stacked under the cover. Right: title,
+  share, description, format cards, buy panel, then About this book and Reviews, divided
+  by hairlines with one smaller heading style. "More by {author}" stays full width
+  below. Phones: cover → title & buy → About → details & previews → Reviews → More by.
+- **ASIN is its own field** (`Book.asin`, migration `20260924_book_asin`): editor shows
+  ISBN (print) | ASIN (Amazon / Kindle) | Page Count; the details card shows each on its
+  own row. Two ASINs that had been typed into ISBN were moved over, and pasted
+  invisible direction marks / spaces were stripped from ISBNs. Both fields are cleaned
+  on save (`cleanIdentifier` in `lib/book-identifiers.ts`, tested).
+
 ## September 24, 2026 — Book page lower half redesign
 
 Below the hero, the book page was one narrow column of mismatched headings, an

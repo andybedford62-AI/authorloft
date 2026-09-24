@@ -387,6 +387,7 @@ model Book {
   coverImageUrl              String?
   publishedAt                DateTime?
   isbn                       String?
+  asin                       String? // Amazon's ID (usually the Kindle edition); ISBN is for print
   pageCount                  Int?
   language                   String               @default("en")
   priceCents                 Int                  @default(0)

@@ -4,6 +4,7 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
 import { parseFormatPrices } from "@/lib/book-formats";
 import { syncBookPrice, hasFormatPrices } from "@/lib/book-price";
+import { cleanIdentifier } from "@/lib/book-identifiers";
 
 export async function GET(
   _req: NextRequest,
@@ -52,7 +53,7 @@ export async function PUT(
   const {
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId, priceCents,
-    isbn, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
+    isbn, asin, pageCount, isFeatured, isPublished, directSalesEnabled, listInBookstore, genreIds,
     availableFormats, formatPrices, caption, releaseDate, flipBookUrl, sampleContent,
     isPreOrder, preOrderDate, autoSendLaunchEmail, showCountdown, launchDate,
   } = body;
@@ -122,7 +123,8 @@ export async function PUT(
         // Derived by syncBookPrice below; only an older client still sends it.
         priceCents: typeof priceCents === "number" ? priceCents : undefined,
         seriesId: seriesId || null,
-        isbn: isbn || null,
+        isbn: cleanIdentifier(isbn),
+        asin: asin !== undefined ? cleanIdentifier(asin) : undefined,
         pageCount: pageCount || null,
         availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
         // Absent (older clients) leaves prices alone; anything malformed is dropped.

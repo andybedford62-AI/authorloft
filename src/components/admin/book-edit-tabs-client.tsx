@@ -40,6 +40,7 @@ type BookData = {
   priceCents: number;
   seriesId: string | null;
   isbn: string | null;
+  asin: string | null;
   pageCount: number | null;
   isFeatured: boolean;
   isPublished: boolean;

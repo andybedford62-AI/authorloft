@@ -5,6 +5,7 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { checkCoverUrl } from "@/lib/cover-url-check";
 import { parseFormatPrices } from "@/lib/book-formats";
 import { syncBookPrice } from "@/lib/book-price";
+import { cleanIdentifier } from "@/lib/book-identifiers";
 import { capturePostHog } from "@/lib/posthog";
 
 export async function GET() {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   const {
     title, slug, subtitle, shortDescription, description,
     coverImageUrl, seriesId,
-    isbn, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
+    isbn, asin, pageCount, isFeatured, isPublished, directSalesEnabled, genreIds,
     availableFormats, formatPrices, caption, releaseDate,
   } = body;
 
@@ -78,7 +79,8 @@ export async function POST(req: NextRequest) {
       coverImageUrl: coverImageUrl || null,
       // priceCents is derived from format + direct-sale prices — see syncBookPrice
       seriesId: seriesId || null,
-      isbn: isbn || null,
+      isbn: cleanIdentifier(isbn),
+      asin: cleanIdentifier(asin),
       pageCount: pageCount || null,
       availableFormats: Array.isArray(availableFormats) ? availableFormats : [],
       // Absent (older clients) leaves prices alone; anything malformed is dropped.

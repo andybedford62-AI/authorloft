@@ -81,7 +81,7 @@ export async function generateMetadata({
 }
 
 /** One heading style for every section below the hero. */
-const SECTION_HEADING = "text-2xl font-bold text-gray-900 mb-5";
+const SECTION_HEADING = "text-xl font-bold text-gray-900 mb-3";
 
 // ── Format display helpers ────────────────────────────────────────────────────
 const FORMAT_COLORS: Record<string, { color: string; bg: string }> = {
@@ -261,7 +261,7 @@ export default async function BookDetailPage({
   ];
 
   const hasBookDetails =
-    !!book.series || book.genres.length > 0 || !!releaseDateFormatted || !!book.pageCount || !!book.isbn;
+    !!book.series || book.genres.length > 0 || !!releaseDateFormatted || !!book.pageCount || !!book.isbn || !!book.asin;
 
   // "More by" row: same-series books first, then featured, then the author's order.
   const otherBooks = await prisma.book.findMany({
@@ -275,6 +275,85 @@ export default async function BookDetailPage({
     .sort((x, y) => x.rank - y.rank)
     .slice(0, 4)
     .map((x) => x.b);
+
+  const isbn = book.isbn;
+  const asin = book.asin;
+
+  // Book facts + "try before you buy" cards. Desktop: stacked under the cover.
+  // Phones: after "About this book", so the title and buy area always come first.
+  const sideCards = hasBookDetails || book.sampleContent || hasAudioTracks ? (
+    <div className="space-y-4">
+      {hasBookDetails && (
+        <aside className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Book details</h3>
+          <dl className="divide-y divide-gray-200 text-[13px]">
+            {book.series && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">Series</dt>
+                <dd className="text-right">
+                  <Link href={`/series/${book.series.slug}`} className="font-medium text-gray-900 hover:text-[var(--accent)]">
+                    {book.series.name}
+                  </Link>
+                </dd>
+              </div>
+            )}
+            {book.genres.length > 0 && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">Genre</dt>
+                <dd className="text-right text-gray-900">{book.genres.map(({ genre }) => genre.name).join(", ")}</dd>
+              </div>
+            )}
+            {releaseDateFormatted && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">Published</dt>
+                <dd className="text-right text-gray-900">{releaseDateFormatted}</dd>
+              </div>
+            )}
+            {book.pageCount && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">Pages</dt>
+                <dd className="text-right text-gray-900">{book.pageCount}</dd>
+              </div>
+            )}
+            {isbn && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">ISBN</dt>
+                <dd className="text-right text-gray-900 break-all">{isbn}</dd>
+              </div>
+            )}
+            {asin && (
+              <div className="flex justify-between gap-3 py-1.5">
+                <dt className="text-gray-500">ASIN</dt>
+                <dd className="text-right text-gray-900 break-all">{asin}</dd>
+              </div>
+            )}
+          </dl>
+        </aside>
+      )}
+      {book.sampleContent && (
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <BookExcerptModal
+            sampleContent={sanitize(book.sampleContent)}
+            bookTitle={book.title}
+            bookSlug={book.slug}
+            hasBuyOptions={hasBuyOptions}
+            accentColor={accentColor}
+          />
+        </div>
+      )}
+      {hasAudioTracks && (
+        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900">Listen to a clip</h3>
+            <p className="text-xs text-gray-500">
+              {book.audioTracks.length === 1 ? "An audio clip from this book" : `${book.audioTracks.length} audio clips from this book`}
+            </p>
+          </div>
+          <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
+        </div>
+      )}
+    </div>
+  ) : null;
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -349,6 +428,7 @@ export default async function BookDetailPage({
               </div>
             )}
 
+            {sideCards && <div className="hidden md:block w-full">{sideCards}</div>}
           </div>
 
           {/* ── Details column ────────────────────────────────────────────── */}
@@ -549,114 +629,35 @@ export default async function BookDetailPage({
               </BookBuySection>
             )}
 
+            {/* About this book */}
+            {book.description && (
+              <section aria-labelledby="about-heading" className="pt-6 border-t border-gray-100">
+                <h2 id="about-heading" className={SECTION_HEADING}>About this book</h2>
+                <BookOverview text={book.description} accentColor={accentColor} />
+              </section>
+            )}
+
+            {/* Phones: book details + previews come after About, never before the title */}
+            {sideCards && <div className="md:hidden pt-6 border-t border-gray-100">{sideCards}</div>}
+
+            {/* Reviews — summary, cards, and a pop-up form */}
+            <section aria-labelledby="reviews-heading" className="pt-6 border-t border-gray-100">
+              <h2 id="reviews-heading" className={SECTION_HEADING}>Reviews</h2>
+              <BookReviews
+                reviews={reviewCards}
+                averageRating={averageRating}
+                ratingCount={ratingCount}
+                bookTitle={book.title}
+                bookSlug={book.slug}
+                domain={domain}
+                accentColor={accentColor}
+              />
+            </section>
           </div>
         </div>
 
-        {/* ── Below the hero: full-width sections, one heading style ─────────── */}
-        <div className="space-y-14 pb-16">
-
-          {/* About this book — overview + details card */}
-          {(book.description || hasBookDetails) && (
-            <section aria-labelledby="about-heading" className="border-t border-gray-100 pt-10">
-              <h2 id="about-heading" className={SECTION_HEADING}>About this book</h2>
-              <div className="grid gap-8 md:grid-cols-3">
-                {book.description && (
-                  <div className="md:col-span-2">
-                    <BookOverview text={book.description} accentColor={accentColor} />
-                  </div>
-                )}
-                {hasBookDetails && (
-                  <aside className={`rounded-2xl border border-gray-200 bg-gray-50 p-5 h-fit ${book.description ? "" : "md:col-span-1"}`}>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Book details</h3>
-                    <dl className="divide-y divide-gray-200 text-sm">
-                      {book.series && (
-                        <div className="flex justify-between gap-4 py-2 first:pt-0">
-                          <dt className="text-gray-500">Series</dt>
-                          <dd className="text-right">
-                            <Link href={`/series/${book.series.slug}`} className="font-medium text-gray-900 hover:text-[var(--accent)]">
-                              {book.series.name}
-                            </Link>
-                          </dd>
-                        </div>
-                      )}
-                      {book.genres.length > 0 && (
-                        <div className="flex justify-between gap-4 py-2 first:pt-0">
-                          <dt className="text-gray-500">Genre</dt>
-                          <dd className="text-right text-gray-900">{book.genres.map(({ genre }) => genre.name).join(", ")}</dd>
-                        </div>
-                      )}
-                      {releaseDateFormatted && (
-                        <div className="flex justify-between gap-4 py-2 first:pt-0">
-                          <dt className="text-gray-500">Published</dt>
-                          <dd className="text-right text-gray-900">{releaseDateFormatted}</dd>
-                        </div>
-                      )}
-                      {book.pageCount && (
-                        <div className="flex justify-between gap-4 py-2 first:pt-0">
-                          <dt className="text-gray-500">Pages</dt>
-                          <dd className="text-right text-gray-900">{book.pageCount}</dd>
-                        </div>
-                      )}
-                      {book.isbn && (
-                        <div className="flex justify-between gap-4 py-2 first:pt-0">
-                          <dt className="text-gray-500">ISBN / ASIN</dt>
-                          <dd className="text-right text-gray-900 break-all">{book.isbn}</dd>
-                        </div>
-                      )}
-                    </dl>
-                  </aside>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Try before you buy — excerpt + audio, as cards */}
-          {(book.sampleContent || hasAudioTracks) && (
-            <section aria-labelledby="try-heading">
-              <h2 id="try-heading" className={SECTION_HEADING}>Try before you buy</h2>
-              <div className={`grid gap-5 ${book.sampleContent && hasAudioTracks ? "md:grid-cols-2" : ""}`}>
-                {book.sampleContent && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <BookExcerptModal
-                      sampleContent={sanitize(book.sampleContent)}
-                      bookTitle={book.title}
-                      bookSlug={book.slug}
-                      hasBuyOptions={hasBuyOptions}
-                      accentColor={accentColor}
-                    />
-                  </div>
-                )}
-                {hasAudioTracks && (
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Listen to a clip</h3>
-                      <p className="text-sm text-gray-500">
-                        {book.audioTracks.length === 1
-                          ? "An audio clip from this book"
-                          : `${book.audioTracks.length} audio clips from this book`}
-                      </p>
-                    </div>
-                    <AudioPlayer tracks={book.audioTracks} accentColor={accentColor} />
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Reviews — summary, cards, and a pop-up form */}
-          <section aria-labelledby="reviews-heading">
-            <h2 id="reviews-heading" className={SECTION_HEADING}>Reviews</h2>
-            <BookReviews
-              reviews={reviewCards}
-              averageRating={averageRating}
-              ratingCount={ratingCount}
-              bookTitle={book.title}
-              bookSlug={book.slug}
-              domain={domain}
-              accentColor={accentColor}
-            />
-          </section>
-
+        {/* ── More by the author — full width under both columns ─────────────── */}
+        <div className="border-t border-gray-100 pt-8 pb-16">
           {/* More by the author — keeps readers browsing instead of a back button */}
           {moreBooks.length > 0 && (
             <section aria-labelledby="more-heading">

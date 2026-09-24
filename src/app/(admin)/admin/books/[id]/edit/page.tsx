@@ -75,6 +75,7 @@ export default async function EditBookPage({
     priceCents: book.priceCents,
     seriesId: book.seriesId,
     isbn: book.isbn,
+    asin: book.asin,
     pageCount: book.pageCount,
     isFeatured: book.isFeatured,
     isPublished: book.isPublished,

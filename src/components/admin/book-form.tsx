@@ -25,6 +25,7 @@ type BookData = {
   priceCents: number;            // retail / display price shown on public book page
   seriesId: string | null;
   isbn: string | null;
+  asin?: string | null;
   pageCount: number | null;
   isFeatured: boolean;
   isPublished: boolean;
@@ -227,6 +228,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
   const [coverImageUrl, setCoverImageUrl]       = useState(book?.coverImageUrl ?? "");
   const [seriesId, setSeriesId]     = useState(book?.seriesId ?? "");
   const [isbn, setIsbn]             = useState(book?.isbn ?? "");
+  const [asin, setAsin]             = useState(book?.asin ?? "");
   const [pageCount, setPageCount]   = useState(book?.pageCount?.toString() ?? "");
   const [isFeatured, setIsFeatured]               = useState(book?.isFeatured ?? false);
   const [isPublished, setIsPublished]             = useState(book?.isPublished ?? true);
@@ -332,6 +334,7 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
       coverImageUrl:    coverImageUrl || null,
       seriesId:         seriesId || null,
       isbn:             isbn || null,
+      asin:             asin || null,
       pageCount:        pageCount ? parseInt(pageCount) : null,
       isFeatured,
       isPublished,
@@ -649,9 +652,11 @@ export function BookForm({ mode, book, series, genres, activeTab, salesEnabled =
 
         <CoverUpload value={coverImageUrl} onChange={setCoverImageUrl} />
 
-        <div className="grid grid-cols-2 gap-4">
-          <Input label="ISBN" value={isbn} onChange={(e) => setIsbn(e.target.value)}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Input label="ISBN (print)" value={isbn} onChange={(e) => setIsbn(e.target.value)}
             placeholder="978-0-000-00000-0" />
+          <Input label="ASIN (Amazon / Kindle)" value={asin} onChange={(e) => setAsin(e.target.value)}
+            placeholder="B0XXXXXXXX" />
           <Input label="Page Count" type="number" value={pageCount}
             onChange={(e) => setPageCount(e.target.value)} placeholder="e.g. 312" />
         </div>
