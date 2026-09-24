@@ -15,6 +15,10 @@ line rather than listing every commit.
 
 ## September 24, 2026 — Course editor: collapsible sections + a save bar that actually sticks
 
+- **Music editor gets the same pinned save bar** with an **Unsaved changes** dot (compares what a
+  save would send; background thumbnail/embed resolution is ignored; the baseline resets when a
+  save succeeds with warnings and the editor stays open). Delete moves to the right of the bar.
+
 - **Admin sticky elements were silently broken.** `<main>` in `admin-shell.tsx` had
   `overflow-y-auto` but no fixed height, so the window scrolled and `<main>` became a
   scroll box that never scrolled — every `sticky` inside it (the course editor's Save bar,

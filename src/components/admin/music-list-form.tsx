@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -103,6 +103,20 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showHelp, setShowHelp] = useState(false);
 
+  // "Unsaved changes" on the save bar: what a save would send, compared with how
+  // the list loaded (or was last saved). Thumbnails and the pasted embed HTML
+  // resolve in the background after a link is added, so they're left out.
+  const snapshot = useMemo(
+    () => JSON.stringify({
+      title, description, coverImageUrl, isPublished, isFeatured, listInBookstore, releaseType, releaseDate,
+      listenLinks: listenLinks.map((l) => l.trim()).filter(Boolean),
+      tracks: tracks.map(({ url, title, description }) => ({ url, title, description })),
+    }),
+    [title, description, coverImageUrl, isPublished, isFeatured, listInBookstore, releaseType, releaseDate, listenLinks, tracks]
+  );
+  const savedSnapshot = useRef(snapshot);
+  const isDirty = snapshot !== savedSnapshot.current;
+
   const atCap = trackCap !== null && tracks.length >= trackCap;
 
   function updateTrack(i: number, patch: Partial<TrackRow>) {
@@ -176,8 +190,11 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Could not save.");
-      if (data.warnings?.length) setWarnings(data.warnings);
-      else {
+      if (data.warnings?.length) {
+        // Saved, but staying on the page to show the warnings — this is the new baseline.
+        savedSnapshot.current = snapshot;
+        setWarnings(data.warnings);
+      } else {
         router.push("/admin/music");
         router.refresh();
       }
@@ -575,7 +592,9 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      {/* Save bar — pinned to the bottom of the screen (same as the course editor) so a
+          long album doesn't need scrolling all the way down to save a small change. */}
+      <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 flex items-center gap-3 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.08)]">
         <Button type="button" onClick={handleSave} disabled={saving || !title.trim()}>
           {saving
             ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</>
@@ -583,8 +602,13 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
               ? <><Check className="h-4 w-4 mr-2" />Save changes</>
               : <><Plus className="h-4 w-4 mr-2" />Create Music List / Album</>}
         </Button>
+        {isDirty && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+            <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" /> Unsaved changes
+          </span>
+        )}
         {isEdit && (
-          <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting} className="ml-auto">
             <Trash2 className="h-4 w-4 mr-2" /> {deleting ? "Deleting…" : "Delete list"}
           </Button>
         )}
