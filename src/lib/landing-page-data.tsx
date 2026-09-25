@@ -41,6 +41,10 @@ export interface LandingPageData {
   ctaSubtitle?: string;
   /** Drop the CTA's "See pricing" button (page shows its own plans instead). */
   hideCtaPricingLink?: boolean;
+  /** Where the top nav's "Pricing" goes on this page (default /pricing). */
+  navPricingHref?: string;
+  /** Social share (og:image) fallback when Super Admin → SEO has no upload for this page. */
+  ogImage?: string;
 }
 
 export const LANDING_PAGES: Record<string, LandingPageData> = {
@@ -768,6 +772,8 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Can I use my own domain?", a: "Yes, on Standard and Premium. Every plan also includes a free authorloft.com address, so you can go live today and add your domain later." },
     ],
     hideCtaPricingLink: true,
+    navPricingHref: "/for-musicians#plans",
+    ogImage: "/og-for-musicians.jpg",
     ctaTitle: "Give your music a home of its own",
     ctaSubtitle: "Set up your site, add your first release, and share it today. Free to start, upgrade when you're ready.",
   },

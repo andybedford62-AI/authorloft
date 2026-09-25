@@ -10,7 +10,8 @@ import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solu
 import { VaultButton } from "@/components/marketing/vault";
 
 
-export async function MarketingNav({ activePage }: { activePage?: "pricing" }) {
+/** `pricingHref` lets a page point "Pricing" at its own plans (e.g. /for-musicians#plans). */
+export async function MarketingNav({ activePage, pricingHref = "/pricing" }: { activePage?: "pricing"; pricingHref?: string }) {
   // Reading cookies opts this component into dynamic rendering so the session
   // is never served from a stale static cache.
   await cookies();
@@ -70,7 +71,7 @@ export async function MarketingNav({ activePage }: { activePage?: "pricing" }) {
           <MarketingNavSolutions />
           <MarketingNavDropdown />
           <Link
-            href="/pricing"
+            href={pricingHref}
             className={`text-sm transition-colors ${
               activePage === "pricing"
                 ? "font-medium text-vault-gold"
@@ -99,7 +100,7 @@ export async function MarketingNav({ activePage }: { activePage?: "pricing" }) {
               </VaultButton>
             </>
           )}
-          <MarketingMobileMenu isAuthor={!!author} />
+          <MarketingMobileMenu isAuthor={!!author} pricingHref={pricingHref} />
         </div>
       </div>
     </header>

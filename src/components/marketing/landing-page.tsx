@@ -40,7 +40,7 @@ export function LandingPage({ data, afterSections }: { data: LandingPageData; af
     <div className="min-h-screen bg-vault-bg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }} />
-      <MarketingNav />
+      <MarketingNav pricingHref={data.navPricingHref} />
 
       <MarketingPageHeader
         eyebrow={data.eyebrow}

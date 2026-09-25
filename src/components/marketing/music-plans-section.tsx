@@ -64,7 +64,7 @@ export async function MusicPlansSection() {
   if (plans.length === 0) return null;
 
   return (
-    <section className="mb-14" id="plans">
+    <section className="mb-14 scroll-mt-24" id="plans">
       <h2 className="font-vault-display italic text-2xl text-vault-ink mb-3">Plans for musicians</h2>
       <p className="text-[#c7cede] leading-relaxed mb-6">
         Every plan includes music, including Free. Upgrade for more releases, your own domain, and AI promotion.

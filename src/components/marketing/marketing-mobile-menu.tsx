@@ -18,9 +18,6 @@ const RESOURCES: [string, string][] = [
   ["/faq", "FAQ"],
 ];
 
-const LINKS_BOTTOM: [string, string][] = [
-  ["/pricing", "Pricing"],
-];
 
 /**
  * Hamburger + dropdown for the shared MarketingNav on screens below md.
@@ -28,7 +25,7 @@ const LINKS_BOTTOM: [string, string][] = [
  * Solutions mirrors the desktop dropdown's 4-category structure (see
  * solution-categories.ts) instead of a flat 12-link list.
  */
-export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
+export function MarketingMobileMenu({ isAuthor, pricingHref = "/pricing" }: { isAuthor: boolean; pricingHref?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -113,7 +110,7 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                 </Link>
               ))}
 
-              {LINKS_BOTTOM.map(([href, label]) => (
+              {([[pricingHref, "Pricing"]] as [string, string][]).map(([href, label]) => (
                 <Link
                   key={href}
                   href={href}

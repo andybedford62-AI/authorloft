@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getOgImage } from "@/lib/seo-config";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -9,7 +10,9 @@ export const revalidate = 60;
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const ogImage = await getOgImage("news");
+  return {
   title: "News — Updates, Features & Announcements",
   description:
     "The latest from AuthorLoft: product updates, new features, specials, and events. Read current and past announcements from the team.",
@@ -22,13 +25,16 @@ export const metadata: Metadata = {
     title: "AuthorLoft News — Updates, Features & Announcements",
     description: "Product updates, new features, specials, and events from the AuthorLoft team.",
     url: `${BASE}/news`,
+    images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft News" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "AuthorLoft News — Updates, Features & Announcements",
     description: "Product updates, new features, specials, and events from the AuthorLoft team.",
+    images: [ogImage],
   },
-};
+  };
+}
 
 async function getNewsPosts() {
   return prisma.platformPost.findMany({

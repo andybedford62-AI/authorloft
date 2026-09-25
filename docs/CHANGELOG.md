@@ -22,6 +22,12 @@ line rather than listing every commit.
   Checking the DB showed tracks-per-list is really 20/75/500 (docs said 15/50/unlimited) and music
   genre themes are open to FREE music publishers — FAQ copy and FEATURE_MATRIX.md corrected.
 - `/pricing` title/subtitle now creator-neutral ("Free for Authors, Musicians & Course Creators").
+- **Social Images uploads now actually apply** to all 13 solution pages and `/news`. Those pages
+  hard-coded `og-home.png` (or no image), so 7 uploads made in Super Admin → Platform Settings →
+  Social Images had never shown on shares. One `landingPageMetadata()` helper replaces 13 copies.
+  `/for-musicians` falls back to a 1200×630 crop of its banner instead of the book-focused default.
+- `/for-musicians`: nav "Pricing" (desktop + mobile) jumps to its own plan cards; no links to the
+  book-focused /pricing remain on the page (CTA button hidden via `hideCtaPricingLink`).
 
 - New solution page at `/for-musicians` for pointing music creators at AuthorLoft: one home for
   every release (links from YouTube, Spotify, Suno, Udio, Donna, or any shareable link), the
