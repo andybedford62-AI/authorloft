@@ -14,19 +14,19 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("pricing");
   return {
-    title: "Pricing — Free Author Career Platform",
+    title: "Pricing — Free for Authors, Musicians & Course Creators",
     description:
       "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
     alternates: { canonical: "/pricing" },
     openGraph: {
       type:        "website",
-      title:       "AuthorLoft Pricing — Free Author Career Platform",
+      title:       "AuthorLoft Pricing — Free Platform for Authors, Musicians & Course Creators",
       description: "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
       images:      [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft pricing plans" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "AuthorLoft Pricing — Free Author Career Platform",
+      title:       "AuthorLoft Pricing — Free Platform for Authors, Musicians & Course Creators",
       description: "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
       images:      [ogImage],
     },
@@ -174,7 +174,7 @@ export default async function PricingPage() {
       <MarketingPageHeader
         eyebrow="Plans & pricing"
         title={<>Simple, <span className="italic text-vault-gold">transparent</span> pricing</>}
-        subtitle="Start free with no credit card. Upgrade when you're ready to grow your author platform."
+        subtitle="Start free with no credit card. Upgrade when you're ready to grow — whether you write books, teach courses, or make music."
         backgroundImage="/pricing-header.png"
         backgroundImageAlt="A laptop on a wooden desk showing the AuthorLoft plans and prices, beside a calculator and a quill in an inkwell"
       />

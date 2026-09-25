@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
@@ -6,7 +7,7 @@ import type { LandingPageData } from "@/lib/landing-page-data";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
-export function LandingPage({ data }: { data: LandingPageData }) {
+export function LandingPage({ data, afterSections }: { data: LandingPageData; afterSections?: ReactNode }) {
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -83,6 +84,8 @@ export function LandingPage({ data }: { data: LandingPageData }) {
             </ul>
           </section>
         ))}
+
+        {afterSections}
 
         {/* Related guide link */}
         {data.relatedGuideSlug && (

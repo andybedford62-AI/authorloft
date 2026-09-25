@@ -15,6 +15,14 @@ line rather than listing every commit.
 
 ## September 25, 2026 — `/for-musicians` promo landing page
 
+- **Follow-up:** Andy's studio/laptop hero banner (anchored `right 70%`); `MarketingPageHeader`
+  gained `backgroundPosition` + an unused-for-now `backgroundVideo` (muted loop, poster = image).
+- **Music plans section** on the page: Free/Standard/Premium cards read live `Plan` rows (lists,
+  tracks, Social Promote monthly cap, domain, analytics), so prices/limits can't drift from /pricing.
+  Checking the DB showed tracks-per-list is really 20/75/500 (docs said 15/50/unlimited) and music
+  genre themes are open to FREE music publishers — FAQ copy and FEATURE_MATRIX.md corrected.
+- `/pricing` title/subtitle now creator-neutral ("Free for Authors, Musicians & Course Creators").
+
 - New solution page at `/for-musicians` for pointing music creators at AuthorLoft: one home for
   every release (links from YouTube, Spotify, Suno, Udio, Donna, or any shareable link), the
   docked player, share kit + Social Promote, and fan-list ownership, with FAQs and a musician-specific CTA.

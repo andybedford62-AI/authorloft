@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LANDING_PAGES } from "@/lib/landing-page-data";
 import { LandingPage } from "@/components/marketing/landing-page";
+import { MusicPlansSection } from "@/components/marketing/music-plans-section";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo-config";
 
 const data = LANDING_PAGES["for-musicians"];
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: `${data.metaTitle} | AuthorLoft`, description: data.metaDescription, images: [DEFAULT_OG_IMAGE] },
 };
 
+export const revalidate = 60;
+
 export default function Page() {
-  return <LandingPage data={data} />;
+  return <LandingPage data={data} afterSections={<MusicPlansSection />} />;
 }
