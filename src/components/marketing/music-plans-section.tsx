@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Check, Minus } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { MUSIC_GENRE_PALETTES } from "@/lib/themes";
@@ -112,11 +111,6 @@ export async function MusicPlansSection() {
           );
         })}
       </div>
-
-      <p className="mt-4 text-sm text-vault-mute">
-        Also writing books or teaching?{" "}
-        <Link href="/pricing" className="text-vault-gold font-medium hover:underline">See full pricing →</Link>
-      </p>
     </section>
   );
 }

@@ -129,12 +129,14 @@ export function LandingPage({ data, afterSections }: { data: LandingPageData; af
             >
               Get Started Free
             </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 text-vault-gold font-medium px-6 py-3 rounded-vault border border-vault-ink/15 hover:border-vault-gold transition-colors"
-            >
-              See pricing
-            </Link>
+            {!data.hideCtaPricingLink && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 text-vault-gold font-medium px-6 py-3 rounded-vault border border-vault-ink/15 hover:border-vault-gold transition-colors"
+              >
+                See pricing
+              </Link>
+            )}
           </div>
           <p className="mt-5 text-sm text-vault-mute">
             Wondering what building your own site would cost?{" "}

@@ -39,6 +39,8 @@ export interface LandingPageData {
   /** Closing CTA copy. Omitted = the default author-career wording. */
   ctaTitle?: string;
   ctaSubtitle?: string;
+  /** Drop the CTA's "See pricing" button (page shows its own plans instead). */
+  hideCtaPricingLink?: boolean;
 }
 
 export const LANDING_PAGES: Record<string, LandingPageData> = {
@@ -765,6 +767,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "I'm not an author. Is AuthorLoft still for me?", a: "Yes. AuthorLoft started with authors and now supports musicians and course creators too. Your site only shows what you publish, so a music-only site has no empty Books section." },
       { q: "Can I use my own domain?", a: "Yes, on Standard and Premium. Every plan also includes a free authorloft.com address, so you can go live today and add your domain later." },
     ],
+    hideCtaPricingLink: true,
     ctaTitle: "Give your music a home of its own",
     ctaSubtitle: "Set up your site, add your first release, and share it today. Free to start, upgrade when you're ready.",
   },
