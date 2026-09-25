@@ -13,6 +13,17 @@ line rather than listing every commit.
 
 ---
 
+## September 25, 2026 — `/for-musicians` promo landing page
+
+- New solution page at `/for-musicians` for pointing music creators at AuthorLoft: one home for
+  every release (links from YouTube, Spotify, Suno, Udio, Donna, or any shareable link), the
+  docked player, share kit + Social Promote, and fan-list ownership, with FAQs and a musician-specific CTA.
+- New "For Musicians" group in the Solutions nav (desktop, mobile, homepage hero) links straight to
+  the page (`SolutionCategory.href`); "Browse all N" and the /solutions hub copy now count pages
+  instead of hard-coding 12. Homepage "Musicians" card gets a "Learn more →" link.
+- Landing template gained optional `ctaTitle` / `ctaSubtitle`; the other 12 pages are unchanged.
+  Sitemap and /features pick it up automatically from `LANDING_PAGES`.
+
 ## September 24, 2026 — Book editor: collapsible cards + pinned save bar
 
 Measured every tab on Night Dive: only Details (3.2 screens) and Organisation (2.6) were

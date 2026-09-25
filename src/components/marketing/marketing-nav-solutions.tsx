@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { SOLUTION_CATEGORIES } from "@/lib/solution-categories";
+import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from "@/lib/solution-categories";
 
 export function MarketingNavSolutions() {
   const [open, setOpen] = useState(false);
@@ -46,7 +46,7 @@ export function MarketingNavSolutions() {
             {SOLUTION_CATEGORIES.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/solutions#${cat.id}`}
+                href={cat.href ?? `/solutions#${cat.id}`}
                 className="flex items-center justify-between gap-3 px-3 py-2.5 -mx-3 rounded-lg hover:bg-vault-ink/6 transition-colors group"
               >
                 <span>
@@ -61,7 +61,7 @@ export function MarketingNavSolutions() {
 
             <div className="border-t border-vault-ink/8 mt-1.5 pt-2">
               <Link href="/solutions" className="text-xs font-medium text-vault-mute hover:text-vault-gold transition-colors">
-                Browse all 12 →
+                Browse all {SOLUTION_PAGE_COUNT} →
               </Link>
             </div>
           </div>

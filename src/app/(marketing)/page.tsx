@@ -297,10 +297,10 @@ export default async function HomePage() {
 
 function BuiltForSection() {
   const SERIF = VAULT.fontDisplay;
-  const cards = [
+  const cards: { icon: typeof Music; label: string; copy: string; href?: string }[] = [
     { icon: BookOpen,      label: "Authors",         copy: "Sell eBooks, audiobooks, and print, direct to readers." },
     { icon: GraduationCap, label: "Course Creators",  copy: "Turn what you know into a paid course, hosted on your own site." },
-    { icon: Music,         label: "Musicians",        copy: "Share playlists and albums that link straight to your music — no cut taken." },
+    { icon: Music,         label: "Musicians",        copy: "Share playlists and albums that link straight to your music — no cut taken.", href: "/for-musicians" },
   ];
   return (
     <section style={{ background: VAULT.surf, padding: '48px 28px' }}>
@@ -309,7 +309,7 @@ function BuiltForSection() {
           Built for every kind of creator
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
-          {cards.map(({ icon: Icon, label, copy }) => (
+          {cards.map(({ icon: Icon, label, copy, href }) => (
             <div key={label} style={{ textAlign: 'center' }}>
               <div style={{
                 width: 52, height: 52, margin: '0 auto 16px', borderRadius: '50%',
@@ -324,6 +324,11 @@ function BuiltForSection() {
               <p style={{ fontSize: '0.9rem', color: VAULT.mute, lineHeight: 1.6, margin: 0, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
                 {copy}
               </p>
+              {href && (
+                <Link href={href} style={{ display: 'inline-block', marginTop: 10, fontSize: '0.85rem', fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
+                  Learn more →
+                </Link>
+              )}
             </div>
           ))}
         </div>

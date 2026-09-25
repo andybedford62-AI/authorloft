@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { VaultButton } from "@/components/marketing/vault";
-import { SOLUTION_CATEGORIES } from "@/lib/solution-categories";
+import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from "@/lib/solution-categories";
 
 const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
@@ -65,12 +65,12 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                 </Link>
               ))}
 
-              {/* Solutions group — same 4 categories as the desktop dropdown */}
+              {/* Solutions group — same categories as the desktop dropdown */}
               <p className="pt-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-vault-mute">Solutions</p>
               {SOLUTION_CATEGORIES.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/solutions#${cat.id}`}
+                  href={cat.href ?? `/solutions#${cat.id}`}
                   onClick={() => setOpen(false)}
                   className="py-2.5 pl-3 border-b border-vault-ink/8 transition-colors"
                 >
@@ -83,7 +83,7 @@ export function MarketingMobileMenu({ isAuthor }: { isAuthor: boolean }) {
                 onClick={() => setOpen(false)}
                 className="py-2.5 pl-3 text-sm font-medium text-vault-gold border-b border-vault-ink/8 transition-colors"
               >
-                Browse all 12 →
+                Browse all {SOLUTION_PAGE_COUNT} →
               </Link>
               <Link
                 href="/features"

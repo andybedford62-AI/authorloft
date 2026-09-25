@@ -32,6 +32,9 @@ export interface LandingPageData {
   backgroundImage?: string;
   /** Descriptive alt text for backgroundImage (Bing flags empty alt). */
   backgroundImageAlt?: string;
+  /** Closing CTA copy. Omitted = the default author-career wording. */
+  ctaTitle?: string;
+  ctaSubtitle?: string;
 }
 
 export const LANDING_PAGES: Record<string, LandingPageData> = {
@@ -692,6 +695,71 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Can I give a course away for free?", a: "Yes. A free course is one of the strongest email-list builders available — students enroll with their email address and are added to your subscriber list the same way a paid buyer is." },
       { q: "Which plan includes courses?", a: "Courses are available on Standard (up to 20 courses) and Premium (unlimited). The Free plan includes up to 5 courses." },
     ],
+  },
+
+  "for-musicians": {
+    slug: "for-musicians",
+    metaTitle: "Music Promotion Platform for Independent Musicians",
+    metaDescription: "Give your music its own home. Share albums, EPs, and playlists from YouTube, Spotify, Suno, Udio, and more on your own site, with share links, AI social posts, and a fan list you own. Free to start.",
+    eyebrow: "For Musicians",
+    heroTitle: <>Your music deserves a home that isn&apos;t <span className="italic text-vault-gold">someone else&apos;s algorithm</span></>,
+    heroSubtitle: "Put every release on one site you own: albums, EPs, singles, and playlists from wherever your music lives, with a player your fans can use and a fan list that's yours. Free to start.",
+    intro: "Your songs are on YouTube, Spotify, Suno, Udio, and a dozen other places, and none of them belongs to you. A streaming platform owns the listener relationship, and a link-in-bio page is just a list of buttons. AuthorLoft gives you a real site where every release has its own page, fans can listen right there, and each share points back to you. You don't upload any audio. Your music stays where it already is, so every play still counts on the platform it came from.",
+    sections: [
+      {
+        title: "One home for every release",
+        description: "Organize your music the way you actually release it, pulling in links from the services you already use.",
+        bullets: [
+          "Build Music Lists as a Playlist, Album, EP, or Single",
+          "Add tracks from YouTube, Spotify, Suno, Udio, Donna, or any site that gives you a shareable link",
+          "Import a whole YouTube playlist at once, or bulk-paste links straight from a spreadsheet",
+          "Album-level \"Listen on\" links send fans to your release on each platform",
+          "Add artwork and a release date, and publish when the release is ready",
+        ],
+      },
+      {
+        title: "A player fans actually use",
+        description: "Visitors can listen without leaving your site, and every track gets a place of its own.",
+        bullets: [
+          "Docked Now Playing player with Previous/Next controls",
+          "Play all, with YouTube tracks advancing automatically",
+          "YouTube and Spotify play inline; Suno, Udio, Donna, and other links open on the source site",
+          "Numbered tracklists for albums, EPs, and singles, and an artwork grid for playlists",
+          "Put your music at the top of your homepage with Hero Focus",
+        ],
+      },
+      {
+        title: "Built to be shared",
+        description: "A new release only matters if people hear it, so sharing is built into every page.",
+        bullets: [
+          "Every song gets its own share link with its own preview image",
+          "Fans can share from their phone straight to TikTok, Instagram, and other apps",
+          "Your share kit includes tracked links, a ready-made caption, and a QR code for shows and flyers",
+          "AI Social Promote writes posts for New Releases, Track Spotlights, Behind the Music, and Ask Listeners",
+          "Optionally list your music in the AuthorLoft Bookstore catalog so new listeners can find it",
+        ],
+      },
+      {
+        title: "Own your fanbase",
+        description: "Followers on a platform can disappear with the next algorithm change. An email list stays with you.",
+        bullets: [
+          "Newsletter signup on your site, with campaigns you send to fans directly",
+          "Export your fan list at any time; nobody can take it away",
+          "Traffic analytics show where listeners come from and which pages they visit",
+          "Contact form for bookings, collaborations, and press",
+          "Your own domain, plus 8 music genre themes that make the site look like yours",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "Do I upload my music to AuthorLoft?", a: "No. AuthorLoft is link-based. You add links to your tracks on YouTube, Spotify, Suno, Udio, Donna, or any other site that gives you a shareable link, and they show up in your player. Your audio stays where it is, so plays and streams still count on those platforms." },
+      { q: "How is this different from Linktree?", a: "A link-in-bio page is a list of buttons. AuthorLoft gives you a full site: a page for each release, a player fans can listen on, share links for every song, a newsletter to reach fans directly, and analytics, all at your own address." },
+      { q: "Which plan includes music?", a: "Every plan. The Free plan includes up to 5 Music Lists with up to 15 tracks each. Standard raises that to 20 lists of 50 tracks and adds music genre themes, AI Social Promote, and a custom domain. Premium makes lists and tracks unlimited." },
+      { q: "I'm not an author. Is AuthorLoft still for me?", a: "Yes. AuthorLoft started with authors and now supports musicians and course creators too. Your site only shows what you publish, so a music-only site has no empty Books section." },
+      { q: "Can I use my own domain?", a: "Yes, on Standard and Premium. Every plan also includes a free authorloft.com address, so you can go live today and add your domain later." },
+    ],
+    ctaTitle: "Give your music a home of its own",
+    ctaSubtitle: "Set up your site, add your first release, and share it today. Free to start, upgrade when you're ready.",
   },
 };
 

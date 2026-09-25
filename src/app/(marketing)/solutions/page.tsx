@@ -5,7 +5,7 @@ import { getOgImage } from "@/lib/seo-config";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { VaultSection, VaultCard, VaultButton } from "@/components/marketing/vault";
-import { SOLUTION_CATEGORIES } from "@/lib/solution-categories";
+import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from "@/lib/solution-categories";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
@@ -14,12 +14,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Solutions — Every Way AuthorLoft Grows Your Author Business",
     description:
-      "Twelve tools across four groups: your platform, selling and growth, marketing and tools, readers and analytics. Browse by category, or compare every feature side-by-side.",
+      `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups: your platform, selling and growth, marketing and tools, readers and analytics, and music. Browse by category, or compare every feature side-by-side.`,
     alternates: { canonical: "/solutions" },
     openGraph: {
       type: "website",
       title: "Solutions — Every Way AuthorLoft Grows Your Author Business",
-      description: "Twelve tools across four groups, built for independent authors.",
+      description: `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups, built for independent authors, musicians, and creators.`,
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft Solutions" }],
     },
     twitter: {
@@ -48,7 +48,7 @@ export default function SolutionsPage() {
       <MarketingPageHeader
         eyebrow="Solutions"
         title={<>Every way AuthorLoft <span className="italic text-vault-gold">grows your business</span></>}
-        subtitle="Twelve tools, four groups. Pick a starting point below, or see the full side-by-side comparison."
+        subtitle={`${SOLUTION_PAGE_COUNT} tools, ${SOLUTION_CATEGORIES.length} groups. Pick a starting point below, or see the full side-by-side comparison.`}
       />
 
       {SOLUTION_CATEGORIES.map((cat, i) => (

@@ -112,10 +112,10 @@ export function LandingPage({ data }: { data: LandingPageData }) {
         <section className="bg-vault-surf-2 rounded-2xl px-6 py-10 text-center">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-vault-gold mb-3">· Start free ·</p>
           <h2 className="font-vault-display italic text-2xl text-vault-ink font-normal mb-4">
-            Ready to take control of your author career?
+            {data.ctaTitle ?? "Ready to take control of your author career?"}
           </h2>
           <p className="text-sm text-vault-mute max-w-md mx-auto mb-6">
-            Join thousands of indie authors building their platform on AuthorLoft — free to start, upgrade when you&apos;re ready.
+            {data.ctaSubtitle ?? "Join thousands of indie authors building their platform on AuthorLoft — free to start, upgrade when you're ready."}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link

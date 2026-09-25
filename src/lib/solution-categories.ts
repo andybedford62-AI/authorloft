@@ -9,6 +9,8 @@ export interface SolutionCategory {
   label: string;
   description: string;
   items: SolutionItem[];
+  /** Nav links here directly instead of /solutions#id (single-page groups). */
+  href?: string;
 }
 
 /**
@@ -62,4 +64,15 @@ export const SOLUTION_CATEGORIES: SolutionCategory[] = [
       { slug: "reader-analytics-for-authors", label: "Reader Analytics", blurb: "See what's actually working, in plain numbers." },
     ],
   },
+  {
+    id: "by-creator",
+    label: "For Musicians",
+    description: "Your albums, EPs, and playlists on your own site",
+    href: "/for-musicians",
+    items: [
+      { slug: "for-musicians", label: "For Musicians", blurb: "One home for every release, built to share, with a fan list you own." },
+    ],
+  },
 ];
+
+export const SOLUTION_PAGE_COUNT = SOLUTION_CATEGORIES.reduce((n, c) => n + c.items.length, 0);

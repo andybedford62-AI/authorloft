@@ -6,7 +6,7 @@ import { useState, useEffect, useId } from 'react';
 import { BookOpen, GraduationCap, Music } from 'lucide-react';
 import { MarketingMobileMenu } from '@/components/marketing/marketing-mobile-menu';
 import { VAULT } from '@/components/marketing/vault-theme';
-import { SOLUTION_CATEGORIES } from '@/lib/solution-categories';
+import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from '@/lib/solution-categories';
 
 const CREATOR_BADGES = [
   { icon: BookOpen,      label: 'Authors' },
@@ -249,14 +249,14 @@ function HeroSolutionsDropdown() {
             </Link>
             <div style={{ height: 1, background: VAULT.hair, margin: '4px 0' }} />
             {SOLUTION_CATEGORIES.map((cat) => (
-              <Link key={cat.id} href={`/solutions#${cat.id}`} style={{ display: 'block', padding: '8px 10px', borderRadius: VAULT.radius, textDecoration: 'none' }}>
+              <Link key={cat.id} href={cat.href ?? `/solutions#${cat.id}`} style={{ display: 'block', padding: '8px 10px', borderRadius: VAULT.radius, textDecoration: 'none' }}>
                 <span style={{ display: 'block', fontSize: 13, color: VAULT.ink }}>{cat.label}</span>
                 <span style={{ display: 'block', fontSize: 11, color: VAULT.mute, marginTop: 1 }}>{cat.description}</span>
               </Link>
             ))}
             <div style={{ height: 1, background: VAULT.hair, margin: '4px 0' }} />
             <Link href="/solutions" style={{ display: 'block', padding: '8px 10px', fontSize: 11.5, fontWeight: 500, color: VAULT.mute, textDecoration: 'none' }}>
-              Browse all 12 →
+              Browse all {SOLUTION_PAGE_COUNT} →
             </Link>
           </div>
         </div>
