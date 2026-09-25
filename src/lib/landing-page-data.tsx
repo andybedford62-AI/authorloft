@@ -32,6 +32,10 @@ export interface LandingPageData {
   backgroundImage?: string;
   /** Descriptive alt text for backgroundImage (Bing flags empty alt). */
   backgroundImageAlt?: string;
+  /** Optional looping MP4 over the banner; backgroundImage is its poster/still. */
+  backgroundVideo?: string;
+  /** Banner object-position override (default "right center"). */
+  backgroundPosition?: string;
   /** Closing CTA copy. Omitted = the default author-career wording. */
   ctaTitle?: string;
   ctaSubtitle?: string;
@@ -699,6 +703,9 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
 
   "for-musicians": {
     slug: "for-musicians",
+    backgroundImage: "/for-musicians-header.jpg",
+    backgroundImageAlt: "A dim home studio at night with a turntable, keyboard, and headphones beside a laptop whose screen reads Your Music, One Home: YouTube, Spotify, Suno, Udio, Donna",
+    backgroundPosition: "right 70%",
     metaTitle: "Music Promotion Platform for Independent Musicians",
     metaDescription: "Give your music its own home. Share albums, EPs, and playlists from YouTube, Spotify, Suno, Udio, and more on your own site, with share links, AI social posts, and a fan list you own. Free to start.",
     eyebrow: "For Musicians",

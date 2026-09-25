@@ -23,6 +23,13 @@ interface MarketingPageHeaderProps {
    * checkers (e.g. Bing) flag empty alt text.
    */
   backgroundImageAlt?: string;
+  /**
+   * Optional muted, looping MP4 played over backgroundImage (which doubles as the poster and
+   * the still shown to reduced-motion users). Decorative only: no audio, no controls.
+   */
+  backgroundVideo?: string;
+  /** CSS object-position for the banner (default "right center"), e.g. "right 70%" to keep a low subject in view. */
+  backgroundPosition?: string;
 }
 
 /**
@@ -37,8 +44,8 @@ interface MarketingPageHeaderProps {
  *
  * Accent a word in the title with: <span className="italic text-vault-gold">Word</span>
  */
-export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, backgroundImageAlt }: MarketingPageHeaderProps) {
-  const hasBanner = !!backgroundImage;
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, backgroundImageAlt, backgroundVideo, backgroundPosition = "right center" }: MarketingPageHeaderProps) {
+  const hasBanner = !!backgroundImage || !!backgroundVideo;
 
   return (
     <section className="relative overflow-hidden bg-vault-surf">
@@ -46,7 +53,24 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         <>
           {/* Banner image — subject weighted right, calm space left. object-contain
               shows the full image (no cropping); navy bg fills the remaining space. */}
-          <Image src={backgroundImage!} alt={backgroundImageAlt ?? ""} aria-hidden={backgroundImageAlt ? undefined : true} fill className="object-cover object-right" />
+          {backgroundImage && (
+            <Image src={backgroundImage} alt={backgroundImageAlt ?? ""} aria-hidden={backgroundImageAlt ? undefined : true} fill priority={!!backgroundVideo} className="object-cover" style={{ objectPosition: backgroundPosition }} />
+          )}
+          {backgroundVideo && (
+            <video
+              aria-hidden
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster={backgroundImage}
+              className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
+              style={{ objectPosition: backgroundPosition }}
+            >
+              <source src={backgroundVideo} type="video/mp4" />
+            </video>
+          )}
           {/* Navy scrim so the left-aligned text stays readable over the art —
               stays dark across the text column even on bright/light photos,
               then fades out toward the right where the image is the focus. */}
