@@ -257,6 +257,22 @@ Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors 
 
 ---
 
+## Achievement Badges — next set
+
+Raised Sept 26, 2026. Badges are auto-calculated from the metrics in `src/lib/badges.ts` (`getAuthorBadgeMetrics`) against `BadgeDefinition` rows (Super Admin → Badges; highest cleared tier per metric shown on the About page + Bookstore spotlight). Adding a metric = a count in `getAuthorBadgeMetrics()`, the metric option in the Super Admin Badges manager, and `BadgeDefinition` rows (data only, no schema change). Update `/features` + `docs/FEATURE_MATRIX.md` when shipping.
+
+- [ ] **Music badges (priority)** — none exist: the "Educator" course count deliberately excludes `kind: MUSIC`, so musicians can only earn the newsletter badges. Prod on Sept 26: 3 music creators, one with 6 published lists / 47 tracks and zero badges. Proposed: *published music lists* — First Release (1), Growing Discography (5); *tracks across published lists* — Ten Tracks (10), Deep Catalog (50). Names/thresholds to confirm. *(small)*
+- [ ] **Other badge ideas** (all from data that already exists — pick a few, don't ship them all):
+  - *Course creators* — enrolled students (`CourseEnrollment`: 10 / 100); lessons published; course reviews (`CourseFeedback`).
+  - *Books* — Series Builder (a `Series` with 3+ books); Audiobook Author (any `BookAudioTrack`); Flip-Book Preview (`FlipBook`); Bestseller (one book with N completed orders).
+  - *Audience* — Newsletter Sender (N `Campaign`s sent); Reader Magnet (`BookMagnetLead` count); Blogger (published `Post`s: 5 / 25).
+  - *Promotion* — Social Promoter (posts published via Social Promote / `SocialPost`); Deal Maker (a `Special` or `DiscountCode` used in an order).
+  - *Milestones* — Own Domain (custom domain connected); anniversary badges (1 / 2 years on AuthorLoft) — both need a small non-count metric (boolean / account age).
+  - *Wording* — a few existing labels say "Author" ("Prolific Author", "Multi-Format Author"); fine for book metrics, but keep new cross-creator labels neutral ("Creator").
+  *(small each)*
+
+---
+
 ## Resources & Downloads (`/resources`)
 
 Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliate directory). Open ideas:
