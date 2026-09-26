@@ -24,8 +24,10 @@ line rather than listing every commit.
 - **Analytics host filter** now matches exact hosts on `NEXT_PUBLIC_PLATFORM_DOMAIN`
   (`src/lib/analytics-hosts.ts`). The old hard-coded `LIKE '%slug.authorloft.com%'` never
   matched staging (`<slug>.staging.authorloft.com`) and credited author "bob" with
-  "jimbob"'s traffic. Custom domains match with and without `www.`. Temporary super-admin
-  diagnostic: `/api/admin/analytics?debug=hosts` lists $pageview counts per host from PostHog.
+  "jimbob"'s traffic. Custom domains match with and without `www.`. (A temporary super-admin
+  `?debug=hosts` diagnostic was used to confirm prod, then removed.)
+- **Consent banner** now records the page the visitor clicks Accept on — previously tracking
+  only started from the next navigation, so every first page view was lost.
 
 ## September 25, 2026 — `/for-musicians` promo landing page
 

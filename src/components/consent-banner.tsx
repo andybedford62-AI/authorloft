@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { initPostHogIfConsented, optOutPostHog } from "@/lib/posthog-client";
+import { initPostHogIfConsented, capturePageview, optOutPostHog } from "@/lib/posthog-client";
 
 export function ConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -30,6 +30,9 @@ export function ConsentBanner() {
         analytics_storage: "granted",
       });
       initPostHogIfConsented();
+      // PostHogPageTracker only captures on route changes, so without this the
+      // page the visitor accepted on would never be counted.
+      capturePageview(window.location.href);
     } else {
       optOutPostHog();
     }
