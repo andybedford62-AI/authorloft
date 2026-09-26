@@ -245,6 +245,18 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 
 ---
 
+## Analytics & Consent
+
+Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors who click **Accept** on the consent banner are counted (PostHog), so author stats undercount. Get legal sign-off before changing consent behaviour — `/gdpr` promises "no tracking cookies without your consent … banner shown on your first visit where required".
+
+- [ ] **Show the consent banner only where the law needs it (e.g. non-US visitors)** — use Vercel's `x-vercel-ip-country` header to decide; outside EU/UK/etc., track without prompting. Needs a decision on which countries count, plus `/gdpr` + `/privacy` wording updates. *(medium)*
+- [ ] **PostHog cookieless mode for non-consenting visitors** — posthog-js 1.404 supports `cookieless_mode: "on_reject"`: visitors who decline or ignore the banner are still counted with no cookie/localStorage (server-side daily hash). PostHog says no consent needed; some EU regulators disagree — confirm with a lawyer. Alternative/complement to the geo idea above. *(small)*
+- [ ] **Google Ads consent-mode default** — `gtag.js` in `src/app/layout.tsx` loads for everyone before consent with no `gtag('consent', 'default', {…: 'denied'})`; the banner only sends an `update` on Accept. Set the denied default before the tag loads if EU compliance matters. *(small)*
+- [ ] **Remove the stale `fonts.gstatic.com` preconnect** in `src/app/layout.tsx` — fonts are self-hosted since Sept 26, 2026, so it only opens a pointless connection to Google. Ride along with the next layout change. *(tiny)*
+- [ ] **Classic-theme author headings render in Inter, not Playfair** — `:root` sets `--author-font-heading: var(--font-playfair), …` but `--font-playfair` is only defined on `<body>`, so at `:root` the value is invalid and headings inherit Inter (affects the default Classic Literary theme and any theme that doesn't override `--author-font-heading`). Fixing it (declare the font vars on `:root`) is a visible design change on live author sites — decide deliberately, check on staging. *(tiny code, needs a design call)*
+
+---
+
 ## Resources & Downloads (`/resources`)
 
 Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliate directory). Open ideas:
