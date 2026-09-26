@@ -21,6 +21,11 @@ line rather than listing every commit.
   only platform-domain events reached PostHog. `/ingest/` is now excluded from the middleware
   matcher (also skips author-site rate limiting and the maintenance check for event calls).
   Events lost Sep 10–26 can't be recovered.
+- **Analytics host filter** now matches exact hosts on `NEXT_PUBLIC_PLATFORM_DOMAIN`
+  (`src/lib/analytics-hosts.ts`). The old hard-coded `LIKE '%slug.authorloft.com%'` never
+  matched staging (`<slug>.staging.authorloft.com`) and credited author "bob" with
+  "jimbob"'s traffic. Custom domains match with and without `www.`. Temporary super-admin
+  diagnostic: `/api/admin/analytics?debug=hosts` lists $pageview counts per host from PostHog.
 
 ## September 25, 2026 — `/for-musicians` promo landing page
 

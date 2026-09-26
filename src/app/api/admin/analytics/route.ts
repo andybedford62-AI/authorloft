@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { labelTrafficSources } from "@/lib/traffic-source";
+import { authorSiteHosts, hostInClause } from "@/lib/analytics-hosts";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
 const POSTHOG_API_KEY = process.env.POSTHOG_PERSONAL_API_KEY;
 const POSTHOG_PROJECT_ID = process.env.POSTHOG_PROJECT_ID;
@@ -50,13 +55,40 @@ export async function GET(req: NextRequest) {
 
   if (!author) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Validate slug/domain before interpolating into HogQL (slugs are alphanumeric + hyphens)
-  const safeSlug = author.slug.replace(/[^a-z0-9-]/gi, "");
-  const safeCustomDomain = author.customDomain?.replace(/[^a-z0-9.-]/gi, "") ?? null;
+  // Exact hosts on this environment's platform domain (staging included);
+  // authorSiteHosts() sanitises them before they go into HogQL.
+  const hosts = authorSiteHosts(author.slug, author.customDomain, PLATFORM_DOMAIN);
+  const hostFilter = hostInClause(hosts);
 
-  const hostFilter = safeCustomDomain
-    ? `(properties.$host LIKE '%${safeSlug}.authorloft.com%' OR properties.$host = '${safeCustomDomain}')`
-    : `properties.$host LIKE '%${safeSlug}.authorloft.com%'`;
+  // TEMPORARY diagnostic (super admins only): what PostHog actually holds —
+  // $pageview counts per $host — to tell "no events arriving" apart from
+  // "events arriving under a host this filter doesn't match". Remove once
+  // author-site analytics is confirmed working.
+  if (req.nextUrl.searchParams.get("debug") === "hosts") {
+    const session = await getServerSession(authOptions);
+    if (!(session?.user as any)?.isSuperAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const [byHost, recent] = await Promise.all([
+      queryPostHog(
+        `SELECT properties.$host as host, count() as views, max(timestamp) as last_seen
+         FROM events WHERE event = '$pageview' AND timestamp >= now() - interval ${days} day
+         GROUP BY host ORDER BY views DESC LIMIT 50`
+      ),
+      queryPostHog(
+        `SELECT event, count() as n FROM events
+         WHERE timestamp >= now() - interval 1 day
+         GROUP BY event ORDER BY n DESC LIMIT 20`
+      ),
+    ]);
+    return NextResponse.json({
+      filterHosts: hosts,
+      postHogApiHost: POSTHOG_API_HOST,
+      postHogProjectId: POSTHOG_PROJECT_ID,
+      pageviewsByHost: byHost.results?.map((r: any[]) => ({ host: r[0], views: Number(r[1]) || 0, lastSeen: r[2] })) ?? [],
+      eventsLast24h: recent.results?.map((r: any[]) => ({ event: r[0], count: Number(r[1]) || 0 })) ?? [],
+    });
+  }
 
   const baseWhere = `event = '$pageview' AND ${hostFilter} AND timestamp >= now() - interval ${days} day`;
 
