@@ -50,9 +50,18 @@
   --author-nav-bg:  #1a2236;  /* nav background — overridden per theme  */
 }
 
-/* ── Google Fonts ───────────────────────────────────────────────────────── */
-/* Loaded via next/font in layout.tsx — CSS vars available as              */
-/* --font-playfair and --font-inter                                        */
+/* ── Site fonts ─────────────────────────────────────────────────────────── */
+/* Self-hosted via @fontsource-variable (imported in layout.tsx); the      */
+/* <body class="site-font-body"> replaces next/font's inter.variable,     */
+/* playfair.variable and inter.className. The vars are declared on body   */
+/* (not :root) exactly as next/font scoped them — :root's                 */
+/* --author-font-heading/body reference them, and moving them to :root    */
+/* would change heading fonts on Classic-theme author sites.              */
+.site-font-body {
+  --font-inter:    'Inter Variable';
+  --font-playfair: 'Playfair Display Variable';
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+}
 
 /* ── Author site theme CSS variables ───────────────────────────────────── */
 /* Applied via data-theme attribute on the author site wrapper div         */

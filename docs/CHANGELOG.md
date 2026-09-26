@@ -28,6 +28,10 @@ line rather than listing every commit.
   `?debug=hosts` diagnostic was used to confirm prod, then removed.)
 - **Consent banner** now records the page the visitor clicks Accept on — previously tracking
   only started from the next navigation, so every first page view was lost.
+- **Self-hosted fonts** — Inter and Playfair Display now come from `@fontsource-variable`
+  (same files and unicode-range subsets Google serves) instead of `next/font/google`, which
+  downloaded them from Google on every build; a failed download broke a prod build today.
+  The CSS vars stay scoped to `<body>` exactly as next/font had them, so no visual change.
 
 ## September 25, 2026 — `/for-musicians` promo landing page
 

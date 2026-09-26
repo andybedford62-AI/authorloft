@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+// Self-hosted from npm (same files and unicode-range subsets Google serves) so
+// builds never download fonts: a failed fonts.gstatic.com fetch during
+// next/font/google's build step broke a prod deploy on Sept 26, 2026.
+// Family names are mapped to --font-inter / --font-playfair in globals.css.
+import "@fontsource-variable/inter/wght.css";
+import "@fontsource-variable/playfair-display/wght.css";
+import "@fontsource-variable/playfair-display/wght-italic.css";
 import { Analytics } from "@vercel/analytics/next";
 import { ConsentBanner } from "@/components/consent-banner";
 import { PostHogPageTracker } from "@/components/posthog-page-tracker";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
 
 const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
@@ -78,7 +72,7 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={`${inter.variable} ${playfair.variable} ${inter.className} min-h-full`} suppressHydrationWarning>
+      <body className="site-font-body min-h-full" suppressHydrationWarning>
         {children}
         <PostHogPageTracker />
         {/* Vercel Web Analytics — cookieless, served from /_vercel/insights on

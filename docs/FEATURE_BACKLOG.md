@@ -242,7 +242,6 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 - [ ] **Cost Savings Calculator — remaining ideas** — blog post "How much does it cost to build an author website?" linking to the calculator (best route to Google search traffic); emailed/shareable results summary; a PostHog funnel + dashboard once events accumulate. *(links from /compare, /features, landing pages and the PostHog events shipped Sept 21, 2026)* *(small–medium)*
 - [ ] **Replace pricing page hero image with a real photo** — `public/pricing-header.png` is AI-generated (confirmed Sept 8, 2026: same asset since Aug 9, just without the visible "Made with AI" badge — violates the no-AI-imagery rule, which was known and enforced elsewhere but missed here). Shipped as a stopgap with updated $9.99/$39.99 pricing baked in; replace with a real photo (with pricing as a separate on-page text overlay, not baked into the image) when one is available. *(small, once a photo is sourced)*
 
-- [ ] **Self-host site fonts (stop build-time Google Fonts downloads)** — `src/app/layout.tsx` loads Inter and Playfair Display via `next/font/google`, which downloads the font files from Google during every build. On Sept 26, 2026 a prod build of an already-tested commit failed with `Can't resolve '@vercel/turbopack-next/internal/font/google/font'` because that download failed; a plain redeploy succeeded. Switch to `next/font/local` with the .woff2 files committed to the repo so builds no longer depend on Google being reachable. Touches the site-wide layout — verify fonts on staging (marketing, admin, author sites) before promoting. *(small)*
 
 ---
 
@@ -259,6 +258,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ## Shipped (for reference)
 
+- ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
 - ✅ **Shared share/promote layer for Books, Courses and Music** — public `ShareBar` (with QR popover) on book/course/music pages, admin `ShareKit` on all three editors, Copy link / View live on list rows, Social Promote for courses with 7 course promo types. (September 24, 2026)
 - ✅ **Traffic Sources reads `utm_source`** — tagged share links are credited to their network instead of "Direct"; friendly labels in `src/lib/traffic-source.ts`. (September 24, 2026)
 - ✅ **Cover URL check on save/import** — `src/lib/cover-url-check.ts`; book/course save refuses a web-page or not-found cover, CSV import drops it and lists the book. (September 24, 2026)
