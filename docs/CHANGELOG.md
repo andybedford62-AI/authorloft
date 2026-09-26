@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## September 26, 2026 — Author-site analytics capture fixed
+
+- **Admin → Analytics showed no data** for every author (and super admins impersonating them)
+  since Sep 10. The PostHog `/ingest` reverse proxy was being caught by `proxy.ts` on author
+  subdomains/custom domains and rewritten to `/<slug>/ingest/...`, so every pageview 404'd and
+  only platform-domain events reached PostHog. `/ingest/` is now excluded from the middleware
+  matcher (also skips author-site rate limiting and the maintenance check for event calls).
+  Events lost Sep 10–26 can't be recovered.
+
 ## September 25, 2026 — `/for-musicians` promo landing page
 
 - **Follow-up:** Andy's studio/laptop hero banner (anchored `right 70%`); `MarketingPageHeader`

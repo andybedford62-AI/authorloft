@@ -318,6 +318,9 @@ export const config = {
     // Apply to all routes except Next.js internals and static binary assets.
     // robots.txt and sitemap.xml must run through middleware so subdomain
     // rewrites can route them to the per-author handlers.
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|json|woff|woff2|ttf|eot)$).*)",
+    // ingest/ is PostHog's reverse proxy (next.config.ts rewrites). It must skip
+    // middleware: on author subdomains/custom domains the rewrite below would turn
+    // /ingest/e into /<slug>/ingest/e and 404 every analytics event.
+    "/((?!_next/static|_next/image|ingest/|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|json|woff|woff2|ttf|eot)$).*)",
   ],
 };
