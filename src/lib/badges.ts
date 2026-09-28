@@ -21,6 +21,8 @@ export type AuthorBadgeMetrics = {
   bundles: number;
   courses: number;
   preorders: number;
+  musicLists: number; // published music lists
+  musicTracks: number; // tracks across published music lists
 };
 
 export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBadgeMetrics> {
@@ -35,6 +37,8 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     bundles,
     courses,
     preorders,
+    musicLists,
+    musicTracks,
   ] = await Promise.all([
     prisma.book.count({ where: { authorId, isPublished: true } }),
     prisma.order.aggregate({ where: { authorId, status: "COMPLETED" }, _sum: { totalCents: true } }),
@@ -46,6 +50,10 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     prisma.bundle.count({ where: { authorId, isPublished: true } }),
     prisma.course.count({ where: { authorId, kind: "COURSE", isPublished: true } }),
     prisma.preOrderSignup.count({ where: { authorId } }),
+    prisma.course.count({ where: { authorId, kind: "MUSIC", isPublished: true } }),
+    prisma.courseLesson.count({
+      where: { module: { course: { authorId, kind: "MUSIC", isPublished: true } } },
+    }),
   ]);
 
   const distinctFormats = new Set(formatBooks.flatMap((b) => b.availableFormats));
@@ -61,6 +69,8 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     bundles,
     courses,
     preorders,
+    musicLists,
+    musicTracks,
   };
 }
 

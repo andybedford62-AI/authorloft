@@ -261,7 +261,7 @@ Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors 
 
 Raised Sept 26, 2026. Badges are auto-calculated from the metrics in `src/lib/badges.ts` (`getAuthorBadgeMetrics`) against `BadgeDefinition` rows (Super Admin → Badges; highest cleared tier per metric shown on the About page + Bookstore spotlight). Adding a metric = a count in `getAuthorBadgeMetrics()`, the metric option in the Super Admin Badges manager, and `BadgeDefinition` rows (data only, no schema change). Update `/features` + `docs/FEATURE_MATRIX.md` when shipping.
 
-- [ ] **Music badges (priority)** — none exist: the "Educator" course count deliberately excludes `kind: MUSIC`, so musicians can only earn the newsletter badges. Prod on Sept 26: 3 music creators, one with 6 published lists / 47 tracks and zero badges. Proposed: *published music lists* — First Release (1), Growing Discography (5); *tracks across published lists* — Ten Tracks (10), Deep Catalog (50). Names/thresholds to confirm. *(small)*
+- [x] **Music badges** — shipped Sept 28, 2026, see `docs/CHANGELOG.md`. Two metrics (`musicLists`, `musicTracks`), four `BadgeDefinition` rows: First Release (1 list), Growing Discography (5), Ten Tracks (10 tracks), Deep Catalog (50). *(done)*
 - [ ] **Other badge ideas** (all from data that already exists — pick a few, don't ship them all):
   - *Course creators* — enrolled students (`CourseEnrollment`: 10 / 100); lessons published; course reviews (`CourseFeedback`).
   - *Books* — Series Builder (a `Series` with 3+ books); Audiobook Author (any `BookAudioTrack`); Flip-Book Preview (`FlipBook`); Bestseller (one book with N completed orders).
@@ -287,6 +287,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 ## Shipped (for reference)
 
 - ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
+- ✅ **Music achievement badges** — First Release / Growing Discography (published music lists), Ten Tracks / Deep Catalog (tracks across published lists). (September 28, 2026)
 - ✅ **Shared share/promote layer for Books, Courses and Music** — public `ShareBar` (with QR popover) on book/course/music pages, admin `ShareKit` on all three editors, Copy link / View live on list rows, Social Promote for courses with 7 course promo types. (September 24, 2026)
 - ✅ **Traffic Sources reads `utm_source`** — tagged share links are credited to their network instead of "Direct"; friendly labels in `src/lib/traffic-source.ts`. (September 24, 2026)
 - ✅ **Cover URL check on save/import** — `src/lib/cover-url-check.ts`; book/course save refuses a web-page or not-found cover, CSV import drops it and lists the book. (September 24, 2026)

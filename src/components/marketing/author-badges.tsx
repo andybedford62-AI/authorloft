@@ -1,14 +1,14 @@
 import {
   Award, BookOpen, Library, BookMarked, DollarSign, TrendingUp, Trophy,
   Star, Sparkles, Mail, Users, FileCheck, Share2, Layers, Package,
-  GraduationCap, Rocket, type LucideIcon,
+  GraduationCap, Rocket, Disc3, ListMusic, Music, AudioLines, type LucideIcon,
 } from "lucide-react";
 import type { EarnedBadge } from "@/lib/badges";
 
 const ICONS: Record<string, LucideIcon> = {
   Award, BookOpen, Library, BookMarked, DollarSign, TrendingUp, Trophy,
   Star, Sparkles, Mail, Users, FileCheck, Share2, Layers, Package,
-  GraduationCap, Rocket,
+  GraduationCap, Rocket, Disc3, ListMusic, Music, AudioLines,
 };
 
 function getIcon(name: string): LucideIcon {

@@ -4,13 +4,13 @@ import { useState } from "react";
 import {
   Award, BookOpen, Library, BookMarked, DollarSign, TrendingUp, Trophy,
   Star, Sparkles, Mail, Users, FileCheck, Share2, Layers, Package,
-  GraduationCap, Rocket, type LucideIcon,
+  GraduationCap, Rocket, Disc3, ListMusic, Music, AudioLines, type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
   Award, BookOpen, Library, BookMarked, DollarSign, TrendingUp, Trophy,
   Star, Sparkles, Mail, Users, FileCheck, Share2, Layers, Package,
-  GraduationCap, Rocket,
+  GraduationCap, Rocket, Disc3, ListMusic, Music, AudioLines,
 };
 
 const METRIC_LABELS: Record<string, string> = {
@@ -24,6 +24,8 @@ const METRIC_LABELS: Record<string, string> = {
   bundles: "Published Bundles",
   courses: "Published Courses",
   preorders: "Pre-Order Signups",
+  musicLists: "Published Music Lists",
+  musicTracks: "Tracks in Published Music Lists",
 };
 
 // revenue is stored in cents; display/edit in dollars

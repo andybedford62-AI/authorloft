@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## September 28, 2026 — Music achievement badges
+
+- **Musicians can now earn achievement badges.** Before this they could only earn the newsletter
+  badges, because the "Educator" course count leaves out `kind: MUSIC`. Two new metrics in
+  `src/lib/badges.ts`: `musicLists` (published music lists) and `musicTracks` (tracks across
+  published lists). Four `BadgeDefinition` rows were added directly in the DB, like the existing badges:
+  First Release (1 list), Growing Discography (5), Ten Tracks (10 tracks), Deep Catalog (50). All are
+  editable in Super Admin → Badges. The icons (Disc3, ListMusic, Music, AudioLines) were added to
+  both the admin and public icon maps.
+
 ## September 26, 2026 — Author-site analytics capture fixed
 
 - **Admin → Analytics showed no data** for every author (and super admins impersonating them)
