@@ -6,7 +6,7 @@ import { OnboardingController } from "@/components/admin/onboarding-controller";
 import { NextStepsCard } from "@/components/admin/next-steps-card";
 import {
   Users, ShoppingBag, TrendingUp,
-  Plus, ArrowRight, MailWarning,
+  Plus, ArrowRight, MailWarning, AlertTriangle,
 } from "lucide-react";
 import { CatalogTabsCard } from "@/components/admin/catalog-tabs-card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { SocialPromoteNudge } from "@/components/admin/social-promote-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getAuthorContentPresence } from "@/lib/author-queries";
 import { getBookCompletionSummary } from "@/lib/book-completeness";
+import { getPlanGraceNotice, KIND_LABELS } from "@/lib/plan-downgrade";
 
 async function getDashboardData(authorId: string) {
   const [
@@ -208,6 +209,7 @@ function ChecklistRow({
 
 export default async function DashboardPage() {
   const authorId = await getAdminAuthorId();
+  const graceNotice = await getPlanGraceNotice(authorId).catch(() => null);
 
   const [data, authorMeta, customPages, courseCount, musicCount, contentPresence] = await Promise.all([
     getDashboardData(authorId),
@@ -366,6 +368,43 @@ export default async function DashboardPage() {
       {/* Email verification banner */}
       {!authorMeta?.emailVerified && (
         <EmailVerificationBanner email={authorMeta?.email ?? ""} />
+      )}
+
+      {/* Plan-downgrade grace notice — content beyond the plan's limits is unpublished
+          (never deleted) when the 30-day grace period ends. See src/lib/plan-downgrade.ts. */}
+      {graceNotice && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-gray-700 space-y-1.5">
+            <p className="font-semibold text-gray-900">
+              {graceNotice.ended
+                ? `Some content is hidden because it's beyond your ${graceNotice.planName} plan`
+                : `Your plan changed — action needed by ${graceNotice.endsAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
+            </p>
+            {graceNotice.over.length > 0 && (
+              <p>
+                {graceNotice.over
+                  .map((o) => `${o.count} ${KIND_LABELS[o.kind][o.count === 1 ? "singular" : "plural"]} published (your plan includes ${o.limit})`)
+                  .join(" · ")}
+                .{" "}
+                {graceNotice.ended
+                  ? "Nothing was deleted, and upgrading restores hidden items."
+                  : "Unpublish or delete what you don't want live, or upgrade to keep everything. Otherwise the extras are hidden (not deleted) after the deadline."}
+              </p>
+            )}
+            {graceNotice.customDomain && (
+              <p>
+                Your custom domain <span className="font-medium">{graceNotice.customDomain}</span> isn't included in your plan
+                {graceNotice.ended
+                  ? " and now redirects to your AuthorLoft address."
+                  : " and will redirect to your AuthorLoft address after the deadline."}
+              </p>
+            )}
+            <Link href="/admin/settings" className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700">
+              View plans &amp; upgrade <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
       )}
 
       {/* Stripe Connect nudge — shown when author has enabled direct sales on any book

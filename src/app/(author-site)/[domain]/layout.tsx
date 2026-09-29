@@ -1,7 +1,7 @@
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { redirectIfRetiredSlug, getAuthorQualifiesForMusicPalette, getAuthorContentPresence } from "@/lib/author-queries";
+import { redirectIfRetiredSlug, redirectIfCustomDomainSuspended, getAuthorQualifiesForMusicPalette, getAuthorContentPresence } from "@/lib/author-queries";
 import { getPublicNavLinks, type AuthorNavFlags } from "@/lib/site-pages";
 import { AuthorNav } from "@/components/author-site/nav";
 import { AuthorFooter } from "@/components/author-site/footer";
@@ -136,6 +136,9 @@ export default async function AuthorSiteLayout({
     await redirectIfRetiredSlug(domain);
     notFound();
   }
+
+  // Custom domain no longer covered by the plan (grace period over) → free subdomain.
+  await redirectIfCustomDomainSuspended(domain, author);
 
   // Fetch custom pages that are published AND set to show in nav
   const customNavPages = await prisma.authorPage.findMany({

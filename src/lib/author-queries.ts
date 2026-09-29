@@ -1,8 +1,9 @@
 // Reusable database queries for the public author site
 import { cache } from "react";
 import { prisma } from "@/lib/db";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { isCustomDomainSuspended } from "@/lib/plan-downgrade";
 import { resolveAccentColor, resolveSecondaryColor, isThemeAllowed, MUSIC_GENRE_PALETTE_IDS } from "@/lib/themes";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
@@ -32,6 +33,27 @@ export async function redirectIfRetiredSlug(domain: string): Promise<void> {
   permanentRedirect(`https://${retired.author.slug}.${PLATFORM_DOMAIN}${path}`);
 }
 
+/**
+ * A custom domain is a paid feature. Once the plan-downgrade grace period ends
+ * (see src/lib/plan-downgrade.ts) requests on the custom domain are sent to the
+ * author's free subdomain instead. The saved domain is kept, so it resumes
+ * serving if they resubscribe. Temporary (307) redirect on purpose — this is
+ * reversible, unlike the permanent retired-slug redirect above.
+ *
+ * Exported so [domain]/layout.tsx can call it: the layout renders before every
+ * child page, so one check there covers the whole site.
+ */
+export async function redirectIfCustomDomainSuspended(
+  domain: string,
+  author: { id: string; slug: string; customDomain: string | null },
+): Promise<void> {
+  if (!author.customDomain || domain.toLowerCase() !== author.customDomain.toLowerCase()) return;
+  if (!(await isCustomDomainSuspended(author.id))) return;
+
+  const path = (await headers()).get("x-original-path") || "/";
+  redirect(`https://${author.slug}.${PLATFORM_DOMAIN}${path}`);
+}
+
 export async function getAuthorByDomain(domain: string) {
   const author = await prisma.author.findFirst({
     where: {
@@ -49,6 +71,7 @@ export async function getAuthorByDomain(domain: string) {
     await redirectIfRetiredSlug(domain);
     notFound();
   }
+  await redirectIfCustomDomainSuspended(domain, author);
 
   // Enforce plan-based theme access at render time:
   // FREE authors are locked to one of the 3 base colour themes, unless they

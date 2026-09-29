@@ -267,6 +267,9 @@ model Author {
   courseCategories              CourseCategory[]
   demoSitePlatformSettings      PlatformSettings[]   @relation("DemoSiteAuthor")
 
+  planGraceStartedAt DateTime? // start of the 30-day grace period after a downgrade/cancellation left content over the new plan limits
+  planGraceEndsAt    DateTime? // when over-limit content is auto-unpublished (and a custom domain stops serving); null = no grace period active
+  planGraceStage     Int       @default(0) // 0 none, 1 started email sent, 2 mid-grace reminder sent, 3 final reminder sent, 4 limits applied
   @@index([slug])
   @@index([customDomain])
 }
@@ -432,6 +435,7 @@ model Book {
   magnetLeads                BookMagnetLead[]
   formatJobs                 BookFormatJob[]
 
+  hiddenByPlanAt DateTime? // set when a plan downgrade auto-unpublished this item after the grace period; cleared when restored. Lets us restore only what the plan hid, never what the author unpublished themselves
   @@unique([authorId, slug])
   @@index([authorId])
   @@index([seriesId])
@@ -633,6 +637,7 @@ model FlipBook {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  hiddenByPlanAt DateTime? // set when a plan downgrade auto-unpublished this item after the grace period; cleared when restored. Lets us restore only what the plan hid, never what the author unpublished themselves
   @@unique([authorId, slug])
   @@index([authorId])
 }
@@ -730,6 +735,7 @@ model Post {
   updatedAt       DateTime  @updatedAt
   author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  hiddenByPlanAt DateTime? // set when a plan downgrade auto-unpublished this item after the grace period; cleared when restored. Lets us restore only what the plan hid, never what the author unpublished themselves
   @@unique([authorId, slug])
   @@index([authorId])
 }
@@ -1635,6 +1641,7 @@ model Course {
   feedback      CourseFeedback[]
   discountCodes DiscountCodeCourse[]
 
+  hiddenByPlanAt DateTime? // set when a plan downgrade auto-unpublished this item after the grace period; cleared when restored. Lets us restore only what the plan hid, never what the author unpublished themselves
   @@unique([authorId, slug])
   @@index([authorId])
   @@index([authorId, kind])

@@ -6,6 +6,21 @@ import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
+import { reconcileAuthor } from "@/lib/plan-downgrade";
+
+/**
+ * Starts/clears the plan-downgrade grace period and restores plan-hidden content
+ * right after a plan change, so cancellations and upgrades take effect now rather
+ * than at the next daily cron. Best-effort: never fail the webhook over it (the
+ * daily cron reconciles anyway).
+ */
+async function reconcilePlanChange(authorIds: string[]) {
+  await Promise.all(
+    authorIds.map((id) =>
+      reconcileAuthor(id).catch((e) => console.error(`[stripe webhook] plan reconcile failed for ${id}:`, e)),
+    ),
+  );
+}
 
 /**
  * Reverts the author's theme if their new plan no longer allows the current one.
@@ -494,6 +509,8 @@ export async function POST(req: NextRequest) {
                 where: { id: authorId },
                 data:  { planId: plan.id },
               });
+              // Resubscribed: end any grace period and restore content the old downgrade hid.
+              await reconcilePlanChange([authorId]);
 
               // Send welcome email — fetch author + plan in parallel
               const [authorRecord, planRecord] = await Promise.all([
@@ -550,6 +567,7 @@ export async function POST(req: NextRequest) {
         where: { authorId: { in: affected.map((a) => a.id) } },
       });
       await Promise.all(affected.map((a) => revertThemeOnDowngrade(a.id, "FREE")));
+      await reconcilePlanChange(affected.map((a) => a.id));
       break;
     }
 
@@ -597,6 +615,7 @@ export async function POST(req: NextRequest) {
             data:  { planId: newPlan.id },
           });
           await Promise.all(affected.map((a) => revertThemeOnDowngrade(a.id, newPlan.tier)));
+          await reconcilePlanChange(affected.map((a) => a.id));
         }
       }
       break;

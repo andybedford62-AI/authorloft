@@ -1306,6 +1306,104 @@ export async function sendTrialExpiryWarningEmail({
   });
 }
 
+// ── Plan downgrade grace-period emails ───────────────────────────────────────
+// Sent by src/lib/plan-downgrade.ts when a cancellation/downgrade leaves more
+// published content (or a custom domain) than the new plan allows.
+
+export async function sendPlanGraceEmail({
+  to,
+  authorName,
+  stage,
+  planName,
+  graceEndsAt,
+  over,
+  customDomain,
+}: {
+  to: string;
+  authorName: string;
+  stage: "started" | "reminder" | "final" | "applied";
+  planName: string;
+  graceEndsAt: Date;
+  over: { singular: string; plural: string; count: number; limit: number }[];
+  customDomain: string | null;
+}) {
+  const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const plansUrl       = `https://www.${platformDomain}/admin/settings`;
+  const dashboardUrl   = `https://www.${platformDomain}/admin/dashboard`;
+  const firstName      = esc(authorName.split(" ")[0]);
+  const endDate        = graceEndsAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+  const daysLeft       = Math.max(0, Math.ceil((graceEndsAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+
+  const noun = (n: number, o: { singular: string; plural: string }) => (n === 1 ? o.singular : o.plural);
+  const overLines = over.map((o) => `${o.count} ${noun(o.count, o)} published (your ${planName} plan includes ${o.limit})`);
+  const domainLine = customDomain
+    ? `Your custom domain ${customDomain} is not included in the ${planName} plan. After ${endDate} it will stop serving your site and visitors will be sent to your AuthorLoft address instead.`
+    : null;
+
+  const subjects: Record<typeof stage, string> = {
+    started:  `Your AuthorLoft plan changed — action needed by ${endDate}`,
+    reminder: `${daysLeft} days left to keep all your AuthorLoft content live`,
+    final:    `Final reminder: ${daysLeft} days until we hide content beyond your plan`,
+    applied:  `We've hidden content beyond your ${planName} plan (nothing was deleted)`,
+  };
+  const intros: Record<typeof stage, string> = {
+    started:  `Your account is now on the ${planName} plan, and you currently have more published than it includes. Nothing has been removed. You have until ${endDate} to upgrade or choose what to keep live.`,
+    reminder: `A reminder that your account is on the ${planName} plan and has more published than it includes. You have ${daysLeft} days (until ${endDate}) before the extra items are hidden.`,
+    final:    `This is a final reminder. On ${endDate} we will automatically hide the items beyond your ${planName} plan. Nothing will be deleted.`,
+    applied:  `Your grace period ended on ${endDate}, so we have hidden the items beyond your ${planName} plan from your public site. Nothing was deleted — it is all still in your dashboard.`,
+  };
+  const outro = stage === "applied"
+    ? `Upgrade at any time and the hidden items are restored automatically, up to your new plan's limits.`
+    : `To keep everything live, upgrade your plan. To choose what stays, unpublish or delete the items you don't want live, and we'll keep the rest. Otherwise we will keep the first ones in your list order (newest for blog posts) and hide the rest — nothing is deleted, and upgrading restores them.`;
+
+  const text = [
+    `Hi ${firstName},`,
+    intros[stage],
+    ...(overLines.length ? [`Over your plan: ${overLines.join("; ")}.`] : []),
+    ...(domainLine ? [domainLine] : []),
+    outro,
+    `Manage your plan: ${plansUrl}`,
+    `— The AuthorLoft Team`,
+  ].join("\n\n");
+
+  return sendMail({
+    to,
+    subject: subjects[stage],
+    text,
+    html: wrapHtml(subjects[stage], `
+      <p style="margin:0 0 16px;">Hi ${firstName},</p>
+      <p style="margin:0 0 16px;">${esc(intros[stage])}</p>
+      ${overLines.length ? `
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin:0 0 16px;">
+        <p style="margin:0 0 8px;font-size:14px;color:#374151;"><strong>Over your plan</strong></p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:#374151;">
+          ${overLines.map((l) => `<li>${esc(l)}</li>`).join("")}
+        </ul>
+      </div>` : ""}
+      ${domainLine ? `<p style="margin:0 0 16px;font-size:14px;color:#374151;">${esc(domainLine)}</p>` : ""}
+      <p style="margin:0 0 24px;font-size:14px;color:#374151;">${esc(outro)}</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:4px 0 12px;">
+            <a href="${plansUrl}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:8px;text-decoration:none;">
+              View Plans &amp; Upgrade
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 0 24px;">
+            <a href="${dashboardUrl}" style="font-size:13px;color:#1d4ed8;">Go to my dashboard</a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+        Questions? Reply to this email — we're here to help.
+      </p>
+    `),
+  });
+}
+
 // ── Trial ended email ─────────────────────────────────────────────────────────
 
 export async function sendTrialEndedEmail({

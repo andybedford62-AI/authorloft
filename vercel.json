@@ -22,6 +22,10 @@
       "schedule": "0 5 * * *"
     },
     {
+      "path": "/api/cron/plan-grace",
+      "schedule": "30 5 * * *"
+    },
+    {
       "path": "/api/cron/launch-preorders",
       "schedule": "0 8 * * *"
     },
