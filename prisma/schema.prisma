@@ -266,6 +266,9 @@ model Author {
   courses                       Course[]
   courseCategories              CourseCategory[]
   demoSitePlatformSettings      PlatformSettings[]   @relation("DemoSiteAuthor")
+  musicPlays                    MusicPlay[]
+  musicTrackStats               MusicTrackStat[]
+  musicTrackReactions           MusicTrackReaction[]
 
   planGraceStartedAt DateTime? // start of the 30-day grace period after a downgrade/cancellation left content over the new plan limits
   planGraceEndsAt    DateTime? // when over-limit content is auto-unpublished (and a custom domain stops serving); null = no grace period active
@@ -1726,4 +1729,59 @@ model CourseEnrollment {
 
   @@unique([courseId, customerEmail])
   @@index([accessToken])
+}
+
+// ── Music plays & reactions ──────────────────────────────────────────────────
+// Keyed by the song (authorId + trackStatKey(url)), never by CourseLesson.id:
+// the music PUT replaces every track row on save, so lesson ids don't survive
+// an edit. Keying on the link also means the same song on a Single and an
+// Album shares one count.
+
+/// One row per play click (embed played, or link-out opened). visitorHash is a
+/// one-way hash of IP + user agent with a salt that changes daily, so it can
+/// tell "same person, same day" apart and nothing more.
+model MusicPlay {
+  id          String   @id @default(cuid())
+  authorId    String
+  courseId    String? // the list it was played from
+  trackKey    String
+  day         DateTime @db.Date
+  visitorHash String
+  source      String // "embed" | "link"
+  createdAt   DateTime @default(now())
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, trackKey, day, visitorHash])
+  @@index([authorId, createdAt])
+}
+
+/// Running totals per song, so public pages read one row instead of counting.
+/// plays = every click; listeners = one per visitor per day (the public figure).
+model MusicTrackStat {
+  id        String   @id @default(cuid())
+  authorId  String
+  trackKey  String
+  plays     Int      @default(0)
+  listeners Int      @default(0)
+  likes     Int      @default(0)
+  dislikes  Int      @default(0)
+  updatedAt DateTime @updatedAt
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, trackKey])
+}
+
+/// One like (1) or dislike (-1) per browser per song. voterHash is a hash of a
+/// random id kept in the visitor's browser only after they react.
+model MusicTrackReaction {
+  id        String   @id @default(cuid())
+  authorId  String
+  trackKey  String
+  voterHash String
+  value     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, trackKey, voterHash])
 }

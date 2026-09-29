@@ -35,6 +35,28 @@ line rather than listing every commit.
   editable in Super Admin → Badges. The icons (Disc3, ListMusic, Music, AudioLines) were added to
   both the admin and public icon maps.
 
+## September 29, 2026 — Music play counts & likes; live Privacy page fix
+
+- **Music play counts.** Every play on a public music page is logged — pressing play on an embedded
+  track (including Play all, Next/Previous and auto-advance) or opening a Suno/Spotify/other link-out
+  track. The admin music editor shows a Plays / Listeners / Likes / Dislikes summary and per-track
+  numbers; the public page shows a track's listener count ("1.2K plays") once it reaches 10. Plays =
+  every click; listeners = one per person per day, identified only by a daily-salted hash of IP + user
+  agent (no cookie). The musician's own plays while signed in, super admins and bots aren't counted.
+- **Likes / dislikes** on every track row and card. The like count is public; dislikes are shown only
+  to the musician. One vote per browser per song (random id in localStorage, hashed server-side),
+  toggle or switch any time.
+- Stats are keyed by the song (`authorId` + `trackStatKey(url)`), **not** `CourseLesson.id` — the music
+  save replaces every track row, so row ids don't survive an edit. Same song on two lists shares one
+  count. New tables `MusicPlay`, `MusicTrackStat`, `MusicTrackReaction`
+  (`prisma/migrations/20260929_music_plays_reactions`). Privacy policy default gained a paragraph
+  describing it.
+- **Fixed: www.authorloft.com/privacy was showing the Terms of Service.** The saved Privacy text had been
+  overwritten with the Terms at 11:18 CDT, and the 11:26 production build baked it into the prerendered
+  page. Cleared the saved copy so the page falls back to the rewritten default, and the Super Admin
+  legal save now revalidates `/privacy` and `/terms` — before this, legal edits only reached the live
+  site on the next deploy.
+
 ## September 26, 2026 — Author-site analytics capture fixed
 
 - **Admin → Analytics showed no data** for every author (and super admins impersonating them)

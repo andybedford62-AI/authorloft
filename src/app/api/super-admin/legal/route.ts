@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 
@@ -45,6 +46,13 @@ export async function PATCH(req: Request) {
     update: data,
     create: { id: "singleton", ...data },
   });
+
+  // /privacy and /terms are prerendered at build time, so without this a save
+  // only reached the live page on the next deploy — and a deploy could bake in
+  // whatever was last saved, right or wrong (Sept 29 2026: Terms text pasted
+  // into Privacy went live that way).
+  if (field === "privacy" || contactEmail !== undefined) revalidatePath("/privacy");
+  if (field === "terms" || contactEmail !== undefined) revalidatePath("/terms");
 
   return NextResponse.json(updated);
 }

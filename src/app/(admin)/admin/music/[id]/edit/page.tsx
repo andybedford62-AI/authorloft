@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Play, Users, ThumbsUp, ThumbsDown } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { maxTracksPerList } from "@/lib/plan-limits";
@@ -8,6 +8,7 @@ import { MusicListForm } from "@/components/admin/music-list-form";
 import { ShareKit } from "@/components/admin/share-kit";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { releaseLabel, parseListenLinks } from "@/lib/music-share";
+import { getTrackStats, PUBLIC_PLAYS_THRESHOLD } from "@/lib/music-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,20 @@ export default async function EditMusicListPage({
   if (!list) notFound();
   const bookstoreEnabled = (author?.plan?.tier ?? "FREE") !== "FREE";
 
-  const trackCap = await maxTracksPerList(authorId);
+  const [trackCap, trackStats] = await Promise.all([
+    maxTracksPerList(authorId),
+    getTrackStats(authorId, list.modules.flatMap((m) => m.lessons.map((l) => l.videoUrl))),
+  ]);
+  // Per song, so a link that appears twice in the list isn't counted twice.
+  const totals = Object.values(trackStats).reduce(
+    (t, s) => ({
+      plays: t.plays + s.plays,
+      listeners: t.listeners + s.listeners,
+      likes: t.likes + s.likes,
+      dislikes: t.dislikes + s.dislikes,
+    }),
+    { plays: 0, listeners: 0, likes: 0, dislikes: 0 }
+  );
   const tracks = list.modules.flatMap((m) =>
     m.lessons.map((l) => ({
       url: l.videoUrl ?? "",
@@ -70,8 +84,31 @@ export default async function EditMusicListPage({
           isPublished={list.isPublished}
         />
       )}
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { icon: Play, label: "Plays", value: totals.plays, hint: "Every click" },
+            { icon: Users, label: "Listeners", value: totals.listeners, hint: "One per person per day" },
+            { icon: ThumbsUp, label: "Likes", value: totals.likes, hint: "Shown publicly" },
+            { icon: ThumbsDown, label: "Dislikes", value: totals.dislikes, hint: "Only you see these" },
+          ].map(({ icon: Icon, label, value, hint }) => (
+            <div key={label}>
+              <p className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <Icon className="h-3.5 w-3.5" /> {label}
+              </p>
+              <p className="text-xl font-semibold text-gray-900 tabular-nums">{value.toLocaleString()}</p>
+              <p className="text-[11px] text-gray-400">{hint}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+          Your public page shows a track&apos;s listener count once it reaches {PUBLIC_PLAYS_THRESHOLD}. Suno and
+          other link-out tracks count the click that opens them. Your own plays while signed in aren&apos;t counted.
+        </p>
+      </div>
       <MusicListForm
         listId={list.id}
+        trackStats={trackStats}
         trackCap={trackCap}
         bookstoreEnabled={bookstoreEnabled}
         initial={{

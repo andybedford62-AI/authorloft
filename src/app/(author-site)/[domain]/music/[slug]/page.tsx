@@ -6,7 +6,8 @@ import { getAuthorByDomain } from "@/lib/author-queries";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { sanitize } from "@/lib/sanitize";
-import { resolveTrackLink } from "@/lib/music-links";
+import { resolveTrackLink, trackStatKey } from "@/lib/music-links";
+import { getTrackStats, PUBLIC_PLAYS_THRESHOLD } from "@/lib/music-stats";
 import { releaseLabel, trackKeys, findTrackIndex, parseListenLinks, formatReleaseDate } from "@/lib/music-share";
 import { MusicTrackList, type PublicTrack } from "@/components/author-site/music-track-list";
 import type { Metadata } from "next";
@@ -122,8 +123,11 @@ export default async function MusicListPage({
   if (!list) notFound();
 
   const flat = flattenTracks(list);
+  const stats = await getTrackStats(author.id, flat.map((t) => t.lesson.videoUrl));
   const tracks: PublicTrack[] = flat.map(({ lesson: l, shareKey, thumbnailUrl }) => {
     const html = l.contentHtml?.trim() ? sanitize(l.contentHtml) : null;
+    const statKey = l.videoUrl ? trackStatKey(l.videoUrl) : null;
+    const stat = statKey ? stats[statKey] : undefined;
     // Plain-text one-liner for the collapsed row; the full note (image and
     // all) still renders under the player once the track is open.
     const text = html
@@ -138,6 +142,11 @@ export default async function MusicListPage({
       thumbnailUrl,
       description: text,
       descriptionHtml: html,
+      statKey,
+      // Listeners (one per person per day), not raw clicks — and only once it
+      // reads as a real audience. The musician sees every click in the admin.
+      plays: stat && stat.listeners >= PUBLIC_PLAYS_THRESHOLD ? stat.listeners : null,
+      likes: stat?.likes ?? 0,
     };
   });
 

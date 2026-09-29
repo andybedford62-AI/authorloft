@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Play, ExternalLink, ListMusic, Share2, Check, SkipBack, SkipForward, X, ChevronDown, ChevronUp,
+  ThumbsUp, ThumbsDown,
 } from "lucide-react";
 import { resolveTrackLink, providerLabel, type ResolvedTrackLink } from "@/lib/music-links";
 import { accentAsSurface, accentAsTextOn } from "@/lib/color-contrast";
@@ -36,7 +37,69 @@ export type PublicTrack = {
   /** Sanitized on the server; shown in the player, so richer notes (and any
    *  image) survive rather than being dropped. */
   descriptionHtml: string | null;
+  /** The song's identity for stats (trackStatKey) — also keys this browser's own reaction. */
+  statKey: string | null;
+  /** Public play count, or null while under the display threshold. */
+  plays: number | null;
+  likes: number;
 };
+
+// ── Plays & reactions ─────────────────────────────────────────────────────────
+// A play is logged on every press of play (or open of a link-out track), as a
+// beacon so it never delays the music or the new tab. Reactions need to know
+// who already voted, so the browser keeps a random id — created only when the
+// visitor first clicks like or dislike — plus its own votes by song.
+
+function logPlay(trackId: string, source: "embed" | "link") {
+  const body = JSON.stringify({ trackId, source });
+  try {
+    if (navigator.sendBeacon?.("/api/public/music/play", new Blob([body], { type: "application/json" }))) return;
+  } catch {
+    // fall through to fetch
+  }
+  fetch("/api/public/music/play", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+    keepalive: true,
+  }).catch(() => {});
+}
+
+const VOTER_KEY = "al_music_voter";
+const VOTES_KEY = "al_music_votes";
+
+function readVotes(): Record<string, 1 | -1> {
+  try {
+    return JSON.parse(localStorage.getItem(VOTES_KEY) ?? "{}") ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function writeVotes(votes: Record<string, 1 | -1>) {
+  try {
+    localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+  } catch {
+    // Private mode etc. — the vote still counts server-side for this visit.
+  }
+}
+
+let memoryVoterId: string | null = null;
+function voterId(): string {
+  try {
+    const existing = localStorage.getItem(VOTER_KEY);
+    if (existing) return existing;
+    const id = crypto.randomUUID();
+    localStorage.setItem(VOTER_KEY, id);
+    return id;
+  } catch {
+    if (!memoryVoterId) memoryVoterId = crypto.randomUUID();
+    return memoryVoterId;
+  }
+}
+
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+const playsLabel = (n: number) => `${compact.format(n)} plays`;
 
 export type PlaylistHero = {
   title: string;
@@ -91,6 +154,12 @@ export function MusicTrackList({
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [highlightId, setHighlightId] = useState<string | null>(initialTrackId ?? null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [likes, setLikes] = useState<Record<string, number>>(
+    () => Object.fromEntries(rawTracks.map((t) => [t.id, t.likes]))
+  );
+  // Read after mount: localStorage doesn't exist during server render.
+  const [votes, setVotes] = useState<Record<string, 1 | -1>>({});
+  useEffect(() => setVotes(readVotes()), []);
   const trackRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Deepened once and reused everywhere white sits on the accent, so the hero
@@ -102,6 +171,7 @@ export function MusicTrackList({
   // Keep the address bar pointing at the playing track, so copying the URL
   // from the browser shares the song rather than the whole list.
   const play = useCallback((id: string | null) => {
+    if (id) logPlay(id, "embed");
     setCurrentId(id);
     const key = id ? rawTracks.find((t) => t.id === id)?.shareKey : null;
     const u = new URL(window.location.href);
@@ -158,6 +228,37 @@ export function MusicTrackList({
     }
   }
 
+  async function react(track: PublicTrack, value: 1 | -1) {
+    if (!track.statKey) return;
+    const key = track.statKey;
+    const previous = votes[key] ?? 0;
+    const next = previous === value ? 0 : value;
+    const likeDelta = (next === 1 ? 1 : 0) - (previous === 1 ? 1 : 0);
+
+    const nextVotes = { ...votes };
+    if (next === 0) delete nextVotes[key];
+    else nextVotes[key] = next;
+    setVotes(nextVotes);
+    writeVotes(nextVotes);
+    setLikes((l) => ({ ...l, [track.id]: Math.max(0, (l[track.id] ?? 0) + likeDelta) }));
+
+    try {
+      const res = await fetch("/api/public/music/react", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackId: track.id, voterId: voterId(), value: next }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = (await res.json()) as { likes: number };
+      setLikes((l) => ({ ...l, [track.id]: data.likes }));
+    } catch {
+      // Undo the optimistic change so the button doesn't lie.
+      setVotes(votes);
+      writeVotes(votes);
+      setLikes((l) => ({ ...l, [track.id]: Math.max(0, (l[track.id] ?? 0) - likeDelta) }));
+    }
+  }
+
   const shareText = `Listen to "${hero.title}"${
     hero.releaseLabel === "Playlist" ? `, a playlist from ${hero.artistName}` : ` by ${hero.artistName}`
   }`;
@@ -172,7 +273,11 @@ export function MusicTrackList({
     providerName: track.link ? providerLabel(track.link.provider) : null,
     canonicalUrl: track.link?.canonicalUrl ?? track.videoUrl ?? null,
     onPlay: () => play(track.id),
+    onOpen: () => logPlay(track.id, "link"),
     onShare: () => shareTrack(track),
+    likes: likes[track.id] ?? 0,
+    myVote: (track.statKey ? votes[track.statKey] ?? 0 : 0) as 0 | 1 | -1,
+    onReact: (value: 1 | -1) => react(track, value),
   });
 
   const highlightWrap = (track: ResolvedTrack, className: string) => ({
@@ -341,7 +446,12 @@ type ItemProps = {
   providerName: string | null;
   canonicalUrl: string | null;
   onPlay: () => void;
+  /** A link-out track was opened in a new tab. */
+  onOpen: () => void;
   onShare: () => void;
+  likes: number;
+  myVote: 0 | 1 | -1;
+  onReact: (value: 1 | -1) => void;
 };
 
 /** Three pulsing bars marking the playing track. */
@@ -373,9 +483,43 @@ function ShareButton({ copied, onShare, title, size = "sm" }: { copied: boolean;
   );
 }
 
+/** Like / dislike. The like count is public; dislikes are only ever shown to the musician. */
+function Reactions({ title, likes, myVote, onReact, textOnWhite }: {
+  title: string; likes: number; myVote: 0 | 1 | -1; onReact: (value: 1 | -1) => void; textOnWhite: string;
+}) {
+  const btn = "inline-flex items-center gap-1 rounded-full px-1.5 py-1 text-[11px] font-medium transition-colors hover:bg-gray-100";
+  return (
+    <span className="flex-shrink-0 inline-flex items-center">
+      <button
+        type="button"
+        onClick={() => onReact(1)}
+        className={btn}
+        style={{ color: myVote === 1 ? textOnWhite : "#9ca3af" }}
+        aria-pressed={myVote === 1}
+        aria-label={myVote === 1 ? `Remove like from ${title}` : `Like ${title}`}
+        title={myVote === 1 ? "Liked" : "Like"}
+      >
+        <ThumbsUp className={`h-3.5 w-3.5 ${myVote === 1 ? "fill-current" : ""}`} />
+        {likes > 0 && <span className="tabular-nums">{compact.format(likes)}</span>}
+      </button>
+      <button
+        type="button"
+        onClick={() => onReact(-1)}
+        className={btn}
+        style={{ color: myVote === -1 ? "#4b5563" : "#9ca3af" }}
+        aria-pressed={myVote === -1}
+        aria-label={myVote === -1 ? `Remove dislike from ${title}` : `Dislike ${title}`}
+        title={myVote === -1 ? "Disliked" : "Dislike"}
+      >
+        <ThumbsDown className={`h-3.5 w-3.5 ${myVote === -1 ? "fill-current" : ""}`} />
+      </button>
+    </span>
+  );
+}
+
 // ── Tracklist row (albums / EPs / singles) ────────────────────────────────────
 
-function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onShare }: ItemProps) {
+function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact }: ItemProps) {
   const inner = (
     <>
       <span className="w-7 flex-shrink-0 flex items-center justify-center text-sm tabular-nums text-gray-400">
@@ -403,6 +547,7 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
           {track.title}
         </span>
         <span className="block text-xs text-gray-500 truncate">
+          {track.plays !== null && <span className="tabular-nums">{playsLabel(track.plays)} · </span>}
           {track.description ?? (providerName ? (track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`) : "")}
         </span>
       </span>
@@ -421,10 +566,11 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
           {inner}
         </button>
       ) : (
-        <a href={canonicalUrl ?? "#"} target="_blank" rel="noopener noreferrer" className={rowClass}>
+        <a href={canonicalUrl ?? "#"} target="_blank" rel="noopener noreferrer" className={rowClass} onClick={onOpen} onAuxClick={onOpen}>
           {inner}
         </a>
       )}
+      <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} />
       <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
     </div>
   );
@@ -432,7 +578,7 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
 
 // ── Artwork card (playlists) ──────────────────────────────────────────────────
 
-function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onShare }: ItemProps) {
+function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact }: ItemProps) {
   let hostname: string | null = null;
   if (canonicalUrl) {
     try {
@@ -511,6 +657,8 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
           target="_blank"
           rel="noopener noreferrer"
           className={mediaClassName}
+          onClick={onOpen}
+          onAuxClick={onOpen}
         >
           {mediaInner}
         </a>
@@ -526,6 +674,9 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
             {track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`}
           </p>
         ) : null}
+        {track.plays !== null && (
+          <p className="text-xs text-gray-400 mt-1 tabular-nums">{playsLabel(track.plays)}</p>
+        )}
 
         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
           {hostname ? (
@@ -534,12 +685,17 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
               target="_blank"
               rel="noopener noreferrer"
               className="min-w-0 inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+              onClick={onOpen}
+              onAuxClick={onOpen}
             >
               <ExternalLink className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{hostname}</span>
             </a>
           ) : <span />}
-          <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
+          <span className="flex items-center gap-1">
+            <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} />
+            <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
+          </span>
         </div>
       </div>
     </div>

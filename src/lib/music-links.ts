@@ -123,6 +123,26 @@ export function resolveTrackLink(input: string): ResolvedTrackLink | null {
   return { provider: "other", mode: "link", embedUrl: null, canonicalUrl: u.toString(), embedHeight: null };
 }
 
+/**
+ * Identity of a song for play counts and likes. Track rows are recreated on
+ * every save, so stats can't hang off the row id — they hang off the link.
+ * Share-link noise (`?sh=`, `?si=`, trailing slashes, www) is dropped so the
+ * same song pasted two ways still counts once. YouTube keeps its canonical
+ * `watch?v=` form, where the query IS the identity.
+ */
+export function trackStatKey(url: string): string | null {
+  const link = resolveTrackLink(url);
+  if (!link) return null;
+  if (link.provider === "youtube" && link.mode === "embed") return link.canonicalUrl;
+  try {
+    const u = new URL(link.canonicalUrl);
+    if (link.provider === "youtube") return u.toString();
+    return `https://${hostOf(u)}${u.pathname.replace(/\/+$/, "")}`;
+  } catch {
+    return null;
+  }
+}
+
 // ── Save-time metadata ───────────────────────────────────────────────────────
 
 export type TrackMetadata = { title: string | null; thumbnailUrl: string | null };

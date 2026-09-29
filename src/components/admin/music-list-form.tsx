@@ -6,14 +6,15 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle, Store, Lock,
-  ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote,
+  ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote, Play, ThumbsUp, ThumbsDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { MusicHelpModal } from "@/components/admin/music-help-modal";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
-import { resolveTrackLink, providerLabel, type ResolvedTrackLink } from "@/lib/music-links";
+import { resolveTrackLink, providerLabel, trackStatKey, type ResolvedTrackLink } from "@/lib/music-links";
+import type { TrackStats } from "@/lib/music-stats";
 import { RELEASE_TYPES, MAX_LISTEN_LINKS, listenPlatform, type MusicReleaseType } from "@/lib/music-share";
 
 // Button/icon standard: Check = Save/Update, Plus = Create/Add, Trash2 =
@@ -53,6 +54,8 @@ interface Props {
   trackCap: number | null;
   /** STANDARD+ gate for the Bookstore opt-in toggle (mirrors CourseForm). */
   bookstoreEnabled?: boolean;
+  /** Plays and reactions keyed by trackStatKey(url); absent when creating. */
+  trackStats?: Record<string, TrackStats>;
 }
 
 let uidSeq = 0;
@@ -70,7 +73,7 @@ function rowThumbnail(track: TrackRow, link: ResolvedTrackLink | null): string |
 const inputClass =
   "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
-export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = false }: Props) {
+export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = false, trackStats = {} }: Props) {
   const router = useRouter();
   const isEdit = !!listId;
 
@@ -416,6 +419,8 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
             const invalid = track.url.trim() !== "" && link === null;
             const isOpen = expanded.has(track.uid);
             const thumb = rowThumbnail(track, link);
+            const statKey = link ? trackStatKey(track.url.trim()) : null;
+            const stat = statKey ? trackStats[statKey] : undefined;
             return (
               <li
                 key={track.uid}
@@ -483,6 +488,16 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
                       {track.description.trim() && (
                         <span className="inline-flex items-center gap-0.5 text-gray-400" title="Has a note">
                           <StickyNote className="h-3 w-3" /> note
+                        </span>
+                      )}
+                      {stat && (
+                        <span
+                          className="inline-flex items-center gap-1.5 text-gray-500 tabular-nums"
+                          title={`${stat.plays} plays (every click) · ${stat.listeners} listeners · ${stat.likes} likes · ${stat.dislikes} dislikes`}
+                        >
+                          <span className="inline-flex items-center gap-0.5"><Play className="h-3 w-3" /> {stat.plays}</span>
+                          <span className="inline-flex items-center gap-0.5"><ThumbsUp className="h-3 w-3" /> {stat.likes}</span>
+                          <span className="inline-flex items-center gap-0.5"><ThumbsDown className="h-3 w-3" /> {stat.dislikes}</span>
                         </span>
                       )}
                     </p>

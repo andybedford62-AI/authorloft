@@ -43,6 +43,8 @@ Your analytics choice. When you first visit, a banner asks whether you accept an
 
 Cookieless analytics. We use Vercel Web Analytics to count visits in aggregate. It does not use cookies.
 
+Music play counts and reactions. When you play or open a track on a musician's page, we record the play so the musician can see how often their music is played. We store only a one-way hash of your IP address and browser combined with a value that changes every day, so repeat plays on the same day can be told apart but you cannot be recognized from one day to the next. No cookie is used for this. If you like or dislike a track, your browser keeps a random identifier and your choice in local storage so you can change or remove it later; we store only a one-way hash of that identifier. Plays made while signed in as the musician are not counted.
+
 Error monitoring. We use Sentry to detect and fix errors. When an error occurs, Sentry may capture a short recording of the screen to help us diagnose it. All text is masked and media is blocked in these recordings, so what you type and what is displayed are not captured.
 
 Google tag. Our pages include a Google tag that we may use in the future to measure advertising. All of its storage is denied by default, and analytics storage is enabled only if you accept the banner. We do not currently run advertising campaigns. If we begin to, we will update this policy first and will use advertising cookies only with your consent.

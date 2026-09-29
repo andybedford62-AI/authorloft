@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from "vitest";
-import { resolveTrackLink, parseOpenGraph, providerLabel, parsePastedTracks } from "@/lib/music-links";
+import { resolveTrackLink, parseOpenGraph, providerLabel, parsePastedTracks, trackStatKey } from "@/lib/music-links";
 
 describe("resolveTrackLink — YouTube", () => {
   it("embeds every single-video URL shape via the no-cookie host", () => {
@@ -201,5 +201,35 @@ describe("parsePastedTracks", () => {
   it("returns nothing for empty input", () => {
     expect(parsePastedTracks("").tracks).toEqual([]);
     expect(parsePastedTracks("   ").tracks).toEqual([]);
+  });
+});
+
+describe("trackStatKey — the song identity plays and likes hang off", () => {
+  it("gives every YouTube URL shape for one video the same key", () => {
+    const keys = [
+      "https://www.youtube.com/watch?v=mL9GwACO8hY",
+      "https://youtu.be/mL9GwACO8hY?si=share123",
+      "https://m.youtube.com/watch?v=mL9GwACO8hY&list=PLabc",
+      "https://www.youtube.com/shorts/mL9GwACO8hY",
+    ].map(trackStatKey);
+    expect(new Set(keys)).toEqual(new Set(["https://www.youtube.com/watch?v=mL9GwACO8hY"]));
+  });
+
+  it("drops share-link noise on link-out providers", () => {
+    expect(trackStatKey("https://suno.com/song/abc-123?sh=XyZ")).toBe("https://suno.com/song/abc-123");
+    expect(trackStatKey("https://www.suno.com/song/abc-123/")).toBe("https://suno.com/song/abc-123");
+    expect(trackStatKey("https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=abc")).toBe(
+      "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC"
+    );
+  });
+
+  it("keeps different songs apart", () => {
+    expect(trackStatKey("https://suno.com/song/one")).not.toBe(trackStatKey("https://suno.com/song/two"));
+  });
+
+  it("returns null for anything that isn't a usable link", () => {
+    expect(trackStatKey("")).toBeNull();
+    expect(trackStatKey("not a url")).toBeNull();
+    expect(trackStatKey("http://suno.com/song/abc")).toBeNull();
   });
 });
