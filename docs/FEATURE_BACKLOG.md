@@ -284,6 +284,16 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ---
 
+## Legal & Compliance
+
+From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist. Items 1–5 are covered (18+ confirmation at signup, self-hosted fonts, consent-gated PostHog, unsubscribe link + postal address in platform emails, renewal terms beside the Stripe Subscribe button). Open:
+
+- [ ] **Register a DMCA designated agent + takedown policy** — authors upload covers/content, so safe harbor needs a registered agent (US Copyright Office, ~$6) and a published takedown/counter-notice policy page linked from Terms. Deferred by Andy for discussion. *(small)*
+- [ ] **Confirm PostHog session replay is off in project settings** — client code doesn't enable it, but the project-level toggle wasn't checked. *(tiny)*
+- [ ] **Author newsletter footer address** — author newsletters use their own footer; consider requiring/prompting the author's own postal address for CAN-SPAM. *(small)*
+
+---
+
 ## Shipped (for reference)
 
 - ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
