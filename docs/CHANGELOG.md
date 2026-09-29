@@ -19,7 +19,7 @@ line rather than listing every commit.
 - Plan subscription checkout now shows auto-renewal terms beside the Subscribe button (Stripe `custom_text.submit`).
 - Platform email footer (`wrapHtml`) now includes the postal address (CAN-SPAM).
 - Signup already had an 18+ confirmation.
-- DMCA: designated agent registered with the U.S. Copyright Office (DMCA-1081407, Anthony P Bedford LLC, dmca@authorloft.com). New `/dmca` Copyright & DMCA Policy page (takedown notice, counter-notice, repeat infringers, agent details) linked from the marketing footer and author-site footers; added to sitemap, robots and llms-full. Default Terms IP section updated (live Terms come from `PlatformSettings.termsContent`, edited separately).
+- DMCA: designated agent registered with the U.S. Copyright Office (DMCA-1081407, Anthony P Bedford LLC, dmca@authorloft.com). New `/dmca` Copyright & DMCA Policy page (takedown notice, counter-notice, repeat infringers, agent details) linked from the marketing footer and author-site footers; added to sitemap, robots and llms-full. Default Terms rewritten (operator identified as Anthony P Bedford LLC, 18+, renewal wording, IP warranty, DMCA, newsletter compliance, Alabama governing law and Shelby County venue; unenforced "annual subscribers must acknowledge" sentence dropped). Live Terms come from `PlatformSettings.termsContent` and are pasted into the Super Admin legal editor separately.
 
 ## September 28, 2026 — Music achievement badges
 

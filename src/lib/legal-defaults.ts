@@ -68,27 +68,31 @@ If you have questions about this Privacy Policy, please contact us at the email 
 
 export const DEFAULT_TERMS = `Please read these Terms of Service carefully before using authorloft.com. By accessing or using our service, you agree to be bound by these terms.
 
+**Who We Are**
+
+AuthorLoft is operated by Anthony P Bedford LLC, 713 Fish Camp Rd., Chelsea, Alabama 35043 ("AuthorLoft", "we", "us"). References to "the Service" mean the AuthorLoft platform, including authorloft.com, author websites hosted on the platform, and the admin dashboard.
+
 **Acceptance of Terms**
 
-By creating an account or using AuthorLoft ("the Service"), you agree to these Terms of Service and our Privacy Policy. If you do not agree to these terms, do not use the Service.
+By creating an account or using the Service, you agree to these Terms of Service and our Privacy Policy. If you do not agree to these terms, do not use the Service.
 
 **Description of Service**
 
-AuthorLoft provides a platform for authors to create and manage their own author websites, including book catalogs, reader newsletters, and digital sales. We provide tools; content and responsibility for that content remain with the individual author.
+AuthorLoft provides a platform for authors to create and manage their own author websites, including book catalogs, reader newsletters, courses, music lists, and digital sales. We provide tools; content and responsibility for that content remain with the individual author.
 
 **Accounts and Registration**
 
-You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your credentials and for all activity that occurs under your account. Notify us immediately of any unauthorized use.
+You must be at least 18 years of age to create an account. You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your credentials and for all activity that occurs under your account. Notify us immediately of any unauthorized use.
 
 **Subscriptions and Billing**
 
 AuthorLoft offers Free, Standard, and Premium subscription plans. Current pricing and plan features are displayed on our Pricing and Plans page. Paid plans are available on a monthly or annual basis. Annual plans are offered at a discounted rate as shown on the Pricing and Plans page.
 
-By subscribing to a paid plan, you authorise AuthorLoft to charge your payment method on each billing date. Subscriptions renew automatically unless cancelled before the renewal date.
+By subscribing to a paid plan, you authorize AuthorLoft to charge your payment method on each billing date. Paid subscriptions renew automatically at the end of each billing period (monthly or yearly, as you selected) at the then-current price until you cancel. You can cancel at any time from the billing management portal in your admin dashboard; cancellation takes effect at the end of the current billing period.
 
 **30-Day Money-Back Guarantee.** New subscribers may request a full refund within 30 days of their first paid subscription payment. This guarantee applies to your initial subscription only and does not apply to subsequent renewals or to plan upgrades between paid tiers. To request a refund, you must contact AuthorLoft support directly. Approved refunds result in the immediate and permanent deletion of your account and all associated content.
 
-After 30 days, all payments are non-refundable. No partial refunds, credits, or exceptions will be made for cancellations, downgrades, or unused portions of any billing period, including annual subscriptions. Annual subscribers are required to explicitly acknowledge this policy at the time of purchase.
+After 30 days, all payments are non-refundable. No partial refunds, credits, or exceptions will be made for cancellations, downgrades, or unused portions of any billing period, including annual subscriptions.
 
 **Failed Payments and Account Restriction**
 
@@ -122,9 +126,15 @@ You retain all rights to content you upload or create on the platform (book desc
 
 You represent and warrant that you own, or have all necessary rights and licenses to use and publish, everything you upload to the platform, and that it does not infringe anyone else's rights.
 
-AuthorLoft responds to notices of alleged copyright infringement under the Digital Millennium Copyright Act as described on our Copyright & DMCA Policy page (https://www.authorloft.com/dmca). We may remove or disable access to content that is the subject of a valid notice, and we will terminate, in appropriate circumstances, the accounts of repeat infringers.
-
 AuthorLoft and its logo, design, and platform software are owned by AuthorLoft and protected by intellectual property laws.
+
+**Copyright and DMCA**
+
+AuthorLoft responds to notices of alleged copyright infringement under the Digital Millennium Copyright Act as described on our Copyright and DMCA Policy page (https://www.authorloft.com/dmca). We may remove or disable access to content that is the subject of a valid notice, and we will terminate, in appropriate circumstances, the accounts of repeat infringers. Notices of infringement should be sent to our designated agent at dmca@authorloft.com.
+
+**Newsletters and Email**
+
+If you send newsletters or other email to your readers through the Service, you are solely responsible for complying with applicable email and privacy laws, including the CAN-SPAM Act and, where applicable, the GDPR. This includes sending only to people who have signed up or otherwise given permission, honoring unsubscribe requests promptly, including a working unsubscribe link, and including a valid physical postal address in your messages.
 
 **Prohibited Uses**
 
@@ -154,7 +164,7 @@ To the maximum extent permitted by law, AuthorLoft shall not be liable for any i
 
 **Governing Law**
 
-These Terms shall be governed by the laws of the applicable jurisdiction, without regard to conflict of law principles.
+These Terms shall be governed by the laws of the State of Alabama and applicable U.S. federal law, without regard to conflict of law principles. Any dispute arising out of or relating to these Terms or the Service shall be brought exclusively in the state or federal courts located in Shelby County, Alabama, and you consent to the jurisdiction of those courts.
 
 **Changes to Terms**
 
@@ -162,4 +172,4 @@ We may update these Terms from time to time. We will notify users of material ch
 
 **Contact**
 
-For questions about these Terms, please use the contact form on our website.`;
+For questions about these Terms, please use the contact form on our website at https://www.authorloft.com/contact. Copyright notices should be sent to our designated agent as described at https://www.authorloft.com/dmca.`;
