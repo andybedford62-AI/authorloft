@@ -68,6 +68,9 @@ export function wrapHtml(title: string, content: string) {
               This email was sent by AuthorLoft &middot;
               <a href="${baseUrl()}" style="color:#6b7280;">authorloft.com</a>
             </p>
+            <p style="margin:6px 0 0;font-size:12px;color:#9ca3af;text-align:center;">
+              713 Fish Camp Rd, Chelsea, AL 35043
+            </p>
           </td>
         </tr>
       </table>

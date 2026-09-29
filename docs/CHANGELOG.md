@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## September 29, 2026 — Legal-risk quick fixes
+
+- Removed the leftover `fonts.gstatic.com` preconnect from `src/app/layout.tsx` (fonts are fully self-hosted).
+- Plan subscription checkout now shows auto-renewal terms beside the Subscribe button (Stripe `custom_text.submit`).
+- Platform email footer (`wrapHtml`) now includes the postal address (CAN-SPAM).
+- Signup already had an 18+ confirmation; DMCA agent registration deferred for discussion.
+
 ## September 28, 2026 — Music achievement badges
 
 - **Musicians can now earn achievement badges.** Before this they could only earn the newsletter

@@ -50,7 +50,6 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <head>
         <link rel="preconnect" href="https://js.stripe.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.stripe.com" />
         <link rel="dns-prefetch" href="https://q.stripe.com" />
 

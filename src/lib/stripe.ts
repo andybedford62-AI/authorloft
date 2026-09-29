@@ -83,6 +83,14 @@ export async function createSubscriptionCheckoutSession({
     ...(existingCustomerId ? { customer: existingCustomerId } : { customer_email: authorEmail }),
     line_items: [{ price: planPriceId, quantity: 1 }],
     metadata: { authorId, type: "plan_subscription" },
+    // Renewal disclosure shown directly beside the Subscribe button (auto-renewal
+    // laws, e.g. California ARL, require terms adjacent to the purchase action).
+    custom_text: {
+      submit: {
+        message:
+          "Your subscription renews automatically each billing period (monthly or yearly, as selected above) at the price shown until you cancel. Cancel anytime from Billing in your AuthorLoft dashboard; cancellation takes effect at the end of the current period.",
+      },
+    },
     // Early bird: auto-apply coupon (mutually exclusive with allow_promotion_codes)
     // Otherwise: let user enter any promo code they have
     ...(earlyBirdCouponId
