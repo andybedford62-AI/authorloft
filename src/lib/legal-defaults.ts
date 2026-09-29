@@ -67,9 +67,11 @@ AuthorLoft is based in the United States, and our service providers may process 
 
 **Data Retention**
 
-We keep your personal information for as long as your account is active or as needed to provide the Service. If you cancel a paid subscription after the 30-day refund window, your site and content are archived for a period that depends on your plan, as described on our Pricing and Plans page and in our Terms of Service, and then permanently deleted. If your account is cancelled and refunded within the 30-day refund window, your account and content are deleted immediately. We retain transaction and billing records for 7 years to meet tax and financial requirements, and support correspondence for 2 years. Newsletter subscriber data is deleted along with the author's site. Copies may remain in backups for a short period after deletion.
+We keep your personal information for as long as your account exists or as needed to provide the Service. Cancelling a subscription, downgrading, or receiving a refund does not delete your account or your content: your account moves to the Free plan, as described in our Terms of Service. If a downgrade leaves you with more published content than your new plan allows, the extra items are unpublished after a 30-day notice period, not deleted, and are restored if you upgrade.
 
-You may request deletion of your account and associated data by contacting us.
+If you ask us to delete your account, or we terminate it, we delete your account and content, generally within 30 days. We retain transaction and billing records for 7 years to meet tax and financial requirements, and support correspondence for 2 years. Newsletter subscriber data is deleted along with the author’s site. Copies may remain in backups for a short period after deletion.
+
+You may request deletion of your account and associated data at any time by contacting us.
 
 **Security**
 
@@ -127,9 +129,9 @@ AuthorLoft offers Free, Standard, and Premium subscription plans. Current pricin
 
 By subscribing to a paid plan, you authorize AuthorLoft to charge your payment method on each billing date. Paid subscriptions renew automatically at the end of each billing period (monthly or yearly, as you selected) at the then-current price until you cancel. You can cancel at any time from the billing management portal in your admin dashboard; cancellation takes effect at the end of the current billing period.
 
-**30-Day Money-Back Guarantee.** New subscribers may request a full refund within 30 days of their first paid subscription payment. This guarantee applies to your initial subscription only and does not apply to subsequent renewals or to plan upgrades between paid tiers. To request a refund, you must contact AuthorLoft support directly. Approved refunds result in the immediate and permanent deletion of your account and all associated content.
+**30-Day Money-Back Guarantee.** New subscribers may request a full refund within 30 days of their first paid subscription payment, whether they chose a monthly or an annual plan. This guarantee applies to your initial subscription only and does not apply to subsequent renewals or to plan upgrades between paid tiers. To request a refund, you must contact AuthorLoft support directly. An approved refund ends your paid plan and moves your account to the Free plan. Your content is not deleted because of a refund.
 
-After 30 days, all payments are non-refundable. No partial refunds, credits, or exceptions will be made for cancellations, downgrades, or unused portions of any billing period, including annual subscriptions.
+After 30 days, all payments are non-refundable. No partial refunds, credits, or exceptions will be made for cancellations, downgrades, or unused portions of any billing period, including annual subscriptions. Annual plans are billed once per year, and once the 30-day guarantee period has passed the annual payment is non-refundable.
 
 **Failed Payments and Account Restriction**
 
@@ -147,15 +149,17 @@ Upgrades take effect immediately. You will be charged a prorated amount for the 
 
 Downgrades take effect at the end of your current billing cycle. You will retain full access to your current plan's features until the downgrade becomes effective. No refund is issued for the remaining period on the higher-tier plan.
 
-**Content Archival and Restoration**
+**Cancellation, Downgrades and Plan Limits**
 
-AuthorLoft is committed to protecting the content you have built on our platform.
+You can cancel or downgrade at any time. Your paid plan stays active until the end of the current billing period, and then your account moves to the Free plan. Your site stays live, and your books, posts, courses, music lists, subscribers, and other content are kept. Features that are not part of the Free plan, such as a custom domain, are paused.
 
-If you downgrade to a lower plan, any content or features that exceed your new plan's limits will be archived rather than deleted. Archived content will not be visible to readers but remains safely stored and will be restored if you return to a higher plan.
+Each plan limits how much content you can have published, such as the number of books, courses, music lists, and blog posts. These limits are shown on our Pricing and Plans page. If you have more published than your new plan allows, you have 30 days from the change to upgrade, or to choose what stays live by unpublishing or deleting items. We email you at the start of that period and again before it ends, and we show a notice in your dashboard.
 
-If you cancel your subscription after 30 days, your entire site and all associated content will be archived. Archived accounts are retained for a period of time based on the plan you held at the time of cancellation, as specified on our Pricing and Plans page. If you resubscribe within the archive retention period, your site and all content will be fully restored automatically. After the retention period expires, your account and all associated content will be permanently and irreversibly deleted.
+After the 30 days, we unpublish, but do not delete, the items beyond your plan’s limits. If you have not chosen, we keep live the items that come first in the order shown in your dashboard (the newest, for blog posts). Unpublished items stay in your account. If you upgrade or resubscribe, we restore them automatically, up to your new plan’s limits.
 
-If your account is cancelled within the 30-day refund window and a refund is approved, your account and all associated content will be permanently and immediately deleted. The archival and restoration policy does not apply in this case.
+A custom domain is a paid feature. If your plan no longer includes it, then after the same 30 days your custom domain redirects visitors to your AuthorLoft address (yourname.authorloft.com). We keep your domain setting, so it resumes if you resubscribe.
+
+We do not delete your content because you cancel, downgrade, or receive a refund. Content is deleted only if you delete it, if you ask us to delete your account, or if we terminate your account as described below.
 
 **Intellectual Property**
 
@@ -189,7 +193,7 @@ Authors who sell digital goods through AuthorLoft are solely responsible for ful
 
 **Termination**
 
-We reserve the right to suspend or terminate your account at any time for violation of these Terms. You may cancel your subscription at any time through the billing management portal in your admin dashboard. Upon cancellation, your account will be handled in accordance with our Content Archival and Restoration policy above. AuthorLoft reserves the right to permanently terminate accounts found to be in serious violation of these Terms, in which case the archival and restoration policy will not apply.
+You may cancel your subscription at any time through the billing management portal in your admin dashboard, and what happens next is described in Cancellation, Downgrades and Plan Limits above. You may also ask us to delete your account and its content at any time by emailing privacy@authorloft.com. We reserve the right to suspend or terminate your account at any time for violation of these Terms, including repeated copyright infringement, and in serious cases we may remove the account’s content.
 
 **Disclaimer of Warranties**
 

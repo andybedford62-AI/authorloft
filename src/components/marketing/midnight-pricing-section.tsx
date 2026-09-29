@@ -166,7 +166,7 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
 
       {/* Footer note */}
       <p style={{ textAlign: 'left', marginTop: 32, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 10, color: VAULT.mute, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-        Stripe fees apply to direct sales · 30-day money-back guarantee · cancel anytime
+        Stripe fees apply to direct sales · 30-day money-back guarantee on your first paid payment · cancel anytime
       </p>
     </div>
   );

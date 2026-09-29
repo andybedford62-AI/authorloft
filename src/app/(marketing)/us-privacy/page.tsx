@@ -103,7 +103,7 @@ If we decline your request, you may appeal by contacting us and referencing "Pri
 
 **Sensitive Personal Information:** We do not collect or use sensitive personal information as defined under CPRA beyond what is necessary to provide the service.
 
-**Data Retention:** We retain personal information for as long as your account is active, plus any plan-based archive period after cancellation and any period required by applicable law. See our Privacy Policy for full retention details.
+**Data Retention:** We retain personal information for as long as your account exists, plus any period required by applicable law (for example, transaction records). Cancelling or downgrading does not delete your account. See our Privacy Policy for full retention details.
 
 **Shine the Light:** California Civil Code Section 1798.83 permits users who are California residents to request certain information regarding disclosure of personal information to third parties for their direct marketing purposes. We do not disclose personal information to third parties for their direct marketing purposes.`,
   },

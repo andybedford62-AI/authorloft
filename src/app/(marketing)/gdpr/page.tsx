@@ -97,9 +97,9 @@ We do not sell your data to any third party. We do not use your data for adverti
   },
   {
     heading: "Data Retention",
-    body: `We retain your data for as long as your account is active. If you cancel a paid subscription after the 30-day refund window, your site and content are archived for a period that depends on your plan (see our Pricing and Plans page and Terms of Service) and then permanently deleted. If your account is cancelled and refunded within the 30-day refund window, your account and content are deleted immediately.
+    body: `We retain your data for as long as your account exists. Cancelling a subscription, downgrading, or receiving a refund does not delete your account or content: your account moves to the Free plan (see our Terms of Service). If you ask us to delete your account, or we terminate it, we delete your account and content, generally within 30 days.
 
-- Book catalog and newsletter subscriber data is deleted along with the account, at the end of the archive period or immediately in the refund case.
+- Book catalog and newsletter subscriber data is deleted along with the account.
 - Transaction and billing records are retained for 7 years to comply with financial regulations.
 - Support correspondence is retained for 2 years.
 - Copies may remain in backups for a short period after deletion.

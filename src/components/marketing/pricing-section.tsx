@@ -210,7 +210,7 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
 
       {/* Footer note */}
       <p className="text-center text-sm text-vault-mute">
-        No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee
+        No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee on your first paid payment
       </p>
 
       {/* Full-page FAQ */}
@@ -218,11 +218,11 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
         <div className="max-w-2xl mx-auto pt-8 border-t border-vault-ink/12 space-y-6">
           <h3 className="text-lg font-bold text-vault-ink text-center">Common questions</h3>
           {[
-            { q: "Can I switch plans later?", a: "Yes — upgrade or downgrade at any time. Changes take effect immediately. If you upgrade mid-cycle you're charged a prorated amount." },
-            { q: "What happens if I exceed my book limit?", a: "You can still view and edit existing books, but you won't be able to add new ones until you upgrade or remove a book." },
+            { q: "Can I switch plans later?", a: "Yes — upgrade or downgrade at any time. Upgrades take effect immediately, and if you upgrade mid-cycle you're charged a prorated amount. Downgrades take effect at the end of your billing period." },
+            { q: "What happens if I exceed my plan's limits?", a: "You can't add more until you upgrade or remove something. If a downgrade leaves you with more published than your new plan allows, you get 30 days to upgrade or choose what stays live. After that the extras are hidden — never deleted — and they come back automatically if you upgrade again." },
             { q: "Do I need a payment processor for digital sales?", a: "Yes — direct sales use Stripe. You connect your own Stripe account so payments go directly to you. AuthorLoft does not take a transaction cut." },
             { q: "Can I use my own domain name?", a: "Custom domains are available on Standard and Premium plans. You point your domain's DNS to AuthorLoft and we handle the rest." },
-            { q: "Is there a contract or lock-in?", a: "No contract, no lock-in. Monthly plans can be cancelled anytime. Annual plans are billed yearly and include a 30-day money-back window." },
+            { q: "Is there a contract or lock-in?", a: "No contract, no lock-in. Cancel anytime, monthly or annual — your plan stays active until the end of the billing period, then your account moves to the Free plan. Your site stays live and your content is kept. Your first paid payment is covered by our 30-day money-back guarantee; after that, payments are non-refundable, including annual plans." },
           ].map(({ q, a }) => (
             <div key={q} className="space-y-1">
               <p className="font-semibold text-vault-ink">{q}</p>

@@ -88,7 +88,7 @@ export async function createSubscriptionCheckoutSession({
     custom_text: {
       submit: {
         message:
-          "Your subscription renews automatically each billing period (monthly or yearly, as selected above) at the price shown until you cancel. Cancel anytime from Billing in your AuthorLoft dashboard; cancellation takes effect at the end of the current period.",
+          "Your subscription renews automatically each billing period (monthly or yearly, as selected above) at the price shown until you cancel. Cancel anytime from Billing in your AuthorLoft dashboard; cancellation takes effect at the end of the current period and your account then moves to the Free plan. Your first payment is covered by our 30-day money-back guarantee. After 30 days, payments — including annual plans — are non-refundable.",
       },
     },
     // Early bird: auto-apply coupon (mutually exclusive with allow_promotion_codes)
