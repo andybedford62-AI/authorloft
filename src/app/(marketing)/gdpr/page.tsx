@@ -18,7 +18,7 @@ const SECTIONS = [
 
 If you have questions about your data or wish to exercise your rights, you can contact us at:
 
-**Email:** hello@authorloft.com
+**Email:** privacy@authorloft.com
 **Website:** https://www.authorloft.com/contact`,
   },
   {
@@ -69,7 +69,7 @@ If you have questions about your data or wish to exercise your rights, you can c
 
 **Right to withdraw consent** — where processing is based on consent (e.g. marketing emails), you can withdraw it at any time without affecting the lawfulness of prior processing.
 
-To exercise any of these rights, email us at **hello@authorloft.com** with the subject line "Data Rights Request". We will respond within 30 days.`,
+To exercise any of these rights, email us at **privacy@authorloft.com** with the subject line "Data Rights Request". We will respond within 30 days.`,
   },
   {
     heading: "Third-Party Data Processors",
@@ -83,6 +83,12 @@ To exercise any of these rights, email us at **hello@authorloft.com** with the s
 
 **Resend** — transactional email delivery (account emails, notifications). https://resend.com/privacy
 
+**PostHog** — product analytics, only after you accept the analytics banner. https://posthog.com/privacy
+
+**Sentry** — error monitoring. When an error occurs it may capture a short session recording with all text masked and media blocked. https://sentry.io/privacy/
+
+**Google** — Gemini API for author-facing AI tools (no reader data sent), and the Google tag, which is denied all storage by default. https://policies.google.com/privacy
+
 We do not sell your data to any third party. We do not use your data for advertising purposes.`,
   },
   {
@@ -91,14 +97,14 @@ We do not sell your data to any third party. We do not use your data for adverti
   },
   {
     heading: "Data Retention",
-    body: `We retain your data for as long as your account is active. If you close your account:
+    body: `We retain your data for as long as your account is active. If you cancel a paid subscription after the 30-day refund window, your site and content are archived for a period that depends on your plan (see our Pricing and Plans page and Terms of Service) and then permanently deleted. If your account is cancelled and refunded within the 30-day refund window, your account and content are deleted immediately.
 
-- Account and profile data is deleted within 30 days.
-- Book catalog and subscriber data is deleted within 30 days.
+- Book catalog and newsletter subscriber data is deleted along with the account, at the end of the archive period or immediately in the refund case.
 - Transaction and billing records are retained for 7 years to comply with financial regulations.
 - Support correspondence is retained for 2 years.
+- Copies may remain in backups for a short period after deletion.
 
-You may request earlier deletion by contacting hello@authorloft.com.`,
+You may request earlier deletion by contacting privacy@authorloft.com.`,
   },
   {
     heading: "Cookies",
@@ -113,7 +119,7 @@ For full details see our Privacy Policy at https://www.authorloft.com/privacy.`,
 **United Kingdom:** Information Commissioner's Office (ICO) — https://ico.org.uk
 **European Union:** Your national Data Protection Authority — https://edpb.europa.eu/about-edpb/about-edpb/members_en
 
-We would always prefer to resolve concerns directly — please contact us first at hello@authorloft.com.`,
+We would always prefer to resolve concerns directly — please contact us first at privacy@authorloft.com.`,
   },
   {
     heading: "Changes to This Page",
@@ -122,8 +128,8 @@ We would always prefer to resolve concerns directly — please contact us first 
 ];
 
 export default function GdprPage() {
-  const updatedAt = new Date("2026-05-19").toLocaleDateString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
+  const updatedAt = new Date("2026-09-29T12:00:00Z").toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });
 
   return (

@@ -251,7 +251,7 @@ Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors 
 
 - [ ] **Show the consent banner only where the law needs it (e.g. non-US visitors)** — use Vercel's `x-vercel-ip-country` header to decide; outside EU/UK/etc., track without prompting. Needs a decision on which countries count, plus `/gdpr` + `/privacy` wording updates. *(medium)*
 - [ ] **PostHog cookieless mode for non-consenting visitors** — posthog-js 1.404 supports `cookieless_mode: "on_reject"`: visitors who decline or ignore the banner are still counted with no cookie/localStorage (server-side daily hash). PostHog says no consent needed; some EU regulators disagree — confirm with a lawyer. Alternative/complement to the geo idea above. *(small)*
-- [ ] **Google Ads consent-mode default** — `gtag.js` in `src/app/layout.tsx` loads for everyone before consent with no `gtag('consent', 'default', {…: 'denied'})`; the banner only sends an `update` on Accept. Set the denied default before the tag loads if EU compliance matters. *(small)*
+- [x] **Google Ads consent-mode default** — `src/app/layout.tsx` now sets `gtag('consent','default', …)` with everything denied (analytics granted only if `analytics-consent` = accepted in localStorage) before the tag configures. Ad storage/user data/personalization stay denied while no ads run; revisit if Google Ads is ever used. *(done Sept 29, 2026)*
 - [ ] **Remove the stale `fonts.gstatic.com` preconnect** in `src/app/layout.tsx` — fonts are self-hosted since Sept 26, 2026, so it only opens a pointless connection to Google. Ride along with the next layout change. *(tiny)*
 - [ ] **Classic-theme author headings render in Inter, not Playfair** — `:root` sets `--author-font-heading: var(--font-playfair), …` but `--font-playfair` is only defined on `<body>`, so at `:root` the value is invalid and headings inherit Inter (affects the default Classic Literary theme and any theme that doesn't override `--author-font-heading`). Fixing it (declare the font vars on `:root`) is a visible design change on live author sites — decide deliberately, check on staging. *(tiny code, needs a design call)*
 
@@ -290,6 +290,10 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
 
 - [x] **Register a DMCA designated agent + takedown policy** — registered Sept 29, 2026 (DMCA-1081407, renew every 3 years, due Sept 2029); `/dmca` page shipped. *(done)*
 - [ ] **Add the IP-warranty + DMCA paragraph to the live Terms** — live Terms are DB-stored (`PlatformSettings.termsContent`, last edited Mar 31, 2026) and don't yet mention DMCA; edit via Super Admin legal editor. *(tiny)*
+- [ ] **Create the `privacy@authorloft.com` alias** (forward to Andy) before the new Privacy/GDPR/US-privacy text goes live — all three now name it as the data-rights contact. *(tiny, blocker for promotion)*
+- [ ] **Add the new Privacy Policy to the live DB** — paste into Super Admin → Legal editor (live `privacyContent` is the Mar 31, 2026 draft with "AurthorLoft/ArthorLoft" typos). *(tiny)*
+- [ ] **Consider consent-gating Sentry error Replay** — currently records on error only, all text masked, media blocked, not tied to the analytics banner; disclosed in the Privacy Policy. *(small, optional)*
+- [ ] **If Google Ads is ever used:** re-check `ad_*` consent signals, add an ads choice to the banner, and update Privacy Policy + `/us-privacy` ("we do not share for advertising"). *(future)*
 - [ ] **Renew DMCA agent registration by Sept 2029**, and amend the directory entry if the agent/address/email changes. *(reminder)*
 - [ ] **Confirm PostHog session replay is off in project settings** — client code doesn't enable it, but the project-level toggle wasn't checked. *(tiny)*
 - [ ] **Author newsletter footer address** — author newsletters use their own footer; consider requiring/prompting the author's own postal address for CAN-SPAM. *(small)*

@@ -63,6 +63,19 @@ export default function RootLayout({
                 __html: `
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
+                  // Consent Mode default: everything denied until the visitor accepts
+                  // the banner. Returning visitors who already accepted are granted
+                  // analytics immediately (the banner only runs its update on click).
+                  // Ad storage/user data/personalization stay denied — we run no ads,
+                  // and the banner only asks about analytics.
+                  var consent = null;
+                  try { consent = localStorage.getItem('analytics-consent'); } catch (e) {}
+                  gtag('consent', 'default', {
+                    ad_storage: 'denied',
+                    ad_user_data: 'denied',
+                    ad_personalization: 'denied',
+                    analytics_storage: consent === 'accepted' ? 'granted' : 'denied'
+                  });
                   gtag('js', new Date());
                   gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}', {'anonymize_ip': true});
                 `,

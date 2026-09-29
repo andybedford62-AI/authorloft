@@ -95,14 +95,15 @@ If we decline your request, you may appeal by contacting us and referencing "Pri
 - Supabase (database hosting)
 - Vercel (application hosting)
 - Resend (transactional email)
-- PostHog (product analytics — anonymised where possible)
+- PostHog (product analytics, only with your consent — anonymised where possible)
 - Sentry (error monitoring)
+- Google (Gemini API for author AI tools; Google tag)
 
 **Do Not Sell or Share My Personal Information:** We do not sell or share personal information as defined under CCPA/CPRA. No opt-out mechanism is required, but you are welcome to contact us to confirm.
 
 **Sensitive Personal Information:** We do not collect or use sensitive personal information as defined under CPRA beyond what is necessary to provide the service.
 
-**Data Retention:** We retain personal information for as long as your account is active, plus any period required by applicable law. See our Privacy Policy for full retention details.
+**Data Retention:** We retain personal information for as long as your account is active, plus any plan-based archive period after cancellation and any period required by applicable law. See our Privacy Policy for full retention details.
 
 **Shine the Light:** California Civil Code Section 1798.83 permits users who are California residents to request certain information regarding disclosure of personal information to third parties for their direct marketing purposes. We do not disclose personal information to third parties for their direct marketing purposes.`,
   },
@@ -110,7 +111,7 @@ If we decline your request, you may appeal by contacting us and referencing "Pri
     heading: "How to Submit a Privacy Request",
     body: `To exercise any of the rights described on this page:
 
-**Email:** hello@authorloft.com
+**Email:** privacy@authorloft.com
 **Subject line:** "US Privacy Rights Request"
 **Or use:** https://www.authorloft.com/contact
 
@@ -130,25 +131,25 @@ We may need to verify your identity before fulfilling a request. We will never u
 
 **Supabase** — database hosting. SOC 2 Type II certified. https://supabase.com/privacy
 
-**Vercel** — application and CDN hosting. https://vercel.com/legal/privacy-policy
+**Vercel** — application and CDN hosting, plus cookieless aggregate web analytics. https://vercel.com/legal/privacy-policy
 
 **Resend** — transactional email (account verification, order confirmations). https://resend.com/privacy
 
-**PostHog** — product analytics (page views, feature usage). Data anonymised where possible. https://posthog.com/privacy
+**PostHog** — product analytics (page views, feature usage), only after you accept the analytics banner. Data anonymised where possible. https://posthog.com/privacy
 
-**Sentry** — error monitoring and crash reporting. https://sentry.io/privacy/
+**Sentry** — error monitoring and crash reporting. When an error occurs it may capture a short session recording with all text masked and media blocked. https://sentry.io/privacy/
 
-**Google (Gemini API)** — AI features (author-facing tools only; no reader data sent). https://policies.google.com/privacy`,
+**Google** — Gemini API for AI features (author-facing tools only; no reader data sent), and the Google tag, which is denied all storage by default and enabled for analytics only if you accept the banner. We do not currently run advertising campaigns. https://policies.google.com/privacy`,
   },
   {
     heading: "Children's Privacy",
-    body: `AuthorLoft is not directed to individuals under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately at hello@authorloft.com and we will delete it promptly.`,
+    body: `You must be at least 18 years old to create an AuthorLoft account. AuthorLoft is not directed to individuals under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately at privacy@authorloft.com and we will delete it promptly.`,
   },
   {
     heading: "Changes to This Page",
     body: `We will update this page as U.S. state privacy laws evolve or our practices change. Material changes will be communicated via email or a notice on the platform. The "Last updated" date at the top of this page reflects the most recent revision.
 
-For questions not answered here, contact us at hello@authorloft.com or via our contact page.`,
+For questions not answered here, contact us at privacy@authorloft.com or via our contact page.`,
   },
 ];
 
@@ -169,8 +170,8 @@ function renderBody(body: string) {
 }
 
 export default function UsPrivacyPage() {
-  const updatedAt = new Date("2026-06-16").toLocaleDateString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
+  const updatedAt = new Date("2026-09-29T12:00:00Z").toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });
 
   return (

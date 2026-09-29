@@ -18,6 +18,8 @@ line rather than listing every commit.
 - Removed the leftover `fonts.gstatic.com` preconnect from `src/app/layout.tsx` (fonts are fully self-hosted).
 - Plan subscription checkout now shows auto-renewal terms beside the Subscribe button (Stripe `custom_text.submit`).
 - Platform email footer (`wrapHtml`) now includes the postal address (CAN-SPAM).
+- Google tag Consent Mode default added in `src/app/layout.tsx` (all denied until the visitor accepts the banner; analytics granted for returning accepted visitors).
+- Privacy Policy rewritten (default in `legal-defaults.ts`): operator identified, author-vs-reader data roles, cookies/analytics/consent detail, Sentry masked error replay, AI (Gemini) disclosure, processor list, retention aligned to the Terms archive policy, 18+/under-13, privacy@authorloft.com contact. `/gdpr` and `/us-privacy` updated to match (retention conflict fixed, processors added, contact email now privacy@authorloft.com).
 - Signup already had an 18+ confirmation.
 - DMCA: designated agent registered with the U.S. Copyright Office (DMCA-1081407, Anthony P Bedford LLC, dmca@authorloft.com). New `/dmca` Copyright & DMCA Policy page (takedown notice, counter-notice, repeat infringers, agent details) linked from the marketing footer and author-site footers; added to sitemap, robots and llms-full. Default Terms rewritten (operator identified as Anthony P Bedford LLC, 18+, renewal wording, IP warranty, DMCA, newsletter compliance, Alabama governing law and Shelby County venue; unenforced "annual subscribers must acknowledge" sentence dropped). Live Terms come from `PlatformSettings.termsContent` and are pasted into the Super Admin legal editor separately.
 

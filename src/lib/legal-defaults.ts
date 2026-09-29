@@ -5,13 +5,23 @@
  * precedence.
  */
 
-export const DEFAULT_PRIVACY = `AuthorLoft ("we", "our", or "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard data when you use authorloft.com and any subdomains hosted on our platform.
+export const DEFAULT_PRIVACY = `AuthorLoft ("we", "our", or "us") is operated by Anthony P Bedford LLC, 713 Fish Camp Rd., Chelsea, Alabama 35043. We are committed to protecting your personal information. This Privacy Policy explains how we collect, use, share, and safeguard data when you use authorloft.com and any author websites hosted on our platform ("the Service").
+
+**Who Is Responsible for Your Data**
+
+For authors, meaning people who create an AuthorLoft account, AuthorLoft is responsible for the personal information described in this policy.
+
+For readers, meaning people who visit an author's website, subscribe to an author's newsletter, download a resource, or make a purchase, the author is responsible for the personal information you give them, and AuthorLoft processes that information on the author's behalf. If you have a question about how a particular author uses your information, please contact that author. You can also contact us and we will help.
 
 **Information We Collect**
 
-We collect information you provide directly to us, such as when you create an account, subscribe to an author's newsletter, or make a purchase. This may include your name, email address, payment information (processed securely by Stripe), and any other information you choose to provide.
+Information you provide directly. When you create an account, subscribe to an author's newsletter, make a purchase, or contact us, we collect information such as your name, email address, and any other details you choose to provide. Authors also provide content such as biographies, book details, images, and course or music information.
 
-We also collect certain information automatically when you visit our platform, including your IP address, browser type, operating system, referring URLs, and information about your use of our services through cookies and similar tracking technologies.
+Payment information. Payments are processed by Stripe. We never see or store your full card number.
+
+Information collected automatically. When you visit the Service we collect technical information such as your IP address, browser type, device and operating system, referring pages, the pages you view, and how you use features. We collect some of this through cookies and similar technologies, described below.
+
+Information you enter into AI tools. If you use the AI writing and marketing tools in the author dashboard, the text you enter is sent to an AI provider to generate suggestions, as described below.
 
 **How We Use Your Information**
 
@@ -22,49 +32,76 @@ We use the information we collect to:
 - Respond to your comments and questions
 - Send marketing communications (you may opt out at any time)
 - Monitor and analyze trends, usage, and activities in connection with our services
+- Detect and prevent fraud, abuse, and security incidents, and diagnose errors
+- Comply with legal obligations
 
-**Cookies**
+**Cookies, Analytics, and Similar Technologies**
 
-We use cookies and similar tracking technologies to track activity on our platform and store certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, some portions of our service may not function properly.
+Essential cookies. We use cookies that are necessary to operate the Service, such as keeping you signed in, protecting your session, remembering that you have seen our legal notices, unlocking a download you requested, and recording an affiliate referral on an author's site. These do not require your consent.
 
-**Data Sharing**
+Your analytics choice. When you first visit, a banner asks whether you accept analytics. We store your choice in your browser. If you accept, we use PostHog for product analytics, such as page views and feature usage. If you decline, PostHog does not run. You can change your choice at any time by clearing this site's data in your browser.
 
-We do not sell your personal information. We may share your information with:
-- **Stripe**: for payment processing (governed by Stripe's Privacy Policy)
-- **Service providers**: who perform services on our behalf, bound by confidentiality agreements
-- **Legal authorities**: when required by law or to protect our rights
+Cookieless analytics. We use Vercel Web Analytics to count visits in aggregate. It does not use cookies.
+
+Error monitoring. We use Sentry to detect and fix errors. When an error occurs, Sentry may capture a short recording of the screen to help us diagnose it. All text is masked and media is blocked in these recordings, so what you type and what is displayed are not captured.
+
+Google tag. Our pages include a Google tag that we may use in the future to measure advertising. All of its storage is denied by default, and analytics storage is enabled only if you accept the banner. We do not currently run advertising campaigns. If we begin to, we will update this policy first and will use advertising cookies only with your consent.
+
+You can also block or delete cookies in your browser settings. If you do, some parts of the Service may not work properly.
+
+**AI Features**
+
+Some author tools, such as the book description writer, SEO helpers, and social post generator, send the text you enter to Google's Gemini API to produce suggestions. Authors may also connect their own Gemini API key. Please do not enter sensitive personal information into these tools. We do not intentionally send reader personal information to AI providers.
+
+**How We Share Your Information**
+
+We do not sell your personal information, and we do not share it for cross-context behavioral advertising. We share information only as follows:
+- **Service providers** that help us run the Service, under contracts that require them to protect it: Stripe (payments), Supabase (database hosting), Vercel (hosting and cookieless analytics), Resend (email delivery), PostHog (analytics, only with your consent), Sentry (error monitoring), and Google (AI features and the Google tag).
+- **Authors.** If you subscribe to an author's newsletter, make a purchase, or contact an author, we provide that information to that author.
+- **Legal authorities** when required by law or to protect our rights, safety, or property.
+- **A successor** if AuthorLoft is involved in a merger, acquisition, or sale of assets, in which case we will notify you of any change in how your information is handled.
+
+**International Data Transfers**
+
+AuthorLoft is based in the United States, and our service providers may process information in the United States and other countries. Where we transfer information from the European Economic Area, the United Kingdom, or Switzerland, we rely on appropriate safeguards such as Standard Contractual Clauses.
 
 **Data Retention**
 
-We retain your personal information for as long as your account is active or as needed to provide you services. You may request deletion of your account and associated data by contacting us.
+We keep your personal information for as long as your account is active or as needed to provide the Service. If you cancel a paid subscription after the 30-day refund window, your site and content are archived for a period that depends on your plan, as described on our Pricing and Plans page and in our Terms of Service, and then permanently deleted. If your account is cancelled and refunded within the 30-day refund window, your account and content are deleted immediately. We retain transaction and billing records for 7 years to meet tax and financial requirements, and support correspondence for 2 years. Newsletter subscriber data is deleted along with the author's site. Copies may remain in backups for a short period after deletion.
+
+You may request deletion of your account and associated data by contacting us.
 
 **Security**
 
-We implement industry-standard security measures to protect your information. However, no method of transmission over the Internet or electronic storage is 100% secure.
+We implement industry-standard security measures to protect your information, including encryption in transit and hashing of passwords. However, no method of transmission over the Internet or electronic storage is 100% secure.
 
 **Your Rights**
 
-Depending on your location, you may have the right to access, correct, or delete your personal information, object to or restrict processing, and data portability. To exercise these rights, please contact us.
+Depending on where you live, you may have the right to access, correct, delete, or receive a copy of your personal information, to object to or restrict certain processing, and to withdraw consent. To exercise these rights, email privacy@authorloft.com. You can find more detail on our GDPR and Data Rights page (https://www.authorloft.com/gdpr) and our U.S. State Privacy Rights page (https://www.authorloft.com/us-privacy).
+
+**Marketing Emails**
+
+You may opt out of marketing emails at any time using the unsubscribe link in each message. Newsletters you receive from an author on our platform come from that author, and each includes an unsubscribe link. We will still send you account, security, and transactional messages.
 
 **Children's Privacy**
 
-Our services are not directed to individuals under 13. We do not knowingly collect personal information from children under 13.
+You must be at least 18 years old to create an AuthorLoft account. Our services are not directed to individuals under 13, and we do not knowingly collect personal information from children under 13. If you believe a child has given us personal information, please contact us at privacy@authorloft.com and we will delete it promptly.
+
+**U.S. State Privacy Rights**
+
+If you are a resident of California, Virginia, Colorado, Connecticut, Utah, Texas, Oregon, Montana, Delaware, Iowa, Nebraska, New Hampshire, New Jersey, Tennessee, Minnesota, Maryland, Indiana, Kentucky, or another U.S. state with a comprehensive privacy law, you may have additional rights over your personal data, including the right to know, correct, delete, and port your information.
+
+We do not sell your personal data or share it for cross-context behavioral advertising.
+
+For a full explanation of your U.S. state privacy rights and how to submit a request, please see our U.S. State Privacy Rights page at https://www.authorloft.com/us-privacy.
 
 **Changes to This Policy**
 
 We may update this Privacy Policy from time to time. We will notify you of significant changes by posting a notice on our platform and updating the "Last Updated" date. Continued use of our services after changes constitutes acceptance of the updated policy.
 
-**U.S. State Privacy Rights**
-
-If you are a resident of California, Virginia, Colorado, Connecticut, Utah, Texas, Oregon, Montana, Delaware, Iowa, Nebraska, New Hampshire, New Jersey, Tennessee, Minnesota, Maryland, Indiana, or another U.S. state with a comprehensive privacy law, you may have additional rights over your personal data — including the right to know, correct, delete, and port your information.
-
-We do not sell or share your personal data for advertising purposes.
-
-For a full explanation of your U.S. state privacy rights and how to submit a request, please see our dedicated U.S. State Privacy Rights page at authorloft.com/us-privacy.
-
 **Contact Us**
 
-If you have questions about this Privacy Policy, please contact us at the email address listed on our Contact page.`;
+Anthony P Bedford LLC, 713 Fish Camp Rd., Chelsea, Alabama 35043. For privacy questions or requests, email privacy@authorloft.com or use the contact form at https://www.authorloft.com/contact.`;
 
 export const DEFAULT_TERMS = `Please read these Terms of Service carefully before using authorloft.com. By accessing or using our service, you agree to be bound by these terms.
 
