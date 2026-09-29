@@ -120,6 +120,10 @@ If your account is cancelled within the 30-day refund window and a refund is app
 
 You retain all rights to content you upload or create on the platform (book descriptions, cover images, blog posts, etc.). By uploading content, you grant AuthorLoft a limited, non-exclusive license to display and deliver that content as necessary to operate the Service.
 
+You represent and warrant that you own, or have all necessary rights and licenses to use and publish, everything you upload to the platform, and that it does not infringe anyone else's rights.
+
+AuthorLoft responds to notices of alleged copyright infringement under the Digital Millennium Copyright Act as described on our Copyright & DMCA Policy page (https://www.authorloft.com/dmca). We may remove or disable access to content that is the subject of a valid notice, and we will terminate, in appropriate circumstances, the accounts of repeat infringers.
+
 AuthorLoft and its logo, design, and platform software are owned by AuthorLoft and protected by intellectual property laws.
 
 **Prohibited Uses**

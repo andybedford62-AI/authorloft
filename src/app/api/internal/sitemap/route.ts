@@ -126,6 +126,7 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     { loc: `${base}/terms`,      lastmod: now, changefreq: "yearly",  priority: 0.4 },
     { loc: `${base}/gdpr`,       lastmod: now, changefreq: "yearly",  priority: 0.4 },
     { loc: `${base}/us-privacy`, lastmod: now, changefreq: "yearly",  priority: 0.4 },
+    { loc: `${base}/dmca`,       lastmod: now, changefreq: "yearly",  priority: 0.4 },
   );
 
   return entries;

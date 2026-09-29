@@ -18,6 +18,7 @@ const NAV_LINKS: [string, string][] = [
   ["Privacy", "/privacy"],
   ["Terms", "/terms"],
   ["GDPR", "/gdpr"],
+  ["DMCA", "/dmca"],
 ];
 
 const ICON_MAP: Record<string, LucideIcon> = {

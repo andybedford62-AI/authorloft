@@ -34,6 +34,7 @@ Allow: /contact
 Allow: /privacy
 Allow: /terms
 Allow: /gdpr
+Allow: /dmca
 Disallow: /admin
 Disallow: /super-admin
 Disallow: /api/

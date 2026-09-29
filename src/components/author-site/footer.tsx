@@ -153,6 +153,14 @@ export function AuthorFooter({ author, links }: FooterProps) {
               >
                 Terms
               </a>
+              <a
+                href="https://www.authorloft.com/dmca"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-600 hover:text-[var(--accent)] transition-colors"
+              >
+                Copyright
+              </a>
               {showPoweredBy && (
                 <p className="text-xs text-gray-600">
                   Powered by{" "}

@@ -100,6 +100,7 @@ export async function GET() {
     `- [Privacy Policy](${BASE}/privacy)`,
     `- [Terms of Service](${BASE}/terms)`,
     `- [GDPR & Data Rights](${BASE}/gdpr)`,
+    `- [Copyright & DMCA Policy](${BASE}/dmca)`,
   );
 
   return new NextResponse(lines.join("\n"), {
