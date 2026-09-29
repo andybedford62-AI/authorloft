@@ -37,6 +37,11 @@ line rather than listing every commit.
 
 ## September 29, 2026 — Music play counts & likes; live Privacy page fix
 
+- **Music listens badges.** New `musicListeners` badge metric — the sum of `MusicTrackStat.listeners`
+  (one per person per day, the public figure; raw clicks can be inflated by refreshing). Three
+  `BadgeDefinition` rows inserted directly in the DB: Tuned In (50), Crowd Favorite (500), Chart
+  Climber (5,000). Icons Headphones / Radio / Flame added to both icon maps.
+
 - **Music play counts.** Every play on a public music page is logged — pressing play on an embedded
   track (including Play all, Next/Previous and auto-advance) or opening a Suno/Spotify/other link-out
   track. The admin music editor shows a Plays / Listeners / Likes / Dislikes summary and per-track

@@ -142,7 +142,7 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 - [x] **Music UX phase 2 — admin editor** — shipped Sept 24, 2026: compact expandable track rows, drag-and-drop reorder, arrow buttons kept for keyboard/touch. *(done)*
 - [x] **Music UX phase 3 — public page** — shipped Sept 24, 2026: docked Now Playing player, Play all with YouTube auto-advance, tracklist layout for albums, "Listen on" links, release date. *(done)*
 - [ ] **Music: Spotify auto-advance** — would need Spotify's iFrame API script (`open.spotify.com/embed/iframe-api/v1`) added to CSP `script-src`. Only worth it if musicians build mostly-Spotify lists. *(small)*
-- [ ] **Music stats follow-ups** (after play counts & likes shipped Sept 29, 2026) — plays-over-time chart for musicians (the `MusicPlay` log already has per-day rows, so it's display only); a plays badge metric (e.g. 100 / 1,000 listeners) in `src/lib/badges.ts`; per-list play totals on the `/admin/music` cards; counting only real playback for Spotify (needs its iFrame API script in CSP `script-src`, same as Spotify auto-advance below). *(small each)*
+- [ ] **Music stats follow-ups** (after play counts & likes shipped Sept 29, 2026) — plays-over-time chart for musicians (the `MusicPlay` log already has per-day rows, so it's display only); per-list play totals on the `/admin/music` cards; counting only real playback for Spotify (needs its iFrame API script in CSP `script-src`, same as Spotify auto-advance below). *(small each)*
 - [x] **Music UX phase 4 — Social Promote for music** — shipped Sept 24, 2026: `music` context type, 4 music promo types, "Write a post with AI" link from the share kit. *(done)*
 - [ ] **Music: direct posting to networks — do NOT build yet** — per-network app review, X API is paid, TikTok only accepts video uploads; copy/share covers most of the value. Revisit alongside "Author Social Scheduling".
 - [ ] **Courses in Social Promote** — course creators get nothing from it today (contexts are book/news/topic/music). Same shape as the Sept 24 music work: `course` context + 3–4 course promo types (enrolment open, lesson spotlight, what you'll learn, student question). *(small–medium)*
@@ -308,6 +308,7 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
 ## Shipped (for reference)
 
 - ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
+- ✅ **Music listens badges** — Tuned In (50), Crowd Favorite (500), Chart Climber (5,000) listens. (September 29, 2026)
 - ✅ **Music play counts & likes** — every play click logged, listeners (1/person/day) shown publicly from 10, likes public, dislikes admin-only; stats keyed by song link. (September 29, 2026)
 - ✅ **Music achievement badges** — First Release / Growing Discography (published music lists), Ten Tracks / Deep Catalog (tracks across published lists). (September 28, 2026)
 - ✅ **Shared share/promote layer for Books, Courses and Music** — public `ShareBar` (with QR popover) on book/course/music pages, admin `ShareKit` on all three editors, Copy link / View live on list rows, Social Promote for courses with 7 course promo types. (September 24, 2026)

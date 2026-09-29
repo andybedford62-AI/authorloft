@@ -23,6 +23,7 @@ export type AuthorBadgeMetrics = {
   preorders: number;
   musicLists: number; // published music lists
   musicTracks: number; // tracks across published music lists
+  musicListeners: number; // listens across all songs — one per person per day (MusicTrackStat.listeners)
 };
 
 export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBadgeMetrics> {
@@ -39,6 +40,7 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     preorders,
     musicLists,
     musicTracks,
+    musicListeners,
   ] = await Promise.all([
     prisma.book.count({ where: { authorId, isPublished: true } }),
     prisma.order.aggregate({ where: { authorId, status: "COMPLETED" }, _sum: { totalCents: true } }),
@@ -54,6 +56,8 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     prisma.courseLesson.count({
       where: { module: { course: { authorId, kind: "MUSIC", isPublished: true } } },
     }),
+    // Listeners, not raw plays: it's the public figure, and refreshing can't inflate it.
+    prisma.musicTrackStat.aggregate({ where: { authorId }, _sum: { listeners: true } }),
   ]);
 
   const distinctFormats = new Set(formatBooks.flatMap((b) => b.availableFormats));
@@ -71,6 +75,7 @@ export async function getAuthorBadgeMetrics(authorId: string): Promise<AuthorBad
     preorders,
     musicLists,
     musicTracks,
+    musicListeners: musicListeners._sum.listeners ?? 0,
   };
 }
 
