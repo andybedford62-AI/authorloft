@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
-import { isBotRequest, recordPlay, resolvePublicTrack } from "@/lib/music-stats";
+import { isBotRequest, isExcludedRequest, recordPlay, resolvePublicTrack } from "@/lib/music-stats";
 
 /**
  * POST { trackId, source: "embed" | "link" } — logs a play click from a public
@@ -27,13 +26,8 @@ export async function POST(req: NextRequest) {
     const ref = await resolvePublicTrack(trackId);
     if (!ref) return NextResponse.json({ error: "Not found." }, { status: 404 });
 
-    // The musician checking their own page, or a super admin browsing, isn't
-    // an audience. The session cookie is scoped to every *.authorloft.com
-    // subdomain, so this works on author sites (custom domains can't see it).
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (token && (token.sub === ref.authorId || token.isSuperAdmin)) {
-      return new NextResponse(null, { status: 204 });
-    }
+    // The musician and super admins aren't an audience — see isExcludedRequest.
+    if (await isExcludedRequest(req, ref.authorId)) return new NextResponse(null, { status: 204 });
 
     await recordPlay(ref, req, source);
     return new NextResponse(null, { status: 204 });

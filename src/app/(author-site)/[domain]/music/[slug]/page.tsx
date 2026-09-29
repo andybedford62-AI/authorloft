@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { sanitize } from "@/lib/sanitize";
 import { resolveTrackLink, trackStatKey } from "@/lib/music-links";
-import { getTrackStats, PUBLIC_PLAYS_THRESHOLD } from "@/lib/music-stats";
+import { getTrackStats, isExcludedViewer, PUBLIC_PLAYS_THRESHOLD } from "@/lib/music-stats";
 import { releaseLabel, trackKeys, findTrackIndex, parseListenLinks, formatReleaseDate } from "@/lib/music-share";
 import { MusicTrackList, type PublicTrack } from "@/components/author-site/music-track-list";
 import type { Metadata } from "next";
@@ -123,7 +123,10 @@ export default async function MusicListPage({
   if (!list) notFound();
 
   const flat = flattenTracks(list);
-  const stats = await getTrackStats(author.id, flat.map((t) => t.lesson.videoUrl));
+  const [stats, ownView] = await Promise.all([
+    getTrackStats(author.id, flat.map((t) => t.lesson.videoUrl)),
+    isExcludedViewer(author.id),
+  ]);
   const tracks: PublicTrack[] = flat.map(({ lesson: l, shareKey, thumbnailUrl }) => {
     const html = l.contentHtml?.trim() ? sanitize(l.contentHtml) : null;
     const statKey = l.videoUrl ? trackStatKey(l.videoUrl) : null;
@@ -162,6 +165,7 @@ export default async function MusicListPage({
       </Link>
 
       <MusicTrackList
+        ownView={ownView}
         tracks={tracks}
         accentColor={author.accentColor}
         initialTrackId={initialIndex >= 0 ? tracks[initialIndex].id : null}

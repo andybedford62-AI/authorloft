@@ -1,5 +1,8 @@
 import { createHash } from "crypto";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { trackStatKey } from "@/lib/music-links";
 
@@ -47,6 +50,26 @@ export function dailyVisitorHash(req: NextRequest, day: Date): string {
 
 export function voterHash(voterId: string): string {
   return hash(`${salt()}|voter|${voterId}`);
+}
+
+// The musician checking their own page, or a super admin browsing, isn't an
+// audience — their plays and votes would only skew the numbers. The session
+// cookie is scoped to every *.authorloft.com subdomain, so this works on
+// author sites (a custom domain can't see it). Compare `id`, not `sub`: for a
+// Google sign-in `sub` is the Google account id, not the author id.
+type Viewer = { id?: unknown; isSuperAdmin?: unknown } | null | undefined;
+const isOwnerOrAdmin = (v: Viewer, authorId: string) => !!v && (v.id === authorId || v.isSuperAdmin === true);
+
+/** For API routes. */
+export async function isExcludedRequest(req: NextRequest, authorId: string): Promise<boolean> {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  return isOwnerOrAdmin(token as Viewer, authorId);
+}
+
+/** For server-rendered pages. */
+export async function isExcludedViewer(authorId: string): Promise<boolean> {
+  const session = await getServerSession(authOptions).catch(() => null);
+  return isOwnerOrAdmin(session?.user as Viewer, authorId);
 }
 
 export type PublicTrackRef = { authorId: string; courseId: string; trackKey: string };

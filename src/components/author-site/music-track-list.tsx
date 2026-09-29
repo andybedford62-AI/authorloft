@@ -133,6 +133,7 @@ export function MusicTrackList({
   layout,
   listenLinks,
   initialTrackId,
+  ownView = false,
 }: {
   tracks: PublicTrack[];
   accentColor: string;
@@ -144,6 +145,8 @@ export function MusicTrackList({
   listenLinks: string[];
   /** From a `?track=` deep link: played (or highlighted, if it can't embed) on load. */
   initialTrackId?: string | null;
+  /** The musician (or a super admin) is viewing: their plays and votes aren't counted. */
+  ownView?: boolean;
 }) {
   const tracks: ResolvedTrack[] = rawTracks.map((t) => {
     const link = t.videoUrl ? resolveTrackLink(t.videoUrl) : null;
@@ -276,7 +279,8 @@ export function MusicTrackList({
     onOpen: () => logPlay(track.id, "link"),
     onShare: () => shareTrack(track),
     likes: likes[track.id] ?? 0,
-    myVote: (track.statKey ? votes[track.statKey] ?? 0 : 0) as 0 | 1 | -1,
+    disabled: ownView,
+    myVote: (ownView || !track.statKey ? 0 : votes[track.statKey] ?? 0) as 0 | 1 | -1,
     onReact: (value: 1 | -1) => react(track, value),
   });
 
@@ -392,6 +396,12 @@ export function MusicTrackList({
         />
       </div>
 
+      {ownView && (
+        <p className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+          You&apos;re signed in as the musician, so your plays, likes and dislikes on this page aren&apos;t counted.
+        </p>
+      )}
+
       {/* ── Tracks ──────────────────────────────────────────────────────────── */}
       {tracks.length === 0 ? (
         <div className="text-center py-16 rounded-xl border border-dashed border-gray-200">
@@ -452,6 +462,7 @@ type ItemProps = {
   likes: number;
   myVote: 0 | 1 | -1;
   onReact: (value: 1 | -1) => void;
+  disabled: boolean;
 };
 
 /** Three pulsing bars marking the playing track. */
@@ -484,20 +495,23 @@ function ShareButton({ copied, onShare, title, size = "sm" }: { copied: boolean;
 }
 
 /** Like / dislike. The like count is public; dislikes are only ever shown to the musician. */
-function Reactions({ title, likes, myVote, onReact, textOnWhite }: {
-  title: string; likes: number; myVote: 0 | 1 | -1; onReact: (value: 1 | -1) => void; textOnWhite: string;
+function Reactions({ title, likes, myVote, onReact, textOnWhite, disabled }: {
+  title: string; likes: number; myVote: 0 | 1 | -1; onReact: (value: 1 | -1) => void; textOnWhite: string; disabled: boolean;
 }) {
-  const btn = "inline-flex items-center gap-1 rounded-full px-1.5 py-1 text-[11px] font-medium transition-colors hover:bg-gray-100";
+  const btn = `inline-flex items-center gap-1 rounded-full px-1.5 py-1 text-[11px] font-medium transition-colors ${
+    disabled ? "cursor-not-allowed opacity-60" : "hover:bg-gray-100"
+  }`;
   return (
     <span className="flex-shrink-0 inline-flex items-center">
       <button
         type="button"
         onClick={() => onReact(1)}
+        disabled={disabled}
         className={btn}
         style={{ color: myVote === 1 ? textOnWhite : "#9ca3af" }}
         aria-pressed={myVote === 1}
         aria-label={myVote === 1 ? `Remove like from ${title}` : `Like ${title}`}
-        title={myVote === 1 ? "Liked" : "Like"}
+        title={disabled ? "Your own votes aren't counted" : myVote === 1 ? "Liked" : "Like"}
       >
         <ThumbsUp className={`h-3.5 w-3.5 ${myVote === 1 ? "fill-current" : ""}`} />
         {likes > 0 && <span className="tabular-nums">{compact.format(likes)}</span>}
@@ -505,11 +519,12 @@ function Reactions({ title, likes, myVote, onReact, textOnWhite }: {
       <button
         type="button"
         onClick={() => onReact(-1)}
+        disabled={disabled}
         className={btn}
         style={{ color: myVote === -1 ? "#4b5563" : "#9ca3af" }}
         aria-pressed={myVote === -1}
         aria-label={myVote === -1 ? `Remove dislike from ${title}` : `Dislike ${title}`}
-        title={myVote === -1 ? "Disliked" : "Dislike"}
+        title={disabled ? "Your own votes aren't counted" : myVote === -1 ? "Disliked" : "Dislike"}
       >
         <ThumbsDown className={`h-3.5 w-3.5 ${myVote === -1 ? "fill-current" : ""}`} />
       </button>
@@ -519,7 +534,7 @@ function Reactions({ title, likes, myVote, onReact, textOnWhite }: {
 
 // ── Tracklist row (albums / EPs / singles) ────────────────────────────────────
 
-function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact }: ItemProps) {
+function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact, disabled }: ItemProps) {
   const inner = (
     <>
       <span className="w-7 flex-shrink-0 flex items-center justify-center text-sm tabular-nums text-gray-400">
@@ -570,7 +585,7 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
           {inner}
         </a>
       )}
-      <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} />
+      <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} disabled={disabled} />
       <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
     </div>
   );
@@ -578,7 +593,7 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
 
 // ── Artwork card (playlists) ──────────────────────────────────────────────────
 
-function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact }: ItemProps) {
+function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact, disabled }: ItemProps) {
   let hostname: string | null = null;
   if (canonicalUrl) {
     try {
@@ -693,7 +708,7 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
             </a>
           ) : <span />}
           <span className="flex items-center gap-1">
-            <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} />
+            <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} disabled={disabled} />
             <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
           </span>
         </div>

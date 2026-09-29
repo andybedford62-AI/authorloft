@@ -47,7 +47,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Music Import** (YouTube playlist, or bulk-paste links — Tab/comma/pipe, spreadsheet-friendly) | ✅ | ✅ | ✅ |
 | **Tracks per Music List** | Up to 20 | Up to 75 | Up to 500 |
 | **Music Player** (docked Now Playing player with Prev/Next; Play all with YouTube auto-advance; numbered tracklist for Album/EP/Single, artwork grid for Playlists; album-level "Listen on" links; optional release date) | ✅ | ✅ | ✅ |
-| **Music Play Counts & Likes** (every play click logged — embeds and Suno/link-out opens; public page shows listeners — one per person per day — once a track reaches 10, plus a like count; dislikes and full plays/listeners/likes/dislikes only in the admin music editor; musician's own signed-in plays not counted; stats follow the song link, so they survive edits and are shared across lists) | ✅ | ✅ | ✅ |
+| **Music Play Counts & Likes** (every play click logged — embeds and Suno/link-out opens; public page shows listeners — one per person per day — once a track reaches 10, plus a like count; dislikes and full plays/listeners/likes/dislikes only in the admin music editor; musician's own and super-admin plays and votes not counted; stats follow the song link, so they survive edits and are shared across lists) | ✅ | ✅ | ✅ |
 | **Music Sharing** (Playlist/Album/EP/Single release type; public share bar incl. phone share sheet for TikTok/Instagram; per-song `?track=` links with their own preview; admin share kit with tracked links, caption, QR) | ✅ | ✅ | ✅ |
 | **Auto-Formatter** (convert an uploaded DOCX to a downloadable ePub) | ✅ | ✅ | ✅ |
 | **Shopping Cart** (multi-item checkout) | ❌ | ✅ | ✅ |

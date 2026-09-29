@@ -103,7 +103,7 @@ export default async function EditMusicListPage({
         </div>
         <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
           Your public page shows a track&apos;s listener count once it reaches {PUBLIC_PLAYS_THRESHOLD}. Suno and
-          other link-out tracks count the click that opens them. Your own plays while signed in aren&apos;t counted.
+          other link-out tracks count the click that opens them. Your own plays, likes and dislikes while signed in aren&apos;t counted.
         </p>
       </div>
       <MusicListForm

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enforceRateLimit } from "@/lib/api-rate-limit";
-import { isBotRequest, resolvePublicTrack, setReaction } from "@/lib/music-stats";
+import { isBotRequest, isExcludedRequest, resolvePublicTrack, setReaction } from "@/lib/music-stats";
 
 /**
  * POST { trackId, voterId, value: 1 | -1 | 0 } — like, dislike, or clear.
@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
   try {
     const ref = await resolvePublicTrack(trackId);
     if (!ref) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    // The page already disables the buttons for these viewers; this is the backstop.
+    if (await isExcludedRequest(req, ref.authorId)) {
+      return NextResponse.json({ error: "Your own votes aren't counted." }, { status: 403 });
+    }
     const { likes } = await setReaction(ref, voterId, value);
     return NextResponse.json({ likes });
   } catch (err) {

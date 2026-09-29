@@ -42,7 +42,9 @@ line rather than listing every commit.
   track. The admin music editor shows a Plays / Listeners / Likes / Dislikes summary and per-track
   numbers; the public page shows a track's listener count ("1.2K plays") once it reaches 10. Plays =
   every click; listeners = one per person per day, identified only by a daily-salted hash of IP + user
-  agent (no cookie). The musician's own plays while signed in, super admins and bots aren't counted.
+  agent (no cookie). The musician's own plays and votes while signed in, super admins' and bots'
+  aren't counted; signed in as the musician, the page says so and the like/dislike buttons are disabled.
+  (Owner check compares `token.id`, not `token.sub` — `sub` is the Google account id for Google sign-ins.)
 - **Likes / dislikes** on every track row and card. The like count is public; dislikes are shown only
   to the musician. One vote per browser per song (random id in localStorage, hashed server-side),
   toggle or switch any time.
