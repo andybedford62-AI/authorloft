@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /admin
+Disallow: /super-admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /orders/
+Disallow: /maintenance
+Disallow: /arc/
+Disallow: /_next/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /super-admin
+Disallow: /api/
+
+Sitemap: https://www.authorloft.com/sitemap.xml
