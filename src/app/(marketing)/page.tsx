@@ -22,18 +22,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Your Books. Your Courses. Your Music. Your Business.",
     description:
-      "Your own storefront for books, courses, or music — your own audience list, 100% of every sale. Free to start, live in 15 minutes.",
+      "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
-      description: "Own your creative business with AuthorLoft. Your own storefront, your own audience list, 100% of every sale. Direct sales for books, courses, and music, newsletter campaigns, audience analytics, media kits, and pre-orders, all in one platform, free to start.",
+      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
-      description: "Own your creative business with AuthorLoft. Your own storefront, your own audience list, 100% of every sale. Direct sales for books, courses, and music, newsletter campaigns, audience analytics, media kits, and pre-orders, all in one platform, free to start.",
+      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
       images:      [ogImage],
     },
   };
