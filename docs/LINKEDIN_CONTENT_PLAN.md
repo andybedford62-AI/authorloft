@@ -121,7 +121,7 @@ Drafted after the data exists. Lead with one real finding and `n`, link to `/res
 > https://www.authorloft.com/blog/5-metrics-every-author-should-track?utm_source=linkedin&utm_medium=social&utm_campaign=blog-series
 
 ### B5 — Thu Oct 22 · Pricing an ebook for direct sales
-> Amazon's royalty tiers push many authors to price between $2.99 and $9.99. The post puts the tiers at 70% inside that range and 35% outside it.
+> Amazon's royalty tiers shape how many authors price their ebooks: the 70% royalty applies within a set price band, and the rate drops to 35% outside it. Check Amazon's current terms for the exact band.
 >
 > Selling direct removes that constraint. The guide covers price points by length and format, launch pricing, newsletter-exclusive pricing, and backlist pricing.
 >
@@ -129,7 +129,7 @@ Drafted after the data exists. Lead with one real finding and `n`, link to `/res
 >
 > #SelfPublishing #DirectSales
 
-*Figure to confirm: Amazon's 70% / 35% tiers and the $2.99–$9.99 range. Check against current KDP terms before this goes out.*
+*Corrected Oct 1, 2026: Amazon widened the 70% band to $2.99–$12.99 effective July 7, 2026 (KDP help page, confirmed by several outside sources). The post no longer quotes the band. The two blog articles that did (`how-to-price-your-ebook-direct-sales`, `self-publishing-vs-amazon-kdp`) were updated to $12.99.*
 
 ### B6 — Tue Oct 27 · Which social platform drives sales
 > Which platform is best for selling books? The post argues that is the wrong question.

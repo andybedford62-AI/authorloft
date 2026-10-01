@@ -79,9 +79,10 @@ const WARN_DAYS = 14;
 
 // Shows when the stored token stops working. The date is entered by hand when
 // connecting (the platforms don't report it), so a blank value just says so.
-function TokenExpiry({ expiresAt }: { expiresAt: string | null }) {
+function TokenExpiry({ expiresAt, platform }: { expiresAt: string | null; platform: string }) {
   if (!expiresAt) {
-    return <p className="text-xs text-gray-400">Expiry not recorded</p>;
+    // Only LinkedIn tokens are known to lapse and carry an entered expiry; X keys do not expire.
+    return platform === "LINKEDIN" ? <p className="text-xs text-gray-400">Expiry not recorded</p> : null;
   }
   const expires = new Date(expiresAt);
   const daysLeft = Math.ceil((expires.getTime() - Date.now()) / 86_400_000);
@@ -304,7 +305,7 @@ export function SocialPlatformConnect({ initialTokens }: { initialTokens: Token[
                     {connected ? (
                       <>
                         <p className="text-xs text-gray-400">{token.accountName}</p>
-                        <TokenExpiry expiresAt={token.tokenExpiresAt} />
+                        <TokenExpiry expiresAt={token.tokenExpiresAt} platform={plat.id} />
                       </>
                     ) : (
                       <p className="text-xs text-gray-400">Not connected</p>
