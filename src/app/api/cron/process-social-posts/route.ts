@@ -4,7 +4,7 @@ import { publishSocialPost }         from "@/lib/social/publisher";
 
 /**
  * GET /api/cron/process-social-posts
- * Called by Vercel Cron every 5 minutes (see vercel.json).
+ * Called by Vercel Cron hourly at :05 (see vercel.json).
  * Finds all SCHEDULED posts whose scheduledAt has passed and publishes them.
  */
 export async function GET(req: NextRequest) {

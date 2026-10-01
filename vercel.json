@@ -15,7 +15,7 @@
     },
     {
       "path": "/api/cron/process-social-posts",
-      "schedule": "0 9 * * *"
+      "schedule": "5 * * * *"
     },
     {
       "path": "/api/cron/expire-trials",
