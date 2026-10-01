@@ -21,10 +21,24 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { platform, accessToken, accountId: rawAccountId } = await req.json();
+  const { platform, accessToken, accountId: rawAccountId, tokenExpiresAt: rawExpiry } = await req.json();
 
   if (!platform || !accessToken?.trim()) {
     return NextResponse.json({ error: "platform and accessToken are required." }, { status: 400 });
+  }
+
+  // Optional expiry (YYYY-MM-DD), entered from the date the platform shows when the token is issued.
+  // The platform APIs we call don't report it, so it is recorded by hand and only used for display.
+  let tokenExpiresAt: Date | null = null;
+  if (rawExpiry) {
+    const parsed = new Date(`${String(rawExpiry)}T23:59:59Z`);
+    if (Number.isNaN(parsed.getTime())) {
+      return NextResponse.json({ error: "Token expiry must be a valid date." }, { status: 400 });
+    }
+    if (parsed.getTime() <= Date.now()) {
+      return NextResponse.json({ error: "Token expiry date is in the past. Check the date shown when the token was generated." }, { status: 400 });
+    }
+    tokenExpiresAt = parsed;
   }
 
   // LinkedIn & Twitter auto-resolve accountId from the credentials; others require it
@@ -74,12 +88,12 @@ export async function POST(req: NextRequest) {
 
   const token = await prisma.socialPlatformToken.upsert({
     where:  { platform },
-    create: { platform, accessToken: encrypted, accountId, accountName, isActive: true },
-    update: { accessToken: encrypted, accountId, accountName, isActive: true, tokenExpiresAt: null },
+    create: { platform, accessToken: encrypted, accountId, accountName, isActive: true, tokenExpiresAt },
+    update: { accessToken: encrypted, accountId, accountName, isActive: true, tokenExpiresAt },
   });
 
   return NextResponse.json({
     id: token.id, platform: token.platform, accountId: token.accountId,
-    accountName: token.accountName, isActive: token.isActive,
+    accountName: token.accountName, isActive: token.isActive, tokenExpiresAt: token.tokenExpiresAt,
   }, { status: 201 });
 }

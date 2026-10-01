@@ -75,6 +75,39 @@ const PLATFORMS = [
   },
 ] as const;
 
+const WARN_DAYS = 14;
+
+// Shows when the stored token stops working. The date is entered by hand when
+// connecting (the platforms don't report it), so a blank value just says so.
+function TokenExpiry({ expiresAt }: { expiresAt: string | null }) {
+  if (!expiresAt) {
+    return <p className="text-xs text-gray-400">Expiry not recorded</p>;
+  }
+  const expires = new Date(expiresAt);
+  const daysLeft = Math.ceil((expires.getTime() - Date.now()) / 86_400_000);
+  const dateLabel = expires.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
+  if (daysLeft <= 0) {
+    return (
+      <p className="text-xs font-medium text-red-600" suppressHydrationWarning>
+        Token expired {dateLabel}. Disconnect and reconnect to post.
+      </p>
+    );
+  }
+  if (daysLeft <= WARN_DAYS) {
+    return (
+      <p className="text-xs font-medium text-amber-600" suppressHydrationWarning>
+        Expires {dateLabel} ({daysLeft} day{daysLeft === 1 ? "" : "s"}). Reconnect soon.
+      </p>
+    );
+  }
+  return (
+    <p className="text-xs text-gray-400" suppressHydrationWarning>
+      Expires {dateLabel} ({daysLeft} days)
+    </p>
+  );
+}
+
 function ConnectPanel({
   platformDef,
   onSuccess,
@@ -85,6 +118,7 @@ function ConnectPanel({
   const [accountId,   setAccountId]   = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [fieldVals,   setFieldVals]   = useState<Record<string, string>>({});
+  const [expiresOn,   setExpiresOn]   = useState("");
   const [saving,      setSaving]      = useState(false);
   const [error,       setError]       = useState("");
 
@@ -123,6 +157,7 @@ function ConnectPanel({
           platform:    platformDef.id,
           accessToken: tokenPayload,
           accountId:   autoId || multiField ? undefined : accountId,
+          tokenExpiresAt: expiresOn || undefined,
         }),
       });
       const data = await res.json();
@@ -186,6 +221,18 @@ function ConnectPanel({
             <input type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)}
               placeholder={platformDef.tokenHint} className={inputCls} />
           </div>
+          {platformDef.id === "LINKEDIN" && (
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-gray-600">
+                Token expiry date <span className="text-gray-400">(optional)</span>
+              </label>
+              <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)}
+                min={new Date().toISOString().slice(0, 10)} className={inputCls} />
+              <p className="text-xs text-gray-400">
+                LinkedIn shows this date when it generates the token. We can&apos;t read it from the token, so enter it here to get a reminder on this card.
+              </p>
+            </div>
+          )}
         </>
       )}
 
@@ -255,7 +302,10 @@ export function SocialPlatformConnect({ initialTokens }: { initialTokens: Token[
                   <div>
                     <p className="text-sm font-medium text-gray-900">{plat.label}</p>
                     {connected ? (
-                      <p className="text-xs text-gray-400">{token.accountName}</p>
+                      <>
+                        <p className="text-xs text-gray-400">{token.accountName}</p>
+                        <TokenExpiry expiresAt={token.tokenExpiresAt} />
+                      </>
                     ) : (
                       <p className="text-xs text-gray-400">Not connected</p>
                     )}
