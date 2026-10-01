@@ -46,9 +46,13 @@ export function SocialPostForm({ tokens, post }: Props) {
   const [caption,     setCaption]     = useState(post?.caption     ?? "");
   const [platforms,   setPlatforms]   = useState<string[]>(post?.platforms  ?? connectedPlatforms);
   const [mediaUrl,    setMediaUrl]    = useState(post?.mediaUrl    ?? "");
-  const [scheduledAt, setScheduledAt] = useState(
-    post?.scheduledAt ? new Date(post.scheduledAt).toISOString().slice(0, 16) : ""
-  );
+  // <input type="datetime-local"> works in the viewer's local time, but the post stores UTC.
+  // Convert on the way in, or re-saving an unchanged post shifts it by the UTC offset.
+  const [scheduledAt, setScheduledAt] = useState(() => {
+    if (!post?.scheduledAt) return "";
+    const d = new Date(post.scheduledAt);
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+  });
 
   const [uploading, setUploading] = useState(false);
   const [saving,    setSaving]    = useState(false);
