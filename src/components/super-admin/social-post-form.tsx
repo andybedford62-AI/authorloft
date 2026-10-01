@@ -266,7 +266,7 @@ export function SocialPostForm({ tokens, post }: Props) {
         </div>
         {scheduledAt && (
           <p className="text-xs text-gray-400">
-            Will be published automatically by the background job within 5 minutes of the scheduled time.
+            Will be published automatically by the background job at the next hourly run (at :05) after the scheduled time.
           </p>
         )}
       </div>
