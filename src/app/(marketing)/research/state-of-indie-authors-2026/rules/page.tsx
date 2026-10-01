@@ -39,11 +39,11 @@ const SECTIONS = [
   },
   {
     heading: "Who Can Enter",
-    body: `You can enter the prize draw if you are **18 or older**, **a resident of the United States**, and an author who self-publishes, including authors who both self-publish and publish traditionally. The survey screens out authors who publish only through a traditional publisher.
+    body: `You can enter the prize draw if you are **18 or older** and an author who self-publishes, including authors who both self-publish and publish traditionally. The survey screens out authors who publish only through a traditional publisher.
 
-Current paid AuthorLoft subscribers, and employees of the Sponsor and their immediate family, are not eligible for the prize.
+The survey and the prize draw are open to authors in any country, except where the law prohibits it.
 
-The survey is open to authors anywhere. If you are outside the United States you are welcome to take part and your answers count in the results, but you cannot win a prize.`,
+Current paid AuthorLoft subscribers, and employees of the Sponsor and their immediate family, are not eligible for the prize.`,
   },
   {
     heading: "How to Enter",

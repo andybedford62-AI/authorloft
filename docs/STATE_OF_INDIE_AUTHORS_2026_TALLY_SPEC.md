@@ -70,13 +70,13 @@ Each question feeds a report finding: Q2+Q4 (earnings), Q5 (income trend), Q6+Q7
 **Live wording is the page, not this file:** `src/app/(marketing)/research/state-of-indie-authors-2026/rules/page.tsx` (`/research/state-of-indie-authors-2026/rules`). If anything below differs from the page, the page wins.
 
 **Decisions confirmed by Andy, Oct 1 2026:**
-- Prize limited to **US residents aged 18+**. The survey itself stays open worldwide; non-US respondents count in the results but cannot win.
+- Prize open to **authors aged 18+ in any country, except where the law prohibits it** (changed Oct 1 2026 from US-only; Andy: "willing to let any new author have a subscription"). Current paid subscribers remain ineligible.
 - Self-published **and hybrid** authors can enter (the survey screens out traditionally-published-only authors).
 - Current **paid** subscribers are ineligible; an existing **free** account can receive the prize (applied to a free account registered with the entry email).
 - Sponsor details: Anthony P Bedford LLC, address as published on `/dmca`.
 - No governing-law clause (not a legal review; add one if a lawyer advises).
 
-**Still to do outside the code:** add the rules link, and a note that the draw is for US residents, to the Tally form description.
+**Tally form text:** the rules link is published. The "US residents" wording on the Tally form (3 blocks) must be changed to worldwide AFTER the updated rules page is live in production, so the form never contradicts the public rules.
 
 *Template, not legal advice.*
 
