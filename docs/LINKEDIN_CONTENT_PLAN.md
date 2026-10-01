@@ -1,6 +1,6 @@
 # LinkedIn Content Plan — State of Indie Authors 2026
 
-**Status:** DRAFT for Andy's review. Nothing is queued or published.
+**Status (Oct 1, 2026):** queued in Super Admin → Social. Survey launch (Oct 5), final-week (Oct 26) and last-day (Nov 1) posts and all 8 blog posts (B1–B8, Oct 8 – Nov 3) are SCHEDULED; the Oct 19 reminder is a DRAFT until the real response count replaces `[N]`; the Dec 1 report-launch post is not drafted. Nothing has published yet. The LinkedIn token expires Nov 30, 2026 (reconnect Nov 16–29). The database copy is what publishes; if you change wording here, change it there too.
 **Posting account:** Andy's personal profile (via the Super Admin social poster).
 **Rules for every post:** only facts we can back up; no invented numbers; real images only (no generated art); disclose "conducted by AuthorLoft"; Andy approves each post before it is queued.
 
