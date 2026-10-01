@@ -1,21 +1,19 @@
-# Survey Build Spec — State of Indie Authors 2026 (v4: 15 questions, Typeform)
+# Tally Build Spec — State of Indie Authors 2026 (v3: 15 questions)
 
-**Survey tool changed Oct 1, 2026: Typeform, not Tally.** Live form: https://form.typeform.com/to/wVDW5jT9 (as of Oct 1 the public page title reads "New form"; set the title below before the first post). This file began as the Tally build spec; the questions, rules and calendar are unchanged, and the Typeform-specific items are marked **verify**. The earlier Tally form (id `2EQ1qj`) is superseded; see Open questions for what to do with any responses it collected.
+Decisions (Sept 30, 2026): **Tally** · **15 questions** · **survey Mon Oct 5 – Sun Nov 1 (4 weeks)** · **3 winners, prize = 1 year of the Standard plan free, granted by Andy in Super Admin after the winner signs up** · **prizes awarded Dec 1** · entrants identified by **name + email only**. Strategy context: `STATE_OF_INDIE_AUTHORS_2026_PLAN.md` (its 20-question list and dates are superseded by this file).
 
-Decisions (Sept 30, 2026, tool amended Oct 1): **Typeform** · **15 questions** · **survey Mon Oct 5 – Sun Nov 1 (4 weeks)** · **3 winners, prize = 1 year of the Standard plan free, granted by Andy in Super Admin after the winner signs up** · **prizes awarded Dec 1** · entrants identified by **name + email only**. Strategy context: `STATE_OF_INDIE_AUTHORS_2026_PLAN.md` (its 20-question list and dates are superseded by this file).
-
-## Typeform setup
+## Tally setup
 - Title: **State of Indie Authors 2026 — 6-minute survey**
 - Description: "Help us build the most honest picture of indie author income and tools. Results published free. Enter the prize draw to win a free year of AuthorLoft's Standard plan. Run by AuthorLoft."
-- Settings: progress bar on, partial submissions **on**, no login, closes automatically **Nov 1, 11:59 PM ET** (use Typeform's close-on-date setting; **verify** it is available on the current plan and that the time zone is ET). Progress bar and partial-response behaviour: **verify** both on the current plan.
-- **Identity = name + email only.** Collect nothing else about the person: no phone, address, social handles or pen name. Do not add a hidden field that captures IP, and turn off any Typeform add-ons or integrations that do. **Verify** the exported CSV has no IP or device columns.
-- **One hidden field: `src`** (reddit, fb, email, newsletter, partner, app, linkedin, social, other). It tags the *channel*, not the person. Typeform requires the hidden field to be **declared in the form first** (Logic → Hidden fields), then passed on the link. Typeform's documented format appends it to the link as `#src=linkedin` (a fragment, not `?src=`); **verify** with a test response before any link is posted. Typeform saves hidden-field values into each response, so each row in the export is: name, email, `src`, answers. Checks so contact info is always captured:
+- Settings: progress bar on, partial submissions **on**, no login, closes automatically **Nov 1, 11:59 PM ET** (use Tally's close-on-date setting).
+- **Identity = name + email only.** Collect nothing else about the person: no phone, address, social handles or pen name. Do not add a hidden field that captures IP, and turn off any Tally analytics add-ons that do.
+- **One hidden field: `src`** (reddit, fb, email, newsletter, partner, app, linkedin, social, other). It tags the *channel*, not the person. Use `?src=...` on every shared link. **Kept.** Tally saves hidden-field values into each response, so each row in the export is: name, email, `src`, answers. Checks so contact info is always captured:
   - **Name and email are OPTIONAL (changed Sept 30 2026).** Leaving both blank = anonymous response; it counts in the data but is not in the draw and gets no report. Only responses with a valid email are draw-eligible.
-  - Unfinished (partial) responses carry **no** contact info. Keep them out of the draw and out of the published counts. **Verify** whether the current Typeform plan stores partials at all.
-  - A link shared without the `src` tag records a blank source; treat blank as "unknown/direct" in analysis. Always test each link before posting.
+  - Tally's "partial submissions" setting stores unfinished answers with **no** contact info. Keep them out of the draw and out of the published counts, or turn partials off.
+  - A link shared without `?src=` records a blank source; treat blank as "unknown/direct" in analysis. Always test each link before posting.
 - **Duplicate entries:** dedupe on lowercase email in the export. Keep the first complete response.
-- **Bot/junk filtering:** hidden fields come from the link, not the page, so they do not work as a honeypot. **Verify** whether Typeform's spam protection is available and on. Otherwise rely on email dedupe, eyeballing the export for gibberish names/emails, and dropping completes that were submitted implausibly fast (compare the Submitted-at times with when the respondent started, if the Typeform export shows both).
-- **Data handling:** the Typeform export contains names + emails linked to answers. Keep it in one private place; for analysis, strip name/email into a separate entrants list and analyze answers with only a response ID. Publish aggregates only.
+- **Bot/junk filtering:** Tally has no true honeypot field (its "hidden fields" come from the URL, not the page), so rely on email dedupe, eyeballing the export for gibberish names/emails, and dropping completes that were submitted implausibly fast (compare the Submitted-at times with when the respondent started, if your Tally view shows both).
+- **Data handling:** the Tally export contains names + emails linked to answers. Keep it in one private place; for analysis, strip name/email into a separate entrants list and analyze answers with only a response ID. Publish aggregates only.
 
 ## Consent page (required checkbox)
 > This survey is run by **AuthorLoft** (authorloft.com), an author platform. It takes about 6 minutes. Your name and email are used to enter you in the prize draw and to send you the report. Your answers are only ever published in aggregate and are never tied to your name. See our [Privacy Policy](https://www.authorloft.com/privacy).
@@ -79,12 +77,12 @@ Each question feeds a report finding: Q2+Q4 (earnings), Q5 (income trend), Q6+Q7
 3. Test the traditional-only exit (must land on the thank-you page, NOT page 1) and the full path with blank and filled name/email.
 4. Export CSV; confirm columns are analyzable and no IP/device columns appear.
 5. Confirm the Privacy link and the rules page work; confirm the auto-close date.
-6. Create per-channel links on the Typeform URL: `https://form.typeform.com/to/wVDW5jT9#src=reddit`, `#src=fb`, `#src=email`, `#src=linkedin`, etc. Submit one test response per link and confirm the `src` value appears in the export.
+6. Create per-channel links: `https://tally.so/r/2EQ1qj?src=reddit`, `?src=fb`, `?src=email`, `?src=linkedin`, etc. Submit one test response per link and confirm the `src` value appears in the export.
 
 ## Calendar
 | Date | Milestone |
 |---|---|
-| Now – Oct 4 | Build + pilot in Typeform; publish rules page; draft recruiting posts |
+| Now – Oct 4 | Build + pilot in Tally; publish rules page; draft recruiting posts |
 | **Mon Oct 5** | **Survey live.** Own list + first community posts on day 1 |
 | Oct 5 – Nov 1 | Recruit in waves: launch Oct 5, reminder ~Oct 19, final "last week" push Oct 26–30 (responses typically bunch at launch and just before close) |
 | Oct 12 | Checkpoint: count responses; adjust channels |
@@ -101,14 +99,9 @@ Each question feeds a report finding: Q2+Q4 (earnings), Q5 (income trend), Q6+Q7
 ## Open questions
 1. **Current paid subscribers:** ineligible and redrawn (as written in the rules)? Or should they get 12 months added?
 2. **Super Admin grant:** want me to check the code for whether a plan can be set with a 12-month end date?
-3. **Earlier Tally form (`2EQ1qj`):** per notes, a Facebook recruiting post went out Sept 30. Did it link the Tally form? If so: export any Tally responses and decide whether to merge them (different tool, so check question wording matches) or close the Tally form with a pointer to the Typeform. Do not leave both open.
-4. **Typeform plan limits:** confirm the plan covers 300+ responses, close-on-date, and the hidden field before launch. Not checked.
 
-## Tally gotchas learned (Sept 30 2026; Tally only, kept for history)
+## Tally gotchas learned (Sept 30 2026)
 - **Never edit in the Tally editor while Claude edits via the connector.** An open editor tab autosaves its older copy over connector changes (this silently reverted the thank-you page twice).
 - Deleting a page can silently re-point logic rules (a jump rule became "jump to page 1"). After any page delete, re-check logic.
 - "Redirect on completion" replaces the thank-you page entirely; keep it off.
 - Live form = last **published** version. Edits are not live until Publish/Update.
-
-## Typeform gotchas
-None recorded yet. Add them here as they are found. The Tally lesson about editing in two places at once may apply to any tool: change the form in one place only.

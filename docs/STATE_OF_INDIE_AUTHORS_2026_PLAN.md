@@ -2,7 +2,7 @@
 
 **Goal:** a linkable research asset that earns 20–50+ *dofollow* backlinks. This matters because the Sept 2026 SEO diagnosis found the real blocker is zero dofollow backlinks (Reddit, Product Hunt and directory links are all nofollow). Technical SEO is done; links are the gap.
 
-**Update Oct 1, 2026: the survey tool is Typeform (https://form.typeform.com/to/wVDW5jT9), not Tally or Google Forms; wherever this plan says Tally, read Typeform.** **Update Sept 30, 2026:** survey narrowed to 10 questions, runs Oct 5 – Nov 1, prize = 1 year Standard plan, winners awarded Dec 1 with the report launch. The build spec, final questions and calendar are in `STATE_OF_INDIE_AUTHORS_2026_SURVEY_SPEC.md`; where they differ from Sections 1 and 5 below, the spec wins.
+**Update Sept 30, 2026:** survey narrowed to 10 questions, runs Oct 5 – Nov 1, prize = 1 year Standard plan, winners awarded Dec 1 with the report launch. The build spec, final questions and calendar are in `STATE_OF_INDIE_AUTHORS_2026_TALLY_SPEC.md`; where they differ from Sections 1 and 5 below, the spec wins.
 
 **Status:** plan only. Nothing built. Every number in Section 4 is a *placeholder or hypothesis*, never a finding. Real data comes only from real respondents.
 
