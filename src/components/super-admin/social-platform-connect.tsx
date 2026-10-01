@@ -81,7 +81,8 @@ const WARN_DAYS = 14;
 // connecting (the platforms don't report it), so a blank value just says so.
 function TokenExpiry({ expiresAt, platform }: { expiresAt: string | null; platform: string }) {
   if (!expiresAt) {
-    // Only LinkedIn tokens are known to lapse and carry an entered expiry; X keys do not expire.
+    // LinkedIn tokens always lapse, so a blank value is worth flagging. Facebook/Instagram Page
+    // tokens only lapse if they were extended from a short-lived token, so blank is normal there. X keys do not expire.
     return platform === "LINKEDIN" ? <p className="text-xs text-gray-400">Expiry not recorded</p> : null;
   }
   const expires = new Date(expiresAt);
@@ -222,7 +223,7 @@ function ConnectPanel({
             <input type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)}
               placeholder={platformDef.tokenHint} className={inputCls} />
           </div>
-          {platformDef.id === "LINKEDIN" && (
+          {(platformDef.id === "LINKEDIN" || platformDef.id === "FACEBOOK" || platformDef.id === "INSTAGRAM") && (
             <div className="space-y-1">
               <label className="block text-xs font-medium text-gray-600">
                 Token expiry date <span className="text-gray-400">(optional)</span>
@@ -230,7 +231,10 @@ function ConnectPanel({
               <input type="date" value={expiresOn} onChange={(e) => setExpiresOn(e.target.value)}
                 min={new Date().toISOString().slice(0, 10)} className={inputCls} />
               <p className="text-xs text-gray-400">
-                LinkedIn shows this date when it generates the token. We can&apos;t read it from the token, so enter it here to get a reminder on this card.
+                {platformDef.id === "LINKEDIN"
+                  ? "LinkedIn shows this date when it generates the token. "
+                  : "Meta shows this date when you extend the token (Access Token Debugger). Leave blank if the debugger says the Page token never expires. "}
+                We can&apos;t read it from the token, so enter it here to get a reminder on this card.
               </p>
             </div>
           )}
