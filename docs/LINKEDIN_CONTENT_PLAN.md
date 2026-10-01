@@ -9,11 +9,16 @@
 | # | Item | Status |
 |---|---|---|
 | 1 | **Reconnect LinkedIn** in Super Admin → Social. The stored token was saved May 26 with no expiry recorded; LinkedIn member tokens normally last ~60 days. Not verified against LinkedIn. | Open |
-| 2 | **Survey link**: replace `[SURVEY_LINK]` with the live Tally URL plus `?src=linkedin`. | Waiting on pilot (due Oct 4) |
-| 3 | **Prize rules page** live and linked before the first post (per the Tally spec). | Open |
-| 4 | Confirm the cron change (hourly) is on staging, so scheduled times are honored. | Pending push |
+| 2 | **Survey link**: replace `[SURVEY_LINK]` with the live Typeform URL, tagged as LinkedIn (see note below). | Waiting on pilot (due Oct 4) |
+| 3 | **Prize rules page** live and linked before the first post (per the survey spec, `STATE_OF_INDIE_AUTHORS_2026_SURVEY_SPEC.md`, which began as a Tally spec and now covers Typeform). | Open |
+| 4 | Hourly cron (`5 * * * *`) live in prod. First run Oct 1, 15:05 UTC: 200, 0 posts found, 0 failed. | Done |
 
-## Survey series (Tally spec calendar: live Oct 5, closes Nov 1)
+**Typeform note (survey tool is Typeform, not Tally):** the survey spec was written for Tally, so these need checking in Typeform before the first post:
+- **Source tagging.** Live form: `https://form.typeform.com/to/wVDW5jT9`. Typeform passes tags through *hidden fields*: add a field named `src` to the form, then use `https://form.typeform.com/to/wVDW5jT9#src=linkedin` in the posts. That `#` format is from Typeform's documentation; it is **not yet tested**. Submit one test response through that exact link and confirm `linkedin` appears in the export before the Oct 5 post. Until then the posts keep `[SURVEY_LINK]`.
+- **Response cap and close date.** Confirm your Typeform plan allows 300+ responses and an automatic close on Nov 1, 11:59 PM ET. I have not checked either limit.
+- **Length and count.** "15 questions, about 6 minutes" came from the Tally spec. Confirm it still matches the Typeform build.
+
+## Survey series (survey spec calendar: live Oct 5, closes Nov 1)
 
 Times are suggestions in ET. LinkedIn engagement is generally best on weekday mornings; confirm against your own post analytics once you have some.
 
@@ -39,7 +44,7 @@ Times are suggestions in ET. LinkedIn engagement is generally best on weekday mo
 >
 > If you know an indie author who isn't on LinkedIn, please pass it along.
 
-*Fill `[N]` with the real count from Tally on the day. If it is low, say so plainly instead of rounding up.*
+*Fill `[N]` with the real count from Typeform on the day. If it is low, say so plainly instead of rounding up.*
 
 ### Post 3 — Final week (Mon Oct 26, ~9:00 AM ET)
 > One week left on the State of Indie Authors survey. It closes Sunday, Nov 1.
@@ -148,7 +153,7 @@ Drafted after the data exists. Lead with one real finding and `n`, link to `/res
 >
 > https://www.authorloft.com/blog/how-much-cost-self-publish-book-2026?utm_source=linkedin&utm_medium=social&utm_campaign=blog-series
 
-*Figures to confirm: editing and cover ranges (stated in the post). The last paragraph matches the Tally spec (Q9 is monthly tools and subscriptions spend, excluding ads, editing and covers).*
+*Figures to confirm: editing and cover ranges (stated in the post). The last paragraph matches the survey spec (Q9 is monthly tools and subscriptions spend, excluding ads, editing and covers).*
 
 ### B8 — Tue Nov 3 · First ARC campaign
 > Never run an advance-reader campaign before? The post walks through it in six steps.
@@ -168,6 +173,6 @@ Drafted after the data exists. Lead with one real finding and `n`, link to `/res
 ## Review checklist before queuing
 1. Edit the copy until it sounds like you. Tell me what to change.
 2. Confirm the three flagged figures (B1, B5, B7).
-3. Survey length ("about 6 minutes") and question count (15) match the final Tally form.
+3. Survey length ("about 6 minutes") and question count (15) match the final Typeform.
 4. LinkedIn reconnected and the survey link in place.
 5. Then I queue each approved post as SCHEDULED in Super Admin, one batch at a time.
