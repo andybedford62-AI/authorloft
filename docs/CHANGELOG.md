@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## October 1, 2026 — Survey prize rules page, hourly social cron
+
+- New public page `/research/state-of-indie-authors-2026/rules`: prize draw rules for the State of Indie Authors 2026 survey (entry Oct 5 – Nov 1, 3 winners, 1 year of Standard, draw Nov 30). Draft wording; prize limited to US residents pending Andy's confirmation. `noindex` and intentionally not in the sitemap.
+- Scheduled social posts now publish hourly (`5 * * * *` in `vercel.json`) instead of once a day at 09:00 UTC; the post form hint was updated to match.
+
 ## September 29, 2026 — Legal-risk quick fixes
 
 - Removed the leftover `fonts.gstatic.com` preconnect from `src/app/layout.tsx` (fonts are fully self-hosted).
