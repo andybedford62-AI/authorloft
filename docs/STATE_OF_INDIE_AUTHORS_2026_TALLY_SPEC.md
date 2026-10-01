@@ -67,9 +67,18 @@ Each question feeds a report finding: Q2+Q4 (earnings), Q5 (income trend), Q6+Q7
 - **No cash alternative.**
 
 ## Prize draw rules (publish on a live page before launch)
-> **No purchase necessary.** Open to self-published authors aged 18+ who complete the survey and enter their name and email between **Oct 5 and Nov 1, 2026**. Three winners each receive one year of AuthorLoft's Standard plan (value $99.99), applied to a new AuthorLoft account created with the entrant's email. Not open to current paid subscribers. Winners are drawn at random on **Nov 30, 2026**, announced and notified by email on **Dec 1, 2026**, and must reply and sign up within 14 days or another winner is drawn. One entry per person. Prizes have no cash value and are not transferable. Names and emails are used only for the draw, the report, and follow-up if ticked. Sponsor: AuthorLoft. Void where prohibited.
->
-> *Template, not legal advice. Prize draws are restricted in some jurisdictions (e.g. Quebec, Italy); consider excluding those or checking local rules.*
+**Live wording is the page, not this file:** `src/app/(marketing)/research/state-of-indie-authors-2026/rules/page.tsx` (`/research/state-of-indie-authors-2026/rules`). If anything below differs from the page, the page wins.
+
+**Decisions confirmed by Andy, Oct 1 2026:**
+- Prize limited to **US residents aged 18+**. The survey itself stays open worldwide; non-US respondents count in the results but cannot win.
+- Self-published **and hybrid** authors can enter (the survey screens out traditionally-published-only authors).
+- Current **paid** subscribers are ineligible; an existing **free** account can receive the prize (applied to a free account registered with the entry email).
+- Sponsor details: Anthony P Bedford LLC, address as published on `/dmca`.
+- No governing-law clause (not a legal review; add one if a lawyer advises).
+
+**Still to do outside the code:** add the rules link, and a note that the draw is for US residents, to the Tally form description.
+
+*Template, not legal advice.*
 
 ## Pilot checklist (before any public post; do by Sun Oct 4)
 1. Send to 5–10 friendly authors, time them (target ≤6 min), ask what confused them.
@@ -97,7 +106,7 @@ Each question feeds a report finding: Q2+Q4 (earnings), Q5 (income trend), Q6+Q7
 **Four-week window:** plenty of room for 300+, but only if the first wave is lined up *before* Oct 5 (your list, Facebook groups, partner shares). Nov 2 – 22 leaves three weeks for analysis and the report, which is enough but not loose; don't extend past Nov 1 without moving Dec 1. Report what you get: with fewer than 200, say "respondents", show n everywhere and drop segment cross-tabs under n=30.
 
 ## Open questions
-1. **Current paid subscribers:** ineligible and redrawn (as written in the rules)? Or should they get 12 months added?
+1. ~~**Current paid subscribers:**~~ Resolved Oct 1 2026: ineligible (see Prize draw rules).
 2. **Super Admin grant:** want me to check the code for whether a plan can be set with a 12-month end date?
 
 ## Tally gotchas learned (Sept 30 2026)
