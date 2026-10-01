@@ -198,6 +198,10 @@ Shipped Bundles June 27, 2026 (admin CRUD, author site listing/detail, direct St
 
 ---
 
+## Super Admin Social Poster
+
+- [ ] **Connect Instagram** — deferred Oct 1 2026. Needs an AuthorLoft Instagram account (Professional, linked to the AuthorLoft Facebook Page) and a JPG image on every post. Connect with the `instagram_business_account` id from `GET /me/accounts` plus the same Page token. Code is ready (image gate, JPEG check, stricter connect test).
+
 ## Custom Domains
 
 Self-serve "bring your own domain" shipped Aug 8, 2026 (Admin → Settings → Custom Domain; link/check-status/unlink against Vercel's Domains API). Verified working end-to-end on staging (linked a test domain, got back the correct DNS record, status showed Pending). Confirmed live in production Aug 9, 2026 (via `main`/`dev` sync, PR #138). Scoped to BYOD only — deliberately excluded from that build:

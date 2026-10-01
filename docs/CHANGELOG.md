@@ -20,6 +20,7 @@ line rather than listing every commit.
 - Content correction: Amazon widened the KDP 70% royalty price band to $2.99–$12.99 (effective July 7, 2026). Updated the two blog articles that stated $2.99–$9.99 (`how-to-price-your-ebook-direct-sales`, `self-publishing-vs-amazon-kdp`) directly in the database; no code change. The Social page no longer shows "Expiry not recorded" for platforms whose tokens do not expire (only LinkedIn).
 - Fixed the Super Admin post edit form showing a scheduled post's UTC clock time as local time. Re-saving an unchanged scheduled post would have shifted it by the viewer's UTC offset (6 hours for Central). The form now converts UTC to local on load (`social-post-form.tsx`).
 - Scheduled social posts now publish hourly (`5 * * * *` in `vercel.json`) instead of once a day at 09:00 UTC; the post form hint was updated to match.
+- Super Admin → Social: Facebook connected (Page token, never expires). New Post no longer preselects Instagram; the Instagram chip stays disabled until a JPG image is attached, and removing the image deselects it. Instagram now rejects non-JPEG images with a clear message, and the connect test rejects an ID that returns no username (a Facebook Page ID answers the call but is not an Instagram account). Facebook/Instagram Graph calls bumped v19.0 → v25.0. Instagram itself is deferred until an AuthorLoft Instagram account (Professional, linked to the Page) exists.
 
 ## September 29, 2026 — Legal-risk quick fixes
 

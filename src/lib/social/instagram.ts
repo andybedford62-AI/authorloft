@@ -12,7 +12,7 @@ export interface InstagramPostResult {
   platformPostId: string;
 }
 
-const GRAPH = "https://graph.facebook.com/v19.0";
+const GRAPH = "https://graph.facebook.com/v25.0";
 
 /**
  * Post an image (required) with caption to Instagram Business Account.
@@ -24,6 +24,14 @@ export async function postToInstagram(
   caption:      string,
   imageUrl:     string,
 ): Promise<InstagramPostResult> {
+  // Instagram only accepts JPEG. Check the file's content type up front for a clear error
+  // (skipped if the host doesn't answer HEAD; Instagram then reports its own error).
+  const head = await fetch(imageUrl, { method: "HEAD" }).catch(() => null);
+  const type = head?.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+  if (type && type !== "image/jpeg") {
+    throw new Error(`Instagram only accepts JPEG images (this image is ${type}). Upload a JPG instead.`);
+  }
+
   // Step 1: Create media container
   const containerRes = await fetch(`${GRAPH}/${igUserId}/media`, {
     method:  "POST",
@@ -78,5 +86,10 @@ export async function testInstagramToken(
   if (!res.ok) throw new Error(`Instagram token test failed: ${res.status}`);
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
-  return data.username ? `@${data.username}` : `Account ${igUserId}`;
+  // A Facebook Page ID also answers this call but has no username, so a missing
+  // username means this is not an Instagram Business Account ID.
+  if (!data.username) {
+    throw new Error("That ID is not an Instagram Business Account (no username returned). Use the id inside instagram_business_account, not the Facebook Page ID.");
+  }
+  return `@${data.username}`;
 }

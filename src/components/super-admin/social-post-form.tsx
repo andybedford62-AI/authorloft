@@ -44,7 +44,7 @@ export function SocialPostForm({ tokens, post }: Props) {
   const connectedPlatforms = tokens.filter((t) => t.isActive).map((t) => t.platform);
 
   const [caption,     setCaption]     = useState(post?.caption     ?? "");
-  const [platforms,   setPlatforms]   = useState<string[]>(post?.platforms  ?? connectedPlatforms);
+  const [platforms,   setPlatforms]   = useState<string[]>(post?.platforms  ?? connectedPlatforms.filter((p) => p !== "INSTAGRAM"));
   const [mediaUrl,    setMediaUrl]    = useState(post?.mediaUrl    ?? "");
   // <input type="datetime-local"> works in the viewer's local time, but the post stores UTC.
   // Convert on the way in, or re-saving an unchanged post shifts it by the UTC offset.
@@ -69,6 +69,12 @@ export function SocialPostForm({ tokens, post }: Props) {
     setPlatforms((prev) =>
       prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]
     );
+  }
+
+  function clearImage() {
+    setMediaUrl("");
+    // Instagram cannot post without an image, so drop it when the image is removed.
+    setPlatforms((prev) => prev.filter((p) => p !== "INSTAGRAM"));
   }
 
   async function handleUpload(file: File) {
@@ -166,12 +172,15 @@ export function SocialPostForm({ tokens, post }: Props) {
           <div className="flex flex-wrap gap-2">
             {connectedPlatforms.map((p) => {
               const selected = platforms.includes(p);
+              const needsImage = p === "INSTAGRAM" && !mediaUrl && !selected;
               return (
                 <button
                   key={p}
                   type="button"
                   onClick={() => togglePlatform(p)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  disabled={needsImage}
+                  title={needsImage ? "Upload a JPG image to enable Instagram" : undefined}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     selected
                       ? "bg-purple-600 text-white border-purple-600"
                       : "bg-white text-gray-600 border-gray-200 hover:border-purple-300"
@@ -182,6 +191,9 @@ export function SocialPostForm({ tokens, post }: Props) {
               );
             })}
           </div>
+        )}
+        {connectedPlatforms.includes("INSTAGRAM") && !mediaUrl && !platforms.includes("INSTAGRAM") && (
+          <p className="text-xs text-gray-400">Instagram is available once you upload a JPG image.</p>
         )}
         {platforms.includes("INSTAGRAM") && !mediaUrl && (
           <p className="text-xs text-amber-600">⚠ Instagram requires an image to post.</p>
@@ -215,7 +227,7 @@ export function SocialPostForm({ tokens, post }: Props) {
       {/* Image */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
-          <h2 className="text-sm font-semibold text-gray-700">Image <span className="text-gray-400 font-normal">(optional — required for Instagram)</span></h2>
+          <h2 className="text-sm font-semibold text-gray-700">Image <span className="text-gray-400 font-normal">(optional — required for Instagram, JPG only)</span></h2>
           <p className="text-xs text-gray-400">Optimal: 1200 × 630px (16:9) · JPG, PNG or WebP</p>
         </div>
 
@@ -225,7 +237,7 @@ export function SocialPostForm({ tokens, post }: Props) {
             <img src={cspSafeImageSrc(mediaUrl)} alt="Post image preview" className="rounded-lg border border-gray-200 w-full h-40 object-cover" />
             <button
               type="button"
-              onClick={() => setMediaUrl("")}
+              onClick={clearImage}
               className="absolute top-2 right-2 p-1 bg-white rounded-full shadow border border-gray-200 text-gray-500 hover:text-red-500 transition-colors"
             >
               <X className="h-3.5 w-3.5" />

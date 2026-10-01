@@ -7,7 +7,7 @@ export interface FacebookPostResult {
   platformPostId: string;
 }
 
-const GRAPH = "https://graph.facebook.com/v19.0";
+const GRAPH = "https://graph.facebook.com/v25.0";
 
 /**
  * Post text (+ optional image) to a Facebook Page.
