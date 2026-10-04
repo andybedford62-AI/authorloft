@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## October 4, 2026 — New draft course: The Business Analyst in the Age of AI
+
+- Added a new course for Anthony Bedford (author `apbedford`), **The Business Analyst in the Age of AI** (`the-business-analyst-in-the-age-of-ai`), built from the uploaded course file and inserted directly into the database; no code or schema change, so no migration. It is **unpublished (draft)** for review: free, not in the bookstore, no cover image, no announcement sent, category Technology › Professional Growth.
+- Structure: 6 modules, 21 lessons. Start Here (overview, free preview); Weeks 1–4 (Modules 1–8, each split into a lesson ending in its quiz plus an "Answers, Reflection and Feedback" lesson so learners attempt the quiz first); Resource Pack (prompt library, glossary and tool landscape, skills check and completion checklist, further learning). Feedback and capstone contact set to andybedford62@gmail.com. The author-only notes in the source file were not imported.
+- Before publishing: add a cover image, check lesson formatting on staging, re-check tool names in the resource pack, and review overlap with the published *AI-Ready Requirements* course.
+
 ## October 1, 2026 — Survey prize rules page, hourly social cron
 
 - New public page `/research/state-of-indie-authors-2026/rules`: prize draw rules for the State of Indie Authors 2026 survey (entry Oct 5 – Nov 1, 3 winners, 1 year of Standard, draw Nov 30). Prize open to authors 18+ in any country except where prohibited by law (decision confirmed by Andy Oct 1). `noindex` and intentionally not in the sitemap.
