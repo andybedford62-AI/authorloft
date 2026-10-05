@@ -61,8 +61,14 @@ export default async function EditMusicListPage({
       description: (l.contentHtml ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
       originalHtml: l.contentHtml ?? "",
       thumbnailUrl: l.thumbnailUrl,
+      lessonId: l.id,
     }))
   );
+  const otherLists = await prisma.course.findMany({
+    where: { authorId, kind: "MUSIC", id: { not: id } },
+    orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+    select: { id: true, title: true },
+  });
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -107,6 +113,10 @@ export default async function EditMusicListPage({
         </p>
       </div>
       <MusicListForm
+        // Remounts when the track set changes (a track moved in or out), so the
+        // form reloads from the server instead of keeping stale local state.
+        key={tracks.map((t) => t.lessonId).join(",")}
+        otherLists={otherLists}
         listId={list.id}
         trackStats={trackStats}
         trackCap={trackCap}

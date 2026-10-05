@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 5, 2026 — Move music tracks between albums/playlists
+
+- New `/admin/music/organize` page (button "Organize tracks" on the Music list, shown with 2+ lists): every list as a card, drag a track onto another list or use its "Move to…" menu. Also a "Move to another list" select inside each saved track in the album editor (disabled while the form has unsaved changes). Backed by `POST /api/admin/music/move-tracks` — a move, not a copy; the track is appended to the end of the destination. Blocks when the destination is at the plan's per-list track cap (403); warns and asks before creating a duplicate song in the destination (409 → confirm). Plays/likes follow the song because they're keyed by author + track URL, not lesson id. No schema change.
+
 ## October 1, 2026 — Survey prize rules page, hourly social cron
 
 - New public page `/research/state-of-indie-authors-2026/rules`: prize draw rules for the State of Indie Authors 2026 survey (entry Oct 5 – Nov 1, 3 winners, 1 year of Standard, draw Nov 30). Prize open to authors 18+ in any country except where prohibited by law (decision confirmed by Andy Oct 1). `noindex` and intentionally not in the sitemap.

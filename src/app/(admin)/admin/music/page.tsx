@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Music } from "lucide-react";
+import { Plus, Music, ArrowRightLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { NavVisibilityBanner } from "@/components/admin/nav-visibility-banner";
@@ -42,11 +42,18 @@ export default async function MusicListsPage() {
             {lists.filter((l) => l.isPublished).length} published
           </p>
         </div>
-        {!atCap && (
-          <Link href="/admin/music/new">
-            <Button><Plus className="h-4 w-4 mr-2" />New Music List / Album</Button>
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {lists.length > 1 && (
+            <Link href="/admin/music/organize">
+              <Button variant="outline"><ArrowRightLeft className="h-4 w-4 mr-2" />Organize tracks</Button>
+            </Link>
+          )}
+          {!atCap && (
+            <Link href="/admin/music/new">
+              <Button><Plus className="h-4 w-4 mr-2" />New Music List / Album</Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       <MusicAddTabs atListLimit={atCap} trackCap={trackCap} />

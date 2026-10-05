@@ -14,6 +14,7 @@ import { MusicHelpModal } from "@/components/admin/music-help-modal";
 import { MusicNoSalesBanner } from "@/components/admin/music-no-sales-banner";
 import { HelpTip } from "@/components/admin/help-tip";
 import { resolveTrackLink, providerLabel, trackStatKey, type ResolvedTrackLink } from "@/lib/music-links";
+import { moveTracksRequest } from "@/lib/music-move-client";
 import type { TrackStats } from "@/lib/music-stats";
 import { RELEASE_TYPES, MAX_LISTEN_LINKS, listenPlatform, type MusicReleaseType } from "@/lib/music-share";
 
@@ -28,6 +29,8 @@ type InitialTrack = {
   originalHtml: string;
   /** Saved artwork, so link-card tracks (Suno etc.) show their art in the row. */
   thumbnailUrl?: string | null;
+  /** Saved track's row id, used only by "Move to…". Absent on rows added this session. */
+  lessonId?: string;
 };
 
 /** `uid` is a client-only stable key: rows reorder and expand independently,
@@ -56,6 +59,8 @@ interface Props {
   bookstoreEnabled?: boolean;
   /** Plays and reactions keyed by trackStatKey(url); absent when creating. */
   trackStats?: Record<string, TrackStats>;
+  /** The author's other music lists — destinations for "Move to…". */
+  otherLists?: { id: string; title: string }[];
 }
 
 let uidSeq = 0;
@@ -73,7 +78,7 @@ function rowThumbnail(track: TrackRow, link: ResolvedTrackLink | null): string |
 const inputClass =
   "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
-export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = false, trackStats = {} }: Props) {
+export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = false, trackStats = {}, otherLists = [] }: Props) {
   const router = useRouter();
   const isEdit = !!listId;
 
@@ -105,6 +110,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [error, setError] = useState("");
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showHelp, setShowHelp] = useState(false);
+  const [movingId, setMovingId] = useState<string | null>(null);
 
   // "Unsaved changes" on the save bar: what a save would send, compared with how
   // the list loaded (or was last saved). Thumbnails and the pasted embed HTML
@@ -164,6 +170,22 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
       [next[i], next[j]] = [next[j], next[i]];
       return next;
     });
+  }
+
+  async function handleMoveTrack(lessonId: string, toListId: string) {
+    const dest = otherLists.find((l) => l.id === toListId);
+    if (!dest) return;
+    setMovingId(lessonId);
+    setError("");
+    const result = await moveTracksRequest([lessonId], toListId, dest.title);
+    setMovingId(null);
+    if (!result.ok) {
+      if (!result.cancelled) setError(result.error);
+      return;
+    }
+    // The edit page re-keys this form on its track ids, so the refresh remounts
+    // it with the moved track gone.
+    router.refresh();
   }
 
   async function handleSave() {
@@ -561,6 +583,28 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
                         className="inline-flex items-center gap-1 text-xs text-gray-500 underline">
                         Preview on {providerLabel(link.provider)} <ExternalLink className="h-3 w-3" />
                       </a>
+                    )}
+                    {isEdit && otherLists.length > 0 && track.lessonId && (
+                      <div className="pt-1">
+                        <label className="block text-[11px] font-semibold text-gray-500">Move to another list</label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <select
+                            value=""
+                            disabled={isDirty || movingId === track.lessonId}
+                            onChange={(e) => e.target.value && handleMoveTrack(track.lessonId!, e.target.value)}
+                            className="max-w-xs rounded-md border border-gray-300 bg-white py-1.5 pl-2 pr-7 text-sm text-gray-700 disabled:opacity-50"
+                          >
+                            <option value="">Choose a list…</option>
+                            {otherLists.map((l) => (
+                              <option key={l.id} value={l.id}>{l.title}</option>
+                            ))}
+                          </select>
+                          {movingId === track.lessonId && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
+                        </div>
+                        {isDirty && (
+                          <p className="text-[11px] text-gray-400 mt-1">Save your changes first, then move the track.</p>
+                        )}
+                      </div>
                     )}
                     <div className="flex sm:hidden gap-2 pt-1">
                       <Button type="button" variant="outline" onClick={() => move(i, -1)} disabled={i === 0}>
