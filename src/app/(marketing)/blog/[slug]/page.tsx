@@ -50,6 +50,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // News posts live at /news/[slug] — don't render them under /blog
   if (!post || !post.isPublished || post.isNews) notFound();
 
+  // Related posts: same category first, topped up with the newest others, so
+  // every post links to (and is linked from) a few siblings — plain crawlable
+  // anchors that give search engines a path to posts with few inbound links.
+  const relatedSelect = { title: true, slug: true, coverImageUrl: true, category: true } as const;
+  const relatedBase = { isPublished: true, isNews: false, id: { not: post.id } };
+  const sameCategory = post.category
+    ? await prisma.platformPost.findMany({
+        where: { ...relatedBase, category: post.category },
+        select: relatedSelect,
+        orderBy: { publishedAt: "desc" },
+        take: 3,
+      }).catch(() => [])
+    : [];
+  const filler = sameCategory.length < 3
+    ? await prisma.platformPost.findMany({
+        where: relatedBase,
+        select: relatedSelect,
+        orderBy: { publishedAt: "desc" },
+        take: 6,
+      }).catch(() => [])
+    : [];
+  const relatedPosts = [...sameCategory, ...filler.filter((f) => !sameCategory.some((s) => s.slug === f.slug))].slice(0, 3);
+
   const safeContent = sanitize(post.content);
   const plainText = post.content.replace(/<[^>]+>/g, "").trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
@@ -179,6 +202,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <PrintButton />
           </div>
         </div>
+
+        {relatedPosts.length > 0 && (
+          <nav aria-label="Related articles" className="mt-16 pt-10 border-t border-[rgba(243,236,219,0.12)] no-print">
+            <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-6">Related Articles</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {relatedPosts.map((rp) => (
+                <Link
+                  key={rp.slug}
+                  href={`/blog/${rp.slug}`}
+                  className="group flex flex-col gap-2 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-4 hover:border-[#d6a94a]/40 transition-colors"
+                >
+                  {rp.category && (
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#93a0bc]">{rp.category}</span>
+                  )}
+                  <h3 className="text-sm font-semibold text-[#f3ecdb] group-hover:text-[#d6a94a] transition-colors line-clamp-3">{rp.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
 
         {/* CTA */}
         <div className="mt-16 bg-[#243756] rounded-2xl p-8 text-center">

@@ -152,6 +152,13 @@ export default async function CalculatorPage() {
         </section>
 
         <p className="mt-12 text-center text-sm text-vault-mute">
+          Want the full picture on publishing costs?{" "}
+          <Link href="/blog/how-much-cost-self-publish-book-2026" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">
+            How much does it cost to self-publish a book in 2026?
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-sm text-vault-mute">
           Have a question about the numbers?{" "}
           <Link href="/contact" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">Contact us</Link>
           {" · "}

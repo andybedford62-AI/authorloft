@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 7, 2026 — Blog internal linking
+
+- Every blog post now ends with a "Related Articles" block of three crawlable links (same category first, topped up with the newest posts). Before this, blog posts linked to no other blog posts; only guides linked in. Prompted by GSC "Crawled - currently not indexed" on two posts (`5-metrics-every-author-should-track`, `how-much-cost-self-publish-book-2026`); both were verified indexable (200, `index,follow`, self-canonical, in sitemap), so the cause is low authority, not a bug. `/pricing/calculator` now links to the self-publishing cost post. Both posts were already linked from three guides each via `relatedSlugsJson`.
+
 ## October 5, 2026 — Move music tracks between albums/playlists
 
 - New `/admin/music/organize` page (button "Organize tracks" on the Music list, shown with 2+ lists): every list as a card, drag a track onto another list or use its "Move to…" menu. Also a "Move to another list" select inside each saved track in the album editor (disabled while the form has unsaved changes). Backed by `POST /api/admin/music/move-tracks` — a move, not a copy; the track is appended to the end of the destination. Blocks when the destination is at the plan's per-list track cap (403); warns and asks before creating a duplicate song in the destination (409 → confirm). Plays/likes follow the song because they're keyed by author + track URL, not lesson id. No schema change.
