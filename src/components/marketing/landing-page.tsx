@@ -3,11 +3,12 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { GuideResources } from "@/components/marketing/guide-resources";
 import type { LandingPageData } from "@/lib/landing-page-data";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
-export function LandingPage({ data, afterSections }: { data: LandingPageData; afterSections?: ReactNode }) {
+export async function LandingPage({ data, afterSections }: { data: LandingPageData; afterSections?: ReactNode }) {
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -87,18 +88,11 @@ export function LandingPage({ data, afterSections }: { data: LandingPageData; af
 
         {afterSections}
 
-        {/* Related guide link */}
-        {data.relatedGuideSlug && (
-          <section className="mb-14 bg-vault-surf rounded-2xl border border-vault-ink/12 p-6">
-            <p className="text-sm text-vault-mute mb-1">Want to learn more?</p>
-            <Link
-              href={`/guides/${data.relatedGuideSlug}`}
-              className="text-vault-gold font-medium hover:underline"
-            >
-              Read our in-depth guide &rarr;
-            </Link>
-          </section>
-        )}
+        {/* Resources: the primary guide first, then any extras */}
+        <GuideResources
+          slugs={[...(data.relatedGuideSlug ? [data.relatedGuideSlug] : []), ...(data.relatedGuideSlugs ?? [])]}
+          className="mb-14"
+        />
 
         {/* FAQ */}
         <section className="mb-14">

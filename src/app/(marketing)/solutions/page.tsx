@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { getOgImage } from "@/lib/seo-config";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { GuideResources } from "@/components/marketing/guide-resources";
 import { VaultSection, VaultCard, VaultButton } from "@/components/marketing/vault";
 import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from "@/lib/solution-categories";
 
@@ -39,7 +40,7 @@ const breadcrumbLd = {
   ],
 };
 
-export default function SolutionsPage() {
+export default async function SolutionsPage() {
   return (
     <div className="min-h-screen bg-vault-bg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
@@ -76,6 +77,21 @@ export default function SolutionsPage() {
           </div>
         </VaultSection>
       ))}
+
+      <div className="max-w-[1100px] mx-auto px-7 pt-16">
+        <GuideResources
+          slugs={[
+            "what-is-an-author-website",
+            "what-is-direct-book-selling",
+            "what-is-book-launch-marketing",
+            "what-is-an-author-newsletter",
+            "what-is-an-arc-program",
+            "what-is-an-author-media-kit",
+            "what-is-reader-analytics-for-authors",
+            "writing-with-ai",
+          ]}
+        />
+      </div>
 
       <div className="max-w-[1100px] mx-auto px-7 py-16 text-left flex flex-wrap gap-3">
         <VaultButton href="/features" variant="primary">

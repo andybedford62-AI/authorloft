@@ -22,6 +22,8 @@ export interface LandingPageData {
   sections: LandingSection[];
   faqs: LandingFaq[];
   relatedGuideSlug?: string;
+  /** Extra guides listed under "Resources" after relatedGuideSlug (published guides only; missing slugs are skipped). */
+  relatedGuideSlugs?: string[];
   /**
    * Optional hero banner photo (same convention as pricing/features/faq/etc:
    * ~1920x620 PNG/WebP, subject weighted right so the left 45% stays clear
@@ -102,6 +104,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Is there a free plan?", a: "Yes. The Free plan includes your author website with book catalog, blog, about page, and contact form — free forever with no credit card required." },
     ],
     relatedGuideSlug: "what-is-an-author-website",
+    relatedGuideSlugs: ["why-every-author-needs-a-website", "build-your-first-website", "best-author-website-examples", "author-website-homepage-checklist", "authorloft-vs-wordpress"],
   },
 
   "sell-books-directly": {
@@ -157,6 +160,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Which plan do I need to sell books?", a: "Direct sales require the Standard plan ($9.99/month) or Premium plan ($39.99/month). The Free plan lets you list books with retailer links but not process direct sales." },
     ],
     relatedGuideSlug: "what-is-direct-book-selling",
+    relatedGuideSlugs: ["direct-sales-vs-amazon", "accepting-payments-author-website-stripe", "ebooks-vs-signed-print-copies", "choosing-book-formats"],
   },
 
   "book-marketing-platform": {
@@ -212,6 +216,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Is the bookstore listing automatic?", a: "Yes. When you publish a book on AuthorLoft, it's automatically listed in the shared bookstore at authorloft.com/bookstore, organized by genre for reader discovery." },
     ],
     relatedGuideSlug: "what-is-book-launch-marketing",
+    relatedGuideSlugs: ["book-launch-timeline", "book-advertising-for-authors", "author-seo-explained", "book-seo-optimizing-book-pages"],
   },
 
   "author-newsletter-platform": {
@@ -377,6 +382,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Can I share the media kit with a link?", a: "Yes. Your media kit has a dedicated URL on your author site that you can share with anyone — podcast hosts, event organizers, journalists, or bloggers." },
     ],
     relatedGuideSlug: "what-is-an-author-media-kit",
+    relatedGuideSlugs: ["what-is-author-branding", "author-brand-guide"],
   },
 
   "ai-tools-for-authors": {
@@ -432,6 +438,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "Do I need to know how to write AI prompts?", a: "No. AuthorLoft handles all prompt engineering behind the scenes. You just pick your book, choose a platform and promo type, and click Generate." },
       { q: "Which plan includes AI tools?", a: "AI tools are available on Standard ($9.99/month) and Premium ($39.99/month) plans. The Free plan does not include AI features." },
     ],
+    relatedGuideSlugs: ["writing-with-ai", "ai-marketing-for-authors", "ai-prompts-for-authors", "ai-descriptions-for-books", "ai-blog-posts-for-authors"],
   },
 
   "indie-author-bookstore": {
@@ -486,6 +493,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "How are 'trending' books determined?", a: "Trending is based on book page views. The more readers visit your book page, the higher it appears in the trending section." },
       { q: "Is the bookstore separate from my author site?", a: "Yes. The bookstore lives at authorloft.com/bookstore and is a shared catalog for all AuthorLoft authors. Your author site is your own dedicated website with your branding, domain, and full book pages." },
     ],
+    relatedGuideSlugs: ["what-is-direct-book-selling", "direct-sales-vs-amazon", "book-seo-optimizing-book-pages", "what-is-an-author-website"],
   },
 
   "book-pre-orders": {
@@ -595,7 +603,6 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "How does tracking work?", a: "When a reader clicks an affiliate link, a cookie is set. If that reader purchases the book, the sale is attributed to the referring affiliate. The commission is tracked automatically." },
       { q: "Which plan includes the affiliate program?", a: "The affiliate program is available on Standard and Premium plans with direct sales enabled." },
     ],
-    relatedGuideSlug: "what-is-an-author-affiliate-program",
   },
 
   "reader-analytics-for-authors": {
