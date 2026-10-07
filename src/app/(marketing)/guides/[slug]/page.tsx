@@ -67,13 +67,24 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const plainText = guide.content.replace(/<[^>]+>/g, "").trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 
-  const relatedPosts = relatedSlugs.length > 0
-    ? await prisma.platformPost.findMany({
-        where: { slug: { in: relatedSlugs }, isPublished: true, isNews: false },
-        select: { title: true, slug: true, excerpt: true, coverImageUrl: true, category: true },
-        orderBy: { publishedAt: "desc" },
-      }).catch(() => [])
-    : [];
+  // Related slugs may name either a blog post or another guide — resolve both,
+  // keeping the order the editor listed them in.
+  const [relatedBlog, relatedGuides] = relatedSlugs.length > 0
+    ? await Promise.all([
+        prisma.platformPost.findMany({
+          where: { slug: { in: relatedSlugs }, isPublished: true, isNews: false },
+          select: { title: true, slug: true, coverImageUrl: true, category: true },
+        }).catch(() => []),
+        prisma.guide.findMany({
+          where: { slug: { in: relatedSlugs, not: slug }, isPublished: true },
+          select: { title: true, slug: true, coverImageUrl: true, category: true },
+        }).catch(() => []),
+      ])
+    : [[], []];
+  const relatedPosts = [
+    ...relatedBlog.map((p) => ({ ...p, href: `/blog/${p.slug}` })),
+    ...relatedGuides.map((g) => ({ ...g, href: `/guides/${g.slug}` })),
+  ].sort((a, b) => relatedSlugs.indexOf(a.slug) - relatedSlugs.indexOf(b.slug));
 
   const articleLd = {
     "@context":         "https://schema.org",
@@ -178,15 +189,15 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           </div>
         )}
 
-        {/* Related Blog Posts */}
+        {/* Related Blog Posts + Guides */}
         {relatedPosts.length > 0 && (
           <div className="mt-16 pt-10 border-t border-[rgba(243,236,219,0.12)]">
-            <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-6">Related Articles</h2>
+            <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-6">Related Reading</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {relatedPosts.map((post) => (
                 <Link
                   key={post.slug}
-                  href={`/blog/${post.slug}`}
+                  href={post.href}
                   className="group flex gap-3 bg-[#1e2f4d] rounded-xl border border-[rgba(243,236,219,0.12)] p-4 hover:border-[#d6a94a]/40 hover:shadow-md transition-all"
                 >
                   {post.coverImageUrl ? (
