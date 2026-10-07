@@ -22,7 +22,7 @@ export interface LandingPageData {
   sections: LandingSection[];
   faqs: LandingFaq[];
   relatedGuideSlug?: string;
-  /** Extra guides listed under "Resources" after relatedGuideSlug (published guides only; missing slugs are skipped). */
+  /** Extra guides listed under "Guides on this topic" after relatedGuideSlug (published guides only; missing slugs are skipped). */
   relatedGuideSlugs?: string[];
   /**
    * Optional hero banner photo (same convention as pricing/features/faq/etc:

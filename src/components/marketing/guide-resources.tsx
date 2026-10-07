@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 
 /**
- * "Resources" list of guide links for marketing/landing pages. Titles come from the
+ * "Guides on this topic" list of guide links for marketing/landing pages. Titles come from the
  * Guide table, in the order given, and unpublished or missing slugs are skipped — so a
  * deleted guide can never leave a dead link on a high-traffic page.
  */
@@ -25,7 +25,7 @@ export async function GuideResources({ slugs, className = "" }: { slugs: string[
 
   return (
     <section className={`bg-vault-surf rounded-2xl border border-vault-ink/12 p-6 ${className}`}>
-      <h2 className="font-vault-display italic text-2xl text-vault-ink mb-4">Resources</h2>
+      <h2 className="font-vault-display italic text-2xl text-vault-ink mb-4">Guides on this topic</h2>
       <ul className="space-y-2.5">
         {ordered.map((g) => (
           <li key={g.slug}>
@@ -39,6 +39,9 @@ export async function GuideResources({ slugs, className = "" }: { slugs: string[
           </li>
         ))}
       </ul>
+      <Link href="/guides" className="mt-5 inline-block text-sm text-vault-mute hover:text-vault-gold transition-colors">
+        Browse all guides &rarr;
+      </Link>
     </section>
   );
 }
