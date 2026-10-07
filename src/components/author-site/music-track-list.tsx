@@ -153,6 +153,18 @@ export function MusicTrackList({
     return { ...t, link, canEmbed: link?.mode === "embed" && !!link.embedUrl };
   });
   const embeddable = tracks.filter((t) => t.canEmbed);
+  // "Play all" is only honest when every track plays on this page. With a mix
+  // (YouTube/Spotify alongside Suno or other link-outs) it only walks the
+  // embeddable ones, so say what it plays and how many.
+  const allEmbeddable = embeddable.length === tracks.length;
+  const embedProviders = new Set(embeddable.map((t) => t.link?.provider));
+  const embedNoun = embedProviders.size === 1
+    ? embedProviders.has("youtube") ? "videos" : "songs"
+    : "tracks";
+  const playButtonLabel = allEmbeddable ? "Play all" : `Play ${embedNoun} (${embeddable.length})`;
+  const playButtonHint = allEmbeddable
+    ? undefined
+    : `Plays the ${embeddable.length} ${embedNoun} that can play on this page, one after another. The other tracks open on their own site.`;
 
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [highlightId, setHighlightId] = useState<string | null>(initialTrackId ?? null);
@@ -362,10 +374,11 @@ export function MusicTrackList({
               <button
                 type="button"
                 onClick={() => play(embeddable[0].id)}
+                title={playButtonHint}
                 className="inline-flex items-center gap-2 rounded-full pl-4 pr-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: surface }}
               >
-                <Play className="h-4 w-4 fill-current" /> Play all
+                <Play className="h-4 w-4 fill-current" /> {playButtonLabel}
               </button>
             )}
             {listenLinks.length > 0 && (
@@ -566,6 +579,17 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
           {track.description ?? (providerName ? (track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`) : "")}
         </span>
       </span>
+      {/* Always visible for link-out tracks (even when a note replaces the
+          "Opens on" caption above), so it's clear before clicking that this
+          one leaves the page and isn't part of Play all. */}
+      {!track.canEmbed && (
+        <span
+          className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-medium text-gray-500"
+          title={`Opens ${providerName ?? "the link"} in a new tab`}
+        >
+          <ExternalLink className="h-3 w-3" /> {providerName ?? "Link"}
+        </span>
+      )}
     </>
   );
 
@@ -683,7 +707,14 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
       <div className="p-4 flex flex-col flex-1">
         <h3 className="text-sm font-semibold text-gray-900 leading-snug">{track.title}</h3>
         {track.description ? (
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{track.description}</p>
+          <>
+            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{track.description}</p>
+            {!track.canEmbed && providerName && (
+              <p className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 mt-1">
+                <ExternalLink className="h-3 w-3" /> Opens on {providerName}
+              </p>
+            )}
+          </>
         ) : providerName ? (
           <p className="text-xs text-gray-500 mt-1">
             {track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`}

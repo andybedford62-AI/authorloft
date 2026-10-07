@@ -13,7 +13,9 @@ line rather than listing every commit.
 
 ---
 
-## October 7, 2026 — Social share image, blog internal linking
+## October 7, 2026 — Social share image, blog internal linking, music play button label
+
+- Music lists: the player button now says **Play all** only when every track can play on the page. On a mixed list (YouTube/Spotify plus Suno or other link-outs) it reads **Play videos (N)** (all YouTube), **Play songs (N)** (all Spotify) or **Play tracks (N)** (both), with a tooltip explaining the rest open on their own site. Link-out tracks (Suno, Udio, other sites) also carry an always-visible "↗ Suno" pill on tracklist rows and an "Opens on Suno" line on grid cards, even when the track has a note (previously the hint disappeared whenever a note was set). N counts only the embeddable tracks the button actually plays. `music-track-list.tsx`.
 
 - New optional **Social Share Image** on Admin → Branding → Profile (`Author.socialShareImageUrl`, nullable; column applied to the DB via migration `20261007_author_social_share_image`). Link previews (Open Graph + Twitter card) for author-site pages now use it, falling back to the Profile Photo when empty, via `authorShareImage()` in `src/lib/share-image.ts`. Applies to home/layout, About, Contact, Books list, Blog list and the cover-less fallbacks on book, course and music pages (items with their own cover still show it). The form notes Facebook's scrape cache and links the Sharing Debugger with the author's site address prefilled (`?q=`). `og:image` width/height tags deferred to the backlog. Prompted by a Facebook preview showing the profile headshot as a small thumbnail.
 
