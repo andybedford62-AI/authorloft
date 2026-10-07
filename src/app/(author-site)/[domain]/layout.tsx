@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -30,6 +31,7 @@ async function resolveAuthor(domain: string) {
       customDomain: true,
       shortBio: true,
       profileImageUrl: true,
+      socialShareImageUrl: true,
       logoUrl: true,
       linkedinUrl: true,
       youtubeUrl: true,
@@ -75,8 +77,9 @@ export async function generateMetadata({
   const authorName = author.displayName || author.name;
   const description = toMetaDescription(author.shortBio, `The official website of ${authorName}. Explore their work, read the latest news and updates, and get in touch.`);
   const baseUrl = getAuthorBaseUrl(author);
-  const ogImages = author.profileImageUrl
-    ? [{ url: author.profileImageUrl, alt: authorName }]
+  const shareImage = authorShareImage(author);
+  const ogImages = shareImage
+    ? [{ url: shareImage, alt: authorName }]
     : [];
 
   return {

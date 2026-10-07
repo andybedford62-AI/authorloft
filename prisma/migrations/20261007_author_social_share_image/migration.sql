@@ -1,0 +1,1 @@
+ALTER TABLE "Author" ADD COLUMN IF NOT EXISTS "socialShareImageUrl" TEXT;

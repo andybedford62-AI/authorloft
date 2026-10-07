@@ -150,8 +150,9 @@ model Author {
   shortBio                      String?
   profileImageUrl               String?
   logoUrl                       String?
+  socialShareImageUrl           String?               // optional wide image used for link previews (Facebook/LinkedIn/X); falls back to profileImageUrl
   heroImageUrl                  String?
-  heroLayout                    String                @default("author-right")
+  heroLayout                   String                @default("author-right")
   heroTitle                     String?
   heroSubtitle                  String?
   accentColor                   String                @default("#7B2D2D") // legacy — no longer drives UI; kept for data safety

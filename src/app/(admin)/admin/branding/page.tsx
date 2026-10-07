@@ -13,6 +13,7 @@ export default async function BrandingPage() {
       select: {
         displayName: true, tagline: true, shortBio: true, bio: true,
         profileImageUrl: true,
+        socialShareImageUrl: true,
         logoUrl: true,
         heroImageUrl: true,
         heroLayout: true,
@@ -45,6 +46,7 @@ export default async function BrandingPage() {
     shortBio:       author.shortBio       ?? "",
     bio:            author.bio            ?? "",
     profileImageUrl: author.profileImageUrl ?? "",
+    socialShareImageUrl: author.socialShareImageUrl ?? "",
     logoUrl:         author.logoUrl         ?? "",
     heroImageUrl:    author.heroImageUrl    ?? "",
     heroLayout:      author.heroLayout      ?? "author-right",

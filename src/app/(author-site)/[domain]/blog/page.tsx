@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +27,7 @@ export async function generateMetadata({
       title: `Blog & News — ${authorName}`,
       description: `News and updates from ${authorName}: announcements, behind-the-scenes posts and the latest on new work.`,
       url: `${base}/blog`,
-      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
+      ...(authorShareImage(author) ? { images: [{ url: authorShareImage(author)!, alt: authorName }] } : {}),
     },
   };
 }

@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -53,7 +54,7 @@ export async function generateMetadata({
   const image =
     course.coverImageUrl ||
     course.modules.flatMap((m) => m.lessons)[0]?.thumbnailUrl ||
-    author.profileImageUrl ||
+    authorShareImage(author) ||
     null;
 
   return {

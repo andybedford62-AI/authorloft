@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { CoverUpload } from "@/components/admin/cover-upload";
 
 import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 type Stat = { value: string; label: string };
@@ -67,6 +68,7 @@ type BrandingFormProps = {
     shortBio: string;
     bio: string;
     profileImageUrl: string;
+    socialShareImageUrl: string;
     logoUrl: string;
     heroImageUrl: string;
     heroLayout: string;
@@ -118,6 +120,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
   const [shortBio, setShortBio] = useState(initial.shortBio);
   const [bio, setBio] = useState(initial.bio);
   const [profileImageUrl, setProfileImageUrl] = useState(initial.profileImageUrl);
+  const [socialShareImageUrl, setSocialShareImageUrl] = useState(initial.socialShareImageUrl);
   const [logoUrl, setLogoUrl]                   = useState(initial.logoUrl);
   const [uploadingLogo, setUploadingLogo]       = useState(false);
   const [logoError, setLogoError]               = useState("");
@@ -290,7 +293,7 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         displayName, tagline, shortBio, bio,
-        profileImageUrl, logoUrl, heroImageUrl, heroLayout,
+        profileImageUrl, socialShareImageUrl, logoUrl, heroImageUrl, heroLayout,
         linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
         contactEmail, contactResponseTime, contactOpenTo,
         heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId, heroFocus,
@@ -376,6 +379,24 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
                   {photoError && <p className="text-xs text-red-600">{photoError}</p>}
                 </div>
               </div>
+            </section>
+
+            {/* Social Share Image */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-3">
+              <div>
+                <h2 className="font-semibold text-gray-900">Social Share Image</h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  The picture that appears when your site is shared on Facebook, LinkedIn, X and in messages.
+                  A wide image (1200 &times; 630) shows as a large card; leave it empty to use your Profile Photo.
+                  Books, courses and music with their own cover still show that cover.
+                </p>
+              </div>
+              <CoverUpload value={socialShareImageUrl} onChange={setSocialShareImageUrl} label="Share image" />
+              <p className="text-xs text-gray-400">
+                Facebook remembers the first image it saw for a link. After changing this, open Facebook&apos;s{" "}
+                <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener noreferrer" className="underline">Sharing Debugger</a>,
+                paste your site address and click &ldquo;Scrape Again&rdquo; to refresh it.
+              </p>
             </section>
 
             {/* Site Logo */}

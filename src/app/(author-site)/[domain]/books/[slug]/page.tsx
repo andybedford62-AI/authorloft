@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { toMetaDescription } from "@/lib/meta-text";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -57,8 +58,8 @@ export async function generateMetadata({
   // than unfurling with no image (page-level openGraph replaces the layout's).
   const ogImages = book.coverImageUrl
     ? [{ url: book.coverImageUrl, alt: book.title, width: 600, height: 900 }]
-    : author.profileImageUrl
-      ? [{ url: author.profileImageUrl, alt: authorName }]
+    : authorShareImage(author)
+      ? [{ url: authorShareImage(author)!, alt: authorName }]
       : [];
 
   return {

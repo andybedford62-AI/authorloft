@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest) {
 
   const {
     displayName, tagline, shortBio, bio,
-    profileImageUrl, logoUrl, heroImageUrl, heroLayout,
+    profileImageUrl, socialShareImageUrl, logoUrl, heroImageUrl, heroLayout,
     linkedinUrl, youtubeUrl, facebookUrl, twitterUrl, instagramUrl, supportUrl,
     contactEmail, contactResponseTime, contactOpenTo,
     heroTitle, heroSubtitle, showHeroBanner, heroFeaturedBookId, heroFocus,
@@ -71,6 +71,9 @@ export async function PATCH(req: NextRequest) {
       ...(bio         !== undefined && { bio:         bio         ?? null }),
       ...(profileImageUrl !== undefined && {
         profileImageUrl: profileImageUrl || null,
+      }),
+      ...(socialShareImageUrl !== undefined && {
+        socialShareImageUrl: socialShareImageUrl || null,
       }),
       ...(logoUrl !== undefined && {
         logoUrl: logoUrl || null,

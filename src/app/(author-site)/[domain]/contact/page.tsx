@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { notFound } from "next/navigation";
@@ -17,7 +18,7 @@ export async function generateMetadata({
   const { domain } = await params;
   const author = await prisma.author.findFirst({
     where: { OR: [{ slug: domain }, { customDomain: domain }], isActive: true },
-    select: { displayName: true, name: true, slug: true, customDomain: true, profileImageUrl: true },
+    select: { displayName: true, name: true, slug: true, customDomain: true, profileImageUrl: true, socialShareImageUrl: true },
   });
   if (!author) return { title: "Contact" };
   const authorName = author.displayName || author.name;
@@ -28,7 +29,7 @@ export async function generateMetadata({
     openGraph: {
       title: `Contact ${authorName}`,
       description: `Send a message to ${authorName}.`,
-      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
+      ...(authorShareImage(author) ? { images: [{ url: authorShareImage(author)!, alt: authorName }] } : {}),
     },
   };
 }

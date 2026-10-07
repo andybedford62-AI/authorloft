@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { toMetaDescription } from "@/lib/meta-text";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,7 +86,7 @@ export async function generateMetadata({
     (shared?.thumbnailUrl) ||
     list.coverImageUrl ||
     tracks.find((t) => t.thumbnailUrl)?.thumbnailUrl ||
-    author.profileImageUrl ||
+    authorShareImage(author) ||
     null;
 
   return {

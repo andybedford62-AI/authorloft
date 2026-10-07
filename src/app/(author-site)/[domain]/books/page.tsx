@@ -1,3 +1,4 @@
+import { authorShareImage } from "@/lib/share-image";
 import { getAuthorByDomain, getAuthorBooks, getAuthorSeries, getAuthorGenres } from "@/lib/author-queries";
 import { getActiveSaleDiscounts } from "@/lib/discount-queries";
 import { prisma } from "@/lib/db";
@@ -21,7 +22,7 @@ export async function generateMetadata({
     openGraph: {
       title: `Books by ${authorName}`,
       description: `The complete book catalog for ${authorName}.`,
-      ...(author.profileImageUrl ? { images: [{ url: author.profileImageUrl, alt: authorName }] } : {}),
+      ...(authorShareImage(author) ? { images: [{ url: authorShareImage(author)!, alt: authorName }] } : {}),
     },
   };
 }
