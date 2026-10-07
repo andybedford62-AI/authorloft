@@ -94,6 +94,8 @@ type BrandingFormProps = {
   planTier?: string;
   /** Which content types this author has published — gates what Hero Focus offers. */
   presence: { hasBooks: boolean; hasCourses: boolean; hasMusic: boolean };
+  /** Public site root, used to prefill Facebook's Sharing Debugger. */
+  siteUrl: string;
 };
 
 type Tab = "profile" | "about" | "hero" | "social";
@@ -105,7 +107,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "social",  label: "Social & Contact" },
 ];
 
-export function BrandingForm({ initial, books, planTier = "FREE", presence }: BrandingFormProps) {
+export function BrandingForm({ initial, books, planTier = "FREE", presence, siteUrl }: BrandingFormProps) {
   const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
 
@@ -393,9 +395,16 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence }: Br
               </div>
               <CoverUpload value={socialShareImageUrl} onChange={setSocialShareImageUrl} label="Share image" />
               <p className="text-xs text-gray-400">
-                Facebook remembers the first image it saw for a link. After changing this, open Facebook&apos;s{" "}
-                <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener noreferrer" className="underline">Sharing Debugger</a>,
-                paste your site address and click &ldquo;Scrape Again&rdquo; to refresh it.
+Facebook remembers the first image it saw for a link. After saving a change here, open{" "}
+                <a
+                  href={`https://developers.facebook.com/tools/debug/?q=${encodeURIComponent(siteUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Facebook&apos;s Sharing Debugger
+                </a>{" "}
+                (your site address is filled in) and click &ldquo;Scrape Again&rdquo; to refresh it.
               </p>
             </section>
 

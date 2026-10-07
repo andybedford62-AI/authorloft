@@ -76,6 +76,8 @@ Related: the deferred **native PDF flip-book viewer** (see `memory/project_flipb
 
 ---
 
+- [ ] **`og:image:width` / `og:image:height` on author-site share images** — deferred Oct 7, 2026. Social Share Image shipped without them; scrapers fetch the image fine, but explicit dimensions let Facebook/LinkedIn lay out the card correctly on the very first share. Needs the image's real dimensions: either store them at upload (new `Author` columns + read size in the upload route) or probe at render. Low value until previews are seen misbehaving. *(small–medium)*
+
 ## Author Newsletter — rich email (WOW v2)
 
 Shipped June 25, 2026: branded email + smart content blocks (featured book showcase, "more on the shelf" strip, smart review quote from `BookReview`/approved `BookFeedback`, smart special block from active `Special`, genre targeting, compose preview that mirrors the send). Next "WOW" ideas:

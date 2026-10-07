@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { BrandingForm } from "@/components/admin/branding-form";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { getAuthorContentPresence } from "@/lib/author-queries";
+import { getAuthorBaseUrl } from "@/lib/site-url";
 
 export default async function BrandingPage() {
   const authorId = await getAdminAuthorId();
@@ -12,6 +13,7 @@ export default async function BrandingPage() {
       where: { id: authorId },
       select: {
         displayName: true, tagline: true, shortBio: true, bio: true,
+        slug: true, customDomain: true,
         profileImageUrl: true,
         socialShareImageUrl: true,
         logoUrl: true,
@@ -81,7 +83,7 @@ export default async function BrandingPage() {
           Update your photo, bio, and how your author site looks and feels.
         </p>
       </div>
-      <BrandingForm initial={initial} books={books} planTier={author.plan?.tier ?? "FREE"} presence={presence} />
+      <BrandingForm siteUrl={getAuthorBaseUrl(author)} initial={initial} books={books} planTier={author.plan?.tier ?? "FREE"} presence={presence} />
     </div>
   );
 }
