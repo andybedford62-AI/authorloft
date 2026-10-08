@@ -311,6 +311,16 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
 
 ---
 
+## Infrastructure & Costs
+
+- [ ] **Move public images off Supabase Storage (conditional)** — only if Supabase *Cached Egress* stays high after the Oct 8, 2026 `next/image` change (0854b671). Background: Free plan hit 7.85 / 5 GB cached egress in the Sep 19–Oct 19 cycle, caused by raw `<img>` on legacy 1 MB+ `no-cache` covers. Decide after about a week of watching Supabase → Usage → Cached Egress. Preferred target is **Cloudflare R2** (no egress fees, S3-compatible) for public images only; keep private files (epubs, ARC, paid downloads) in Supabase with their signed URLs. Scope: swap the helper in `src/lib/supabase-storage.ts` and ~12 upload routes, copy the 286 existing covers, rewrite stored image URLs across all tables (back up first), update CSP `img-src` and `next.config.ts`. Alternatives considered: Vercel Blob (check plan transfer limits), Backblaze B2 + Cloudflare, Cloudinary. *(medium; a day or more)*
+- [ ] **Re-save the legacy covers** — 239 of 286 `book-covers` objects are stored `no-cache`, and ~110 are over 1 MB. Re-upload as resized WebP with a 1-year cache (`ONE_YEAR_CACHE`). Cheap partial fix that shrinks origin fetches and lets browsers cache without a migration; overwrites production files, so back them up locally first. Same cache-header gap exists on `book-files`, `book-audio` and `book-previews` (all `no-cache`). Don't reuse a path with a long cache if the content changes later. Revisit after watching Cached Egress for a week. *(small)*
+- [ ] **Database query optimization — not needed.** Database is ~38 MB with tiny tables; DB egress is negligible next to storage. Only revisit if plain Egress (not Cached Egress) grows. *(no action)*
+- [ ] **Convert the remaining raw `<img>` cover/logo uses to `next/image`**: author-site nav logo, media-kit page, and any og/social image paths that link a Supabase URL directly. *(small)*
+- [ ] **Supabase Pro upgrade decision** — Andy's call; Free plan restrictions (402/read-only) can apply after the Oct 9, 2026 grace period. Upgrading lifts restrictions immediately; can downgrade after the Oct 19 reset. *(decision)*
+
+---
+
 ## Shipped (for reference)
 
 - ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
