@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search, ArrowRight, BookOpen, Feather, Mail, Home, PenLine,
   ShoppingBag, User, Library, BookMarked, Bell, type LucideIcon,
@@ -43,11 +44,12 @@ function BlogCard({ post }: { post: FilterablePost }) {
     <Link href={`/blog/${post.slug}`} className="group flex flex-col gap-4">
       <div className="relative w-full aspect-[16/9] overflow-hidden rounded-br-[36px] shadow-[8px_12px_26px_rgba(0,0,0,0.35)] bg-vault-bg">
         {post.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={post.coverImageUrl}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
           />
         ) : (
           <div

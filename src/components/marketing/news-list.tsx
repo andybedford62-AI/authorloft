@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Clock, ArrowRight, Megaphone } from "lucide-react";
 import { usePostFilters, type FilterablePost } from "./use-post-filters";
 import { PostFilterControls } from "./post-filter-controls";
@@ -12,10 +13,12 @@ function NewsCard({ post }: { post: FilterablePost }) {
       className="group flex flex-col sm:flex-row gap-4 sm:gap-6 bg-vault-surf rounded-2xl border border-vault-ink/12 overflow-hidden hover:shadow-md transition-shadow p-5"
     >
       {post.coverImageUrl && (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
+        <Image
           src={post.coverImageUrl}
           alt={post.title}
+          width={384}
+          height={256}
+          sizes="(min-width: 640px) 192px, 100vw"
           className="w-full sm:w-48 h-40 sm:h-32 object-cover rounded-xl flex-shrink-0"
         />
       )}

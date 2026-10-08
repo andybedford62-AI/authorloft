@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Star, BookOpen, Eye } from "lucide-react";
 import { withFrom, type BookstoreBook } from "@/components/marketing/bookstore-book-card";
 
@@ -37,12 +38,12 @@ export function BookstoreListCard({
       {/* Cover */}
       <div className="relative w-[88px] sm:w-24 flex-shrink-0 aspect-[2/3] rounded-md bg-vault-bg overflow-hidden">
         {book.coverImageUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={book.coverImageUrl}
             alt={book.title}
-            loading="lazy"
-            className="h-full w-full object-cover"
+            fill
+            sizes="96px"
+            className="object-cover"
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-vault-mute">

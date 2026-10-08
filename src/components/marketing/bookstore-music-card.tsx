@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Music2, Star } from "lucide-react";
 
 export type BookstoreMusic = {
@@ -20,12 +21,12 @@ export function BookstoreMusicCard({ music }: { music: BookstoreMusic }) {
       {/* Cover (square — album/playlist art convention, unlike landscape course covers) */}
       <div className="relative w-full aspect-square bg-vault-bg overflow-hidden">
         {music.coverImageUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={music.coverImageUrl}
             alt={music.title}
-            loading="lazy"
-            className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+            className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
           />
         ) : (
           <div className="h-full w-full flex flex-col items-center justify-center gap-2 text-vault-mute">

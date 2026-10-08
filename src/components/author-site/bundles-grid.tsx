@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Package } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 
@@ -55,10 +56,12 @@ export function BundlesGrid({ bundles }: { bundles: BundleForGrid[] }) {
                   style={{ transform: `rotate(${(i - 1.5) * 3}deg)` }}
                 >
                   {item.saleItem.book.coverImageUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
+                    <Image
                       src={item.saleItem.book.coverImageUrl}
                       alt={item.saleItem.book.title}
+                      width={160}
+                      height={224}
+                      sizes="80px"
                       className="w-full h-full object-cover"
                     />
                   ) : (
