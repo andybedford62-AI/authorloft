@@ -5,8 +5,8 @@ import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
-import { sanitize } from "@/lib/sanitize";
-import { articleTitle } from "@/lib/seo-title";
+import { sanitizeArticle } from "@/lib/sanitize";
+import { articleDescription, articleTitle } from "@/lib/seo-title";
 import { PLATFORM_AUTHOR, articleAuthorLd } from "@/lib/platform-author";
 
 export const dynamic = "force-dynamic";
@@ -29,12 +29,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const guide = await prisma.guide.findUnique({
     where: { slug },
-    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, isPublished: true, seoTitle: true, metaDescription: true, focusKeyword: true },
+    select: { title: true, slug: true, excerpt: true, content: true, coverImageUrl: true, isPublished: true, seoTitle: true, metaDescription: true, focusKeyword: true },
   }).catch(() => null);
   if (!guide || !guide.isPublished) return {};
 
   const metaTitle = guide.seoTitle || guide.title;
-  const metaDesc = guide.metaDescription || guide.excerpt || undefined;
+  const metaDesc = articleDescription(guide.metaDescription, guide.excerpt, guide.content);
 
   return {
     title: articleTitle(metaTitle),
@@ -64,7 +64,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
   const faqs = parseFaqs(guide.faqsJson);
   const relatedSlugs = parseSlugs(guide.relatedSlugsJson);
-  const safeContent = sanitize(guide.content);
+  const safeContent = sanitizeArticle(guide.content);
 
   const plainText = guide.content.replace(/<[^>]+>/g, "").trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;

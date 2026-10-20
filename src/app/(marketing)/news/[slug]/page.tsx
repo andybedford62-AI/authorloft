@@ -6,8 +6,8 @@ import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
-import { sanitize } from "@/lib/sanitize";
-import { articleTitle } from "@/lib/seo-title";
+import { sanitizeArticle } from "@/lib/sanitize";
+import { articleDescription, articleTitle } from "@/lib/seo-title";
 import { PLATFORM_AUTHOR, articleAuthorLd, isPlatformAuthor } from "@/lib/platform-author";
 
 export const dynamic = "force-dynamic";
@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = await prisma.platformPost.findUnique({
     where: { slug },
-    select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true },
+    select: { title: true, slug: true, excerpt: true, content: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true },
   }).catch(() => null);
   if (!post || !post.isPublished || !post.isNews) return {};
 
   const metaTitle = post.seoTitle || post.title;
-  const metaDesc  = post.metaDescription || post.excerpt || undefined;
+  const metaDesc  = articleDescription(post.metaDescription, post.excerpt, post.content);
 
   return {
     title:       articleTitle(metaTitle),
@@ -55,7 +55,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
   // Must be a published News post — otherwise 404 (blog posts don't render here)
   if (!post || !post.isPublished || !post.isNews) notFound();
 
-  const safeContent = sanitize(post.content);
+  const safeContent = sanitizeArticle(post.content);
   const plainText = post.content.replace(/<[^>]+>/g, "").trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 

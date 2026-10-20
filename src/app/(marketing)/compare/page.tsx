@@ -11,7 +11,7 @@ export function generateMetadata(): Metadata {
   return {
     title: "Compare AuthorLoft to Other Platforms",
     description:
-      "See how AuthorLoft compares to the platforms authors, course creators, and musicians already use — Tertulia, Quilltips, Teachable, Kajabi, Linktree, Bandzoogle, and more.",
+      "See how AuthorLoft compares with Tertulia, Quilltips, Teachable, Kajabi, Linktree, Bandzoogle and other platforms authors, course creators and musicians use.",
     alternates: { canonical: "/compare" },
     openGraph: {
       type: "website",

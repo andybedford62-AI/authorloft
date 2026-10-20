@@ -41,3 +41,11 @@ export function sanitize(html: string | null | undefined): string {
     },
   });
 }
+
+/**
+ * Sanitizes article body HTML and demotes any <h1> inside it to <h2>: the page template already renders
+ * the title as the one H1, and editor-authored bodies often carry their own H1s.
+ */
+export function sanitizeArticle(html: string | null | undefined): string {
+  return sanitize(html).replace(/<h1(\s|>)/gi, "<h2$1").replace(/<\/h1>/gi, "</h2>");
+}

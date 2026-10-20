@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Solutions to Grow Your Author Business",
     description:
-      `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups: your platform, selling and growth, marketing and tools, readers and analytics, and music. Browse by category, or compare every feature side-by-side.`,
+      `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups: your platform, selling, marketing, readers and music. Browse by category or compare every feature side by side.`,
     alternates: { canonical: "/solutions" },
     openGraph: {
       type: "website",

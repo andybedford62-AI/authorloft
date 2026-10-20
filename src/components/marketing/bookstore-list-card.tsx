@@ -18,10 +18,14 @@ function formatPrice(cents: number | null): string | null {
 export function BookstoreListCard({
   book,
   onQuickView,
+  headingLevel = "h3",
 }: {
   book: BookstoreBook;
   onQuickView?: (book: BookstoreBook) => void;
+  /** h2 where the card sits directly under the page H1 (no section heading above it). */
+  headingLevel?: "h2" | "h3";
 }) {
+  const Heading = headingLevel;
   // One priority badge to keep the compact card uncluttered. "Featured" (Premium
   // tier) deliberately omitted here — this grid is the plain catalog listing,
   // not a promotional row, so every book shows on equal footing.
@@ -60,14 +64,14 @@ export function BookstoreListCard({
 
       {/* Details */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <h3 className="font-vault-display text-sm text-vault-ink leading-snug line-clamp-2">
+        <Heading className="font-vault-display text-sm text-vault-ink leading-snug line-clamp-2">
           <a
             href={book.bookUrl}
             className="group-hover:text-vault-gold transition-colors after:absolute after:inset-0 after:z-0"
           >
             {book.title}
           </a>
-        </h3>
+        </Heading>
         <div className="flex items-baseline justify-between gap-2 mt-0.5">
           <p className="text-xs text-vault-mute truncate">
             by{" "}

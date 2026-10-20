@@ -21,3 +21,40 @@ export function articleTitle(raw: string): string {
   const cut = clipped.lastIndexOf(" ");
   return (cut >= MIN_OWN ? clipped.slice(0, cut) : title.slice(0, MAX_OWN)).replace(/[\s,:;&–—-]+$/, "");
 }
+
+const DESC_MIN = 110;
+const DESC_MAX = 160;
+
+function clampDescription(text: string): string {
+  if (text.length <= DESC_MAX) return text;
+  const head = text.slice(0, DESC_MAX + 1);
+  // Prefer ending on a full sentence, then on a word, so the snippet never stops mid-word.
+  const sentence = Math.max(head.lastIndexOf(". "), head.lastIndexOf("? "), head.lastIndexOf("! "));
+  if (sentence >= DESC_MIN - 1) return head.slice(0, sentence + 1);
+  const word = head.lastIndexOf(" ");
+  return head.slice(0, word > DESC_MIN ? word : DESC_MAX).replace(/[\s,:;–—-]+$/, "");
+}
+
+/**
+ * Picks the meta description for a database-stored article: the editor's description if it is 110-160
+ * characters, otherwise the excerpt, otherwise the opening of the article body. Anything too long is cut at
+ * a sentence or word break. A description that is only too short is used as written when nothing longer exists.
+ */
+export function articleDescription(
+  meta: string | null | undefined,
+  excerpt: string | null | undefined,
+  contentHtml: string | null | undefined,
+): string | undefined {
+  const body = (contentHtml ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  const candidates = [meta, excerpt, body]
+    .map((c) => (c ?? "").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  if (candidates.length === 0) return undefined;
+
+  for (const c of candidates) {
+    if (c.length >= DESC_MIN && c.length <= DESC_MAX) return c;
+  }
+  const long = candidates.find((c) => c.length > DESC_MAX);
+  if (long) return clampDescription(long);
+  return candidates[0];
+}

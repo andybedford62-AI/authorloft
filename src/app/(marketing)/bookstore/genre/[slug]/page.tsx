@@ -125,7 +125,7 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
           <ArrowLeft className="h-3.5 w-3.5" /> All books
         </Link>
 
-        <BookstoreGrid books={filtered} allGenres={[]} />
+        <BookstoreGrid books={filtered} allGenres={[]} cardHeadingLevel="h2" />
 
         {/* Interlink to other genres (SEO + discovery) */}
         {otherGenres.length > 0 && (

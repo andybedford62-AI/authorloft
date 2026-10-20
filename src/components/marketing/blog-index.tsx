@@ -75,9 +75,9 @@ function BlogCard({ post }: { post: FilterablePost }) {
         <span className="text-vault-mute font-semibold whitespace-nowrap">{post.readTimeMinutes} min</span>
       </div>
 
-      <h3 className="font-vault-display text-2xl leading-tight text-vault-ink font-semibold tracking-tight transition-colors group-hover:text-vault-gold">
+      <h2 className="font-vault-display text-2xl leading-tight text-vault-ink font-semibold tracking-tight transition-colors group-hover:text-vault-gold">
         {post.title}
-      </h3>
+      </h2>
 
       {post.excerpt && (
         <p className="text-sm leading-relaxed text-vault-mute line-clamp-2">{post.excerpt}</p>
@@ -152,7 +152,7 @@ export function BlogIndex({ posts }: { posts: FilterablePost[] }) {
         {filtered.length === 0 ? (
           <div className="col-span-full text-center py-18">
             <Search className="h-10 w-10 text-vault-gold/40 mx-auto mb-4" />
-            <h3 className="font-vault-display text-2xl text-vault-ink mb-2">No articles found</h3>
+            <h2 className="font-vault-display text-2xl text-vault-ink mb-2">No articles found</h2>
             <p className="text-sm text-vault-mute mb-4">Try a different category or clear your search.</p>
             <button
               type="button"

@@ -34,9 +34,11 @@ const SORT_OPTIONS: { id: SortKey; label: string }[] = [
 export function BookstoreGrid({
   books,
   allGenres,
+  cardHeadingLevel,
 }: {
   books: BookstoreBook[];
   allGenres: string[];
+  cardHeadingLevel?: "h2" | "h3";
 }) {
   const [search, setSearch] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]); // lowercased genre names
@@ -275,7 +277,7 @@ export function BookstoreGrid({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {pageItems.map((b) => (
-            <BookstoreListCard key={b.id} book={b} onQuickView={setQuickViewBook} />
+            <BookstoreListCard key={b.id} book={b} onQuickView={setQuickViewBook} headingLevel={cardHeadingLevel} />
           ))}
         </div>
       )}

@@ -159,7 +159,11 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
 
               {/* Name + price */}
               <div>
-                <h3 className="text-lg font-bold text-vault-ink mb-3">{plan.name}</h3>
+                {fullPage ? (
+                  <h2 className="text-lg font-bold text-vault-ink mb-3">{plan.name}</h2>
+                ) : (
+                  <h3 className="text-lg font-bold text-vault-ink mb-3">{plan.name}</h3>
+                )}
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-extrabold text-vault-ink">{displayPrice}</span>
                   <span className="text-sm text-vault-mute">{isFree ? "/forever" : "/mo"}</span>

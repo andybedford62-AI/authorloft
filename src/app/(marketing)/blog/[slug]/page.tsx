@@ -6,8 +6,8 @@ import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
 import { PrintButton } from "./print-button";
-import { sanitize } from "@/lib/sanitize";
-import { articleTitle } from "@/lib/seo-title";
+import { sanitizeArticle } from "@/lib/sanitize";
+import { articleDescription, articleTitle } from "@/lib/seo-title";
 import { PLATFORM_AUTHOR, articleAuthorLd, isPlatformAuthor } from "@/lib/platform-author";
 
 export const dynamic = "force-dynamic";
@@ -16,11 +16,11 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.platformPost.findUnique({ where: { slug }, select: { title: true, slug: true, excerpt: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true } }).catch(() => null);
+  const post = await prisma.platformPost.findUnique({ where: { slug }, select: { title: true, slug: true, excerpt: true, content: true, coverImageUrl: true, publishedAt: true, isPublished: true, isNews: true, seoTitle: true, metaDescription: true, authorName: true, category: true } }).catch(() => null);
   if (!post || !post.isPublished || post.isNews) return {};
 
   const metaTitle = post.seoTitle || post.title;
-  const metaDesc  = post.metaDescription || post.excerpt || undefined;
+  const metaDesc  = articleDescription(post.metaDescription, post.excerpt, post.content);
 
   return {
     title:       articleTitle(metaTitle),
@@ -75,7 +75,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     : [];
   const relatedPosts = [...sameCategory, ...filler.filter((f) => !sameCategory.some((s) => s.slug === f.slug))].slice(0, 3);
 
-  const safeContent = sanitize(post.content);
+  const safeContent = sanitizeArticle(post.content);
   const plainText = post.content.replace(/<[^>]+>/g, "").trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 

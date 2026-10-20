@@ -16,18 +16,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Author Platform Features: Sales & Growth",
     description:
-      "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
+      "Direct sales, reader analytics, newsletter capture, custom domain and AI tools for indie authors. Compare the Free, Standard and Premium plans side by side.",
     alternates: { canonical: "/features" },
     openGraph: {
       type:   "website",
       title:  "Author Platform Features: Sales & Growth | AuthorLoft",
-      description: "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
+      description: "Direct sales, reader analytics, newsletter capture, custom domain and AI tools for indie authors. Compare the Free, Standard and Premium plans side by side.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft features" }],
     },
     twitter: {
       card:  "summary_large_image",
       title: "Author Platform Features: Sales & Growth | AuthorLoft",
-      description: "Everything indie authors need to own their business: direct sales, reader analytics, newsletter capture, custom domain, and AI tools. Compare FREE, STANDARD, and PREMIUM.",
+      description: "Direct sales, reader analytics, newsletter capture, custom domain and AI tools for indie authors. Compare the Free, Standard and Premium plans side by side.",
       images: [ogImage],
     },
   };

@@ -91,7 +91,7 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
         </div>
       ) : (
         <>
-          <h3 className="font-serif text-xl sm:text-2xl mb-1">Get AuthorLoft News in your inbox</h3>
+          <h2 className="font-serif text-xl sm:text-2xl mb-1">Get AuthorLoft News in your inbox</h2>
           <p className={`text-sm mb-4 ${onDark ? "text-[#D4DDEB]" : "text-[#5C6E89]"}`}>
             Product updates, new features, specials, and events — no spam, unsubscribe anytime.
           </p>

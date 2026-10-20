@@ -22,18 +22,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Your Books. Your Courses. Your Music.",
     description:
-      "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
+      "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
-      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
+      description: "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
-      description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
+      description: "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
       images:      [ogImage],
     },
   };
@@ -305,9 +305,9 @@ function BuiltForSection() {
   return (
     <section style={{ background: VAULT.surf, padding: '48px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, textAlign: 'center', marginBottom: 32 }}>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, textAlign: 'center', margin: '0 0 32px' }}>
           Built for every kind of creator
-        </p>
+        </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
           {cards.map(({ icon: Icon, label, copy, href }) => (
             <div key={label} style={{ textAlign: 'center' }}>
