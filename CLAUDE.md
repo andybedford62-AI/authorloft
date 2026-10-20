@@ -35,7 +35,7 @@ live environment.
    DB. Cosmetic drift (FK re-orders, TIMESTAMP precision, default-clause
    noise) is ignored. Bypass: `SKIP_SCHEMA_DRIFT_CHECK=1`.
 3. **`scripts/check-grants.mjs`** — verifies every public table has
-   SELECT/INSERT/UPDATE/DELETE for anon/authenticated/postgres/service_role.
+   SELECT for anon and SELECT/INSERT/UPDATE/DELETE for authenticated/postgres/service_role.
    Catches "new table works locally but RLS-protected queries 401 in
    prod." Bypass: `SKIP_GRANTS_CHECK=1`.
 
@@ -52,9 +52,12 @@ host). Run locally with `npm run check:all`.
   2. Apply the corresponding SQL to Supabase via MCP `apply_migration`
      **before pushing the code**. Additive changes (new nullable columns,
      new tables) are safe to apply to prod DB ahead of code promotion.
-  3. **If you added a new table:** include `GRANT ALL ON TABLE "X" TO
-     anon, authenticated, postgres, service_role;` in the same migration.
-     The grants check (#3 above) will block the deploy if you forget.
+  3. **If you added a new table:** include these in the same migration
+     (Supabase stops auto-granting Data API access to new tables Oct 30 2026):
+     `GRANT SELECT ON TABLE "X" TO anon;` and `GRANT SELECT, INSERT, UPDATE,
+     DELETE ON TABLE "X" TO authenticated, postgres, service_role;`.
+     anon is read-only. The grants check (#3 above) will block the deploy
+     if you forget.
   4. Drop the same SQL into `prisma/migrations/<YYYYMMDD>_<name>/migration.sql`
      so the history lives in git.
   5. Run `npm run check:all` locally to confirm everything is in sync,

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Fails the build if any public table is missing SELECT/INSERT/UPDATE/DELETE
-// GRANTs for the four standard Supabase roles (anon, authenticated, postgres,
-// service_role). Catches the "new table works locally but RLS-protected
+// Fails the build if any public table is missing its standard GRANTs:
+// SELECT for anon, and SELECT/INSERT/UPDATE/DELETE for authenticated, postgres
+// and service_role. anon is read-only by design (Supabase's recommended
+// least-privilege pattern; the app never writes through the Data API). Catches the "new table works locally but RLS-protected
 // queries return 401/403 in prod" class of bug — every table the app uses
 // needs these GRANTs in addition to its RLS policies.
 //
@@ -29,8 +30,18 @@ if (!DB_URL) {
   process.exit(0);
 }
 
-const REQUIRED_ROLES = ["anon", "authenticated", "postgres", "service_role"];
-const REQUIRED_PRIVS = ["SELECT", "INSERT", "UPDATE", "DELETE"];
+const ALL_PRIVS = ["SELECT", "INSERT", "UPDATE", "DELETE"];
+const REQUIRED_GRANTS = {
+  anon: ["SELECT"],
+  authenticated: ALL_PRIVS,
+  postgres: ALL_PRIVS,
+  service_role: ALL_PRIVS,
+};
+const REQUIRED_PAIRS = Object.entries(REQUIRED_GRANTS).flatMap(([role, privs]) =>
+  privs.map((priv) => [role, priv]),
+);
+const REQUIRED_ROLES = REQUIRED_PAIRS.map(([role]) => role);
+const REQUIRED_PRIVS = REQUIRED_PAIRS.map(([, priv]) => priv);
 
 // Tables we intentionally don't grant on (system tables, migration history, etc.).
 // Add to this list if you add a table that legitimately should NOT have the
@@ -46,30 +57,29 @@ try {
 
   const { rows: missing } = await client.query(`
     WITH expected AS (
-      SELECT t.table_name, g.role, p.priv
+      SELECT t.table_name, g.role, g.priv
       FROM (SELECT table_name FROM information_schema.tables
             WHERE table_schema = 'public' AND table_type = 'BASE TABLE') t
-      CROSS JOIN (SELECT unnest($1::text[]) AS role) g
-      CROSS JOIN (SELECT unnest($2::text[]) AS priv) p
+      CROSS JOIN (SELECT * FROM unnest($1::text[], $2::text[]) AS x(role, priv)) g
     ),
     actual AS (
       SELECT table_name, grantee AS role, privilege_type AS priv
       FROM information_schema.role_table_grants
       WHERE table_schema = 'public'
         AND grantee = ANY($1::text[])
-        AND privilege_type = ANY($2::text[])
+        AND privilege_type = ANY($3::text[])
     )
     SELECT e.table_name, e.role, e.priv
     FROM expected e
     LEFT JOIN actual a USING (table_name, role, priv)
     WHERE a.table_name IS NULL
     ORDER BY e.table_name, e.role, e.priv
-  `, [REQUIRED_ROLES, REQUIRED_PRIVS]);
+  `, [REQUIRED_ROLES, REQUIRED_PRIVS, ALL_PRIVS]);
 
   const filtered = missing.filter((r) => !ALLOWLIST.has(r.table_name));
 
   if (filtered.length === 0) {
-    console.log("[grants-check] OK — every public table has the standard GRANTs for anon/authenticated/postgres/service_role.");
+    console.log("[grants-check] OK — every public table has the standard GRANTs (anon SELECT; authenticated/postgres/service_role full CRUD).");
     process.exit(0);
   }
 
@@ -99,7 +109,8 @@ try {
   console.error("");
   console.error("------------------------------------------------------------------");
   for (const table of byTable.keys()) {
-    console.error(`GRANT ALL ON TABLE "${table}" TO anon, authenticated, postgres, service_role;`);
+    console.error(`GRANT SELECT ON TABLE "${table}" TO anon;`);
+    console.error(`GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE "${table}" TO authenticated, postgres, service_role;`);
   }
   console.error("------------------------------------------------------------------");
   console.error("");

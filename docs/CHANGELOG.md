@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 20, 2026 — Supabase Data API grants tightened (Oct 30 change)
+
+- **anon is now read-only on every public table; new-table GRANT pattern updated.** Supabase stops auto-granting Data API access to new `public` tables on Oct 30, 2026. Live RLS audit found no exposure (RLS on everywhere, no anon write policies), so this was hardening: migration `20261020_tighten_data_api_grants` revokes anon INSERT/UPDATE/DELETE on all 84 tables (SELECT kept) and revokes anon/authenticated EXECUTE on `rls_auto_enable()`. `scripts/check-grants.mjs` now requires anon SELECT and full CRUD for authenticated/postgres/service_role. `CLAUDE.md` and the `prisma-migrate` skill give the new per-table GRANTs for migrations.
+
 ## October 8, 2026 — Supabase cached-egress reduction
 
 - **Public cover images now go through `next/image`** instead of raw `<img>` pointing at Supabase. Supabase Usage showed Cached Egress at 7.85 / 5 GB (157%) on the Free plan, with the grace period ending Oct 9; 110 of 286 `book-covers` objects are over 1 MB (legacy originals, `no-cache`), and raw `<img>` made every page view download the full original from Supabase's CDN. Vercel's image optimizer now fetches each cover once and serves resized WebP from its own cache. Converted: `bookstore-book-card`, `bookstore-list-card`, `bookstore-course-card`, `bookstore-music-card`, `blog-index`, `news-list`, `author-site/bundles-grid`. New uploads were already resized (max 2000px WebP) with a 1-year cache, so those weren't the cause. Still raw (lower traffic): author-site nav logo, media-kit page, admin screens.
