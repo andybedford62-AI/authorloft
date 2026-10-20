@@ -14,6 +14,7 @@ const NAV_LINKS: [string, string][] = [
   ["Learn", "/guides"],
   ["Resources", "/resources"],
   ["FAQ", "/faq"],
+  ["About", "/about"],
   ["Contact", "/contact"],
   ["Privacy", "/privacy"],
   ["Terms", "/terms"],

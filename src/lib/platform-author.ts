@@ -1,7 +1,6 @@
 // The named person behind AuthorLoft's own articles (blog, news, guides).
 // Drives the /author/[slug] page and the Person node in every article's JSON-LD.
-// sameAs is left empty on purpose: list only profiles he actually runs
-// (personal LinkedIn, X, ...) once he confirms the URLs.
+// sameAs lists only profiles he runs himself.
 
 export const PLATFORM_BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
@@ -9,7 +8,7 @@ export const PLATFORM_AUTHOR = {
   slug: "anthony-bedford",
   name: "Anthony Bedford",
   jobTitle: "Thriller author and founder of AuthorLoft",
-  sameAs: [] as string[],
+  sameAs: ["https://www.linkedin.com/in/anthonybedford/"],
 };
 
 export const PLATFORM_AUTHOR_URL = `${PLATFORM_BASE}/author/${PLATFORM_AUTHOR.slug}`;
