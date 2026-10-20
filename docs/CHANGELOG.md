@@ -18,6 +18,7 @@ line rather than listing every commit.
 - **Pricing card copy (DB, live immediately):** `Plan.description` now reads Free "Your first author site, free forever.", Standard "When you start selling direct.", Premium "For authors running a full backlist." `featuredLabel` cleared on Free ("Starter Package") and Premium ("Unlimited Features"); only Standard keeps "Most Popular". Free `featuresJson` gains "Direct digital sales (Stripe) - eBook" so the card matches the comparison table.
 - **FAQ speed claim (DB):** `HomepageFaq` "go live in under five minutes" → "within 15 minutes", matching the hero and landing-page FAQ.
 - **Mobile menu button** tap target 36px → 44px (`marketing-mobile-menu.tsx`).
+- **Founder photo:** the "AB" initials circle in the homepage "From the founder" block is now a real photo (`public/AndyBedford-casual2.jpg`, via `next/image`, 52px avatar). Name, title and "See my site →" link unchanged.
 
 ## October 20, 2026 — Hero headline names the category (audit D1)
 

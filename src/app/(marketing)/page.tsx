@@ -502,9 +502,14 @@ function FounderNoteSection({
           dangerouslySetInnerHTML={{ __html: `“${sanitize(testimonial.quote)}”` }}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 52, height: 52, borderRadius: '50%', background: VAULT.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', color: VAULT.bg, fontWeight: 700, fontSize: 17, flexShrink: 0 }}>
-            {testimonial.authorName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-          </div>
+          <Image
+            src="/AndyBedford-casual2.jpg"
+            alt={`${testimonial.authorName}, founder of AuthorLoft`}
+            width={52}
+            height={52}
+            sizes="52px"
+            style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', objectPosition: '50% 25%', flexShrink: 0 }}
+          />
           <div>
             <p style={{ fontWeight: 600, fontSize: 15, margin: 0, color: VAULT.ink }}>{testimonial.authorName}</p>
             {testimonial.authorRole && <p style={{ fontSize: 13, margin: 0, color: VAULT.mute }}>{testimonial.authorRole}</p>}
