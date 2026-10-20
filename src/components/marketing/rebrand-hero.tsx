@@ -278,8 +278,8 @@ export function RebelHero({
   subheadline?: string | null;
   demoUrl?: string | null;
 }) {
-  const line1 = headlineLine1 || "You made the work. They keep the fans.";
-  const line2 = headlineLine2 || "Take it back.";
+  const line1 = headlineLine1 || "Sell your books direct.";
+  const line2 = headlineLine2 || "Keep 100% and your reader list.";
   const demoHref = demoUrl || "https://demo.authorloft.com";
   const sub    = subheadline || "Every sale through someone else's platform is someone you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own audience list, and everything you earn, whether you're selling books, courses, or music. It's free to start and takes about fifteen minutes to launch.";
 

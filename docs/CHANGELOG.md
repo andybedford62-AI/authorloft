@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 20, 2026 — Hero headline names the category (audit D1)
+
+- **Homepage hero H1 fallback now names the category.** `rebrand-hero.tsx` fallback changed from "You made the work. They keep the fans. / Take it back." to "Sell your books direct. / Keep 100% and your reader list." (wording from the heycatch audit, D1 Positioning). Subhead untouched. The live headline is DB-backed (`PlatformSettings.heroHeadlineLine1/2`); that row was updated directly via SQL to the same wording, so it is live on production immediately.
+
 ## October 20, 2026 — Supabase Data API grants tightened (Oct 30 change)
 
 - **anon is now read-only on every public table; new-table GRANT pattern updated.** Supabase stops auto-granting Data API access to new `public` tables on Oct 30, 2026. Live RLS audit found no exposure (RLS on everywhere, no anon write policies), so this was hardening: migration `20261020_tighten_data_api_grants` revokes anon INSERT/UPDATE/DELETE on all 84 tables (SELECT kept) and revokes anon/authenticated EXECUTE on `rls_auto_enable()`. `scripts/check-grants.mjs` now requires anon SELECT and full CRUD for authenticated/postgres/service_role. `CLAUDE.md` and the `prisma-migrate` skill give the new per-table GRANTs for migrations.
