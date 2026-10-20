@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## October 20, 2026 — Audit quick wins: pricing cards, FAQ, mobile menu (heycatch)
+
+- **Pricing card copy (DB, live immediately):** `Plan.description` now reads Free "Your first author site, free forever.", Standard "When you start selling direct.", Premium "For authors running a full backlist." `featuredLabel` cleared on Free ("Starter Package") and Premium ("Unlimited Features"); only Standard keeps "Most Popular". Free `featuresJson` gains "Direct digital sales (Stripe) - eBook" so the card matches the comparison table.
+- **FAQ speed claim (DB):** `HomepageFaq` "go live in under five minutes" → "within 15 minutes", matching the hero and landing-page FAQ.
+- **Mobile menu button** tap target 36px → 44px (`marketing-mobile-menu.tsx`).
+
 ## October 20, 2026 — Hero headline names the category (audit D1)
 
 - **Homepage hero H1 fallback now names the category.** `rebrand-hero.tsx` fallback changed from "You made the work. They keep the fans. / Take it back." to "Sell your books direct. / Keep 100% and your reader list." (wording from the heycatch audit, D1 Positioning). Subhead untouched. The live headline is DB-backed (`PlatformSettings.heroHeadlineLine1/2`); that row was updated directly via SQL to the same wording, so it is live on production immediately.

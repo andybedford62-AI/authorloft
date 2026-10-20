@@ -35,7 +35,7 @@ export function MarketingMobileMenu({ isAuthor, pricingHref = "/pricing" }: { is
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
-        className="p-2 -mr-1 rounded-md text-vault-mute hover:text-vault-ink hover:bg-vault-ink/6 transition-colors"
+        className="p-3 -mr-2 rounded-md text-vault-mute hover:text-vault-ink hover:bg-vault-ink/6 transition-colors"
       >
         {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
