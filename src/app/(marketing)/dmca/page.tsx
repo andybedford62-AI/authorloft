@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: "Copyright & DMCA Policy",
   description: "How to report copyright infringement on AuthorLoft, how to file a counter-notice, and our repeat-infringer policy.",
   alternates: { canonical: "/dmca" },
-  openGraph: { type: "website", title: "Copyright & DMCA Policy | AuthorLoft", description: "How to report copyright infringement on AuthorLoft and how counter-notices work." },
-  twitter:    { card: "summary",  title: "Copyright & DMCA Policy | AuthorLoft", description: "How to report copyright infringement on AuthorLoft and how counter-notices work." },
+  openGraph: { type: "website", title: "Copyright & DMCA Policy | AuthorLoft", description: "How to report copyright infringement on AuthorLoft and how counter-notices work.", images: ["/og-home.png"] },
+  twitter:    { card: "summary_large_image",  title: "Copyright & DMCA Policy | AuthorLoft", description: "How to report copyright infringement on AuthorLoft and how counter-notices work.", images: ["/og-home.png"] },
 };
 
 // Matches the U.S. Copyright Office DMCA Designated Agent Directory listing

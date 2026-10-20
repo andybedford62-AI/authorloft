@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## October 20, 2026 — SEO audit: authorship, titles, share cards (heycatch)
+
+- **Named author on every article.** New `src/lib/platform-author.ts` + `/author/anthony-bedford` page (bio, links to his articles, guides and news, `ProfilePage`/`Person` JSON-LD; added to the sitemap route). Blog, news and guide JSON-LD `author` is now a `Person` with a `url` instead of an `Organization`; bylines link to the author page (`rel="author"`); guides gained a byline. DB: `PlatformPost.authorName` "AuthorLoft Team" / "The AuthorLoft Team" → "Anthony Bedford" on all 38 published posts (done via SQL, live immediately). Person `sameAs` is empty until his own profiles are confirmed.
+- **Organization `sameAs`** now lists the company profiles saved under Super Admin → Social links (bare-root placeholders such as `https://www.instagram.com/` are skipped) instead of just the site itself.
+- **Titles in the 30–60 character range.** Shortened the page-own title on `/`, `/features`, `/solutions`, `/pricing`, `/compare`, `/bookstore`, `/guides`, `/contact`, the 11 solution landing pages and the 4 `/compare/*` pages. New `src/lib/seo-title.ts` (`articleTitle`) strips an editor-typed " | AuthorLoft" / " | AuthorLoft Blog" (guides and posts were rendering the brand twice) and shortens over-long article titles at a colon or word break for `<title>` only; H1 and og:title keep the full title.
+- **Share cards:** `og:image` fallback (`/og-home.png`) for articles without a cover image, and for `/gdpr`, `/dmca`, `/compare`, `/us-privacy` (new `layout.tsx`, since that page is a client component).
+
 ## October 20, 2026 — Audit quick wins: pricing cards, FAQ, mobile menu (heycatch)
 
 - **Pricing card copy (DB, live immediately):** `Plan.description` now reads Free "Your first author site, free forever.", Standard "When you start selling direct.", Premium "For authors running a full backlist." `featuredLabel` cleared on Free ("Starter Package") and Premium ("Unlimited Features"); only Standard keeps "Most Popular". Free `featuresJson` gains "Direct digital sales (Stripe) - eBook" so the card matches the comparison table.

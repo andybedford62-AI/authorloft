@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/db";
 import { LegalBanner } from "@/components/marketing/legal-banner";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
+import { getSocialLinks } from "@/lib/social-links";
 
 // AuthorLoft's own Organization / WebSite structured data. Lives here (marketing pages only) rather than in the
 // root layout, which also wraps every author site and was declaring each author page part of AuthorLoft's WebSite.
 const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
-const orgJsonLd = {
+const buildOrgJsonLd = (sameAs: string[]) => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "AuthorLoft",
@@ -14,8 +15,19 @@ const orgJsonLd = {
   logo: `${PLATFORM_URL}/authorloft-logo.png`,
   description:
     "The all-in-one platform for independent authors. Sell books directly, grow your newsletter, and showcase your work — no coding required.",
-  sameAs: [PLATFORM_URL],
-};
+  sameAs,
+});
+
+// sameAs lists only the company profiles saved under Super Admin → Social links. A bare site root
+// (e.g. "https://www.instagram.com/") is a placeholder, not a profile, so it is left out.
+function isProfileUrl(raw: string): boolean {
+  try {
+    const u = new URL(raw);
+    return u.pathname.replace(/\/+$/, "") !== "" || u.search !== "";
+  } catch {
+    return false;
+  }
+}
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
@@ -41,6 +53,9 @@ export default async function MarketingLayout({ children }: { children: React.Re
 
   const privacyUpdatedAt = settings?.privacyUpdatedAt?.toISOString() ?? null;
   const termsUpdatedAt   = settings?.termsUpdatedAt?.toISOString()   ?? null;
+
+  const profileUrls = (await getSocialLinks()).map((l) => l.url).filter(isProfileUrl);
+  const orgJsonLd = buildOrgJsonLd(profileUrls);
 
   return (
     <>

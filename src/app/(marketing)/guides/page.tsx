@@ -14,7 +14,7 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("guides");
   return {
-    title: "Author Guides — Learn to Own Your Author Business",
+    title: "Guides: Learn to Own Your Author Business",
     description: "In-depth guides on author websites, direct book sales, newsletters, ARCs, branding, and everything independent authors need to succeed.",
     alternates: {
       canonical: "/guides",

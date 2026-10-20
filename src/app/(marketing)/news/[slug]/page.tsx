@@ -7,6 +7,8 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { Clock, ArrowLeft, ArrowRight, FileDown } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
+import { articleTitle } from "@/lib/seo-title";
+import { PLATFORM_AUTHOR, articleAuthorLd, isPlatformAuthor } from "@/lib/platform-author";
 
 export const dynamic = "force-dynamic";
 
@@ -24,14 +26,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const metaDesc  = post.metaDescription || post.excerpt || undefined;
 
   return {
-    title:       metaTitle,
+    title:       articleTitle(metaTitle),
     description: metaDesc,
     alternates:  { canonical: `${BASE}/news/${post.slug}` },
     openGraph: {
       type:          "article",
       title:         metaTitle,
       description:   metaDesc,
-      images:        post.coverImageUrl ? [{ url: post.coverImageUrl }] : undefined,
+      images:        [{ url: post.coverImageUrl || "/og-home.png" }],
       publishedTime: post.publishedAt?.toISOString(),
       authors:       [post.authorName],
       ...(post.category && { section: post.category }),
@@ -41,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card:        "summary_large_image",
       title:       metaTitle,
       description: metaDesc,
-      images:      post.coverImageUrl ? [post.coverImageUrl] : undefined,
+      images:      [post.coverImageUrl || "/og-home.png"],
     },
   };
 }
@@ -66,7 +68,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
     image:              post.coverImageUrl || undefined,
     datePublished:      post.publishedAt?.toISOString(),
     dateModified:       post.updatedAt.toISOString(),
-    author:             { "@type": "Organization", name: post.authorName },
+    author:             articleAuthorLd(post.authorName),
     publisher:          { "@type": "Organization", name: "AuthorLoft", url: BASE, logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
     mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/news/${post.slug}` },
     speakable:          { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
@@ -143,7 +145,14 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
           <div className="w-8 h-8 rounded-full bg-[#d6a94a] flex items-center justify-center text-[#16233d] text-sm font-serif font-normal">
             {post.authorName[0]}
           </div>
-          <span className="text-sm text-[#93a0bc]">by <strong className="text-[#f3ecdb] font-medium">{post.authorName}</strong></span>
+          <span className="text-sm text-[#93a0bc]">
+            by{" "}
+            {isPlatformAuthor(post.authorName) ? (
+              <Link href={`/author/${PLATFORM_AUTHOR.slug}`} rel="author" className="text-[#f3ecdb] font-medium hover:text-[#d6a94a] transition-colors">{post.authorName}</Link>
+            ) : (
+              <strong className="text-[#f3ecdb] font-medium">{post.authorName}</strong>
+            )}
+          </span>
         </div>
 
         {/* Content */}

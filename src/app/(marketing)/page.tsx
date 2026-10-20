@@ -20,19 +20,19 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Your Books. Your Courses. Your Music. Your Business.",
+    title: "Your Books. Your Courses. Your Music.",
     description:
       "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
+      title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
       description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Your Books. Your Courses. Your Music. Your Business. | AuthorLoft",
+      title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
       description: "Website, email newsletter, direct book sales, reader analytics, media kits, and pre-orders — everything creators need to run their business, all in one platform. Free to start.",
       images:      [ogImage],
     },
@@ -103,7 +103,7 @@ const PLATFORM_URL = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "
 const webPageLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "AuthorLoft: Your Books. Your Courses. Your Music. Your Business.",
+  name: "AuthorLoft: Your Books. Your Courses. Your Music.",
   url: PLATFORM_URL,
   description:
     "Own your creative business with AuthorLoft. Direct sales for books, courses, and music, audience analytics, newsletter capture, and every tool to grow, all on one platform, free to start.",

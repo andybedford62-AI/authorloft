@@ -9,15 +9,17 @@ export const revalidate = 3600;
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Compare AuthorLoft — Books, Courses & Music Platforms",
+    title: "Compare AuthorLoft to Other Platforms",
     description:
       "See how AuthorLoft compares to the platforms authors, course creators, and musicians already use — Tertulia, Quilltips, Teachable, Kajabi, Linktree, Bandzoogle, and more.",
     alternates: { canonical: "/compare" },
     openGraph: {
       type: "website",
-      title: "Compare AuthorLoft — Books, Courses & Music Platforms",
+      title: "Compare AuthorLoft to Other Platforms",
       description: "How AuthorLoft stacks up against the platforms authors, course creators, and musicians already use, category by category.",
+      images: ["/og-home.png"],
     },
+    twitter: { card: "summary_large_image", images: ["/og-home.png"] },
   };
 }
 

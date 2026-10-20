@@ -14,7 +14,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("pricing");
   return {
-    title: "Pricing — Free for Authors, Musicians & Course Creators",
+    title: "Pricing: Free for Authors & Creators",
     description:
       "Start free forever. Upgrade to Standard ($9.99/mo) for direct sales and custom domains, or Premium ($39.99/mo) for full analytics. No credit card required.",
     alternates: { canonical: "/pricing" },

@@ -37,7 +37,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
   bookfunnel: {
     slug: "bookfunnel",
     name: "BookFunnel",
-    metaTitle: "AuthorLoft vs BookFunnel: Features, Sales & Pricing Compared",
+    metaTitle: "AuthorLoft vs BookFunnel Compared",
     metaDescription:
       "AuthorLoft vs BookFunnel for indie authors: a full author website plus direct ebook, audiobook and print sales, newsletters and reader magnets — compared.",
     subtitle:
@@ -99,7 +99,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
   storyorigin: {
     slug: "storyorigin",
     name: "StoryOrigin",
-    metaTitle: "AuthorLoft vs StoryOrigin: Website, Direct Sales & Marketing",
+    metaTitle: "AuthorLoft vs StoryOrigin Compared",
     metaDescription:
       "AuthorLoft vs StoryOrigin for authors: a full website and storefront selling ebooks, audiobooks and print direct vs newsletter swaps and reader magnets.",
     subtitle:
@@ -159,7 +159,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
   tertulia: {
     slug: "tertulia",
     name: "Tertulia",
-    metaTitle: "AuthorLoft vs Tertulia: Author Website & Direct Sales",
+    metaTitle: "AuthorLoft vs Tertulia Compared",
     metaDescription:
       "AuthorLoft vs Tertulia for authors: build a website that sells ebooks, audiobooks and print direct vs a reader discovery app with a basic author site.",
     subtitle:
@@ -217,7 +217,7 @@ export const COMPARISONS: Record<string, ComparisonData> = {
   quilltips: {
     slug: "quilltips",
     name: "Quilltips",
-    metaTitle: "AuthorLoft vs Quilltips: Author Website, Sales & Tipping",
+    metaTitle: "AuthorLoft vs Quilltips Compared",
     metaDescription:
       "AuthorLoft vs Quilltips for authors: a full author website with direct ebook, audiobook and print sales vs tip-jar book pages and QR codes for readers.",
     subtitle:

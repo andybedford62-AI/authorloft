@@ -114,6 +114,8 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     entries.push({ loc: `${base}/guides/${g.slug}`, lastmod: g.updatedAt, changefreq: "monthly", priority: 0.7 });
   }
 
+  entries.push({ loc: `${base}/author/anthony-bedford`, lastmod: now, changefreq: "monthly", priority: 0.6 });
+
   entries.push({ loc: `${base}/resources`, lastmod: now, changefreq: "monthly", priority: 0.7 });
   for (const d of resourceDownloads) {
     entries.push({ loc: `${base}/resources/${d.slug}`, lastmod: d.updatedAt, changefreq: "monthly", priority: 0.65 });

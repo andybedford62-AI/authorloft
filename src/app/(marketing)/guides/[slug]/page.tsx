@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
+import { articleTitle } from "@/lib/seo-title";
+import { PLATFORM_AUTHOR, articleAuthorLd } from "@/lib/platform-author";
 
 export const dynamic = "force-dynamic";
 
@@ -35,22 +37,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const metaDesc = guide.metaDescription || guide.excerpt || undefined;
 
   return {
-    title: metaTitle,
+    title: articleTitle(metaTitle),
     description: metaDesc,
     alternates: { canonical: `${BASE}/guides/${guide.slug}` },
     openGraph: {
       type: "article",
       title: metaTitle,
       description: metaDesc,
-      images: guide.coverImageUrl ? [{ url: guide.coverImageUrl }] : undefined,
-      authors: ["AuthorLoft"],
+      images: [{ url: guide.coverImageUrl || "/og-home.png" }],
+      authors: [PLATFORM_AUTHOR.name],
       ...(guide.focusKeyword && { tags: [guide.focusKeyword] }),
     },
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
       description: metaDesc,
-      images: guide.coverImageUrl ? [guide.coverImageUrl] : undefined,
+      images: [guide.coverImageUrl || "/og-home.png"],
     },
   };
 }
@@ -95,7 +97,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
     image:              guide.coverImageUrl || undefined,
     datePublished:      guide.publishedAt?.toISOString(),
     dateModified:       guide.updatedAt.toISOString(),
-    author:             { "@type": "Organization", name: "AuthorLoft" },
+    author:             articleAuthorLd(PLATFORM_AUTHOR.name),
     publisher:          { "@type": "Organization", name: "AuthorLoft", url: BASE, logo: { "@type": "ImageObject", url: `${BASE}/authorloft-logo.png` } },
     mainEntityOfPage:   { "@type": "WebPage", "@id": `${BASE}/guides/${guide.slug}` },
     speakable:          { "@type": "SpeakableSpecification", cssSelector: ["h1", ".rich-content"] },
@@ -148,6 +150,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         <h1 className="font-serif italic text-4xl sm:text-5xl font-normal text-[#f3ecdb] leading-tight mb-6">
           {guide.title}
         </h1>
+
+        {/* Byline */}
+        <p className="text-sm text-[#93a0bc] mb-6">
+          by{" "}
+          <Link href={`/author/${PLATFORM_AUTHOR.slug}`} rel="author" className="text-[#f3ecdb] font-medium hover:text-[#d6a94a] transition-colors">{PLATFORM_AUTHOR.name}</Link>
+        </p>
 
         {/* Excerpt */}
         {guide.excerpt && (

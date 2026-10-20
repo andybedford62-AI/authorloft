@@ -13,19 +13,19 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("features");
   return {
-    title: "Solutions — Every Way AuthorLoft Grows Your Author Business",
+    title: "Solutions to Grow Your Author Business",
     description:
       `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups: your platform, selling and growth, marketing and tools, readers and analytics, and music. Browse by category, or compare every feature side-by-side.`,
     alternates: { canonical: "/solutions" },
     openGraph: {
       type: "website",
-      title: "Solutions — Every Way AuthorLoft Grows Your Author Business",
+      title: "Solutions to Grow Your Author Business",
       description: `${SOLUTION_PAGE_COUNT} tools across ${SOLUTION_CATEGORIES.length} groups, built for independent authors, musicians, and creators.`,
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft Solutions" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Solutions — Every Way AuthorLoft Grows Your Author Business",
+      title: "Solutions to Grow Your Author Business",
       images: [ogImage],
     },
   };
