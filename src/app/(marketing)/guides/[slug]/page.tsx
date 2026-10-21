@@ -155,6 +155,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         <p className="text-sm text-[#93a0bc] mb-6">
           by{" "}
           <Link href={`/author/${PLATFORM_AUTHOR.slug}`} rel="author" className="text-[#f3ecdb] font-medium hover:text-[#d6a94a] transition-colors">{PLATFORM_AUTHOR.name}</Link>
+          {" · "}AI-assisted draft, reviewed by {PLATFORM_AUTHOR.name}
+          {" · "}
+          <Link href="/about#how-we-write" className="text-[#d6a94a] hover:underline">How we write</Link>
         </p>
 
         {/* Excerpt */}

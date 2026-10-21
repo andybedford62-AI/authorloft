@@ -120,6 +120,15 @@ export default async function AboutPage() {
           </p>
         </section>
 
+        <section id="how-we-write" className="mb-12 scroll-mt-24">
+          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">How we write and review articles</h2>
+          <p className="text-[#c7cede]">
+            I write and review every article, guide and news post on AuthorLoft. An AI assistant
+            (Claude, from Anthropic) produces first drafts, and I read and approve each one before
+            it is published. No article goes live without that review.
+          </p>
+        </section>
+
         <section className="flex flex-wrap gap-4">
           <Link
             href="/register"

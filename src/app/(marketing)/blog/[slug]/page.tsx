@@ -173,6 +173,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             ) : (
               <strong className="text-[#f3ecdb] font-medium">{post.authorName}</strong>
             )}
+            {isPlatformAuthor(post.authorName) && (
+              <>
+                {" · "}AI-assisted draft, reviewed by {PLATFORM_AUTHOR.name}
+                {" · "}
+                <Link href="/about#how-we-write" className="text-[#d6a94a] hover:underline">How we write</Link>
+              </>
+            )}
           </span>
         </div>
 
