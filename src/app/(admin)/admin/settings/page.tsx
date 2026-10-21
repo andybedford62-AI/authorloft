@@ -382,6 +382,20 @@ function StripeConnectSection() {
           <p className="text-xs text-gray-400">
             Account ID: <span className="font-mono">{status.accountId}</span>
           </p>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            <strong>Taxes:</strong> you are the seller of record for your sales. Sales tax or VAT is added
+            at checkout only if you&apos;ve turned on{" "}
+            <a
+              href="https://docs.stripe.com/tax/set-up"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Stripe Tax
+            </a>{" "}
+            in your own Stripe account. If you haven&apos;t, no tax is collected and you&apos;re responsible
+            for any tax you owe.
+          </p>
           {status.connectType === "standard" ? (
             <a
               href="https://dashboard.stripe.com"
@@ -495,6 +509,10 @@ function StripeConnectSection() {
               <li className="flex items-start gap-2">
                 <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
                 <span><strong>Sometimes:</strong> a photo of your driver&apos;s licence or passport — Stripe will ask only if needed</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span><strong>Sales tax / VAT (your responsibility):</strong> AuthorLoft can add tax at checkout only if you turn on Stripe Tax in your Stripe account after connecting. You are responsible for the taxes on your sales.</span>
               </li>
             </ul>
             <p className="mt-3 text-xs text-gray-500 italic">

@@ -561,6 +561,11 @@ export function DirectSalesItems({
             Payments go directly to your connected Stripe account. AuthorLoft takes{" "}
             <strong>no platform fee</strong>; Stripe&apos;s standard processing fee applies.
           </p>
+          <p className="text-blue-600 mt-1">
+            You are the seller of record. Sales tax or VAT is added at checkout only if you&apos;ve turned
+            on Stripe Tax in your Stripe dashboard; otherwise no tax is collected and you&apos;re
+            responsible for any tax you owe.
+          </p>
           <p className="text-blue-600 font-medium mt-1">
             Make sure <em>Direct Sales</em> is enabled in the Book Details section above.
           </p>
