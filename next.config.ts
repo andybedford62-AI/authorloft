@@ -112,6 +112,32 @@ const nextConfig: NextConfig = {
         destination: "/guides/what-is-an-arc-program",
         permanent: true,
       },
+      // Oct 2026 SEO audit, thin-page merges: three guides absorb five shorter ones.
+      {
+        source: "/guides/author-website-mistakes",
+        destination: "/guides/author-website-homepage-checklist",
+        permanent: true,
+      },
+      {
+        source: "/guides/best-author-website-examples",
+        destination: "/guides/author-website-homepage-checklist",
+        permanent: true,
+      },
+      {
+        source: "/guides/getting-started-guide",
+        destination: "/guides/what-is-authorloft",
+        permanent: true,
+      },
+      {
+        source: "/guides/welcome-email-sequence-for-authors",
+        destination: "/guides/building-your-first-author-email-list",
+        permanent: true,
+      },
+      {
+        source: "/guides/reader-magnets-explained",
+        destination: "/guides/building-your-first-author-email-list",
+        permanent: true,
+      },
     ];
   },
   async rewrites() {
