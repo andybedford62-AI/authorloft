@@ -54,7 +54,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
           {/* Banner image — subject weighted right, calm space left. object-contain
               shows the full image (no cropping); navy bg fills the remaining space. */}
           {backgroundImage && (
-            <Image src={backgroundImage} alt={backgroundImageAlt ?? ""} aria-hidden={backgroundImageAlt ? undefined : true} fill priority={!!backgroundVideo} className="object-cover" style={{ objectPosition: backgroundPosition }} />
+            <Image src={backgroundImage} alt={backgroundImageAlt ?? ""} aria-hidden={backgroundImageAlt ? undefined : true} width={1920} height={640} sizes="100vw" priority={!!backgroundVideo} className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: backgroundPosition }} />
           )}
           {backgroundVideo && (
             <video

@@ -234,11 +234,11 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <p className="text-sm font-mono uppercase tracking-widest text-[#d6a94a] mb-3">
             &middot; {guide.ctaTitle || "Ready to start your business?"} &middot;
           </p>
-          <h2 className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
+          <p className="font-serif italic text-2xl text-[#f3ecdb] font-normal mb-4">
             {guide.ctaDescription || <>Own your author business <span className="italic text-[#d6a94a]">starting today</span></>}
-          </h2>
+          </p>
           <p className="text-sm text-[#93a0bc] mb-6 max-w-sm mx-auto">
-            Keep 100 % of every sale and own every reader relationship — no middleman.
+            Sell books from your own site and keep every reader&apos;s email address.
           </p>
           <Link
             href={guide.ctaButtonUrl || "/register"}
