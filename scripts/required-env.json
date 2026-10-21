@@ -14,6 +14,7 @@
 
     { "name": "STRIPE_SECRET_KEY", "purpose": "Stripe server-side key — checkout + subscriptions" },
     { "name": "STRIPE_WEBHOOK_SECRET", "purpose": "Stripe webhook signing secret — /api/stripe/webhook" },
+    { "name": "STRIPE_CONNECT_WEBHOOK_SECRET", "purpose": "Signing secret of the Stripe webhook endpoint set to 'Listen to events on Connected accounts' (same URL, /api/stripe/webhook). Without it, direct-charge sales on authors' own Stripe accounts never complete: no order confirmation, no download email." },
     { "name": "STRIPE_STANDARD_PRICE_ID", "purpose": "Stripe price ID for the Standard plan" },
     { "name": "STRIPE_PREMIUM_PRICE_ID", "purpose": "Stripe price ID for the Premium plan" },
 
@@ -44,7 +45,7 @@
 
     { "name": "STRIPE_EARLY_BIRD_COUPON_MONTHLY", "purpose": "Founding-member coupon ID (monthly plans)" },
     { "name": "STRIPE_EARLY_BIRD_COUPON_ANNUAL", "purpose": "Founding-member coupon ID (annual plans)" },
-    { "name": "PLATFORM_FEE_PERCENT", "purpose": "Override default Stripe Connect platform fee % (defaults to 0 — AuthorLoft takes no cut, matching the \"zero platform fees\" claim across the site)" },
+    { "name": "PLATFORM_FEE_PERCENT", "purpose": "Override default platform fee % taken as the application fee on author sales (defaults to 0 — AuthorLoft takes no cut, matching the \"zero platform fees\" claim across the site)" },
 
     { "name": "POSTHOG_PERSONAL_API_KEY", "purpose": "PostHog server-side API key — analytics queries" },
     { "name": "POSTHOG_PROJECT_ID", "purpose": "PostHog project ID — analytics queries" },

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/lib/use-toast";
 import { HelpTip } from "@/components/admin/help-tip";
 import { slugify } from "@/lib/utils";
+import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -304,12 +305,17 @@ function StripeConnectSection() {
   const [status, setStatus] = useState<{
     status: "not_connected" | "pending" | "active";
     accountId?: string;
+    country?: string;
+    connectType?: "standard" | "express";
     chargesEnabled?: boolean;
     payoutsEnabled?: boolean;
     requirementsDue?: string[];
   } | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState("");
+  // null = author hasn't touched the picker; fall back to the existing account's country, then US
+  const [pickedCountry, setPickedCountry] = useState<string | null>(null);
+  const country = pickedCountry ?? status?.country ?? "US";
 
   useEffect(() => {
     fetch("/api/admin/stripe/connect/status")
@@ -318,11 +324,18 @@ function StripeConnectSection() {
       .catch(() => setStatus({ status: "not_connected" }));
   }, []);
 
-  async function handleConnect() {
+  // withCountry=false reopens an existing account without touching its country
+  async function handleConnect(withCountry = true) {
     setConnectError("");
     setConnecting(true);
     try {
-      const res = await fetch("/api/admin/stripe/connect", { method: "POST" });
+      const res = await fetch("/api/admin/stripe/connect", {
+        method: "POST",
+        ...(withCountry && {
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ country }),
+        }),
+      });
       const data = await res.json();
       if (!res.ok) {
         setConnectError(data.error || "Could not start Stripe Connect. Please try again.");
@@ -369,15 +382,27 @@ function StripeConnectSection() {
           <p className="text-xs text-gray-400">
             Account ID: <span className="font-mono">{status.accountId}</span>
           </p>
-          <button
-            type="button"
-            onClick={handleConnect}
-            disabled={connecting}
-            className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
-          >
-            <ExternalLink className="h-3 w-3" />
-            {connecting ? "Opening Stripe…" : "Manage payout settings in Stripe"}
-          </button>
+          {status.connectType === "standard" ? (
+            <a
+              href="https://dashboard.stripe.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Open your Stripe dashboard (payouts, refunds, tax settings)
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleConnect(false)}
+              disabled={connecting}
+              className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {connecting ? "Opening Stripe…" : "Manage payout settings in Stripe"}
+            </button>
+          )}
         </div>
       ) : status.status === "pending" ? (
         /* ── Account created but onboarding incomplete ───────────────────── */
@@ -391,11 +416,22 @@ function StripeConnectSection() {
               </p>
             </div>
           </div>
-          <Button onClick={handleConnect} disabled={connecting}>
+          {status.connectType !== "standard" && (
+            <>
+              <StripeCountrySelect value={country} onChange={setPickedCountry} />
+              <p className="text-xs text-gray-400">
+                Pick the country where your bank account is, then continue — we&apos;ll restart setup in the right country.
+              </p>
+            </>
+          )}
+          <Button onClick={() => handleConnect()} disabled={connecting}>
             {connecting
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Continue Stripe setup →"}
           </Button>
+          {connectError && (
+            <p className="text-sm text-red-600">{connectError}</p>
+          )}
           <p className="text-xs text-gray-500">
             Not sure what&apos;s missing? Open your{" "}
             <a
@@ -418,8 +454,10 @@ function StripeConnectSection() {
             <p className="text-blue-700 text-xs leading-relaxed">
               Stripe is the company that handles card payments and sends the money to your bank.
               This is <strong>separate</strong> from your AuthorLoft subscription — you don&apos;t need
-              it to use the platform, only if you want to sell books directly. Setup takes about
-              5–10 minutes and Stripe walks you through every screen.
+              it to use the platform, only if you want to sell books directly. You&apos;ll create
+              (or sign in to) your <strong>own Stripe account</strong>, so sales go straight to you and
+              Stripe handles your payouts. Setup takes about 5–10 minutes and Stripe walks you through
+              every screen.
             </p>
             <p className="text-blue-700 text-xs leading-relaxed">
               When a reader buys, <strong>90% goes straight to your bank</strong> and AuthorLoft
@@ -447,7 +485,7 @@ function StripeConnectSection() {
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span><strong>Bank account info</strong> — routing &amp; account number (US) or sort code &amp; account number (UK/EU)</span>
+                <span><strong>Bank account info</strong> — routing &amp; account number (US), sort code &amp; account number (UK), or IBAN (EU)</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-3.5 w-3.5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -463,7 +501,8 @@ function StripeConnectSection() {
             </p>
           </details>
 
-          <Button onClick={handleConnect} disabled={connecting}>
+          <StripeCountrySelect value={country} onChange={setPickedCountry} />
+          <Button onClick={() => handleConnect()} disabled={connecting}>
             {connecting
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Opening Stripe…</>
               : "Connect Stripe account →"}

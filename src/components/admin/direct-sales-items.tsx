@@ -9,6 +9,7 @@ import { HelpTip } from "@/components/admin/help-tip";
 import { IconButton } from "@/components/admin/icon-button";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/use-toast";
+import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
 
 // ── Format config ─────────────────────────────────────────────────────────────
 
@@ -305,6 +306,8 @@ export function DirectSalesItems({
   // Stripe Connect
   const [connectLoading, setConnectLoading] = useState(false);
   const [connectError, setConnectError] = useState("");
+  // "" = untouched: fine if an account already exists, otherwise the server asks for a country
+  const [connectCountry, setConnectCountry] = useState("");
 
   // Toggle error (shown inline above the item list)
   const [toggleError, setToggleError] = useState("");
@@ -441,7 +444,13 @@ export function DirectSalesItems({
     setConnectError("");
     setConnectLoading(true);
     try {
-      const res = await fetch("/api/admin/stripe/connect", { method: "POST" });
+      const res = await fetch("/api/admin/stripe/connect", {
+        method: "POST",
+        ...(connectCountry && {
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ country: connectCountry }),
+        }),
+      });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
@@ -515,6 +524,13 @@ export function DirectSalesItems({
               <strong>10% platform fee</strong> per sale. A paid edition stays hidden from readers
               until Stripe is connected.
             </p>
+            <div className="mt-3">
+              <StripeCountrySelect
+                value={connectCountry}
+                onChange={setConnectCountry}
+                placeholder="Select your country…"
+              />
+            </div>
             {connectError && <p className="text-red-600 mt-2 text-xs">{connectError}</p>}
             <button
               type="button"

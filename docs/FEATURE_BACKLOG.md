@@ -291,6 +291,14 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 
 ---
 
+## Payments & Payouts (Stripe)
+
+- **Authors outside Stripe's supported countries** can't take direct sales. Options: PayPal Commerce/Payouts as a fallback, or Stripe Global Payouts (needs separate legal/compliance review if AuthorLoft holds funds). Gauge demand first.
+- **Per-author currency.** Checkout is hard-coded to USD; a non-USD Stripe account converts at the author's cost. Present in the author's currency.
+- **Refund the application fee.** If a platform fee is ever set, Stripe doesn't refund it when the author refunds from their own dashboard; needs a `refund_application_fee` flow or webhook handling.
+- **Fee copy vs. config.** Settings/help say "10% platform fee" but `PLATFORM_FEE_PERCENT` defaults to 0 and `required-env.json` says "zero platform fees" — pick one and make them match.
+- **Stripe Tax onboarding nudge** for Standard authors (without it, no tax is collected on their sales).
+
 ## Legal & Compliance
 
 From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist. Items 1–5 are covered (18+ confirmation at signup, self-hosted fonts, consent-gated PostHog, unsubscribe link + postal address in platform emails, renewal terms beside the Stripe Subscribe button). Open:

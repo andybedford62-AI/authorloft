@@ -204,8 +204,9 @@ model Author {
   stripeCustomerId              String?
   stripeSubscriptionId          String?
   assignedCouponId              String? // Stripe coupon ID assigned by super-admin, auto-applied at next checkout
-  stripeConnectAccountId        String? // Stripe Express connected account ID (acct_xxx)
+  stripeConnectAccountId        String? // Stripe connected account ID (acct_xxx)
   stripeConnectOnboarded        Boolean               @default(false) // true once onboarding is complete
+  stripeConnectType             String? // "standard" = author's own Stripe account, direct charges; null = legacy Express, destination charges
   planId                        String?
   plan                          Plan?                 @relation(fields: [planId], references: [id])
   isActive                      Boolean               @default(true)

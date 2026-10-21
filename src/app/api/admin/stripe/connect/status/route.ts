@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     const author = await prisma.author.findUnique({
       where: { id: authorId },
-      select: { stripeConnectAccountId: true, stripeConnectOnboarded: true },
+      select: { stripeConnectAccountId: true, stripeConnectOnboarded: true, stripeConnectType: true },
     });
 
     if (!author?.stripeConnectAccountId) {
@@ -38,6 +38,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         status: onboarded ? "active" : "pending",
         accountId: author.stripeConnectAccountId,
+        country: account.country,
+        connectType: author.stripeConnectType ?? "express",
         chargesEnabled: account.charges_enabled,
         payoutsEnabled: account.payouts_enabled,
         requirementsDue: account.requirements?.currently_due ?? [],
@@ -47,6 +49,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         status: author.stripeConnectOnboarded ? "active" : "pending",
         accountId: author.stripeConnectAccountId,
+        connectType: author.stripeConnectType ?? "express",
       });
     }
   } catch (err: any) {

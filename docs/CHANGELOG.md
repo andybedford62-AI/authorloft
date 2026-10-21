@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## October 21, 2026 — Stripe payouts for authors in any Stripe country (direct to the author)
+
+- **Authors now connect their own Stripe account (Standard) and sales are direct charges.** A Cyprus author could only pick the US: `/api/admin/stripe/connect` created every Express account with no `country`, so Stripe defaulted it to the US platform's country, and a US platform can't pay out cross-border to most countries. Authors now choose the country of their bank account (`stripe-country-select.tsx`, in Settings → Stripe Payouts and the Direct Sales "Connect Stripe" banner) and get a Standard account in that country, so AuthorLoft never holds their money and any country Stripe supports for businesses works. Stripe collects its own processing fee from the author's account and charges neither the platform nor the author a Connect fee for Standard accounts. The country can't be changed once the account exists, so the API refuses to create one without it.
+- **Checkout** (`src/lib/stripe-connect.ts`, used by both session creators in `/api/checkout`): Standard authors get a direct charge (`stripeAccount` request option, optional `application_fee_amount` from `PLATFORM_FEE_PERCENT`); legacy Express authors keep destination charges. Automatic tax is only switched on when the author's own account has Stripe Tax active (checked per checkout) — otherwise Checkout would fail; authors without it collect no sales tax/VAT.
+- **Webhook** accepts a second signing secret (`STRIPE_CONNECT_WEBHOOK_SECRET`, new **required** env var) for a Stripe endpoint set to "events on connected accounts", same URL. Events from an author's own account are only trusted to complete that author's own book/bundle/course order — they control that account, so they could otherwise forge e.g. a `plan_subscription` session.
+- **DB:** `Author.stripeConnectType` (`"standard"`; null = legacy Express). Applied to Supabase before the push. At the time, 2 authors had a Stripe account and none had finished onboarding, so nobody is on the legacy flow in practice.
+- An unfinished legacy Express account is deleted and replaced by a Standard one when the author picks their country. Also fixed: Stripe's `refresh_url` hit `/api/admin/stripe/connect` with GET, which only had POST (expired onboarding links dead-ended); added a GET that issues a fresh link.
+
+---
+
 ## October 20, 2026 — SEO audit: authorship, titles, share cards (heycatch)
 
 - **Named author on every article.** New `src/lib/platform-author.ts` + `/author/anthony-bedford` page (bio, links to his articles, guides and news, `ProfilePage`/`Person` JSON-LD; added to the sitemap route). Blog, news and guide JSON-LD `author` is now a `Person` with a `url` instead of an `Organization`; bylines link to the author page (`rel="author"`); guides gained a byline. DB: `PlatformPost.authorName` "AuthorLoft Team" / "The AuthorLoft Team" → "Anthony Bedford" on all 38 published posts (done via SQL, live immediately). Person `sameAs` is empty until his own profiles are confirmed.

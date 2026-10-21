@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
+import { getConnectCheckoutConfig } from "@/lib/stripe-connect";
 import { calcDiscount } from "@/lib/discount-queries";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
               slug: true,
               stripeConnectAccountId: true,
               stripeConnectOnboarded: true,
+              stripeConnectType: true,
               plan: { select: { coursesEnabled: true } },
             },
           },
@@ -134,13 +136,13 @@ export async function POST(req: NextRequest) {
       const cancelUrl = `${baseUrl}/courses/${course.slug}`;
       const feePct = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "0") / 100;
       const platformFeeCents = Math.round(totalCents * feePct);
-      const useConnect = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
+      const connect = await getConnectCheckoutConfig(author, platformFeeCents);
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
         billing_address_collection: "required",
-        automatic_tax: { enabled: true },
+        automatic_tax: { enabled: connect.automaticTax },
         line_items: [{
           price_data: {
             currency: "usd",
@@ -160,13 +162,8 @@ export async function POST(req: NextRequest) {
         },
         success_url: successUrl,
         cancel_url: cancelUrl,
-        ...(useConnect && {
-          payment_intent_data: {
-            application_fee_amount: platformFeeCents,
-            transfer_data: { destination: author.stripeConnectAccountId! },
-          },
-        }),
-      });
+        ...(connect.paymentIntentData && { payment_intent_data: connect.paymentIntentData }),
+      }, connect.requestOptions);
 
       await prisma.order.create({
         data: {
@@ -211,7 +208,7 @@ export async function POST(req: NextRequest) {
         where: { id: validatedBody.bundleId },
         include: {
           items: { include: { saleItem: { select: { id: true } } }, orderBy: { sortOrder: "asc" } },
-          author: { select: { id: true, slug: true, stripeConnectAccountId: true, stripeConnectOnboarded: true, plan: { select: { bundlesEnabled: true } } } },
+          author: { select: { id: true, slug: true, stripeConnectAccountId: true, stripeConnectOnboarded: true, stripeConnectType: true, plan: { select: { bundlesEnabled: true } } } },
         },
       });
 
@@ -250,6 +247,7 @@ export async function POST(req: NextRequest) {
                 slug: true,
                 stripeConnectAccountId: true,
                 stripeConnectOnboarded: true,
+                stripeConnectType: true,
               },
             },
           },
@@ -409,7 +407,7 @@ export async function POST(req: NextRequest) {
 
     const feePct           = parseFloat(process.env.PLATFORM_FEE_PERCENT ?? "0") / 100;
     const platformFeeCents = Math.round(totalCents * feePct);
-    const useConnect       = !!author.stripeConnectAccountId && author.stripeConnectOnboarded;
+    const connect          = await getConnectCheckoutConfig(author, platformFeeCents);
 
     // Build Stripe line items
     const stripeLineItems = bundleRecord
@@ -443,7 +441,7 @@ export async function POST(req: NextRequest) {
       payment_method_types:     ["card"],
       mode:                     "payment",
       billing_address_collection: "required",
-      automatic_tax:            { enabled: true },
+      automatic_tax:            { enabled: connect.automaticTax },
       line_items:               stripeLineItems,
       metadata: {
         type:        bundleRecord ? "bundle_purchase" : "book_purchase",
@@ -460,13 +458,8 @@ export async function POST(req: NextRequest) {
       },
       success_url: successUrl,
       cancel_url:  cancelUrl,
-      ...(useConnect && {
-        payment_intent_data: {
-          application_fee_amount: platformFeeCents,
-          transfer_data: { destination: author.stripeConnectAccountId! },
-        },
-      }),
-    });
+      ...(connect.paymentIntentData && { payment_intent_data: connect.paymentIntentData }),
+    }, connect.requestOptions);
 
     // Create PENDING order with all items
     await prisma.order.create({

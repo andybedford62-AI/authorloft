@@ -58,14 +58,21 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature")!;
 
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
+  // Two Stripe endpoints point here, each with its own signing secret: the platform
+  // account (plans, destination charges) and "events on connected accounts" (direct
+  // charges on authors' own Stripe accounts).
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_CONNECT_WEBHOOK_SECRET]
+    .filter((s): s is string => !!s);
+  let event: ReturnType<typeof stripe.webhooks.constructEvent> | undefined;
+  for (const secret of secrets) {
+    try {
+      event = stripe.webhooks.constructEvent(body, sig, secret);
+      break;
+    } catch {
+      // try the next secret
+    }
+  }
+  if (!event) {
     return NextResponse.json({ error: "Invalid webhook signature." }, { status: 400 });
   }
 
@@ -75,6 +82,22 @@ export async function POST(req: NextRequest) {
   } catch {
     // Unique constraint violation = already processed
     return NextResponse.json({ received: true });
+  }
+
+  // Events from an author's own Stripe account (event.account is set) are only
+  // trusted to complete a sale of that author's. The author controls that account,
+  // so they could otherwise forge e.g. a plan_subscription session for themselves.
+  if (event.account) {
+    const connectSession = event.data.object as any;
+    const purchaseTypes = ["book_purchase", "bundle_purchase", "course_purchase"];
+    const ownOrder =
+      event.type === "checkout.session.completed" && purchaseTypes.includes(connectSession.metadata?.type)
+        ? await prisma.order.findFirst({
+            where: { stripeSessionId: connectSession.id, author: { stripeConnectAccountId: event.account } },
+            select: { id: true },
+          })
+        : null;
+    if (!ownOrder) return NextResponse.json({ received: true });
   }
 
   switch (event.type) {
