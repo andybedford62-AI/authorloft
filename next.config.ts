@@ -13,7 +13,7 @@ const ContentSecurityPolicy = [
   // Next.js App Router requires unsafe-inline + unsafe-eval for hydration scripts
   // Google Ads (gtag.js) conversion tracking — googletagmanager.com loads gtag.js itself;
   // googleads.g.doubleclick.net loads a separate view-through-conversion script
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://in.heycatch.ai",
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
   // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
@@ -22,7 +22,7 @@ const ContentSecurityPolicy = [
   // Supabase storage uploads are initiated from the browser directly
   // Google Ads (gtag.js) beacon/conversion calls, incl. ad.doubleclick.net which
   // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host)
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net",
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://in.heycatch.ai",
   // Stripe 3D Secure and payment frames.
   // Plus the video/music hosts extractVideoEmbed() (course lessons) and
   // resolveTrackLink() (music pages) rewrite author-supplied URLs to. Without
@@ -58,6 +58,13 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
   async redirects() {
     return [
+      // HeyCatch channel attribution: single-character paths (/a-/z, /0-/9) carry the
+      // short-link code into utm params. No real route uses a one-character path.
+      {
+        source: "/:l([a-z0-9])",
+        destination: "/?utm_source=heycatch&utm_campaign=:l",
+        permanent: false,
+      },
       // These two blog posts duplicated existing Guide articles on the exact
       // same topic (confirmed via Search Console — Google was declining to
       // index the blog versions). Posts unpublished in the CMS; redirect

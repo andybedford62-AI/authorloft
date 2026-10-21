@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminSessionProvider } from "@/components/admin/session-provider";
+import { HeyCatchIdentity } from "@/components/admin/heycatch-identity";
 import { ToastProvider } from "@/components/toast-provider";
 import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
 import { RenewalReminderBanner } from "@/components/admin/renewal-reminder-banner";
@@ -78,6 +79,15 @@ export default async function AdminLayout({
   return (
     <AdminSessionProvider>
       <ToastProvider />
+      {/* Never identify as the impersonated author — that would attribute the super admin's activity to them */}
+      {!impersonatedId && (
+        <HeyCatchIdentity
+          id={sessionAuthorId}
+          email={session.user.email}
+          name={authorName}
+          plan={planTier}
+        />
+      )}
       <div
         data-admin-theme={adminTheme}
         className="flex min-h-screen flex-col"

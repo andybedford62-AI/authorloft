@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { analytics } from "@heycatch/sdk";
 import { useEffect, useState } from "react";
 import {
   ExternalLink,
@@ -459,7 +460,7 @@ export function AdminSidebar({
           </Link>
           <button
             className={cn("flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full", t.signout)}
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => { analytics.resetIdentity(); signOut({ callbackUrl: "/" }); }}
           >
             <LogOut className="h-4 w-4" />
             Sign Out

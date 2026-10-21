@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { analytics } from "@heycatch/sdk";
 import Link from "next/link";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
@@ -115,7 +116,7 @@ export default function AcceptTermsPage() {
             If you do not agree, you can{" "}
             <button
               type="button"
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => { analytics.resetIdentity(); signOut({ callbackUrl: "/login" }); }}
               className="text-red-500 hover:underline"
             >
               sign out

@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## October 21, 2026 — HeyCatch analytics installed
+
+- **HeyCatch SDK (`@heycatch/sdk`) added**, initialised in `src/instrumentation-client.ts` (autocapture of pageviews/clicks). Server events from the Stripe webhook: `book_sale_completed`, `bundle_sale_completed`, `course_sale_completed` (attributed to the selling author), `subscription_started`, `subscription_canceled`. `setIdentity` runs from the admin layout (skipped while impersonating); `resetIdentity` on every sign-out button.
+- **CSP** now allows `https://in.heycatch.ai` in `script-src` and `connect-src`. Single-character paths (`/a`–`/z`, `/0`–`/9`) redirect to `/?utm_source=heycatch&utm_campaign=<char>` for HeyCatch channel attribution.
+- HeyCatch init is not gated on the analytics consent banner (PostHog is). Check against the /gdpr and /us-privacy wording before promoting to prod.
+
 ## October 21, 2026 — Stripe payouts for authors in any Stripe country (direct to the author)
 
 - **Authors now connect their own Stripe account (Standard) and sales are direct charges.** A Cyprus author could only pick the US: `/api/admin/stripe/connect` created every Express account with no `country`, so Stripe defaulted it to the US platform's country, and a US platform can't pay out cross-border to most countries. Authors now choose the country of their bank account (`stripe-country-select.tsx`, in Settings → Stripe Payouts and the Direct Sales "Connect Stripe" banner) and get a Standard account in that country, so AuthorLoft never holds their money and any country Stripe supports for businesses works. Stripe collects its own processing fee from the author's account and charges neither the platform nor the author a Connect fee for Standard accounts. The country can't be changed once the account exists, so the API refuses to create one without it.

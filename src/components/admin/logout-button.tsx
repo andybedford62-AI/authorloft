@@ -1,12 +1,13 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { analytics } from "@heycatch/sdk";
 import { LogOut } from "lucide-react";
 
 export function LogoutButton() {
   return (
     <button
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={() => { analytics.resetIdentity(); signOut({ callbackUrl: "/" }); }}
       className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors"
       title="Sign out"
     >

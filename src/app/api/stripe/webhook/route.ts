@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { capturePostHog } from "@/lib/posthog";
+import { analytics } from "@heycatch/sdk";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
 import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 import { reconcileAuthor } from "@/lib/plan-downgrade";
+
+analytics.init({ projectKey: "hck_pk_o2i_fmXp33LBPS7Uxg7-bNUyqe3035U5" });
 
 /**
  * Starts/clears the plan-downgrade grace period and restores plan-hidden content
@@ -127,6 +130,13 @@ export async function POST(req: NextRequest) {
               stripePaymentIntentId: session.payment_intent,
             },
           });
+
+          // Attributed to the selling author — buyers have no account of their own
+          await analytics.trackEvent(
+            "book_sale_completed",
+            { total_cents: order.totalCents },
+            { userId: order.authorId },
+          );
 
           // Increment discount code usage count if one was applied
           if (order.discountCodeId) {
@@ -304,6 +314,13 @@ export async function POST(req: NextRequest) {
             data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
           });
 
+          // Attributed to the selling author — buyers have no account of their own
+          await analytics.trackEvent(
+            "bundle_sale_completed",
+            { total_cents: order.totalCents },
+            { userId: order.authorId },
+          );
+
           // Increment discount code usage count if one was applied
           if (order.discountCodeId) {
             await prisma.discountCode.update({
@@ -409,6 +426,13 @@ export async function POST(req: NextRequest) {
             where: { id: order.id },
             data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
           });
+
+          // Attributed to the selling author — buyers have no account of their own
+          await analytics.trackEvent(
+            "course_sale_completed",
+            { total_cents: order.totalCents },
+            { userId: order.authorId },
+          );
 
           // Increment discount code usage count if one was applied
           if (order.discountCodeId) {
@@ -552,6 +576,11 @@ export async function POST(req: NextRequest) {
                 plan:     planRecord?.name ?? "paid",
                 interval,
               });
+              await analytics.trackEvent(
+                "subscription_started",
+                { plan: planRecord?.name ?? "paid", interval },
+                { userId: authorId },
+              );
 
               if (authorRecord && planRecord) {
                 const amountCents = interval === "annual"
@@ -591,6 +620,9 @@ export async function POST(req: NextRequest) {
       });
       await Promise.all(affected.map((a) => revertThemeOnDowngrade(a.id, "FREE")));
       await reconcilePlanChange(affected.map((a) => a.id));
+      for (const a of affected) {
+        await analytics.trackEvent("subscription_canceled", {}, { userId: a.id });
+      }
       break;
     }
 
