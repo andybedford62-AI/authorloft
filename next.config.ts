@@ -79,6 +79,39 @@ const nextConfig: NextConfig = {
         destination: "/guides/what-is-direct-book-selling",
         permanent: true,
       },
+      // Oct 2026 SEO audit: near-duplicate and thin pages folded into the stronger
+      // page on the same topic. Each is unpublished in the CMS; these redirects
+      // keep old links and indexed URLs working.
+      {
+        source: "/blog/author-branding",
+        destination: "/guides/what-is-author-branding",
+        permanent: true,
+      },
+      {
+        source: "/blog/direct-sales-for-authors",
+        destination: "/guides/what-is-direct-book-selling",
+        permanent: true,
+      },
+      {
+        source: "/guides/direct-sales-vs-amazon",
+        destination: "/guides/what-is-direct-book-selling",
+        permanent: true,
+      },
+      {
+        source: "/guides/why-every-author-needs-a-website",
+        destination: "/guides/what-is-an-author-website",
+        permanent: true,
+      },
+      {
+        source: "/news/whats-new-june-2026",
+        destination: "/news/june-mid-month-update-2026",
+        permanent: true,
+      },
+      {
+        source: "/guides/what-is-an-arc",
+        destination: "/guides/what-is-an-arc-program",
+        permanent: true,
+      },
     ];
   },
   async rewrites() {
