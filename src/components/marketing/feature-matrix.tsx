@@ -109,6 +109,14 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "AuthorLoft platform fee on direct sales (Stripe's own processing fee still applies)",
+          tiers: {
+            FREE: free?.salesEnabled ? "0%" : "—",
+            STANDARD: standard?.salesEnabled ? "0%" : "—",
+            PREMIUM: premium?.salesEnabled ? "0%" : "—",
+          },
+        },
+        {
           name: "Format & Price Picker on book pages (price per format, stores per format)",
           tiers: { FREE: "✓", STANDARD: "✓", PREMIUM: "✓" },
         },

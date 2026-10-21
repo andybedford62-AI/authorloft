@@ -154,10 +154,10 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     ],
     faqs: [
       { q: "What payment processor do you use?", a: "AuthorLoft uses Stripe Connect. You connect your own Stripe account, and payments go directly to you. AuthorLoft never touches your money." },
-      { q: "What percentage does AuthorLoft take?", a: "Zero. AuthorLoft does not take a cut of your sales. You keep 100% of the revenue minus standard Stripe processing fees (typically 2.9% + 30¢ per transaction)." },
+      { q: "What percentage does AuthorLoft take?", a: "Zero. AuthorLoft does not take a cut of your sales. You keep 100% of the revenue minus standard Stripe processing fees (for US cards, typically 2.9% + 30¢ per transaction; rates vary by country)." },
       { q: "Can I still list my books on Amazon and other retailers?", a: "Absolutely. You can add retailer links (Amazon, Kobo, Barnes & Noble, etc.) alongside your direct sales. Many authors do both — direct sales for maximum revenue, retailers for maximum reach." },
       { q: "How do readers get their ebooks after purchase?", a: "Readers receive an instant download link after checkout. Files are delivered securely — readers can download immediately." },
-      { q: "Which plan do I need to sell books?", a: "Direct sales require the Standard plan ($9.99/month) or Premium plan ($39.99/month). The Free plan lets you list books with retailer links but not process direct sales." },
+      { q: "Which plan do I need to sell books?", a: "Every plan, including Free, can sell eBooks directly through Stripe. Standard ($9.99/month) adds Print editions, bundles and more, and Premium ($39.99/month) adds Audio and Flipbook editions." },
     ],
     relatedGuideSlug: "what-is-direct-book-selling",
     relatedGuideSlugs: ["direct-sales-vs-amazon", "accepting-payments-author-website-stripe", "ebooks-vs-signed-print-copies", "choosing-book-formats"],
@@ -487,7 +487,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       },
     ],
     faqs: [
-      { q: "Is the bookstore listing free?", a: "Bookstore listing is included on Standard and Premium plans. Free plan authors can list their books with external retailer links but direct sales require a paid plan." },
+      { q: "Is the bookstore listing free?", a: "Yes. The AuthorLoft Bookstore listing is included on every plan, including Free. Free plan authors can sell eBooks directly and link to other retailers; Print, Audio and bundles need Standard or Premium." },
       { q: "Do I control how my books appear?", a: "Yes. Your book's title, cover, description, and genre are pulled from your book catalog. Update them in your admin dashboard and the bookstore listing updates automatically." },
       { q: "Can readers buy books directly from the bookstore?", a: "The bookstore links to your book page on your author site, where readers can purchase directly from you (if you have direct sales enabled) or click through to retailer links." },
       { q: "How are 'trending' books determined?", a: "Trending is based on book page views. The more readers visit your book page, the higher it appears in the trending section." },

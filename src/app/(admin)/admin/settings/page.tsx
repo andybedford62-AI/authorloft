@@ -359,7 +359,7 @@ function StripeConnectSection() {
           <HelpTip id="stripe-connect" />
         </h2>
         <p className="text-xs text-gray-400 mt-1">
-          Connect your Stripe account to receive direct sales revenue. A 10% platform fee applies per sale.
+          Connect your own Stripe account to receive direct sales revenue. AuthorLoft takes no cut of your sales; Stripe&apos;s standard processing fees apply.
         </p>
       </div>
 
@@ -460,8 +460,9 @@ function StripeConnectSection() {
               every screen.
             </p>
             <p className="text-blue-700 text-xs leading-relaxed">
-              When a reader buys, <strong>90% goes straight to your bank</strong> and AuthorLoft
-              keeps a 10% platform fee. No invoices, no manual transfers.
+              When a reader buys, the money goes <strong>straight to your Stripe account</strong> and
+              then to your bank. AuthorLoft takes <strong>no platform fee</strong>; Stripe&apos;s standard
+              processing fee for your country applies. No invoices, no manual transfers.
             </p>
             <p className="pt-1">
               <a

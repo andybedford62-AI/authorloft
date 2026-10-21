@@ -296,7 +296,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 - **Authors outside Stripe's supported countries** can't take direct sales. Options: PayPal Commerce/Payouts as a fallback, or Stripe Global Payouts (needs separate legal/compliance review if AuthorLoft holds funds). Gauge demand first.
 - **Per-author currency.** Checkout is hard-coded to USD; a non-USD Stripe account converts at the author's cost. Present in the author's currency.
 - **Refund the application fee.** If a platform fee is ever set, Stripe doesn't refund it when the author refunds from their own dashboard; needs a `refund_application_fee` flow or webhook handling.
-- **Fee copy vs. config.** Settings/help say "10% platform fee" but `PLATFORM_FEE_PERCENT` defaults to 0 and `required-env.json` says "zero platform fees" — pick one and make them match.
+- **Tiered platform fee (idea, not planned).** Possible later: e.g. Free 10% / Standard 5% / Premium 0%. Decided 0% on every plan for now. If ever introduced it applies to **new subscribers only**; founding and existing members are never changed. Needs a per-plan fee column read at checkout, a way to grandfather accounts, Terms of Service fee wording, handling of refunding the application fee (Stripe doesn't do it when the author refunds from their own dashboard), and a rewrite of the "zero platform fee" claims across the site. Break-even maths: Free 10% vs Standard $9.99 + 5% is about $200/month in sales; Standard vs Premium $39.99 is about $600/month. Pull paid orders by plan tier first to see whether it's worth it.
 - **Stripe Tax onboarding nudge** for Standard authors (without it, no tax is collected on their sales).
 
 ## Legal & Compliance

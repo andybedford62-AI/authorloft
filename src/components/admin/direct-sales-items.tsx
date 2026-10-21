@@ -520,9 +520,9 @@ export function DirectSalesItems({
             <p className="font-medium text-violet-900">Connect Stripe to sell paid editions</p>
             <p className="text-violet-700 mt-1">
               Free Reader Magnets work without it. To charge for an edition, connect your Stripe
-              account — payments land in your own account instantly and AuthorLoft retains a{" "}
-              <strong>10% platform fee</strong> per sale. A paid edition stays hidden from readers
-              until Stripe is connected.
+              account — payments land directly in your own Stripe account and AuthorLoft takes{" "}
+              <strong>no platform fee</strong> (Stripe&apos;s standard processing fee applies). A paid
+              edition stays hidden from readers until Stripe is connected.
             </p>
             <div className="mt-3">
               <StripeCountrySelect
@@ -558,8 +558,8 @@ export function DirectSalesItems({
             buyers receive a secure download link after payment.
           </p>
           <p className="text-blue-600 mt-1">
-            Payments go directly to your connected Stripe account. AuthorLoft retains a{" "}
-            <strong>10% platform fee</strong> per sale.
+            Payments go directly to your connected Stripe account. AuthorLoft takes{" "}
+            <strong>no platform fee</strong>; Stripe&apos;s standard processing fee applies.
           </p>
           <p className="text-blue-600 font-medium mt-1">
             Make sure <em>Direct Sales</em> is enabled in the Book Details section above.
