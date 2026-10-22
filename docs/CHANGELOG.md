@@ -25,6 +25,7 @@ line rather than listing every commit.
 - **Speed (D5.4, partial):** hero card stack mounts a card only once it is shown or next, not all 8 at first paint. Edge caching NOT done — the homepage reads the session, which makes it dynamic.
 - **Mobile (D2.5):** pricing quick-comparison table scrolls instead of clipping the Premium column at 375px; footer links and social icons get taller tap targets.
 - **`/compare` Music tab:** rebuilt against Suno, Udio, Donna, Spotify and Bandcamp (was Linktree, Feature.fm, Bandzoogle, Beacons). AuthorLoft shown honestly as link-only: No on hosting audio, AI music and auto-posting to social; Yes on own website, albums/playlists, link-out, share kit and AI promo posts. Competitor cells come from official help pages and App Store listings (Donna, Udio) read Oct 22 2026; re-check before editing. Data in `src/lib/compare-hub-data.ts`.
+- **Homepage copy follow-ups (D2.B, D1.3, D3.3):** new "Probably not the right fit if…" block above pricing (marketplace, hosted audio, newsletter-only); the Course Creators card now tells the book-then-course job ("Sold the book? Offer the course next…"); founder note gets a "See what I've shipped lately →" link to `/news`. Founder block also links Anthony's personal LinkedIn profile (footer keeps the company page).
 - **Not done:** print fulfillment copy (needs the real flow, TODO in `landing-page-data.tsx`).
 
 ## October 21, 2026 — SEO audit fixes (heycatch audit, 84/100)

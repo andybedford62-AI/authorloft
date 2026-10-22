@@ -243,6 +243,9 @@ export default async function HomePage() {
       {/* ── Newsletter mid-page ───────────────────────────────────────── */}
       <NewsletterMidSection />
 
+      {/* ── Who it's not for (D2.B scope honesty) ────────────────────── */}
+      <NotForSection />
+
       {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
       <section style={{ background: VAULT.surf, borderTop: `1px solid ${VAULT.line}`, borderBottom: `1px solid ${VAULT.line}`, padding: '64px 28px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -296,7 +299,7 @@ function BuiltForSection() {
   const SERIF = VAULT.fontDisplay;
   const cards: { icon: typeof Music; label: string; copy: string; href?: string }[] = [
     { icon: BookOpen,      label: "Authors",         copy: "Sell eBooks, audiobooks, and print, direct to readers." },
-    { icon: GraduationCap, label: "Course Creators",  copy: "Turn what you know into a paid course, hosted on your own site." },
+    { icon: GraduationCap, label: "Course Creators",  copy: "Sold the book? Offer the course next, on the same site, to the readers already on your list." },
     { icon: Music,         label: "Musicians",        copy: "Share playlists and albums that link straight to your music — no cut taken.", href: "/for-musicians" },
   ];
   return (
@@ -517,6 +520,12 @@ function FounderNoteSection({
             See my site →
           </a>
         )}
+        <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, marginLeft: siteUrl ? 24 : 0, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
+          See what I&apos;ve shipped lately →
+        </Link>
+        <a href="https://www.linkedin.com/in/anthonybedford/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, marginLeft: 24, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
+          Find me on LinkedIn →
+        </a>
       </div>
     </section>
   );
@@ -612,6 +621,27 @@ function NewPlatformSection() {
         <p style={{ marginTop: 24, fontSize: '0.9rem' }}>
           <Link href="/news" style={{ color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>See what we&apos;ve shipped lately →</Link>
         </p>
+      </div>
+    </section>
+  );
+}
+
+function NotForSection() {
+  const items = [
+    'You want a marketplace that sends you readers. AuthorLoft gives you the storefront and the list; you bring the audience.',
+    'You want your audio files hosted and streamed here. Music on AuthorLoft is links to where it already lives.',
+    'You only need a newsletter tool and nothing else.',
+  ];
+  return (
+    <section style={{ background: VAULT.bg, borderTop: `1px solid ${VAULT.line}`, padding: '56px 28px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, margin: '0 0 14px' }}>Honest fit check</p>
+        <h2 style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(1.6rem, 2.6vw, 2.2rem)', fontWeight: 600, lineHeight: 1.15, fontStyle: 'italic', color: VAULT.ink, margin: '0 0 20px', letterSpacing: '-0.01em' }}>
+          Probably not the right fit if&hellip;
+        </h2>
+        <ul style={{ margin: 0, paddingLeft: 20, color: VAULT.mute, fontSize: '1rem', lineHeight: 1.7 }}>
+          {items.map((t) => (<li key={t} style={{ marginBottom: 8 }}>{t}</li>))}
+        </ul>
       </div>
     </section>
   );
