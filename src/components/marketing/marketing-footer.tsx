@@ -61,7 +61,7 @@ export async function MarketingFooter() {
               <span key={label} className="inline-flex items-center">
                 <Link
                   href={href}
-                  className="text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors px-2.5 font-vault-display"
+                  className="text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors px-2.5 py-3 sm:py-0 font-vault-display"
                   {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
                   {label}
@@ -90,7 +90,7 @@ export async function MarketingFooter() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={link.platform}
-                    className="text-vault-cream-mute opacity-60 hover:opacity-100 transition-opacity"
+                    className="text-vault-cream-mute opacity-60 hover:opacity-100 transition-opacity p-3 -m-3 sm:p-0 sm:m-0"
                   >
                     <Icon className="h-4 w-4" />
                   </a>

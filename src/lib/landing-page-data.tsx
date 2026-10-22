@@ -117,6 +117,11 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     heroTitle: <>Sell books directly and <span className="italic text-vault-gold">keep every dollar</span></>,
     heroSubtitle: "No marketplace fees, no middleman. Sell ebooks, print books, and audiobooks straight to your readers.",
     intro: "Every sale through Amazon, Kobo, or another retailer costs you 30–65% in fees. With AuthorLoft, you sell directly to your readers and keep 100% of the revenue (minus standard payment processing). Your books, your prices, your customers — no middleman.",
+    // TODO(Andy) — heycatch audit FIT "Explain the print fulfillment flow": add a section
+    // here (and a one-line note under the Standard/Premium pricing cards) answering who
+    // prints, who ships, what it costs, and what the author does. Not written yet on
+    // purpose: the checkout code collects no shipping address, so the real flow has to
+    // come from you before it is published.
     sections: [
       {
         title: "Multiple formats, one storefront",

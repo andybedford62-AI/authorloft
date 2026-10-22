@@ -252,6 +252,24 @@ Manual (non-metric) status flag shipped Aug 9, 2026 — `Author.isFoundingMember
 
 ---
 
+### For tomorrow (Oct 21, 2026) — heycatch audit follow-ups
+
+Two heycatch audits ran Oct 20: the site audit (D1–D5) and the SEO audit (79/100). Quick wins, authorship, titles, share cards, headings, meta descriptions and `/about` are shipped to prod (see `docs/CHANGELOG.md`). **First step: re-run both audits and compare against the "was" values** (site audit D1 20/25, D4.3 4.5/5, D4.2 3/4, D2.5 3/4, D3.3 3/4; SEO audit a_author_schema 3.0, a_author_page 2.0, a_sameas 2.0, c_title 1.5, c_social_cards 0.4, c_meta_description 0.4, c_hierarchy 0.3 points open).
+
+- [ ] **External sources on articles (a_external_sources, 3.8 pts, biggest open item)** — 33 articles need 2+ links to real primary sources (official docs, studies). Draft candidate sources per article for Andy to approve; never invent links.
+- [ ] **Article text edits in small reviewed batches (5–10 at a time)** — c_thin (35 pages under 800 words: extend, merge or redirect), c_question_headings (69), g_sentence_length (88), g_self_contained (30). Not a mass rewrite.
+- [ ] **Repetitive article structure (a_ai_slop, 1.0)** — change how articles are produced (drop the fixed H2 count / mandatory FAQ / takeaways template); Andy hand-edits 10–20 pieces. Andy's call.
+- [ ] **Investigate image dimensions and format (c_image_dimensions 1.0, c_image_format 1.0)** — `next/image` `fill` images carry no width/height (fixed-size boxes, no layout shift); likely a checker limitation. Decide whether to convert hero/cover `fill` images or leave.
+- [ ] **g_structured_data on site pages (0.3)** — Organization + WebSite JSON-LD already on every marketing page; check one page in Google's Rich Results Test to see what the checker wants.
+- [ ] **Server response time (site audit D5.4)** — measured ~0.7–1.5 s on prod Oct 20 (audit saw 6–9 s). Marketing pages are `no-store` / cache MISS; if the re-run still flags speed, static/ISR the marketing pages (needs care: nav is sign-in aware).
+- [ ] **Homepage edge caching (heycatch D5.4, Oct 22 2026)** — audit measured 1.8–2.8 s server response on home/pricing/features. Homepage calls `getServerSession` + `cookies()`, so it is dynamic and cannot be cached. Fix = move the `isAuthor` nav state client-side so the page can be static/ISR. Hero card stack already trimmed.
+- [ ] **Print fulfillment explainer (heycatch FIT, Oct 22 2026)** — `/sell-books-directly` section + note under Standard/Premium cards: who prints, who ships, cost, what the author does. Checkout collects no shipping address today, so decide the real flow first. TODO marker in `landing-page-data.tsx`.
+- [ ] **Fill the proof surfaces (heycatch D3.2/D3.5, Oct 22 2026)** — homepage customer-testimonials section is built and hidden until non-founder `Testimonial` rows exist; add real SaaSHub URL to `src/lib/third-party-proof.ts`.
+- [ ] **`/about` "coming next" roadmap** — deliberately left out; Andy decides what to promise publicly.
+- [ ] **Testimonials, third-party proof strip, courses/music launch-job copy (site audit D3.1/D3.2, D3.5, D1.3)** — need real quotes + photos, a real outside signal (Product Hunt/review/press), and Andy picking which live courses/playlists to feature.
+- [ ] **Check company vs personal profiles** — X (`@AndyBedford0406`) and Instagram (`andybedford62`) were added to company social links / Organization `sameAs`; swap for company accounts if those are personal.
+- [ ] **Spot-check prod after the Oct 20 promotion** — founder photo crop, heading levels on `/pricing` and `/blog`, article descriptions, an article that had its own H1 in the body.
+
 ## Analytics & Consent
 
 Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors who click **Accept** on the consent banner are counted (PostHog), so author stats undercount. Get legal sign-off before changing consent behaviour — `/gdpr` promises "no tracking cookies without your consent … banner shown on your first visit where required".

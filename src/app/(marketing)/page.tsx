@@ -14,26 +14,27 @@ import { getFoundingOfferCopy } from "@/lib/founding-offer";
 import { getDemoSiteUrl } from "@/lib/demo-site";
 import { sanitize } from "@/lib/sanitize";
 import { VAULT } from "@/components/marketing/vault-theme";
+import { THIRD_PARTY_PROOF } from "@/lib/third-party-proof";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
   return {
-    title: "Your Books. Your Courses. Your Music.",
+    title: "Sell Books Direct from Your Own Author Website",
     description:
-      "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
+      "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
-      title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
-      description: "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
+      title:       "Sell Books Direct from Your Own Author Website | AuthorLoft",
+      description: "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
-      title:       "Your Books. Your Courses. Your Music. | AuthorLoft",
-      description: "Author website, email newsletter, direct book sales, reader analytics and pre-orders in one platform for authors, course creators and musicians. Free to start.",
+      title:       "Sell Books Direct from Your Own Author Website | AuthorLoft",
+      description: "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
       images:      [ogImage],
     },
   };
@@ -60,7 +61,7 @@ async function getTestimonials() {
   return prisma.testimonial.findMany({
     where: { isActive: true },
     orderBy: { displayOrder: "asc" },
-    take: 3,
+    take: 6,
     select: { id: true, authorName: true, authorRole: true, quote: true, rating: true, image: true },
   }).catch(() => []);
 }
@@ -234,6 +235,9 @@ export default async function HomePage() {
       {/* ── Product preview (real screenshots, not mockups) ───────────── */}
       <ProductPreviewSection />
 
+      {/* ── Third-party proof + shipped-work link (D3.5) ─────────────── */}
+      <ProofStrip />
+
       {/* ── Founder note (dynamic from DB — swap back to
           AuthorShowcaseSection + MidnightTestimonialsSection once
           there are 2+ real, independent customer testimonials) ────── */}
@@ -242,6 +246,14 @@ export default async function HomePage() {
         author={showcaseAuthors[0]}
         platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
       />
+
+      {/* ── Other authors, in their own words (D3.2). testimonials[0] is the
+          founder note above; this only renders once real non-founder
+          testimonials exist in the DB (Super Admin → Testimonials). ──── */}
+      <CustomerProofSection testimonials={testimonials.slice(1)} />
+
+      {/* ── "Very new platform" objection (D1.4) ─────────────────────── */}
+      <NewPlatformSection />
 
       {/* ── Newsletter mid-page ───────────────────────────────────────── */}
       <NewsletterMidSection />
@@ -375,7 +387,7 @@ function WhatChangesSection() {
             Here&apos;s exactly what you get back.
           </h2>
           <p style={{ fontSize: '1.0625rem', color: VAULT.mute, maxWidth: 560, margin: 0, lineHeight: 1.72 }}>
-            Here's what's actually different from the moment you switch, without the vague promises.
+            Every sale through someone else&apos;s platform is someone you&apos;ll never hear from again. You don&apos;t get their name, their email, or a way to reach them next time. Here&apos;s what&apos;s actually different from the moment you switch.
           </p>
         </div>
         <div className="rdh-cmp-table">
@@ -520,6 +532,101 @@ function FounderNoteSection({
             See my site →
           </a>
         )}
+      </div>
+    </section>
+  );
+}
+
+function ProofStrip() {
+  return (
+    <section style={{ background: VAULT.bg, borderBottom: `1px solid ${VAULT.line}`, padding: '28px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '12px 28px', fontSize: '0.9rem' }}>
+        {THIRD_PARTY_PROOF.length > 0 && (
+          <>
+            <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: VAULT.mute }}>Find us on</span>
+            {THIRD_PARTY_PROOF.map((p) => (
+              <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ color: VAULT.ink, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                {p.label}{p.note ? ` · ${p.note}` : ''}
+              </a>
+            ))}
+            <span aria-hidden style={{ color: VAULT.line }}>|</span>
+          </>
+        )}
+        <Link href="/news" style={{ color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>
+          See what we&apos;ve shipped lately →
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function CustomerProofSection({
+  testimonials,
+}: {
+  testimonials: { id: string; authorName: string; authorRole: string | null; quote: string; image: string | null }[];
+}) {
+  if (testimonials.length === 0) return null;
+  return (
+    <section style={{ background: VAULT.bg, borderTop: `1px solid ${VAULT.line}`, padding: '64px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, margin: '0 0 14px' }}>From authors using it</p>
+        <h2 style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: VAULT.ink, margin: '0 0 32px', letterSpacing: '-0.01em' }}>
+          Other authors, in their own words.
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+          {testimonials.map((t) => (
+            <figure key={t.id} style={{ margin: 0, padding: 24, borderRadius: 14, border: `1px solid ${VAULT.line}`, background: VAULT.surf }}>
+              <blockquote
+                style={{ margin: '0 0 20px', fontSize: '1rem', lineHeight: 1.6, color: VAULT.ink }}
+                dangerouslySetInnerHTML={{ __html: `“${sanitize(t.quote)}”` }}
+              />
+              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {t.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={t.image} alt={`${t.authorName}`} width={44} height={44} loading="lazy" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                )}
+                <span>
+                  <span style={{ display: 'block', fontWeight: 600, fontSize: 14, color: VAULT.ink }}>{t.authorName}</span>
+                  {t.authorRole && <span style={{ display: 'block', fontSize: 13, color: VAULT.mute }}>{t.authorRole}</span>}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NewPlatformSection() {
+  const points = [
+    { head: 'Build it all before you pay.', body: 'The Free plan needs no credit card, so you can set up your site and see it working first.' },
+    { head: '30-day money-back guarantee.', body: 'On your first paid payment, if Standard or Premium is not for you.' },
+    { head: 'Your readers stay yours.', body: 'Your email list is exportable anytime, and nobody can rent it back to you.' },
+    { head: 'Sales go straight to you.', body: 'You connect your own Stripe account, so payments reach you directly and we take no cut.' },
+    { head: 'Cancel and keep your work.', body: 'If you cancel, your account moves to the Free plan and your content is kept.' },
+  ];
+  return (
+    <section style={{ background: VAULT.surf, borderTop: `1px solid ${VAULT.line}`, padding: '64px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, margin: '0 0 14px' }}>Is it safe to start here?</p>
+        <h2 style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: VAULT.ink, margin: '0 0 12px', letterSpacing: '-0.01em' }}>
+          AuthorLoft is a new platform. Here&apos;s what protects you.
+        </h2>
+        <p style={{ color: VAULT.mute, fontSize: '1.0625rem', maxWidth: 600, margin: '0 0 32px', lineHeight: 1.7 }}>
+          You should not have to take our word for it, so these are the terms you can check for yourself.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+          {points.map((p) => (
+            <div key={p.head} style={{ padding: '18px 20px', borderRadius: 12, border: `1px solid ${VAULT.line}`, background: VAULT.bg }}>
+              <p style={{ fontWeight: 600, color: VAULT.ink, margin: '0 0 6px', fontSize: '0.975rem' }}>{p.head}</p>
+              <p style={{ color: VAULT.mute, margin: 0, fontSize: '0.9rem', lineHeight: 1.6 }}>{p.body}</p>
+            </div>
+          ))}
+        </div>
+        <p style={{ marginTop: 24, fontSize: '0.9rem' }}>
+          <Link href="/news" style={{ color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>See what we&apos;ve shipped lately →</Link>
+        </p>
       </div>
     </section>
   );

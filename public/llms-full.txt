@@ -49,7 +49,7 @@ Website: https://www.authorloft.com
 ## Feature Details
 
 ### Direct Sales
-Authors sell ebooks (PDF, EPUB), print books, and audiobooks directly from their AuthorLoft site. Payments are processed through Stripe — the author keeps 100% of the sale price (minus Stripe's standard processing fee). Supports multiple formats per book, custom pricing, and discount codes.
+Authors sell ebooks (PDF, EPUB), print books, and audiobooks directly from their AuthorLoft site. All plans can sell eBooks via Stripe; print, audio and flipbook sales need Standard or Premium. Payments are processed through Stripe — the author keeps 100% of the sale price (minus Stripe's standard processing fee). Supports multiple formats per book, custom pricing, and discount codes.
 
 ### Author Website
 Each author gets a professionally designed website with:

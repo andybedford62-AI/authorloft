@@ -265,40 +265,40 @@ export default async function PricingPage() {
           <p className="text-vault-mute text-sm text-center max-w-xl mx-auto mb-10">
             See what&apos;s included at every level — from free to premium.
           </p>
-          <div className="bg-vault-surf rounded-2xl border border-vault-ink/20 overflow-hidden shadow-lg">
-            <table className="w-full text-sm">
+          <div className="bg-vault-surf rounded-2xl border border-vault-ink/20 overflow-x-auto shadow-lg">
+            <table className="w-full text-sm min-w-[520px]">
               <thead>
                 <tr className="border-b-2 border-vault-ink/20 bg-vault-surf-2">
-                  <th className="text-left px-6 py-4 font-medium text-vault-mute w-1/2">Feature</th>
-                  <th className="text-center px-6 py-4 font-semibold text-vault-ink">Free</th>
-                  <th className="text-center px-6 py-4 font-semibold text-vault-gold">Standard</th>
-                  <th className="text-center px-6 py-4 font-semibold text-vault-gold-light">Premium</th>
+                  <th className="text-left px-3 sm:px-6 py-4 font-medium text-vault-mute w-1/2">Feature</th>
+                  <th className="text-center px-3 sm:px-6 py-4 font-semibold text-vault-ink">Free</th>
+                  <th className="text-center px-3 sm:px-6 py-4 font-semibold text-vault-gold">Standard</th>
+                  <th className="text-center px-3 sm:px-6 py-4 font-semibold text-vault-gold-light">Premium</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-vault-ink/15">
                 {comparisonRows.map(({ label, free, standard, premium }) => (
                   <tr key={label} className="hover:bg-vault-ink/6 transition-colors">
-                    <td className="px-6 py-3.5 text-vault-ink font-medium">{label}</td>
-                    <td className="px-6 py-3.5 text-center text-vault-mute">{free}</td>
-                    <td className="px-6 py-3.5 text-center text-vault-ink bg-vault-gold/[0.07]">{standard}</td>
-                    <td className="px-6 py-3.5 text-center text-vault-ink">{premium}</td>
+                    <td className="px-3 sm:px-6 py-3.5 text-vault-ink font-medium">{label}</td>
+                    <td className="px-3 sm:px-6 py-3.5 text-center text-vault-mute">{free}</td>
+                    <td className="px-3 sm:px-6 py-3.5 text-center text-vault-ink bg-vault-gold/[0.07]">{standard}</td>
+                    <td className="px-3 sm:px-6 py-3.5 text-center text-vault-ink">{premium}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="border-t border-vault-ink/12 bg-vault-surf-2">
-                  <td className="px-6 py-4" />
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-3 sm:px-6 py-4" />
+                  <td className="px-3 sm:px-6 py-4 text-center">
                     <Link href="/register" className="text-sm font-semibold text-vault-gold hover:underline">
                       Get started →
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-center bg-vault-surf-2">
+                  <td className="px-3 sm:px-6 py-4 text-center bg-vault-surf-2">
                     <Link href="/register?plan=standard" className="text-sm font-semibold text-vault-gold hover:underline">
                       Start free → Standard
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-3 sm:px-6 py-4 text-center">
                     <Link href="/register?plan=premium" className="text-sm font-semibold text-vault-gold-light hover:underline">
                       Start free → Premium
                     </Link>

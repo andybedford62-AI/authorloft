@@ -4,10 +4,13 @@ import { useState } from "react";
 import { Check, X, Minus } from "lucide-react";
 import { COMPARE_CATEGORIES, type Cell } from "@/lib/compare-hub-data";
 
+// Icon-only cells have no text in the served HTML, so crawlers and AI assistants
+// saw a table of empty cells. Real (sr-only) text makes every verdict readable
+// without JavaScript (heycatch audit D5.3).
 function CellIcon({ v }: { v: Cell }) {
-  if (v === "yes") return <Check className="h-5 w-5 text-emerald-500 mx-auto" aria-label="Yes" />;
-  if (v === "limited") return <Minus className="h-5 w-5 text-amber-400 mx-auto" aria-label="Limited" />;
-  return <X className="h-5 w-5 text-[#93a0bc] mx-auto" aria-label="No" />;
+  if (v === "yes") return <><Check className="h-5 w-5 text-emerald-500 mx-auto" aria-hidden="true" /><span className="sr-only">Yes</span></>;
+  if (v === "limited") return <><Minus className="h-5 w-5 text-amber-400 mx-auto" aria-hidden="true" /><span className="sr-only">Limited</span></>;
+  return <><X className="h-5 w-5 text-[#93a0bc] mx-auto" aria-hidden="true" /><span className="sr-only">No</span></>;
 }
 
 export function CompareHubTabs() {

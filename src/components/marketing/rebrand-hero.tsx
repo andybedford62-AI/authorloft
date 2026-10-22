@@ -118,18 +118,25 @@ const PAIN_CARDS = [
 
 function PainSolutionCards() {
   const [idx, setIdx] = useState(0);
+  // Only mount a card once it has been shown (or is next up) — 8 stacked cards
+  // used to request every image on first paint (heycatch audit D5.4).
+  const [seen, setSeen] = useState<Set<number>>(() => new Set([0]));
 
   useEffect(() => {
     const timer = setInterval(() => setIdx((i) => (i + 1) % PAIN_CARDS.length), 3000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setSeen((s) => (s.has(idx) ? s : new Set(s).add(idx)));
+  }, [idx]);
+
   return (
     <div className="hidden lg:block relative" style={{ height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ position: 'absolute', inset: '10% -10%', background: `radial-gradient(50% 50% at 50% 50%, ${VAULT.gold}22, transparent 70%)`, filter: 'blur(40px)' }} />
 
       <div style={{ position: 'relative', width: '100%', maxWidth: 540 }}>
-        {PAIN_CARDS.map((card, i) => (
+        {PAIN_CARDS.map((card, i) => (!seen.has(i) && i !== (idx + 1) % PAIN_CARDS.length) ? null : (
           <div key={i} style={{
             position: i === idx ? 'relative' : 'absolute',
             top: 0, left: 0, right: 0,
@@ -278,10 +285,10 @@ export function RebelHero({
   subheadline?: string | null;
   demoUrl?: string | null;
 }) {
-  const line1 = headlineLine1 || "Sell your books direct.";
+  const line1 = headlineLine1 || "Authors: sell your books direct.";
   const line2 = headlineLine2 || "Keep 100% and your reader list.";
   const demoHref = demoUrl || "https://demo.authorloft.com";
-  const sub    = subheadline || "Every sale through someone else's platform is someone you'll never hear from again. You don't get their name, their email, or a way to reach them next time. AuthorLoft gives you your own site, your own audience list, and everything you earn, whether you're selling books, courses, or music. It's free to start and takes about fifteen minutes to launch.";
+  const sub    = subheadline || "Free to start, live in fifteen minutes. Your own site, your own reader list, and everything you earn from your books, courses, or music.";
 
   return (
     <section style={{ position: 'relative', background: VAULT.bg, overflow: 'hidden', minHeight: '56vh' }}>

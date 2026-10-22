@@ -13,6 +13,24 @@ line rather than listing every commit.
 
 ---
 
+## October 22, 2026 — Site audit fixes (heycatch website audit, 76/100)
+
+- **Hero (D1.1, D2.1):** h1 now "Authors: sell your books direct. / Keep 100% and your reader list."; subhead cut to two sentences leading with "Free to start, live in fifteen minutes." The retailer-pain paragraph moved to the "What actually changes" intro. Code fallback in `rebrand-hero.tsx`; live values are `PlatformSettings.heroHeadlineLine1` / `heroSubheadline`, updated by SQL.
+- **Homepage title/meta (D5.1):** "Sell Books Direct from Your Own Author Website | AuthorLoft", description leads with keep-100% and owned-list.
+- **Free-plan selling rule (FIT, D4.3):** one sentence everywhere — "All plans can sell eBooks via Stripe; print, audio and flipbook sales need Standard or Premium." Homepage FAQ row (DB), `llms.txt`, `llms-full.txt`. Pricing card, feature matrix and `/sell-books-directly` FAQ already said this.
+- **Trust (D3.2, D3.5, D1.4):** new homepage sections — customer testimonials (renders only when non-founder `Testimonial` rows exist; none yet), a "new platform, here's what protects you" block built from existing guarantees, and a proof strip linking `/news`. Third-party listings go in `src/lib/third-party-proof.ts` (empty until real URLs exist).
+- **`/compare` hub (D5.3):** icon-only table cells now carry real text (sr-only Yes/No/Limited) so the served HTML has verdicts.
+- **Speed (D5.4, partial):** hero card stack mounts a card only once it is shown or next, not all 8 at first paint. Edge caching NOT done — the homepage reads the session, which makes it dynamic.
+- **Mobile (D2.5):** pricing quick-comparison table scrolls instead of clipping the Premium column at 375px; footer links and social icons get taller tap targets.
+- **Not done:** print fulfillment copy (needs the real flow, TODO in `landing-page-data.tsx`).
+
+## October 21, 2026 — SEO audit fixes (heycatch audit, 84/100)
+
+- **Code:** shared page header background image now has `width`/`height` (`marketing-page-header.tsx`, `c_image_dimensions`). Article closing block on blog and guide pages is a `<p>` with reworded copy, not a repeated H2 (`a_ai_slop`). `/about` has a "How we write and review articles" section (`#how-we-write`), and blog and guide bylines carry an AI-assisted-draft, reviewed-by line (`a_author_diversity`). Commits `7c7dc04b`, `8a9ea2f1`.
+- **Redirects (`next.config.ts`, permanent):** 6 near-duplicate or thin pages (`blog/author-branding`, `blog/direct-sales-for-authors`, `guides/direct-sales-vs-amazon`, `guides/why-every-author-needs-a-website`, `news/whats-new-june-2026`, `guides/what-is-an-arc`) and 5 guides merged into three (`author-website-mistakes` + `best-author-website-examples` -> `author-website-homepage-checklist`; `getting-started-guide` -> `what-is-authorloft`; `welcome-email-sequence-for-authors` + `reader-magnets-explained` -> `building-your-first-author-email-list`). Commits `e8e9c0b7`, `5524d321`. The 11 old pages are unpublished in the CMS.
+- **Content (database, live, no migration):** answer-first openings on 6 guides (`g_answer_first`); 10 pronoun-led sentences rewritten in 4 posts (`g_self_contained`); ARC blog post `seoTitle` set to NULL so it no longer duplicates `/arc-management` (`c_duplicate_titles`); two-link Sources lists on 7 articles (`a_external_sources`); the three merge-target guides rewritten. Old text for every change: `docs/SEO_AUDIT_CONTENT_DRAFTS.md` and `docs/SEO_MERGE_ROLLBACK.md`; merge plan in `docs/SEO_MERGE_PLAN.md`.
+- **Still open:** a second real author or reviewer, original sources for the rest, hand edits to 10-20 articles, sentence length, question-style headings, extending the other thin pages.
+
 ## October 21, 2026 — HeyCatch analytics installed
 
 - **HeyCatch SDK (`@heycatch/sdk`) added**, initialised in `src/instrumentation-client.ts` (autocapture of pageviews/clicks). Server events from the Stripe webhook: `book_sale_completed`, `bundle_sale_completed`, `course_sale_completed` (attributed to the selling author), `subscription_started`, `subscription_canceled`. `setIdentity` runs from the admin layout (skipped while impersonating); `resetIdentity` on every sign-out button.
