@@ -22,6 +22,7 @@ line rather than listing every commit.
 - **`/compare` hub (D5.3):** icon-only table cells now carry real text (sr-only Yes/No/Limited) so the served HTML has verdicts.
 - **Speed (D5.4, partial):** hero card stack mounts a card only once it is shown or next, not all 8 at first paint. Edge caching NOT done — the homepage reads the session, which makes it dynamic.
 - **Mobile (D2.5):** pricing quick-comparison table scrolls instead of clipping the Premium column at 375px; footer links and social icons get taller tap targets.
+- **`/compare` Music tab:** rebuilt against Suno, Udio, Donna, Spotify and Bandcamp (was Linktree, Feature.fm, Bandzoogle, Beacons). AuthorLoft shown honestly as link-only: No on hosting audio, AI music and auto-posting to social; Yes on own website, albums/playlists, link-out, share kit and AI promo posts. Competitor cells come from official help pages and App Store listings (Donna, Udio) read Oct 22 2026; re-check before editing. Data in `src/lib/compare-hub-data.ts`.
 - **Not done:** print fulfillment copy (needs the real flow, TODO in `landing-page-data.tsx`).
 
 ## October 21, 2026 — SEO audit fixes (heycatch audit, 84/100)

@@ -41,7 +41,7 @@ export function CompareHubTabs() {
 
       {/* Comparison table */}
       <div className="overflow-x-auto rounded-xl border border-[#2a3a5c]">
-        <table className="w-full text-sm min-w-[560px]">
+        <table className="w-full text-sm" style={{ minWidth: 220 + (active.competitorNames.length + 1) * 88 }}>
           <thead>
             <tr className="bg-[#1c2b4a]">
               <th className="text-left px-4 py-3 text-[#f3ecdb] font-semibold">Feature</th>
