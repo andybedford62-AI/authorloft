@@ -1,37 +1,13 @@
 import Link from "next/link";
-import { LayoutDashboard } from "lucide-react";
-import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { MarketingMobileMenu } from "@/components/marketing/marketing-mobile-menu";
 import { MarketingNavDropdown } from "@/components/marketing/marketing-nav-dropdown";
 import { MarketingNavSolutions } from "@/components/marketing/marketing-nav-solutions";
-import { VaultButton } from "@/components/marketing/vault";
-
+import { MarketingNavAuthLeft, MarketingNavAuthRight } from "@/components/marketing/marketing-nav-auth";
 
 /** `pricingHref` lets a page point "Pricing" at its own plans (e.g. /for-musicians#plans). */
-export async function MarketingNav({ activePage, pricingHref = "/pricing" }: { activePage?: "pricing"; pricingHref?: string }) {
-  // Reading cookies opts this component into dynamic rendering so the session
-  // is never served from a stale static cache.
-  await cookies();
-
-  const session = await getServerSession(authOptions);
-
-  // Check if the logged-in user is a registered author (any plan)
-  let author: { name: string | null; displayName: string | null } | null = null;
-  if (session?.user) {
-    const userId = (session.user as any).id as string;
-    if (userId) {
-      author = await prisma.author.findUnique({
-        where: { id: userId },
-        select: { name: true, displayName: true },
-      }).catch(() => null);
-    }
-  }
-
-  const displayName = author?.displayName || author?.name || session?.user?.name || "My Account";
-
+// No session or cookie reads here: that made every marketing page dynamic (~2 s). The signed-in
+// bits (name, Dashboard button) render in the browser via MarketingNavAuthLeft/Right.
+export function MarketingNav({ activePage, pricingHref = "/pricing" }: { activePage?: "pricing"; pricingHref?: string }) {
   return (
     <header className="sticky top-0 z-50 bg-vault-surf border-b border-vault-ink/12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
@@ -46,18 +22,7 @@ export async function MarketingNav({ activePage, pricingHref = "/pricing" }: { a
             </svg>
           </Link>
 
-          {author && (
-            <>
-              <span className="hidden sm:block text-vault-ink/20 select-none">|</span>
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-vault-mute">{displayName}</span>
-                <VaultButton href="/admin/dashboard" variant="subtle" size="sm">
-                  <LayoutDashboard className="h-3.5 w-3.5" />
-                  Dashboard
-                </VaultButton>
-              </div>
-            </>
-          )}
+          <MarketingNavAuthLeft />
         </div>
 
         {/* Middle nav links */}
@@ -84,23 +49,8 @@ export async function MarketingNav({ activePage, pricingHref = "/pricing" }: { a
 
         {/* Right CTA + mobile menu */}
         <div className="flex items-center gap-2">
-          {author ? (
-            /* Mobile: show Dashboard button on the right when logo area is too small */
-            <VaultButton href="/admin/dashboard" variant="subtle" size="sm" className="flex sm:hidden">
-              <LayoutDashboard className="h-3.5 w-3.5" />
-              Dashboard
-            </VaultButton>
-          ) : (
-            <>
-              <VaultButton href="/login" variant="secondary" className="hidden sm:inline-flex">
-                Sign in
-              </VaultButton>
-              <VaultButton href="/register" variant="primary" className="hidden sm:inline-flex">
-                Start free →
-              </VaultButton>
-            </>
-          )}
-          <MarketingMobileMenu isAuthor={!!author} pricingHref={pricingHref} />
+          <MarketingNavAuthRight />
+          <MarketingMobileMenu pricingHref={pricingHref} />
         </div>
       </div>
     </header>

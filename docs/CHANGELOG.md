@@ -15,6 +15,8 @@ line rather than listing every commit.
 
 ## October 22, 2026 — Site audit fixes (heycatch website audit, 76/100)
 
+- **Marketing pages now cacheable (D5.4, follow-up):** `MarketingNav` called `cookies()` + `getServerSession`, which made every marketing page dynamic (the audit's 1.8–2.8 s). The nav is now a plain server component; the signed-in name, Dashboard button, mobile-menu CTA and homepage hero nav read state in the browser via `useAuthState` (`use-auth-state.ts`, one request to the new `GET /api/marketing/auth-state`, `private, no-store`). The homepage also drops its own session read, so `revalidate = 60` takes effect. Trade-off: a signed-in author briefly sees Sign in / Start free before it swaps. Blog/guide/news article pages stay `force-dynamic`.
+
 - **Hero (D1.1, D2.1):** h1 now "Authors: sell your books direct. / Keep 100% and your reader list."; subhead cut to two sentences leading with "Free to start, live in fifteen minutes." The retailer-pain paragraph moved to the "What actually changes" intro. Code fallback in `rebrand-hero.tsx`; live values are `PlatformSettings.heroHeadlineLine1` / `heroSubheadline`, updated by SQL.
 - **Homepage title/meta (D5.1):** "Sell Books Direct from Your Own Author Website | AuthorLoft", description leads with keep-100% and owned-list.
 - **Free-plan selling rule (FIT, D4.3):** one sentence everywhere — "All plans can sell eBooks via Stripe; print, audio and flipbook sales need Standard or Premium." Homepage FAQ row (DB), `llms.txt`, `llms-full.txt`. Pricing card, feature matrix and `/sell-books-directly` FAQ already said this.

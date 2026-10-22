@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect, useId } from 'react';
 import { BookOpen, GraduationCap, Music } from 'lucide-react';
 import { MarketingMobileMenu } from '@/components/marketing/marketing-mobile-menu';
+import { useAuthState } from '@/components/marketing/use-auth-state';
 import { VAULT } from '@/components/marketing/vault-theme';
 import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from '@/lib/solution-categories';
 
@@ -273,18 +274,17 @@ function HeroSolutionsDropdown() {
 }
 
 export function RebelHero({
-  isAuthor = false,
   headlineLine1,
   headlineLine2,
   subheadline,
   demoUrl,
 }: {
-  isAuthor?: boolean;
   headlineLine1?: string | null;
   headlineLine2?: string | null;
   subheadline?: string | null;
   demoUrl?: string | null;
 }) {
+  const { isAuthor } = useAuthState();
   const line1 = headlineLine1 || "Authors: sell your books direct.";
   const line2 = headlineLine2 || "Keep 100% and your reader list.";
   const demoHref = demoUrl || "https://demo.authorloft.com";
@@ -341,7 +341,7 @@ export function RebelHero({
             </>
           )}
         </div>
-        <MarketingMobileMenu isAuthor={isAuthor} />
+        <MarketingMobileMenu />
       </nav>
 
       {/* Content grid */}

@@ -4,9 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, GraduationCap, Music } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
-import { authOptions } from "@/lib/auth";
 import { MidnightPricingSection } from "@/components/marketing/midnight-pricing-section";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { RebelHero } from "@/components/marketing/rebrand-hero";
@@ -174,10 +171,8 @@ const howToLd = {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  await cookies();
-  const [plans, testimonials, showcaseAuthors, faqData, session, heroSettings, foundingOffer, demoSiteUrl] = await Promise.all([
+  const [plans, testimonials, showcaseAuthors, faqData, heroSettings, foundingOffer, demoSiteUrl] = await Promise.all([
     getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
-    getServerSession(authOptions),
     prisma.platformSettings.findUnique({
       where: { id: "singleton" },
       select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
@@ -185,15 +180,6 @@ export default async function HomePage() {
     getFoundingOfferCopy().catch(() => null),
     getDemoSiteUrl(),
   ]);
-
-  let isAuthor = false;
-  if (session?.user) {
-    const userId = (session.user as any).id as string;
-    if (userId) {
-      const author = await prisma.author.findUnique({ where: { id: userId }, select: { id: true } }).catch(() => null);
-      isAuthor = !!author;
-    }
-  }
 
   const faqs = faqData.items;
   const faqJsonLd = faqs.length > 0 ? {
@@ -216,7 +202,6 @@ export default async function HomePage() {
 
       {/* ── Hero (with nav) ───────────────────────────────────────────── */}
       <RebelHero
-        isAuthor={isAuthor}
         headlineLine1={heroSettings?.heroHeadlineLine1}
         headlineLine2={heroSettings?.heroHeadlineLine2}
         subheadline={heroSettings?.heroSubheadline}

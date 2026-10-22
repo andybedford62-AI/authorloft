@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 import { VaultButton } from "@/components/marketing/vault";
 import { SOLUTION_CATEGORIES, SOLUTION_PAGE_COUNT } from "@/lib/solution-categories";
+import { useAuthState } from "@/components/marketing/use-auth-state";
 
 const LINKS_TOP: [string, string][] = [
   ["/bookstore", "Bookstore"],
@@ -21,12 +22,13 @@ const RESOURCES: [string, string][] = [
 
 /**
  * Hamburger + dropdown for the shared MarketingNav on screens below md.
- * Receives auth state from the (server) MarketingNav so the CTA matches.
+ * Reads signed-in state in the browser (pages are statically cached) so the CTA matches.
  * Solutions mirrors the desktop dropdown's 4-category structure (see
  * solution-categories.ts) instead of a flat 12-link list.
  */
-export function MarketingMobileMenu({ isAuthor, pricingHref = "/pricing" }: { isAuthor: boolean; pricingHref?: string }) {
+export function MarketingMobileMenu({ pricingHref = "/pricing" }: { pricingHref?: string }) {
   const [open, setOpen] = useState(false);
+  const { isAuthor } = useAuthState();
 
   return (
     <div className="md:hidden">
