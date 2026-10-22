@@ -16,6 +16,7 @@ line rather than listing every commit.
 ## October 22, 2026 — HeyCatch-powered guides at /blog/guides
 
 - **`/blog/guides` + `/blog/guides/[slug]`:** articles are read live from the HeyCatch API (`src/lib/heycatch.ts`, key in `HEYCATCH_API_KEY`, 120 s revalidate, never copied to the DB). Index = title/date/read time only; article page sanitizes `content_html` (keeps `id` on `h2` only), builds a Table of contents after Key takeaways, sets canonical/OG/JSON-LD and `lang`/`dir`. Errors/timeouts show an empty state, never crash the build. Added to the sitemap route. Lives beside, not instead of, the DB-backed `/blog` (separate path chosen so existing posts and slugs are untouched).
+- **Heading + discovery:** heading and metadata say "independent creators" (not authors), and `/blog` shows a "Browse our guides" link only while HeyCatch has at least one article. Build fix: `revalidate` on the pages must be a literal number (an imported constant failed the Vercel build). Promoted to prod and verified Oct 22. On a 30-day HeyCatch trial; if not continued, export articles into `platformPost` first, then remove `src/lib/heycatch.ts`, the guides pages, the sitemap block and the `/blog` link.
 
 ## October 22, 2026 — Site audit fixes (heycatch website audit, 76/100)
 
