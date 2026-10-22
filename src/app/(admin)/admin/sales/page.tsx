@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { parseShippingAddress, shippingLines } from "@/lib/shipping-address";
 import { getAdminAuthorId } from "@/lib/admin-auth";
@@ -15,15 +16,24 @@ const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger
   FAILED: "danger",
 };
 
-export default async function SalesPage() {
+// ?view=orders (default): real orders, i.e. everything except abandoned checkouts
+// ?view=abandoned: checkouts started but never paid (status PENDING)
+// ?view=all: everything
+type SalesView = "orders" | "abandoned" | "all";
+
+export default async function SalesPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const authorId = await getAdminAuthorId();
+  const { view: rawView } = await searchParams;
+  const view: SalesView = rawView === "abandoned" || rawView === "all" ? rawView : "orders";
+  const statusFilter =
+    view === "orders" ? { status: { not: "PENDING" as const } } : view === "abandoned" ? { status: "PENDING" as const } : {};
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth, toShipCount] = await Promise.all([
+  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth, toShipCount, abandonedCount] = await Promise.all([
     prisma.order.findMany({
-      where: { authorId },
+      where: { authorId, ...statusFilter },
       include: {
         items: {
           include: { book: { select: { title: true } } },
@@ -47,6 +57,7 @@ export default async function SalesPage() {
     prisma.order.count({
       where: { authorId, status: "COMPLETED", shippingAddress: { not: Prisma.DbNull }, shippedAt: null },
     }),
+    prisma.order.count({ where: { authorId, status: "PENDING" } }),
   ]);
 
   const stats = [
@@ -111,14 +122,41 @@ export default async function SalesPage() {
       {/* Revenue charts */}
       <SalesCharts />
 
+      {/* View filter: abandoned checkouts are hidden by default so they don't bury real orders */}
+      <div className="flex flex-wrap items-center gap-2 text-sm" role="tablist" aria-label="Order view">
+        {([
+          ["orders", "Orders"],
+          ["abandoned", `Abandoned checkouts${abandonedCount > 0 ? ` (${abandonedCount})` : ""}`],
+          ["all", "All"],
+        ] as [SalesView, string][]).map(([v, label]) => (
+          <Link
+            key={v}
+            href={v === "orders" ? "/admin/sales" : `/admin/sales?view=${v}`}
+            role="tab"
+            aria-selected={view === v}
+            className={`rounded-full border px-4 py-1.5 transition-colors ${
+              view === v ? "border-blue-600 bg-blue-50 font-medium text-blue-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
+      {view === "abandoned" && (
+        <p className="-mt-3 text-xs text-gray-500">
+          Readers who reached checkout but did not finish paying. No money was taken. These are removed automatically after 30 days.
+        </p>
+      )}
+
       {/* Orders table */}
       {orders.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
           <ShoppingBag className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-          <p className="font-medium text-gray-500">No orders yet</p>
+          <p className="font-medium text-gray-500">{view === "abandoned" ? "No abandoned checkouts" : "No orders yet"}</p>
           <p className="text-sm text-gray-400 mt-1">
-            Orders will appear here once readers purchase your books.
-            Make sure Stripe is connected and your books have prices set.
+            {view === "abandoned"
+              ? "Checkouts that were started but not paid will show here."
+              : "Orders will appear here once readers purchase your books. Make sure Stripe is connected and your books have prices set."}
           </p>
         </div>
       ) : (

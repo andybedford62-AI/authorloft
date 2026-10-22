@@ -10,6 +10,10 @@
       "schedule": "0 3 * * *"
     },
     {
+      "path": "/api/cron/cleanup-abandoned-orders",
+      "schedule": "20 3 * * *"
+    },
+    {
       "path": "/api/cron/onboarding-cleanup",
       "schedule": "0 4 * * *"
     },
