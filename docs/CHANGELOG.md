@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 22, 2026 — HeyCatch-powered guides at /blog/guides
+
+- **`/blog/guides` + `/blog/guides/[slug]`:** articles are read live from the HeyCatch API (`src/lib/heycatch.ts`, key in `HEYCATCH_API_KEY`, 120 s revalidate, never copied to the DB). Index = title/date/read time only; article page sanitizes `content_html` (keeps `id` on `h2` only), builds a Table of contents after Key takeaways, sets canonical/OG/JSON-LD and `lang`/`dir`. Errors/timeouts show an empty state, never crash the build. Added to the sitemap route. Lives beside, not instead of, the DB-backed `/blog` (separate path chosen so existing posts and slugs are untouched).
+
 ## October 22, 2026 — Site audit fixes (heycatch website audit, 76/100)
 
 - **Marketing pages now cacheable (D5.4, follow-up):** `MarketingNav` called `cookies()` + `getServerSession`, which made every marketing page dynamic (the audit's 1.8–2.8 s). The nav is now a plain server component; the signed-in name, Dashboard button, mobile-menu CTA and homepage hero nav read state in the browser via `useAuthState` (`use-auth-state.ts`, one request to the new `GET /api/marketing/auth-state`, `private, no-store`). The homepage also drops its own session read, so `revalidate = 60` takes effect. Trade-off: a signed-in author briefly sees Sign in / Start free before it swaps. Blog/guide/news article pages stay `force-dynamic`.
