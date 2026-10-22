@@ -3,6 +3,7 @@ import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/db";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
+import { TAX_CODES, taxCodeForFormat, taxCodeForDigitalBundle } from "@/lib/tax-codes";
 import { getConnectCheckoutConfig } from "@/lib/stripe-connect";
 import { calcDiscount } from "@/lib/discount-queries";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
@@ -156,7 +157,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: course.title,
               description: "Online course — lifetime access",
-              tax_code: "txcd_10401100",
+              tax_code: TAX_CODES.COURSE_UNVERIFIED,
             },
           },
           quantity: 1,
@@ -254,6 +255,7 @@ export async function POST(req: NextRequest) {
                 stripeConnectAccountId: true,
                 stripeConnectOnboarded: true,
                 stripeConnectType: true,
+                printShippingCents: true,
               },
             },
           },
@@ -415,8 +417,11 @@ export async function POST(req: NextRequest) {
     const platformFeeCents = Math.round(totalCents * feePct);
     const connect          = await getConnectCheckoutConfig(author, platformFeeCents);
 
-    // Build Stripe line items
-    const stripeLineItems = bundleRecord
+    // Build Stripe line items. Each gets the tax code for what it is (eBook, audiobook, print book).
+    // A bundle is normally one line, but a bundle with a print item is split per item so the physical
+    // book and the downloads are each taxed correctly.
+    const bundleHasPrint = !!bundleRecord && saleItems.some((i) => i.format === "PRINT");
+    const stripeLineItems = bundleRecord && !bundleHasPrint
       ? [{
           price_data: {
             currency:     "usd",
@@ -424,7 +429,7 @@ export async function POST(req: NextRequest) {
             product_data: {
               name:     bundleRecord.title,
               description: `Bundle — ${saleItems.length} items included`,
-              tax_code: "txcd_10401100",
+              tax_code: taxCodeForDigitalBundle(saleItems.map((i) => i.format)),
             },
           },
           quantity: 1,
@@ -434,15 +439,16 @@ export async function POST(req: NextRequest) {
             currency:     "usd",
             unit_amount:  itemPrice,
             product_data: {
-              name:     `${item.book.title} — ${item.label}`,
+              name:     bundleRecord ? `${bundleRecord.title}: ${item.book.title} — ${item.label}` : `${item.book.title} — ${item.label}`,
               ...(item.description ? { description: item.description } : {}),
-              tax_code: "txcd_10401100",
+              tax_code: taxCodeForFormat(item.format),
             },
           },
           quantity: 1,
         }));
 
     const hasPrintItem = saleItems.some((i) => i.format === "PRINT");
+    const printShippingCents = hasPrintItem ? Math.max(0, author.printShippingCents ?? 0) : 0;
 
     // Include all saleItemIds in metadata (comma-separated for webhook)
     const session = await stripe.checkout.sessions.create({
@@ -451,6 +457,18 @@ export async function POST(req: NextRequest) {
       billing_address_collection: "required",
       // Print items ship from the author, so Stripe must ask the buyer where to send them.
       ...(hasPrintItem && { shipping_address_collection: { allowed_countries: PRINT_SHIP_COUNTRIES } }),
+      // Author's flat shipping fee, added once per order (not per copy). null/0 = free shipping.
+      ...(hasPrintItem && printShippingCents > 0 && {
+        shipping_options: [{
+          shipping_rate_data: {
+            type: "fixed_amount" as const,
+            display_name: "Shipping",
+            fixed_amount: { amount: printShippingCents, currency: "usd" },
+            tax_behavior: "exclusive" as const,
+            tax_code: TAX_CODES.SHIPPING,
+          },
+        }],
+      }),
       automatic_tax:            { enabled: connect.automaticTax },
       line_items:               stripeLineItems,
       metadata: {

@@ -206,6 +206,8 @@ model Author {
   assignedCouponId              String? // Stripe coupon ID assigned by super-admin, auto-applied at next checkout
   stripeConnectAccountId        String? // Stripe connected account ID (acct_xxx)
   stripeConnectOnboarded        Boolean               @default(false) // true once onboarding is complete
+  // Flat shipping fee (cents) added at checkout when a cart has a PRINT item. null/0 = free shipping.
+  printShippingCents            Int?
   stripeConnectType             String? // "standard" = author's own Stripe account, direct charges; null = legacy Express, destination charges
   planId                        String?
   plan                          Plan?                 @relation(fields: [planId], references: [id])
@@ -851,6 +853,11 @@ model Order {
   // Shipping address collected by Stripe Checkout when the order includes a PRINT item (null otherwise).
   // { name, line1, line2, city, state, postalCode, country }
   shippingAddress       Json?
+  // Print orders: what the buyer paid for shipping, and the author's fulfillment record.
+  shippingCents         Int           @default(0)
+  shippedAt             DateTime?
+  trackingCarrier       String?
+  trackingNumber        String?
   status                OrderStatus   @default(PENDING)
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt

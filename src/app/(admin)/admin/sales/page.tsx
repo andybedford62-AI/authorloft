@@ -1,10 +1,12 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { parseShippingAddress, shippingLines } from "@/lib/shipping-address";
 import { getAdminAuthorId } from "@/lib/admin-auth";
-import { ShoppingBag, TrendingUp, DollarSign, Package } from "lucide-react";
+import { ShoppingBag, TrendingUp, DollarSign, Package, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/utils";
 import { SalesCharts } from "@/components/admin/sales-charts";
+import { OrderShipControl } from "@/components/admin/order-ship-control";
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger"> = {
   COMPLETED: "success",
@@ -19,7 +21,7 @@ export default async function SalesPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth] = await Promise.all([
+  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth, toShipCount] = await Promise.all([
     prisma.order.findMany({
       where: { authorId },
       include: {
@@ -41,6 +43,9 @@ export default async function SalesPage() {
     prisma.order.aggregate({
       where: { authorId, status: "COMPLETED", createdAt: { gte: startOfMonth } },
       _sum: { totalCents: true },
+    }),
+    prisma.order.count({
+      where: { authorId, status: "COMPLETED", shippingAddress: { not: Prisma.DbNull }, shippedAt: null },
     }),
   ]);
 
@@ -75,6 +80,10 @@ export default async function SalesPage() {
     },
   ];
 
+  if (toShipCount > 0) {
+    stats.push({ label: "Print orders to ship", value: toShipCount.toString(), icon: Truck, color: "text-red-600", bg: "bg-red-50" });
+  }
+
   return (
     <div className="space-y-6 max-w-6xl">
 
@@ -85,7 +94,7 @@ export default async function SalesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-2 gap-4 ${stats.length > 4 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
         {stats.map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
             <div className={`p-2 rounded-lg ${bg}`}>
@@ -140,6 +149,14 @@ export default async function SalesPage() {
                         </p>
                       ) : null;
                     })()}
+                    {order.shippingAddress && order.status === "COMPLETED" && (
+                      <OrderShipControl
+                        orderId={order.id}
+                        shippedAt={order.shippedAt ? order.shippedAt.toISOString() : null}
+                        trackingCarrier={order.trackingCarrier}
+                        trackingNumber={order.trackingNumber}
+                      />
+                    )}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <div className="space-y-0.5">
@@ -152,6 +169,9 @@ export default async function SalesPage() {
                   </td>
                   <td className="px-5 py-4">
                     <span className="font-semibold text-gray-900">{formatCents(order.totalCents)}</span>
+                    {order.shippingCents > 0 && (
+                      <p className="text-xs text-gray-400">+ {formatCents(order.shippingCents)} shipping</p>
+                    )}
                   </td>
                   <td className="px-5 py-4 hidden sm:table-cell">
                     <Badge variant={STATUS_VARIANT[order.status] ?? "default"}>

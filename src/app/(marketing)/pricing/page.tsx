@@ -317,7 +317,7 @@ export default async function PricingPage() {
             </table>
           </div>
           <p className="text-center text-xs text-vault-mute mt-4 max-w-xl mx-auto">
-            Print editions (Standard and Premium) are author-fulfilled: readers pay and give a shipping address at checkout, and you print and ship the copy.
+            Print editions (Standard and Premium) are author-fulfilled: readers pay, plus your flat shipping fee if you set one, and give a shipping address at checkout. You print and ship the copy, then mark it shipped.
           </p>
           <p className="text-center text-sm text-vault-mute mt-6">
             All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.

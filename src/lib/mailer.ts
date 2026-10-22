@@ -1829,3 +1829,47 @@ export function buildBroadcastMailPayload(opts: {
     ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
   };
 }
+
+// ── Shipped notice (to buyer) ────────────────────────────────────────────────
+
+export async function sendOrderShippedEmail({
+  to,
+  customerName,
+  authorName,
+  itemTitles,
+  carrier,
+  trackingNumber,
+  orderId,
+}: {
+  to: string;
+  customerName?: string | null;
+  authorName: string;
+  itemTitles: string[];
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  orderId: string;
+}) {
+  const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
+  const items = itemTitles.length ? itemTitles : ["your order"];
+  const tracking = [carrier, trackingNumber].filter(Boolean).join(" ");
+  const shortId = orderId.slice(-8).toUpperCase();
+
+  return sendMail({
+    to,
+    subject: `Your order #${shortId} has shipped`,
+    text: [
+      customerName ? `Hi ${customerName},` : "Hi there,",
+      `${authorName} has shipped your order: ${items.join(", ")}.`,
+      tracking ? `Tracking: ${tracking}` : "",
+      `Order #${orderId}`,
+      `Questions about your order? Reply to this email or contact ${authorName} directly.`,
+    ].filter(Boolean).join("\n\n"),
+    html: wrapHtml("Your order has shipped", `
+      <p style="margin:0 0 16px;">${greeting}</p>
+      <p style="margin:0 0 16px;">${esc(authorName)} has shipped your order:</p>
+      <ul style="margin:0 0 16px;padding-left:20px;">${items.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+      ${tracking ? `<p style="margin:0 0 16px;"><strong>Tracking:</strong> ${esc(tracking)}</p>` : ""}
+      <p style="margin:0;font-size:13px;color:#9ca3af;">Order #${shortId}</p>
+    `),
+  });
+}

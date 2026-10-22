@@ -131,6 +131,7 @@ export async function POST(req: NextRequest) {
               customerName,
               stripePaymentIntentId: session.payment_intent,
               ...(shipping && { shippingAddress: shipping }),
+              shippingCents: session.total_details?.amount_shipping ?? 0,
             },
           });
 
@@ -317,7 +318,7 @@ export async function POST(req: NextRequest) {
 
           await prisma.order.update({
             where: { id: order.id },
-            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent, ...(shipping && { shippingAddress: shipping }) },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent, ...(shipping && { shippingAddress: shipping }), shippingCents: session.total_details?.amount_shipping ?? 0 },
           });
 
           // Attributed to the selling author — buyers have no account of their own

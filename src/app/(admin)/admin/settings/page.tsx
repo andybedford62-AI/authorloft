@@ -10,6 +10,7 @@ import { useToast } from "@/lib/use-toast";
 import { HelpTip } from "@/components/admin/help-tip";
 import { slugify } from "@/lib/utils";
 import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
+import { PrintShippingSettings } from "@/components/admin/print-shipping-settings";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -1689,6 +1690,7 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <SubscriptionSection />
           <StripeConnectSection />
+          <PrintShippingSettings />
         </div>
       )}
 
