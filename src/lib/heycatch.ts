@@ -70,6 +70,12 @@ export async function listHeyCatchArticles(): Promise<HeyCatchListItem[]> {
   return all;
 }
 
+/** True when at least one article exists (cheap: limit=1). */
+export async function hasHeyCatchArticles(): Promise<boolean> {
+  const { data } = await hcFetch<{ total: number }>("/articles", { limit: 1 });
+  return (data?.total ?? 0) > 0;
+}
+
 /** `null` = not found; `undefined` = API error (render empty state, not 404). */
 export async function getHeyCatchArticle(slug: string): Promise<HeyCatchArticle | null | undefined> {
   const { status, data } = await hcFetch<{ article: HeyCatchArticle }>(`/articles/${encodeURIComponent(slug)}`);

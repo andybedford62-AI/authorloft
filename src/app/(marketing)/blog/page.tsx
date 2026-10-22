@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { BlogIndex } from "@/components/marketing/blog-index";
+import { hasHeyCatchArticles } from "@/lib/heycatch";
 import { BookOpen, ArrowRight } from "lucide-react";
 
 export const revalidate = 60;
@@ -45,7 +46,7 @@ async function getPosts() {
 }
 
 export default async function BlogIndexPage() {
-  const rows = await getPosts();
+  const [rows, hasGuides] = await Promise.all([getPosts(), hasHeyCatchArticles()]);
   const posts = rows.map((p) => ({ ...p, publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null }));
 
   return (
@@ -61,6 +62,14 @@ export default async function BlogIndexPage() {
       />
 
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
+
+        {hasGuides && (
+          <div className="mb-8 text-right">
+            <Link href="/blog/guides" className="inline-flex items-center gap-1.5 text-sm text-vault-gold hover:underline">
+              Browse our guides <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
 
         {posts.length === 0 ? (
           <div className="text-center py-24 bg-vault-surf rounded-2xl border border-vault-ink/12">

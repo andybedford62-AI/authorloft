@@ -10,13 +10,13 @@ const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorlo
 const PER_PAGE = 20;
 
 export const metadata: Metadata = {
-  title: "Guides for Independent Authors",
-  description: "In-depth articles on selling books direct, building an audience, and running an author business.",
+  title: "Guides for Independent Creators",
+  description: "In-depth guides on selling your work direct, building an audience, and running a creator business.",
   alternates: { canonical: `${BASE}/blog/guides` },
   openGraph: {
     type: "website",
-    title: "Guides for Independent Authors — AuthorLoft",
-    description: "In-depth articles on selling books direct, building an audience, and running an author business.",
+    title: "Guides for Independent Creators — AuthorLoft",
+    description: "In-depth guides on selling your work direct, building an audience, and running a creator business.",
   },
 };
 
@@ -41,7 +41,7 @@ export default async function GuidesIndexPage({ searchParams }: { searchParams: 
 
         <p className="text-sm font-mono uppercase tracking-widest text-vault-gold mb-3">· Guides ·</p>
         <h1 className="font-vault-display italic text-4xl sm:text-5xl text-vault-ink font-normal mb-10">
-          Guides for <span className="italic text-vault-gold">independent authors</span>
+          Guides for <span className="italic text-vault-gold">independent creators</span>
         </h1>
 
         {visible.length === 0 ? (
