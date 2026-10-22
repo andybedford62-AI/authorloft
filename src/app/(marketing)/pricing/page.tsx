@@ -200,8 +200,17 @@ export default async function PricingPage() {
         </Link>
       </section>
 
+      {/* Jump links: the page has four long sections, so let a visitor who wants one answer go straight to it (heycatch audit D2.3). */}
+      <nav aria-label="On this page" className="px-4 pt-6 max-w-5xl mx-auto flex flex-wrap gap-2 text-sm">
+        {([["#plans", "Plans"], ["#plan-details", "Compare plans"], ["#comparison", "vs. the competition"]] as const).map(([href, label]) => (
+          <a key={href} href={href} className="inline-flex items-center min-h-11 px-4 rounded-full border border-vault-gold/40 text-vault-gold hover:bg-vault-gold/10 transition-colors">
+            {label}
+          </a>
+        ))}
+      </nav>
+
       {/* Pricing cards — live from DB */}
-      <section className="px-4 pt-10 pb-20 max-w-5xl mx-auto">
+      <section id="plans" className="px-4 pt-6 pb-20 max-w-5xl mx-auto scroll-mt-24">
         {foundingOffer && (
           <div className="max-w-2xl mx-auto mb-10 flex items-center gap-5 rounded-2xl border border-vault-gold/60 bg-vault-surf-2 px-6 py-5 shadow-xl shadow-vault-bg/25">
             <div className="flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-full bg-gradient-to-br from-vault-gold-light to-vault-gold text-vault-bg shadow-md">
@@ -254,7 +263,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Feature comparison table */}
-      <section className="py-20 bg-vault-surf px-4">
+      <section id="plan-details" className="py-20 bg-vault-surf px-4 scroll-mt-24">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest text-vault-gold text-center mb-2">
             Plan details
@@ -307,6 +316,9 @@ export default async function PricingPage() {
               </tfoot>
             </table>
           </div>
+          <p className="text-center text-xs text-vault-mute mt-4 max-w-xl mx-auto">
+            Print editions (Standard and Premium) are author-fulfilled: readers pay and give a shipping address at checkout, and you print and ship the copy.
+          </p>
           <p className="text-center text-sm text-vault-mute mt-6">
             All plans begin with a free account. Verify your email, then upgrade to Standard or Premium anytime from your dashboard — takes under 2 minutes.
           </p>
@@ -314,7 +326,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Competitor comparison table */}
-      <section id="comparison" className="py-20 bg-vault-bg px-4">
+      <section id="comparison" className="py-20 bg-vault-bg px-4 scroll-mt-24">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-vault-gold mb-2">How we compare</p>

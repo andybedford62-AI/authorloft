@@ -6,6 +6,7 @@
  * without email configured.
  */
 
+import { shippingLines, type ShippingAddress } from "@/lib/shipping-address";
 import { Resend } from "resend";
 import { prisma } from "./db";
 import { sanitize } from "./sanitize";
@@ -100,6 +101,7 @@ export async function sendSaleNotificationEmail({
   itemLabel,
   priceCents,
   orderId,
+  shippingAddress,
 }: {
   to: string;
   authorName: string;
@@ -109,8 +111,11 @@ export async function sendSaleNotificationEmail({
   itemLabel: string;
   priceCents: number;
   orderId: string;
+  /** Set for print items: where the author needs to send the copy. */
+  shippingAddress?: ShippingAddress | null;
 }) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+  const shipLines = shippingAddress ? shippingLines(shippingAddress) : [];
   const salesUrl = `https://www.${platformDomain}/admin/sales`;
   const dollars = (priceCents / 100).toFixed(2);
   const buyer = customerName ? `${esc(customerName)} (${esc(customerEmail)})` : esc(customerEmail);
@@ -127,6 +132,7 @@ export async function sendSaleNotificationEmail({
       `Book: ${bookTitle} (${itemLabel})`,
       `Amount: $${dollars}`,
       `Buyer: ${buyer}`,
+      ...(shipLines.length ? [`SHIP THIS COPY TO:\n${shipLines.join("\n")}`] : []),
       `Date: ${now}`,
       `View all sales: ${salesUrl}`,
     ].join("\n\n"),
@@ -155,6 +161,12 @@ export async function sendSaleNotificationEmail({
               <span style="font-size:14px;color:#374151;">${buyer}</span>
             </td>
           </tr>
+          ${shipLines.length ? `<tr>
+            <td style="padding:6px 0;border-top:1px solid #d1fae5;">
+              <span style="font-size:13px;color:#6b7280;">Ship this copy to</span><br/>
+              <span style="font-size:14px;color:#374151;">${shipLines.map(esc).join("<br/>")}</span>
+            </td>
+          </tr>` : ""}
           <tr>
             <td style="padding:6px 0;border-top:1px solid #d1fae5;">
               <span style="font-size:13px;color:#6b7280;">Date</span><br/>
@@ -579,6 +591,8 @@ export interface OrderItemForEmail {
   authorName: string;
   authorSlug: string;
   priceCents: number;
+  /** Print copy: shipped by the author, so no download link. */
+  isPrint?: boolean;
 }
 
 export async function sendOrderConfirmationEmail({
@@ -612,10 +626,12 @@ export async function sendOrderConfirmationEmail({
       <td style="padding:12px 0;">
         <div style="font-weight:600;color:#111827;">${esc(item.bookTitle)}</div>
         <div style="font-size:13px;color:#6b7280;margin:4px 0 8px;">${esc(item.itemLabel)} — ${esc(item.authorName)}</div>
-        <a href="${item.downloadUrl}"
+        ${item.isPrint
+          ? `<div style="font-size:13px;color:#374151;margin-top:4px;">Printed copy. ${esc(item.authorName)} will ship it to the address you entered at checkout.</div>`
+          : `<a href="${item.downloadUrl}"
            style="display:inline-block;background:#3b82f6;color:#ffffff;font-size:13px;font-weight:600;padding:8px 20px;border-radius:6px;text-decoration:none;margin-top:4px;">
           Download
-        </a>
+        </a>`}
       </td>
       <td style="padding:12px 0;text-align:right;color:#111827;font-weight:600;">
         $${(item.priceCents / 100).toFixed(2)}
@@ -624,7 +640,7 @@ export async function sendOrderConfirmationEmail({
   `).join("");
 
   const itemsText = items.map(item =>
-    `${item.bookTitle} (${item.itemLabel})\n  Author: ${item.authorName}\n  Price: $${(item.priceCents / 100).toFixed(2)}\n  Download: ${item.downloadUrl}`
+    `${item.bookTitle} (${item.itemLabel})\n  Author: ${item.authorName}\n  Price: $${(item.priceCents / 100).toFixed(2)}\n  ${item.isPrint ? `Printed copy: ${item.authorName} will ship it to the address you entered at checkout.` : `Download: ${item.downloadUrl}`}`
   ).join("\n\n");
 
   return sendMail({

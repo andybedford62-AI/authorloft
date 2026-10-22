@@ -98,6 +98,37 @@ interface PricingSectionProps {
   fullPage?: boolean;
 }
 
+const COLLAPSED_FEATURES = 6;
+
+/** Plan feature list. On phones (cards stack below md) the full-page pricing cards show the first few
+ *  features and a "Show all" toggle, so the page isn't three screens of bullets before the comparison. */
+function FeatureList({ features, collapsible }: { features: string[]; collapsible: boolean }) {
+  const [open, setOpen] = useState(false);
+  const hideExtra = collapsible && !open;
+  return (
+    <div className="flex-1">
+      <ul className="space-y-2.5">
+        {features.map((f, i) => (
+          <li key={f} className={`items-start gap-2 text-sm ${hideExtra && i >= COLLAPSED_FEATURES ? "hidden md:flex" : "flex"}`}>
+            <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-vault-gold" />
+            <span className="text-[#c7cede]">{f}</span>
+          </li>
+        ))}
+      </ul>
+      {collapsible && features.length > COLLAPSED_FEATURES && (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="md:hidden mt-3 min-h-11 text-sm font-semibold text-vault-gold"
+        >
+          {open ? "Show fewer features" : `Show all ${features.length} features`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function PricingSection({ plans, fullPage = false }: PricingSectionProps) {
   const [annual, setAnnual] = useState(false);
   const hasAnnual = plans.some((p) => p.annualPriceCents > 0);
@@ -179,14 +210,7 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
               </div>
 
               {/* Feature list */}
-              <ul className="space-y-2.5 flex-1">
-                {features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5 text-vault-gold" />
-                    <span className="text-[#c7cede]">{f}</span>
-                  </li>
-                ))}
-              </ul>
+              <FeatureList features={features} collapsible={!!fullPage} />
 
               {/* CTA button */}
               <Link

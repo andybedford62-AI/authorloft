@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { parseShippingAddress, shippingLines } from "@/lib/shipping-address";
 import { getAdminAuthorId } from "@/lib/admin-auth";
 import { ShoppingBag, TrendingUp, DollarSign, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -130,6 +131,15 @@ export default async function SalesPage() {
                   <td className="px-5 py-4">
                     <p className="font-medium text-gray-900">{order.customerName || "—"}</p>
                     <p className="text-xs text-gray-400">{order.customerEmail}</p>
+                    {(() => {
+                      const ship = parseShippingAddress(order.shippingAddress);
+                      return ship ? (
+                        <p className="mt-1 text-xs text-emerald-700">
+                          <span className="font-semibold">Ship to:</span>{" "}
+                          {shippingLines(ship).join(", ")}
+                        </p>
+                      ) : null;
+                    })()}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <div className="space-y-0.5">

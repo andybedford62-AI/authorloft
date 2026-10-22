@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { shippingFromSession } from "@/lib/shipping-address";
 import { stripe } from "@/lib/stripe";
 import { capturePostHog } from "@/lib/posthog";
 import { analytics } from "@heycatch/sdk";
@@ -119,6 +120,7 @@ export async function POST(req: NextRequest) {
           const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
           const customerName  = session.customer_details?.name ?? undefined;
           const hasBelowMinimumPricing = session.metadata?.hasBelowMinimumPricing === "true";
+          const shipping = shippingFromSession(session);
 
           // Mark order complete and record customer email + payment intent
           await prisma.order.update({
@@ -128,6 +130,7 @@ export async function POST(req: NextRequest) {
               customerEmail,
               customerName,
               stripePaymentIntentId: session.payment_intent,
+              ...(shipping && { shippingAddress: shipping }),
             },
           });
 
@@ -212,7 +215,7 @@ export async function POST(req: NextRequest) {
               select: {
                 downloadToken: true,
                 priceCents: true,
-                saleItem: { select: { label: true } },
+                saleItem: { select: { label: true, format: true } },
                 book: {
                   select: {
                     title: true,
@@ -240,6 +243,7 @@ export async function POST(req: NextRequest) {
               authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
               authorSlug: fi.book?.author.slug ?? "",
               priceCents: fi.priceCents,
+              isPrint: fi.saleItem?.format === "PRINT",
             }));
 
             const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
@@ -278,6 +282,7 @@ export async function POST(req: NextRequest) {
                 itemLabel:     fi.saleItem?.label ?? "eBook",
                 priceCents:    fi.priceCents,
                 orderId:       order.id,
+                ...(fi.saleItem?.format === "PRINT" && shipping && { shippingAddress: shipping }),
               }).catch((e) => console.error("[webhook] Failed to send author notification:", e));
 
               // 3. If below-minimum pricing was applied, send alert to author
@@ -308,10 +313,11 @@ export async function POST(req: NextRequest) {
         if (order) {
           const customerEmail = session.customer_email ?? session.customer_details?.email ?? "";
           const customerName  = session.customer_details?.name ?? undefined;
+          const shipping = shippingFromSession(session);
 
           await prisma.order.update({
             where: { id: order.id },
-            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent },
+            data: { status: "COMPLETED", customerEmail, customerName, stripePaymentIntentId: session.payment_intent, ...(shipping && { shippingAddress: shipping }) },
           });
 
           // Attributed to the selling author — buyers have no account of their own
@@ -365,7 +371,7 @@ export async function POST(req: NextRequest) {
               where: { orderId: order.id },
               select: {
                 downloadToken: true, priceCents: true,
-                saleItem: { select: { label: true } },
+                saleItem: { select: { label: true, format: true } },
                 book: { select: { title: true, author: { select: { id: true, displayName: true, name: true, slug: true, email: true } } } },
               },
             });
@@ -378,6 +384,7 @@ export async function POST(req: NextRequest) {
               authorName: fi.book?.author.displayName || fi.book?.author.name || "Author",
               authorSlug: fi.book?.author.slug ?? "",
               priceCents: fi.priceCents,
+              isPrint: fi.saleItem?.format === "PRINT",
             }));
 
             const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
@@ -405,6 +412,7 @@ export async function POST(req: NextRequest) {
                 itemLabel: fi.saleItem?.label ?? "Bundle item",
                 priceCents: fi.priceCents,
                 orderId: order.id,
+                ...(fi.saleItem?.format === "PRINT" && shipping && { shippingAddress: shipping }),
               }).catch((e) => console.error("[webhook] Failed to send bundle author notification:", e));
             }
           }

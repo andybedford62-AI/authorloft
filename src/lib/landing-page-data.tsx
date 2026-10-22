@@ -117,11 +117,6 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
     heroTitle: <>Sell books directly and <span className="italic text-vault-gold">keep every dollar</span></>,
     heroSubtitle: "No marketplace fees, no middleman. Sell ebooks, print books, and audiobooks straight to your readers.",
     intro: "Every sale through Amazon, Kobo, or another retailer costs you 30–65% in fees. With AuthorLoft, you sell directly to your readers and keep 100% of the revenue (minus standard payment processing). Your books, your prices, your customers — no middleman.",
-    // TODO(Andy) — heycatch audit FIT "Explain the print fulfillment flow": add a section
-    // here (and a one-line note under the Standard/Premium pricing cards) answering who
-    // prints, who ships, what it costs, and what the author does. Not written yet on
-    // purpose: the checkout code collects no shipping address, so the real flow has to
-    // come from you before it is published.
     sections: [
       {
         title: "Multiple formats, one storefront",
@@ -132,6 +127,17 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
           "Audiobooks — sell audio directly with built-in preview player",
           "Flip Books — interactive page-turn previews that convert browsers to buyers",
           "Bundle multiple formats per book with individual pricing",
+        ],
+      },
+      {
+        title: "How print copies work",
+        description: "Print editions are author-fulfilled: you print and ship, AuthorLoft collects the order and the address.",
+        bullets: [
+          "A reader picks your Print edition and pays by card through Stripe",
+          "Checkout asks for their shipping address (US, Canada, UK, Australia, New Zealand and Ireland)",
+          "You get an email with the address, and it is saved on the order in your Sales page",
+          "You order or print the copy and ship it yourself. AuthorLoft does not print or ship books",
+          "Shipping is not added at checkout, so price the Print edition to cover printing and postage",
         ],
       },
       {
@@ -162,6 +168,7 @@ export const LANDING_PAGES: Record<string, LandingPageData> = {
       { q: "What percentage does AuthorLoft take?", a: "Zero. AuthorLoft does not take a cut of your sales. You keep 100% of the revenue minus standard Stripe processing fees (for US cards, typically 2.9% + 30¢ per transaction; rates vary by country)." },
       { q: "Can I still list my books on Amazon and other retailers?", a: "Absolutely. You can add retailer links (Amazon, Kobo, Barnes & Noble, etc.) alongside your direct sales. Many authors do both — direct sales for maximum revenue, retailers for maximum reach." },
       { q: "How do readers get their ebooks after purchase?", a: "Readers receive an instant download link after checkout. Files are delivered securely — readers can download immediately." },
+      { q: "Who prints and ships a print copy?", a: "You do. When a reader buys a Print edition, AuthorLoft collects payment and their shipping address and emails you the address. You order or print the copy and ship it yourself, so set the price to cover printing and postage. Print sales need the Standard or Premium plan." },
       { q: "Which plan do I need to sell books?", a: "Every plan, including Free, can sell eBooks directly through Stripe. Standard ($9.99/month) adds Print editions, bundles and more, and Premium ($39.99/month) adds Audio and Flipbook editions." },
     ],
     relatedGuideSlug: "what-is-direct-book-selling",

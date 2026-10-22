@@ -848,6 +848,9 @@ model Order {
   totalCents            Int
   discountCents         Int           @default(0)
   discountCodeId        String?
+  // Shipping address collected by Stripe Checkout when the order includes a PRINT item (null otherwise).
+  // { name, line1, line2, city, state, postalCode, country }
+  shippingAddress       Json?
   status                OrderStatus   @default(PENDING)
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt

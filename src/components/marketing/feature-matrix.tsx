@@ -445,14 +445,22 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
 
   return (
     <div className="space-y-8">
-      {featureRows.map((section) => (
-        <div key={section.category}>
-          <h2 className={`text-xl font-bold text-vault-ink ${section.description ? 'mb-1' : 'mb-4'}`}>{section.category}</h2>
-          {section.description && (
-            <p className="text-sm text-vault-mute mb-4 max-w-2xl font-vault-display" style={{ lineHeight: 1.6 }}>
-              {section.description}
-            </p>
-          )}
+      {/* Each group is a native <details>: only the first starts open, so the page is
+          four headings to scan instead of four stacked tables (heycatch audit D2.3).
+          The table markup stays in the HTML either way. */}
+      {featureRows.map((section, idx) => (
+        <details key={section.category} open={idx === 0} className="group">
+          <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-start justify-between gap-4 mb-4 min-h-11">
+            <span>
+              <h2 className="text-xl font-bold text-vault-ink mb-1">{section.category}</h2>
+              {section.description && (
+                <span className="block text-sm text-vault-mute max-w-2xl font-vault-display" style={{ lineHeight: 1.6 }}>
+                  {section.description}
+                </span>
+              )}
+            </span>
+            <span aria-hidden className="mt-1 shrink-0 text-vault-gold transition-transform group-open:rotate-180">▼</span>
+          </summary>
           <div className="bg-vault-surf rounded-lg border border-vault-ink/20 shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden">
             <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
@@ -495,7 +503,7 @@ export function FeatureMatrix({ plans, defaultAiUsageCap = 20 }: FeatureMatrixPr
             </table>
             </div>
           </div>
-        </div>
+        </details>
       ))}
 
       {/* Upcoming features — NOT built yet, verified against the codebase Aug 7 2026.

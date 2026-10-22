@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/db";
+import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { getConnectCheckoutConfig } from "@/lib/stripe-connect";
 import { calcDiscount } from "@/lib/discount-queries";
@@ -9,6 +10,11 @@ import { auditLog, getAuditContext } from "@/lib/audit-logger";
 import { validateCheckoutRequest } from "@/lib/schemas/checkout";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
+
+// Countries a buyer can ship a print copy to. The author ships it themselves, so keep this to
+// markets where a self-shipped paperback is practical; widen it deliberately, not by default.
+const PRINT_SHIP_COUNTRIES: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
+  ["US", "CA", "GB", "AU", "NZ", "IE"];
 
 /**
  * POST /api/checkout
@@ -436,11 +442,15 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         }));
 
+    const hasPrintItem = saleItems.some((i) => i.format === "PRINT");
+
     // Include all saleItemIds in metadata (comma-separated for webhook)
     const session = await stripe.checkout.sessions.create({
       payment_method_types:     ["card"],
       mode:                     "payment",
       billing_address_collection: "required",
+      // Print items ship from the author, so Stripe must ask the buyer where to send them.
+      ...(hasPrintItem && { shipping_address_collection: { allowed_countries: PRINT_SHIP_COUNTRIES } }),
       automatic_tax:            { enabled: connect.automaticTax },
       line_items:               stripeLineItems,
       metadata: {

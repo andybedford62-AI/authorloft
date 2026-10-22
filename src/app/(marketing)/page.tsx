@@ -325,7 +325,7 @@ function BuiltForSection() {
                 {copy}
               </p>
               {href && (
-                <Link href={href} style={{ display: 'inline-block', marginTop: 10, fontSize: '0.85rem', fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
+                <Link href={href} style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, marginTop: 4, fontSize: '0.85rem', fontWeight: 600, color: VAULT.gold, textDecoration: 'none' }}>
                   Learn more →
                 </Link>
               )}
@@ -516,14 +516,14 @@ function FounderNoteSection({
           </div>
         </div>
         {siteUrl && (
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 44, marginTop: 16, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
             See my site →
           </a>
         )}
-        <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, marginLeft: siteUrl ? 24 : 0, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
+        <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 44, marginTop: 16, marginLeft: siteUrl ? 24 : 0, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
           See what I&apos;ve shipped lately →
         </Link>
-        <a href="https://www.linkedin.com/in/anthonybedford/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 28, marginLeft: 24, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
+        <a href="https://www.linkedin.com/in/anthonybedford/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 44, marginTop: 16, marginLeft: 24, fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: VAULT.gold, textDecoration: 'none' }}>
           Find me on LinkedIn →
         </a>
       </div>
@@ -539,14 +539,14 @@ function ProofStrip() {
           <>
             <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: VAULT.mute }}>Find us on</span>
             {THIRD_PARTY_PROOF.map((p) => (
-              <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ color: VAULT.ink, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+              <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: VAULT.ink, textDecoration: 'underline', textUnderlineOffset: 3 }}>
                 {p.label}{p.note ? ` · ${p.note}` : ''}
               </a>
             ))}
             <span aria-hidden style={{ color: VAULT.line }}>|</span>
           </>
         )}
-        <Link href="/news" style={{ color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>
+        <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>
           See what we&apos;ve shipped lately →
         </Link>
       </div>
@@ -619,7 +619,7 @@ function NewPlatformSection() {
           ))}
         </div>
         <p style={{ marginTop: 24, fontSize: '0.9rem' }}>
-          <Link href="/news" style={{ color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>See what we&apos;ve shipped lately →</Link>
+          <Link href="/news" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>See what we&apos;ve shipped lately →</Link>
         </p>
       </div>
     </section>

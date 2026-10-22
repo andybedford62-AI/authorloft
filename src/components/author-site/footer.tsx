@@ -34,7 +34,6 @@ export function AuthorFooter({ author, links }: FooterProps) {
   const displayName  = author.displayName || author.name;
   const firstName    = displayName.split(" ")[0];
   const year         = new Date().getFullYear();
-  const showPoweredBy = (author.plan?.tier ?? "FREE") === "FREE";
   const quickLinks   = links.filter((l) => l.href !== "/");
   const siteUrl      = getAuthorBaseUrl(author);
   // Env-var based, matching nav.tsx -- a hardcoded authorloft.com here would
@@ -161,19 +160,18 @@ export function AuthorFooter({ author, links }: FooterProps) {
               >
                 Copyright
               </a>
-              {showPoweredBy && (
-                <p className="text-xs text-gray-600">
-                  Powered by{" "}
-                  <a
-                    href="https://www.authorloft.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[var(--accent)] transition-colors"
-                  >
-                    AuthorLoft
-                  </a>
-                </p>
-              )}
+              {/* Link back to the main site, on every plan (it used to be Free-only). */}
+              <p className="text-xs text-gray-600">
+                Powered by{" "}
+                <a
+                  href="https://www.authorloft.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--accent)] transition-colors"
+                >
+                  AuthorLoft
+                </a>
+              </p>
               {/* Relocated out of primary nav -- the author's own way back in,
                   without spending reader-facing nav space on it. */}
               <a
