@@ -111,13 +111,13 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
         </>
       )}
 
-      <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
+      <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 ${wide ? "py-8 sm:py-10" : "py-12 sm:py-16"} flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
         <div className={`min-w-0 ${wide ? "max-w-3xl" : "max-w-xl"}`}>
           {eyebrow && (
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-vault-gold mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">· {eyebrow} ·</p>
           )}
           <h1 className="font-vault-display italic text-4xl sm:text-5xl text-vault-ink font-normal leading-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]">{title}</h1>
-          {subtitle && <p className="mt-4 text-base text-vault-mute max-w-xl leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">{subtitle}</p>}
+          {subtitle && <p className={`mt-4 text-base text-vault-mute leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] ${wide ? "max-w-3xl" : "max-w-xl"}`}>{subtitle}</p>}
         </div>
 
         {imageSrc && !hasBanner && (

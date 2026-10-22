@@ -51,10 +51,10 @@ export function ShareStoryForm() {
         eyebrow="Testimonial"
         wide
         title={<span className="whitespace-nowrap">Share your <span className="italic text-[#d6a94a]">AuthorLoft</span> story</span>}
-        subtitle="This is our testimonial page. A few honest sentences about what you've done with AuthorLoft helps other authors decide, and a specific result beats a compliment."
+        subtitle="This is our testimonial page. A few honest sentences about what you've done with AuthorLoft helps other authors decide. A specific result beats a compliment."
       />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {sent ? (
           <div className="bg-[#1e2f4d] border border-[rgba(243,236,219,0.12)] rounded-2xl p-10 text-center">
             <div className="w-12 h-12 rounded-full bg-[#243756] flex items-center justify-center mx-auto mb-4">

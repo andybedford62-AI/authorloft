@@ -14,6 +14,7 @@ import { formatCents } from "@/lib/utils";
 import { EmailVerificationBanner } from "@/components/admin/email-verification-banner";
 import { SitePagesCard } from "@/components/admin/site-pages-card";
 import { StripeConnectNudge } from "@/components/admin/stripe-connect-nudge";
+import { ShareStoryNudge } from "@/components/admin/share-story-nudge";
 import { SocialPromoteNudge } from "@/components/admin/social-promote-nudge";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { getAuthorContentPresence } from "@/lib/author-queries";
@@ -462,6 +463,9 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
+      {/* Testimonial ask — near the top so it is easy to find; dismissible */}
+      <ShareStoryNudge />
+
       {/* Next steps — every plan tier, dismissible, shown from the first book until complete or hidden.
           Gated on hasBook (not onboardingCompletedAt) so it doesn't duplicate the pre-first-book modal. */}
       {hasBook &&
@@ -556,17 +560,6 @@ export default async function DashboardPage() {
             coursesEnabled={coursesEnabled}
             bundlesEnabled={bundlesEnabled}
           />
-
-          {/* Ask for a testimonial */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Enjoying AuthorLoft?</p>
-              <p className="text-xs text-gray-500 mt-1">A few sentences about what you&apos;ve done with it helps other authors decide.</p>
-            </div>
-            <Link href="/share-your-story" target="_blank">
-              <Button size="sm" variant="outline">Share your story</Button>
-            </Link>
-          </div>
 
           {/* Plan info */}
           <div className="bg-blue-50 rounded-xl border border-blue-100 p-5">
