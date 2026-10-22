@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
-import { listHeyCatchArticles, HEYCATCH_REVALIDATE } from "@/lib/heycatch";
+import { listHeyCatchArticles } from "@/lib/heycatch";
 import { Clock, BookOpen, ArrowLeft } from "lucide-react";
 
-export const revalidate = HEYCATCH_REVALIDATE;
+export const revalidate = 120; // literal required by Next; matches HEYCATCH_REVALIDATE
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 const PER_PAGE = 20;

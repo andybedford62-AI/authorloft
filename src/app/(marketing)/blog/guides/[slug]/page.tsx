@@ -4,10 +4,10 @@ import Link from "next/link";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { Clock, ArrowLeft, BookOpen } from "lucide-react";
 import {
-  getHeyCatchArticle, sanitizeHeyCatchHtml, splitForToc, HEYCATCH_REVALIDATE, RTL_LANGS,
+  getHeyCatchArticle, sanitizeHeyCatchHtml, splitForToc, RTL_LANGS,
 } from "@/lib/heycatch";
 
-export const revalidate = HEYCATCH_REVALIDATE;
+export const revalidate = 120; // literal required by Next; matches HEYCATCH_REVALIDATE
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
