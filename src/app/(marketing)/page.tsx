@@ -557,7 +557,7 @@ function ProofStrip() {
 function CustomerProofSection({
   testimonials,
 }: {
-  testimonials: { id: string; authorName: string; authorRole: string | null; quote: string; image: string | null }[];
+  testimonials: { id: string; authorName: string; authorRole: string | null; quote: string; rating: number | null; image: string | null }[];
 }) {
   if (testimonials.length === 0) return null;
   return (
@@ -570,6 +570,11 @@ function CustomerProofSection({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
           {testimonials.map((t) => (
             <figure key={t.id} style={{ margin: 0, padding: 24, borderRadius: 14, border: `1px solid ${VAULT.line}`, background: VAULT.surf }}>
+              {t.rating ? (
+                <p aria-label={`${t.rating} out of 5 stars`} style={{ margin: '0 0 10px', color: VAULT.gold, letterSpacing: 2, fontSize: '1rem' }}>
+                  {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
+                </p>
+              ) : null}
               <blockquote
                 style={{ margin: '0 0 20px', fontSize: '1rem', lineHeight: 1.6, color: VAULT.ink }}
                 dangerouslySetInnerHTML={{ __html: `“${sanitize(t.quote)}”` }}

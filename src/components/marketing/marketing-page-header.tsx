@@ -30,6 +30,8 @@ interface MarketingPageHeaderProps {
   backgroundVideo?: string;
   /** CSS object-position for the banner (default "right center"), e.g. "right 70%" to keep a low subject in view. */
   backgroundPosition?: string;
+  /** Let the title run wider than max-w-xl so a longer title can stay on one line (desktop). */
+  wide?: boolean;
 }
 
 /**
@@ -44,7 +46,7 @@ interface MarketingPageHeaderProps {
  *
  * Accent a word in the title with: <span className="italic text-vault-gold">Word</span>
  */
-export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, backgroundImageAlt, backgroundVideo, backgroundPosition = "right center" }: MarketingPageHeaderProps) {
+export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageAlt = "", backgroundImage, backgroundImageAlt, backgroundVideo, backgroundPosition = "right center", wide = false }: MarketingPageHeaderProps) {
   const hasBanner = !!backgroundImage || !!backgroundVideo;
 
   return (
@@ -110,7 +112,7 @@ export function MarketingPageHeader({ eyebrow, title, subtitle, imageSrc, imageA
       )}
 
       <div className={`relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex items-center justify-between gap-8 ${hasBanner ? "min-h-[260px] sm:min-h-[320px]" : ""}`}>
-        <div className="min-w-0 max-w-xl">
+        <div className={`min-w-0 ${wide ? "max-w-3xl" : "max-w-xl"}`}>
           {eyebrow && (
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-vault-gold mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">· {eyebrow} ·</p>
           )}

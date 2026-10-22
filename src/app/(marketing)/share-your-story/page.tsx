@@ -4,8 +4,8 @@ import { ShareStoryForm } from "./share-story-form";
 
 // A form, not content: keep it out of search results (and out of the sitemap).
 export const metadata: Metadata = {
-  title: "Share Your AuthorLoft Story",
-  description: "Tell us what AuthorLoft has done for your books, courses or music. A few sentences is plenty.",
+  title: "Share Your Story: AuthorLoft Testimonials",
+  description: "Leave a testimonial about what AuthorLoft has done for your books, courses or music. A few sentences and an optional star rating is plenty.",
   robots: { index: false, follow: true },
   alternates: { canonical: "/share-your-story" },
 };

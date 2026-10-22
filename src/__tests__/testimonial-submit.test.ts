@@ -8,8 +8,9 @@ vi.mock("@/lib/db", () => ({
     platformSettings: { findUnique: vi.fn().mockResolvedValue(null) },
   },
 }));
+const sendMail = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/mailer", () => ({
-  sendMail: vi.fn().mockResolvedValue(undefined),
+  sendMail: (...a: unknown[]) => sendMail(...a),
   esc: (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"),
 }));
 
@@ -33,7 +34,10 @@ const good = {
   consent: true,
 };
 
-beforeEach(() => create.mockClear());
+beforeEach(() => {
+  create.mockClear();
+  sendMail.mockClear();
+});
 
 describe("POST /api/marketing/testimonial", () => {
   it("saves a valid submission as inactive, with consent and source", async () => {
@@ -51,6 +55,33 @@ describe("POST /api/marketing/testimonial", () => {
     const quote: string = create.mock.calls[0][0].data.quote;
     expect(quote).not.toContain("<script>");
     expect(quote.startsWith("<p>")).toBe(true);
+  });
+
+  it("stores an optional 1-5 star rating and rejects anything else", async () => {
+    await POST(req({ ...good, rating: 5 }));
+    expect(create.mock.calls[0][0].data.rating).toBe(5);
+    create.mockClear();
+    await POST(req(good));
+    expect(create.mock.calls[0][0].data.rating).toBeNull();
+    create.mockClear();
+    expect((await POST(req({ ...good, rating: 0 }))).status).toBe(400);
+    expect((await POST(req({ ...good, rating: 6 }))).status).toBe(400);
+    expect((await POST(req({ ...good, rating: "5" }))).status).toBe(400);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("emails a copy back to the submitter", async () => {
+    await POST(req({ ...good, rating: 4 }));
+    const toSubmitter = sendMail.mock.calls.map((c) => c[0]).find((m) => m.to === "jane@example.com");
+    expect(toSubmitter).toBeTruthy();
+    expect(toSubmitter.text).toContain(good.quote);
+    expect(toSubmitter.text).toContain("4 out of 5");
+  });
+
+  it("does not email anyone for honeypot or invalid submissions", async () => {
+    await POST(req({ ...good, website: "http://spam.example" }));
+    await POST(req({ ...good, consent: false }));
+    expect(sendMail).not.toHaveBeenCalled();
   });
 
   it("requires consent", async () => {

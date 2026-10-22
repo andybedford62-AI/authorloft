@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Send, Check } from "lucide-react";
+import { Send, Check, Star } from "lucide-react";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 
 const MAX_QUOTE = 1200;
@@ -12,6 +12,7 @@ export function ShareStoryForm() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [quote, setQuote] = useState("");
+  const [rating, setRating] = useState(0); // 0 = no rating given
   const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState(""); // honeypot
   const [sending, setSending] = useState(false);
@@ -26,7 +27,7 @@ export function ShareStoryForm() {
       const res = await fetch("/api/marketing/testimonial", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, role, quote, consent, website }),
+        body: JSON.stringify({ name, email, role, quote, rating: rating || undefined, consent, website }),
       });
       if (res.ok) {
         setSent(true);
@@ -47,9 +48,10 @@ export function ShareStoryForm() {
   return (
     <div className="min-h-screen bg-[#16233d]">
       <MarketingPageHeader
-        eyebrow="Your story"
-        title={<>Share your <span className="italic text-[#d6a94a]">AuthorLoft</span> story</>}
-        subtitle="A few honest sentences about what you've done with AuthorLoft helps other authors decide. A specific result beats a compliment."
+        eyebrow="Testimonial"
+        wide
+        title={<span className="whitespace-nowrap">Share your <span className="italic text-[#d6a94a]">AuthorLoft</span> story</span>}
+        subtitle="This is our testimonial page. A few honest sentences about what you've done with AuthorLoft helps other authors decide, and a specific result beats a compliment."
       />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
@@ -60,7 +62,7 @@ export function ShareStoryForm() {
             </div>
             <h2 className="text-xl font-bold text-[#f3ecdb] mb-2">Thank you!</h2>
             <p className="text-[#93a0bc] mb-6">
-              We read every one. Before anything goes on the site we&apos;ll check it, and if we&apos;d like to add your photo we&apos;ll email you at <strong>{email}</strong>.
+              We read every one. A copy is on its way to <strong>{email}</strong>. Before anything goes on the site we&apos;ll check it, and if we&apos;d like to add your photo we&apos;ll email you.
             </p>
             <Link href="/" className="text-sm text-[#93a0bc] hover:text-[#f3ecdb] transition-colors">
               ← Back to AuthorLoft home
@@ -96,6 +98,28 @@ export function ShareStoryForm() {
               <input id="story-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" required autoComplete="email" className={inputClass} />
               <p className="text-xs text-[#93a0bc]">Never shown publicly. Only used if we need to check something with you.</p>
             </div>
+
+            <fieldset className="space-y-1">
+              <legend className="block text-sm font-medium text-[#f3ecdb]">
+                Your rating <span className="text-[#93a0bc] font-normal">(optional)</span>
+              </legend>
+              <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating out of 5 stars">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    role="radio"
+                    aria-checked={rating === n}
+                    aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                    onClick={() => setRating(rating === n ? 0 : n)}
+                    className="h-11 w-11 inline-flex items-center justify-center rounded-md hover:bg-[rgba(243,236,219,0.06)] focus:outline-none focus:ring-2 focus:ring-[#d6a94a]"
+                  >
+                    <Star className={`h-7 w-7 ${n <= rating ? "fill-[#d6a94a] text-[#d6a94a]" : "text-[#93a0bc]"}`} />
+                  </button>
+                ))}
+                {rating > 0 && <span className="ml-2 text-xs text-[#93a0bc]">{rating} of 5</span>}
+              </div>
+            </fieldset>
 
             <div className="space-y-1">
               <label htmlFor="story-quote" className="block text-sm font-medium text-[#f3ecdb]">
