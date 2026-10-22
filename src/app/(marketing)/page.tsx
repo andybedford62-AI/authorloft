@@ -37,6 +37,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// Testimonial quotes are stored as rich-text HTML (<p>...</p>). Flatten the paragraphs so the
+// curly quote marks sit on the same line as the text instead of on lines of their own.
+function quoteHtml(html: string): string {
+  const inner = sanitize(html)
+    .replace(/<\/p>\s*<p[^>]*>/gi, "<br/><br/>")
+    .replace(/^\s*<p[^>]*>/i, "")
+    .replace(/<\/p>\s*$/i, "");
+  return `\u201C${inner}\u201D`;
+}
+
 // ── Data fetching (same as main homepage) ────────────────────────────────────
 
 async function getActivePlans() {
@@ -499,7 +509,7 @@ function FounderNoteSection({
         </p>
         <div
           style={{ fontFamily: VAULT.fontDisplay, fontStyle: 'italic', fontSize: 'clamp(21px, 2.4vw, 28px)', lineHeight: 1.5, color: VAULT.ink, margin: '0 0 32px' }}
-          dangerouslySetInnerHTML={{ __html: `“${sanitize(testimonial.quote)}”` }}
+          dangerouslySetInnerHTML={{ __html: quoteHtml(testimonial.quote) }}
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <Image
@@ -561,33 +571,31 @@ function CustomerProofSection({
 }) {
   if (testimonials.length === 0) return null;
   return (
-    <section style={{ background: VAULT.bg, borderTop: `1px solid ${VAULT.line}`, padding: '64px 28px' }}>
+    <section style={{ background: VAULT.bg, borderTop: `1px solid ${VAULT.line}`, padding: '36px 28px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, margin: '0 0 14px' }}>From authors using it</p>
-        <h2 style={{ fontFamily: VAULT.fontDisplay, fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 600, lineHeight: 1.12, fontStyle: 'italic', color: VAULT.ink, margin: '0 0 32px', letterSpacing: '-0.01em' }}>
-          Other authors, in their own words.
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: VAULT.gold, margin: '0 0 16px' }}>From authors using AuthorLoft</p>
+        {/* auto-fill (not auto-fit): a single testimonial stays card-sized instead of stretching across the page */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
           {testimonials.map((t) => (
-            <figure key={t.id} style={{ margin: 0, padding: 24, borderRadius: 14, border: `1px solid ${VAULT.line}`, background: VAULT.surf }}>
-              {t.rating ? (
-                <p aria-label={`${t.rating} out of 5 stars`} style={{ margin: '0 0 10px', color: VAULT.gold, letterSpacing: 2, fontSize: '1rem' }}>
-                  {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
-                </p>
-              ) : null}
+            <figure key={t.id} style={{ margin: 0, padding: '16px 20px', borderRadius: 12, border: `1px solid ${VAULT.line}`, background: VAULT.surf }}>
               <blockquote
-                style={{ margin: '0 0 20px', fontSize: '1rem', lineHeight: 1.6, color: VAULT.ink }}
-                dangerouslySetInnerHTML={{ __html: `“${sanitize(t.quote)}”` }}
+                style={{ margin: '0 0 12px', fontSize: '0.95rem', lineHeight: 1.55, color: VAULT.ink }}
+                dangerouslySetInnerHTML={{ __html: quoteHtml(t.quote) }}
               />
-              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 {t.image && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={t.image} alt={`${t.authorName}`} width={44} height={44} loading="lazy" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <img src={t.image} alt={`${t.authorName}`} width={36} height={36} loading="lazy" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                 )}
-                <span>
-                  <span style={{ display: 'block', fontWeight: 600, fontSize: 14, color: VAULT.ink }}>{t.authorName}</span>
-                  {t.authorRole && <span style={{ display: 'block', fontSize: 13, color: VAULT.mute }}>{t.authorRole}</span>}
+                <span style={{ fontSize: 13, color: VAULT.mute }}>
+                  <span style={{ fontWeight: 600, color: VAULT.ink }}>{t.authorName}</span>
+                  {t.authorRole ? ` · ${t.authorRole}` : ''}
                 </span>
+                {t.rating ? (
+                  <span aria-label={`${t.rating} out of 5 stars`} style={{ marginLeft: 'auto', color: VAULT.gold, letterSpacing: 1, fontSize: '0.85rem' }}>
+                    {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
+                  </span>
+                ) : null}
               </figcaption>
             </figure>
           ))}
