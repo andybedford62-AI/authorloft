@@ -557,6 +557,17 @@ export default async function DashboardPage() {
             bundlesEnabled={bundlesEnabled}
           />
 
+          {/* Ask for a testimonial */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Enjoying AuthorLoft?</p>
+              <p className="text-xs text-gray-500 mt-1">A few sentences about what you&apos;ve done with it helps other authors decide.</p>
+            </div>
+            <Link href="/share-your-story" target="_blank">
+              <Button size="sm" variant="outline">Share your story</Button>
+            </Link>
+          </div>
+
           {/* Plan info */}
           <div className="bg-blue-50 rounded-xl border border-blue-100 p-5">
             <div className="flex items-start justify-between">

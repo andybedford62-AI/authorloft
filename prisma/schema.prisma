@@ -1094,6 +1094,10 @@ model Testimonial {
   image        String?
   isActive     Boolean  @default(false)
   displayOrder Int      @default(0)
+  // Set when submitted through /share-your-story (never shown publicly): who sent it and whether they agreed to publication.
+  submitterEmail   String?
+  consentToPublish Boolean  @default(false)
+  source           String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

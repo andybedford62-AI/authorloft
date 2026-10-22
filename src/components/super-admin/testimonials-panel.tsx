@@ -16,6 +16,9 @@ type Testimonial = {
   image: string | null;
   isActive: boolean;
   displayOrder: number;
+  submitterEmail?: string | null;
+  consentToPublish?: boolean;
+  source?: string | null;
 };
 
 type FormState = {
@@ -373,6 +376,15 @@ export function TestimonialsPanel({ initialTestimonials }: { initialTestimonials
                         )}
                         <span className="text-xs text-gray-400 ml-auto">Order: {t.displayOrder}</span>
                       </div>
+                      {t.source === "share-your-story" && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          <span className="inline-block rounded bg-amber-100 px-1.5 py-0.5 font-medium text-amber-800 mr-2">Submitted</span>
+                          {t.submitterEmail}
+                          {" · "}
+                          {t.consentToPublish ? "agreed to publish" : "no publish consent"}
+                          {!t.isActive && " · not live yet"}
+                        </p>
+                      )}
                       <p
                         className="text-sm text-gray-600 mt-1.5 leading-relaxed line-clamp-2"
                         dangerouslySetInnerHTML={{ __html: `"${t.quote}"` }}
