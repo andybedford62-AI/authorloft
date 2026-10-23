@@ -53,7 +53,7 @@ export function ConsentBanner() {
           </p>
           <button
             onClick={() => setShowBanner(false)}
-            className="text-gray-400 hover:text-gray-600 p-1 -m-1 flex-shrink-0"
+            className="text-gray-400 hover:text-gray-600 p-3.5 -m-3.5 flex-shrink-0"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
@@ -62,13 +62,13 @@ export function ConsentBanner() {
         <div className="flex items-center gap-2 justify-end">
           <button
             onClick={() => handleConsent(false)}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+            className="text-sm font-medium text-gray-600 hover:text-gray-900 px-4 py-3 sm:py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
           >
             Decline
           </button>
           <button
             onClick={() => handleConsent(true)}
-            className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-3 sm:py-2 rounded-lg transition-colors"
           >
             Accept
           </button>
