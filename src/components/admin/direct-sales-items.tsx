@@ -7,7 +7,9 @@ import {
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { IconButton } from "@/components/admin/icon-button";
-import { ShippingProfileForm } from "@/components/admin/shipping-settings";
+import { ShippingProfileForm, type ShippingProfileRow } from "@/components/admin/shipping-settings";
+import { summarizeProfile, buyerTotalText } from "@/lib/shipping-summary";
+import { countryName } from "@/lib/shipping-countries";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/use-toast";
 import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
@@ -93,8 +95,6 @@ type DirectSaleItem = {
   magnetLeadCount?: number;
 };
 
-type ShippingProfileOption = { id: string; name: string };
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function dollarsTocents(dollars: string): number {
@@ -107,7 +107,7 @@ function centsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
-/** Which shipping profile prices a Print edition's postage; new profiles can be created right here. */
+/** Which shipping profile prices a Print edition's postage. Shows what it charges; create/edit without leaving the book. */
 function ShippingProfileSelect({
   profiles,
   value,
@@ -115,51 +115,78 @@ function ShippingProfileSelect({
   shipFrom,
   onShipFromChange,
   onCreated,
+  onUpdated,
 }: {
-  profiles: ShippingProfileOption[];
+  profiles: ShippingProfileRow[];
   value: string;
   onChange: (id: string) => void;
   shipFrom: string | null;
   onShipFromChange: (code: string | null) => void;
-  onCreated: (profile: ShippingProfileOption) => void;
+  onCreated: (profile: ShippingProfileRow) => void;
+  onUpdated: (profile: ShippingProfileRow) => void;
 }) {
-  const [creating, setCreating] = useState(false);
+  const [mode, setMode] = useState<"idle" | "creating" | "editing">("idle");
+  const selected = profiles.find((p) => p.id === value) ?? null;
 
-  if (creating) {
+  if (mode === "creating" || (mode === "editing" && selected)) {
+    const editing = mode === "editing" ? selected : null;
     return (
-      <ShippingProfileForm
-        profile={null}
-        shipFrom={shipFrom}
-        onShipFromChange={onShipFromChange}
-        onCancel={() => setCreating(false)}
-        onSaved={(saved) => {
-          onCreated({ id: saved.id, name: saved.name });
-          onChange(saved.id);
-          setCreating(false);
-        }}
-      />
+      <div className="space-y-2">
+        {editing && editing.itemCount > 1 && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+            “{editing.name}” is used by {editing.itemCount} print editions. Changing its prices changes shipping on all of them.
+          </p>
+        )}
+        <ShippingProfileForm
+          profile={editing}
+          shipFrom={shipFrom}
+          onShipFromChange={onShipFromChange}
+          onCancel={() => setMode("idle")}
+          onSaved={(saved) => {
+            if (editing) onUpdated(saved);
+            else { onCreated(saved); onChange(saved.id); }
+            setMode("idle");
+          }}
+        />
+      </div>
     );
   }
 
+  const summary = selected ? summarizeProfile(selected, shipFrom) : null;
+
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <label className="text-xs font-medium text-gray-600">Shipping profile</label>
       {profiles.length === 0 ? (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
           Print editions need a shipping profile (postage by country) before they can be sold.{" "}
-          <button type="button" className="underline font-medium" onClick={() => setCreating(true)}>Create one now</button>
+          <button type="button" className="underline font-medium" onClick={() => setMode("creating")}>Create one now</button>
         </p>
       ) : (
         <>
           <select
             value={value}
-            onChange={(e) => (e.target.value === "__new" ? setCreating(true) : onChange(e.target.value))}
+            onChange={(e) => (e.target.value === "__new" ? setMode("creating") : onChange(e.target.value))}
             className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm"
           >
             <option value="">Choose a profile…</option>
             {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             <option value="__new">+ New shipping profile…</option>
           </select>
+
+          {summary && selected && (
+            <div className="rounded-md bg-white border border-gray-200 px-3 py-2 space-y-1">
+              <p className="text-xs font-medium text-gray-700">What buyers pay for shipping</p>
+              <ul className="text-xs text-gray-600 space-y-0.5">
+                {summary.lines.map((l, i) => <li key={i}>{l}</li>)}
+              </ul>
+              {summary.warning && <p className="text-xs text-amber-700">{summary.warning}</p>}
+              <button type="button" className="text-xs text-blue-600 hover:underline" onClick={() => setMode("editing")}>
+                Edit these prices
+              </button>
+            </div>
+          )}
+
           <span className="flex gap-3 text-xs">
             <a href="/admin/settings?tab=shipping" className="text-gray-500 underline hover:text-gray-700">Manage shipping profiles</a>
             <a href="/admin/help?article=ha_print_shipping" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">How shipping works</a>
@@ -380,7 +407,7 @@ export function DirectSalesItems({
   const [toggleError, setToggleError] = useState("");
 
   // Shipping profiles (Print editions only)
-  const [shipProfiles, setShipProfiles] = useState<ShippingProfileOption[]>([]);
+  const [shipProfiles, setShipProfiles] = useState<ShippingProfileRow[]>([]);
   const [addProfileId, setAddProfileId] = useState("");
   const [editProfileId, setEditProfileId] = useState("");
   const [shipFrom, setShipFrom] = useState<string | null>(null);
@@ -390,7 +417,7 @@ export function DirectSalesItems({
     fetch("/api/admin/shipping")
       .then((r) => r.json())
       .then((d) => {
-        const list: ShippingProfileOption[] = Array.isArray(d.profiles) ? d.profiles.map((p: ShippingProfileOption) => ({ id: p.id, name: p.name })) : [];
+        const list: ShippingProfileRow[] = Array.isArray(d.profiles) ? d.profiles : [];
         setShipProfiles(list);
         setShipFrom(d.shipFromCountry ?? null);
         if (list.length > 0) setAddProfileId((cur) => cur || list[0].id);
@@ -749,7 +776,7 @@ export function DirectSalesItems({
           )}
 
           {selectedFormat === "PRINT" && (
-            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
+            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} onUpdated={(p) => setShipProfiles((prev) => prev.map((x) => (x.id === p.id ? p : x)))} />
           )}
 
           {/* Description */}
@@ -851,7 +878,7 @@ export function DirectSalesItems({
                       )}
                     </div>
                     {item.format === "PRINT" && (
-                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
+                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} onUpdated={(p) => setShipProfiles((prev) => prev.map((x) => (x.id === p.id ? p : x)))} />
                     )}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
@@ -908,9 +935,16 @@ export function DirectSalesItems({
                         )}
                         {item.format === "PRINT" && (
                           item.shippingProfileId ? (
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              Ships with: {shipProfiles.find((p) => p.id === item.shippingProfileId)?.name ?? "shipping profile"}
-                            </p>
+                            (() => {
+                              const prof = shipProfiles.find((p) => p.id === item.shippingProfileId);
+                              const total = prof ? buyerTotalText(prof, shipFrom, item.priceCents) : null;
+                              return (
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                  Ships with: {prof?.name ?? "shipping profile"}
+                                  {total && shipFrom ? ` · a buyer in ${countryName(shipFrom)} pays ${total}` : ""}
+                                </p>
+                              );
+                            })()
                           ) : (
                             <p className="text-xs text-amber-700 mt-0.5">No shipping profile. Edit this format to choose one before it can be sold.</p>
                           )
