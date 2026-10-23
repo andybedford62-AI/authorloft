@@ -302,7 +302,7 @@ export default async function HomePage() {
           <MidnightPricingSection plans={plans} />
           <p style={{ fontSize: '0.8125rem', color: VAULT.mute, marginTop: 24 }}>
             Stripe fees apply to direct sales &nbsp;&middot;&nbsp; 30-day money-back guarantee on your first paid payment &nbsp;&middot;&nbsp; cancel anytime &nbsp;&middot;&nbsp;
-            <Link href="/pricing" style={{ color: VAULT.mute, textDecoration: 'underline' }}>Full plan comparison →</Link>
+            <Link href="/pricing" style={{ color: VAULT.mute, textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', minHeight: 44 }}>Full plan comparison →</Link>
           </p>
         </div>
       </section>

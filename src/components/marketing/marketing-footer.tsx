@@ -72,7 +72,7 @@ export async function MarketingFooter() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <Link
             href="/"
-            className="text-lg font-bold italic text-vault-cream-ink hover:text-vault-gold-muted transition-colors font-vault-display"
+            className="inline-flex items-center min-h-11 text-lg font-bold italic text-vault-cream-ink hover:text-vault-gold-muted transition-colors font-vault-display"
           >
             AuthorLoft
           </Link>
@@ -99,7 +99,7 @@ export async function MarketingFooter() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="inline-block text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors py-2.5 sm:py-1 font-vault-display"
+                      className="inline-block text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors py-3 sm:py-1 font-vault-display"
                       {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     >
                       {label}

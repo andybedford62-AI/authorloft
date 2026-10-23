@@ -54,12 +54,12 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
           type="email"
           required
           placeholder="Your email"
-          className="rounded-lg px-3 py-2 text-sm bg-white border border-[#DCDBD3] text-[#1B2B47] placeholder-[#9b8e7e] focus:outline-none focus:border-[#5C6E89] min-w-0 sm:w-56"
+          className="rounded-lg px-3 py-3 sm:py-2 text-sm bg-white border border-[#DCDBD3] text-[#1B2B47] placeholder-[#9b8e7e] focus:outline-none focus:border-[#5C6E89] min-w-0 sm:w-56"
         />
         <button
           type="submit"
           disabled={state === "loading"}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#1B2B47] text-white text-sm font-medium hover:bg-[#27406B] transition-colors disabled:opacity-60 flex-shrink-0"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-3 sm:py-2 rounded-lg bg-[#1B2B47] text-white text-sm font-medium hover:bg-[#27406B] transition-colors disabled:opacity-60 flex-shrink-0"
         >
           {state === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
           Subscribe
@@ -101,7 +101,7 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
               type="email"
               required
               placeholder="you@example.com"
-              className={`flex-1 rounded-lg px-4 py-2.5 text-sm focus:outline-none ${
+              className={`flex-1 rounded-lg px-4 py-3 sm:py-2.5 text-sm focus:outline-none ${
                 onDark
                   ? "bg-white/15 text-white placeholder-white/60 border border-white/30 focus:border-white/70"
                   : "bg-white text-[#1B2B47] placeholder-[#9b8e7e] border border-[#A9BDD6] focus:border-[#5C6E89]"
@@ -110,7 +110,7 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
             <button
               type="submit"
               disabled={state === "loading"}
-              className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-60 flex-shrink-0 ${
+              className={`inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-60 flex-shrink-0 ${
                 onDark ? "bg-[#B8893D] text-[#1B2B47] hover:bg-[#D4AE6A]" : "bg-[#1B2B47] text-white hover:bg-[#27406B]"
               }`}
             >
@@ -125,7 +125,7 @@ export function NewsSubscribeForm({ source, variant = "box", darkMode = false }:
           )}
           <p className={`text-xs mt-3 ${onDark ? "text-[#D4DDEB]/70" : "text-[#5C6E89]/80"}`}>
             By subscribing you agree to our{" "}
-            <a href="/privacy" className="underline hover:no-underline">Privacy Policy</a>.
+            <a href="/privacy" className="underline hover:no-underline inline-flex items-center min-h-11">Privacy Policy</a>.
           </p>
         </>
       )}

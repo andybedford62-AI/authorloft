@@ -55,16 +55,15 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
         <button
           onClick={() => setAnnual(!annual)}
           aria-label="Toggle billing period"
-          style={{
-            width: 48, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer', padding: 0,
-            background: annual ? VAULT.gold : VAULT.surf2, position: 'relative', transition: 'background 0.2s',
-          }}
+          style={{ width: 56, height: 44, border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <div style={{
-            position: 'absolute', top: 3, left: annual ? 25 : 3,
-            width: 20, height: 20, borderRadius: '50%', background: VAULT.ink,
-            transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-          }} />
+          <span style={{ width: 48, height: 26, borderRadius: 999, background: annual ? VAULT.gold : VAULT.surf2, position: 'relative', transition: 'background 0.2s', display: 'block' }}>
+            <span style={{
+              position: 'absolute', top: 3, left: annual ? 25 : 3,
+              width: 20, height: 20, borderRadius: '50%', background: VAULT.ink,
+              transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', display: 'block',
+            }} />
+          </span>
         </button>
         <span style={{ fontSize: 14, fontWeight: 500, color: annual ? VAULT.ink : VAULT.mute }}>
           Annual <span style={{ fontSize: 12, color: VAULT.gold, fontWeight: 600 }}>save 20%</span>

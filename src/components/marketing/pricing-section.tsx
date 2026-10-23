@@ -145,9 +145,12 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
             role="switch"
             aria-checked={annual}
             onClick={() => setAnnual((v) => !v)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-vault-gold" : "bg-vault-surf-2"}`}
+            aria-label="Toggle billing period"
+            className="inline-flex h-11 w-14 items-center justify-center"
           >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-vault-ink shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
+            <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${annual ? "bg-vault-gold" : "bg-vault-surf-2"}`}>
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-vault-ink shadow transition-transform ${annual ? "translate-x-6" : "translate-x-1"}`} />
+            </span>
           </button>
           <span className={`text-sm font-medium ${annual ? "text-vault-ink" : "text-vault-mute"}`}>Annual</span>
           {annual && (
