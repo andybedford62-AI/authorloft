@@ -17,10 +17,11 @@ export function isBookFormat(v: unknown): v is BookFormatId {
   return typeof v === "string" && FORMAT_IDS.has(v);
 }
 
-/** Direct-sale items use their own format enum; this is the card each lands on. */
-export function directSaleCardFormat(format: string): BookFormatId {
+/** Direct-sale items use their own format enum; this is the card each lands on. A print edition lands on
+ *  Hardcover when its printBinding says so, otherwise (null/unknown) on Paperback. */
+export function directSaleCardFormat(format: string, printBinding?: string | null): BookFormatId {
   switch (format) {
-    case "PRINT": return "PAPERBACK";
+    case "PRINT": return printBinding === "HARDBACK" ? "HARDBACK" : "PAPERBACK";
     case "AUDIO": return "AUDIOBOOK";
     default:      return "EBOOK"; // EBOOK and FLIPBOOK are both digital reads
   }
@@ -44,7 +45,7 @@ export function parseLinkFormats(input: unknown): BookFormatId[] {
   return BOOK_FORMATS.map((f) => f.id).filter((id) => input.includes(id));
 }
 
-type SaleItem = { id: string; format: string; label: string; description: string | null; priceCents: number };
+type SaleItem = { id: string; format: string; label: string; description: string | null; priceCents: number; printBinding?: string | null };
 type Link = { id: string; retailer: string; label: string; url: string; formats: string[] };
 
 export type FormatOption = {
@@ -83,12 +84,12 @@ export function buildFormatOptions({
 }): FormatOption[] {
   const prices = parseFormatPrices(formatPrices);
   const wanted = new Set<BookFormatId>(availableFormats.filter(isBookFormat));
-  for (const i of [...paidItems, ...magnetItems]) wanted.add(directSaleCardFormat(i.format));
+  for (const i of [...paidItems, ...magnetItems]) wanted.add(directSaleCardFormat(i.format, i.printBinding));
 
   const stores = retailerLinks.filter((l) => l.retailer !== "goodreads");
 
   return BOOK_FORMATS.filter((f) => wanted.has(f.id)).map((f) => {
-    const direct = paidItems.filter((i) => directSaleCardFormat(i.format) === f.id);
+    const direct = paidItems.filter((i) => directSaleCardFormat(i.format, i.printBinding) === f.id);
     const cheapest = direct.length ? Math.min(...direct.map((i) => i.priceCents)) : null;
     const list = prices[f.id] ?? null;
     return {
@@ -98,7 +99,7 @@ export function buildFormatOptions({
       priceIsDirect: cheapest !== null,
       listPriceCents: list,
       directItems: direct,
-      magnetItems: magnetItems.filter((i) => directSaleCardFormat(i.format) === f.id),
+      magnetItems: magnetItems.filter((i) => directSaleCardFormat(i.format, i.printBinding) === f.id),
       stores: stores.filter((l) => l.formats.length === 0 || l.formats.includes(f.id)),
     };
   });

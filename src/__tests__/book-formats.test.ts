@@ -61,6 +61,28 @@ describe("parsers", () => {
     expect(directSaleCardFormat("AUDIO")).toBe("AUDIOBOOK");
     expect(directSaleCardFormat("FLIPBOOK")).toBe("EBOOK");
   });
+
+  it("sends a print edition to Hardcover only when its binding says so", () => {
+    expect(directSaleCardFormat("PRINT", "HARDBACK")).toBe("HARDBACK");
+    expect(directSaleCardFormat("PRINT", "PAPERBACK")).toBe("PAPERBACK");
+    expect(directSaleCardFormat("PRINT", null)).toBe("PAPERBACK");
+    expect(directSaleCardFormat("PRINT", "junk")).toBe("PAPERBACK");
+    expect(directSaleCardFormat("EBOOK", "HARDBACK")).toBe("EBOOK"); // binding only applies to print
+  });
+
+  it("puts a hardcover direct item on the Hardcover card, apart from the paperback", () => {
+    const paperback = { id: "p", format: "PRINT", label: "Paperback", description: null, priceCents: 699, printBinding: null };
+    const hardcover = { id: "h", format: "PRINT", label: "Hardcover", description: null, priceCents: 2499, printBinding: "HARDBACK" };
+    const o = buildFormatOptions({
+      availableFormats: ["PAPERBACK", "HARDBACK"], formatPrices: { HARDBACK: 2499 },
+      retailerLinks: [amazon], paidItems: [paperback, hardcover], magnetItems: [],
+    });
+    expect(o.map((x) => x.id)).toEqual(["PAPERBACK", "HARDBACK"]);
+    expect(o[0].directItems.map((i) => i.id)).toEqual(["p"]);
+    expect(o[1].directItems.map((i) => i.id)).toEqual(["h"]);
+    expect(o[1]).toMatchObject({ priceCents: 2499, priceIsDirect: true });
+    expect(o[1].stores.map((s) => s.id)).toEqual(["a"]);
+  });
 });
 
 describe("single book price for listings", () => {

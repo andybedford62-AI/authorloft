@@ -21,7 +21,7 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { label, description, priceCents, isActive, isReaderMagnet, clearFile, shippingProfileId } = body;
+  const { label, description, priceCents, isActive, isReaderMagnet, clearFile, shippingProfileId, printBinding } = body;
 
   // Print editions need a shipping profile of the author's own before they can be sold.
   let nextProfileId: string | null = existing.shippingProfileId;
@@ -93,6 +93,7 @@ export async function PATCH(
       ...(forceInactive && { isActive: false }),
       ...(isReaderMagnet !== undefined && { isReaderMagnet }),
       ...(existing.format === "PRINT" && nextProfileId !== existing.shippingProfileId && { shippingProfileId: nextProfileId }),
+      ...(existing.format === "PRINT" && (printBinding === "HARDBACK" || printBinding === "PAPERBACK") && { printBinding }),
       ...(clearFile && { fileUrl: null, fileKey: null, fileName: null }),
     },
   });

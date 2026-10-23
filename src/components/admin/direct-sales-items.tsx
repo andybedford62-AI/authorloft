@@ -92,6 +92,7 @@ type DirectSaleItem = {
   fileKey: string | null;
   fileName: string | null;
   shippingProfileId: string | null;
+  printBinding?: string | null;
   magnetLeadCount?: number;
 };
 
@@ -105,6 +106,24 @@ function dollarsTocents(dollars: string): number {
 
 function centsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
+}
+
+/** Paperback or Hardcover: decides which format card on the book page this print edition is sold under. */
+function PrintBindingSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-gray-600">This print edition is a</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm"
+      >
+        <option value="PAPERBACK">Paperback</option>
+        <option value="HARDBACK">Hardcover</option>
+      </select>
+      <p className="text-xs text-gray-400">Readers see it under the matching format on your book page.</p>
+    </div>
+  );
 }
 
 /** Which shipping profile prices a Print edition's postage. Shows what it charges; create/edit without leaving the book. */
@@ -410,6 +429,8 @@ export function DirectSalesItems({
   const [shipProfiles, setShipProfiles] = useState<ShippingProfileRow[]>([]);
   const [addProfileId, setAddProfileId] = useState("");
   const [editProfileId, setEditProfileId] = useState("");
+  const [addBinding, setAddBinding] = useState("PAPERBACK");
+  const [editBinding, setEditBinding] = useState("PAPERBACK");
   const [shipFrom, setShipFrom] = useState<string | null>(null);
 
   // ── Load ───────────────────────────────────────────────────────────────────
@@ -440,7 +461,7 @@ export function DirectSalesItems({
     // Free-plan authors can only offer free Reader Magnets, so force price 0 and
     // mark the edition as a magnet up front.
     const priceCents = salesEnabled ? dollarsTocents(priceInput) : 0;
-    const label = customLabel.trim() || FORMATS[selectedFormat].defaultLabel;
+    const label = customLabel.trim() || (selectedFormat === "PRINT" && addBinding === "HARDBACK" ? "Hardcover" : FORMATS[selectedFormat].defaultLabel);
 
     setSaving(true);
     const res = await fetch(`/api/admin/books/${bookId}/direct-sales`, {
@@ -453,6 +474,7 @@ export function DirectSalesItems({
         priceCents,
         isReaderMagnet: salesEnabled ? undefined : true,
         ...(selectedFormat === "PRINT" && addProfileId && { shippingProfileId: addProfileId }),
+        ...(selectedFormat === "PRINT" && { printBinding: addBinding }),
       }),
     });
 
@@ -530,6 +552,7 @@ export function DirectSalesItems({
     setEditDesc(item.description ?? "");
     setEditPrice(centsToDollars(item.priceCents));
     setEditProfileId(item.shippingProfileId ?? "");
+    setEditBinding(item.printBinding === "HARDBACK" ? "HARDBACK" : "PAPERBACK");
   }
 
   // ── Save edit ──────────────────────────────────────────────────────────────
@@ -539,10 +562,11 @@ export function DirectSalesItems({
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        label: editLabel.trim() || FORMATS[item.format].defaultLabel,
+        label: editLabel.trim() || (item.format === "PRINT" && editBinding === "HARDBACK" ? "Hardcover" : FORMATS[item.format].defaultLabel),
         description: editDesc.trim() || null,
         priceCents: dollarsTocents(editPrice),
         ...(item.format === "PRINT" && editProfileId && { shippingProfileId: editProfileId }),
+        ...(item.format === "PRINT" && { printBinding: editBinding }),
       }),
     });
     if (res.ok) {
@@ -734,14 +758,14 @@ export function DirectSalesItems({
               <label className="text-xs font-medium text-gray-600">
                 Button label{" "}
                 <span className="text-gray-400 font-normal">
-                  (optional — defaults to "{FORMATS[selectedFormat].defaultLabel}")
+                  (optional — defaults to "{selectedFormat === "PRINT" && addBinding === "HARDBACK" ? "Hardcover" : FORMATS[selectedFormat].defaultLabel}")
                 </span>
               </label>
               <input
                 type="text"
                 value={customLabel}
                 onChange={(e) => setCustomLabel(e.target.value)}
-                placeholder={FORMATS[selectedFormat].defaultLabel}
+                placeholder={selectedFormat === "PRINT" && addBinding === "HARDBACK" ? "Hardcover" : FORMATS[selectedFormat].defaultLabel}
                 className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
@@ -775,6 +799,7 @@ export function DirectSalesItems({
             </p>
           )}
 
+          {selectedFormat === "PRINT" && <PrintBindingSelect value={addBinding} onChange={setAddBinding} />}
           {selectedFormat === "PRINT" && (
             <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} onUpdated={(p) => setShipProfiles((prev) => prev.map((x) => (x.id === p.id ? p : x)))} />
           )}
@@ -877,6 +902,7 @@ export function DirectSalesItems({
                         </div>
                       )}
                     </div>
+                    {item.format === "PRINT" && <PrintBindingSelect value={editBinding} onChange={setEditBinding} />}
                     {item.format === "PRINT" && (
                       <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} onUpdated={(p) => setShipProfiles((prev) => prev.map((x) => (x.id === p.id ? p : x)))} />
                     )}
@@ -940,7 +966,7 @@ export function DirectSalesItems({
                               const total = prof ? buyerTotalText(prof, shipFrom, item.priceCents) : null;
                               return (
                                 <p className="text-xs text-gray-400 mt-0.5">
-                                  Ships with: {prof?.name ?? "shipping profile"}
+                                  {item.printBinding === "HARDBACK" ? "Hardcover" : "Paperback"} · Ships with: {prof?.name ?? "shipping profile"}
                                   {total && shipFrom ? ` · a buyer in ${countryName(shipFrom)} pays ${total}` : ""}
                                 </p>
                               );

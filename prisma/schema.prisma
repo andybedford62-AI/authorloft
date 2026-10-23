@@ -479,6 +479,7 @@ model BookDirectSaleItem {
   fileUrl        String? // Supabase storage URL (for display / reference)
   fileKey        String? // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
   fileName       String? // Original filename shown in admin UI
+  printBinding   String? // PRINT items only: "PAPERBACK" | "HARDBACK" — which book-page format card the edition sells under; null = PAPERBACK
   shippingProfileId String? // PRINT items only: which of the author's shipping profiles prices this item's postage
   shippingProfile   ShippingProfile? @relation(fields: [shippingProfileId], references: [id], onDelete: SetNull)
   createdAt      DateTime         @default(now())

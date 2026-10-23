@@ -91,6 +91,7 @@ export async function POST(
     if (wanted && !profile) return NextResponse.json({ error: "Shipping profile not found." }, { status: 400 });
     shippingProfileId = profile?.id ?? null;
   }
+  const printBinding = format === "PRINT" ? (body.printBinding === "HARDBACK" ? "HARDBACK" : "PAPERBACK") : null;
 
   const item = await prisma.bookDirectSaleItem.create({
     data: {
@@ -105,6 +106,7 @@ export async function POST(
       // start inactive so there's never a live buy button with nothing behind it.
       isActive: format === "PRINT" && !!shippingProfileId,
       ...(shippingProfileId && { shippingProfileId }),
+      ...(printBinding && { printBinding }),
     },
   });
 

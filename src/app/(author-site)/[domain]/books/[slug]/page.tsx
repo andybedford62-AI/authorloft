@@ -115,7 +115,7 @@ export default async function BookDetailPage({
       },
       directSaleItems: {
         where: { isActive: true },
-        select: { id: true, format: true, label: true, description: true, priceCents: true, isReaderMagnet: true, fileKey: true },
+        select: { id: true, format: true, label: true, description: true, priceCents: true, printBinding: true, isReaderMagnet: true, fileKey: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
       audioTracks: {
