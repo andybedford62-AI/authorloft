@@ -129,7 +129,7 @@ export async function MarketingFooter() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={link.platform}
-                    className="text-vault-cream-mute opacity-60 hover:opacity-100 transition-opacity p-3 -m-3 sm:p-0 sm:m-0"
+                    className="text-vault-cream-mute opacity-60 hover:opacity-100 transition-opacity p-3.5 -m-3.5 sm:p-0 sm:m-0"
                   >
                     <Icon className="h-4 w-4" />
                   </a>

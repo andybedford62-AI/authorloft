@@ -233,7 +233,7 @@ export default async function PricingPage() {
                 <p className="mt-8 text-center text-sm text-vault-mute max-w-2xl mx-auto leading-relaxed">
                   Building the same basics yourself takes about <b className="text-vault-ink">{setupHours} hours</b> to set up and around{" "}
                   <b className="text-vault-ink">${monthlyCost} a month</b>. The Free plan includes them.{" "}
-                  <Link href="/pricing/calculator" className="text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">
+                  <Link href="/pricing/calculator" className="inline-flex items-center min-h-11 text-vault-gold font-semibold hover:text-vault-gold-light transition-colors">
                     See the numbers for your project →
                   </Link>
                 </p>
@@ -298,12 +298,12 @@ export default async function PricingPage() {
                 <tr className="border-t border-vault-ink/12 bg-vault-surf-2">
                   <td className="px-3 sm:px-6 py-4" />
                   <td className="px-3 sm:px-6 py-4 text-center">
-                    <Link href="/register" className="text-sm font-semibold text-vault-gold hover:underline">
+                    <Link href="/register" className="inline-flex items-center min-h-11 text-sm font-semibold text-vault-gold hover:underline">
                       Get started →
                     </Link>
                   </td>
                   <td className="px-3 sm:px-6 py-4 text-center bg-vault-surf-2">
-                    <Link href="/register?plan=standard" className="text-sm font-semibold text-vault-gold hover:underline">
+                    <Link href="/register?plan=standard" className="inline-flex items-center min-h-11 text-sm font-semibold text-vault-gold hover:underline">
                       Start free → Standard
                     </Link>
                   </td>
@@ -348,19 +348,19 @@ export default async function PricingPage() {
                     <span className="block text-xs font-semibold text-vault-gold-light mt-0.5">STANDARD · $9.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-vault-ink">
-                    <Link href="/compare/tertulia" className="hover:text-vault-gold hover:underline transition-colors">Tertulia</Link>
+                    <Link href="/compare/tertulia" className="inline-flex items-center min-h-11 hover:text-vault-gold hover:underline transition-colors">Tertulia</Link>
                     <span className="block text-xs font-normal text-vault-mute mt-0.5">$7.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-vault-ink">
-                    <Link href="/compare/quilltips" className="hover:text-vault-gold hover:underline transition-colors">Quilltips</Link>
+                    <Link href="/compare/quilltips" className="inline-flex items-center min-h-11 hover:text-vault-gold hover:underline transition-colors">Quilltips</Link>
                     <span className="block text-xs font-normal text-vault-mute mt-0.5">$4.99/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-vault-ink">
-                    <Link href="/compare/storyorigin" className="hover:text-vault-gold hover:underline transition-colors">StoryOrigin</Link>
+                    <Link href="/compare/storyorigin" className="inline-flex items-center min-h-11 hover:text-vault-gold hover:underline transition-colors">StoryOrigin</Link>
                     <span className="block text-xs font-normal text-vault-mute mt-0.5">~$20/mo</span>
                   </th>
                   <th className="text-center px-4 py-4 font-semibold text-vault-ink">
-                    <Link href="/compare/bookfunnel" className="hover:text-vault-gold hover:underline transition-colors">BookFunnel</Link>
+                    <Link href="/compare/bookfunnel" className="inline-flex items-center min-h-11 hover:text-vault-gold hover:underline transition-colors">BookFunnel</Link>
                     <span className="block text-xs font-normal text-vault-mute mt-0.5">~$49/mo</span>
                   </th>
                 </tr>
@@ -397,18 +397,18 @@ export default async function PricingPage() {
           </p>
           <p className="text-center text-sm mt-3 text-vault-mute">
             Full comparisons:{" "}
-            <Link href="/compare/bookfunnel" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookFunnel</Link>
+            <Link href="/compare/bookfunnel" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookFunnel</Link>
             {" · "}
-            <Link href="/compare/storyorigin" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs StoryOrigin</Link>
+            <Link href="/compare/storyorigin" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-medium transition-colors">vs StoryOrigin</Link>
             {" · "}
-            <Link href="/compare/tertulia" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Tertulia</Link>
+            <Link href="/compare/tertulia" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Tertulia</Link>
             {" · "}
-            <Link href="/compare/quilltips" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Quilltips</Link>
+            <Link href="/compare/quilltips" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Quilltips</Link>
             {" · "}
-            <Link href="/compare/bookauth" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookAuth</Link>
+            <Link href="/compare/bookauth" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookAuth</Link>
           </p>
           <p className="text-center text-sm mt-4">
-            <Link href="/compare" className="text-vault-gold hover:text-vault-ink font-semibold transition-colors">
+            <Link href="/compare" className="inline-flex items-center min-h-11 text-vault-gold hover:text-vault-ink font-semibold transition-colors">
               Teach courses or make music? See how AuthorLoft compares for those too →
             </Link>
           </p>

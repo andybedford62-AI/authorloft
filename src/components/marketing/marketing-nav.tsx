@@ -14,7 +14,7 @@ export function MarketingNav({ activePage, pricingHref = "/pricing" }: { activeP
 
         {/* Left: Logo + author name if logged in */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center min-h-11">
             <svg viewBox="0 0 260 38" width={200} height={34} aria-label="AuthorLoft" role="img">
               <text x="0" y="30" style={{ fontFamily: 'var(--font-vault-display)', fontStyle: 'italic', fontSize: 32, fontWeight: 400, letterSpacing: '-0.02em' }}>
                 <tspan className="fill-vault-gold">Author</tspan><tspan className="fill-vault-ink">Loft</tspan>
