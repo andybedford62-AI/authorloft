@@ -5,6 +5,7 @@ import { ShoppingCart, Loader2 } from "lucide-react";
 import { formatCents } from "@/lib/utils";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
+import { TaxNotice } from "@/components/author-site/tax-notice";
 import { ShippingPicker, NO_SHIPPING, type ShippingSelection } from "@/components/author-site/shipping-picker";
 
 interface BuySectionProps {
@@ -111,6 +112,8 @@ export function BuySection({ saleItemId, basePriceCents, accentColor }: BuySecti
           <><ShoppingCart className="h-4 w-4" /> Pay {formatCents(finalPrice)}</>
         )}
       </button>
+
+      <TaxNotice />
 
       {checkoutError && (
         <p className="text-sm text-red-600 text-center">{checkoutError}</p>

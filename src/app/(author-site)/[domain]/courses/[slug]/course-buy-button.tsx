@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
+import { TaxNotice } from "@/components/author-site/tax-notice";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
 
 interface CourseBuyButtonProps {
@@ -161,6 +162,7 @@ export function CourseBuyButton({ courseId, priceCents, accentColor }: CourseBuy
         )}
         Enroll — ${(finalPriceCents / 100).toFixed(2)}
       </Button>
+      <TaxNotice />
       {error && (
         <p className="text-sm text-red-600 mt-2 text-center">{error}</p>
       )}

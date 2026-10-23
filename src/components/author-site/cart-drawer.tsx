@@ -6,6 +6,7 @@ import { useCart } from "@/context/cart-context";
 import { formatCents } from "@/lib/utils";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
+import { TaxNotice } from "@/components/author-site/tax-notice";
 import { ShippingPicker, NO_SHIPPING, type ShippingSelection } from "@/components/author-site/shipping-picker";
 import Image from "next/image";
 
@@ -231,7 +232,7 @@ export function CartDrawer() {
                 <span>Total</span>
                 <span>{formatCents(finalTotal)}</span>
               </div>
-              <p className="text-xs text-gray-400">+ tax where applicable</p>
+              <TaxNotice className="text-left" />
             </div>
 
             {/* Stripe minimum warning */}

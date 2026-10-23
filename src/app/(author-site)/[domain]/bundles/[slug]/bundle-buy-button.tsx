@@ -5,6 +5,7 @@ import { Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
+import { TaxNotice } from "@/components/author-site/tax-notice";
 import { ShippingPicker, NO_SHIPPING, type ShippingSelection } from "@/components/author-site/shipping-picker";
 
 interface BundleBuyButtonProps {
@@ -82,6 +83,7 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
         )}
         Buy Bundle — ${(finalPriceCents / 100).toFixed(2)}
       </Button>
+      <TaxNotice />
       {error && (
         <p className="text-sm text-red-600 mt-2 text-center">{error}</p>
       )}
