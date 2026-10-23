@@ -88,7 +88,7 @@ export default async function BookstorePage() {
   };
 
   // Structured data
-  const bookListItems = books.slice(0, 100).map((b, i) => ({
+  const bookListItems = books.slice(0, 12).map((b, i) => ({
     "@type": "ListItem",
     position: i + 1,
     item: {
@@ -114,7 +114,7 @@ export default async function BookstorePage() {
   // Courses continue the same ItemList numbering after the books.
   // schema.org Course requires name/description/provider, so description falls
   // back rather than emitting an incomplete entity.
-  const courseListItems = courses.slice(0, 100).map((c, i) => ({
+  const courseListItems = courses.slice(0, 12).map((c, i) => ({
     "@type": "ListItem",
     position: bookListItems.length + i + 1,
     item: {
@@ -141,7 +141,7 @@ export default async function BookstorePage() {
   // Music continues the same ItemList numbering after books and courses.
   // schema.org MusicPlaylist requires no strict fields beyond name/url, so
   // no description fallback is needed the way Course requires one.
-  const musicListItems = music.slice(0, 100).map((m, i) => ({
+  const musicListItems = music.slice(0, 12).map((m, i) => ({
     "@type": "ListItem",
     position: bookListItems.length + courseListItems.length + i + 1,
     item: {

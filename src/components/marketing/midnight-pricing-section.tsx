@@ -121,7 +121,7 @@ export function MidnightPricingSection({ plans }: { plans: PlanData[] }) {
                   {price}
                 </span>
                 <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, opacity: 0.6 }}>
-                  {annual && plan.annualPriceCents > 0 ? '/mo · billed yearly' : '/month'}
+                  {annual && plan.annualPriceCents > 0 ? '/mo · billed yearly' : plan.monthlyPriceCents === 0 ? '/forever' : '/month'}
                 </span>
               </div>
 

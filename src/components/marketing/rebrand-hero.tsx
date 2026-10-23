@@ -360,9 +360,9 @@ export function RebelHero({
 
           {/* Mantra strip */}
           <div style={{ display: 'flex', gap: 0, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
-            {['your storefront', 'your audience', 'your revenue', 'your rules'].map((word, i) => (
+            {['your storefront', 'your audience', 'your courses', 'your music', 'your rules'].map((word, i) => (
               <span key={word} style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: i % 2 === 0 ? VAULT.ink : VAULT.gold, opacity: i % 2 === 0 ? 0.55 : 0.9, marginRight: 16 }}>
-                {word}{i < 3 ? ' ·' : ''}
+                {word}{i < 4 ? ' ·' : ''}
               </span>
             ))}
           </div>

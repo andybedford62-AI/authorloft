@@ -404,6 +404,8 @@ export default async function PricingPage() {
             <Link href="/compare/tertulia" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Tertulia</Link>
             {" · "}
             <Link href="/compare/quilltips" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs Quilltips</Link>
+            {" · "}
+            <Link href="/compare/bookauth" className="text-vault-gold hover:text-vault-ink font-medium transition-colors">vs BookAuth</Link>
           </p>
           <p className="text-center text-sm mt-4">
             <Link href="/compare" className="text-vault-gold hover:text-vault-ink font-semibold transition-colors">

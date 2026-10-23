@@ -91,6 +91,14 @@ async function getShowcaseAuthors() {
   }).catch(() => []);
 }
 
+// Real count of live creator sites for the proof block above pricing (audit D3.1).
+// Only counts authors who opted into the showcase and have a published book.
+async function getLaunchedAuthorCount() {
+  return prisma.author.count({
+    where: { showInShowcase: true, isActive: true, books: { some: { isPublished: true } } },
+  }).catch(() => 0);
+}
+
 async function getFaqs() {
   const [items, total] = await Promise.all([
     prisma.homepageFaq.findMany({
@@ -181,8 +189,8 @@ const howToLd = {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [plans, testimonials, showcaseAuthors, faqData, heroSettings, foundingOffer, demoSiteUrl] = await Promise.all([
-    getActivePlans(), getTestimonials(), getShowcaseAuthors(), getFaqs(),
+  const [plans, testimonials, showcaseAuthors, launchedAuthorCount, faqData, heroSettings, foundingOffer, demoSiteUrl] = await Promise.all([
+    getActivePlans(), getTestimonials(), getShowcaseAuthors(), getLaunchedAuthorCount(), getFaqs(),
     prisma.platformSettings.findUnique({
       where: { id: "singleton" },
       select: { heroHeadlineLine1: true, heroHeadlineLine2: true, heroSubheadline: true },
@@ -192,10 +200,12 @@ export default async function HomePage() {
   ]);
 
   const faqs = faqData.items;
-  const faqJsonLd = faqs.length > 0 ? {
+  // Short schema payload (audit D5.4): the first few questions are enough for rich results.
+  const faqSchemaItems = faqs.slice(0, 5);
+  const faqJsonLd = faqSchemaItems.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
+    mainEntity: faqSchemaItems.map((f) => ({
       "@type": "Question",
       name: f.question,
       acceptedAnswer: { "@type": "Answer", text: f.answer.replace(/<[^>]+>/g, "").trim() },
@@ -230,6 +240,11 @@ export default async function HomePage() {
       {/* ── Product preview (real screenshots, not mockups) ───────────── */}
       <ProductPreviewSection />
 
+      {/* ── Other authors, in their own words (D3.2). testimonials[0] is the
+          founder note below; this only renders once real non-founder
+          testimonials exist in the DB (Super Admin → Testimonials). ──── */}
+      <CustomerProofSection testimonials={testimonials.slice(1)} />
+
       {/* ── Third-party proof + shipped-work link (D3.5) ─────────────── */}
       <ProofStrip />
 
@@ -242,11 +257,6 @@ export default async function HomePage() {
         platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'}
       />
 
-      {/* ── Other authors, in their own words (D3.2). testimonials[0] is the
-          founder note above; this only renders once real non-founder
-          testimonials exist in the DB (Super Admin → Testimonials). ──── */}
-      <CustomerProofSection testimonials={testimonials.slice(1)} />
-
       {/* ── "Very new platform" objection (D1.4) ─────────────────────── */}
       <NewPlatformSection />
 
@@ -255,6 +265,9 @@ export default async function HomePage() {
 
       {/* ── Who it's not for (D2.B scope honesty) ────────────────────── */}
       <NotForSection />
+
+      {/* ── Member count with faces (D3.1). Hidden until the number is one we can defend. ── */}
+      <LaunchedAuthorsProof count={launchedAuthorCount} authors={showcaseAuthors} platformDomain={process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || 'authorloft.com'} />
 
       {/* ── Pricing (dynamic from DB) ─────────────────────────────────── */}
       <section style={{ background: VAULT.surf, borderTop: `1px solid ${VAULT.line}`, borderBottom: `1px solid ${VAULT.line}`, padding: '64px 28px' }}>
@@ -550,7 +563,7 @@ function ProofStrip() {
             <span style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: VAULT.mute }}>Find us on</span>
             {THIRD_PARTY_PROOF.map((p) => (
               <a key={p.href} href={p.href} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: VAULT.ink, textDecoration: 'underline', textUnderlineOffset: 3 }}>
-                {p.label}{p.note ? ` · ${p.note}` : ''}
+                {p.label}{p.note ? ` · ${p.note}` : ''}{p.asOf ? ` · as of ${p.asOf}` : ''}
               </a>
             ))}
             <span aria-hidden style={{ color: VAULT.line }}>|</span>
@@ -600,6 +613,47 @@ function CustomerProofSection({
             </figure>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+const MIN_LAUNCHED_AUTHORS_TO_SHOW = 5;
+
+function LaunchedAuthorsProof({
+  count,
+  authors,
+  platformDomain,
+}: {
+  count: number;
+  authors: { id: string; slug: string; displayName: string | null; name: string; profileImageUrl: string | null; customDomain: string | null }[];
+  platformDomain: string;
+}) {
+  if (count < MIN_LAUNCHED_AUTHORS_TO_SHOW) return null;
+  const faces = authors.filter((a) => a.profileImageUrl).slice(0, 8);
+  return (
+    <section style={{ background: VAULT.bg, borderTop: `1px solid ${VAULT.line}`, padding: '36px 28px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px 28px' }}>
+        <p style={{ margin: 0, fontFamily: VAULT.fontDisplay, fontStyle: 'italic', fontSize: '1.4rem', color: VAULT.ink }}>
+          {count} creators have launched a site on AuthorLoft.
+        </p>
+        {faces.length > 0 && (
+          <div style={{ display: 'flex' }}>
+            {faces.map((a, i) => {
+              const href = a.customDomain ? `https://${a.customDomain}` : `https://${a.slug}.${platformDomain}`;
+              const label = a.displayName || a.name;
+              return (
+                <a key={a.id} href={href} target="_blank" rel="noopener noreferrer" title={label} aria-label={`${label}'s site`} style={{ marginLeft: i === 0 ? 0 : -10 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={a.profileImageUrl as string} alt={label} width={44} height={44} loading="lazy" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${VAULT.bg}` }} />
+                </a>
+              );
+            })}
+          </div>
+        )}
+        <Link href="/bookstore" style={{ display: 'inline-flex', alignItems: 'center', minHeight: 44, color: VAULT.gold, fontWeight: 600, textDecoration: 'none' }}>
+          See their sites →
+        </Link>
       </div>
     </section>
   );

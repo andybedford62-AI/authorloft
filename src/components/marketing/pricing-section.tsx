@@ -240,6 +240,13 @@ export function PricingSection({ plans, fullPage = false }: PricingSectionProps)
       <p className="text-center text-sm text-vault-mute">
         No credit card required for Free plan · Cancel anytime · 30-day money-back guarantee on your first paid payment
       </p>
+      {fullPage && (
+        <p className="text-center text-sm text-vault-mute -mt-2">
+          Prices as shown since September 2026 — changes are announced on{" "}
+          <Link href="/news" className="underline underline-offset-2 hover:text-vault-ink">/news</Link>{" "}
+          before they take effect.
+        </p>
+      )}
 
       {/* Full-page FAQ */}
       {fullPage && (

@@ -13,6 +13,16 @@ line rather than listing every commit.
 
 ---
 
+## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
+
+- **Homepage:** hero keyword strip now names courses and music; real-count "N creators have launched a site" block with member faces above pricing (hidden until 5+ showcase authors); customer testimonial row moved directly under the product screenshots; SaaSHub proof badge now dated ("as of October 2026"); homepage Free tier label "/forever" (matches /pricing); FAQ schema capped at 5 questions.
+- **Footer:** 16-link row regrouped into Product / Learn / Legal columns plus About and Contact.
+- **/pricing:** price-stability line ("Prices as shown since September 2026 — changes announced on /news"); "vs BookAuth" link.
+- **/compare/bookauth:** new comparison page (sitemap derives from `COMPARISON_SLUGS`); added to `llms.txt`.
+- **/bookstore:** ItemList JSON-LD capped at 12 items per type to cut page weight.
+
+---
+
 ## October 23, 2026 — Print shipping profiles (per-edition, per-country postage)
 
 _Promoted to prod Oct 23, 2026 (dev head `c35352b1`). Migrations and Help Centre content were already applied to the shared database._

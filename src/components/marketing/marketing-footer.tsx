@@ -4,22 +4,40 @@ import { getSocialLinks } from "@/lib/social-links";
 import { getDemoSiteUrl } from "@/lib/demo-site";
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 
-const NAV_LINKS: [string, string][] = [
-  ["Features", "/features"],
-  ["Bookstore", "/bookstore"],
-  ["Pricing", "/pricing"],
-  ["Cost Calculator", "/pricing/calculator"],
-  ["Blog", "/blog"],
-  ["News", "/news"],
-  ["Learn", "/guides"],
-  ["Resources", "/resources"],
-  ["FAQ", "/faq"],
+const COLUMNS: { title: string; links: [string, string][] }[] = [
+  {
+    title: "Product",
+    links: [
+      ["Features", "/features"],
+      ["Bookstore", "/bookstore"],
+      ["Pricing", "/pricing"],
+      ["Cost Calculator", "/pricing/calculator"],
+    ],
+  },
+  {
+    title: "Learn",
+    links: [
+      ["Blog", "/blog"],
+      ["News", "/news"],
+      ["Guides", "/guides"],
+      ["Resources", "/resources"],
+      ["FAQ", "/faq"],
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      ["Privacy", "/privacy"],
+      ["Terms", "/terms"],
+      ["GDPR", "/gdpr"],
+      ["DMCA", "/dmca"],
+    ],
+  },
+];
+
+const COMPANY_LINKS: [string, string][] = [
   ["About", "/about"],
   ["Contact", "/contact"],
-  ["Privacy", "/privacy"],
-  ["Terms", "/terms"],
-  ["GDPR", "/gdpr"],
-  ["DMCA", "/dmca"],
 ];
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -32,7 +50,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 export async function MarketingFooter() {
   const [socialLinks, demoSiteUrl] = await Promise.all([getSocialLinks(), getDemoSiteUrl()]);
-  const navLinks: [string, string][] = [...NAV_LINKS, ["Demo", demoSiteUrl]];
+  const columns = COLUMNS.map((c) =>
+    c.title === "Product" ? { ...c, links: [...c.links, ["Demo", demoSiteUrl] as [string, string]] } : c,
+  );
 
   return (
     <footer className="bg-vault-cream border-t border-vault-cream-border" style={{ padding: "28px 24px" }}>
@@ -48,7 +68,7 @@ export async function MarketingFooter() {
           <NewsSubscribeForm source="footer" variant="compact" />
         </div>
 
-        {/* Top row: logo + inline links */}
+        {/* Top row: logo + company links */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <Link
             href="/"
@@ -56,20 +76,39 @@ export async function MarketingFooter() {
           >
             AuthorLoft
           </Link>
-          <div className="flex flex-wrap items-center gap-y-1.5">
-            {navLinks.map(([label, href], i) => (
-              <span key={label} className="inline-flex items-center">
-                <Link
-                  href={href}
-                  className="text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors px-2.5 py-3 sm:py-0 font-vault-display"
-                  {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                >
-                  {label}
-                </Link>
-                {i < navLinks.length - 1 && <span className="text-vault-cream-border">·</span>}
-              </span>
+          <div className="flex flex-wrap items-center">
+            {COMPANY_LINKS.map(([label, href]) => (
+              <Link
+                key={label}
+                href={href}
+                className="text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors px-2.5 py-3 sm:py-0 font-vault-display"
+              >
+                {label}
+              </Link>
             ))}
           </div>
+        </div>
+
+        {/* Grouped link columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-5">
+          {columns.map((col) => (
+            <nav key={col.title} aria-label={col.title}>
+              <p className="text-xs font-semibold uppercase tracking-wider text-vault-cream-ink mb-1 font-vault-display">{col.title}</p>
+              <ul className="list-none m-0 p-0">
+                {col.links.map(([label, href]) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="inline-block text-[13px] text-vault-cream-mute hover:text-vault-cream-ink transition-colors py-2.5 sm:py-1 font-vault-display"
+                      {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
 
         {/* Bottom row: copyright + social icons */}

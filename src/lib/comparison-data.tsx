@@ -279,6 +279,67 @@ export const COMPARISONS: Record<string, ComparisonData> = {
       { q: "How much does AuthorLoft cost compared to Quilltips?", a: "Quilltips has a Free tier and a Plus tier at $4.99/mo for unlimited book pages. AuthorLoft has a free plan that already includes direct eBook sales and newsletter campaigns — Standard at $9.99/mo adds a custom domain, print editions, bundles and more, and Premium adds audio and flipbook editions. See the AuthorLoft pricing page for current plans." },
     ],
   },
+  // ── BookAuth ───────────────────────────────────────────────────────────────
+  // Claims here come from BookAuth's own launch press coverage; re-check against
+  // bookauth.com before changing anything. Paid-tier prices are deliberately omitted.
+  bookauth: {
+    slug: "bookauth",
+    name: "BookAuth",
+    metaTitle: "AuthorLoft vs BookAuth Compared",
+    metaDescription:
+      "AuthorLoft vs BookAuth for indie authors: two all-in-one platforms with a free tier and direct sales. Compare features, direct-sale fees and fit.",
+    subtitle:
+      "Both are all-in-one platforms for independent authors, so the choice comes down to details. Here's an honest, side-by-side look.",
+    tldr: (
+      <>
+        <strong>The short version:</strong> <strong>BookAuth</strong> and <strong>AuthorLoft</strong> are both
+        all-in-one author platforms with a free tier, an author website, direct sales through Stripe, ARC campaigns and
+        newsletters. <strong>AuthorLoft</strong> also covers courses and music links, takes no cut of your direct sales,
+        and has a discovery bookstore. <strong>BookAuth</strong> leans into print-on-demand and signed editions.
+      </>
+    ),
+    chooseUs: [
+      "You also sell courses or share music, not only books",
+      "You want zero platform fees on direct sales, with payouts straight to your own Stripe account",
+      "You want a discovery bookstore listing for your books",
+      "You want a free plan with direct ebook sales and newsletter campaigns included",
+    ],
+    chooseThem: [
+      "Print-on-demand paperbacks and signed editions are central to how you sell",
+      "You want abandoned-cart recovery and series bundling tools",
+      "You only write and sell books and don't need courses or music",
+      "You like its manuscript-editor plans for the future",
+    ],
+    rows: [
+      { label: "Free plan",                         us: "yes", them: "yes" },
+      { label: "Author website",                    us: "yes", them: "yes" },
+      { label: "Custom domain",                     us: "yes", them: "yes",     note: "On BookAuth, custom domains are on higher tiers. On AuthorLoft, they start on Standard." },
+      { label: "Direct eBook sales via Stripe",     us: "yes", them: "yes" },
+      { label: "Direct print book sales",           us: "yes", them: "yes" },
+      { label: "Pre-orders",                        us: "yes", them: "yes" },
+      { label: "ARC management",                    us: "yes", them: "yes" },
+      { label: "Newsletter campaigns",              us: "yes", them: "yes" },
+      { label: "Courses",                           us: "yes", them: "no" },
+      { label: "Music links",                       us: "yes", them: "no" },
+      { label: "Discovery bookstore listing",       us: "yes", them: "no" },
+      { label: "Abandoned-cart recovery",           us: "no",  them: "yes" },
+    ],
+    coreDifference: (
+      <>
+        The two platforms overlap a lot: a website, direct sales through Stripe, pre-orders, ARCs and newsletters.
+        The difference is scope. AuthorLoft is built for creators who sell more than books, so courses and music links
+        sit alongside your book catalog, and your books can be listed in the AuthorLoft discovery bookstore. AuthorLoft
+        takes no transaction cut on direct sales; you connect your own Stripe account and the money goes to you.
+      </>
+    ),
+    faqs: [
+      { q: "Is AuthorLoft a good BookAuth alternative?", a: "Yes, if you want an all-in-one platform that also covers courses and music links. Both offer a free plan, an author website, direct sales through Stripe, pre-orders, ARCs and newsletters. AuthorLoft takes no cut of your direct sales." },
+      { q: "Does AuthorLoft take a percentage of direct sales?", a: "No. You connect your own Stripe account, so payments go directly to you. Stripe's own processing fees still apply." },
+      { q: "Can I sell print books with AuthorLoft?", a: "Yes. Direct print sales are available on Standard and Premium, with shipping profiles you set up for each country zone." },
+      { q: "Does AuthorLoft have abandoned-cart recovery like BookAuth?", a: "No. AuthorLoft doesn't send abandoned-cart reminders today." },
+      { q: "How much does AuthorLoft cost?", a: "Free to start with no credit card. Standard is $9.99/mo and Premium is $39.99/mo, with 20% off on annual billing. See the AuthorLoft pricing page for current plans, and check BookAuth's own site for its current prices." },
+    ],
+  },
 };
 
 export const COMPARISON_SLUGS = Object.keys(COMPARISONS);

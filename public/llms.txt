@@ -50,6 +50,7 @@ AuthorLoft helps independent authors take control of their careers by providing 
 - AuthorLoft vs StoryOrigin: https://www.authorloft.com/compare/storyorigin
 - AuthorLoft vs Tertulia: https://www.authorloft.com/compare/tertulia
 - AuthorLoft vs Quilltips: https://www.authorloft.com/compare/quilltips
+- AuthorLoft vs BookAuth: https://www.authorloft.com/compare/bookauth
 
 ## Legal
 - Privacy Policy: https://www.authorloft.com/privacy
