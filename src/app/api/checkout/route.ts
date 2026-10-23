@@ -9,7 +9,7 @@ import { calcDiscount } from "@/lib/discount-queries";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
 import { validateCheckoutRequest } from "@/lib/schemas/checkout";
-import { quoteShipping } from "@/lib/shipping";
+import { quoteShipping, bundleShares } from "@/lib/shipping";
 import { shippingFailureMessage, toShippingCartItem, withShippingProfile } from "@/lib/shipping-server";
 import { countryName, isShippableCountry } from "@/lib/shipping-countries";
 
@@ -455,7 +455,12 @@ export async function POST(req: NextRequest) {
       if (!shippingCountry || !isShippableCountry(shippingCountry)) {
         return NextResponse.json({ error: "Choose a delivery country for the print edition in your cart." }, { status: 400 });
       }
-      const quote = quoteShipping(printItems.map(toShippingCartItem), shippingCountry);
+      // In a bundle, an edition counts toward free shipping at its share of the bundle price, not its list price.
+      const shares = bundleRecord ? bundleShares(saleItems.map((i) => ({ id: i.id, priceCents: i.priceCents })), bundleRecord.priceCents) : null;
+      const quote = quoteShipping(
+        printItems.map(toShippingCartItem).map((c) => (shares?.has(c.saleItemId) ? { ...c, priceCents: shares.get(c.saleItemId)! } : c)),
+        shippingCountry
+      );
       if (!quote.ok) {
         return NextResponse.json({ error: shippingFailureMessage(quote.reason, countryName(shippingCountry)) }, { status: 400 });
       }

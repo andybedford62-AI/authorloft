@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from "vitest";
-import { quoteShipping, shippableCountries, zoneForCountry, type ShippingProfileData, type ShippingCartItem } from "@/lib/shipping";
+import { quoteShipping, shippableCountries, zoneForCountry, bundleShares, type ShippingProfileData, type ShippingCartItem } from "@/lib/shipping";
 
 const zone = (over: Partial<ShippingProfileData["zones"][0]> & { name: string }) => ({
   id: over.name, countries: [], isRestOfWorld: false, firstItemCents: 0, additionalItemCents: 0, estimateNote: null, ...over,
@@ -72,6 +72,27 @@ describe("quoteShipping", () => {
   it("collects de-duplicated estimate notes", () => {
     const q = quoteShipping([item("a", paperback), item("b", paperback)], "US");
     expect(q.ok && q.estimateNotes).toEqual(["3-5 days"]);
+  });
+});
+
+describe("bundleShares", () => {
+  it("splits the bundle price in proportion to list prices, digital items included", () => {
+    const shares = bundleShares([{ id: "ebook", priceCents: 500 }, { id: "print", priceCents: 1500 }], 1600);
+    expect(shares.get("ebook")).toBe(400);
+    expect(shares.get("print")).toBe(1200);
+  });
+
+  it("lets a discounted bundle miss a free-shipping threshold its list prices would clear", () => {
+    const freeOver30: ShippingProfileData = { ...paperback, freeOverCents: 3000 };
+    const listPrice = quoteShipping([item("p", freeOver30, 3500)], "US");
+    expect(listPrice.ok && listPrice.amountCents).toBe(0);
+    const share = bundleShares([{ id: "p", priceCents: 3500 }, { id: "e", priceCents: 1500 }], 2500).get("p")!;
+    const bundled = quoteShipping([item("p", freeOver30, share)], "US");
+    expect(bundled.ok && bundled.amountCents).toBe(400);
+  });
+
+  it("falls back to an even split when every list price is zero", () => {
+    expect(bundleShares([{ id: "a", priceCents: 0 }, { id: "b", priceCents: 0 }], 1000).get("a")).toBe(500);
   });
 });
 

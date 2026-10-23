@@ -90,6 +90,21 @@ export function quoteShipping(items: ShippingCartItem[], country: string): Shipp
   return { ok: true, amountCents, freeApplied, estimateNotes, breakdown: { country, amountCents, freeApplied, lines } };
 }
 
+/**
+ * A bundle sells several editions for one price, so a print edition's share of that price (not its list
+ * price) is what counts toward a free-shipping threshold. Shares are proportional to list prices over ALL
+ * items in the bundle, digital ones included.
+ */
+export function bundleShares(items: { id: string; priceCents: number }[], bundlePriceCents: number): Map<string, number> {
+  const total = items.reduce((s, i) => s + i.priceCents, 0);
+  return new Map(
+    items.map((i) => [
+      i.id,
+      total > 0 ? Math.round((i.priceCents * bundlePriceCents) / total) : Math.round(bundlePriceCents / Math.max(items.length, 1)),
+    ])
+  );
+}
+
 /** Countries every print item in the cart can ship to (the cart's destination dropdown). */
 export function shippableCountries(items: ShippingCartItem[]): { code: string; name: string }[] {
   if (items.length === 0 || items.some((i) => !i.profile)) return [];

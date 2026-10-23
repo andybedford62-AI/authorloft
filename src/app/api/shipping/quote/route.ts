@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
-import { quoteShipping, shippableCountries } from "@/lib/shipping";
+import { quoteShipping, shippableCountries, bundleShares } from "@/lib/shipping";
 import { shippingFailureMessage, toShippingCartItem, withShippingProfile } from "@/lib/shipping-server";
 import { countryName, isShippableCountry } from "@/lib/shipping-countries";
 
@@ -18,12 +18,15 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   let ids: unknown = body.saleItemIds;
+  // For a bundle, what counts toward a free-shipping threshold is each edition's share of the bundle price.
+  let shares: Map<string, number> | null = null;
   if (typeof body.bundleId === "string" && body.bundleId) {
     const bundle = await prisma.bundle.findFirst({
       where: { id: body.bundleId, isPublished: true },
-      select: { items: { select: { saleItemId: true } } },
+      select: { priceCents: true, items: { select: { saleItemId: true, saleItem: { select: { priceCents: true } } } } },
     });
     ids = bundle?.items.map((i) => i.saleItemId) ?? [];
+    if (bundle) shares = bundleShares(bundle.items.map((i) => ({ id: i.saleItemId, priceCents: i.saleItem.priceCents })), bundle.priceCents);
   }
   if (!Array.isArray(ids) || ids.length > 50 || ids.some((i) => typeof i !== "string")) {
     return NextResponse.json({ error: "saleItemIds or bundleId is required." }, { status: 400 });
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
   });
   if (items.length === 0) return NextResponse.json({ hasPrint: false, countries: [] });
 
-  const cartItems = items.map(toShippingCartItem);
+  const cartItems = items.map(toShippingCartItem).map((c) => (shares?.has(c.saleItemId) ? { ...c, priceCents: shares.get(c.saleItemId)! } : c));
   const countries = shippableCountries(cartItems);
 
   if (!country) return NextResponse.json({ hasPrint: true, countries });

@@ -6,6 +6,8 @@ import { Loader2, X, Plus, GripVertical, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
 import { formatCents } from "@/lib/utils";
+import { quoteShipping, bundleShares, type ShippingProfileData } from "@/lib/shipping";
+import { countryName } from "@/lib/shipping-countries";
 
 import { cspSafeImageSrc } from "@/lib/csp-safe-image";
 export interface BundleData {
@@ -25,6 +27,8 @@ type SaleItemOption = {
   priceCents: number;
   bookTitle: string;
   bookCoverUrl: string | null;
+  /** PRINT editions only: the shipping profile pricing their postage (null/absent = none chosen) */
+  shippingProfile?: ShippingProfileData | null;
 };
 
 interface BundleFormProps {
@@ -45,6 +49,7 @@ export function BundleForm({ initial, mode }: BundleFormProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>(initial?.saleItemIds ?? []);
 
   const [availableItems, setAvailableItems] = useState<SaleItemOption[]>([]);
+  const [shipFrom, setShipFrom] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +61,10 @@ export function BundleForm({ initial, mode }: BundleFormProps) {
         if (Array.isArray(data)) setAvailableItems(data);
       })
       .catch(() => {});
+    fetch("/api/admin/shipping")
+      .then((r) => r.json())
+      .then((d) => setShipFrom(d.shipFromCountry ?? null))
+      .catch(() => {});
   }, []);
 
   const individualTotal = availableItems
@@ -66,6 +75,37 @@ export function BundleForm({ initial, mode }: BundleFormProps) {
   const savings = individualTotal > 0 && priceCents < individualTotal
     ? Math.round(((individualTotal - priceCents) / individualTotal) * 100)
     : 0;
+
+  // Print editions in the bundle: shipping is added at checkout from their shipping profiles.
+  const selectedAll = availableItems.filter((item) => selectedItems.includes(item.id));
+  const printSelected = selectedAll.filter((item) => item.format === "PRINT");
+  let shippingNote: { warn: boolean; text: string } | null = null;
+  if (printSelected.length > 0) {
+    const missing = printSelected.filter((item) => !item.shippingProfile);
+    if (missing.length > 0) {
+      shippingNote = {
+        warn: true,
+        text: `${missing.map((i) => `${i.bookTitle} (${i.label})`).join(", ")} has no shipping profile yet, so this bundle can't ship until you choose one on that print edition.`,
+      };
+    } else if (!shipFrom) {
+      shippingNote = {
+        warn: false,
+        text: "This bundle includes a print edition. Shipping is added at checkout from that edition's shipping profile. Choose where you ship from (Settings → Shipping) to preview what buyers pay.",
+      };
+    } else {
+      const shares = bundleShares(selectedAll.map((i) => ({ id: i.id, priceCents: i.priceCents })), priceCents > 0 ? priceCents : individualTotal);
+      const quote = quoteShipping(
+        printSelected.map((i) => ({ saleItemId: i.id, priceCents: shares.get(i.id) ?? i.priceCents, profile: i.shippingProfile! })),
+        shipFrom
+      );
+      shippingNote = quote.ok
+        ? {
+            warn: false,
+            text: `This bundle includes a print edition. Shipping is added at checkout from its shipping profile: a buyer in ${countryName(shipFrom)} would pay ${quote.amountCents === 0 ? "no" : formatCents(quote.amountCents)} shipping on top of the bundle price.`,
+          }
+        : { warn: true, text: `Buyers in ${countryName(shipFrom)} can't order this bundle: a print edition in it has no shipping price for that country.` };
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -229,6 +269,16 @@ export function BundleForm({ initial, mode }: BundleFormProps) {
               <span>{formatCents(individualTotal)}</span>
             </div>
           </div>
+        )}
+
+        {shippingNote && (
+          <p
+            className={`mt-3 text-xs rounded-lg border px-3 py-2 ${
+              shippingNote.warn ? "text-amber-700 bg-amber-50 border-amber-200" : "text-gray-600 bg-gray-50 border-gray-200"
+            }`}
+          >
+            {shippingNote.text}
+          </p>
         )}
       </div>
 

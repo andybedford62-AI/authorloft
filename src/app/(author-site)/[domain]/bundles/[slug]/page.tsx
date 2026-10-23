@@ -152,6 +152,12 @@ export default async function BundleDetailPage({
               )}
             </div>
 
+            {bundle.items.some((i) => i.saleItem.format === "PRINT") && (
+              <p className="text-center text-xs text-gray-500">
+                Includes a print edition. Shipping is calculated at checkout once you choose your country.
+              </p>
+            )}
+
             {/* Buy button */}
             <BundleBuyButton
               bundleId={bundle.id}
