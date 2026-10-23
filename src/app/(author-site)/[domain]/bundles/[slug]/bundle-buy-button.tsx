@@ -5,6 +5,7 @@ import { Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
+import { ShippingPicker, NO_SHIPPING, type ShippingSelection } from "@/components/author-site/shipping-picker";
 
 interface BundleBuyButtonProps {
   bundleId: string;
@@ -17,8 +18,13 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [applied, setApplied] = useState<AppliedDiscount | null>(null);
+  const [shipping, setShipping] = useState<ShippingSelection>(NO_SHIPPING);
 
   async function handleBuy() {
+    if (!shipping.ready) {
+      setError("Choose a delivery country first.");
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -29,7 +35,11 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
           "Content-Type": "application/json",
           ...(csrfToken && { "X-CSRF-Token": csrfToken }),
         },
-        body: JSON.stringify({ bundleId, ...(applied && { discountCode: applied.code }) }),
+        body: JSON.stringify({
+          bundleId,
+          ...(applied && { discountCode: applied.code }),
+          ...(shipping.hasPrint && { shippingCountry: shipping.country }),
+        }),
       });
       const data = await res.json();
 
@@ -48,7 +58,8 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
     }
   }
 
-  const finalPriceCents = applied ? applied.finalPriceCents : priceCents;
+  const shippingCents = shipping.hasPrint ? shipping.amountCents ?? 0 : 0;
+  const finalPriceCents = (applied ? applied.finalPriceCents : priceCents) + shippingCents;
 
   return (
     <div className="space-y-3">
@@ -57,9 +68,10 @@ export function BundleBuyButton({ bundleId, priceCents, accentColor }: BundleBuy
         accentColor={accentColor}
         onApplied={setApplied}
       />
+      <ShippingPicker bundleId={bundleId} onChange={setShipping} />
       <Button
         onClick={handleBuy}
-        disabled={loading}
+        disabled={loading || !shipping.ready}
         className="w-full text-base py-6"
         style={{ backgroundColor: accentColor }}
       >

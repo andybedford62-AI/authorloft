@@ -9,13 +9,11 @@ import { calcDiscount } from "@/lib/discount-queries";
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from "@/lib/rate-limit";
 import { auditLog, getAuditContext } from "@/lib/audit-logger";
 import { validateCheckoutRequest } from "@/lib/schemas/checkout";
+import { quoteShipping } from "@/lib/shipping";
+import { shippingFailureMessage, toShippingCartItem, withShippingProfile } from "@/lib/shipping-server";
+import { countryName, isShippableCountry } from "@/lib/shipping-countries";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
-
-// Countries a buyer can ship a print copy to. The author ships it themselves, so keep this to
-// markets where a self-shipped paperback is practical; widen it deliberately, not by default.
-const PRINT_SHIP_COUNTRIES: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
-  ["US", "CA", "GB", "AU", "NZ", "IE"];
 
 /**
  * POST /api/checkout
@@ -246,6 +244,7 @@ export async function POST(req: NextRequest) {
     const saleItems = await prisma.bookDirectSaleItem.findMany({
       where: { id: { in: saleItemIds }, isActive: true },
       include: {
+        ...withShippingProfile,
         book: {
           include: {
             author: {
@@ -255,7 +254,6 @@ export async function POST(req: NextRequest) {
                 stripeConnectAccountId: true,
                 stripeConnectOnboarded: true,
                 stripeConnectType: true,
-                printShippingCents: true,
               },
             },
           },
@@ -447,22 +445,42 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         }));
 
-    const hasPrintItem = saleItems.some((i) => i.format === "PRINT");
-    const printShippingCents = hasPrintItem ? Math.max(0, author.printShippingCents ?? 0) : 0;
+    // ── Print postage: recomputed here from the author's shipping profiles, never trusted from the browser ──
+    const printItems = saleItems.filter((i) => i.format === "PRINT");
+    const hasPrintItem = printItems.length > 0;
+    let shippingQuote: Extract<ReturnType<typeof quoteShipping>, { ok: true }> | null = null;
+    let shippingCountry: string | null = null;
+    if (hasPrintItem) {
+      shippingCountry = validatedBody.shippingCountry ?? null;
+      if (!shippingCountry || !isShippableCountry(shippingCountry)) {
+        return NextResponse.json({ error: "Choose a delivery country for the print edition in your cart." }, { status: 400 });
+      }
+      const quote = quoteShipping(printItems.map(toShippingCartItem), shippingCountry);
+      if (!quote.ok) {
+        return NextResponse.json({ error: shippingFailureMessage(quote.reason, countryName(shippingCountry)) }, { status: 400 });
+      }
+      shippingQuote = quote;
+    }
+    const printShippingCents = shippingQuote?.amountCents ?? 0;
 
     // Include all saleItemIds in metadata (comma-separated for webhook)
     const session = await stripe.checkout.sessions.create({
       payment_method_types:     ["card"],
       mode:                     "payment",
       billing_address_collection: "required",
-      // Print items ship from the author, so Stripe must ask the buyer where to send them.
-      ...(hasPrintItem && { shipping_address_collection: { allowed_countries: PRINT_SHIP_COUNTRIES } }),
-      // Author's flat shipping fee, added once per order (not per copy). null/0 = free shipping.
+      // Print items ship from the author, so Stripe must ask the buyer where to send them. The country was
+      // chosen in the cart (that's what priced the postage), so only that country is accepted here.
+      ...(hasPrintItem && shippingCountry && {
+        shipping_address_collection: {
+          allowed_countries: [shippingCountry] as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
+        },
+      }),
+      // Postage from the author's shipping profiles (free when a threshold is met → no rate line).
       ...(hasPrintItem && printShippingCents > 0 && {
         shipping_options: [{
           shipping_rate_data: {
             type: "fixed_amount" as const,
-            display_name: "Shipping",
+            display_name: shippingQuote?.estimateNotes.length ? `Shipping (${shippingQuote.estimateNotes.join(", ")})` : "Shipping",
             fixed_amount: { amount: printShippingCents, currency: "usd" },
             tax_behavior: "exclusive" as const,
             tax_code: TAX_CODES.SHIPPING,
@@ -499,6 +517,7 @@ export async function POST(req: NextRequest) {
         ...(discountCodeId && { discountCodeId }),
         stripeSessionId: session.id,
         status:          "PENDING",
+        ...(shippingQuote && { shippingBreakdown: shippingQuote.breakdown }),
         items: {
           create: lineItems.map(({ item, itemPrice }) => ({
             itemType:   bundleRecord ? "BUNDLE" : "BOOK",

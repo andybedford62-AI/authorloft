@@ -6,6 +6,7 @@ import { useCart } from "@/context/cart-context";
 import { formatCents } from "@/lib/utils";
 import { useCSRFToken } from "@/hooks/use-csrf-token";
 import { DiscountCodeInput, type AppliedDiscount } from "@/components/author-site/discount-code-input";
+import { ShippingPicker, NO_SHIPPING, type ShippingSelection } from "@/components/author-site/shipping-picker";
 import Image from "next/image";
 
 // ── Format icon helper ────────────────────────────────────────────────────────
@@ -43,6 +44,7 @@ export function CartDrawer() {
   const [loading,       setLoading]       = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [applied, setApplied] = useState<AppliedDiscount | null>(null);
+  const [shipping, setShipping] = useState<ShippingSelection>(NO_SHIPPING);
 
   // Close on Escape
   useEffect(() => {
@@ -55,6 +57,10 @@ export function CartDrawer() {
 
   async function handleCheckout() {
     if (items.length === 0) return;
+    if (!shipping.ready) {
+      setCheckoutError("Choose a delivery country for the print edition first.");
+      return;
+    }
     setCheckoutError("");
     setLoading(true);
     try {
@@ -67,6 +73,7 @@ export function CartDrawer() {
         body:    JSON.stringify({
           items: items.map((i) => ({ saleItemId: i.saleItemId })),
           ...(applied && { discountCode: applied.code }),
+          ...(shipping.hasPrint && { shippingCountry: shipping.country }),
         }),
       });
       const data = await res.json();
@@ -82,7 +89,9 @@ export function CartDrawer() {
     }
   }
 
-  const finalTotal = applied ? applied.finalPriceCents : totalCents;
+  const itemsTotal = applied ? applied.finalPriceCents : totalCents;
+  const shippingCents = shipping.hasPrint ? shipping.amountCents ?? 0 : 0;
+  const finalTotal = itemsTotal + shippingCents;
 
   return (
     <>
@@ -195,6 +204,9 @@ export function CartDrawer() {
               onApplied={setApplied}
             />
 
+            {/* Print postage: destination country + live rate */}
+            <ShippingPicker saleItemIds={items.map((i) => i.saleItemId)} onChange={setShipping} />
+
             {/* Price summary */}
             <div className="space-y-1.5">
               {applied && (
@@ -208,6 +220,12 @@ export function CartDrawer() {
                     <span>−{formatCents(applied.discountCents)}</span>
                   </div>
                 </>
+              )}
+              {shipping.hasPrint && shipping.amountCents !== null && (
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Shipping</span>
+                  <span>{shipping.amountCents === 0 ? "Free" : formatCents(shipping.amountCents)}</span>
+                </div>
               )}
               <div className="flex justify-between font-semibold text-gray-900 text-base pt-1 border-t border-gray-100">
                 <span>Total</span>
@@ -230,7 +248,7 @@ export function CartDrawer() {
             <button
               type="button"
               onClick={handleCheckout}
-              disabled={loading}
+              disabled={loading || !shipping.ready}
               className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gray-900 text-white font-semibold text-base transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
             >
               {loading ? (

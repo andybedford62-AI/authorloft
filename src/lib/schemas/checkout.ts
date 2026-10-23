@@ -16,6 +16,8 @@ export const checkoutRequestSchema = z
     saleItemId: z.string().min(1, "Sale item ID required").optional(),
     bundleId: z.string().min(1, "Bundle ID required").optional(),
     courseId: z.string().min(1, "Course ID required").optional(),
+    // Destination for carts containing a print edition (ISO-2). Postage is recomputed server-side from it.
+    shippingCountry: z.string().length(2, "Invalid country").toUpperCase().optional(),
     discountCode: z
       .string()
       .max(50, "Discount code too long")

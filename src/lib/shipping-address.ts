@@ -1,5 +1,5 @@
 // Shipping address for orders that include a PRINT item. Stripe Checkout collects it
-// (see PRINT_SHIP_COUNTRIES in /api/checkout) and the webhook stores it on Order.shippingAddress.
+// (restricted to the country chosen in the cart; see /api/checkout) and the webhook stores it on Order.shippingAddress.
 
 export type ShippingAddress = {
   name: string | null;

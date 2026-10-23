@@ -208,7 +208,9 @@ model Author {
   stripeConnectOnboarded        Boolean               @default(false) // true once onboarding is complete
   // Flat shipping fee (cents) added at checkout when a cart has a PRINT item. null/0 = free shipping.
   printShippingCents            Int?
-  stripeConnectType             String? // "standard" = author's own Stripe account, direct charges; null = legacy Express, destination charges
+  shipFromCountry               String? // ISO-2 country the author ships print copies from; pre-fills the first shipping zone
+  shippingProfiles              ShippingProfile[]
+  stripeConnectType            String? // "standard" = author's own Stripe account, direct charges; null = legacy Express, destination charges
   planId                        String?
   plan                          Plan?                 @relation(fields: [planId], references: [id])
   isActive                      Boolean               @default(true)
@@ -477,6 +479,8 @@ model BookDirectSaleItem {
   fileUrl        String? // Supabase storage URL (for display / reference)
   fileKey        String? // Supabase storage path (e.g. "authorId/book-files/...") — used for deletion & signing
   fileName       String? // Original filename shown in admin UI
+  shippingProfileId String? // PRINT items only: which of the author's shipping profiles prices this item's postage
+  shippingProfile   ShippingProfile? @relation(fields: [shippingProfileId], references: [id], onDelete: SetNull)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   orderItems     OrderItem[]
@@ -484,6 +488,42 @@ model BookDirectSaleItem {
   bundleItems    BundleItem[]
 
   @@index([bookId])
+  @@index([shippingProfileId])
+}
+
+// ─── Print shipping ───────────────────────────────────────────────────────────
+
+/// Author-defined postage preset (e.g. "Paperback", "Hardcover", "Signed bundle").
+/// Each PRINT sale item points at one. Rates live on its zones.
+model ShippingProfile {
+  id            String               @id @default(cuid())
+  authorId      String
+  author        Author               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  name          String
+  freeOverCents Int? // null = no free-shipping threshold; otherwise print subtotal at/above this ships free
+  zones         ShippingZone[]
+  saleItems     BookDirectSaleItem[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([authorId])
+}
+
+/// A set of countries with a price. A country with no matching zone (and no rest-of-world zone) is not shipped to.
+model ShippingZone {
+  id                  String          @id @default(cuid())
+  profileId           String
+  profile             ShippingProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name                String
+  countries           String[] // ISO-2 codes
+  isRestOfWorld       Boolean         @default(false) // catch-all for any country not named in another zone of this profile
+  firstItemCents      Int
+  additionalItemCents Int             @default(0)
+  estimateNote        String? // optional, e.g. "5-7 business days"
+  currency            String          @default("usd") // unused until author currency (Phase 2)
+  sortOrder           Int             @default(0)
+
+  @@index([profileId])
 }
 
 // ─── Author Slug History (301 redirects after a site-URL change) ──────────────
@@ -855,7 +895,9 @@ model Order {
   shippingAddress       Json?
   // Print orders: what the buyer paid for shipping, and the author's fulfillment record.
   shippingCents         Int           @default(0)
-  shippedAt             DateTime?
+  // Snapshot of how shipping was priced: { profiles, country, zoneName, estimateNote, amountCents, freeApplied }
+  shippingBreakdown     Json?
+  shippedAt            DateTime?
   trackingCarrier       String?
   trackingNumber        String?
   status                OrderStatus   @default(PENDING)

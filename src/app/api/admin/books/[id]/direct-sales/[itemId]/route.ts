@@ -21,7 +21,18 @@ export async function PATCH(
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { label, description, priceCents, isActive, isReaderMagnet, clearFile } = body;
+  const { label, description, priceCents, isActive, isReaderMagnet, clearFile, shippingProfileId } = body;
+
+  // Print editions need a shipping profile of the author's own before they can be sold.
+  let nextProfileId: string | null = existing.shippingProfileId;
+  if (existing.format === "PRINT" && typeof shippingProfileId === "string") {
+    const profile = await prisma.shippingProfile.findFirst({ where: { id: shippingProfileId, authorId }, select: { id: true } });
+    if (!profile) return NextResponse.json({ error: "Shipping profile not found." }, { status: 400 });
+    nextProfileId = profile.id;
+  }
+  if (existing.format === "PRINT" && isActive === true && !nextProfileId) {
+    return NextResponse.json({ error: "Choose a shipping profile for this print edition before activating it." }, { status: 400 });
+  }
 
   // Paid editions can only go live with a paid plan AND a connected Stripe
   // account. Free Reader Magnets need neither, so they activate freely.
@@ -81,6 +92,7 @@ export async function PATCH(
       ...(isActive !== undefined && { isActive }),
       ...(forceInactive && { isActive: false }),
       ...(isReaderMagnet !== undefined && { isReaderMagnet }),
+      ...(existing.format === "PRINT" && nextProfileId !== existing.shippingProfileId && { shippingProfileId: nextProfileId }),
       ...(clearFile && { fileUrl: null, fileKey: null, fileName: null }),
     },
   });

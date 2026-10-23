@@ -88,8 +88,11 @@ type DirectSaleItem = {
   fileUrl: string | null;
   fileKey: string | null;
   fileName: string | null;
+  shippingProfileId: string | null;
   magnetLeadCount?: number;
 };
+
+type ShippingProfileOption = { id: string; name: string };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -101,6 +104,39 @@ function dollarsTocents(dollars: string): number {
 
 function centsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
+}
+
+/** Which shipping profile prices a Print edition's postage. */
+function ShippingProfileSelect({
+  profiles,
+  value,
+  onChange,
+}: {
+  profiles: ShippingProfileOption[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  if (profiles.length === 0) {
+    return (
+      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+        Create a shipping profile first (<a href="/admin/settings?tab=billing" className="underline">Settings → Print shipping</a>).
+        A print edition stays inactive until it has one.
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-gray-600">Shipping profile</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm"
+      >
+        <option value="">Choose a profile…</option>
+        {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+    </div>
+  );
 }
 
 // ── File Upload widget (per item) ─────────────────────────────────────────────
@@ -312,7 +348,23 @@ export function DirectSalesItems({
   // Toggle error (shown inline above the item list)
   const [toggleError, setToggleError] = useState("");
 
+  // Shipping profiles (Print editions only)
+  const [shipProfiles, setShipProfiles] = useState<ShippingProfileOption[]>([]);
+  const [addProfileId, setAddProfileId] = useState("");
+  const [editProfileId, setEditProfileId] = useState("");
+
   // ── Load ───────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    fetch("/api/admin/shipping")
+      .then((r) => r.json())
+      .then((d) => {
+        const list: ShippingProfileOption[] = Array.isArray(d.profiles) ? d.profiles.map((p: ShippingProfileOption) => ({ id: p.id, name: p.name })) : [];
+        setShipProfiles(list);
+        if (list.length > 0) setAddProfileId((cur) => cur || list[0].id);
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     fetch(`/api/admin/books/${bookId}/direct-sales`)
       .then((r) => r.json())
@@ -340,6 +392,7 @@ export function DirectSalesItems({
         description: description.trim() || undefined,
         priceCents,
         isReaderMagnet: salesEnabled ? undefined : true,
+        ...(selectedFormat === "PRINT" && addProfileId && { shippingProfileId: addProfileId }),
       }),
     });
 
@@ -416,6 +469,7 @@ export function DirectSalesItems({
     setEditLabel(item.label);
     setEditDesc(item.description ?? "");
     setEditPrice(centsToDollars(item.priceCents));
+    setEditProfileId(item.shippingProfileId ?? "");
   }
 
   // ── Save edit ──────────────────────────────────────────────────────────────
@@ -428,6 +482,7 @@ export function DirectSalesItems({
         label: editLabel.trim() || FORMATS[item.format].defaultLabel,
         description: editDesc.trim() || null,
         priceCents: dollarsTocents(editPrice),
+        ...(item.format === "PRINT" && editProfileId && { shippingProfileId: editProfileId }),
       }),
     });
     if (res.ok) {
@@ -435,6 +490,9 @@ export function DirectSalesItems({
       setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...updated, magnetLeadCount: i.magnetLeadCount } : i)));
       showToast("success", "Saved");
       setEditingId(null);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setToggleError(data.error || "Could not save. Please try again.");
     }
     setEditSaving(false);
   }
@@ -657,6 +715,10 @@ export function DirectSalesItems({
             </p>
           )}
 
+          {selectedFormat === "PRINT" && (
+            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} />
+          )}
+
           {/* Description */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600">
@@ -755,6 +817,9 @@ export function DirectSalesItems({
                         </div>
                       )}
                     </div>
+                    {item.format === "PRINT" && (
+                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} />
+                    )}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
                       <input
@@ -807,6 +872,15 @@ export function DirectSalesItems({
                         </div>
                         {item.description && (
                           <p className="text-xs text-gray-400 mt-0.5">{item.description}</p>
+                        )}
+                        {item.format === "PRINT" && (
+                          item.shippingProfileId ? (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Ships with: {shipProfiles.find((p) => p.id === item.shippingProfileId)?.name ?? "shipping profile"}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-amber-700 mt-0.5">No shipping profile. Edit this format to choose one before it can be sold.</p>
+                          )
                         )}
                       </div>
 

@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## October 23, 2026 — Print shipping profiles (per-edition, per-country postage)
+
+- **Shipping profiles replace the single flat fee.** Authors create named profiles (Paperback, Hardcover, Signed bundle…) in Settings → billing tab ("Print shipping"). Each profile has zones (country sets or a rest-of-world catch-all) with a first-item price, an additional-item price and an optional delivery-estimate note, plus an optional "free over $X" threshold. Each Print edition picks a profile (Books → edit → Direct Sales); an edition with no profile stays inactive. A country no zone covers cannot order that edition. Tables `ShippingProfile` / `ShippingZone`, `BookDirectSaleItem.shippingProfileId`, `Author.shipFromCountry`, `Order.shippingBreakdown` (snapshot of how postage was priced).
+- **Rate rule (`src/lib/shipping.ts`, unit-tested):** the item with the highest first-item rate pays that rate, every other print item pays its own zone's additional-item rate; a profile whose print subtotal clears its threshold ships free.
+- **Cart / buy page / bundle page:** a shared `ShippingPicker` asks for the delivery country (hosted Stripe Checkout can't vary rates by the address typed there, so the country is chosen first), previews postage via `POST /api/shipping/quote`, and `/api/checkout` recomputes it server-side. Stripe's address form is limited to the chosen country.
+- **Migration backfill:** every author with a Print edition got a "Standard" profile = their old flat fee, once per order, to the six countries checkout previously allowed (US/CA/GB/AU/NZ/IE), so nothing changed until they edit it. `Author.printShippingCents` is now unused (drop in a later cleanup). Postage is still USD; author currency is a separate later phase.
+
 ## October 22, 2026 — HeyCatch-powered guides at /blog/guides
 
 - **`/blog/guides` + `/blog/guides/[slug]`:** articles are read live from the HeyCatch API (`src/lib/heycatch.ts`, key in `HEYCATCH_API_KEY`, 120 s revalidate, never copied to the DB). Index = title/date/read time only; article page sanitizes `content_html` (keeps `id` on `h2` only), builds a Table of contents after Key takeaways, sets canonical/OG/JSON-LD and `lang`/`dir`. Errors/timeouts show an empty state, never crash the build. Added to the sitemap route. Lives beside, not instead of, the DB-backed `/blog` (separate path chosen so existing posts and slugs are untouched).

@@ -80,6 +80,18 @@ export async function POST(
 
   const count = await prisma.bookDirectSaleItem.count({ where: { bookId } });
 
+  // Print editions are priced for postage by one of the author's shipping profiles. Without one the
+  // edition can't be sold (checkout would have no rate), so it starts inactive.
+  let shippingProfileId: string | null = null;
+  if (format === "PRINT") {
+    const wanted = typeof body.shippingProfileId === "string" ? body.shippingProfileId : null;
+    const profile = wanted
+      ? await prisma.shippingProfile.findFirst({ where: { id: wanted, authorId }, select: { id: true } })
+      : await prisma.shippingProfile.findFirst({ where: { authorId }, orderBy: { createdAt: "asc" }, select: { id: true } });
+    if (wanted && !profile) return NextResponse.json({ error: "Shipping profile not found." }, { status: 400 });
+    shippingProfileId = profile?.id ?? null;
+  }
+
   const item = await prisma.bookDirectSaleItem.create({
     data: {
       bookId,
@@ -91,7 +103,8 @@ export async function POST(
       sortOrder: count,
       // Every format except PRINT needs an uploaded file before it can be sold —
       // start inactive so there's never a live buy button with nothing behind it.
-      isActive: format === "PRINT",
+      isActive: format === "PRINT" && !!shippingProfileId,
+      ...(shippingProfileId && { shippingProfileId }),
     },
   });
 
