@@ -113,12 +113,14 @@ function ShippingProfileSelect({
   value,
   onChange,
   shipFrom,
+  onShipFromChange,
   onCreated,
 }: {
   profiles: ShippingProfileOption[];
   value: string;
   onChange: (id: string) => void;
   shipFrom: string | null;
+  onShipFromChange: (code: string | null) => void;
   onCreated: (profile: ShippingProfileOption) => void;
 }) {
   const [creating, setCreating] = useState(false);
@@ -128,6 +130,7 @@ function ShippingProfileSelect({
       <ShippingProfileForm
         profile={null}
         shipFrom={shipFrom}
+        onShipFromChange={onShipFromChange}
         onCancel={() => setCreating(false)}
         onSaved={(saved) => {
           onCreated({ id: saved.id, name: saved.name });
@@ -157,9 +160,10 @@ function ShippingProfileSelect({
             {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             <option value="__new">+ New shipping profile…</option>
           </select>
-          <a href="/admin/settings?tab=shipping" className="text-xs text-gray-500 underline hover:text-gray-700">
-            Manage shipping profiles
-          </a>
+          <span className="flex gap-3 text-xs">
+            <a href="/admin/settings?tab=shipping" className="text-gray-500 underline hover:text-gray-700">Manage shipping profiles</a>
+            <a href="/admin/help?article=ha_print_shipping" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">How shipping works</a>
+          </span>
         </>
       )}
     </div>
@@ -745,7 +749,7 @@ export function DirectSalesItems({
           )}
 
           {selectedFormat === "PRINT" && (
-            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
+            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
           )}
 
           {/* Description */}
@@ -847,7 +851,7 @@ export function DirectSalesItems({
                       )}
                     </div>
                     {item.format === "PRINT" && (
-                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
+                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onShipFromChange={setShipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
                     )}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>
