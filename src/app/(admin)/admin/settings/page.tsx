@@ -916,11 +916,12 @@ function EmailPreferencesSection() {
 
 // ── Tab types ────────────────────────────────────────────────────────────────
 
-type SettingsTab = "account" | "billing" | "integrations" | "appearance" | "communications" | "danger";
+type SettingsTab = "account" | "billing" | "shipping" | "integrations" | "appearance" | "communications" | "danger";
 
 const TABS: { id: SettingsTab; label: string }[] = [
   { id: "account",        label: "Account"        },
   { id: "billing",        label: "Billing"        },
+  { id: "shipping",       label: "Shipping"       },
   { id: "integrations",   label: "Integrations"   },
   { id: "appearance",     label: "Appearance"     },
   { id: "communications", label: "Communications" },
@@ -1690,9 +1691,10 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <SubscriptionSection />
           <StripeConnectSection />
-          <ShippingSettings />
         </div>
       )}
+
+      {activeTab === "shipping" && <ShippingSettings />}
 
       {activeTab === "integrations" && <AiKeySection />}
 

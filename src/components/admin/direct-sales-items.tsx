@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { IconButton } from "@/components/admin/icon-button";
+import { ShippingProfileForm } from "@/components/admin/shipping-settings";
 import { Button } from "@/components/ui/button";
 import { showToast } from "@/lib/use-toast";
 import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
@@ -106,35 +107,61 @@ function centsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
-/** Which shipping profile prices a Print edition's postage. */
+/** Which shipping profile prices a Print edition's postage; new profiles can be created right here. */
 function ShippingProfileSelect({
   profiles,
   value,
   onChange,
+  shipFrom,
+  onCreated,
 }: {
   profiles: ShippingProfileOption[];
   value: string;
   onChange: (id: string) => void;
+  shipFrom: string | null;
+  onCreated: (profile: ShippingProfileOption) => void;
 }) {
-  if (profiles.length === 0) {
+  const [creating, setCreating] = useState(false);
+
+  if (creating) {
     return (
-      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-        Create a shipping profile first (<a href="/admin/settings?tab=billing" className="underline">Settings → Print shipping</a>).
-        A print edition stays inactive until it has one.
-      </p>
+      <ShippingProfileForm
+        profile={null}
+        shipFrom={shipFrom}
+        onCancel={() => setCreating(false)}
+        onSaved={(saved) => {
+          onCreated({ id: saved.id, name: saved.name });
+          onChange(saved.id);
+          setCreating(false);
+        }}
+      />
     );
   }
+
   return (
     <div className="space-y-1">
       <label className="text-xs font-medium text-gray-600">Shipping profile</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm"
-      >
-        <option value="">Choose a profile…</option>
-        {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-      </select>
+      {profiles.length === 0 ? (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+          Print editions need a shipping profile (postage by country) before they can be sold.{" "}
+          <button type="button" className="underline font-medium" onClick={() => setCreating(true)}>Create one now</button>
+        </p>
+      ) : (
+        <>
+          <select
+            value={value}
+            onChange={(e) => (e.target.value === "__new" ? setCreating(true) : onChange(e.target.value))}
+            className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm"
+          >
+            <option value="">Choose a profile…</option>
+            {profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            <option value="__new">+ New shipping profile…</option>
+          </select>
+          <a href="/admin/settings?tab=shipping" className="text-xs text-gray-500 underline hover:text-gray-700">
+            Manage shipping profiles
+          </a>
+        </>
+      )}
     </div>
   );
 }
@@ -352,6 +379,7 @@ export function DirectSalesItems({
   const [shipProfiles, setShipProfiles] = useState<ShippingProfileOption[]>([]);
   const [addProfileId, setAddProfileId] = useState("");
   const [editProfileId, setEditProfileId] = useState("");
+  const [shipFrom, setShipFrom] = useState<string | null>(null);
 
   // ── Load ───────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -360,6 +388,7 @@ export function DirectSalesItems({
       .then((d) => {
         const list: ShippingProfileOption[] = Array.isArray(d.profiles) ? d.profiles.map((p: ShippingProfileOption) => ({ id: p.id, name: p.name })) : [];
         setShipProfiles(list);
+        setShipFrom(d.shipFromCountry ?? null);
         if (list.length > 0) setAddProfileId((cur) => cur || list[0].id);
       })
       .catch(() => {});
@@ -716,7 +745,7 @@ export function DirectSalesItems({
           )}
 
           {selectedFormat === "PRINT" && (
-            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} />
+            <ShippingProfileSelect profiles={shipProfiles} value={addProfileId} onChange={setAddProfileId} shipFrom={shipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
           )}
 
           {/* Description */}
@@ -818,7 +847,7 @@ export function DirectSalesItems({
                       )}
                     </div>
                     {item.format === "PRINT" && (
-                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} />
+                      <ShippingProfileSelect profiles={shipProfiles} value={editProfileId} onChange={setEditProfileId} shipFrom={shipFrom} onCreated={(p) => setShipProfiles((prev) => [...prev, p])} />
                     )}
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-gray-600">Short note (optional)</label>

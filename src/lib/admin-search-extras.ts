@@ -21,6 +21,7 @@ import {
   WifiOff,
   UserX,
   Settings,
+  Package,
 } from "lucide-react";
 
 // Search entries for functionality that lives *inside* a page as a tab, not
@@ -46,7 +47,8 @@ export const ADMIN_SEARCH_EXTRAS: SearchExtraItem[] = [
   // ── Settings tabs ──────────────────────────────────────────────────────
   { href: "/admin/settings?tab=account",       label: "Account & Password",  parentLabel: "Settings", icon: User,       section: "admin" },
   { href: "/admin/settings?tab=billing",       label: "Billing",             parentLabel: "Settings", icon: CreditCard, section: "admin" },
-  { href: "/admin/settings?tab=integrations",  label: "AI Assistant Key",    parentLabel: "Settings", icon: Bot,        section: "admin" },
+  { href: "/admin/settings?tab=shipping",      label: "Print Shipping",      parentLabel: "Settings", icon: Package,    section: "admin" },
+  { href: "/admin/settings?tab=integrations",  label: "AI Assistant Key",   parentLabel: "Settings", icon: Bot,        section: "admin" },
   { href: "/admin/settings?tab=appearance",    label: "Admin Theme",         parentLabel: "Settings", icon: Paintbrush, section: "admin" },
   { href: "/admin/settings?tab=communications",label: "Email Communications",parentLabel: "Settings", icon: Bell,       section: "admin" },
   { href: "/admin/settings?tab=danger",        label: "Danger Zone",         parentLabel: "Settings", icon: Trash2,     section: "admin" },
