@@ -49,11 +49,21 @@ export function extensionForContentType(contentType: string): string {
  *                            format (still resized + recompressed) — use this where a downstream
  *                            consumer needs a specific format, e.g. OG images for social-media
  *                            crawlers, or images forwarded to a third-party posting API.
+ * @param opts.shareCard      Crop-to-fill to exactly this width x height and re-encode as JPEG
+ *                            (transparency flattened onto white). For social share images, which crawlers
+ *                            fetch repeatedly — keeps them small and in a format every platform renders.
+ *                            Overrides maxDimension/convertFormat/lossless.
  */
 export async function optimizeImageForWeb(
   buffer: Buffer,
   contentType: string,
-  opts: { maxDimension?: number; quality?: number; lossless?: boolean; convertFormat?: boolean } = {}
+  opts: {
+    maxDimension?: number;
+    quality?: number;
+    lossless?: boolean;
+    convertFormat?: boolean;
+    shareCard?: { width: number; height: number };
+  } = {}
 ): Promise<OptimizeResult> {
   const normalizedType = contentType === "image/jpg" ? "image/jpeg" : contentType;
 
@@ -61,7 +71,22 @@ export async function optimizeImageForWeb(
     return { buffer, contentType, ext: extensionForContentType(contentType) };
   }
 
-  const { maxDimension = 2000, quality = 82, lossless = false, convertFormat = true } = opts;
+  const { maxDimension = 2000, quality = 82, lossless = false, convertFormat = true, shareCard } = opts;
+
+  if (shareCard) {
+    try {
+      const card = await sharp(buffer)
+        .rotate()
+        .resize({ width: shareCard.width, height: shareCard.height, fit: "cover" })
+        .flatten({ background: "#ffffff" })
+        .jpeg({ quality, mozjpeg: true })
+        .toBuffer();
+      return { buffer: card, contentType: "image/jpeg", ext: "jpg" };
+    } catch (err) {
+      console.warn("[image-processing] share card failed, storing original:", err);
+      return { buffer, contentType: normalizedType, ext: extensionForContentType(normalizedType) };
+    }
+  }
 
   try {
     let pipeline = sharp(buffer)

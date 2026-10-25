@@ -34,12 +34,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pag
     return NextResponse.json({ error: "Image must be 5 MB or smaller." }, { status: 400 });
   }
 
-  // convertFormat: false — OG images are fetched by social crawlers (Facebook, Twitter/X)
-  // that don't reliably render WebP, so keep the original JPEG/PNG, just resized/recompressed.
+  // OG images are fetched repeatedly by social crawlers (Facebook, Twitter/X, LinkedIn)
+  // that don't reliably render WebP, so store a 1200x630 JPEG (the standard share-card size).
   const rawBuffer = Buffer.from(await file.arrayBuffer());
   const { buffer, contentType, ext } = await optimizeImageForWeb(rawBuffer, file.type, {
-    maxDimension: 2400,
-    convertFormat: false,
+    shareCard: { width: 1200, height: 630 },
+    quality: 80,
   });
   const fileKey = `seo/og-${page}-${Date.now()}.${ext}`;
 
