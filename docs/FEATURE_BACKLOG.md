@@ -348,6 +348,15 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
 - [ ] **Database query optimization — not needed.** Database is ~38 MB with tiny tables; DB egress is negligible next to storage. Only revisit if plain Egress (not Cached Egress) grows. *(no action)*
 - [ ] **Convert the remaining raw `<img>` cover/logo uses to `next/image`**: author-site nav logo, media-kit page, and any og/social image paths that link a Supabase URL directly. *(small)*
 - [ ] **Supabase Pro upgrade decision** — Andy's call; Free plan restrictions (402/read-only) can apply after the Oct 9, 2026 grace period. Upgrading lifts restrictions immediately; can downgrade after the Oct 19 reset. *(decision)*
+- [ ] **Cached Egress overage follow-up (Oct 25, 2026 — resume Oct 26)** — usage was 6.42 / 5.5 GB and storage returned HTTP 402 as of 2026-10-25 00:16 UTC (public images likely broken). ~80% of egress was Facebook's crawler (`facebookexternalhit`) re-fetching share images, mainly the 2.3 MB `seo/og-home-*.png`. Full plan: `docs/supabase-egress-handoff.md`. *(medium)*
+  - [x] Step 1 — SEO share-image uploads now crop to 1200×630 JPEG (`shareCard` option, commit `2e49d73`, on `dev`/staging).
+  - [ ] **Blocked on Andy's call:** upgrade to Supabase Pro now, or wait for the cycle reset? Steps 2–4 need working reads.
+  - [ ] Test an SEO share-image upload on staging once Supabase is unblocked (expect `.jpg`, 1200×630, under ~200 KB, `max-age=31536000`).
+  - [ ] Step 2 — re-save the 15 legacy `.png` `SeoConfig` share images (all but `book-pre-orders` and `for-musicians`) as 1200×630 JPEGs at new paths (never overwrite; keep originals), update `SeoConfig.ogImageUrl`, then re-scrape `home` in the Facebook Sharing Debugger. Dry-run list first.
+  - [ ] Step 3 — dry-run script to re-save legacy PNG/JPEG in public buckets as WebP next to the originals (1-year cache); needs approval on 1200 px max width for covers.
+  - [ ] Step 4 — back up URLs, then repoint DB URL columns (and image URLs inside rich-text HTML) to the WebP copies.
+  - [ ] Step 5 — watch Cached Egress for a week, then decide on R2.
+  - [ ] Open question: author share images (`Author.socialShareImageUrl`) go through `/api/admin/upload/image` (2000 px WebP), which Facebook may not render. Decide whether to add a dedicated share-image upload.
 
 ---
 
