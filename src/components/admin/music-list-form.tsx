@@ -124,8 +124,8 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
     }),
     [title, description, coverImageUrl, isPublished, isFeatured, listInBookstore, releaseType, releaseDate, listenLinks, tracks]
   );
-  const savedSnapshot = useRef(snapshot);
-  const isDirty = snapshot !== savedSnapshot.current;
+  const [savedSnapshot, setSavedSnapshot] = useState(snapshot);
+  const isDirty = snapshot !== savedSnapshot;
 
   const atCap = trackCap !== null && tracks.length >= trackCap;
 
@@ -216,9 +216,11 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Could not save.");
+      // Saved: this is the new baseline, so "Unsaved changes" clears right away
+      // (including the moment before the redirect lands).
+      setSavedSnapshot(snapshot);
       if (data.warnings?.length) {
-        // Saved, but staying on the page to show the warnings — this is the new baseline.
-        savedSnapshot.current = snapshot;
+        // Staying on the page to show the warnings.
         setWarnings(data.warnings);
       } else {
         router.push("/admin/music");
@@ -675,6 +677,17 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
             <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" /> Unsaved changes
           </span>
         )}
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={saving || deleting}
+          onClick={() => {
+            if (isDirty && !confirm("Discard your unsaved changes?")) return;
+            router.push("/admin/music");
+          }}
+        >
+          Cancel
+        </Button>
         {isEdit && (
           <Button type="button" variant="danger" onClick={handleDelete} disabled={deleting} className="ml-auto">
             <Trash2 className="h-4 w-4 mr-2" /> {deleting ? "Deleting…" : "Delete list"}
