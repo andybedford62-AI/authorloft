@@ -13,6 +13,12 @@ line rather than listing every commit.
 
 ---
 
+## October 26, 2026 — Legacy cover re-save, batch 1 (Supabase egress)
+
+- **Book, course and bundle covers converted to resized WebP.** 27 referenced `book-covers/*/covers/*` PNG/JPEG originals (26.5 MB) were re-encoded to WebP (max 2000px, aspect kept, 1-year cache; 3.7 MB total) and uploaded at **new `.webp` paths**; `Book` (20), `Course` (6) and `Bundle` (1) `coverImageUrl` rows now point at them. Old files are intentionally left in place for about a week before deletion. Full local backup of the bucket and the dry-run report are in `Downloads\supabase-backup-2026-10-26\`. Remaining batches: blog covers, profiles/hero/logos/blog-images, OG share images (stay JPEG), small buckets.
+
+---
+
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
 
 - **Homepage:** hero keyword strip now names courses and music; real-count "N creators have launched a site" block with member faces above pricing (hidden until 5+ showcase authors); customer testimonial row moved directly under the product screenshots; SaaSHub proof badge now dated ("as of October 2026"); homepage Free tier label "/forever" (matches /pricing); FAQ schema capped at 5 questions.
