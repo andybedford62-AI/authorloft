@@ -144,6 +144,7 @@ export default async function MusicListPage({
       title: l.title,
       videoUrl: l.videoUrl,
       thumbnailUrl,
+      genre: l.genre?.trim() || null,
       description: text,
       descriptionHtml: html,
       statKey,

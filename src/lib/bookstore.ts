@@ -305,7 +305,21 @@ export async function getBookstoreCourses(): Promise<BookstoreCoursesData> {
   return { courses, categories };
 }
 
-export type BookstoreMusicData = { music: BookstoreMusic[] };
+/** Distinct song genres on a list, most common first (case-insensitive), capped for the card. */
+function topGenres(all: (string | null)[], limit = 3): string[] {
+  const counts = new Map<string, { label: string; n: number }>();
+  for (const g of all) {
+    const label = g?.trim();
+    if (!label) continue;
+    const key = label.toLowerCase();
+    const e = counts.get(key);
+    if (e) e.n++;
+    else counts.set(key, { label, n: 1 });
+  }
+  return [...counts.values()].sort((a, b) => b.n - a.n).slice(0, limit).map((e) => e.label);
+}
+
+export type BookstoreMusicData ={ music: BookstoreMusic[] };
 
 /**
  * Public bookstore music — parallel to getBookstoreCourses() but for MUSIC-kind
@@ -341,7 +355,7 @@ export async function getBookstoreMusic(): Promise<BookstoreMusicData> {
             name: true,
           },
         },
-        modules: { select: { lessons: { select: { id: true } } } },
+        modules: { select: { lessons: { select: { id: true, genre: true } } } },
         feedback: { where: { status: "APPROVED" }, select: { rating: true } },
       },
     })
@@ -366,11 +380,12 @@ export async function getBookstoreMusic(): Promise<BookstoreMusicData> {
       musicUrl: `${getAuthorBaseUrl(m.author)}/music/${m.slug}`,
       description: m.description ? stripHtml(m.description) : null,
       trackCount,
+      genres: topGenres(m.modules.flatMap((mod) => mod.lessons.map((l) => l.genre))),
       sortTimestamp: new Date(m.createdAt).getTime(),
       averageRating,
       ratingCount,
     };
   });
 
-  return { music };
+return { music };
 }

@@ -16,6 +16,8 @@ export type IncomingTrack = {
   title?: string;
   /** Plain-text note the author typed. */
   description?: string;
+  /** Optional free-text genre, one per song. */
+  genre?: string;
   /** The track's existing contentHtml, echoed back by the editor. Lets a
    *  richer note (e.g. one containing an image, as imported course lessons
    *  can) survive an edit that didn't touch the text — PATCH replaces every
@@ -63,6 +65,7 @@ export async function buildTrackRows(tracks: IncomingTrack[], cap: number | null
         videoUrl: link.canonicalUrl,
         thumbnailUrl: meta.thumbnailUrl,
         contentHtml: buildTrackContentHtml(raw),
+        genre: typeof raw.genre === "string" ? raw.genre.trim().slice(0, 50) || null : null,
         sortOrder: i,
         isPreview: false,
       };

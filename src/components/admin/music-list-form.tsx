@@ -27,6 +27,7 @@ type InitialTrack = {
   title: string;
   description: string;
   originalHtml: string;
+  genre?: string;
   /** Saved artwork, so link-card tracks (Suno etc.) show their art in the row. */
   thumbnailUrl?: string | null;
   /** Saved track's row id, used only by "Move to…". Absent on rows added this session. */
@@ -119,7 +120,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
     () => JSON.stringify({
       title, description, coverImageUrl, isPublished, isFeatured, listInBookstore, releaseType, releaseDate,
       listenLinks: listenLinks.map((l) => l.trim()).filter(Boolean),
-      tracks: tracks.map(({ url, title, description }) => ({ url, title, description })),
+      tracks: tracks.map(({ url, title, description, genre }) => ({ url, title, description, genre })),
     }),
     [title, description, coverImageUrl, isPublished, isFeatured, listInBookstore, releaseType, releaseDate, listenLinks, tracks]
   );
@@ -206,7 +207,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         // description + originalHtml ride along; uid/thumbnailUrl are client-only.
         tracks: tracks
           .filter((t) => t.url.trim())
-          .map(({ url, title, description, originalHtml }) => ({ url, title, description, originalHtml })),
+          .map(({ url, title, description, originalHtml, genre }) => ({ url, title, description, originalHtml, genre })),
       };
       const res = await fetch(isEdit ? `/api/admin/music/${listId}` : "/api/admin/music", {
         method: isEdit ? "PATCH" : "POST",
@@ -569,6 +570,14 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
                       onChange={(e) => updateTrack(i, { title: e.target.value })}
                       className={inputClass}
                       placeholder="Optional — leave blank to use the linked page's title"
+                    />
+                    <label className="block text-[11px] font-semibold text-gray-500 pt-1">Genre</label>
+                    <input
+                      value={track.genre ?? ""}
+                      onChange={(e) => updateTrack(i, { genre: e.target.value })}
+                      maxLength={50}
+                      className={inputClass}
+                      placeholder="Optional — e.g. Indie Folk, Hip-Hop, Ambient"
                     />
                     <label className="block text-[11px] font-semibold text-gray-500 pt-1">Note</label>
                     <textarea

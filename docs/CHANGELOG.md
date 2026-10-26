@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## October 26, 2026 — Music: per-song genre
+
+- **Optional genre on each music track.** New nullable `CourseLesson.genre` (free text, one per song, max 50 chars; migration `20261026_course_lesson_genre`, applied to Supabase ahead of code). Genre input in the music editor's track row; shown as a pill on playlist cards, inline in album/EP rows, and in the Now Playing player. Bookstore music cards show up to 3 distinct genres from the list's songs. `/features` Music Player row and `docs/FEATURE_MATRIX.md` updated.
+
 ## October 26, 2026 — Legacy cover re-save, batch 1 (Supabase egress)
 
 - **Book, course and bundle covers converted to resized WebP.** 27 referenced `book-covers/*/covers/*` PNG/JPEG originals (26.5 MB) were re-encoded to WebP (max 2000px, aspect kept, 1-year cache; 3.7 MB total) and uploaded at **new `.webp` paths**; `Book` (20), `Course` (6) and `Bundle` (1) `coverImageUrl` rows now point at them. Old files are intentionally left in place for about a week before deletion. Full local backup of the bucket and the dry-run report are in `Downloads\supabase-backup-2026-10-26\`. Remaining batches: blog covers, profiles/hero/logos/blog-images, OG share images (stay JPEG), small buckets.

@@ -199,7 +199,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
         },
         {
           // Not plan-gated beyond having Music at all.
-          name: "Music Player (Play all, album tracklists, \"Listen on\" links)",
+          name: "Music Player (Play all, album tracklists, \"Listen on\" links, per-song genre)",
           tiers: {
             FREE: free?.musicEnabled ? "✓" : "—",
             STANDARD: standard?.musicEnabled ? "✓" : "—",

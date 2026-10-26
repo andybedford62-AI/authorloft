@@ -1764,6 +1764,8 @@ model CourseLesson {
   /// Cached from the track URL's Open Graph tags at save time, so public pages
   /// never fetch third-party sites per view. Music tracks only.
   thumbnailUrl String?
+  /// Music tracks only — optional free-text genre, one per song.
+  genre       String?
   fileKey     String?
   fileName    String?
   sortOrder   Int          @default(0)

@@ -10,6 +10,7 @@ export type BookstoreMusic = {
   musicUrl: string;   // absolute URL to the music list/album page on the author's own site
   description: string | null; // stripped plain-text blurb
   trackCount: number;
+  genres: string[]; // distinct song genres, most common first
   sortTimestamp: number; // for "Newest" sort (createdAt)
   averageRating: number | null;
   ratingCount: number;
@@ -71,6 +72,16 @@ export function BookstoreMusicCard({ music }: { music: BookstoreMusic }) {
               ))}
             </div>
             <span className="text-[11px] text-vault-mute">{music.averageRating.toFixed(1)}</span>
+          </div>
+        )}
+
+        {music.genres.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {music.genres.map((g) => (
+              <span key={g} className="rounded-full border border-vault-ink/22 px-2 py-0.5 text-[11px] text-vault-mute">
+                {g}
+              </span>
+            ))}
           </div>
         )}
 

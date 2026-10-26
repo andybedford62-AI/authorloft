@@ -32,6 +32,7 @@ export type PublicTrack = {
   title: string;
   videoUrl: string | null;
   thumbnailUrl: string | null;
+  genre: string | null;
   /** Plain-text one-liner for the collapsed row. */
   description: string | null;
   /** Sanitized on the server; shown in the player, so richer notes (and any
@@ -575,6 +576,7 @@ function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, 
           {track.title}
         </span>
         <span className="block text-xs text-gray-500 truncate">
+          {track.genre && <span>{track.genre} · </span>}
           {track.plays !== null && <span className="tabular-nums">{playsLabel(track.plays)} · </span>}
           {track.description ?? (providerName ? (track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`) : "")}
         </span>
@@ -706,6 +708,11 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
       {/* Body */}
       <div className="p-4 flex flex-col flex-1">
         <h3 className="text-sm font-semibold text-gray-900 leading-snug">{track.title}</h3>
+        {track.genre && (
+          <span className="mt-1 self-start rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+            {track.genre}
+          </span>
+        )}
         {track.description ? (
           <>
             <p className="text-xs text-gray-500 mt-1 line-clamp-2">{track.description}</p>
@@ -846,6 +853,7 @@ function NowPlayingDock({
             Now playing · {position} of {total}
           </p>
           <p className="text-sm font-semibold text-gray-900 truncate">{track.title}</p>
+          {track.genre && <p className="text-[11px] text-gray-500 truncate">{track.genre}</p>}
         </div>
         <button
           type="button"
