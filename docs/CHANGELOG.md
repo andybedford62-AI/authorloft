@@ -21,6 +21,8 @@ line rather than listing every commit.
 
 - **Batch 3 — blog and news covers.** 36 `PlatformPost.coverImageUrl` PNGs (54.6 MB) re-saved as JPEGs (max 1600px, q80, 4.6 MB total, each under 200 KB) at new `.jpg` paths with a 1-year cache; rows updated, old PNGs kept. JPEG rather than WebP because a post's cover is also its og:image/twitter image for social crawlers. 2 tiny `PlatformResource` logos and 4 already-WebP covers left alone; 44 unreferenced blog files are deletion candidates pending approval.
 
+- **Batch 4 — author profile/hero/logo and embedded images.** 18 referenced files (12.5 MB to 1.5 MB): 5 author profile photos to JPEG (max 1200px), Anthony Bedford's hero to WebP, his logo kept as an optimised PNG (`-opt.png`, because newsletter/course emails render it and some mail clients can't show WebP), 9 course-lesson HTML images and 1 blog-post image to WebP, 1 author post cover to JPEG (also its share image). 17 rows updated (`Author`, `Post`, `CourseLesson.contentHtml`, `PlatformPost.content`); old files kept. After this, all 128 distinct `book-covers` URLs referenced from those tables exist in storage. Still on legacy files: `marketing/hero-1788469065867.png` (platform hero), 2 tiny `PlatformResource` logos, and the smaller buckets (`book-previews`, `specials`, `flip-book-covers`, `author-assets`).
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
