@@ -25,6 +25,8 @@ line rather than listing every commit.
 
 - **Batch 5 — book previews, flip-book covers, specials, platform hero.** 21 files (15.9 MB to 2.1 MB) converted to WebP in their own buckets at new paths with a 1-year cache; `BookPreviewMedia` (file + thumbnail key and URL), `FlipBook` (cover key and URL), `Special.imageUrl` and `PlatformSettings.marketingHeroImageUrl` updated; old files kept. `author-assets` skipped (all unused). Remaining legacy: ~260 unreferenced originals in `book-covers` (deletion deferred, would break old emails/social posts and is not needed for egress), 2 tiny `PlatformResource` logos, and one kept 125 KB cover JPEG.
 
+- **Landing pages now re-render every 60 s.** The 12 solution landing pages (`/arc-management`, `/sell-books-directly`, `/book-pre-orders`, etc.) had no `revalidate`, so they were frozen at build time and a Super Admin share-image change never showed until the next deploy (the new JPEGs were still serving the old PNG). Added `export const revalidate = 60;` to each, matching `for-musicians`.
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
