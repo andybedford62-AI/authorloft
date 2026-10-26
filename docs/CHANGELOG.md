@@ -23,6 +23,8 @@ line rather than listing every commit.
 
 - **Batch 4 — author profile/hero/logo and embedded images.** 18 referenced files (12.5 MB to 1.5 MB): 5 author profile photos to JPEG (max 1200px), Anthony Bedford's hero to WebP, his logo kept as an optimised PNG (`-opt.png`, because newsletter/course emails render it and some mail clients can't show WebP), 9 course-lesson HTML images and 1 blog-post image to WebP, 1 author post cover to JPEG (also its share image). 17 rows updated (`Author`, `Post`, `CourseLesson.contentHtml`, `PlatformPost.content`); old files kept. After this, all 128 distinct `book-covers` URLs referenced from those tables exist in storage. Still on legacy files: `marketing/hero-1788469065867.png` (platform hero), 2 tiny `PlatformResource` logos, and the smaller buckets (`book-previews`, `specials`, `flip-book-covers`, `author-assets`).
 
+- **Batch 5 — book previews, flip-book covers, specials, platform hero.** 21 files (15.9 MB to 2.1 MB) converted to WebP in their own buckets at new paths with a 1-year cache; `BookPreviewMedia` (file + thumbnail key and URL), `FlipBook` (cover key and URL), `Special.imageUrl` and `PlatformSettings.marketingHeroImageUrl` updated; old files kept. `author-assets` skipped (all unused). Remaining legacy: ~260 unreferenced originals in `book-covers` (deletion deferred, would break old emails/social posts and is not needed for egress), 2 tiny `PlatformResource` logos, and one kept 125 KB cover JPEG.
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
