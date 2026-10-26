@@ -510,6 +510,11 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
                       ) : (
                         <span className="text-gray-400">No link yet</span>
                       )}
+                      {track.genre?.trim() && (
+                        <span className="rounded-full bg-gray-100 px-1.5 py-px text-[11px] font-medium text-gray-600" title="Genre">
+                          {track.genre.trim()}
+                        </span>
+                      )}
                       {track.description.trim() && (
                         <span className="inline-flex items-center gap-0.5 text-gray-400" title="Has a note">
                           <StickyNote className="h-3 w-3" /> note
