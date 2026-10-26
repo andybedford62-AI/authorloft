@@ -27,6 +27,8 @@ line rather than listing every commit.
 
 - **Landing pages now re-render every 60 s.** The 12 solution landing pages (`/arc-management`, `/sell-books-directly`, `/book-pre-orders`, etc.) had no `revalidate`, so they were frozen at build time and a Super Admin share-image change never showed until the next deploy (the new JPEGs were still serving the old PNG). Added `export const revalidate = 60;` to each, matching `for-musicians`.
 
+- **New homepage share image.** `SeoConfig.home` now points at `seo/og-home-1793035702000.jpg` (1200x630 JPEG, 60 KB, 1-year cache), a real screenshot of the current hero ("Authors: sell your books direct. Keep 100% and your reader list."), replacing the old image that still showed the retired "You wrote the book. They keep the reader." headline. Also: keyword-strip items no longer break mid-phrase (6b92195b).
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)

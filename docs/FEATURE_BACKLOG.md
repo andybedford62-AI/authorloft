@@ -356,7 +356,7 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
   - [x] Step 3 (done Oct 26, 2026; covers kept at 2000 px, no 1200 px cut) — dry-run script to re-save legacy PNG/JPEG in public buckets as WebP next to the originals (1-year cache); needs approval on 1200 px max width for covers.
   - [x] Step 4 (done Oct 26, 2026 across Book/Course/Bundle/Author/Post/PlatformPost/CourseLesson HTML/SeoConfig/BookPreviewMedia/FlipBook/Special/PlatformSettings; old files kept) — back up URLs, then repoint DB URL columns (and image URLs inside rich-text HTML) to the WebP copies.
   - [ ] Step 5 — watch Cached Egress for a week, then decide on R2 and on deleting ~260 unused originals in `book-covers` (232 MB; no egress cost, but they back rollback and old emails/social posts). Reminder scheduled for Nov 2, 2026.
-  - [ ] Re-scrape `home` in the Facebook Sharing Debugger (Andy). The homepage share image still carries the old "You wrote the book. They keep the reader." headline; needs a fresh real screenshot-based 1200×630 image.
+  - [ ] Re-scrape `home` in the Facebook Sharing Debugger (Andy). New real-screenshot homepage share image uploaded Oct 26, 2026 (`seo/og-home-1793035702000.jpg`); only the Facebook re-scrape remains.
   - [ ] Open question: author share images (`Author.socialShareImageUrl`) go through `/api/admin/upload/image` (2000 px WebP), which Facebook may not render. Decide whether to add a dedicated share-image upload.
 
 ---
