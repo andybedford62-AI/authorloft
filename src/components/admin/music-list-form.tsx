@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -110,6 +110,24 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [justSaved, setJustSaved] = useState(false);
+
+  // A save refreshes the page (the edit page re-keys this form on its track ids,
+  // so it remounts), which would drop the "Saved" note and any warnings. They
+  // ride across the remount in sessionStorage.
+  useEffect(() => {
+    if (!listId) return;
+    try {
+      const raw = sessionStorage.getItem(`music-saved-${listId}`);
+      if (!raw) return;
+      sessionStorage.removeItem(`music-saved-${listId}`);
+      const data = JSON.parse(raw) as { warnings?: string[] };
+      setJustSaved(true);
+      if (data.warnings?.length) setWarnings(data.warnings);
+    } catch {
+      // Storage unavailable — the save still happened.
+    }
+  }, [listId]);
   const [showHelp, setShowHelp] = useState(false);
   const [movingId, setMovingId] = useState<string | null>(null);
 
@@ -193,6 +211,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
     setSaving(true);
     setError("");
     setWarnings([]);
+    setJustSaved(false);
     try {
       const payload = {
         title,
@@ -219,12 +238,21 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
       // Saved: this is the new baseline, so "Unsaved changes" clears right away
       // (including the moment before the redirect lands).
       setSavedSnapshot(snapshot);
-      if (data.warnings?.length) {
-        // Staying on the page to show the warnings.
-        setWarnings(data.warnings);
-      } else {
-        router.push("/admin/music");
+      // Stay on the page so the author can keep adding and editing. A new list
+      // moves to its own edit page; an existing one refreshes in place.
+      const id = isEdit ? listId : data.id;
+      try {
+        sessionStorage.setItem(`music-saved-${id}`, JSON.stringify({ warnings: data.warnings ?? [] }));
+      } catch {
+        // Storage unavailable — the note and warnings just won't carry over.
+      }
+      if (isEdit) {
+        // Also set here: with no tracks the form isn't remounted by the refresh.
+        setJustSaved(true);
+        if (data.warnings?.length) setWarnings(data.warnings);
         router.refresh();
+      } else {
+        router.push(`/admin/music/${id}/edit`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save.");
@@ -677,6 +705,11 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
               ? <><Check className="h-4 w-4 mr-2" />Save changes</>
               : <><Plus className="h-4 w-4 mr-2" />Create Music List / Album</>}
         </Button>
+        {!isDirty && justSaved && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+            <Check className="h-3.5 w-3.5" /> Saved
+          </span>
+        )}
         {isDirty && (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
             <span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" /> Unsaved changes
@@ -688,7 +721,10 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
           disabled={saving || deleting}
           onClick={() => {
             if (isDirty && !confirm("Discard your unsaved changes?")) return;
-            router.push("/admin/music");
+            // Editing: reload from the saved version and stay here. A new list
+            // has nothing saved to return to, so it goes back to the list.
+            if (isEdit) window.location.reload();
+            else router.push("/admin/music");
           }}
         >
           Cancel
