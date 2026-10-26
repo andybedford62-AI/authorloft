@@ -17,6 +17,8 @@ line rather than listing every commit.
 
 - **Book, course and bundle covers converted to resized WebP.** 27 referenced `book-covers/*/covers/*` PNG/JPEG originals (26.5 MB) were re-encoded to WebP (max 2000px, aspect kept, 1-year cache; 3.7 MB total) and uploaded at **new `.webp` paths**; `Book` (20), `Course` (6) and `Bundle` (1) `coverImageUrl` rows now point at them. Old files are intentionally left in place for about a week before deletion. Full local backup of the bucket and the dry-run report are in `Downloads\supabase-backup-2026-10-26\`. Remaining batches: blog covers, profiles/hero/logos/blog-images, OG share images (stay JPEG), small buckets.
 
+- **Batch 2 — SEO share images.** 15 `SeoConfig.ogImageUrl` PNGs (12.1 MB) re-saved as 1200x630 JPEGs (q80, 0.8 MB total) at new `.jpg` paths with a 1-year cache; rows updated to match, old PNGs kept. Targets the Facebook crawler traffic that made up ~80% of image egress. Not yet re-scraped in Facebook's Sharing Debugger. Note: the homepage share image still carries the old "You wrote the book. They keep the reader." headline.
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
