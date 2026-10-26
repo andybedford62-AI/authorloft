@@ -19,6 +19,8 @@ line rather than listing every commit.
 
 - **Batch 2 — SEO share images.** 15 `SeoConfig.ogImageUrl` PNGs (12.1 MB) re-saved as 1200x630 JPEGs (q80, 0.8 MB total) at new `.jpg` paths with a 1-year cache; rows updated to match, old PNGs kept. Targets the Facebook crawler traffic that made up ~80% of image egress. Not yet re-scraped in Facebook's Sharing Debugger. Note: the homepage share image still carries the old "You wrote the book. They keep the reader." headline.
 
+- **Batch 3 — blog and news covers.** 36 `PlatformPost.coverImageUrl` PNGs (54.6 MB) re-saved as JPEGs (max 1600px, q80, 4.6 MB total, each under 200 KB) at new `.jpg` paths with a 1-year cache; rows updated, old PNGs kept. JPEG rather than WebP because a post's cover is also its og:image/twitter image for social crawlers. 2 tiny `PlatformResource` logos and 4 already-WebP covers left alone; 44 unreferenced blog files are deletion candidates pending approval.
+
 ---
 
 ## October 23, 2026 — HeyCatch audit fixes (84/100 re-audit)
