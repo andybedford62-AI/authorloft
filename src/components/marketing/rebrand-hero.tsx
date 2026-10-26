@@ -359,9 +359,9 @@ export function RebelHero({
           </h1>
 
           {/* Mantra strip */}
-          <div style={{ display: 'flex', gap: 0, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', rowGap: 6, marginBottom: 24, animation: 'rbFadeUp 0.7s 0.2s ease both', opacity: 0 }}>
             {['your storefront', 'your audience', 'your courses', 'your music', 'your rules'].map((word, i) => (
-              <span key={word} style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: i % 2 === 0 ? VAULT.ink : VAULT.gold, opacity: i % 2 === 0 ? 0.55 : 0.9, marginRight: 16 }}>
+              <span key={word} style={{ fontFamily: 'var(--font-geist-mono, monospace)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: i % 2 === 0 ? VAULT.ink : VAULT.gold, opacity: i % 2 === 0 ? 0.55 : 0.9, marginRight: 16, whiteSpace: 'nowrap' }}>
                 {word}{i < 4 ? ' ·' : ''}
               </span>
             ))}
