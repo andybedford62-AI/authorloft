@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { canUseFeature } from "@/lib/plan-limits";
+import { INTEREST_TAG_NAMES } from "@/lib/newsletter-interests";
 
 export async function GET() {
   const authorId = await getAdminAuthorIdForApi();
@@ -22,7 +23,7 @@ export async function GET() {
   ]);
 
   // Build genre lookup map
-  const genreMap = new Map(genres.map((g) => [g.id, g.name]));
+  const genreMap = new Map<string, string>([...Object.entries(INTEREST_TAG_NAMES), ...genres.map((g): [string, string] => [g.id, g.name])]);
 
   // Build CSV
   const header = ["Name", "Email", "Interests", "Confirmed", "Subscribed At"];

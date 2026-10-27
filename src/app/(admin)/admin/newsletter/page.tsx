@@ -4,6 +4,7 @@ import { NewsletterTabs } from "./newsletter-tabs";
 import { resolveAccentColor } from "@/lib/themes";
 import { htmlToText, featuredBookTag } from "@/lib/newsletter-format";
 import { getAdminAuthorId } from "@/lib/admin-auth";
+import { INTEREST_TAGS, INTEREST_TAG_NAMES } from "@/lib/newsletter-interests";
 
 export const dynamic = "force-dynamic";
 
@@ -108,7 +109,7 @@ export default async function NewsletterPage() {
   const openedByCampaign  = new Map(openedCounts.map((r) => [r.campaignId, r._count._all]));
   const clickedByCampaign = new Map(clickedCounts.map((r) => [r.campaignId, r._count._all]));
 
-  const genreMap      = Object.fromEntries(genres.map((g) => [g.id, g.name]));
+  const genreMap      = { ...INTEREST_TAG_NAMES, ...Object.fromEntries(genres.map((g) => [g.id, g.name])) };
   const confirmedCount = subscribers.filter((s) => s.isConfirmed).length;
 
   const socials = [
@@ -158,7 +159,7 @@ export default async function NewsletterPage() {
             ...s,
             subscribedAt: s.subscribedAt.toISOString(),
           }))}
-          genres={genres}
+          genres={[...INTEREST_TAGS, ...genres]}
           genreMap={genreMap}
           confirmedCount={confirmedCount}
           accentColor={resolveAccentColor({

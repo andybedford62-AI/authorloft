@@ -18,12 +18,14 @@ const REFERRAL_OPTIONS = [
 interface ModalProps {
   authorId: string;
   accentColor: string;
+  /** Content-type interests this author offers (Courses / New music / Blog & news). */
+  extraInterests?: { id: string; name: string }[];
   onClose: () => void;
 }
 
 // ── Modal (inner) ────────────────────────────────────────────────────────────
 
-function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
+function NewsletterModal({ authorId, accentColor, extraInterests = [], onClose }: ModalProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName,  setLastName]  = useState("");
   const [email,     setEmail]     = useState("");
@@ -203,14 +205,14 @@ function NewsletterModal({ authorId, accentColor, onClose }: ModalProps) {
                   Picking specific genres lets the author target you with
                   newsletters about those topics; "All" (the default) means
                   you receive every newsletter. */}
-              {genres.length > 0 && (
+              {(extraInterests.length > 0 || genres.length > 0) && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Interests{" "}
                     <span className="text-gray-400 font-normal">(optional)</span>
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {[{ id: "all", name: "All" }, ...genres].map((item) => {
+                    {[{ id: "all", name: "All" }, ...extraInterests, ...genres].map((item) => {
                       const checked = interests.includes(item.id);
                       return (
                         <button
@@ -300,10 +302,12 @@ export function NewsletterModalButton({
   authorId,
   authorName,
   accentColor,
+  extraInterests,
 }: {
   authorId: string;
   authorName: string;
   accentColor: string;
+  extraInterests?: { id: string; name: string }[];
 }) {
   const [open, setOpen] = useState(false);
 
@@ -322,6 +326,7 @@ export function NewsletterModalButton({
         <NewsletterModal
           authorId={authorId}
           accentColor={accentColor}
+          extraInterests={extraInterests}
           onClose={() => setOpen(false)}
         />
       )}

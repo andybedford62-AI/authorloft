@@ -132,6 +132,7 @@ export default async function EditMusicListPage({
           releaseType: list.releaseType ?? "PLAYLIST",
           releaseDate: list.releaseDate ? list.releaseDate.toISOString().slice(0, 10) : "",
           listenLinks: parseListenLinks(list.listenLinks),
+          announcedAt: list.courseAnnouncedAt ? list.courseAnnouncedAt.toISOString() : null,
           tracks: tracks.length > 0 ? tracks : [{ url: "", title: "", description: "", originalHtml: "" }],
         }}
       />

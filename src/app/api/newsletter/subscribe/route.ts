@@ -26,7 +26,17 @@ const schema = z.object({
   name: z.string().max(200).optional(),
   email: z.string().email().max(200),
   categoryPrefs: z.array(z.string().max(100)).max(50).optional(),
+  // Merge mode (used by single-topic boxes like the Music page): ADD these
+  // interests to whatever the subscriber already has instead of replacing it.
+  // An existing "everything" subscriber (empty prefs) is never narrowed.
+  mergeInterests: z.array(z.string().max(100)).max(10).optional(),
 });
+
+function mergePrefs(existing: string[] | null, add: string[]): string[] {
+  if (existing === null) return add;
+  if (existing.length === 0) return [];
+  return Array.from(new Set([...existing, ...add]));
+}
 
 // Double opt-in: direct signups (this modal) are unverified until the reader
 // clicks the confirmation email. Purchase-triggered and reader-magnet
@@ -62,13 +72,21 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.subscriber.findUnique({
       where: { authorId_email: { authorId: data.authorId, email: data.email } },
-      select: { id: true, isConfirmed: true, lastConfirmationSentAt: true },
+      select: { id: true, isConfirmed: true, lastConfirmationSentAt: true, categoryPrefs: true },
     });
+
+    // Merge mode keeps existing interests (and the existing name); otherwise the
+    // submitted preferences replace them, as the full signup modal intends.
+    const prefsFor = (current: string[] | null) =>
+      data.mergeInterests ? mergePrefs(current, data.mergeInterests) : data.categoryPrefs || [];
 
     if (existing?.isConfirmed) {
       await prisma.subscriber.update({
         where: { id: existing.id },
-        data: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
+        data: {
+          ...(data.mergeInterests ? {} : { name: data.name }),
+          categoryPrefs: prefsFor(existing.categoryPrefs),
+        },
       });
       return NextResponse.json({ success: true, id: existing.id, alreadyConfirmed: true });
     }
@@ -76,7 +94,10 @@ export async function POST(req: NextRequest) {
     if (existing?.lastConfirmationSentAt && Date.now() - existing.lastConfirmationSentAt.getTime() < RESEND_COOLDOWN_MS) {
       await prisma.subscriber.update({
         where: { id: existing.id },
-        data: { name: data.name, categoryPrefs: data.categoryPrefs || [] },
+        data: {
+          ...(data.mergeInterests ? {} : { name: data.name }),
+          categoryPrefs: prefsFor(existing.categoryPrefs),
+        },
       });
       return NextResponse.json({ success: true, id: existing.id });
     }
@@ -86,12 +107,17 @@ export async function POST(req: NextRequest) {
 
     const subscriber = await prisma.subscriber.upsert({
       where: { authorId_email: { authorId: data.authorId, email: data.email } },
-      update: { name: data.name, categoryPrefs: data.categoryPrefs || [], confirmToken, lastConfirmationSentAt: now },
+      update: {
+        ...(data.mergeInterests ? {} : { name: data.name }),
+        categoryPrefs: prefsFor(existing?.categoryPrefs ?? null),
+        confirmToken,
+        lastConfirmationSentAt: now,
+      },
       create: {
         authorId: data.authorId,
         name: data.name,
         email: data.email,
-        categoryPrefs: data.categoryPrefs || [],
+        categoryPrefs: prefsFor(null),
         confirmToken,
         lastConfirmationSentAt: now,
       },

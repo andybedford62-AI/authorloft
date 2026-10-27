@@ -35,6 +35,13 @@ export function AuthorFooter({ author, links }: FooterProps) {
   const firstName    = displayName.split(" ")[0];
   const year         = new Date().getFullYear();
   const quickLinks   = links.filter((l) => l.href !== "/");
+  // Interest chips for the signup modal, derived from what the author actually
+  // shows (the same content-aware list that drives the header menu).
+  const extraInterests = [
+    quickLinks.some((l) => l.href === "/courses") && { id: "courses", name: "Courses" },
+    quickLinks.some((l) => l.href === "/music")   && { id: "music",   name: "New music" },
+    quickLinks.some((l) => l.href === "/blog")    && { id: "blog",    name: "Blog & news" },
+  ].filter((x): x is { id: string; name: string } => !!x);
   const siteUrl      = getAuthorBaseUrl(author);
   // Env-var based, matching nav.tsx -- a hardcoded authorloft.com here would
   // send an author signing in from staging to the production login instead.
@@ -75,6 +82,7 @@ export function AuthorFooter({ author, links }: FooterProps) {
                 authorId={author.id}
                 authorName={displayName}
                 accentColor={author.accentColor}
+                extraInterests={extraInterests}
               />
             </div>
 

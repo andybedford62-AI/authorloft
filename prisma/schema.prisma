@@ -781,6 +781,7 @@ model Post {
   // Downloadable resource
   attachmentUrl   String? // external link or uploaded file URL
   attachmentLabel String? // e.g. "Download Free Chapter"
+  emailedAt       DateTime? // stamped once the author emails this post to subscribers; guards against re-sending on later edits
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   author          Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)

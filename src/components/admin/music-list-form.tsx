@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Check, Plus, Trash2, Loader2, AlertTriangle, GripVertical, ExternalLink, EyeOff, HelpCircle, Store, Lock,
-  ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote, Play, ThumbsUp, ThumbsDown,
+  ChevronDown, ChevronUp, ArrowUp, ArrowDown, Music2, StickyNote, Play, ThumbsUp, ThumbsDown, Megaphone, CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CoverUpload } from "@/components/admin/cover-upload";
@@ -53,6 +53,8 @@ interface Props {
     releaseDate: string;
     listenLinks: string[];
     tracks: InitialTrack[];
+    /** ISO timestamp once the "new release" email has gone out (Course.courseAnnouncedAt). */
+    announcedAt?: string | null;
   };
   /** Plan cap on tracks; null = unlimited. */
   trackCap: number | null;
@@ -108,6 +110,10 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
 
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [announcing, setAnnouncing] = useState(false);
+  const [announceError, setAnnounceError] = useState("");
+  const [announcedAt, setAnnouncedAt] = useState(initial?.announcedAt ?? null);
+  const [announceResult, setAnnounceResult] = useState<{ sent: number; total: number } | null>(null);
   const [error, setError] = useState("");
   const [warnings, setWarnings] = useState<string[]>([]);
   const [justSaved, setJustSaved] = useState(false);
@@ -261,6 +267,27 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
     }
   }
 
+  async function handleAnnounce() {
+    if (!listId) return;
+    if (!confirm("Email everyone who opted in to new music about this release? This can't be undone.")) return;
+    setAnnouncing(true);
+    setAnnounceError("");
+    try {
+      const res = await fetch(`/api/admin/music/${listId}/announce`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setAnnounceError(data.error ?? "Failed to send announcement");
+        return;
+      }
+      setAnnounceResult({ sent: data.sent, total: data.total });
+      setAnnouncedAt(new Date().toISOString());
+    } catch {
+      setAnnounceError("Something went wrong");
+    } finally {
+      setAnnouncing(false);
+    }
+  }
+
   async function handleDelete() {
     if (!listId) return;
     if (!confirm(`Delete "${title || "this music list"}" and all its tracks? This cannot be undone.`)) return;
@@ -390,6 +417,34 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
           <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="rounded border-gray-300" />
           Featured (shown as the hero highlight when your homepage focus is set to Music)
         </label>
+        {isEdit && initial?.isPublished && (
+          <div className="rounded-lg border border-gray-200 px-4 py-3.5">
+            {announcedAt ? (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                Announced to subscribers on {new Date(announcedAt).toLocaleDateString()}
+                {announceResult && ` — sent to ${announceResult.sent} of ${announceResult.total} subscribers`}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                    <Megaphone className="h-3.5 w-3.5 text-gray-400" />
+                    Announce this release
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Email subscribers who opted in to new music (and everyone who signed up for everything). One-time send — editing or re-saving afterward won&apos;t trigger another.
+                  </p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={handleAnnounce} disabled={announcing} className="flex-shrink-0">
+                  {announcing && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+                  Announce to Subscribers
+                </Button>
+              </div>
+            )}
+            {announceError && <p className="text-xs text-red-600 mt-2">{announceError}</p>}
+          </div>
+        )}
         {!isPublished && (
           <div className="flex items-start gap-2.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-800">
             <EyeOff className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />

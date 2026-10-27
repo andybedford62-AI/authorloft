@@ -86,7 +86,7 @@ Early bird / founding member discount available to FREE users within a configura
 |---------|------|----------|---------|
 | **Share Tools — books & courses** (public share bar incl. phone share sheet + QR popover on book/course pages; admin share kit with tracked links, caption, QR download, "Write a post with AI"; Copy link / View live on list rows) | ✅ | ✅ | ✅ |
 | **Newsletter Signup Form** | ✅ (full campaigns) | ✅ (full campaigns) | ✅ (full campaigns) |
-| **Newsletter Campaigns** (send to subscribers; starter + saved templates, autosaved drafts, send-test-to-me, scheduled sends) | ✅ | ✅ | ✅ |
+| **Newsletter Campaigns** (send to subscribers; starter + saved templates, autosaved drafts, send-test-to-me, scheduled sends; Courses / Music / Blog interest tags with one-click announce for new courses, releases and posts) | ✅ | ✅ | ✅ |
 | **Newsletter Integration** (3rd-party) | ❌ | ✅ (Resend, etc.) | ✅ (Resend, etc.) |
 | **Media Kit Page** (press kit for interviews, downloadable PDF with stats) | ❌ | ✅ | ✅ |
 | **Contact Support Form** (reach platform) | ✅ | ✅ | ✅ |

@@ -29,6 +29,7 @@ export default async function EditPostPage({
       focusKeyword: true,
       attachmentUrl: true,
       attachmentLabel: true,
+      emailedAt: true,
     },
   });
 
@@ -58,7 +59,7 @@ export default async function EditPostPage({
         </div>
       </div>
 
-      <PostForm post={post} />
+      <PostForm post={{ ...post, emailedAt: post.emailedAt ? post.emailedAt.toISOString() : null }} />
     </div>
   );
 }

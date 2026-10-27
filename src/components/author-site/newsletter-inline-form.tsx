@@ -23,6 +23,10 @@ interface Props {
   inputBg?: string;
   /** Explicit button label colour, overriding the readability calculation. */
   buttonTextColor?: string;
+  /** Interest tags to ADD for this signup (e.g. ["music"]); existing interests are kept. */
+  mergeInterests?: string[];
+  /** Overrides the "Subscribe →" label. */
+  buttonLabel?: string;
 }
 
 export function NewsletterInlineForm({
@@ -32,6 +36,8 @@ export function NewsletterInlineForm({
   rounded = "lg",
   inputBg,
   buttonTextColor,
+  mergeInterests,
+  buttonLabel,
 }: Props) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +55,7 @@ export function NewsletterInlineForm({
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ authorId, email }),
+        body: JSON.stringify({ authorId, email, ...(mergeInterests ? { mergeInterests } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -124,7 +130,7 @@ export function NewsletterInlineForm({
             borderRadius: radius,
           }}
         >
-          {loading ? "Subscribing…" : "Subscribe →"}
+          {loading ? "Subscribing…" : buttonLabel ?? "Subscribe →"}
         </button>
       </form>
       {status === "error" && (

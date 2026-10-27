@@ -1,4 +1,5 @@
 import { authorShareImage } from "@/lib/share-image";
+import { MusicNotify } from "@/components/author-site/music-notify";
 import { toMetaDescription } from "@/lib/meta-text";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -189,6 +190,10 @@ export default async function MusicListPage({
           campaign: slug,
         }}
       />
+
+      <div className="mt-14">
+        <MusicNotify authorId={author.id} accentColor={author.accentColor} artistName={author.displayName || author.name} />
+      </div>
     </div>
   );
 }

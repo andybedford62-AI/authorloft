@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { getAuthorBaseUrl } from "@/lib/site-url";
 import { accentAsSurface } from "@/lib/color-contrast";
 import { releaseLabel } from "@/lib/music-share";
+import { MusicNotify } from "@/components/author-site/music-notify";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -144,6 +145,12 @@ export default async function MusicPage({
           </>
         )}
       </section>
+
+      {lists.length > 0 && (
+        <div className="px-4 sm:px-6 pb-16">
+          <MusicNotify authorId={author.id} accentColor={accentColor} artistName={author.displayName || author.name} />
+        </div>
+      )}
     </div>
   );
 }

@@ -27,6 +27,8 @@ interface PostFormProps {
     focusKeyword: string | null;
     attachmentUrl: string | null;
     attachmentLabel: string | null;
+    /** ISO timestamp once this post has been emailed to subscribers. */
+    emailedAt?: string | null;
   };
 }
 
@@ -59,6 +61,7 @@ export function PostForm({ post }: PostFormProps) {
   const [attachmentUrl,   setAttachmentUrl]   = useState(post?.attachmentUrl   ?? "");
   const [attachmentLabel, setAttachmentLabel] = useState(post?.attachmentLabel ?? "");
 
+  const [emailPost,       setEmailPost]       = useState(false);
   const [saving,         setSaving]         = useState(false);
   const [error,          setError]          = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
@@ -108,6 +111,21 @@ export function PostForm({ post }: PostFormProps) {
       });
 
       if (res.ok) {
+        // Opt-in subscriber email: runs only after the save succeeded, and only
+        // when the author ticked the box on a published, not-yet-emailed post.
+        if (emailPost && isPublished && !post?.emailedAt) {
+          const saved = await res.json().catch(() => null);
+          const postId = isEdit ? post.id : saved?.id;
+          if (postId) {
+            const er = await fetch(`/api/admin/blog/${postId}/email`, { method: "POST" }).catch(() => null);
+            const ed = er ? await er.json().catch(() => ({})) : {};
+            if (!er || !er.ok) {
+              window.alert(`Your post was saved, but the subscriber email was not sent: ${ed.error ?? "network error"}`);
+            } else {
+              window.alert(`Post saved and emailed to ${ed.sent} of ${ed.total} subscribers.`);
+            }
+          }
+        }
         router.push("/admin/blog");
         router.refresh();
       } else {
@@ -341,6 +359,29 @@ export function PostForm({ post }: PostFormProps) {
             {isPublished ? "Published — visible to readers" : "Draft — not visible to readers"}
           </span>
         </label>
+
+        {isPublished && (
+          post?.emailedAt ? (
+            <p className="text-xs text-gray-500">
+              Emailed to subscribers on {new Date(post.emailedAt).toLocaleDateString()}.
+            </p>
+          ) : (
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={emailPost}
+                onChange={(e) => setEmailPost(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span>
+                <span className="block text-sm text-gray-700">Email this post to subscribers when I save</span>
+                <span className="block text-xs text-gray-400 mt-0.5">
+                  Goes to subscribers who signed up for everything or chose Blog &amp; news. One-time send; off unless you tick it.
+                </span>
+              </span>
+            </label>
+          )
+        )}
       </section>
 
       {/* ── Downloadable Resource ─────────────────────────────────────────── */}

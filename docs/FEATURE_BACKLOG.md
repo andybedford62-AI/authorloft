@@ -90,6 +90,7 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 - [x] **Open/click analytics** — shipped Aug 10, 2026; new `CampaignSendLog` table + `/api/webhooks/resend` consuming Resend's native email.opened/email.clicked events (not a custom pixel/redirect system); History tab shows Opened/Clicked rate + count. Requires manual Resend dashboard setup (enable Open+Click Tracking on the domain, add the webhook, set `RESEND_WEBHOOK_SECRET`) before it actually records anything. *(done — pending dashboard config)*
 - [x] **Scheduled sends** — shipped Oct 27, 2026 (hourly cron, cancel-to-draft). *(done)*
 - [ ] **Recurring auto-digest cadence** — optional repeat schedule on top of scheduled sends. *(medium)*
+- [ ] **Preference center / change interests link** — subscribers can only change interests by re-submitting the signup form; a real page behind the footer link would let them add/remove Courses / Music / Blog. *(medium)*
 - [ ] **`{{firstName}}` personalization in newsletters** — `Subscriber.name` exists and the send loop renders per recipient; needs a fallback for blank names. *(small)*
 - [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
 - [x] **Reuse a prior newsletter** — shipped Aug 10, 2026; a "Reuse" button on each History tab row loads that campaign's exact subject/body/block config back into the composer. `Campaign` now persists this on send. *(done)*
