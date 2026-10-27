@@ -11,7 +11,7 @@ export async function GET() {
   if (!gate.allowed) return NextResponse.json({ error: gate.reason }, { status: 403 });
 
   const campaigns = await prisma.campaign.findMany({
-    where:   { authorId },
+    where:   { authorId, status: "SENT" },
     orderBy: { sentAt: "desc" },
     select: {
       id:            true,

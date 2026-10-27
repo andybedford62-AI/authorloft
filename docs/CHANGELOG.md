@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## October 27, 2026 — Newsletter: test send, drafts, templates, scheduling
+
+- **Send test to me.** New `POST /api/admin/newsletter/test` emails one `[TEST]` copy (same HTML as the real send) to the author's login address; no Campaign row or send logs; rate-limited 10/hour.
+- **Autosaved drafts.** New `NewsletterDraft` table; composer autosaves ~2.5s after typing stops, "Your drafts" list to resume/delete (confirm), max 25. A draft is consumed when sent or scheduled.
+- **Templates.** New `NewsletterTemplate` table ("Save as template", max 30, delete with confirm) plus 5 built-in starters (New release, Cover reveal, Sale or special, Monthly update, Behind the scenes) in `src/lib/newsletter-starters.ts`.
+- **Scheduled sends.** `Campaign.status` (SENT/SCHEDULED/SENDING/FAILED, existing rows default SENT) + `scheduledFor`; hourly cron `/api/cron/send-scheduled-newsletters` (:10) claims rows atomically SCHEDULED to SENDING so a retry can't double-send. Cancel from History turns the send back into a draft. Sends land within about an hour of the chosen time.
+- Send logic and email HTML moved out of the send route into `src/lib/newsletter-send.ts` / `newsletter-email.ts`, shared by send-now, cron and test. Migration `20261027_newsletter_drafts_templates_schedule` (applied to Supabase ahead of code; includes GRANTs for both new tables). `/features` row and `docs/FEATURE_MATRIX.md` updated.
+
 ## October 26, 2026 — Music: per-song genre
 
 - **Optional genre on each music track.** New nullable `CourseLesson.genre` (free text, one per song, max 50 chars; migration `20261026_course_lesson_genre`, applied to Supabase ahead of code). Genre input in the music editor's track row; shown as a pill on playlist cards, inline in album/EP rows, and in the Now Playing player. Bookstore music cards show up to 3 distinct genres from the list's songs. `/features` Music Player row and `docs/FEATURE_MATRIX.md` updated.

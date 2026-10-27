@@ -12,7 +12,7 @@ export default async function NewsletterPage() {
 
   const now = new Date();
 
-  const [subscribers, genres, author, campaigns, books, activeSpecials, openedCounts, clickedCounts] = await Promise.all([
+  const [subscribers, genres, author, campaigns, books, activeSpecials, openedCounts, clickedCounts, drafts, templates] = await Promise.all([
     prisma.subscriber.findMany({
       where:   { authorId },
       orderBy: { subscribedAt: "desc" },
@@ -45,6 +45,8 @@ export default async function NewsletterPage() {
       orderBy: { sentAt: "desc" },
       select: {
         id:            true,
+        status:        true,
+        scheduledFor:  true,
         subject:       true,
         sentAt:        true,
         totalSent:     true,
@@ -90,6 +92,16 @@ export default async function NewsletterPage() {
       by:    ["campaignId"],
       where: { campaign: { authorId }, clickCount: { gt: 0 } },
       _count: { _all: true },
+    }),
+    prisma.newsletterDraft.findMany({
+      where:   { authorId },
+      orderBy: { updatedAt: "desc" },
+      select:  { id: true, subject: true, body: true, categoryFilter: true, includeBooks: true, includeReview: true, specialId: true, updatedAt: true },
+    }),
+    prisma.newsletterTemplate.findMany({
+      where:   { authorId },
+      orderBy: { createdAt: "desc" },
+      select:  { id: true, name: true, subject: true, body: true, includeBooks: true, includeReview: true },
     }),
   ]);
 
@@ -163,9 +175,12 @@ export default async function NewsletterPage() {
           shelf={shelf}
           review={review}
           activeSpecials={activeSpecials}
+          drafts={drafts.map((d) => ({ ...d, updatedAt: d.updatedAt.toISOString() }))}
+          templates={templates}
           campaigns={campaigns.map((c) => ({
             ...c,
             sentAt: c.sentAt.toISOString(),
+            scheduledFor: c.scheduledFor?.toISOString() ?? null,
             totalOpened:  openedByCampaign.get(c.id) ?? 0,
             totalClicked: clickedByCampaign.get(c.id) ?? 0,
           }))}

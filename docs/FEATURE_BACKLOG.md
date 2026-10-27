@@ -85,10 +85,12 @@ Shipped June 25, 2026: branded email + smart content blocks (featured book showc
 - [ ] **Hero banner image** — optional full-width header image (`heroImageUrl` or a per-send upload) behind the masthead, with a readable scrim + image-off fallback. *(medium — email image hosting + Outlook fallbacks)*
 - [ ] **Drag-drop content blocks** — let authors add/reorder optional promo panels (text + image + CTA) in the composer instead of the fixed block order. Biggest lift; needs a block editor + storage. *(large)*
 - [ ] **Multiple featured books / pick the featured title** — currently auto-picks newest published; let the author choose which book headlines, and optionally feature 2–3. *(small–medium)*
-- [ ] **Per-send saved layouts / templates** — save a block configuration ("monthly update", "launch announcement") to reuse. *(medium)*
+- [x] **Per-send saved layouts / templates** — shipped Oct 27, 2026: author-saved templates + 5 starters, autosaved drafts, send-test-to-me. *(done)*
 - [ ] **Subscriber preference center** — a real "update preferences" page (re-pick genres, pause) so the footer link is more than unsubscribe. Unlocks the "Update preferences" footer link we deferred. *(medium)*
 - [x] **Open/click analytics** — shipped Aug 10, 2026; new `CampaignSendLog` table + `/api/webhooks/resend` consuming Resend's native email.opened/email.clicked events (not a custom pixel/redirect system); History tab shows Opened/Clicked rate + count. Requires manual Resend dashboard setup (enable Open+Click Tracking on the domain, add the webhook, set `RESEND_WEBHOOK_SECRET`) before it actually records anything. *(done — pending dashboard config)*
-- [ ] **Scheduled / recurring sends** — "send later" + optional auto-digest cadence. *(medium–large)*
+- [x] **Scheduled sends** — shipped Oct 27, 2026 (hourly cron, cancel-to-draft). *(done)*
+- [ ] **Recurring auto-digest cadence** — optional repeat schedule on top of scheduled sends. *(medium)*
+- [ ] **`{{firstName}}` personalization in newsletters** — `Subscriber.name` exists and the send loop renders per recipient; needs a fallback for blank names. *(small)*
 - [ ] **Featured quote field on the campaign** — let authors type a one-off pull-quote per send instead of only pulling from `BookReview`/`BookFeedback`. *(small)*
 - [x] **Reuse a prior newsletter** — shipped Aug 10, 2026; a "Reuse" button on each History tab row loads that campaign's exact subject/body/block config back into the composer. `Campaign` now persists this on send. *(done)*
 - [ ] **AI-assisted newsletter drafting** *(investigate — may not build)* — explore an "AI assist" button in the composer (reuse the existing Gemini/`GEMINI_API_KEY` + AI-usage-cap infra from other admin AI tools) to draft or polish newsletter copy from a short prompt or from the author's latest book/blog/special. Evaluate value vs. abuse/cost (counts against AI usage cap) before committing. *(medium — spike first)*

@@ -250,6 +250,8 @@ model Author {
   series                        Series[]
   subscribers                   Subscriber[]
   campaigns                     Campaign[]
+  newsletterDrafts              NewsletterDraft[]
+  newsletterTemplates           NewsletterTemplate[]
   orders                        Order[]
   sessions                      Session[]
   accounts                      Account[]
@@ -824,8 +826,46 @@ model Campaign {
   includeBooks    Boolean  @default(true)
   includeReview   Boolean  @default(true)
   specialId       String? // no FK -- historical snapshot, shouldn't break if the Special is later deleted
+  // "SENT" (default, every pre-existing row) | "SCHEDULED" | "SENDING" | "FAILED".
+  // Scheduled rows carry the full compose config; sentAt holds the scheduled time until it goes out.
+  status          String    @default("SENT")
+  scheduledFor    DateTime?
   author        Author            @relation(fields: [authorId], references: [id], onDelete: Cascade)
   sendLogs      CampaignSendLog[]
+
+  @@index([authorId])
+  @@index([status, scheduledFor])
+}
+
+// Work-in-progress newsletter compose state, autosaved from the composer.
+model NewsletterDraft {
+  id             String   @id @default(cuid())
+  authorId       String
+  subject        String   @default("")
+  body           String   @default("") @db.Text
+  categoryFilter String[] @default([])
+  includeBooks   Boolean  @default(true)
+  includeReview  Boolean  @default(true)
+  specialId      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  author         Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, updatedAt])
+}
+
+// Author-saved reusable newsletter skeletons ("Save as template").
+model NewsletterTemplate {
+  id            String   @id @default(cuid())
+  authorId      String
+  name          String
+  subject       String   @default("")
+  body          String   @default("") @db.Text
+  includeBooks  Boolean  @default(true)
+  includeReview Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([authorId])
 }

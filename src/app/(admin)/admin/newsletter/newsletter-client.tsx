@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Download, Users, Mail, Tag, Send, Eye, EyeOff,
   CheckCircle, XCircle, Loader2, History, AlertTriangle, Copy,
+  Clock, FileText, Trash2, BookmarkPlus, Check,
 } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
+import { NEWSLETTER_STARTERS } from "@/lib/newsletter-starters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +40,28 @@ type Campaign = {
   includeBooks?:    boolean;
   includeReview?:   boolean;
   specialId?:       string | null;
+  status?:          string;          // SENT | SCHEDULED | SENDING | FAILED
+  scheduledFor?:    string | null;
+};
+
+type Draft = {
+  id:             string;
+  subject:        string;
+  body:           string;
+  categoryFilter: string[];
+  includeBooks:   boolean;
+  includeReview:  boolean;
+  specialId:      string | null;
+  updatedAt:      string;
+};
+
+type Template = {
+  id:            string;
+  name:          string;
+  subject:       string;
+  body:          string;
+  includeBooks:  boolean;
+  includeReview: boolean;
 };
 
 type FeaturedBook = { title: string; coverImageUrl: string | null; blurb: string | null; eyebrow: string; ctaLabel: string };
@@ -62,9 +86,11 @@ interface Props {
   review:          ReviewQuote | null;
   activeSpecials:  ActiveSpecial[];
   campaigns:       Campaign[];
+  drafts:          Draft[];
+  templates:       Template[];
 }
 
-type SendResult = { sent: number; failed: number; total: number } | null;
+type SendResult = { sent: number; failed: number; total: number; scheduledFor?: string } | null;
 type Tab = "subscribers" | "compose" | "history";
 
 export function NewsletterClient({
@@ -83,6 +109,8 @@ export function NewsletterClient({
   review,
   activeSpecials,
   campaigns: initialCampaigns,
+  drafts: initialDrafts,
+  templates: initialTemplates,
 }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("compose");
@@ -103,6 +131,166 @@ export function NewsletterClient({
 
   // History — updated optimistically after each send
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+
+  // Drafts (autosaved), templates, test send, scheduling
+  const [drafts,       setDrafts]       = useState<Draft[]>(initialDrafts);
+  const [templates,    setTemplates]    = useState<Template[]>(initialTemplates);
+  const [draftId,      setDraftId]      = useState<string | null>(null);
+  const [saveState,    setSaveState]    = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [showTplForm,  setShowTplForm]  = useState(false);
+  const [tplName,      setTplName]      = useState("");
+  const [tplError,     setTplError]     = useState("");
+  const [testState,    setTestState]    = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [testMessage,  setTestMessage]  = useState("");
+  const [scheduleOn,   setScheduleOn]   = useState(false);
+  const [scheduleAt,   setScheduleAt]   = useState("");
+
+  const contentKey = JSON.stringify([subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId]);
+  const savedKey   = useRef("");
+  const hasContent = subject.trim() !== "" || (htmlBody.trim() !== "" && htmlBody !== "<p></p>");
+  const bodyReady  = htmlBody.trim() !== "" && htmlBody !== "<p></p>";
+
+  // Autosave: persist the composer to a draft a couple of seconds after the
+  // author stops typing. Skipped while sending and when nothing has changed.
+  useEffect(() => {
+    if (tab !== "compose" || sendState !== "idle" || !hasContent) return;
+    if (contentKey === savedKey.current) return;
+    const timer = setTimeout(async () => {
+      setSaveState("saving");
+      try {
+        const res = await fetch("/api/admin/newsletter/drafts", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ id: draftId, subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "save failed");
+        savedKey.current = contentKey;
+        setDraftId(data.id);
+        setDrafts((prev) => [
+          { id: data.id, subject, body: htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null, updatedAt: data.updatedAt },
+          ...prev.filter((d) => d.id !== data.id),
+        ]);
+        setSaveState("saved");
+      } catch {
+        setSaveState("error");
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [contentKey, tab, sendState, hasContent, draftId, subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId]);
+
+  function keyFor(d: { subject: string; body: string; categoryFilter: string[]; includeBooks: boolean; includeReview: boolean; specialId: string | null }) {
+    return JSON.stringify([d.subject, d.body, d.categoryFilter, d.includeBooks, d.includeReview, d.specialId ?? ""]);
+  }
+
+  function loadDraft(d: Draft) {
+    if (hasContent && draftId !== d.id && !window.confirm("Replace what you're writing now with this draft? Your current work is autosaved as its own draft.")) return;
+    setSubject(d.subject);
+    setHtmlBody(d.body);
+    setCategoryFilter(d.categoryFilter);
+    setIncludeBooks(d.includeBooks);
+    setIncludeReview(d.includeReview);
+    setSpecialId(d.specialId ?? "");
+    setDraftId(d.id);
+    savedKey.current = keyFor(d);
+    setSaveState("saved");
+    setSendState("idle");
+    setSendError("");
+    setTab("compose");
+  }
+
+  async function deleteDraft(d: Draft) {
+    if (!window.confirm(`Delete the draft "${d.subject || "Untitled"}"? This can't be undone.`)) return;
+    await fetch(`/api/admin/newsletter/drafts/${d.id}`, { method: "DELETE" }).catch(() => {});
+    setDrafts((prev) => prev.filter((x) => x.id !== d.id));
+    if (draftId === d.id) { setDraftId(null); savedKey.current = ""; setSaveState("idle"); }
+  }
+
+  function applyTemplate(t: { subject: string; body: string; includeBooks: boolean; includeReview: boolean }) {
+    if (hasContent && !window.confirm("Replace what you've written so far with this template?")) return;
+    setSubject(t.subject);
+    setHtmlBody(t.body);
+    setIncludeBooks(t.includeBooks);
+    setIncludeReview(t.includeReview);
+    setDraftId(null);
+    savedKey.current = "";
+    setSaveState("idle");
+  }
+
+  function onPickTemplate(value: string) {
+    if (!value) return;
+    const t = NEWSLETTER_STARTERS.find((s) => s.id === value) ?? templates.find((x) => x.id === value);
+    if (t) applyTemplate(t);
+  }
+
+  async function saveAsTemplate() {
+    setTplError("");
+    try {
+      const res = await fetch("/api/admin/newsletter/templates", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ name: tplName, subject, htmlBody, includeBooks, includeReview }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setTplError(data.error || "Could not save the template."); return; }
+      setTemplates((prev) => [data, ...prev]);
+      setShowTplForm(false);
+      setTplName("");
+    } catch {
+      setTplError("Network error. Please try again.");
+    }
+  }
+
+  async function deleteTemplate(t: Template) {
+    if (!window.confirm(`Delete the template "${t.name}"? This can't be undone.`)) return;
+    await fetch(`/api/admin/newsletter/templates/${t.id}`, { method: "DELETE" }).catch(() => {});
+    setTemplates((prev) => prev.filter((x) => x.id !== t.id));
+  }
+
+  async function sendTest() {
+    setTestState("sending");
+    setTestMessage("");
+    try {
+      const res = await fetch("/api/admin/newsletter/test", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setTestState("error"); setTestMessage(data.error || "Could not send the test."); return; }
+      setTestState("sent");
+      setTestMessage(`Test sent to ${data.to}. Check your inbox (and spam folder).`);
+    } catch {
+      setTestState("error");
+      setTestMessage("Network error. Please try again.");
+    }
+  }
+
+  async function cancelScheduled(c: Campaign) {
+    if (!window.confirm(`Cancel the scheduled send of "${c.subject}"? It will be saved back as a draft.`)) return;
+    try {
+      const res = await fetch(`/api/admin/newsletter/scheduled/${c.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) { window.alert(data.error || "Could not cancel."); router.refresh(); return; }
+      setCampaigns((prev) => prev.filter((x) => x.id !== c.id));
+      setDrafts((prev) => [
+        {
+          id: data.draft.id, subject: c.subject, body: c.body ?? "", categoryFilter: c.categoryFilter ?? [],
+          includeBooks: c.includeBooks ?? true, includeReview: c.includeReview ?? true, specialId: c.specialId ?? null,
+          updatedAt: data.draft.updatedAt,
+        },
+        ...prev,
+      ]);
+    } catch {
+      window.alert("Network error. Please try again.");
+    }
+  }
+
+  // datetime-local gives local wall-clock time; convert to an absolute instant.
+  const scheduledIso = scheduleOn && scheduleAt ? new Date(scheduleAt).toISOString() : null;
+  const scheduleTooSoon = scheduleOn && (!scheduleAt || new Date(scheduleAt).getTime() < Date.now() + 5 * 60 * 1000);
+  const formatWhen = (iso: string) =>
+    new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 
   const targetCount =
     categoryFilter.length === 0
@@ -131,6 +319,10 @@ export function NewsletterClient({
     setIncludeBooks(c.includeBooks ?? true);
     setIncludeReview(c.includeReview ?? true);
     setSpecialId(c.specialId ?? "");
+    setDraftId(null);
+    savedKey.current = "";
+    setSaveState("idle");
+    setScheduleOn(false);
     setSendState("idle");
     setSendError("");
     setTab("compose");
@@ -144,16 +336,29 @@ export function NewsletterClient({
       const res = await fetch("/api/admin/newsletter/send", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null }),
+        body:    JSON.stringify({ subject, htmlBody, categoryFilter, includeBooks, includeReview, specialId: specialId || null, scheduledFor: scheduledIso, draftId }),
       });
       const data = await res.json();
 
       if (!res.ok) {
         setSendError(data.error || "Failed to send campaign.");
         setSendState("idle");
+      } else if (data.scheduled) {
+        setSendResult({ sent: 0, failed: 0, total: 0, scheduledFor: data.scheduledFor });
+        setSendState("done");
+        if (draftId) setDrafts((prev) => prev.filter((d) => d.id !== draftId));
+        setDraftId(null);
+        router.refresh();
+        setCampaigns((prev) => [{
+          id: data.campaignId, subject, sentAt: data.scheduledFor, totalSent: 0, totalFailed: 0, totalTargeted: 0,
+          body: sanitize(htmlBody), categoryFilter, includeBooks, includeReview, specialId: specialId || null,
+          status: "SCHEDULED", scheduledFor: data.scheduledFor,
+        }, ...prev]);
       } else {
         setSendResult(data);
         setSendState("done");
+        if (draftId) setDrafts((prev) => prev.filter((d) => d.id !== draftId));
+        setDraftId(null);
         // Refresh campaign history from server
         router.refresh();
         // Also add optimistically to local state so History tab shows it immediately.
@@ -191,6 +396,13 @@ export function NewsletterClient({
     setSendResult(null);
     setSendState("idle");
     setSendError("");
+    setDraftId(null);
+    savedKey.current = "";
+    setSaveState("idle");
+    setScheduleOn(false);
+    setScheduleAt("");
+    setTestState("idle");
+    setTestMessage("");
   }
 
   return (
@@ -216,7 +428,7 @@ export function NewsletterClient({
         {[
           { label: "Total Subscribers", value: subscribers.length,                                          icon: Users   },
           { label: "Confirmed",         value: confirmedCount,                                              icon: Mail    },
-          { label: "Campaigns Sent",    value: campaigns.length,                                            icon: History },
+          { label: "Campaigns Sent",    value: campaigns.filter((c) => (c.status ?? "SENT") === "SENT").length, icon: History },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg">
@@ -339,14 +551,27 @@ export function NewsletterClient({
                 <XCircle className="h-12 w-12 text-amber-500 mx-auto" />
               )}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Campaign sent!</h2>
-                <p className="text-gray-500 mt-1">
-                  <span className="font-medium text-green-600">{sendResult.sent} delivered</span>
-                  {sendResult.failed > 0 && (
-                    <span className="ml-2 text-amber-600">· {sendResult.failed} failed</span>
-                  )}
-                  <span className="text-gray-400"> of {sendResult.total} total</span>
-                </p>
+                {sendResult.scheduledFor ? (
+                  <>
+                    <h2 className="text-xl font-semibold text-gray-900">Campaign scheduled!</h2>
+                    <p className="text-gray-500 mt-1">
+                      It will go out on <span className="font-medium text-gray-700">{formatWhen(sendResult.scheduledFor)}</span>
+                      <span className="text-gray-400"> (within about an hour of that time)</span>.
+                      You can cancel it from the History tab until then.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-semibold text-gray-900">Campaign sent!</h2>
+                    <p className="text-gray-500 mt-1">
+                      <span className="font-medium text-green-600">{sendResult.sent} delivered</span>
+                      {sendResult.failed > 0 && (
+                        <span className="ml-2 text-amber-600">· {sendResult.failed} failed</span>
+                      )}
+                      <span className="text-gray-400"> of {sendResult.total} total</span>
+                    </p>
+                  </>
+                )}
               </div>
               <div className="flex items-center justify-center gap-3">
                 <Button variant="outline" onClick={resetCompose}>
@@ -364,7 +589,100 @@ export function NewsletterClient({
           {sendState !== "done" && (
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-                <h2 className="font-semibold text-gray-900">Compose Campaign</h2>
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <h2 className="font-semibold text-gray-900">Compose Campaign</h2>
+                  <span className="text-xs text-gray-400 flex items-center gap-1 h-5">
+                    {saveState === "saving" && (<><Loader2 className="h-3 w-3 animate-spin" /> Saving draft…</>)}
+                    {saveState === "saved"  && (<><Check className="h-3 w-3 text-green-500" /> Draft saved</>)}
+                    {saveState === "error"  && (<span className="text-amber-600">Couldn&apos;t autosave. Your work is still here.</span>)}
+                  </span>
+                </div>
+
+                {/* Start faster: templates + drafts */}
+                <div className="rounded-lg bg-gray-50 border border-gray-100 p-3 space-y-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <label className="text-sm font-medium text-gray-700" htmlFor="nl-template">Start from a template</label>
+                    <select
+                      id="nl-template"
+                      value=""
+                      onChange={(e) => onPickTemplate(e.target.value)}
+                      disabled={sendState === "sending"}
+                      className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Choose…</option>
+                      <optgroup label="Starter templates">
+                        {NEWSLETTER_STARTERS.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </optgroup>
+                      {templates.length > 0 && (
+                        <optgroup label="My templates">
+                          {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </optgroup>
+                      )}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => { setShowTplForm((v) => !v); setTplError(""); }}
+                      disabled={!bodyReady}
+                      className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      title={bodyReady ? "Save the current subject and body as a reusable template" : "Write something first"}
+                    >
+                      <BookmarkPlus className="h-3.5 w-3.5" /> Save as template
+                    </button>
+                  </div>
+
+                  {showTplForm && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <input
+                        value={tplName}
+                        onChange={(e) => setTplName(e.target.value)}
+                        placeholder="Template name, e.g. Monthly update"
+                        maxLength={80}
+                        className="flex-1 min-w-[200px] border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <Button size="sm" onClick={saveAsTemplate} disabled={!tplName.trim()}>
+                        <Check className="h-4 w-4 mr-1" /> Save
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setShowTplForm(false)}>Cancel</Button>
+                      {tplError && <p className="w-full text-xs text-red-600">{tplError}</p>}
+                    </div>
+                  )}
+
+                  {templates.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {templates.map((t) => (
+                        <span key={t.id} className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white pl-3 pr-1.5 py-0.5 text-xs text-gray-600">
+                          {t.name}
+                          <button type="button" onClick={() => deleteTemplate(t)} className="p-0.5 text-gray-400 hover:text-red-600" title="Delete template" aria-label={`Delete template ${t.name}`}>
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {drafts.length > 0 && (
+                    <div className="space-y-1.5 pt-1 border-t border-gray-100">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide pt-2">Your drafts</p>
+                      {drafts.slice(0, 5).map((d) => (
+                        <div key={d.id} className="flex items-center gap-2 text-sm">
+                          <FileText className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" />
+                          <button
+                            type="button"
+                            onClick={() => loadDraft(d)}
+                            className={`truncate text-left hover:text-blue-700 ${d.id === draftId ? "font-medium text-gray-900" : "text-gray-600"}`}
+                          >
+                            {d.subject || "Untitled draft"}
+                          </button>
+                          <span className="text-xs text-gray-400 flex-shrink-0">{formatWhen(d.updatedAt)}</span>
+                          <button type="button" onClick={() => deleteDraft(d)} className="ml-auto p-0.5 text-gray-400 hover:text-red-600" title="Delete draft" aria-label="Delete draft">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      {drafts.length > 5 && <p className="text-xs text-gray-400">+ {drafts.length - 5} older drafts</p>}
+                    </div>
+                  )}
+                </div>
 
                 <Input
                   label="Subject Line"
@@ -643,8 +961,13 @@ export function NewsletterClient({
                     <Send className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-gray-900">
-                        Send to {targetCount} subscriber{targetCount !== 1 ? "s" : ""}?
+                        {scheduledIso ? "Schedule" : "Send"} to {targetCount} subscriber{targetCount !== 1 ? "s" : ""}?
                       </p>
+                      {scheduledIso && (
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          Goes out <span className="font-medium text-gray-700">{formatWhen(scheduledIso)}</span> (within about an hour of that time).
+                        </p>
+                      )}
                       <p className="text-sm text-gray-500 mt-0.5">
                         Subject: <span className="font-medium text-gray-700">{subject}</span>
                       </p>
@@ -655,8 +978,8 @@ export function NewsletterClient({
                   </div>
                   <div className="flex gap-3">
                     <Button onClick={handleSend} disabled={!subject.trim()}>
-                      <Send className="h-4 w-4 mr-2" />
-                      Yes, send now
+                      {scheduledIso ? <Clock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                      {scheduledIso ? "Yes, schedule it" : "Yes, send now"}
                     </Button>
                     <Button variant="ghost" onClick={() => setSendState("idle")}>Cancel</Button>
                   </div>
@@ -672,25 +995,69 @@ export function NewsletterClient({
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-4">
-                  <Button
-                    size="lg"
-                    onClick={() => setSendState("confirming")}
-                    disabled={!subject.trim() || !htmlBody.trim() || htmlBody === "<p></p>" || targetCount === 0}
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Campaign
-                    {targetCount > 0 && (
-                      <span className="ml-2 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">
-                        {targetCount}
-                      </span>
+                <div className="space-y-3">
+                  <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={scheduleOn}
+                        onChange={(e) => setScheduleOn(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      Schedule for later
+                    </label>
+                    {scheduleOn && (
+                      <div className="space-y-1">
+                        <input
+                          type="datetime-local"
+                          value={scheduleAt}
+                          onChange={(e) => setScheduleAt(e.target.value)}
+                          className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <p className="text-xs text-gray-400">
+                          Your local time ({Intl.DateTimeFormat().resolvedOptions().timeZone}). Scheduled newsletters go out within about an hour of the time you pick.
+                        </p>
+                        {scheduleAt && scheduleTooSoon && (
+                          <p className="text-xs text-amber-600">Pick a time at least 5 minutes from now.</p>
+                        )}
+                      </div>
                     )}
-                  </Button>
-                  <p className="text-sm text-gray-400">
-                    {targetCount === 0
-                      ? "No confirmed subscribers to send to."
-                      : `Will send to ${targetCount} confirmed subscriber${targetCount !== 1 ? "s" : ""}.`}
-                  </p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <Button
+                        variant="outline"
+                        onClick={sendTest}
+                        disabled={!subject.trim() || !bodyReady || testState === "sending"}
+                        title="Emails one copy to your own login address. Nothing goes to subscribers."
+                      >
+                        {testState === "sending" ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+                        Send test to me
+                      </Button>
+                      {testMessage && (
+                        <p className={`text-xs ${testState === "error" ? "text-red-600" : "text-green-600"}`}>{testMessage}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Button
+                      size="lg"
+                      onClick={() => setSendState("confirming")}
+                      disabled={!subject.trim() || !bodyReady || targetCount === 0 || (scheduleOn && scheduleTooSoon)}
+                    >
+                      {scheduleOn ? <Clock className="h-4 w-4 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                      {scheduleOn ? "Schedule Campaign" : "Send Campaign"}
+                      {targetCount > 0 && (
+                        <span className="ml-2 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">
+                          {targetCount}
+                        </span>
+                      )}
+                    </Button>
+                    <p className="text-sm text-gray-400">
+                      {targetCount === 0
+                        ? "No confirmed subscribers to send to."
+                        : `Will ${scheduleOn ? "be scheduled for" : "send to"} ${targetCount} confirmed subscriber${targetCount !== 1 ? "s" : ""}.`}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -736,6 +1103,38 @@ export function NewsletterClient({
                   const clickRate = c.totalSent > 0 && c.totalClicked !== undefined
                     ? Math.round((c.totalClicked / c.totalSent) * 100)
                     : null;
+                  const status = c.status ?? "SENT";
+                  if (status !== "SENT") {
+                    const label =
+                      status === "SCHEDULED" ? `Scheduled · ${c.scheduledFor ? formatWhen(c.scheduledFor) : ""}`
+                      : status === "SENDING" ? "Sending now…"
+                      : "Failed to send";
+                    return (
+                      <div key={c.id} className="grid grid-cols-7 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
+                        <div className="col-span-2 pr-4">
+                          <p className="text-sm font-medium text-gray-900 truncate">{c.subject}</p>
+                        </div>
+                        <div className="col-span-4 flex items-center gap-2">
+                          {status === "FAILED"
+                            ? <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                            : <Clock className="h-4 w-4 text-blue-500 flex-shrink-0" />}
+                          <span className={`text-sm ${status === "FAILED" ? "text-red-600" : "text-gray-600"}`}>{label}</span>
+                        </div>
+                        <div className="text-right flex items-center justify-end gap-3">
+                          {c.body && (
+                            <button type="button" onClick={() => duplicateCampaign(c)} className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors" title="Load this newsletter into the composer">
+                              <Copy className="h-3.5 w-3.5" /> Reuse
+                            </button>
+                          )}
+                          {status === "SCHEDULED" && (
+                            <button type="button" onClick={() => cancelScheduled(c)} className="text-xs font-medium text-red-600 hover:text-red-700 transition-colors">
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }
                   return (
                     <div key={c.id} className="grid grid-cols-7 px-5 py-4 items-center hover:bg-gray-50 transition-colors">
                       <div className="col-span-2 pr-4">

@@ -380,7 +380,7 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           tiers: { FREE: "✓ Full campaigns", STANDARD: "✓ Full campaigns", PREMIUM: "✓ Full campaigns" },
         },
         {
-          name: "Newsletter Campaigns",
+          name: "Newsletter Campaigns (starter & saved templates, autosaved drafts, test send, scheduled sends)",
           tiers: {
             FREE: free?.newsletter ? "✓" : "—",
             STANDARD: standard?.newsletter ? "✓" : "—",
