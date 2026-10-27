@@ -4,6 +4,7 @@ import { getAdminAuthorIdForApi } from "@/lib/admin-auth";
 import { canUseFeature } from "@/lib/plan-limits";
 import { sendAnnouncement } from "@/lib/announce-send";
 import { releaseLabel } from "@/lib/music-share";
+import { loadListTracks } from "@/lib/music-notify";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -53,7 +54,12 @@ export async function POST(_req: NextRequest, { params }: Params) {
   });
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
 
-  await prisma.course.update({ where: { id: list.id }, data: { courseAnnouncedAt: new Date() } });
+  // Everything on the list right now counts as announced; later additions become "new tracks".
+  const tracks = await loadListTracks(list.id);
+  await prisma.course.update({
+    where: { id: list.id },
+    data: { courseAnnouncedAt: new Date(), notifiedTrackKeys: tracks.map((t) => t.key), trackBaselineAt: new Date() },
+  });
 
   return NextResponse.json({ sent: result.sent, failed: result.failed, total: result.total });
 }

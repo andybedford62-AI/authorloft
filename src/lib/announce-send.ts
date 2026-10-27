@@ -20,6 +20,7 @@ export interface AnnouncementInput {
   title:       string;
   subtitle?:   string | null;     // e.g. price or "Album · 8 tracks"
   description?: string | null;
+  items?:      string[];          // optional bullet list (e.g. new track titles)
   imageUrl?:   string | null;
   ctaLabel:    string;            // e.g. "View the course"
   ctaPath:     string;            // path on the author's site, e.g. "/courses/my-course"
@@ -104,6 +105,7 @@ export async function sendAnnouncement(input: AnnouncementInput): Promise<Announ
           <p style="margin:0 0 8px;font-size:20px;font-weight:700;color:#111827;text-align:center;">${escapeHtml(title)}</p>
           ${input.subtitle ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;text-align:center;font-weight:600;">${escapeHtml(input.subtitle)}</p>` : ""}
           ${input.description ? `<p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#374151;">${escapeHtml(input.description)}</p>` : ""}
+          ${input.items && input.items.length > 0 ? `<ul style="margin:0 0 24px;padding:0 0 0 20px;font-size:15px;line-height:1.8;color:#374151;">${input.items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>` : ""}
         </td></tr>
         <tr><td style="padding:0 40px 32px;text-align:center;">
           <table cellpadding="0" cellspacing="0" align="center"><tr><td style="border-radius:999px;background:${accentColor};">
@@ -155,7 +157,7 @@ export async function sendAnnouncement(input: AnnouncementInput): Promise<Announ
         subject,
         replyTo,
         html: buildHtml(unsubscribeUrl),
-        text: `${title}\n${input.subtitle ?? ""}\n\n${input.description ?? ""}\n\n${input.ctaLabel}: ${targetUrl}\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
+        text: `${title}\n${input.subtitle ?? ""}\n\n${input.description ?? ""}${(input.items ?? []).map((i) => `\n- ${i}`).join("")}\n\n${input.ctaLabel}: ${targetUrl}\n\n---\nUnsubscribe: ${unsubscribeUrl}`,
       };
     });
 

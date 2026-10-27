@@ -6,6 +6,7 @@ import { slugify } from "@/lib/utils";
 import { buildTrackRows } from "../route";
 import { Prisma } from "@prisma/client";
 import { isReleaseType, parseListenLinks, parseReleaseDate } from "@/lib/music-share";
+import { trackKeyOf } from "@/lib/music-notify";
 
 /** Every handler scopes by authorId AND kind, so a course id can't be driven
  *  through the music endpoints (or vice versa). */
@@ -114,6 +115,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const modules = await tx.courseModule.findMany({ where: { courseId: id }, select: { id: true } });
     const moduleId = modules[0]?.id
       ?? (await tx.courseModule.create({ data: { courseId: id, title: "Tracks", sortOrder: 0 }, select: { id: true } })).id;
+
+    // Lists announced before new-track notices existed have no baseline yet.
+    // Snapshot the tracks as stored BEFORE this save replaces them, so anything
+    // added in this save counts as new and everything older does not.
+    if (existing.courseAnnouncedAt && !existing.trackBaselineAt) {
+      const before = await tx.courseLesson.findMany({ where: { moduleId }, select: { title: true, videoUrl: true } });
+      await tx.course.update({
+        where: { id },
+        data: { notifiedTrackKeys: Array.from(new Set(before.map(trackKeyOf))), trackBaselineAt: new Date() },
+      });
+    }
 
     await tx.courseLesson.deleteMany({ where: { moduleId } });
     if (rows.length > 0) {

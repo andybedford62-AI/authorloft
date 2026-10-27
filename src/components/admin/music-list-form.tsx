@@ -114,6 +114,12 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
   const [announceError, setAnnounceError] = useState("");
   const [announcedAt, setAnnouncedAt] = useState(initial?.announcedAt ?? null);
   const [announceResult, setAnnounceResult] = useState<{ sent: number; total: number } | null>(null);
+
+  // "New tracks" notices — only meaningful once the release has been announced.
+  const [trackInfo, setTrackInfo] = useState<{ pending: string[]; auto: boolean; nextAllowedAt: string | null } | null>(null);
+  const [noticing, setNoticing] = useState(false);
+  const [noticeError, setNoticeError] = useState("");
+  const [noticeResult, setNoticeResult] = useState<{ sent: number; total: number; count: number } | null>(null);
   const [error, setError] = useState("");
   const [warnings, setWarnings] = useState<string[]>([]);
   const [justSaved, setJustSaved] = useState(false);
@@ -257,6 +263,7 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
         setJustSaved(true);
         if (data.warnings?.length) setWarnings(data.warnings);
         router.refresh();
+        if (announcedAt) void loadTrackInfo();
       } else {
         router.push(`/admin/music/${id}/edit`);
       }
@@ -264,6 +271,58 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
       setError(err instanceof Error ? err.message : "Could not save.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function loadTrackInfo() {
+    if (!listId) return;
+    try {
+      const res = await fetch(`/api/admin/music/${listId}/track-notices`);
+      if (!res.ok) return;
+      const d = await res.json();
+      setTrackInfo({ pending: d.pending ?? [], auto: !!d.auto, nextAllowedAt: d.nextAllowedAt ?? null });
+    } catch {
+      // Panel just stays hidden/stale; nothing else depends on it.
+    }
+  }
+
+  useEffect(() => {
+    if (announcedAt) void loadTrackInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [announcedAt, listId]);
+
+  async function handleNotifyTracks() {
+    if (!listId || !trackInfo) return;
+    const n = trackInfo.pending.length;
+    if (!confirm(`Email subscribers about ${n} new track${n === 1 ? "" : "s"}? This can't be undone.`)) return;
+    setNoticing(true);
+    setNoticeError("");
+    try {
+      const res = await fetch(`/api/admin/music/${listId}/track-notices`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) { setNoticeError(data.error ?? "Failed to send"); return; }
+      setNoticeResult({ sent: data.sent, total: data.total, count: data.count });
+      await loadTrackInfo();
+    } catch {
+      setNoticeError("Something went wrong");
+    } finally {
+      setNoticing(false);
+    }
+  }
+
+  async function handleToggleAuto(next: boolean) {
+    if (!listId) return;
+    setTrackInfo((t) => (t ? { ...t, auto: next } : t));
+    try {
+      const res = await fetch(`/api/admin/music/${listId}/track-notices`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auto: next }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setTrackInfo((t) => (t ? { ...t, auto: !next } : t));
+      setNoticeError("Could not change that setting. Please try again.");
     }
   }
 
@@ -443,6 +502,59 @@ export function MusicListForm({ listId, initial, trackCap, bookstoreEnabled = fa
               </div>
             )}
             {announceError && <p className="text-xs text-red-600 mt-2">{announceError}</p>}
+            {announcedAt && trackInfo && (
+              <div className="mt-3 pt-3 border-t border-gray-100 space-y-3">
+                {trackInfo.pending.length > 0 ? (
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-700">
+                        {trackInfo.pending.length} new track{trackInfo.pending.length === 1 ? "" : "s"} since your last notice
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">
+                        {trackInfo.pending.slice(0, 5).join(", ")}{trackInfo.pending.length > 5 ? `, and ${trackInfo.pending.length - 5} more` : ""}
+                      </p>
+                      {trackInfo.nextAllowedAt && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          A notice went out recently. You can send the next one after {new Date(trackInfo.nextAllowedAt).toLocaleString()}.
+                        </p>
+                      )}
+                      {isDirty && (
+                        <p className="text-xs text-amber-600 mt-1">Save your changes first so the email matches what&apos;s on your page.</p>
+                      )}
+                    </div>
+                    <Button
+                      type="button" variant="outline" size="sm" className="flex-shrink-0"
+                      onClick={handleNotifyTracks}
+                      disabled={noticing || isDirty || !!trackInfo.nextAllowedAt}
+                    >
+                      {noticing && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
+                      Notify subscribers about {trackInfo.pending.length} new track{trackInfo.pending.length === 1 ? "" : "s"}
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    {noticeResult
+                      ? `Sent about ${noticeResult.count} new track${noticeResult.count === 1 ? "" : "s"} to ${noticeResult.sent} of ${noticeResult.total} subscribers.`
+                      : "No new tracks since your last notice. Add tracks and save to notify subscribers."}
+                  </p>
+                )}
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={trackInfo.auto}
+                    onChange={(e) => handleToggleAuto(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                  />
+                  <span>
+                    <span className="block text-sm text-gray-700">Auto-notify subscribers about new tracks</span>
+                    <span className="block text-xs text-gray-400 mt-0.5">
+                      Sends one email a day at most, around 15:00 UTC, and only after you&apos;ve stopped editing for a couple of hours. Off unless you turn it on.
+                    </span>
+                  </span>
+                </label>
+                {noticeError && <p className="text-xs text-red-600">{noticeError}</p>}
+              </div>
+            )}
           </div>
         )}
         {!isPublished && (

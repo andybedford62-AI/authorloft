@@ -1733,6 +1733,13 @@ model Course {
   workbookFileName String?
   workbookUrl      String?         // externally-hosted workbook link, mutually exclusive with workbookFileKey
   courseAnnouncedAt DateTime?      // stamped once the author sends the "new course" announcement — guards against re-sending on later edits/unpublish-republish
+  // MUSIC only — "new tracks" notices. Tracks are recreated on every save, so they are identified by link
+  // (see src/lib/music-notify.ts trackKeyOf). notifiedTrackKeys = tracks subscribers were already told about;
+  // trackBaselineAt = when that baseline was established (null = unknown, so no notice can fire yet).
+  notifiedTrackKeys String[]       @default([])
+  trackBaselineAt   DateTime?
+  trackNoticeAt     DateTime?      // last "new tracks" email; enforces the 24h minimum gap
+  autoNotifyTracks  Boolean        @default(false) // opt-in: daily cron emails new tracks in one batch
   displayOrder  Int                @default(0)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
