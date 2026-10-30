@@ -81,10 +81,12 @@ export async function testInstagramToken(
   igUserId:    string,
 ): Promise<string> {
   const res = await fetch(
-    `${GRAPH}/${igUserId}?fields=username&access_token=${accessToken}`
+    `${GRAPH}/${encodeURIComponent(igUserId)}?fields=username&access_token=${encodeURIComponent(accessToken)}`
   );
-  if (!res.ok) throw new Error(`Instagram token test failed: ${res.status}`);
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Instagram token test failed: ${res.status} ${data.error?.message ?? ""}`.trim());
+  }
   if (data.error) throw new Error(data.error.message);
   // A Facebook Page ID also answers this call but has no username, so a missing
   // username means this is not an Instagram Business Account ID.
