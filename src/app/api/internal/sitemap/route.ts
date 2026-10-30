@@ -5,6 +5,7 @@ import { getBookstoreData } from "@/lib/bookstore";
 import { COMPARISON_SLUGS } from "@/lib/comparison-data";
 import { LANDING_PAGES } from "@/lib/landing-page-data";
 import { listHeyCatchArticles } from "@/lib/heycatch";
+import { PLATFORM_STATIC_PAGES } from "@/lib/site-pages";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -75,15 +76,14 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     }).catch(() => []),
   ]);
 
-  const entries: Entry[] = [
-    { loc: `${base}/`,          lastmod: now, changefreq: "weekly",  priority: 1.0 },
-    { loc: `${base}/features`,  lastmod: now, changefreq: "monthly", priority: 0.9 },
-    { loc: `${base}/solutions`, lastmod: now, changefreq: "monthly", priority: 0.85 },
-    { loc: `${base}/pricing`,   lastmod: now, changefreq: "monthly", priority: 0.9 },
-    { loc: `${base}/pricing/calculator`, lastmod: now, changefreq: "monthly", priority: 0.8 },
-    { loc: `${base}/compare`,   lastmod: now, changefreq: "monthly", priority: 0.8 },
-    { loc: `${base}/bookstore`, lastmod: now, changefreq: "weekly",  priority: 0.85 },
-  ];
+  // Fixed pages come from the shared list the Super Admin dashboard card also
+  // reads (src/lib/site-pages.ts) — add a new fixed public page there.
+  const entries: Entry[] = PLATFORM_STATIC_PAGES.map((p) => ({
+    loc: p.path === "/" ? `${base}/` : `${base}${p.path}`,
+    lastmod: now,
+    changefreq: p.changefreq,
+    priority: p.priority,
+  }));
 
   for (const g of bookstore.genres) {
     entries.push({ loc: `${base}/bookstore/genre/${g.slug}`, lastmod: now, changefreq: "weekly", priority: 0.6 });
@@ -100,14 +100,12 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     entries.push({ loc: `${base}/compare/${slug}`, lastmod: now, changefreq: "monthly", priority: 0.75 });
   }
 
-  entries.push({ loc: `${base}/blog`, lastmod: now, changefreq: "weekly", priority: 0.85 });
   for (const p of blogPosts) {
     entries.push({ loc: `${base}/blog/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
   }
 
   // HeyCatch-powered articles, read live from the API (see src/lib/heycatch.ts).
   const heycatch = await listHeyCatchArticles().catch(() => []);
-  entries.push({ loc: `${base}/blog/guides`, lastmod: now, changefreq: "weekly", priority: 0.8 });
   for (const a of heycatch) {
     const updated = a.updated_at ?? a.updated;
     entries.push({
@@ -118,33 +116,19 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
     });
   }
 
-  entries.push({ loc: `${base}/news`, lastmod: now, changefreq: "weekly", priority: 0.8 });
   for (const p of newsPosts) {
     entries.push({ loc: `${base}/news/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
   }
 
-  entries.push({ loc: `${base}/guides`, lastmod: now, changefreq: "weekly", priority: 0.85 });
   for (const g of guides) {
     entries.push({ loc: `${base}/guides/${g.slug}`, lastmod: g.updatedAt, changefreq: "monthly", priority: 0.7 });
   }
 
-  entries.push({ loc: `${base}/about`, lastmod: now, changefreq: "monthly", priority: 0.6 });
   entries.push({ loc: `${base}/author/anthony-bedford`, lastmod: now, changefreq: "monthly", priority: 0.6 });
 
-  entries.push({ loc: `${base}/resources`, lastmod: now, changefreq: "monthly", priority: 0.7 });
   for (const d of resourceDownloads) {
     entries.push({ loc: `${base}/resources/${d.slug}`, lastmod: d.updatedAt, changefreq: "monthly", priority: 0.65 });
   }
-
-  entries.push(
-    { loc: `${base}/faq`,        lastmod: now, changefreq: "monthly", priority: 0.7 },
-    { loc: `${base}/contact`,    lastmod: now, changefreq: "yearly",  priority: 0.6 },
-    { loc: `${base}/privacy`,    lastmod: now, changefreq: "yearly",  priority: 0.4 },
-    { loc: `${base}/terms`,      lastmod: now, changefreq: "yearly",  priority: 0.4 },
-    { loc: `${base}/gdpr`,       lastmod: now, changefreq: "yearly",  priority: 0.4 },
-    { loc: `${base}/us-privacy`, lastmod: now, changefreq: "yearly",  priority: 0.4 },
-    { loc: `${base}/dmca`,       lastmod: now, changefreq: "yearly",  priority: 0.4 },
-  );
 
   return entries;
 }

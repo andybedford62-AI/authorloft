@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## October 30, 2026 — Super Admin: Platform Site Pages card
+
+- **Platform Site Pages card** on `/super-admin`: pills for every public marketing page (fixed pages, 13 solution pages, compare pages), blog/news/guides counts, and a copyable `/sitemap.xml` pill. Mirrors the author dashboard's "Your Site Pages" card in Super Admin dark styling.
+- **One list for fixed pages.** `PLATFORM_STATIC_PAGES` in `src/lib/site-pages.ts` now feeds both the card and `api/internal/sitemap/route.ts`, replacing the hard-coded entries there. Add new fixed public pages in that list only.
+
 ## October 27, 2026 — Newsletter: test send, drafts, templates, scheduling
 
 - **Send test to me.** New `POST /api/admin/newsletter/test` emails one `[TEST]` copy (same HTML as the real send) to the author's login address; no Campaign row or send logs; rate-limited 10/hour.

@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/db";
 import Link from "next/link";
+import { PlatformSitePagesCard } from "@/components/super-admin/platform-site-pages-card";
 
 export default async function SuperAdminDashboard() {
-  const [totalAuthors, totalPlans, planBreakdown] = await Promise.all([
+  const baseUrl = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
+  const [totalAuthors, totalPlans, planBreakdown, blogCount, newsCount, guideCount] = await Promise.all([
     prisma.author.count(),
     prisma.plan.count({ where: { isActive: true } }),
     prisma.plan.findMany({
@@ -10,6 +12,9 @@ export default async function SuperAdminDashboard() {
       select: { id: true, name: true, badgeColor: true, _count: { select: { subscriptions: true } } },
       orderBy: { sortOrder: "asc" },
     }),
+    prisma.platformPost.count({ where: { isPublished: true, isNews: false } }),
+    prisma.platformPost.count({ where: { isPublished: true, isNews: true } }),
+    prisma.guide.count({ where: { isPublished: true } }),
   ]);
 
   const badgeClass: Record<string, string> = {
@@ -38,6 +43,10 @@ export default async function SuperAdminDashboard() {
           </p>
         </div>
       </div>
+      <PlatformSitePagesCard
+        baseUrl={baseUrl}
+        counts={{ "/blog": blogCount, "/news": newsCount, "/guides": guideCount }}
+      />
       <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-semibold text-white">Subscribers by Plan</h2>

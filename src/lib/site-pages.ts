@@ -162,6 +162,48 @@ export function getAuthorSitePages(
   return pages;
 }
 
+// ── Platform (marketing) site ────────────────────────────────────────────────
+
+export interface PlatformStaticPage {
+  label: string;
+  path: string;
+  group: "Main" | "Content" | "Company & legal";
+  changefreq: "weekly" | "monthly" | "yearly";
+  priority: number;
+}
+
+/**
+ * Fixed public pages on the platform's own site. ONE list feeds both the
+ * platform sitemap (api/internal/sitemap/route.ts) and the Super Admin
+ * dashboard's "Platform Site Pages" card, so the two can't drift. Solution and
+ * compare pages are not listed here — both consumers derive them from
+ * LANDING_PAGES / COMPARISONS.
+ */
+export const PLATFORM_STATIC_PAGES: PlatformStaticPage[] = [
+  { label: "Home",       path: "/",                    group: "Main", changefreq: "weekly",  priority: 1.0 },
+  { label: "Features",   path: "/features",            group: "Main", changefreq: "monthly", priority: 0.9 },
+  { label: "Solutions",  path: "/solutions",           group: "Main", changefreq: "monthly", priority: 0.85 },
+  { label: "Pricing",    path: "/pricing",             group: "Main", changefreq: "monthly", priority: 0.9 },
+  { label: "Cost Calculator", path: "/pricing/calculator", group: "Main", changefreq: "monthly", priority: 0.8 },
+  { label: "Compare",    path: "/compare",             group: "Main", changefreq: "monthly", priority: 0.8 },
+  { label: "Bookstore",  path: "/bookstore",           group: "Main", changefreq: "weekly",  priority: 0.85 },
+
+  { label: "Blog",       path: "/blog",                group: "Content", changefreq: "weekly",  priority: 0.85 },
+  { label: "Blog Guides", path: "/blog/guides",        group: "Content", changefreq: "weekly",  priority: 0.8 },
+  { label: "News",       path: "/news",                group: "Content", changefreq: "weekly",  priority: 0.8 },
+  { label: "Guides",     path: "/guides",              group: "Content", changefreq: "weekly",  priority: 0.85 },
+  { label: "Resources",  path: "/resources",           group: "Content", changefreq: "monthly", priority: 0.7 },
+
+  { label: "About",      path: "/about",               group: "Company & legal", changefreq: "monthly", priority: 0.6 },
+  { label: "FAQ",        path: "/faq",                 group: "Company & legal", changefreq: "monthly", priority: 0.7 },
+  { label: "Contact",    path: "/contact",             group: "Company & legal", changefreq: "yearly",  priority: 0.6 },
+  { label: "Privacy",    path: "/privacy",             group: "Company & legal", changefreq: "yearly",  priority: 0.4 },
+  { label: "Terms",      path: "/terms",               group: "Company & legal", changefreq: "yearly",  priority: 0.4 },
+  { label: "GDPR",       path: "/gdpr",                group: "Company & legal", changefreq: "yearly",  priority: 0.4 },
+  { label: "US Privacy", path: "/us-privacy",          group: "Company & legal", changefreq: "yearly",  priority: 0.4 },
+  { label: "DMCA",       path: "/dmca",                group: "Company & legal", changefreq: "yearly",  priority: 0.4 },
+];
+
 // ── Visibility, for the admin side ───────────────────────────────────────────
 
 /** Public pages that have both an admin screen and a nav show/hide toggle. */
