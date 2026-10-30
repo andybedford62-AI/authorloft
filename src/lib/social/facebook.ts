@@ -54,10 +54,12 @@ export async function testFacebookToken(
   pageId:      string,
 ): Promise<string> {
   const res = await fetch(
-    `${GRAPH}/${pageId}?fields=name&access_token=${accessToken}`
+    `${GRAPH}/${encodeURIComponent(pageId)}?fields=name&access_token=${encodeURIComponent(accessToken)}`
   );
-  if (!res.ok) throw new Error(`Facebook token test failed: ${res.status}`);
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Facebook token test failed: ${res.status} ${data.error?.message ?? ""}`.trim());
+  }
   if (data.error) throw new Error(data.error.message);
   return data.name ?? `Page ${pageId}`;
 }

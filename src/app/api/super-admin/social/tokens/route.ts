@@ -21,9 +21,12 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { platform, accessToken, accountId: rawAccountId, tokenExpiresAt: rawExpiry } = await req.json();
+  const { platform, accessToken: rawToken, accountId: rawAccountId, tokenExpiresAt: rawExpiry } = await req.json();
+  // A pasted token often carries a trailing space/newline from the copy; sent raw
+  // it fails the platform's own check (Facebook answers 400) though it is valid.
+  const accessToken: string | undefined = typeof rawToken === "string" ? rawToken.trim() : undefined;
 
-  if (!platform || !accessToken?.trim()) {
+  if (!platform || !accessToken) {
     return NextResponse.json({ error: "platform and accessToken are required." }, { status: 400 });
   }
 
