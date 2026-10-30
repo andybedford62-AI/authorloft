@@ -53,6 +53,12 @@ export async function testFacebookToken(
   accessToken: string,
   pageId:      string,
 ): Promise<string> {
+  // Instagram Business Account IDs start with 17841 and also answer this name
+  // lookup, so without this check they save "successfully" and every post then
+  // fails with "Object with ID ... does not exist".
+  if (pageId.startsWith("17841")) {
+    throw new Error("That looks like an Instagram account ID. Use the Facebook Page ID here.");
+  }
   const res = await fetch(
     `${GRAPH}/${encodeURIComponent(pageId)}?fields=name&access_token=${encodeURIComponent(accessToken)}`
   );
