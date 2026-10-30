@@ -9,7 +9,7 @@ export default async function SuperAdminDashboard() {
     prisma.plan.count({ where: { isActive: true } }),
     prisma.plan.findMany({
       where: { isActive: true },
-      select: { id: true, name: true, badgeColor: true, _count: { select: { subscriptions: true } } },
+      select: { id: true, name: true, badgeColor: true, _count: { select: { authors: true } } },
       orderBy: { sortOrder: "asc" },
     }),
     prisma.platformPost.count({ where: { isPublished: true, isNews: false } }),
@@ -39,7 +39,7 @@ export default async function SuperAdminDashboard() {
         <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
           <p className="text-sm text-gray-400 mb-1">On Paid Plans</p>
           <p className="text-3xl font-bold text-white">
-            {planBreakdown.filter((p) => !["free"].includes(p.name.toLowerCase())).reduce((sum, p) => sum + p._count.subscriptions, 0)}
+            {planBreakdown.filter((p) => !["free"].includes(p.name.toLowerCase())).reduce((sum, p) => sum + p._count.authors, 0)}
           </p>
         </div>
       </div>
@@ -49,14 +49,14 @@ export default async function SuperAdminDashboard() {
       />
       <div className="rounded-xl bg-gray-900 border border-gray-800 p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-semibold text-white">Subscribers by Plan</h2>
+          <h2 className="font-semibold text-white">Authors by Plan</h2>
           <Link href="/super-admin/plans" className="text-sm text-purple-400 hover:text-purple-300">Manage Plans →</Link>
         </div>
         <div className="space-y-3">
           {planBreakdown.map((plan) => (
             <div key={plan.id} className="flex items-center justify-between">
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${badgeClass[plan.badgeColor] ?? badgeClass.gray}`}>{plan.name}</span>
-              <span className="text-white font-medium">{plan._count.subscriptions} <span className="text-gray-500 font-normal text-sm">subscriber{plan._count.subscriptions !== 1 ? "s" : ""}</span></span>
+              <span className="text-white font-medium">{plan._count.authors} <span className="text-gray-500 font-normal text-sm">author{plan._count.authors !== 1 ? "s" : ""}</span></span>
             </div>
           ))}
         </div>
