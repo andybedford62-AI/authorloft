@@ -79,14 +79,6 @@ export default async function MaintenancePage() {
           Maintenance in progress
         </div>
 
-        {/* Marketing page link — stays accessible */}
-        <p className="text-xs text-blue-300/50">
-          You can still{" "}
-          <a href="https://www.authorloft.com" className="underline underline-offset-2 hover:text-blue-200 transition-colors">
-            browse the AuthorLoft homepage
-          </a>
-          {" "}while we work.
-        </p>
       </div>
     </div>
   );

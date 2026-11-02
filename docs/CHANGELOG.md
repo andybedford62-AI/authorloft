@@ -15,6 +15,8 @@ line rather than listing every commit.
 
 ## November 2, 2026 — Vercel usage: cache maintenance check in proxy
 
+- **Maintenance lockout fixed.** While maintenance mode was on, the proxy redirected `/super-admin`, `/login` and the toggle's own PATCH to `/maintenance`, so it could only be cleared in the DB (staging and prod share one DB, so prod went down too). `/login`, `/api/auth/`, `/super-admin` and `/api/super-admin/maintenance` are now exempt (each enforces its own auth). Removed the dead "browse the homepage" link from `/maintenance` (it was redirected too).
+
 - **Maintenance check cached in `proxy.ts`.** The proxy used to fetch `/api/maintenance-check` on every request (page views, prefetches, bots), each an ISR read. It now caches the answer in memory for 15s per instance (5s on failure, still fails open) and shares one in-flight lookup. Toggling maintenance mode can lag up to ~30s. Prompted by Vercel's Data Cache → Runtime Cache billing migration; follow-ups in `docs/FEATURE_BACKLOG.md`.
 
 ## October 30, 2026 — Super Admin: Platform Site Pages card

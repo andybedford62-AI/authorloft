@@ -21,6 +21,14 @@ const MAINTENANCE_EXEMPT = [
   "/maintenance",
   "/api/maintenance-check",
   "/api/cron/",
+  // Lets a super admin sign in and switch maintenance back OFF. Without these
+  // the toggle locked its own owner out: the PATCH was redirected to
+  // /maintenance and the setting could only be cleared in the database.
+  // Both areas enforce their own auth.
+  "/login",
+  "/api/auth/",
+  "/super-admin",
+  "/api/super-admin/maintenance",
 ];
 
 // Endpoints that REQUIRE CSRF validation (starting with public checkout, expand later)
