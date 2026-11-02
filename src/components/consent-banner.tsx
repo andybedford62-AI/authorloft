@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
 import { initPostHogIfConsented, capturePageview, optOutPostHog } from "@/lib/posthog-client";
 
 export function ConsentBanner() {
@@ -47,18 +46,9 @@ export function ConsentBanner() {
   return (
     <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-40 sm:max-w-sm bg-white border border-gray-200 rounded-xl shadow-lg">
       <div className="p-4 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-sm text-gray-700">
-            We use analytics to measure site performance and understand how visitors use AuthorLoft. No personal data is shared without your consent.
-          </p>
-          <button
-            onClick={() => setShowBanner(false)}
-            className="text-gray-400 hover:text-gray-600 p-3.5 -m-3.5 flex-shrink-0"
-            aria-label="Dismiss"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        <p className="text-sm text-gray-700">
+          We use analytics to measure site performance and understand how visitors use AuthorLoft. No personal data is shared without your consent.
+        </p>
         <div className="flex items-center gap-2 justify-end">
           <button
             onClick={() => handleConsent(false)}

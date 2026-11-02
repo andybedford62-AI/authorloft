@@ -15,6 +15,8 @@ line rather than listing every commit.
 
 ## November 2, 2026 — Vercel usage: cache maintenance check in proxy
 
+- **Consent banner can no longer be dismissed.** Removed the X in `consent-banner.tsx`; the visitor must choose Accept or Decline, so the choice is always stored and the banner doesn't return on later visits. Tracking was already off until Accept.
+
 - **Content pages moved to ISR.** `blog/[slug]`, `news/[slug]`, `guides/[slug]` and `author/[slug]` were `force-dynamic` (a function + DB query per visit, bots included); now `revalidate = 3600`. New `src/lib/revalidate-content.ts` (`revalidatePosts()` / `revalidateGuides()`) is called from every Super Admin post and guide create/update/delete so edits still show immediately. **Any new write path for posts or guides must call it.**
 - **Longer `revalidate` (60 → 3600)** on the 13 landing pages (SEO saves already revalidate their path), `/features`, `/pricing`, `/faq`, `/news`, `/guides`. Left at 60: `/`, `/blog` (also reads HeyCatch), `/pricing/calculator`, `/resources`, `/resources/[slug]` — fed by author activity or paths with no on-demand revalidation. `POST /api/super-admin/plans` now also revalidates `/features`. Motivation: ISR Writes appeared Oct 22 at 6–10k/day (Vercel cost export).
 - **Maintenance lockout fixed.** While maintenance mode was on, the proxy redirected `/super-admin`, `/login` and the toggle's own PATCH to `/maintenance`, so it could only be cleared in the DB (staging and prod share one DB, so prod went down too). `/login`, `/api/auth/`, `/super-admin` and `/api/super-admin/maintenance` are now exempt (each enforces its own auth). Removed the dead "browse the homepage" link from `/maintenance` (it was redirected too).
