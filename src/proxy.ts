@@ -74,6 +74,43 @@ function checkAuthorSiteRateLimit(ip: string): { allowed: boolean; resetAt: numb
   return { allowed, resetAt: entry.resetTime };
 }
 
+// ── Maintenance-mode lookup (cached per isolate) ────────────────────────────
+// This used to fetch /api/maintenance-check on EVERY request — page views,
+// prefetches, bot hits — each one an ISR cache read plus a middleware-side
+// subrequest. Keeping the answer in memory for a short window collapses that to
+// roughly one fetch per isolate per window. Worst-case lag for toggling
+// maintenance mode is this TTL plus the route's own 15s revalidate.
+const MAINTENANCE_CACHE_TTL_MS = 15_000;
+const MAINTENANCE_ERROR_TTL_MS = 5_000; // don't hammer the route while it's failing
+let maintenanceCache: { value: boolean; expiresAt: number } | null = null;
+let maintenanceInflight: Promise<boolean> | null = null;
+
+async function isMaintenanceMode(origin: string): Promise<boolean> {
+  const now = Date.now();
+  if (maintenanceCache && maintenanceCache.expiresAt > now) return maintenanceCache.value;
+  if (maintenanceInflight) return maintenanceInflight;
+
+  maintenanceInflight = (async () => {
+    try {
+      const res = await fetch(`${origin}/api/maintenance-check`, {
+        signal: AbortSignal.timeout(3000),
+      });
+      if (res.ok) {
+        const data = await res.json() as { maintenanceMode: boolean };
+        maintenanceCache = { value: !!data.maintenanceMode, expiresAt: Date.now() + MAINTENANCE_CACHE_TTL_MS };
+        return maintenanceCache.value;
+      }
+    } catch {
+      // fall through — fail open
+    }
+    // Fail open — DB hiccup should not lock everyone out
+    maintenanceCache = { value: false, expiresAt: Date.now() + MAINTENANCE_ERROR_TTL_MS };
+    return false;
+  })().finally(() => { maintenanceInflight = null; });
+
+  return maintenanceInflight;
+}
+
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
@@ -173,19 +210,9 @@ export async function proxy(req: NextRequest) {
     (p) => url.pathname === p || url.pathname.startsWith(p)
   );
   if (!isExempt) {
-    try {
-      const origin = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
-      const res = await fetch(`${origin}/api/maintenance-check`, {
-        signal: AbortSignal.timeout(3000),
-      });
-      if (res.ok) {
-        const data = await res.json() as { maintenanceMode: boolean };
-        if (data.maintenanceMode) {
-          return NextResponse.redirect(new URL("/maintenance", req.url));
-        }
-      }
-    } catch {
-      // Fail open — DB hiccup should not lock everyone out
+    const origin = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
+    if (await isMaintenanceMode(origin)) {
+      return NextResponse.redirect(new URL("/maintenance", req.url));
     }
   }
 

@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## November 2, 2026 — Vercel usage: cache maintenance check in proxy
+
+- **Maintenance check cached in `proxy.ts`.** The proxy used to fetch `/api/maintenance-check` on every request (page views, prefetches, bots), each an ISR read. It now caches the answer in memory for 15s per instance (5s on failure, still fails open) and shares one in-flight lookup. Toggling maintenance mode can lag up to ~30s. Prompted by Vercel's Data Cache → Runtime Cache billing migration; follow-ups in `docs/FEATURE_BACKLOG.md`.
+
 ## October 30, 2026 — Super Admin: Platform Site Pages card
 
 - **Platform Site Pages card** on `/super-admin`: pills for every public marketing page (fixed pages, 13 solution pages, compare pages), blog/news/guides counts, and a copyable `/sitemap.xml` pill. Mirrors the author dashboard's "Your Site Pages" card in Super Admin dark styling.

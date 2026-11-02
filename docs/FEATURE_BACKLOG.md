@@ -275,6 +275,15 @@ Two heycatch audits ran Oct 20: the site audit (D1–D5) and the SEO audit (79/1
 - [ ] **Check company vs personal profiles** — X (`@AndyBedford0406`) and Instagram (`andybedford62`) were added to company social links / Organization `sameAs`; swap for company accounts if those are personal.
 - [ ] **Spot-check prod after the Oct 20 promotion** — founder photo crop, heading levels on `/pricing` and `/blog`, article descriptions, an article that had its own H1 in the body.
 
+## Vercel usage / overage (Nov 2 2026 audit)
+
+Vercel is merging Data Cache into Runtime Cache billing. We have no `unstable_cache`/`use cache` and one cached fetch (HeyCatch), so the exposure is ISR + function invocations instead. Billing/observability APIs 404 for our team via MCP — check the dashboard (Usage, Observability) for real numbers first.
+
+- [ ] **Maintenance check → Edge Config.** `proxy.ts` now caches it in memory 15s (shipped); Edge Config (Vercel "Global Config") would remove the DB query and `/api/maintenance-check` hit entirely. Needs a store, `EDGE_CONFIG` env var, and the maintenance admin route writing to it.
+- [ ] **`force-dynamic` public content pages → ISR.** `blog/[slug]`, `news/[slug]`, `guides/[slug]`, `author/[slug]` run a function + DB query per visit incl. bots. Use long `revalidate` + `revalidatePath` on publish/edit.
+- [ ] **Raise `revalidate = 60` on ~25 marketing pages** (e.g. 3600) once confirmed that admin/super-admin saves call `revalidatePath`. Bookstore (1800) and compare (3600) are already longer.
+- [ ] **HeyCatch list pagination** — `listHeyCatchArticles` makes one cached request per 50 articles; watch as the guide count grows.
+
 ## Analytics & Consent
 
 Raised Sept 26, 2026 after author-site analytics was fixed. Today only visitors who click **Accept** on the consent banner are counted (PostHog), so author stats undercount. Get legal sign-off before changing consent behaviour — `/gdpr` promises "no tracking cookies without your consent … banner shown on your first visit where required".
