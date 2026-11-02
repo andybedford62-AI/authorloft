@@ -6,7 +6,7 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { NewsSubscribeForm } from "@/components/marketing/news-subscribe-form";
 import { NewsList } from "@/components/marketing/news-list";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 

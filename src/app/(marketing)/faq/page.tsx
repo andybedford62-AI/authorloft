@@ -10,7 +10,7 @@ import { getCategories } from "@/lib/categories";
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("faq");

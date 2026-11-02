@@ -7,7 +7,7 @@ const data = LANDING_PAGES["for-musicians"];
 
 export const generateMetadata = () => landingPageMetadata(data.slug);
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default function Page() {
   return <LandingPage data={data} afterSections={<MusicPlansSection />} />;

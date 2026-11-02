@@ -5,7 +5,8 @@ import { prisma } from "@/lib/db";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { PLATFORM_AUTHOR, PLATFORM_AUTHOR_URL, PLATFORM_BASE } from "@/lib/platform-author";
 
-export const dynamic = "force-dynamic";
+// ISR: lists posts and guides, refreshed on demand by revalidatePosts()/revalidateGuides().
+export const revalidate = 3600;
 
 const TITLE = `${PLATFORM_AUTHOR.name}, Founder of AuthorLoft`;
 const DESCRIPTION =

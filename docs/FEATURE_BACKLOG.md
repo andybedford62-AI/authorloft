@@ -280,8 +280,9 @@ Two heycatch audits ran Oct 20: the site audit (D1–D5) and the SEO audit (79/1
 Vercel is merging Data Cache into Runtime Cache billing. We have no `unstable_cache`/`use cache` and one cached fetch (HeyCatch), so the exposure is ISR + function invocations instead. Billing/observability APIs 404 for our team via MCP — check the dashboard (Usage, Observability) for real numbers first.
 
 - [ ] **Maintenance check → Edge Config.** `proxy.ts` now caches it in memory 15s (shipped); Edge Config (Vercel "Global Config") would remove the DB query and `/api/maintenance-check` hit entirely. Needs a store, `EDGE_CONFIG` env var, and the maintenance admin route writing to it.
-- [ ] **`force-dynamic` public content pages → ISR.** `blog/[slug]`, `news/[slug]`, `guides/[slug]`, `author/[slug]` run a function + DB query per visit incl. bots. Use long `revalidate` + `revalidatePath` on publish/edit.
-- [ ] **Raise `revalidate = 60` on ~25 marketing pages** (e.g. 3600) once confirmed that admin/super-admin saves call `revalidatePath`. Bookstore (1800) and compare (3600) are already longer.
+- [x] **`force-dynamic` public content pages → ISR** — shipped Nov 2 2026 (see CHANGELOG).
+- [x] **Raise `revalidate = 60` on marketing pages** — shipped for landing pages, features, pricing, faq, news, guides. Still 60: `/`, `/blog`, `/pricing/calculator`, `/resources`, `/resources/[slug]` — add on-demand revalidation (author publish → `/`; resource saves → `/resources/[slug]`), then raise.
+- [ ] **Re-export Vercel costs ~Nov 10** and compare ISR Writes / Function Invocations / Observability Events against Oct 22–Nov 2 baselines (6–10k ISR writes/day, 6–26k invocations/day).
 - [ ] **HeyCatch list pagination** — `listHeyCatchArticles` makes one cached request per 50 articles; watch as the guide count grows.
 
 ## Analytics & Consent

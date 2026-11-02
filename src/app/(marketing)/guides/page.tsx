@@ -7,7 +7,7 @@ import { MarketingPageHeader } from "@/components/marketing/marketing-page-heade
 import { GuidesIndexClient } from "@/components/marketing/guides-index-client";
 import { ArrowRight } from "lucide-react";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 

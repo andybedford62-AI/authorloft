@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     });
     revalidatePath("/");
     revalidatePath("/pricing");
+    revalidatePath("/features");
     return NextResponse.json(plan, { status: 201 });
   } catch (err: any) {
     if (err?.code === "P2002") return NextResponse.json({ error: "A plan with that slug already exists." }, { status: 400 });

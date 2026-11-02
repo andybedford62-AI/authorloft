@@ -9,7 +9,7 @@ import { getOgImage } from "@/lib/seo-config";
 import { getFoundingOfferCopy } from "@/lib/founding-offer";
 import { basicsSnapshot } from "@/lib/savings-calculator-data";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("pricing");

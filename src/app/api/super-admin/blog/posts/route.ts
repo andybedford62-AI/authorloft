@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 import { pingIndexNow } from "@/lib/indexnow";
+import { revalidatePosts } from "@/lib/revalidate-content";
 
 export async function GET() {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -46,6 +47,8 @@ export async function POST(req: NextRequest) {
       metaDescription: metaDescription?.trim() || null,
     },
   });
+
+  revalidatePosts();
 
   // Notify IndexNow (Bing) when a post is published
   if (post.isPublished) {

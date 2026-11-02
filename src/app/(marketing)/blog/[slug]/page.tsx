@@ -10,7 +10,8 @@ import { sanitizeArticle } from "@/lib/sanitize";
 import { articleDescription, articleTitle } from "@/lib/seo-title";
 import { PLATFORM_AUTHOR, articleAuthorLd, isPlatformAuthor } from "@/lib/platform-author";
 
-export const dynamic = "force-dynamic";
+// ISR: refreshed on demand by revalidatePosts() on every Super Admin post write.
+export const revalidate = 3600;
 
 const BASE = `https://www.${process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "authorloft.com"}`;
 

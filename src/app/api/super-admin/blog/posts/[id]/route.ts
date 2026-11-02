@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireSuperAdminId } from "@/lib/super-admin-auth";
 import { pingIndexNow } from "@/lib/indexnow";
+import { revalidatePosts } from "@/lib/revalidate-content";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!await requireSuperAdminId()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,6 +49,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     },
   });
 
+  revalidatePosts();
+
   // Notify IndexNow (Bing) when the post is published
   if (post.isPublished) {
     const section = post.isNews ? "news" : "blog";
@@ -65,5 +68,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  revalidatePosts();
   return NextResponse.json({ ok: true });
 }

@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { getOgImage } from "@/lib/seo-config";
 import { LANDING_PAGES, LANDING_PAGE_SLUGS } from "@/lib/landing-page-data";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("features");
