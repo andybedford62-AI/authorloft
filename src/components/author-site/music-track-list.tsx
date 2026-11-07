@@ -131,7 +131,6 @@ export function MusicTrackList({
   accentColor,
   hero,
   share,
-  layout,
   listenLinks,
   initialTrackId,
   ownView = false,
@@ -140,8 +139,6 @@ export function MusicTrackList({
   accentColor: string;
   hero: PlaylistHero;
   share: PlaylistShare;
-  /** "list" = numbered tracklist (albums/EPs/singles); "grid" = artwork cards (playlists). */
-  layout: "list" | "grid";
   /** Album-level "Listen on" links. */
   listenLinks: string[];
   /** From a `?track=` deep link: played (or highlighted, if it can't embed) on load. */
@@ -422,14 +419,6 @@ export function MusicTrackList({
           <ListMusic className="h-8 w-8 text-gray-200 mx-auto mb-3" />
           <p className="text-sm text-gray-500">No tracks in this list yet.</p>
         </div>
-      ) : layout === "list" ? (
-        <ol className="rounded-2xl border border-gray-200 bg-white divide-y divide-gray-100 overflow-hidden">
-          {tracks.map((track, index) => (
-            <li key={track.id} {...highlightWrap(track, "")}>
-              <TrackRow {...itemProps(track, index)} />
-            </li>
-          ))}
-        </ol>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {tracks.map((track, index) => (
@@ -546,78 +535,7 @@ function Reactions({ title, likes, myVote, onReact, textOnWhite, disabled }: {
   );
 }
 
-// ── Tracklist row (albums / EPs / singles) ────────────────────────────────────
-
-function TrackRow({ track, index, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact, disabled }: ItemProps) {
-  const inner = (
-    <>
-      <span className="w-7 flex-shrink-0 flex items-center justify-center text-sm tabular-nums text-gray-400">
-        {isPlaying ? (
-          <PlayingBars color={textOnWhite} />
-        ) : (
-          <>
-            <span className="group-hover:hidden">{index + 1}</span>
-            {track.canEmbed
-              ? <Play className="h-3.5 w-3.5 fill-current hidden group-hover:block" style={{ color: textOnWhite }} />
-              : <ExternalLink className="h-3.5 w-3.5 hidden group-hover:block" />}
-          </>
-        )}
-      </span>
-      {track.thumbnailUrl && (
-        <span className="relative hidden sm:block w-16 aspect-video rounded overflow-hidden bg-gray-100 flex-shrink-0">
-          <Image src={track.thumbnailUrl} alt="" fill sizes="64px" className="object-cover" />
-        </span>
-      )}
-      <span className="flex-1 min-w-0">
-        <span
-          className="block text-sm font-medium truncate"
-          style={{ color: isPlaying ? textOnWhite : "#111827" }}
-        >
-          {track.title}
-        </span>
-        <span className="block text-xs text-gray-500 truncate">
-          {track.genre && <span>{track.genre} · </span>}
-          {track.plays !== null && <span className="tabular-nums">{playsLabel(track.plays)} · </span>}
-          {track.description ?? (providerName ? (track.canEmbed ? `Plays here · ${providerName}` : `Opens on ${providerName}`) : "")}
-        </span>
-      </span>
-      {/* Always visible for link-out tracks (even when a note replaces the
-          "Opens on" caption above), so it's clear before clicking that this
-          one leaves the page and isn't part of Play all. */}
-      {!track.canEmbed && (
-        <span
-          className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-[11px] font-medium text-gray-500"
-          title={`Opens ${providerName ?? "the link"} in a new tab`}
-        >
-          <ExternalLink className="h-3 w-3" /> {providerName ?? "Link"}
-        </span>
-      )}
-    </>
-  );
-
-  const rowClass = "group flex-1 min-w-0 flex items-center gap-3 text-left py-3 pl-3 sm:pl-4";
-
-  return (
-    <div
-      className="flex items-center gap-3 pr-3 sm:pr-4 transition-colors hover:bg-gray-50"
-      style={isPlaying ? { backgroundColor: `color-mix(in srgb, ${textOnWhite} 6%, white)` } : undefined}
-    >
-      {track.canEmbed ? (
-        <button type="button" onClick={onPlay} className={rowClass} aria-label={`Play ${track.title}`}>
-          {inner}
-        </button>
-      ) : (
-        <a href={canonicalUrl ?? "#"} target="_blank" rel="noopener noreferrer" className={rowClass} onClick={onOpen} onAuxClick={onOpen}>
-          {inner}
-        </a>
-      )}
-      <Reactions title={track.title} likes={likes} myVote={myVote} onReact={onReact} textOnWhite={textOnWhite} disabled={disabled} />
-      <ShareButton copied={copied} onShare={onShare} title={track.title} size="xs" />
-    </div>
-  );
-}
-
-// ── Artwork card (playlists) ──────────────────────────────────────────────────
+// ── Artwork card (all releases: albums, EPs, singles, playlists) ──────────────────────────────────────────────────
 
 function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, providerName, canonicalUrl, onPlay, onOpen, onShare, likes, myVote, onReact, disabled }: ItemProps) {
   let hostname: string | null = null;
@@ -630,30 +548,18 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
   }
 
   const mediaClassName =
-    "relative aspect-video w-full bg-gray-100 flex items-center justify-center overflow-hidden";
+    "relative aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden";
 
   const mediaInner = (
     <>
       {track.thumbnailUrl ? (
-        <>
-          {/* Blurred copy fills the 16:9 frame so square artwork (e.g. Suno)
-              can be shown whole with object-contain instead of being cropped. */}
-          <Image
-            src={track.thumbnailUrl}
-            alt=""
-            aria-hidden
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover scale-110 blur-xl opacity-70"
-          />
-          <Image
-            src={track.thumbnailUrl}
-            alt={track.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-contain transition-transform duration-300 group-hover:scale-105"
-          />
-        </>
+        <Image
+          src={track.thumbnailUrl}
+          alt={track.title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
       ) : (
         <div
           className="absolute inset-0"

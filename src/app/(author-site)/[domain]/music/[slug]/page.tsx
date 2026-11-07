@@ -181,9 +181,6 @@ export default async function MusicListPage({
           releaseDate: list.releaseDate ? formatReleaseDate(list.releaseDate) : null,
           artistName: author.displayName || author.name,
         }}
-        // Albums, EPs and singles read as a numbered tracklist; playlists keep
-        // the artwork grid, which suits their mostly-video tracks.
-        layout={list.releaseType && list.releaseType !== "PLAYLIST" ? "list" : "grid"}
         listenLinks={parseListenLinks(list.listenLinks)}
         share={{
           url: `${getAuthorBaseUrl(author)}/music/${slug}`,
