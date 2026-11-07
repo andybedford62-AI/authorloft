@@ -635,28 +635,40 @@ function TrackCard({ track, index, surface, textOnWhite, isPlaying, copied, prov
   const mediaInner = (
     <>
       {track.thumbnailUrl ? (
-        <Image
-          src={track.thumbnailUrl}
-          alt={track.title}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        <>
+          {/* Blurred copy fills the 16:9 frame so square artwork (e.g. Suno)
+              can be shown whole with object-contain instead of being cropped. */}
+          <Image
+            src={track.thumbnailUrl}
+            alt=""
+            aria-hidden
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover scale-110 blur-xl opacity-70"
+          />
+          <Image
+            src={track.thumbnailUrl}
+            alt={track.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+        </>
       ) : (
         <div
           className="absolute inset-0"
           style={{ background: `linear-gradient(135deg, ${surface}, #111827)` }}
         />
       )}
-      <div className={`absolute inset-0 transition-colors ${isPlaying ? "bg-black/45" : "bg-black/10 group-hover:bg-black/25"}`} />
+      <div className={`absolute inset-0 transition-colors ${isPlaying ? "bg-black/45" : "bg-transparent group-hover:bg-black/15"}`} />
 
       {isPlaying ? (
-        <span className="relative inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold shadow" style={{ color: textOnWhite }}>
+        <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold shadow" style={{ color: textOnWhite }}>
           <PlayingBars color={textOnWhite} /> Playing
         </span>
       ) : (
         <span
-          className="relative h-12 w-12 rounded-full flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
+          className="absolute bottom-2.5 right-2.5 h-11 w-11 rounded-full flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
           style={{ backgroundColor: surface }}
         >
           {track.canEmbed ? (
