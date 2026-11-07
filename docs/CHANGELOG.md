@@ -16,6 +16,7 @@ line rather than listing every commit.
 ## November 7, 2026 — Music cover sizing
 
 - **Music index cards are now 16:9** (was square), so a 16:9 cover shows in full on both `/music` and the list detail header instead of being side-cropped. `CoverUpload` gained an optional `hint` prop; the music form tells authors to upload 16:9, ~1600×900, key content centred.
+- **Bookstore music cards are 16:9** (was square) to match the author-site music pages; wide covers no longer side-cropped.
 - **Music list pages share one layout.** Albums, EPs, singles and playlists all render the square artwork-card grid (previously albums/EPs/singles used a numbered list with small thumbnails). Tiles are `aspect-square` + `object-cover` (no blur/padding bars); play/open button and "Playing" pill sit lower-right. Removed `TrackRow` and the `layout` prop of `MusicTrackList`.
 
 ## November 2, 2026 — Vercel usage: cache maintenance check in proxy

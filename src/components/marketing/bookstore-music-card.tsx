@@ -19,8 +19,8 @@ export type BookstoreMusic = {
 export function BookstoreMusicCard({ music }: { music: BookstoreMusic }) {
   return (
     <div className="group relative flex flex-col h-full bg-vault-surf-2 rounded-2xl border border-vault-ink/22 shadow-[0_1px_4px_rgba(0,0,0,0.3)] overflow-hidden hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 transition-all duration-200">
-      {/* Cover (square — album/playlist art convention, unlike landscape course covers) */}
-      <div className="relative w-full aspect-square bg-vault-bg overflow-hidden">
+      {/* Cover (16:9 — matches the music pages on author sites, so wide cover art isn't side-cropped) */}
+      <div className="relative w-full aspect-video bg-vault-bg overflow-hidden">
         {music.coverImageUrl ? (
           <Image
             src={music.coverImageUrl}
