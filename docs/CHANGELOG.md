@@ -13,6 +13,10 @@ line rather than listing every commit.
 
 ---
 
+## November 7, 2026 — Music cover sizing
+
+- **Music index cards are now 16:9** (was square), so a 16:9 cover shows in full on both `/music` and the list detail header instead of being side-cropped. `CoverUpload` gained an optional `hint` prop; the music form tells authors to upload 16:9, ~1600×900, key content centred.
+
 ## November 2, 2026 — Vercel usage: cache maintenance check in proxy
 
 - **Consent banner can no longer be dismissed.** Removed the X in `consent-banner.tsx`; the visitor must choose Accept or Decline, so the choice is always stored and the banner doesn't return on later visits. Tracking was already off until Accept.

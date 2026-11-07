@@ -91,7 +91,7 @@ export default async function MusicPage({
                     href={`/music/${list.slug}`}
                     className="group rounded-2xl border border-gray-200 overflow-hidden bg-white hover:border-transparent hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
                   >
-                    <div className="relative aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <div className="relative aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
                       {list.coverImageUrl ? (
                         <Image
                           src={list.coverImageUrl}

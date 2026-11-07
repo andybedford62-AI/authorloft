@@ -8,9 +8,10 @@ interface CoverUploadProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  hint?: string;
 }
 
-export function CoverUpload({ value, onChange, label = "Cover Image" }: CoverUploadProps) {
+export function CoverUpload({ value, onChange, label = "Cover Image", hint }: CoverUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [showUrlInput, setShowUrlInput] = useState(!!value);
@@ -62,6 +63,7 @@ export function CoverUpload({ value, onChange, label = "Cover Image" }: CoverUpl
     return (
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700">{label} <span className="font-normal text-gray-400">(optional)</span></label>
+        {hint && <p className="-mt-2 text-xs text-gray-500">{hint}</p>}
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={cspSafeImageSrc(value)} alt="Cover preview"
@@ -99,6 +101,7 @@ export function CoverUpload({ value, onChange, label = "Cover Image" }: CoverUpl
   return (
     <div className="space-y-3">
       <label className="block text-sm font-medium text-gray-700">{label} <span className="font-normal text-gray-400">(optional)</span></label>
+      {hint && <p className="-mt-2 text-xs text-gray-500">{hint}</p>}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
