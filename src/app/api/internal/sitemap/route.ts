@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { getBookstoreData } from "@/lib/bookstore";
 import { COMPARISON_SLUGS } from "@/lib/comparison-data";
 import { LANDING_PAGES } from "@/lib/landing-page-data";
-import { listHeyCatchArticles } from "@/lib/heycatch";
 import { PLATFORM_STATIC_PAGES } from "@/lib/site-pages";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
@@ -102,18 +101,6 @@ async function buildPlatformSitemap(host: string): Promise<Entry[]> {
 
   for (const p of blogPosts) {
     entries.push({ loc: `${base}/blog/${p.slug}`, lastmod: p.updatedAt, changefreq: "monthly", priority: 0.7 });
-  }
-
-  // HeyCatch-powered articles, read live from the API (see src/lib/heycatch.ts).
-  const heycatch = await listHeyCatchArticles().catch(() => []);
-  for (const a of heycatch) {
-    const updated = a.updated_at ?? a.updated;
-    entries.push({
-      loc: `${base}/blog/guides/${encodeURIComponent(a.slug)}`,
-      lastmod: updated ? new Date(updated) : undefined,
-      changefreq: "monthly",
-      priority: 0.7,
-    });
   }
 
   for (const p of newsPosts) {

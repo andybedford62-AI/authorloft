@@ -19,6 +19,7 @@ line rather than listing every commit.
 - **Homepage meta description trimmed** from 189 to 136 characters so it isn't truncated in search results. OG/Twitter descriptions reuse the same string.
 - **Homepage H1 spacing.** Added a space between the two H1 sentences (they were separate block spans, so text extractors read "direct.Keep").
 - **Homepage OG image now served from our own domain** (`public/og-home-2026-11.jpg`, copy of the Supabase image); `SeoConfig` row `home` updated to the relative path after the file was live on prod. A future Super Admin upload will write a Supabase URL again.
+- **HeyCatch guides removed.** The trial was stopped Nov 16 and the 5 API-fed articles under `/blog/guides` drew no traffic. Deleted `src/lib/heycatch.ts` and both `/blog/guides` pages, the sitemap block, the "Browse our guides" link on `/blog`, the "Blog Guides" site-pages entry, and `HEYCATCH_API_KEY` from `required-env.json`. `/blog/guides` and `/blog/guides/:slug` now 301 to `/guides`. No DB data existed (articles were read live). **Kept:** the `@heycatch/sdk` analytics integration and the `/a`–`/z` short-link attribution redirects. **To do in Vercel:** delete the `HEYCATCH_API_KEY` env var.
 - **Build fix.** `a75c8068` overwrote `music-track-list.tsx` with `PLACEHOLDER` and broke the Vercel build. File restored from `829950ef` (`93a83dd7`). The per-track artwork list that commit described was never shipped and is intentionally not being rebuilt (list view was dropped Nov 7).
 
 ## November 7, 2026 — Music cover sizing

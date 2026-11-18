@@ -287,7 +287,6 @@ Vercel is merging Data Cache into Runtime Cache billing. We have no `unstable_ca
 - [x] **`force-dynamic` public content pages → ISR** — shipped Nov 2 2026 (see CHANGELOG).
 - [x] **Raise `revalidate = 60` on marketing pages** — shipped for landing pages, features, pricing, faq, news, guides. Still 60: `/`, `/blog`, `/pricing/calculator`, `/resources`, `/resources/[slug]` — add on-demand revalidation (author publish → `/`; resource saves → `/resources/[slug]`), then raise.
 - [ ] **Re-export Vercel costs ~Nov 10** and compare ISR Writes / Function Invocations / Observability Events against Oct 22–Nov 2 baselines (6–10k ISR writes/day, 6–26k invocations/day).
-- [ ] **HeyCatch list pagination** — `listHeyCatchArticles` makes one cached request per 50 articles; watch as the guide count grows.
 
 ## Analytics & Consent
 

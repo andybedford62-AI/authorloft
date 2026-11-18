@@ -189,7 +189,6 @@ export const PLATFORM_STATIC_PAGES: PlatformStaticPage[] = [
   { label: "Bookstore",  path: "/bookstore",           group: "Main", changefreq: "weekly",  priority: 0.85 },
 
   { label: "Blog",       path: "/blog",                group: "Content", changefreq: "weekly",  priority: 0.85 },
-  { label: "Blog Guides", path: "/blog/guides",        group: "Content", changefreq: "weekly",  priority: 0.8 },
   { label: "News",       path: "/news",                group: "Content", changefreq: "weekly",  priority: 0.8 },
   { label: "Guides",     path: "/guides",              group: "Content", changefreq: "weekly",  priority: 0.85 },
   { label: "Resources",  path: "/resources",           group: "Content", changefreq: "monthly", priority: 0.7 },

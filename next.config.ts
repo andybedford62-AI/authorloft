@@ -65,6 +65,10 @@ const nextConfig: NextConfig = {
         destination: "/?utm_source=heycatch&utm_campaign=:l",
         permanent: false,
       },
+      // Nov 2026: the HeyCatch-powered /blog/guides section was removed (trial ended,
+      // no traffic). Old URLs go to the main guides index.
+      { source: "/blog/guides", destination: "/guides", permanent: true },
+      { source: "/blog/guides/:slug", destination: "/guides", permanent: true },
       // These two blog posts duplicated existing Guide articles on the exact
       // same topic (confirmed via Search Console — Google was declining to
       // index the blog versions). Posts unpublished in the CMS; redirect
