@@ -17,23 +17,24 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const ogImage = await getOgImage("home");
+  // Kept under ~155 chars so Google doesn't truncate it.
+  const DESC = "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics. Free to start.";
   return {
     title: "Sell Books Direct from Your Own Author Website",
-    description:
-      "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
+    description: DESC,
     alternates: { canonical: "/" },
     openGraph: {
       type:        "website",
       siteName:    "AuthorLoft",
       url:         PLATFORM_URL,
       title:       "Sell Books Direct from Your Own Author Website | AuthorLoft",
-      description: "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
+      description: DESC,
       images: [{ url: ogImage, width: 1200, height: 630, alt: "AuthorLoft: your books, your courses, your music, your business" }],
     },
     twitter: {
       card:        "summary_large_image",
       title:       "Sell Books Direct from Your Own Author Website | AuthorLoft",
-      description: "Keep 100% of every direct book sale and own your reader email list. Author website, newsletter, pre-orders and analytics in one place, free to start. Also for course creators and musicians.",
+      description: DESC,
       images:      [ogImage],
     },
   };

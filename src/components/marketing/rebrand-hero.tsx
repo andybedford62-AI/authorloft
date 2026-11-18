@@ -354,7 +354,7 @@ export function RebelHero({
 
           {/* Headline */}
           <h1 style={{ fontFamily: VAULT.fontDisplay, fontWeight: 400, fontSize: 'clamp(32px, 4.5vw, 68px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', animation: 'rbFadeUp 0.7s 0.1s ease both', opacity: 0 }}>
-            <span style={{ display: 'block' }}>{line1}</span>
+            <span style={{ display: 'block' }}>{line1}</span>{" "}
             <span style={{ display: 'block', color: VAULT.gold, fontStyle: 'italic' }}>{line2}</span>
           </h1>
 
