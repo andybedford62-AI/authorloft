@@ -13,6 +13,14 @@ line rather than listing every commit.
 
 ---
 
+## November 18, 2026 — Homepage SEO tidy-up (from a Ranked.ai scan)
+
+- **Audit triage.** Checked the Ranked.ai report against the live site: structured data (Organization, WebSite, SoftwareApplication, FAQPage, HowTo), canonicals on every page including author subdomains, `og:type`, and unique titles were all already in place — those findings were scanner false positives. Backlink findings matched the Sept diagnosis (nofollow directory links, no editorial links).
+- **Homepage meta description trimmed** from 189 to 136 characters so it isn't truncated in search results. OG/Twitter descriptions reuse the same string.
+- **Homepage H1 spacing.** Added a space between the two H1 sentences (they were separate block spans, so text extractors read "direct.Keep").
+- **Homepage OG image now served from our own domain** (`public/og-home-2026-11.jpg`, copy of the Supabase image); `SeoConfig` row `home` updated to the relative path after the file was live on prod. A future Super Admin upload will write a Supabase URL again.
+- **Build fix.** `a75c8068` overwrote `music-track-list.tsx` with `PLACEHOLDER` and broke the Vercel build. File restored from `829950ef` (`93a83dd7`). The per-track artwork list that commit described was never shipped and is intentionally not being rebuilt (list view was dropped Nov 7).
+
 ## November 7, 2026 — Music cover sizing
 
 - **Music index cards are now 16:9** (was square), so a 16:9 cover shows in full on both `/music` and the list detail header instead of being side-cropped. `CoverUpload` gained an optional `hint` prop; the music form tells authors to upload 16:9, ~1600×900, key content centred.
