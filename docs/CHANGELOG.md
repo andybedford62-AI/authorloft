@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## November 20, 2026 — Cinematic compaction + wide hero banners (in prod)
+
+- **Cinematic homepage made more compact.** Hero is ~33% shorter (`clamp(390px, 54vh, 620px)`) with headline, subhead, CTAs and padding scaled to match; the gold "new release" eyebrow line in the hero was removed (the Featured Release section below is unchanged). "The Shelf" shows the first 4 books only (no series filter pills; `CinematicBooksFilter` gained `showFilters`; "All books" link now always visible; heading is "From the shelf"). "Choose your series" is now a single-row snap-scroll carousel with ~25% smaller cards and arrows that appear only on overflow (new `cinematic-series-carousel.tsx`).
+- **Author name in the nav is 50% larger** (`text-sm` → `text-[21px]`, icon `h-6`) — shared nav, so every template. Authors using an uploaded logo image are unchanged.
+- **Cinematic hero uses a wide banner full-bleed.** `author.heroImageUrl` (recommended ~1900×800, author on the right, dark empty left) fills the hero behind the text with a navy left gradient. With no hero image set, the profile photo falls back to a shrink-wrapped, uncropped portrait box with a left fade. No new DB field — it reuses the existing Hero Image.
+- **Bold / Classic hero photo column** (`HeroBanner` author-left/right layouts) now anchors the crop at `object-[92%_center]` so a wide banner shows the face instead of the empty dark half. Portrait photos are unaffected. Limitation: the anchor is fixed, so a banner with the author on the left crops wrong (focal-point setting would fix this; see backlog).
+- **Branding → Hero Photo:** upload hint now recommends a landscape ~1.4:1+ image (e.g. 1900×800) with the author on the right, plus a collapsible, copyable **image prompt** authors can paste into an AI tool with their own photo attached.
+- Commits: `022ba125`, `8cca7f5e`, `1946f269`, `eb3b6116`, `14a05278`, `04afbe3b`. Tested on staging by Andy, promoted to prod, no errors.
+
 ## November 18, 2026 — Homepage SEO tidy-up (from a Ranked.ai scan)
 
 - **Audit triage.** Checked the Ranked.ai report against the live site: structured data (Organization, WebSite, SoftwareApplication, FAQPage, HowTo), canonicals on every page including author subdomains, `og:type`, and unique titles were all already in place — those findings were scanner false positives. Backlink findings matched the Sept diagnosis (nofollow directory links, no editorial links).
