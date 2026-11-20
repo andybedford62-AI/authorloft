@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, ChevronRight, GraduationCap, ListMusic, Mail } from "lucide-react";
 import { sanitize } from "@/lib/sanitize";
 import { CinematicBooksFilter } from "./cinematic-books-filter";
+import { CinematicSeriesCarousel } from "./cinematic-series-carousel";
 import { NewsletterInlineForm } from "@/components/author-site/newsletter-inline-form";
 import { formatCents } from "@/lib/utils";
 import type { HomeTemplateProps } from "./types";
@@ -24,14 +25,6 @@ const DEFAULT_PRESS_NAMES = [
   "NPR BOOKS",
 ];
 
-// Series accent colours (cycles by index)
-const SERIES_ACCENTS = [
-  ["#1E3A5F", "#2C507F"],
-  ["#1F3A2F", "#2A5040"],
-  ["#3A1E5F", "#50307F"],
-  ["#3A2A1E", "#5A3E28"],
-];
-
 function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
@@ -45,20 +38,10 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
   // author.heroImageUrl || author.profileImageUrl precedent used by Classic/Bold);
   // falls back to the profile photo so authors who haven't set one still see something.
   const heroPhotoSrc = author.heroImageUrl || author.profileImageUrl;
-  // heroEyebrow: minimal type, used only for eyebrow label + Browse CTA in the
-  // hero section — this template has no cover-art hero slot (no HeroBanner
-  // call here), so heroFocus only ever needs to steer this text, not imagery.
-  // The separate Featured Release section below stays Books-only/untouched —
-  // it's a distinct, unconfirmed piece of scope.
-  const heroEyebrowBook   = author.heroFeaturedBook ?? books.find((b) => b.isFeatured) ?? books[0] ?? null;
-  const heroEyebrowCourse = courses.find((c) => c.isFeatured) ?? courses[0] ?? null;
-  const heroEyebrowMusic  = music.find((m) => m.isFeatured) ?? music[0] ?? null;
-  // Normalized to a common shape — Course/Music have no `caption` field (they
-  // have `description` instead), so the eyebrow simply omits it for those two.
-  const heroEyebrow: { title: string; caption: string | null } | null =
-    author.heroFocus === "COURSES" ? (heroEyebrowCourse && { title: heroEyebrowCourse.title, caption: null }) :
-    author.heroFocus === "MUSIC"   ? (heroEyebrowMusic && { title: heroEyebrowMusic.title, caption: null })  :
-    heroEyebrowBook;
+  // The hero used to show a gold "new release" eyebrow (featured book/course/
+  // playlist title); removed Nov 20 2026 at Andy's request. heroFocus now only
+  // steers the Browse CTA below. The separate Featured Release section further
+  // down is untouched.
   const browseHref  = author.heroFocus === "COURSES" ? "/courses" : author.heroFocus === "MUSIC" ? "/music" : "/books";
   const browseLabel = author.heroFocus === "COURSES" ? "Browse Courses" : author.heroFocus === "MUSIC" ? "Browse Music" : "Browse Books";
   const personLabel = author.heroFocus === "COURSES" || author.heroFocus === "MUSIC" ? "Meet the Creator" : "Meet the Author";
@@ -79,7 +62,8 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       <section
         className="relative overflow-hidden flex items-center"
         style={{
-          minHeight: "clamp(580px, 80vh, 920px)",
+          // ~33% smaller than the original clamp(580px, 80vh, 920px)
+          minHeight: "clamp(390px, 54vh, 620px)",
           background: `
             radial-gradient(ellipse 75% 60% at 30% 50%, ${accent}18 0%, transparent 70%),
             radial-gradient(ellipse 60% 80% at 75% 30%, #1E3A5F40 0%, transparent 65%),
@@ -101,7 +85,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
               src={heroPhotoSrc}
               alt={authorName}
               fill
-              className="object-cover object-center"
+              className="object-cover object-[50%_25%]"
               style={{ filter: "brightness(0.75) contrast(1.05)" }}
               priority
             />
@@ -109,48 +93,37 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
         )}
 
         {/* Text content — left side */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-28">
-          <div className="max-w-[380px] lg:max-w-[520px] space-y-6">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-16">
+          <div className="max-w-[300px] lg:max-w-[360px] space-y-4">
 
-            {/* Eyebrow */}
-            {heroEyebrow && (
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-px" style={{ background: accent }} />
-                <p
-                  className="text-[11px] font-semibold uppercase tracking-[0.32em]"
-                  style={{ color: accent }}
-                >
-                  {heroEyebrow.title}
-                  {heroEyebrow.caption ? ` · ${heroEyebrow.caption}` : ""}
-                </p>
-              </div>
-            )}
+            {/* Eyebrow removed — the hero no longer announces a "new release"
+                title (heroEyebrow is still computed above for future use). */}
 
-            {/* Headline */}
+            {/* Headline — scaled ~⅔ with the rest of the hero */}
             <h1
-              className="author-font-heading text-[clamp(44px,7vw,96px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
+              className="author-font-heading text-[clamp(30px,4.7vw,64px)] leading-[0.96] tracking-[-0.03em] text-[#FBF6E9]"
               dangerouslySetInnerHTML={{ __html: formatHeadline(headline, accent) }}
             />
 
             {/* Subhead */}
             {subhead && (
-              <p className="text-[17px] leading-relaxed text-[#FBF6E9]/70 max-w-[440px]">
+              <p className="text-[15px] leading-relaxed text-[#FBF6E9]/70 max-w-[320px]">
                 {subhead}
               </p>
             )}
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="flex flex-wrap gap-2.5 pt-1">
               <Link
                 href={browseHref}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
                 style={{ background: accent, color: NAVY_DEEP }}
               >
-                {browseLabel} <ArrowRight className="w-4 h-4" />
+                {browseLabel} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border transition-all duration-200 hover:border-opacity-100 hover:-translate-y-0.5 text-[#FBF6E9]"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[13px] font-semibold border transition-all duration-200 hover:border-opacity-100 hover:-translate-y-0.5 text-[#FBF6E9]"
                 style={{ borderColor: accent + "66" }}
               >
                 {personLabel}
@@ -167,7 +140,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
                 FEATURE_BACKLOG.md). The separator is now index-guarded so the
                 first credential doesn't start with a stray divider. */}
             {metaCredentials.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3 pt-4 border-t" style={{ borderColor: accent + "22" }}>
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t" style={{ borderColor: accent + "22" }}>
                 {metaCredentials.map((c, i) => (
                   <span key={i} className="text-[11px] text-[#FBF6E9]/50">
                     {i > 0 && <span className="mx-2" style={{ color: accent + "66" }}>|</span>}
@@ -310,25 +283,26 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       {/* ── All Books ─────────────────────────────────────────────────────── */}
       {author.heroFocus === "BOOKS" && books.length > 0 && (
         <section style={{ background: NAVY_DEEP }}>
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
-            <div className="flex items-end justify-between mb-10">
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-14 md:py-16">
+            <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                   The Shelf
                 </p>
                 <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
-                  The complete shelf
+                  From the shelf
                 </h2>
               </div>
+              {/* Always visible now: with only 4 books shown, this is the way to the rest. */}
               <Link
                 href="/books"
-                className="hidden sm:flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
+                className="flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
                 style={{ color: accent }}
               >
                 All books <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <CinematicBooksFilter books={books} accentColor={accent} />
+            <CinematicBooksFilter books={books.slice(0, 4)} accentColor={accent} showFilters={false} />
           </div>
         </section>
       )}
@@ -428,74 +402,17 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
       {/* ── Browse by Series ─────────────────────────────────────────────── */}
       {author.heroFocus === "BOOKS" && series.length > 0 && (
         <section style={{ background: NAVY }}>
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-20 md:py-24">
-            <div className="text-center mb-12">
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-12 md:py-14">
+            <div className="text-center mb-7">
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-2" style={{ color: accent }}>
                 Collections
               </p>
-              <h2 className="author-font-heading text-[clamp(28px,4vw,48px)] text-[#FBF6E9]">
+              <h2 className="author-font-heading text-[clamp(24px,3.2vw,36px)] text-[#FBF6E9]">
                 Choose your series
               </h2>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {series.map((s, i) => {
-                const [colorA, colorB] = SERIES_ACCENTS[i % SERIES_ACCENTS.length];
-                const cover = s.books.find((b) => b.coverImageUrl);
-                return (
-                  <Link
-                    key={s.id}
-                    href={`/series/${s.slug}`}
-                    className="group relative overflow-hidden rounded-sm transition-transform duration-300 hover:-translate-y-1.5"
-                    style={{
-                      background: `linear-gradient(160deg, ${colorA} 0%, ${colorB} 100%)`,
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
-                    }}
-                  >
-                    {/* Dark overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050D1C]/90 via-[#050D1C]/30 to-transparent" />
-
-                    {/* Tilted cover */}
-                    {cover?.coverImageUrl && (
-                      <div
-                        className="absolute top-4 right-4 w-20 aspect-[2/3] rounded-sm overflow-hidden opacity-70"
-                        style={{
-                          transform: "perspective(600px) rotateY(-14deg)",
-                          boxShadow: "6px 8px 16px rgba(0,0,0,0.5)",
-                        }}
-                      >
-                        <Image src={cover.coverImageUrl} alt={s.name} fill className="object-cover" />
-                      </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="relative z-10 p-7 pt-28 sm:pt-32">
-                      <span
-                        className="inline-block text-[10px] font-bold uppercase tracking-widest mb-2 px-2 py-0.5 rounded-full"
-                        style={{ background: accent + "22", color: accent }}
-                      >
-                        {s.books.length} {s.books.length === 1 ? "book" : "books"}
-                      </span>
-                      <h3 className="author-font-heading text-[22px] text-[#FBF6E9] leading-tight mb-2">
-                        {s.name}
-                      </h3>
-                      {s.description && (
-                        <p className="text-sm text-[#FBF6E9]/60 line-clamp-2 mb-4">
-                          {s.description}
-                        </p>
-                      )}
-                      <span
-                        className="flex items-center gap-1.5 text-sm font-semibold transition-colors"
-                        style={{ color: accent }}
-                      >
-                        Explore series
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            <CinematicSeriesCarousel series={series} accentColor={accent} />
           </div>
         </section>
       )}

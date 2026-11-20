@@ -10,13 +10,15 @@ import { hasPriceRange } from "@/lib/book-formats";
 interface Props {
   books: BookForTemplate[];
   accentColor: string;
+  /** Series filter pills. Off when the caller passes a truncated list. */
+  showFilters?: boolean;
 }
 
 function formatPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-export function CinematicBooksFilter({ books, accentColor }: Props) {
+export function CinematicBooksFilter({ books, accentColor, showFilters = true }: Props) {
   const seriesNames = Array.from(
     new Set(books.map((b) => b.series?.name).filter(Boolean) as string[])
   );
@@ -38,7 +40,7 @@ export function CinematicBooksFilter({ books, accentColor }: Props) {
   return (
     <div>
       {/* Filter pills */}
-      {filters.length > 1 && (
+      {showFilters && filters.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-8">
           {filters.map((f) => (
             <button

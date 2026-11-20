@@ -120,8 +120,9 @@ export function AuthorNav({ author, navConfig, links }: NavProps) {
               />
             ) : (
               <>
-                <BookOpen className={cn("h-5 w-5 flex-shrink-0 transition-opacity group-hover:opacity-80", t.logoIcon)} />
-                <span className={cn("author-font-heading font-semibold text-sm group-hover:opacity-80 transition-opacity", t.logoText)}>
+                <BookOpen className={cn("h-6 w-6 flex-shrink-0 transition-opacity group-hover:opacity-80", t.logoIcon)} />
+                {/* text-[21px] = the old text-sm (14px) + 50% */}
+                <span className={cn("author-font-heading font-semibold text-[21px] leading-none group-hover:opacity-80 transition-opacity", t.logoText)}>
                   {author.displayName || author.name}
                 </span>
               </>
