@@ -34,10 +34,8 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
   const authorName   = author.displayName || author.name;
   const firstName    = authorName.split(" ")[0];
   const pressNames   = author.pressOutlets?.length ? author.pressOutlets : DEFAULT_PRESS_NAMES;
-  // Hero portrait: an explicit Hero Image wins (matches HeroBanner's own
-  // author.heroImageUrl || author.profileImageUrl precedent used by Classic/Bold);
-  // falls back to the profile photo so authors who haven't set one still see something.
-  const heroPhotoSrc = author.heroImageUrl || author.profileImageUrl;
+  // Hero imagery: an explicit Hero Image (wide banner) renders full-bleed; with
+  // none set, the profile photo falls back to a contained portrait (see hero JSX).
   // The hero used to show a gold "new release" eyebrow (featured book/course/
   // playlist title); removed Nov 20 2026 at Andy's request. heroFocus now only
   // steers the Browse CTA below. The separate Featured Release section further
@@ -71,8 +69,31 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
           `,
         }}
       >
-        {/* Author portrait — right side with left-fade mask */}
-        {heroPhotoSrc && (
+        {/* Wide hero banner (author.heroImageUrl, ~1900×800): full-bleed behind
+            the text. The banner carries its own dark left side; the gradient
+            just matches it to the section colour so there is no visible seam. */}
+        {author.heroImageUrl && (
+          <div className="absolute inset-0 hidden md:block">
+            <Image
+              src={author.heroImageUrl}
+              alt={authorName}
+              fill
+              sizes="100vw"
+              className="object-cover object-[75%_center]"
+              style={{ filter: "brightness(0.92)" }}
+              priority
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(to right, ${NAVY_DEEP} 0%, ${NAVY_DEEP}99 28%, transparent 55%)` }}
+            />
+          </div>
+        )}
+
+        {/* Fallback when no hero image is set: the profile photo is usually a
+            tall portrait, so it gets a shrink-wrapped box (full photo, never
+            cropped) with a left-fade mask. */}
+        {!author.heroImageUrl && author.profileImageUrl && (
           <div
             className="absolute inset-y-0 right-0 hidden md:block"
             style={{
@@ -85,7 +106,7 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
             }}
           >
             <Image
-              src={heroPhotoSrc}
+              src={author.profileImageUrl}
               alt={authorName}
               width={0}
               height={0}
