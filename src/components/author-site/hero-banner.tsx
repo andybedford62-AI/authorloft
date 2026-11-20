@@ -249,7 +249,7 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride, coverS
               // and this column is narrow, so centre-cropping would show only
               // the empty dark half. Portrait photos are unaffected (they
               // already fill the column's width).
-              className="object-cover object-[76%_center]"
+              className="object-cover object-[92%_center]"
               style={{
                 maskImage:
                   "radial-gradient(ellipse 78% 82% at 48% 38%, #000 35%, rgba(0,0,0,0.75) 58%, transparent 85%)",
