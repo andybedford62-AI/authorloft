@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock, GripVertical } from "lucide-react";
+import { Check, Loader2, Upload, X, User, Plus, Trash2, Lock, GripVertical, Copy, ChevronDown } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -107,6 +107,20 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "social",  label: "Social & Contact" },
 ];
 
+// Prompt authors can paste into an image tool (with their own photo attached) to
+// produce a hero that fits every template: wide, author on the right, dark left.
+const HERO_IMAGE_PROMPT = `Using the attached photo of me as the reference, create a wide website hero banner, 1900 x 800 pixels (landscape, about 2.4:1).
+
+Composition:
+- Place me on the RIGHT side of the frame, head and shoulders, with my face roughly 75% of the way across the image and my head well clear of the top and bottom edges.
+- Keep my face, hair, skin tone and expression exactly true to the photo. Do not change my features or age.
+- The LEFT half of the image must be dark, soft and mostly empty (deep navy or near-black with a gentle fade) so white headline text can sit on top of it.
+- Fade the left edge of the scene smoothly into that dark area, with no hard lines or borders.
+
+Background: [a setting that fits your genre, e.g. a warm wood-panelled library with bookshelves / a moody sea at dusk / a misty forest], softly out of focus and slightly darkened behind me.
+
+Style: professional author portrait, cinematic lighting, natural and realistic, high resolution. No text, logos, watermarks, borders or extra people.`;
+
 export function BrandingForm({ initial, books, planTier = "FREE", presence, siteUrl }: BrandingFormProps) {
   const isFree = planTier === "FREE";
   const [activeTab, setActiveTab] = useState<Tab>("profile");
@@ -133,6 +147,8 @@ export function BrandingForm({ initial, books, planTier = "FREE", presence, site
   const [uploadingHero, setUploadingHero]       = useState(false);
   const [heroError, setHeroError]               = useState("");
   const heroInputRef = useRef<HTMLInputElement>(null);
+  const [showHeroPrompt, setShowHeroPrompt]     = useState(false);
+  const [heroPromptCopied, setHeroPromptCopied] = useState(false);
   const [linkedinUrl, setLinkedinUrl] = useState(initial.linkedinUrl);
   const [youtubeUrl, setYoutubeUrl] = useState(initial.youtubeUrl);
   const [facebookUrl, setFacebookUrl] = useState(initial.facebookUrl);
@@ -641,6 +657,47 @@ Facebook remembers the first image it saw for a link. After saving a change here
                     )}
                   </div>
                   <p className="text-xs text-gray-400">JPEG, PNG or WebP · Max 10 MB</p>
+
+                  {/* Prompt helper — lets authors recreate the recommended hero from their own photo */}
+                  <div className="rounded-lg border border-gray-200 bg-gray-50">
+                    <button
+                      type="button"
+                      onClick={() => setShowHeroPrompt((v) => !v)}
+                      aria-expanded={showHeroPrompt}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-xs font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
+                    >
+                      <span>Need help creating this image? Get an image prompt</span>
+                      <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform ${showHeroPrompt ? "rotate-180" : ""}`} />
+                    </button>
+                    {showHeroPrompt && (
+                      <div className="px-3 pb-3 space-y-2">
+                        <p className="text-xs text-gray-500">
+                          Copy this prompt into an AI image tool that accepts a photo upload (such as ChatGPT or Gemini),
+                          attach a clear head-and-shoulders photo of yourself, then upload the result here.
+                          Edit the bracketed parts to suit your genre.
+                        </p>
+                        <pre className="whitespace-pre-wrap text-xs text-gray-700 bg-white border border-gray-200 rounded-md p-3 leading-relaxed font-sans">{HERO_IMAGE_PROMPT}</pre>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(HERO_IMAGE_PROMPT);
+                              setHeroPromptCopied(true);
+                              setTimeout(() => setHeroPromptCopied(false), 2000);
+                            } catch { /* clipboard blocked: the text above can still be selected manually */ }
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                        >
+                          {heroPromptCopied ? <><Check className="h-3.5 w-3.5" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy prompt</>}
+                        </button>
+                        <p className="text-xs text-gray-400">
+                          Use your own photo as the reference so the result looks like you. Check the final image
+                          before uploading — your face and the dark left side matter most.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
                   {heroError && <p className="text-xs text-red-600">{heroError}</p>}
                   {!heroImageUrl && (
                     <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-3 py-2">
