@@ -244,7 +244,12 @@ export function HeroBanner({ author, focus, featuredItem, layoutOverride, coverS
               alt={authorName}
               fill
               priority
-              className="object-cover object-center"
+              // Anchor right of centre: the recommended hero is a wide banner
+              // (~1900×800) with the author on the right and a dark left side,
+              // and this column is narrow, so centre-cropping would show only
+              // the empty dark half. Portrait photos are unaffected (they
+              // already fill the column's width).
+              className="object-cover object-[76%_center]"
               style={{
                 maskImage:
                   "radial-gradient(ellipse 78% 82% at 48% 38%, #000 35%, rgba(0,0,0,0.75) 58%, transparent 85%)",

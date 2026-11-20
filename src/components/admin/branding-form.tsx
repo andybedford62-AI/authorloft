@@ -610,7 +610,7 @@ Facebook remembers the first image it saw for a link. After saving a change here
                     <p className="text-sm font-medium text-gray-700">Hero Photo</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       This photo appears on the left or right panel of your homepage hero banner, fading softly into the background.
-                      For best results: use a portrait or head-and-shoulders shot with your subject centered — the display area crops to fit, so avoid placing important content near the very top or bottom edges.
+                      For best results: upload a landscape image, about 1.4:1 or wider (for example 1900×800), with you on the right and a dark, empty left side for the text. The display area crops to fit, so keep your face away from the very top and bottom edges.
                     </p>
                   </div>
                   {heroImageUrl && (
