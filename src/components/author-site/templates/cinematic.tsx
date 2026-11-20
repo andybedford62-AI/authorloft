@@ -76,7 +76,10 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
           <div
             className="absolute inset-y-0 right-0 hidden md:block"
             style={{
-              width: "58%",
+              // The box shrink-wraps the photo: full hero height, width from the
+              // image's own ratio, so the WHOLE photo shows at any aspect
+              // ratio (no object-cover cropping). Capped at 58% of the hero.
+              maxWidth: "58%",
               WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 28%)",
               maskImage: "linear-gradient(to right, transparent 0%, black 28%)",
             }}
@@ -84,8 +87,10 @@ export function CinematicTemplate({ author, books, courses, music, series }: Hom
             <Image
               src={heroPhotoSrc}
               alt={authorName}
-              fill
-              className="object-cover object-[50%_25%]"
+              width={0}
+              height={0}
+              sizes="(min-width: 768px) 58vw, 0px"
+              className="block h-full w-auto max-w-full"
               style={{ filter: "brightness(0.75) contrast(1.05)" }}
               priority
             />
