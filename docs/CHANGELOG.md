@@ -13,6 +13,11 @@ line rather than listing every commit.
 
 ---
 
+## November 22, 2026 — Google Ads beacon CSP fix + LCP alert guard (dev, not yet verified on staging)
+
+- **CSP now allows `https://pagead2.googlesyndication.com`** in `img-src` and `connect-src` (`next.config.ts`). The gtag page_view/conversion beacon (`/ccm/collect`) was blocked on every page load. Consent mode still applies (`npa=1`), so counts depend on consent. If staging shows further blocked Google hosts (e.g. `www.googleadservices.com`), add them the same way.
+- **PostHog "Mobile homepage LCP above 4,000ms" alert** (insight `CEagDuFm`) now returns 0 until 100+ samples in the 14-day window, and shows the sample count. It fired at 4,788ms on ~28 samples; a lab test of the mobile homepage showed LCP ~0.6s (logo text, no hero image), so it was sample noise. Changed in PostHog directly, no code.
+
 ## November 20, 2026 — Cinematic compaction + wide hero banners (in prod)
 
 - **Cinematic homepage made more compact.** Hero is ~33% shorter (`clamp(390px, 54vh, 620px)`) with headline, subhead, CTAs and padding scaled to match; the gold "new release" eyebrow line in the hero was removed (the Featured Release section below is unchanged). "The Shelf" shows the first 4 books only (no series filter pills; `CinematicBooksFilter` gained `showFilters`; "All books" link now always visible; heading is "From the shelf"). "Choose your series" is now a single-row snap-scroll carousel with ~25% smaller cards and arrows that appear only on overflow (new `cinematic-series-carousel.tsx`).

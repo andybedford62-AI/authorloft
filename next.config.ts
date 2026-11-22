@@ -17,12 +17,14 @@ const ContentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   // Supabase storage (covers any project ref), Google user avatars, Stripe branding
   // Google Ads conversion pixel (googletagmanager.com's own image-beacon fallback, plus doubleclick.net)
-  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
+  "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://lh3.googleusercontent.com https://q.stripe.com https://www.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com",
   "font-src 'self' data:",
   // Supabase storage uploads are initiated from the browser directly
   // Google Ads (gtag.js) beacon/conversion calls, incl. ad.doubleclick.net which
-  // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host)
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://in.heycatch.ai",
+  // is where the actual conversion-tracking beacon posts (googleads.g.doubleclick.net is just the script host).
+  // pagead2.googlesyndication.com/ccm/collect is the gtag page_view/conversion beacon (fetch + img fallback);
+  // it was CSP-blocked on every page until Nov 22 2026 (also added to img-src above).
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.ingest.us.sentry.io https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://pagead2.googlesyndication.com https://in.heycatch.ai",
   // Stripe 3D Secure and payment frames.
   // Plus the video/music hosts extractVideoEmbed() (course lessons) and
   // resolveTrackLink() (music pages) rewrite author-supplied URLs to. Without
