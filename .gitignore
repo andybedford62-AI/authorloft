@@ -38,3 +38,6 @@ prisma/URLs.txt
 .playwright-mcp/
 /*.png
 /*.jpeg
+
+# Claude Code per-machine permission allowlist (not shared)
+.claude/settings.local.json
