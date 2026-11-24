@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   const ok = await sendOrderConfirmationEmail({
     to: author.email,
-    customerName: firstName ? `${firstName} (preview)` : undefined,
+    customerName: firstName,
     items: [{
       bookTitle: "Your Book Title",
       itemLabel: "eBook",
