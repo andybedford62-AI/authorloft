@@ -258,8 +258,8 @@ export default async function CourseDetailPage({
             </div>
           )}
 
-          {/* Reader feedback form */}
-          <div className="pt-6">
+          {/* Reader feedback form (#feedback: target of the author's follow-up email link) */}
+          <div id="feedback" className="pt-6">
             <CourseFeedbackForm
               courseSlug={course.slug}
               domain={domain}

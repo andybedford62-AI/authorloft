@@ -13,6 +13,15 @@ line rather than listing every commit.
 
 ---
 
+## November 24, 2026 — Sales page: "Thank & ask for feedback" follow-up (dev/staging, not yet in prod)
+
+- **Authors can thank a buyer and ask for a rating from Admin → Sales.** Each completed order with a buyer email and a book or course gets a "Thank & ask for feedback" link. It opens a pre-filled, editable message (greets the buyer by first name, names the title(s), invites a quick rating, invites a reply). Send emails the buyer a "A note from {author}" email with a "Rate {title}" button per item (up to 3). Replies go to the author's contact email (fallback: account email); sent as "{author} via AuthorLoft".
+- **Lands straight on the review form.** Book links go to `/books/{slug}#write-review` (the rating pop-up now opens automatically on that hash); course links go to `/courses/{slug}#feedback`. Ratings arrive through the existing moderated reader-feedback flow, so nothing new to approve elsewhere.
+- **One send per order.** New nullable `Order.followUpSentAt` (migration `20261124_order_follow_up_sent_at`, applied to Supabase before the push). The row shows "Asked Nov 24" and "Send again" (explicit; warns it emails the buyer twice). The send is claimed before the email goes out and rolled back if the email fails. Links are built server-side from the DB, never from the client.
+- **Timing hint, not a block:** "Bought 2 days ago. Readers usually need about a week…", or "This print order hasn't shipped yet."
+- **Deliberately not a newsletter:** one order at a time, no unsubscribe footer (personal 1:1, like other author sends), not filtered on the author's mailing list (unsubscribing deletes the Subscriber row, so a missing row can't be told apart from an older buyer who was never added).
+- **Plan:** same tier as the Sales page (Standard and up). `/features` row and `docs/FEATURE_MATRIX.md` updated. Files: `mailer.ts` (`sendFeedbackRequestEmail`), `api/admin/orders/[id]/feedback-request`, `order-feedback-control.tsx`, Sales page.
+
 ## November 24, 2026 — Author buyer thank-you note (dev/staging, not yet in prod)
 
 - **Authors can write a personal thank-you that buyers see after a paid purchase.** Settings → Communications → "Buyer thank-you message": plain text (1,500 chars), `{{firstName}}` supported, "Send me a test" previews it to the author's own email. It appears as "A note from {author}" in the order confirmation (book and bundle purchases) and the paid course access email. Free downloads and free enrollments don't include it.

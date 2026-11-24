@@ -416,6 +416,14 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Buyer follow-up from Sales (thank a buyer and ask for a rating, one tap, your own wording)",
+          tiers: {
+            FREE: "—",
+            STANDARD: standard?.salesEnabled ? "✓" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓" : "—",
+          },
+        },
+        {
           name: "Reader Analytics (page views, trends, referrers)",
           tiers: {
             FREE: free?.analyticsEnabled ? "✓" : "—",

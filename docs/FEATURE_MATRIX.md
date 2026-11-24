@@ -126,6 +126,7 @@ Early bird / founding member discount available to FREE users within a configura
 | **Sales Revenue Charts** (revenue over time, by book, by format — area + bar charts) | ❌ | ✅ | ✅ |
 | **Sales Reports / Invoices** (year-filtered invoice view, downloadable CSV, discount breakdown) | ❌ | ✅ | ✅ |
 | **Order History** (track each sale with customer info) | ❌ | ✅ | ✅ |
+| **Buyer follow-up from Sales** ("Thank & ask for feedback" on each completed book/bundle/course order: pre-filled, editable message + a "Rate …" button per item linking to the book/course review form; sent once per order, "Send again" is explicit; replies go to the author; timing hint, never blocks) | ❌ | ✅ | ✅ |
 | **Site Traffic Analytics** (PostHog: page views, referrers, countries — 7/30/90d; `/admin/analytics`) | ✅ | ✅ | ✅ |
 | **Deep Reading Engagement Analytics** (per-chapter/page read depth & retention, beyond site-traffic pageviews) | ❌ | ❌ | Roadmap |
 | **Review Monitoring** (aggregate Amazon/Goodreads scores) | ❌ | ❌ | Roadmap |

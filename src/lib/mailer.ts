@@ -1941,3 +1941,67 @@ export async function sendOrderShippedEmail({
     `),
   });
 }
+
+// ── Feedback request (author → buyer, sent manually from Admin → Sales) ──────
+// A personal one-to-one follow-up about a specific purchase, not a newsletter:
+// author-written message (pre-filled, editable), one "Rate …" button per item,
+// replies go to the author. No unsubscribe footer, same as other 1:1 author sends.
+
+export interface FeedbackTarget {
+  title: string;
+  url: string;
+}
+
+export async function sendFeedbackRequestEmail({
+  to,
+  authorName,
+  message,
+  targets,
+  replyTo,
+}: {
+  to: string;
+  authorName: string;
+  message: string;            // plain text, written/edited by the author
+  targets: FeedbackTarget[];  // where each "Rate …" button goes
+  replyTo?: string;
+}) {
+  // Display name goes in a header: drop anything that could break out of it.
+  const safeName = authorName.replace(/["<>,\r\n]/g, "").trim() || "Your author";
+  const bodyHtml = esc(message).replace(/\r?\n/g, "<br/>");
+  const subject = targets.length === 1
+    ? `How are you enjoying ${targets[0].title}?`
+    : `How are you enjoying your order from ${safeName}?`;
+
+  const buttons = targets.map((t) => `
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="padding:0 0 12px;">
+            <a href="${esc(t.url)}"
+               style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;">
+              ⭐ Rate ${esc(t.title)}
+            </a>
+          </td>
+        </tr>
+      </table>`).join("");
+
+  return sendMail({
+    to,
+    from: `${safeName} via AuthorLoft <noreply@authorloft.com>`,
+    ...(replyTo ? { replyTo } : {}),
+    subject,
+    text: [
+      message,
+      ``,
+      ...targets.map((t) => `Rate ${t.title}: ${t.url}`),
+      ``,
+      `You're getting this because you bought from ${safeName}. Just reply to this email to reach them.`,
+    ].join("\n"),
+    html: wrapHtml(`A note from ${esc(safeName)}`, `
+      <p style="margin:0 0 24px;">${bodyHtml}</p>
+      ${buttons}
+      <p style="margin:12px 0 0;font-size:13px;color:#9ca3af;text-align:center;">
+        You're getting this because you bought from ${esc(safeName)}. Just reply to this email to reach them.
+      </p>
+    `),
+  });
+}

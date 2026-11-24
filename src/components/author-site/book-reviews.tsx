@@ -46,6 +46,12 @@ export function BookReviews({
 }) {
   const [open, setOpen] = useState(false);
 
+  // The "rate this book" link in the author's follow-up email lands on #write-review:
+  // open the rating pop-up straight away so it's one tap from the email.
+  useEffect(() => {
+    if (window.location.hash === "#write-review") setOpen(true);
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";

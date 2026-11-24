@@ -943,6 +943,8 @@ model Order {
   // Snapshot of how shipping was priced: { profiles, country, zoneName, estimateNote, amountCents, freeApplied }
   shippingBreakdown     Json?
   shippedAt            DateTime?
+  // Set when the author sends the buyer a "thanks, would you leave a rating?" follow-up from Admin → Sales.
+  followUpSentAt        DateTime?
   trackingCarrier       String?
   trackingNumber        String?
   status                OrderStatus   @default(PENDING)

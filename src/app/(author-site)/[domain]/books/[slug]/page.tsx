@@ -642,7 +642,7 @@ export default async function BookDetailPage({
             {sideCards && <div className="md:hidden pt-6 border-t border-gray-100">{sideCards}</div>}
 
             {/* Reviews — summary, cards, and a pop-up form */}
-            <section aria-labelledby="reviews-heading" className="pt-6 border-t border-gray-100">
+            <section id="write-review" aria-labelledby="reviews-heading" className="pt-6 border-t border-gray-100">
               <h2 id="reviews-heading" className={SECTION_HEADING}>Reviews</h2>
               <BookReviews
                 reviews={reviewCards}

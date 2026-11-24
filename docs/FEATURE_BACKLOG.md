@@ -339,7 +339,7 @@ Shipped June 11, 2026 (email-gated downloadable resources alongside the affiliat
 - **Separate Stripe test environment.** Preview/staging uses live Stripe keys and the production DB, so Stripe flows can't be tested safely before prod. Options: a Supabase branch or second project plus test-mode keys, price IDs and webhook secrets for Preview only.
 - **Verify the first Standard-account (direct charge) sale** once Maria finishes onboarding — see the Oct 21 follow-ups in `docs/CHANGELOG.md`.
 - **Stripe Tax onboarding nudge** for Standard authors (without it, no tax is collected on their sales).
-- **Buyer thank-you follow-ups (after the Nov 24 v1 note).** (a) A delayed "how did you like it / leave a review" email N days after purchase (needs a scheduled job; `CRON_SECRET` is already set up). (b) Per-book or per-course note overrides. (c) Rich-text note via the existing editor + `sanitize` (v1 is plain text). (d) A "Reply to buyer" button on the Sales page (buyer email is plain text today). (e) Show the note on the checkout success page too.
+- **Buyer thank-you follow-ups (after the Nov 24 v1 note).** (a) An *automatic* delayed "how did you like it / leave a review" email N days after purchase (needs a scheduled job; `CRON_SECRET` is already set up). The manual per-order version shipped Nov 24 (see Shipped). (b) Per-book or per-course note overrides. (c) Rich-text note via the existing editor + `sanitize` (v1 is plain text). (d) A general "Reply to buyer" (free-form email) button on the Sales page; buyer email is plain text today. (e) Show the note on the checkout success page too. (f) Bulk "ask everyone from the last N days" for the feedback follow-up (v1 is one order at a time on purpose).
 
 ## Legal & Compliance
 
@@ -383,6 +383,7 @@ From a Sept 29, 2026 audit against a "6 legal traps for AI-built apps" checklist
 
 ## Shipped (for reference)
 
+- ✅ **Buyer follow-up from the Sales page** — "Thank & ask for feedback" per completed order: pre-filled editable message, a "Rate …" button per book/course linking straight into the review form, sent once per order (`Order.followUpSentAt`), replies to the author. (November 24, 2026, dev/staging)
 - ✅ **Author buyer thank-you note** — Settings → Communications: author's own message in the order confirmation (books, bundles) and paid course access emails; `{{firstName}}`; replies go to the author; "Send me a test". `Author.thankYouMessage`. (November 24, 2026, dev/staging)
 - ✅ **Self-hosted site fonts** — Inter + Playfair Display from `@fontsource-variable` instead of `next/font/google`, so builds never download fonts (a failed Google Fonts fetch broke a prod build Sept 26). (September 26, 2026)
 - ✅ **Music listens badges** — Tuned In (50), Crowd Favorite (500), Chart Climber (5,000) listens. (September 29, 2026)

@@ -8,6 +8,19 @@ import { Badge } from "@/components/ui/badge";
 import { formatCents } from "@/lib/utils";
 import { SalesCharts } from "@/components/admin/sales-charts";
 import { OrderShipControl } from "@/components/admin/order-ship-control";
+import { OrderFeedbackControl } from "@/components/admin/order-feedback-control";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Advisory timing nudge for the "Thank & ask for feedback" follow-up; never blocks sending.
+function followUpHint(order: { createdAt: Date; shippedAt: Date | null; shippingAddress: unknown }): string | null {
+  if (order.shippingAddress && !order.shippedAt) return "This print order hasn't shipped yet.";
+  const since = order.shippedAt ?? order.createdAt;
+  const days = Math.floor((Date.now() - since.getTime()) / DAY_MS);
+  if (days >= 7) return null;
+  const when = days <= 0 ? "today" : `${days} day${days === 1 ? "" : "s"} ago`;
+  return `${order.shippedAt ? "Shipped" : "Bought"} ${when}. Readers usually need about a week before they can rate it.`;
+}
 
 const STATUS_VARIANT: Record<string, "success" | "warning" | "default" | "danger"> = {
   COMPLETED: "success",
@@ -31,12 +44,12 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth, toShipCount, abandonedCount] = await Promise.all([
+  const [orders, totalRevenue, ordersThisMonth, totalOrders, revenueThisMonth, toShipCount, abandonedCount, authorInfo] = await Promise.all([
     prisma.order.findMany({
       where: { authorId, ...statusFilter },
       include: {
         items: {
-          include: { book: { select: { title: true } } },
+          include: { book: { select: { title: true } }, course: { select: { title: true } } },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -58,7 +71,9 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
       where: { authorId, status: "COMPLETED", shippingAddress: { not: Prisma.DbNull }, shippedAt: null },
     }),
     prisma.order.count({ where: { authorId, status: "PENDING" } }),
+    prisma.author.findUnique({ where: { id: authorId }, select: { displayName: true, name: true } }),
   ]);
+  const authorName = authorInfo?.displayName || authorInfo?.name || "";
 
   const stats = [
     {
@@ -195,6 +210,21 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
                         trackingNumber={order.trackingNumber}
                       />
                     )}
+                    {(() => {
+                      // Rateable items = books and courses; nothing to ask about otherwise.
+                      const titles = [...new Set(order.items.map((i) => i.book?.title ?? i.course?.title).filter((t): t is string => !!t))];
+                      if (order.status !== "COMPLETED" || !order.customerEmail || titles.length === 0) return null;
+                      return (
+                        <OrderFeedbackControl
+                          orderId={order.id}
+                          buyerFirstName={order.customerName?.trim().split(/\s+/)[0] || null}
+                          authorName={authorName}
+                          titles={titles}
+                          followUpSentAt={order.followUpSentAt ? order.followUpSentAt.toISOString() : null}
+                          hint={followUpHint(order)}
+                        />
+                      );
+                    })()}
                   </td>
                   <td className="px-5 py-4 hidden md:table-cell">
                     <div className="space-y-0.5">
