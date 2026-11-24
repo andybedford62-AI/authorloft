@@ -13,6 +13,13 @@ line rather than listing every commit.
 
 ---
 
+## November 24, 2026 — Author buyer thank-you note (dev/staging, not yet in prod)
+
+- **Authors can write a personal thank-you that buyers see after a paid purchase.** Settings → Communications → "Buyer thank-you message": plain text (1,500 chars), `{{firstName}}` supported, "Send me a test" previews it to the author's own email. It appears as "A note from {author}" in the order confirmation (book and bundle purchases) and the paid course access email. Free downloads and free enrollments don't include it.
+- **Replies reach the author.** Only when a note is set, the buyer email's Reply-To is the author's `contactEmail` (fallback: account email) and the footer says "Reply to this email to reach {author}". Authors with no note are unchanged (replies still go to the platform address).
+- **Under the hood:** new nullable `Author.thankYouMessage` (migration `20261124_author_thank_you_message`, applied to Supabase before the push). `getBuyerThankYou()` + note block in `mailer.ts`; the three purchase branches in the Stripe webhook pass it; routes `api/admin/settings/thank-you` (GET/PUT) and `/test`; UI in `buyer-thank-you-settings.tsx`. Not gated by plan — shown wherever direct sales are on. `/features` row and `docs/FEATURE_MATRIX.md` updated.
+- **Not tested with a real purchase.** Staging uses live Stripe keys and the prod DB (see backlog), so only the preview email and typecheck were exercised before prod.
+
 ## November 22, 2026 — Google Ads beacon CSP fix + LCP alert guard (on dev/staging, verified; not yet in prod)
 
 - **CSP now allows `https://pagead2.googlesyndication.com`** in `img-src` and `connect-src` (`next.config.ts`). The gtag page_view/conversion beacon (`/ccm/collect`) was blocked on every page load. Consent mode still applies (`npa=1`), so counts depend on consent. If staging shows further blocked Google hosts (e.g. `www.googleadservices.com`), add them the same way.

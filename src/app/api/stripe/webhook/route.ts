@@ -5,7 +5,7 @@ import { capturePostHog } from "@/lib/posthog";
 import { analytics } from "@heycatch/sdk";
 import { prisma } from "@/lib/db";
 import { generateDownloadExpiry } from "@/lib/stripe";
-import { sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
+import { getBuyerThankYou, sendOrderConfirmationEmail, sendSaleNotificationEmail, sendRenewalReminderEmail, sendSubscriptionWelcomeEmail, sendPaymentFailedEmail, sendBelowMinimumPricingAlert, sendCourseAccessEmail, sendCourseSaleNotificationEmail } from "@/lib/mailer";
 import { isThemeAllowed, BASE_THEME_IDS } from "@/lib/themes";
 import { getAuthorQualifiesForMusicPalette } from "@/lib/author-queries";
 import { reconcileAuthor } from "@/lib/plan-downgrade";
@@ -250,6 +250,7 @@ export async function POST(req: NextRequest) {
             const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
             const discountCents = order.discountCodeId ? (order.items[0]?.priceCents ?? 0) * fullItems.length - totalCents : 0; // Approximate discount
 
+            const thankYou = await getBuyerThankYou(order.authorId);
             sendOrderConfirmationEmail({
               to: customerEmail,
               customerName,
@@ -258,6 +259,7 @@ export async function POST(req: NextRequest) {
               discountCents: Math.max(0, discountCents),
               downloadExpiry: expiry,
               orderId: order.id,
+              ...thankYou,
             }).catch((e) => console.error("[webhook] Failed to send buyer email:", e));
 
             // 2. Per-author sale notifications (each author gets notified of their sale immediately)
@@ -389,9 +391,11 @@ export async function POST(req: NextRequest) {
             }));
 
             const totalCents = fullItems.reduce((sum, item) => sum + item.priceCents, 0);
+            const thankYou = await getBuyerThankYou(order.authorId);
             sendOrderConfirmationEmail({
               to: customerEmail, customerName, items: orderItemsForEmail, totalCents,
               discountCents: order.discountCents, downloadExpiry: expiry, orderId: order.id,
+              ...thankYou,
             }).catch((e) => console.error("[webhook] Failed to send bundle buyer email:", e));
 
             for (const fi of fullItems) {
@@ -469,6 +473,7 @@ export async function POST(req: NextRequest) {
               const accessUrl = `https://${course.author.slug}.${platformDomain}/courses/${course.slug}/learn?token=${enrollment.accessToken}`;
               const authorName = course.author.displayName || course.author.name || "Author";
 
+              const thankYou = await getBuyerThankYou(course.author.id);
               sendCourseAccessEmail({
                 to: customerEmail,
                 customerName,
@@ -477,6 +482,7 @@ export async function POST(req: NextRequest) {
                 accessUrl,
                 isPaid: true,
                 priceCents: order.totalCents,
+                ...thankYou,
               }).catch((e) => console.error("[webhook] Failed to send course access email:", e));
 
               // Save the buyer as a subscriber, same as a paid book purchase now does.

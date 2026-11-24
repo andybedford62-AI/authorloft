@@ -595,6 +595,56 @@ export interface OrderItemForEmail {
   isPrint?: boolean;
 }
 
+// ── Author thank-you note (shown to buyers in purchase emails) ────────────────
+
+export interface AuthorNote {
+  message: string;     // plain text, may contain {{firstName}}
+  authorName: string;
+}
+
+/**
+ * Loads the selling author's thank-you note + the address buyer replies should go to.
+ * Returns {} when the author has no note, so purchase emails are unchanged for them
+ * (including keeping replies on the platform address).
+ */
+export async function getBuyerThankYou(authorId: string): Promise<{ authorNote?: AuthorNote; replyTo?: string }> {
+  try {
+    const a = await prisma.author.findUnique({
+      where: { id: authorId },
+      select: { thankYouMessage: true, contactEmail: true, email: true, displayName: true, name: true },
+    });
+    const message = a?.thankYouMessage?.trim();
+    if (!a || !message) return {};
+    return {
+      authorNote: { message, authorName: a.displayName || a.name || "the author" },
+      replyTo: a.contactEmail?.trim() || a.email || undefined,
+    };
+  } catch (e) {
+    console.error("[mailer] getBuyerThankYou failed:", e);
+    return {}; // never block a purchase email over the optional note
+  }
+}
+
+function resolveAuthorNote(note: AuthorNote, customerName?: string | null): string {
+  const first = customerName?.trim().split(/\s+/)[0] || "there";
+  return note.message.replace(/\{\{\s*firstname\s*\}\}/gi, first);
+}
+
+function authorNoteHtml(note: AuthorNote | undefined, customerName?: string | null): string {
+  if (!note) return "";
+  const body = esc(resolveAuthorNote(note, customerName)).replace(/\r?\n/g, "<br/>");
+  return `
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:18px 20px;margin:0 0 24px;">
+        <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#92400e;">A note from ${esc(note.authorName)}</p>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">${body}</p>
+      </div>`;
+}
+
+function authorNoteText(note: AuthorNote | undefined, customerName?: string | null): string[] {
+  if (!note) return [];
+  return [`A note from ${note.authorName}:`, resolveAuthorNote(note, customerName), ``];
+}
+
 export async function sendOrderConfirmationEmail({
   to,
   customerName,
@@ -603,6 +653,9 @@ export async function sendOrderConfirmationEmail({
   discountCents,
   downloadExpiry,
   orderId,
+  authorNote,
+  replyTo,
+  isTest,
 }: {
   to: string;
   customerName?: string;
@@ -611,6 +664,10 @@ export async function sendOrderConfirmationEmail({
   discountCents: number;
   downloadExpiry: Date;
   orderId: string;
+  authorNote?: AuthorNote;
+  replyTo?: string;
+  /** Author preview of their thank-you note: prefixes the subject, nothing else changes. */
+  isTest?: boolean;
 }) {
   const platformDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
   const expiryStr = downloadExpiry.toLocaleDateString("en-US", {
@@ -645,11 +702,13 @@ export async function sendOrderConfirmationEmail({
 
   return sendMail({
     to,
-    subject: `Order confirmation #${orderId.slice(-8).toUpperCase()} — AuthorLoft`,
+    ...(replyTo ? { replyTo } : {}),
+    subject: `${isTest ? "[Test] " : ""}Order confirmation #${orderId.slice(-8).toUpperCase()} — AuthorLoft`,
     text: [
       greeting,
       `Thank you for your purchase! Your order has been confirmed.`,
       ``,
+      ...authorNoteText(authorNote, customerName),
       `Order #${orderId}`,
       `Date: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
       ``,
@@ -666,6 +725,7 @@ export async function sendOrderConfirmationEmail({
     html: wrapHtml("Order Confirmed", `
       <p style="margin:0 0 16px;">${greeting}</p>
       <p style="margin:0 0 24px;">Thank you for your purchase! Your download links are ready below.</p>
+      ${authorNoteHtml(authorNote, customerName)}
 
       <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;margin:0 0 24px;">
         <table width="100%" cellpadding="0" cellspacing="0">
@@ -722,7 +782,7 @@ export async function sendOrderConfirmationEmail({
       </table>
 
       <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
-        Questions? Reply to this email — we're here to help.
+        ${replyTo && authorNote ? `Questions? Reply to this email to reach ${esc(authorNote.authorName)}.` : "Questions? Reply to this email — we're here to help."}
       </p>
     `),
   });
@@ -778,6 +838,8 @@ export async function sendCourseAccessEmail({
   accessUrl,
   isPaid,
   priceCents,
+  authorNote,
+  replyTo,
 }: {
   to: string;
   customerName?: string;
@@ -786,6 +848,9 @@ export async function sendCourseAccessEmail({
   accessUrl: string;
   isPaid: boolean;
   priceCents?: number;
+  /** Paid purchases only — the caller must not pass this for free enrollments. */
+  authorNote?: AuthorNote;
+  replyTo?: string;
 }) {
   const greeting = customerName ? `Hi ${esc(customerName)},` : "Hi there,";
   const priceStr = isPaid && priceCents ? `$${(priceCents / 100).toFixed(2)}` : "Free";
@@ -793,12 +858,14 @@ export async function sendCourseAccessEmail({
 
   return sendMail({
     to,
+    ...(replyTo ? { replyTo } : {}),
     subject: `Your course access: ${courseTitle} — AuthorLoft`,
     text: [
       greeting,
       ``,
       `${enrollType}! You now have access to "${courseTitle}" by ${authorName}.`,
       ``,
+      ...authorNoteText(authorNote, customerName),
       `Access your course here:`,
       accessUrl,
       ``,
@@ -817,6 +884,7 @@ export async function sendCourseAccessEmail({
         <p style="margin:0;font-size:14px;color:#6b7280;">by ${esc(authorName)}</p>
         <p style="margin:8px 0 0;font-size:13px;color:#0369a1;font-weight:600;">${priceStr}</p>
       </div>
+      ${authorNoteHtml(authorNote, customerName)}
 
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
@@ -834,7 +902,7 @@ export async function sendCourseAccessEmail({
       </p>
 
       <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
-        Questions? Reply to this email — we're here to help.
+        ${replyTo && authorNote ? `Questions? Reply to this email to reach ${esc(authorNote.authorName)}.` : "Questions? Reply to this email — we're here to help."}
       </p>
     `),
   });

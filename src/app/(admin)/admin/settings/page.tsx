@@ -11,6 +11,7 @@ import { HelpTip } from "@/components/admin/help-tip";
 import { slugify } from "@/lib/utils";
 import { StripeCountrySelect } from "@/components/admin/stripe-country-select";
 import { ShippingSettings } from "@/components/admin/shipping-settings";
+import { BuyerThankYouSettings } from "@/components/admin/buyer-thank-you-settings";
 
 const PLATFORM_DOMAIN = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "authorloft.com";
 
@@ -1700,7 +1701,12 @@ export default function SettingsPage() {
 
       {activeTab === "appearance" && <AdminThemeSection />}
 
-      {activeTab === "communications" && <EmailPreferencesSection />}
+      {activeTab === "communications" && (
+        <div className="space-y-6">
+          <BuyerThankYouSettings />
+          <EmailPreferencesSection />
+        </div>
+      )}
 
       {activeTab === "danger" && (
         <section className="bg-white rounded-xl border border-red-100 p-6">

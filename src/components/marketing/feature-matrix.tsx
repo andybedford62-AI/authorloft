@@ -109,6 +109,14 @@ function buildFeatureRows(plans: FeatureMatrixPlanData[], aiCap: number): Featur
           },
         },
         {
+          name: "Buyer thank-you note (your own message in the purchase confirmation email; replies go to you)",
+          tiers: {
+            FREE: free?.salesEnabled ? "✓" : "—",
+            STANDARD: standard?.salesEnabled ? "✓" : "—",
+            PREMIUM: premium?.salesEnabled ? "✓" : "—",
+          },
+        },
+        {
           name: "AuthorLoft platform fee on direct sales (Stripe's own processing fee still applies)",
           tiers: {
             FREE: free?.salesEnabled ? "0%" : "—",
